@@ -25,6 +25,7 @@ import pyspiel
 
 
 _FULLY_OPTIONAL_PYTHON_GAMES = frozenset([
+    "python_pokerkit_wrapper",
     "python_pokerkit_wrapper_acpc_style"
 ])
 # Specify game names in alphabetical order, to make the test easier to read.
@@ -388,12 +389,13 @@ class PyspielTest(parameterized.TestCase):
           + "firstPlayer=2 1 1 1,numBoardCards=0 3 1 1,numHoleCards=2,"
           + "numPlayers=2,numRanks=13,numRounds=4,numSuits=4,stack=20000 20000"
           + "))"),
-      (
-          "python_pokerkit_wrapper_acpc_style",
-          "python_pokerkit_wrapper_acpc_style(variant=NoLimitTexasHoldem,"
-          + "num_players=2,blinds=5 10,stack_sizes=1000 1000,"
-          + "bring_in=5,small_bet=10,big_bet=20)",
-      ),
+      ("python_pokerkit_wrapper", "python_pokerkit_wrapper()"),
+      ("python_pokerkit_wrapper",
+       "python_pokerkit_wrapper(variant=FixedLimitSevenCardStud)"),
+      ("python_pokerkit_wrapper",
+       "python_pokerkit_wrapper(variant=PotLimitOmahaHoldem)"),
+      ("python_pokerkit_wrapper_acpc_style",
+       "python_pokerkit_wrapper_acpc_style(),"),
       ("kuhn_poker", "kuhn_poker(players=3)"),
       ("tic_tac_toe", "tic_tac_toe"),
       ("breakthrough", "breakthrough(rows=6,columns=6)"))

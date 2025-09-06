@@ -57,6 +57,20 @@ FOLD_AND_CHECK_OR_CALL_ACTIONS = [ACTION_FOLD, ACTION_CHECK_OR_CALL]
 class PokerkitWrapperTest(absltest.TestCase):
   """Test the OpenSpiel game wrapper for Pokerkit."""
 
+  # TODO: b/437724266 - add additional tests for the following:
+  # - sidepot handling in general
+  # - sidepots where the next bet will be exactly 1 chip (if possible?)
+  # - all-ins with exactly 1 chip left in stack
+  # - all-ins in simple multiway situations with varying stack sizes
+  # - all-ins in fixed-limit games with sidepots
+  # - shortdeck ("6+") poker card dealing
+  # - razz poker hand evaluation working as expected / differing from seven card
+  #   stud
+  # - seven card stud gameplay actually different from texas holdem, including
+  #   hand evaluation
+  # - hand mucking / displaying unmucked hands that reach showdown properly
+  # - censoring private hole cards in the observer strings
+
   # --- Lightweight testing to verify that the 'usage' directories are at least
   # _somewhat_ correct. (Not intended to be exhaustive!) ---
 
@@ -78,6 +92,159 @@ class PokerkitWrapperTest(absltest.TestCase):
     self.assertIn(pokerkit.FixedLimitTexasHoldem.__name__, variants)
     self.assertIn(pokerkit.FixedLimitSevenCardStud.__name__, variants)
     self.assertNotIn(pokerkit.NoLimitTexasHoldem.__name__, variants)
+
+  # --- More intensive / 'typical' testing ---
+  def test_game_from_cc(self):
+    """Runs our standard game tests, checking API consistency."""
+    game = pyspiel.load_game("python_pokerkit_wrapper")
+    pyspiel.random_sim_test(game, num_sims=10, serialize=False, verbose=True)
+
+  def test_playthrough_robustness(self):
+    """Runs full random playthroughs for various games to ensure stability."""
+    scenarios = [
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 3,
+            "blinds": "5 10",
+            "stack_sizes": "100 200 300",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 2,
+            "blinds": "50 100",
+            "stack_sizes": "20000 20000",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 2,
+            "blinds": "1 2",
+            "stack_sizes": "20 100",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 4,
+            "blinds": "50 100",
+            "stack_sizes": "20 20 100 400",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 2,
+            "blinds": "50 100",  # Both players forced all-in from blinds
+            "stack_sizes": "20 20",
+        },
+        {
+            "variant": "FixedLimitTexasHoldem",
+            "num_players": 5,
+            "blinds": "50 100",
+            "stack_sizes": "400 100 1000 300 400",
+        },
+        {
+            "variant": "FixedLimitTexasHoldem",
+            "num_players": 4,
+            "blinds": "50 100",
+            "stack_sizes": "20 20 100 400",
+        },
+        {
+            "variant": "FixedLimitTexasHoldem",
+            "num_players": 2,
+            "blinds": "50 100",
+            "stack_sizes": "20 20",
+        },
+        # Encourage formation of side-pots
+        {
+            "variant": "FixedLimitTexasHoldem",
+            "num_players": 4,
+            "blinds": "5 10",
+            "stack_sizes": "200 200 30 80",
+        },
+        # --- Additional games not supported in universal_poker ---
+        {
+            "variant": "FixedLimitRazz",
+            "num_players": 4,
+            "stack_sizes": "200 200 183 190",
+            "bring_in": 5,
+            "small_bet": 10,
+            "big_bet": 20,
+        },
+        {
+            "variant": "FixedLimitRazz",
+            "num_players": 4,
+            "stack_sizes": "200 200 183 190",
+            "bring_in": 500,
+            "small_bet": 1000,
+            "big_bet": 2000,
+        },
+        {
+            "variant": "FixedLimitSevenCardStud",
+            "num_players": 4,
+            "stack_sizes": "200 200 189 164",
+            "bring_in": 5,
+            "small_bet": 10,
+            "big_bet": 20,
+        },
+        {
+            "variant": "FixedLimitSevenCardStud",
+            "num_players": 4,
+            "stack_sizes": "200 600 49 54",
+            "bring_in": 50,
+            "small_bet": 100,
+            "big_bet": 200,
+        },
+        {
+            "variant": "PotLimitOmahaHoldem",
+            "num_players": 4,
+            "blinds": "5 10",
+            "stack_sizes": "198 189 200 200",
+        },
+        {
+            "variant": "PotLimitOmahaHoldem",
+            "num_players": 4,
+            "blinds": "500 1000",
+            "stack_sizes": "2098 189 600 200",
+        },
+        {
+            "variant": "NoLimitShortDeckHoldem",
+            "num_players": 3,
+            "blinds": "5 10",
+            "stack_sizes": "200 200 200",
+        },
+        {
+            "variant": "NoLimitShortDeckHoldem",
+            "num_players": 3,
+            "blinds": "190 380",
+            "stack_sizes": "200 200 200",
+        },
+        # --- Bet size edge cases ---
+        # Encourage situations where player are likely to be betting 1 chip
+        # to verify that we gracefully handle any edge cases.
+        # TODO: b/437724266 - split out into separate tests just for this edge
+        # case. Also run multiple times (fail on any failyres) and/or
+        # hand-choose bet sizes to force these edge cases.
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 9,
+            "blinds": "1 2",
+            "stack_sizes": "100 100 1 2 1 3 3 3 3",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 9,
+            "blinds": "1 2",
+            "stack_sizes": "3 3 3 3 3 3 3 3 3",
+        },
+    ]
+
+    for params in scenarios:
+      with self.subTest(variant=params["variant"]):
+        game = pyspiel.load_game("python_pokerkit_wrapper", params)
+        state = game.new_initial_state()
+        while not state.is_terminal():
+          if state.is_chance_node():
+            action = random.choice([o for o, p in state.chance_outcomes()])
+          else:
+            action = random.choice(state.legal_actions())
+          state.apply_action(action)
+        self.assertAlmostEqual(sum(state.returns()), 0.0)
 
   def test_action_space_equals_max_stack_size(self):
     obj: PokerkitWrapper = PokerkitWrapper(
@@ -377,6 +544,63 @@ class PokerkitWrapperTest(absltest.TestCase):
       if a not in FOLD_AND_CHECK_OR_CALL_ACTIONS:
         self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to(a))
 
+  def test_single_chip_shove_is_mapped_to_next_nonreserved_action(self):
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 3,
+        "blinds": "10 20",
+        "stack_sizes": "21 21 21",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper", params)
+    state = game.new_initial_state()
+    wrapped_state: pokerkit.State = state._wrapped_state
+    while state.is_chance_node():
+      state.apply_action(random.choice([o for o, _ in state.chance_outcomes()]))
+    state.apply_action(ACTION_CHECK_OR_CALL)
+    state.apply_action(ACTION_CHECK_OR_CALL)
+    state.apply_action(ACTION_CHECK_OR_CALL)
+    while state.is_chance_node():
+      state.apply_action(random.choice([o for o, _ in state.chance_outcomes()]))
+    self.assertEqual(wrapped_state.stacks, [1, 1, 1])
+    # P0 can either check or shove for 1 chip, hitting an edge case that needs
+    # to be handled correctly (mapping 1 chip shove to action 2).
+    # (P0 cannot fold since pokerkit doesn't allow folding when not actually
+    # facing an opponent's bet.)
+    self.assertEqual(
+        state._legal_actions(state._wrapped_state.actor_index),
+        [ACTION_CHECK_OR_CALL, 2],
+    )
+    self.assertIn("[ALL-IN EDGECASE]", state._action_to_string(0, 2))
+    self.assertIn("Bet/Raise to 1", state._action_to_string(0, 2))
+    state.apply_action(2)
+
+    # Verify that the 2 actually mapped to a bet of 1 chip / that the next
+    # players get entirely normal fold/check_or_call actions.
+    self.assertEqual(wrapped_state.stacks, [0, 1, 1])
+    self.assertEqual(
+        state._legal_actions(state._wrapped_state.actor_index),
+        [ACTION_FOLD, ACTION_CHECK_OR_CALL],
+    )
+    self.assertEqual(
+        state._action_to_string(
+            wrapped_state.actor_index, ACTION_CHECK_OR_CALL
+        ),
+        "Call(1)",
+    )
+    state.apply_action(ACTION_FOLD)
+
+    self.assertEqual(wrapped_state.stacks, [0, 1, 1])
+    self.assertEqual(
+        state._legal_actions(state._wrapped_state.actor_index),
+        [ACTION_FOLD, ACTION_CHECK_OR_CALL],
+    )
+    self.assertEqual(
+        state._action_to_string(
+            wrapped_state.actor_index, ACTION_CHECK_OR_CALL
+        ),
+        "Call(1)",
+    )
+
 
 class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
   """Test the OpenSpiel game wrapper for Pokerkit."""
@@ -491,7 +715,7 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
     state.apply_action(game.card_to_int[Card(DEUCE, CLUB)])
 
     state.apply_action(60)  # P2 raises
-    state.apply_action(ACTION_CHECK_OR_CALL)  # P0 folds
+    state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls
 
     # P1 can call (0), fold (1), or reraise
     expected_actions = [0, 1] + list(range(100, 2001))

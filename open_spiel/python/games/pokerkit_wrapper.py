@@ -13,7 +13,20 @@
 # limitations under the License.
 
 # Lint as python3
-"""Pokerkit wrapper to provide support for multiple poker game variants."""
+r"""Pokerkit wrapper to provide support for multiple poker game variants.
+
+The base class supports:
+- Texas Hold'em
+- Limit Texas Hold'em
+- Seven Card Stud
+- Razz
+- Pot Limit Omaha (PLO)
+
+We also provide a subclass that more closely mimics the UniversalPoker / ACPC
+implementation in the C++ codebase, but only supports:
+- Texas Hold'em
+- Limit Texas Hold'em
+"""
 
 import copy
 import dataclasses
@@ -21,6 +34,7 @@ import decimal
 import inspect
 import math
 
+from absl import logging
 import numpy as np
 import pokerkit
 
@@ -76,12 +90,10 @@ _STANDARD_DECK_VARIANTS = [
     if v.__name__ not in _SHORT_DECK_VARIANTS
 ]
 
-# pylint: disable=unused-private-name
 _VARIANTS_SUPPORTING_ACPC_STYLE = [
     pokerkit.NoLimitTexasHoldem.__name__,
     pokerkit.FixedLimitTexasHoldem.__name__,
 ]
-# pylint: enable=unused-private-name
 
 
 def _get_variants_supporting_param(param_name: str) -> list[str]:
@@ -127,11 +139,14 @@ _DEFAULT_PARAMS = {
     "num_streets": 4,
     # Relevant for games with public hole cards. Will be ignored by all
     # other games (including the default NoLimitTexasHoldem).
-    "bring_in": 50,
+    # NOTE: Must be strictly < small_bet.
+    "bring_in": 5,
     # Relevant for various FixedLimit ("limit") games. Will be ignored by all
-    # other games (including the default NoLimitTexasHoldem).
-    "small_bet": 25,
-    "big_bet": 100,
+    # other games (including the default NoLimitTexasHoldem). Must be provided
+    # if bring_in is provided.
+    # NOTE: Must be strictly < big_bet.
+    "small_bet": 10,
+    "big_bet": 20,
     # NOTE: not yet officially supported. Added primarily for future-proofing.
     "antes": "0 0",
     # Stack sizes for each player. Should be a string containing num_players #
@@ -189,9 +204,8 @@ _GAME_TYPE_ACPC_STYLE = pyspiel.GameType(
     provides_information_state_tensor=False,
     provides_observation_tensor=True,
     provides_observation_string=True,
-    # It might be possible this should be True, unfortunately we're not actually
-    # sure. (The original universal_poker.cc file we based most of this on
-    # doesn't appear to set this at all!)
+    # TODO: b/437724266 - determine what this value does and whether it should
+    # be True or False / what functionality it's actually controlling.
     provides_factored_observation_string=False,
     parameter_specification=_DEFAULT_PARAMS,
 )
@@ -200,18 +214,23 @@ _GAME_TYPE_ACPC_STYLE = pyspiel.GameType(
 # NOTE: FOLD and CHECK_OR_CALL deliberately chosen to match kFold and kCall in
 # universal_poker so that it's easier to port code over from it.
 ACTION_FOLD = 0
-# TODO: b/437724266 - this inherently limits our ability to ever raise / perform
-# a completion bet to a size of 1 chip.
 ACTION_CHECK_OR_CALL = 1
 FOLD_AND_CHECK_OR_CALL_ACTIONS = [ACTION_FOLD, ACTION_CHECK_OR_CALL]
 
-# NOTE: any other play actions >1 will be interpreted as part of a raise,
-# reraise, or completion bet. Generally this follows typical poker assumptions
-# i.e. "raise to X" = asserting a total contribution of X chips on the current
-# street. However, we do provide an alternative interpretations of these actions
-# via the PokerkitWrapperAcpcStyle subclass below in order to mimic the actions
-# used in UniversalPoker / ACPC, which instead treats it as a "total
-# contribution of X chips across **all** streets" (i.e. across the entire hand).
+# NOTE: with one exception (see below), all player actions with value >= 2 will
+# be interpreted as part of a raise, reraise, or completion bet. Generally this
+# follows typical poker assumptions, where "raise to X" declares a total
+# contribution on the *current street* of X chips. (This differs from an
+# ACPC-"style" implementation / universal_poker's approach, which isntead treats
+# it as declaring a total contribution of X chips across **all** streets", i.e.
+# the entire hand).
+
+# NOTE: As a result of using action `1` to handle ACTION_CHECK_OR_CALL, we have
+# to handle bet sizes of 1 chip via special-case 'mapping' them to another
+# action value. This can can happen in exactly one case: when a player has a
+# single chip left in their stack and wants to shove all-in. (We prevent bet
+# sizes < 2 in all other situations by ensuring that we only ever provide
+# pokerkit min_bet and small_bet parameters of size >= 2.)
 
 
 def _parse_values(param_str) -> list[int | decimal.Decimal]:
@@ -242,11 +261,13 @@ class PokerkitWrapper(pyspiel.Game):
 
     if not params:
       params = {}
-    # In addition to simply filling in for None or {} params, this also makes it
-    # easier to set only a subset of the arguments for testing purposes.
-    # NOTE: if this ends up too bug-prone, we may later remove this behavior in
-    # the future in favor of some helper or factory methods
+    # Replicates pyspiel.load_game()'s behavior of using the default's value for
+    # each param missing from the provided params.
     self.params = _DEFAULT_PARAMS | params
+    # Prevents accidental usage params instead of self.params below.
+    # NOTE: Only removes the reference from *local scope* here; for details see:
+    # https://docs.python.org/3/tutorial/classes.html#python-scopes-and-namespaces
+    del params
 
     variant = self.params.get("variant")
     if variant not in _SUPPORTED_VARIANT_MAP:
@@ -278,41 +299,75 @@ class PokerkitWrapper(pyspiel.Game):
           f" min_players ({game_type.min_num_players})."
       )
 
+    # NOTE: Will not include any params set by a user which happen to match the
+    # default value. Meaning even params not present in this set might have been
+    # set explicitly by a user; we cannot assume it came from a default value.
+    definitely_overriden = set([
+        param
+        for param, v in _DEFAULT_PARAMS.items()
+        if v != self.params.get(param)
+    ])
+
+    # --- Blinds, Bet Sizes, and Antes or Bring-ins ---
+    self.blinds = _parse_values(self.params["blinds"])
+    if (
+        self.blinds is None
+        or len(self.blinds) != 2
+        or self.blinds[0] > self.blinds[1]
+    ):
+      raise ValueError(
+          "blinds must parse to a list of 2 values [Small Blind, Big Blind],"
+          " where SB >= 1, BB >= 2, and SB <= BB. But instead got: ",
+          self.params["blinds"],
+          " which parsed to: ",
+          self.blinds,
+      )
+    if any(x <= 0 for x in self.blinds):
+      raise ValueError("Blinds must all be >= 1: ", self.blinds)
+    # Ensure that users do not configure games with blinds low enough that it
+    # will matter that we can't support bet sizes <= 1.
+    if not max(self.blinds) >= 2:
+      raise ValueError("Big Blind must be at least 2: ", self.blinds)
+
     assert self.params["small_bet"] < self.params["big_bet"]
     if variant in _VARIANT_PARAM_USAGE["bring_in"]:
       assert self.params["bring_in"] < self.params["small_bet"]
 
-    for param in ["bring_in", "small_bet", "big_bet"]:
-      if variant in _VARIANT_PARAM_USAGE[param]:
-        # TODO: b/437724266 - Consider whether we should allow this to use
-        # default values brought into self.params, rather than requiring the
-        # user to _explicitly_ set these in all circumstances. (See e.g. how we
-        # handle min_bet above by checking against the original unmodified input
-        # params.)
-        if param not in self.params:
-          raise ValueError(
-              f"Parameter {param} is required for variant {variant}"
+    # This is such a common + confusing mistake that it's helpful to at least
+    # warn about it, even if we can't actually throw an error (without losing
+    # the ability to manually choose these default values in certain cases).
+    for param1, param2 in [
+        ("bring_in", "small_bet"),
+        ("bring_in", "big_bet"),
+        ("small_bet", "big_bet"),
+        ("big_bet", "small_bet"),
+    ]:
+      if (
+          param1 in definitely_overriden
+          and param2 not in definitely_overriden
+          and (
+              variant in _VARIANT_PARAM_USAGE[param1]
+              or variant in _VARIANT_PARAM_USAGE[param2]
           )
-        if self.params.get(param) <= 1:
-          raise ValueError(
-              f"Parameter {param} must be >= 2, but is {self.params.get(param)}"
-          )
-      else:
-        del self.params[param]
+      ):
+        logging.warning(
+            "In the following pair of tightly-coupled params, the first param"
+            " differs from its default value but the second does not: %s vs"
+            " %s. (NOTE: This may be intended, and is technically allowed, so"
+            " we are not raising an error. But in practice, it's very likely"
+            " that you set the params here incorrectly!).",
+            param1,
+            param2,
+        )
 
-    self.stack_sizes = _parse_values(self.params["stack_sizes"])
-    if self.stack_sizes is None or len(self.stack_sizes) != num_players:
+    stack_sizes = _parse_values(self.params["stack_sizes"])
+    if stack_sizes is None or len(stack_sizes) != num_players:
       raise ValueError(
           "stack_sizes must be a space-separated list of "
-          f" {num_players} values: ({self.params['stack_sizes']})"
+          f" {num_players} values. Was provided: {self.params['stack_sizes']},"
+          f" which parsed to: {stack_sizes}"
       )
-
-    self.blinds = _parse_values(self.params["blinds"])
-    if self.blinds is None or len(self.blinds) != 2:
-      raise ValueError(
-          "blinds must be a space-separated list [Small Blind, Big Blind]): "
-          f"({self.params['blinds']})"
-      )
+    self.stack_sizes = stack_sizes
 
     # --- Card and Deck Information ---
     self._deck = pokerkit.Deck.STANDARD
@@ -320,6 +375,7 @@ class PokerkitWrapper(pyspiel.Game):
       self._deck = pokerkit.Deck.SHORT_DECK_HOLDEM
     else:
       assert variant in _STANDARD_DECK_VARIANTS
+
     self.deck_size = len(self._deck)
     self.card_to_int = {card: i for i, card in enumerate(self._deck)}
     self.int_to_card = {i: card for i, card in enumerate(self._deck)}
@@ -412,6 +468,17 @@ class PokerkitWrapper(pyspiel.Game):
       raise ValueError(
           f"Player {player} is out of range [0, {self.num_players()})"
       )
+
+  # Not yet actually supported. Providing this 'return hardcoded value'
+  # placeholder implementation instead of throwing an error to avoid crashing
+  # anything in OpenSpiel that doesn't properly respect the
+  # provides_information_state_tensor=False setting above.
+  def information_state_tensor_size(self) -> int:
+    logging.warning(
+        "information_state_tensor_size() is not yet supported for"
+        " PokerkitWrapper. Returning a default value of 1 for now."
+    )
+    return 1
 
   def _wrapped_game_template_factory(self):
     """Creates a default pokerkit 'template' that can easily construct states.
@@ -588,44 +655,123 @@ class PokerkitWrapperState(pyspiel.State):
       return self._wrapped_state.actor_index
 
   def _legal_actions(self, player):
-    self.get_game().raise_error_if_player_out_of_range(player)
+    wrapped_state: pokerkit.State = self._wrapped_state
+    game: PokerkitWrapper = self.get_game()
+    game.raise_error_if_player_out_of_range(player)
 
     if self.is_terminal():
       return []
+    if not (
+        wrapped_state.can_check_or_call()
+        or wrapped_state.can_fold()
+        or wrapped_state.can_complete_bet_or_raise_to()
+    ):
+      # currently in a chance node, so players can't take any actions.
+      return []
+
+    # player is not the active player, and so can't take any actions.
+    if player != wrapped_state.actor_index:
+      return []
+
     actions = []
 
     # Handling player nodes first since they're the most straightforward.
-    if self._wrapped_state.can_fold():
+    if wrapped_state.can_fold():
       actions.append(ACTION_FOLD)
-    if self._wrapped_state.can_check_or_call():
+    if wrapped_state.can_check_or_call():
       actions.append(ACTION_CHECK_OR_CALL)
-    if self._wrapped_state.can_complete_bet_or_raise_to():
-      actions = actions + list(
-          range(
-              max(
-                  self._wrapped_state.min_completion_betting_or_raising_to_amount,
-                  # bet size 0 is equivalent to check/call, and bet size 1 is
-                  # disallowed due to us needing that number for FOLD
-                  2,
-              ),
-              self._wrapped_state.max_completion_betting_or_raising_to_amount
-              + 1,
-          )
-      )
-    if (
-        self._wrapped_state.can_check_or_call()
-        or self._wrapped_state.can_fold()
-        or self._wrapped_state.can_complete_bet_or_raise_to()
-    ):
-      return sorted(actions)
+    if wrapped_state.can_complete_bet_or_raise_to():
+      valid_bet_sizes = []
+      betting_structure = wrapped_state.betting_structure
+      min_bet = wrapped_state.min_completion_betting_or_raising_to_amount
+      max_bet = wrapped_state.max_completion_betting_or_raising_to_amount
+      assert min_bet is not None and max_bet is not None
 
-    # Otherwise we're in a chance node and the actions must be dealable cards!
-    # TODO: b/437724266 - extract out this to helper function for here +
-    # chance_outcomes to share
-    return sorted(
-        self.get_game().card_to_int[c]
-        for c in self._wrapped_state.get_dealable_cards()
-    )
+      if betting_structure == pokerkit.state.BettingStructure.FIXED_LIMIT:
+        # min and max completion, bet, and raise amounts are identical as per:
+        # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.BettingStructure.FIXED_LIMIT
+        assert min_bet == max_bet
+        fixed_size: int | None = min_bet
+        if (
+            fixed_size is not None
+            and fixed_size not in FOLD_AND_CHECK_OR_CALL_ACTIONS
+        ):
+          valid_bet_sizes.append(fixed_size)
+      elif (
+          betting_structure == pokerkit.state.BettingStructure.NO_LIMIT
+          or betting_structure == pokerkit.state.BettingStructure.POT_LIMIT
+      ):
+        assert min_bet <= max_bet
+        valid_bet_sizes.extend([
+            amount
+            for amount in range(
+                min_bet,
+                max_bet + 1,
+            )
+            if amount not in FOLD_AND_CHECK_OR_CALL_ACTIONS
+        ])
+      else:
+        raise RuntimeError(
+            f"Unsupported pokerkit betting structure: {betting_structure}"
+        )
+      assert all(
+          amount not in FOLD_AND_CHECK_OR_CALL_ACTIONS
+          for amount in valid_bet_sizes
+      )
+
+      if len(valid_bet_sizes) == 1:
+        only_valid_bet = valid_bet_sizes[0]
+        assert only_valid_bet == min_bet and only_valid_bet == max_bet
+        current_street: pokerkit.Street = wrapped_state.streets[
+            wrapped_state.street_index
+        ]
+        # "Global minimum" size for the current street, regardless of player.
+        # TODO: b/437724266 - double check this actually is independent from
+        # player!
+        street_minimum_size = (
+            current_street.min_completion_betting_or_raising_amount
+        )
+        if only_valid_bet < street_minimum_size:
+          # In 2-person games, the only way for this to happen is if the player
+          # doesn't actually have enough chips left in their stack and so is
+          # shoving. So we can trivially verify that this isn't happening
+          # incorrectly.
+          if game.num_players() == 2:
+            assert only_valid_bet == wrapped_state.stacks[player]
+          # In 3+ person games, this is significantly more complicated to verify
+          # since side-pots can significantly complicate the math, especially
+          # in fixed-limit games. Any asserts we could write here would be
+          # overly bug-prone + require significant testing anyways.
+          pass
+
+      # Handle edge case in both no limit and fixed limit where the player has
+      # so few chips that a legal bet would have conflicted with one of our
+      # reserved actions, and so got filtered out above.
+      if not valid_bet_sizes and wrapped_state.stacks[player] > 0:
+        # If the stack size is non-zero, then we *should* be in a situation
+        # where we were going to try to bet 1 chip, which got filtered out due
+        # to it being in the reserved actions set. (Anything else would mean
+        # there's a bug in our code above.)
+        assert wrapped_state.stacks[player] == 1
+        assert min_bet == 1 and max_bet == 1
+        # This decision to map to 2 is arbitrary! We could alternatively have
+        # mapped to any other (reasonably small) positive integer not in the
+        # reserved actions set.
+        logging.warning(
+            "Mapping shove size 1 chip to action 2 in legal_actions to avoid"
+            " conflict with 'reserved' actions.",
+        )
+        valid_bet_sizes.append(2)
+
+      # TODO: b/437724266 - Extract this entire giant if-statement block out
+      # to a helper function to make this overall more readable. (In particular,
+      # having the .extend() for the entire can_complete_bet_or_raise_to()
+      # handling at the very bottom down here is difficult to read + bug
+      # prone).
+      assert set(valid_bet_sizes).isdisjoint(FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      actions.extend(valid_bet_sizes)
+
+    return sorted(actions)
 
   def chance_outcomes(self):
     """Returns the possible chance outcomes and their probabilities."""
@@ -638,51 +784,118 @@ class PokerkitWrapperState(pyspiel.State):
     return [(o, p) for o in outcomes]
 
   def _apply_action(self, action):
+    wrapped_state: pokerkit.State = self._wrapped_state
     # Handling player actions first since it's the more striaghtforward case.
     if not self.is_chance_node():
+      if action not in self.legal_actions():
+        raise ValueError(
+            f"Attempted to apply illegal action {action} to player"
+            f" {self.current_player()}. Legal actions were"
+            f" {self.legal_actions()}"
+        )
+
       if action == ACTION_FOLD:
-        self._wrapped_state.fold()
+        wrapped_state.fold()
       elif action == ACTION_CHECK_OR_CALL:
-        self._wrapped_state.check_or_call()
+        wrapped_state.check_or_call()
       else:
-        # Warning: this means that it's impossible to compelete bets or raise to
-        # sizes that equal one of the actions above!
-        self._wrapped_state.complete_bet_or_raise_to(action)
+        if wrapped_state.can_complete_bet_or_raise_to(action):
+          wrapped_state.complete_bet_or_raise_to(action)
+        else:
+          # Should be an edge case when trying to shove with exactly 1 chip,
+          # where we remapped the shove to action 2 to avoid conflicting with
+          # reserved actions.
+          assert action == 2
+          assert wrapped_state.stacks[wrapped_state.actor_index] == 1
+          assert wrapped_state.can_complete_bet_or_raise_to(1)
+          assert wrapped_state.stacks[wrapped_state.actor_index] == 1
+          assert "Bet/Raise to 1 [ALL-IN EDGECASE]" in self.action_to_string(
+              wrapped_state.actor_index, action
+          )
+          wrapped_state.complete_bet_or_raise_to(1)
       return
 
     # else it's a chance node (which is a bit more complicated):
 
     card_from_action = self.get_game().int_to_card[action]
-    if card_from_action not in self._wrapped_state.get_dealable_cards():
+    if card_from_action not in wrapped_state.get_dealable_cards():
       raise ValueError(
           f"Chance action maps to non-dealable card {card_from_action}: "
-          f"{self._wrapped_state.can_deal_hole()} "
-          f"{self._wrapped_state.can_deal_board()}"
+          f"{wrapped_state.can_deal_hole()} "
+          f"{wrapped_state.can_deal_board()}"
       )
-    if self._wrapped_state.can_deal_hole():
-      if self._wrapped_state.can_deal_board():
+    if wrapped_state.can_deal_hole():
+      if wrapped_state.can_deal_board():
         raise ValueError(
             "Chance node with both dealable hole and board cards: "
-            f"{self._wrapped_state.can_deal_hole()} "
-            f"{self._wrapped_state.can_deal_board()}"
+            f"{wrapped_state.can_deal_hole()} "
+            f"{wrapped_state.can_deal_board()}"
         )
-      self._wrapped_state.deal_hole(card_from_action)
-    elif self._wrapped_state.can_deal_board():
-      self._wrapped_state.deal_board(card_from_action)
+      wrapped_state.deal_hole(card_from_action)
+    elif wrapped_state.can_deal_board():
+      wrapped_state.deal_board(card_from_action)
     else:
       raise ValueError(
           "Chance node with no dealable cards: "
-          f"{self._wrapped_state.can_deal_hole()} "
-          f"{self._wrapped_state.can_deal_board()}"
+          f"{wrapped_state.can_deal_hole()} "
+          f"{wrapped_state.can_deal_board()}"
       )
 
   def _action_to_string(self, player, action):
+    wrapped_state: pokerkit.State = self._wrapped_state
+    if self.is_chance_node():
+      assert player < 0
+      if wrapped_state.can_deal_hole():
+        return f"Deal Hole Card: {self.get_game().int_to_card[action]}"
+      elif wrapped_state.can_deal_board():
+        return f"Deal Board Card: {self.get_game().int_to_card[action]}"
+      else:
+        raise ValueError(
+            f"Chance node with action {action} but cannot deal cards. "
+            f"can_deal_hole: {wrapped_state.can_deal_hole()} "
+            f"can_deal_board: {wrapped_state.can_deal_board()}"
+        )
+    if player != wrapped_state.actor_index:
+      raise ValueError(
+          "Attempted to call _action_to_string() for a not-currently-active"
+          "player (who shouldn't have any actions available)."
+      )
+    assert player == wrapped_state.actor_index
     if action == ACTION_FOLD:
-      return "Fold"
-    if action == ACTION_CHECK_OR_CALL:
-      amount = self._wrapped_state.checking_or_calling_amount
-      return "Check" if amount == 0 else f"Call({amount})"
-    return f"Bet/Raise to {action}"
+      return f"Player {player}: Fold"
+    elif action == ACTION_CHECK_OR_CALL:
+      amount = wrapped_state.checking_or_calling_amount
+      return f"Player {player}: Check" if amount == 0 else f"Call({amount})"
+    elif action >= 0 and action not in FOLD_AND_CHECK_OR_CALL_ACTIONS:
+      if wrapped_state.stacks[player] != 1:
+        return f"Player {player}: Bet/Raise to {action}"
+
+      # In this very specific edge case, we likely mapped a shove size of 1 chip
+      # to action 2 to avoid conflicting with reserved actions. For more details
+      # see the comment in _legal_actions().
+      assert action == 2
+      assert wrapped_state.min_completion_betting_or_raising_to_amount == 1
+      assert wrapped_state.max_completion_betting_or_raising_to_amount == 1
+      # As per the docs:
+      # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State.payoffs
+      # "Negated versions of these values can be thought of as contributions
+      # to the hand by the individual players."
+      #
+      # Bets on the other hand has the positive amounts the player already
+      # contributed on this street.
+      contribution_on_prior_streets = -1 * (
+          wrapped_state.payoffs[player] + wrapped_state.bets[player]
+      )
+      assert (
+          wrapped_state.starting_stacks[player] - contribution_on_prior_streets
+          == 1
+      )
+      return f"Player {player}: Bet/Raise to 1 [ALL-IN EDGECASE]"
+    else:
+      raise ValueError(
+          f"Invalid action {action} for player {player}. 'legal actions' was "
+          f" {self.legal_actions()}"
+      )
 
   def is_terminal(self):
     # .status will be False IFF the game has not started or if it's been
@@ -1359,10 +1572,5 @@ class PokerkitWrapperAcpcStyleObserver(PokerkitWrapperObserver):
 
 # ------------------------------------------------------------------------------
 
-# TODO: b/437724266 - Re-enable registration of 'base' PokerkitWrapper once
-# we have support for at least one game (i.e. _not_ attempting to mimick the
-# ACPC-wrapping UniversalPoker game)
-#
-# pyspiel.register_game(_GAME_TYPE, PokerkitWrapper)
-
+pyspiel.register_game(_GAME_TYPE, PokerkitWrapper)
 pyspiel.register_game(_GAME_TYPE_ACPC_STYLE, PokerkitWrapperAcpcStyle)
