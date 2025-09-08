@@ -241,14 +241,8 @@ void BasicUniversalPokerTests() {
   testing::RandomSimTestCustomObserver(*LoadGame("universal_poker"), observer);
 }
 
-constexpr absl::string_view kHULHString =
-    ("universal_poker(betting=limit,numPlayers=2,numRounds=4,blind=50 100,"
-     "firstPlayer=2 1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 "
-     "1 "
-     "1,raiseSize=200 200 400 400,maxRaises=3 4 4 4)");
-
 void ChumpPolicyTests() {
-  std::shared_ptr<const Game> game = LoadGame(std::string(kHULHString));
+  std::shared_ptr<const Game> game = LoadGame(HulhGameString("fcpa"));
   std::vector<std::unique_ptr<Bot>> bots;
   bots.push_back(MakePolicyBot(*game, /*player_id=*/0, /*seed=*/0,
                                std::make_unique<open_spiel::UniformPolicy>()));
@@ -1009,12 +1003,7 @@ void Bet4ConfusedForHalfPotRegressionTest() {
 }
 
 void TestToStringAtChanceNodesFullGame() {
-  std::string game_str = (
-    "universal_poker(betting=nolimit,numPlayers=2,stack=20000 20000,"
-    "numRounds=2,blind=50 100,firstPlayer=1 1,numSuits=4,numRanks=13,"
-    "numHoleCards=2,numBoardCards=0 3 1 1,bettingAbstraction=fullgame)"
-  );
-  std::shared_ptr<const Game> game = LoadGame(game_str);
+  std::shared_ptr<const Game> game = LoadGame(HulhGameString("fullgame"));
   std::unique_ptr<State> state = game->NewInitialState();
 
   std::vector<Action> action_sequence = {10, 11, 12, 13};
