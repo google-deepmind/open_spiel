@@ -23,6 +23,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/strings/strip.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/game_parameters.h"
@@ -80,7 +81,8 @@ std::vector<BlindLevel> ParseBlindSchedule(
   if (blind_schedule_str.empty()) {
     return blind_levels;
   }
-  std::vector<std::string> levels = absl::StrSplit(blind_schedule_str, ';');
+  std::vector<std::string> levels = absl::StrSplit(
+      absl::StripSuffix(blind_schedule_str, ";"), ';');
   for (const auto& level : levels) {
     std::vector<std::string> parts = absl::StrSplit(level, ',');
     SPIEL_CHECK_EQ(parts.size(), 3);
@@ -128,6 +130,16 @@ RepeatedPokerState::RepeatedPokerState(
     player_to_seat_[i] = i;
     seat_to_player_[i] = i;
   }
+  // Action always begins to the left of the dealer after the flop.
+  SPIEL_CHECK_GE(acpc_game->NumRounds(), 2);
+  dealer_ = ((raw_acpc_game.firstPlayer[1] - 1) % num_players_ +
+             num_players_) % num_players_;
+  for (int round_num = 2; round_num < acpc_game->NumRounds(); ++round_num) {
+    // ACPC does not enforce a consistent dealer position for all rounds after
+    // the flop, but we do, as this is always the case in practice.
+    SPIEL_CHECK_EQ(raw_acpc_game.firstPlayer[1],
+                   raw_acpc_game.firstPlayer[round_num]);
+  }
   blind_schedule_levels_ = ParseBlindSchedule(blind_schedule_str_);
   if (!blind_schedule_str_.empty() && blind_schedule_levels_.empty()) {
     SpielFatalError("Failed to parse blind schedule.");
@@ -151,19 +163,9 @@ RepeatedPokerState::RepeatedPokerState(
     SPIEL_CHECK_EQ(num_blinds, 2);
     SPIEL_CHECK_GT(small_blind_, 0);
     SPIEL_CHECK_GT(big_blind_, 0);
-  } else {
-    UpdateBlinds();
   }
-  // Action always begins to the left of the dealer after the flop.
-  SPIEL_CHECK_GE(acpc_game->NumRounds(), 2);
-  dealer_ = ((raw_acpc_game.firstPlayer[1] - 1) % num_players_ +
-             num_players_) % num_players_;
-  for (int round_num = 2; round_num < acpc_game->NumRounds(); ++round_num) {
-    // ACPC does not enforce a consistent dealer position for all rounds after
-    // the flop, but we do, as this is always the case in practice.
-    SPIEL_CHECK_EQ(raw_acpc_game.firstPlayer[1],
-                   raw_acpc_game.firstPlayer[round_num]);
-  }
+  UpdateBlinds();
+  UpdateUniversalPoker();
 }
 
 // Must manually define copy constructor because we're storing a unique_ptr to
@@ -231,6 +233,14 @@ void RepeatedPokerState::UpdateDealer() {
 }
 
 void RepeatedPokerState::UpdateBlinds() {
+  // Update seat assignments for blinds.
+  if (num_active_players_ == 2) {
+    small_blind_seat_ = DealerSeat();
+    big_blind_seat_ = 1 - DealerSeat();
+  } else {
+    small_blind_seat_ = (DealerSeat() + 1) % num_active_players_;
+    big_blind_seat_ = (DealerSeat() + 2) % num_active_players_;
+  }
   // Update value of blinds based on the blind schedule.
   if (!blind_schedule_levels_.empty()) {
     int num_hands = 0;
@@ -245,14 +255,6 @@ void RepeatedPokerState::UpdateBlinds() {
     // If we've exceeded the schedule, use the last level.
     small_blind_ = blind_schedule_levels_.back().small_blind;
     big_blind_ = blind_schedule_levels_.back().big_blind;
-  }
-  // Update seat assignments for blinds.
-  if (num_active_players_ == 2) {
-    small_blind_seat_ = DealerSeat();
-    big_blind_seat_ = 1 - DealerSeat();
-  } else {
-    small_blind_seat_ = (DealerSeat() + 1) % num_active_players_;
-    big_blind_seat_ = (DealerSeat() + 2) % num_active_players_;
   }
 }
 
