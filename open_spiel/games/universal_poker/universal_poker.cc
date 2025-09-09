@@ -525,7 +525,7 @@ void UniversalPokerState::ObservationTensor(Player player,
 
   // Adding the contribution of each players to the pot.
   for (auto p = Player{0}; p < NumPlayers(); p++) {
-    values[offset + p] = acpc_state_.Ante(p);
+    values[offset + p] = acpc_state_.CurrentSpent(p);
   }
   offset += NumPlayers();
   SPIEL_CHECK_EQ(offset, game_->ObservationTensorShape()[0]);
@@ -574,9 +574,9 @@ std::string UniversalPokerState::ObservationString(Player player) const {
     absl::StrAppend(&result, "[Private: ", HoleCards(player).ToString(), "]");
   }
   // Adding the contribution of each players to the pot
-  absl::StrAppend(&result, "[Ante:");
+  absl::StrAppend(&result, "[PlayerContribution:");
   for (auto p = Player{0}; p < num_players_; p++) {
-    absl::StrAppend(&result, " ", acpc_state_.Ante(p));
+    absl::StrAppend(&result, " ", acpc_state_.CurrentSpent(p));
   }
   absl::StrAppend(&result, "]");
 

@@ -93,7 +93,6 @@ class ACPCState {
   uint8_t CurrentPlayer() const;
   uint8_t NumFolded() const;
   uint32_t Money(const uint8_t player) const;
-  uint32_t Ante(const uint8_t player) const;
   uint32_t TotalSpent() const;
   uint32_t CurrentSpent(const uint8_t player) const;
   std::string ToString() const;

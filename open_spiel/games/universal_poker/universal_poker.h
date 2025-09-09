@@ -266,7 +266,7 @@ int GetHoleCardsReachIndex(int card_a, int card_b,
 
 // Make random subgame, with optionally specified round, pot size, board
 // cards and hand reach probs. If all of these variables are specified,
-// it is actually a non-randomized subgame: by omiting any parameter,
+// it is actually a non-randomized subgame: by omitting any parameter,
 // a random value will be supplied automatically.
 std::shared_ptr<const Game> MakeRandomSubgame(
     std::mt19937 &rng, int pot_size = -1, std::string board_cards = "",
