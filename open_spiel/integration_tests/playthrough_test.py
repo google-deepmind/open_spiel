@@ -27,6 +27,7 @@ _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
 _OPTIONAL_GAMES = frozenset([
     "hanabi",
+    "python_pokerkit_wrapper",
     "python_pokerkit_wrapper_acpc_style",
     "universal_poker"
 ])
