@@ -1564,9 +1564,7 @@ class PokerkitWrapperAcpcStyleObserver(PokerkitWrapperObserver):
         f"[Pot: {pot}]"
         f"[Money: {remaining_money}]"
         f"[Private:{private}]"
-        # Called "ante" to match universal_poker, but in reality this has
-        # nothing to do with _actual_ pokerkit antes.
-        f"[Ante: {contribution}]"
+        f"[PlayerContribution: {contribution}]"
     )
 
 
