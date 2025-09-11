@@ -615,7 +615,7 @@ void BridgeState::ComputeDoubleDummyTricks() const {
     // TODO(author11) Make DDS code thread-safe
     // NOTE: Please leave the ampersand on the next line as we have to support
     // older versions of abseil. See b/442608965 for details. TODO(author5)
-    absl::MutexLock lock(&dds_mutex);  // NOLINT
+    absl::MutexLock lock(dds_mutex);  // NOLINT
     double_dummy_results_ = ddTableResults{};
     ddTableDeal dd_table_deal{};
     for (int suit = 0; suit < kNumSuits; ++suit) {
@@ -655,7 +655,7 @@ std::vector<int> BridgeState::ScoreForContracts(
       // exactly what.
       // NOTE: Please leave the ampersand on the next line as we have to support
       // older versions of abseil. See b/442608965 for details. TODO(author5)
-      absl::MutexLock lock(&dds_mutex);  // NOLINT
+      absl::MutexLock lock(dds_mutex);  // NOLINT
       DDS_EXTERNAL(SetMaxThreads)(0);
     }
 
