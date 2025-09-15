@@ -29,6 +29,7 @@ _OPTIONAL_GAMES = frozenset([
     "hanabi",
     "python_pokerkit_wrapper",
     "python_pokerkit_wrapper_acpc_style",
+    "repeated_poker",
     "universal_poker"
 ])
 _AVAILABLE_GAMES = set(pyspiel.registered_names())
