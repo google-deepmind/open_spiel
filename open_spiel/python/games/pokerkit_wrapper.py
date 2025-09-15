@@ -974,7 +974,7 @@ class PokerkitWrapperObserver:
       # information_state_* if not specified. Since `perfect_recall` in practice
       # chooses between information_state_* vs observation_* from the
       # perspective of OpenSpiel. See e.g.
-      # google3/third_party/open_spiel/python/algorithms/generate_playthrough.py
+      # open_spiel/python/algorithms/generate_playthrough.py
       self.iig_obs_types = pyspiel.IIGObservationType(perfect_recall=False)
     self.params = params
 
@@ -1002,8 +1002,7 @@ class PokerkitWrapperObserver:
         state._wrapped_state,
         # pylint: enable=protected-access
     )
-    # Censoring other players' hole cards; see e.g.
-    # https://screenshot.googleplex.com/AHBiteaBwkyseNr
+    # Censoring other players' hole cards
     per_player_action_view: list[str] = []
     for action in hand_history.actions:
       # If not dealing a hole card no need to censor.
