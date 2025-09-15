@@ -205,11 +205,13 @@ class PyspielTest(parameterized.TestCase):
         "turn_based_simultaneous_game",
         "normal_form_extensive_game",
         "repeated_game",
-        "repeated_poker",
         "restricted_nash_response",
         "start_at",
         "zerosum",
     ]
+    if (os.environ.get("OPEN_SPIEL_BUILD_WITH_ACPC", "OFF") == "ON" and
+        "repeated_poker" not in expected):
+      expected.append("repeated_poker")
     self.assertCountEqual(non_default_loadable, expected)
 
   def test_registered_game_attributes(self):
