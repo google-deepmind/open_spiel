@@ -39,10 +39,14 @@ from open_spiel.python.games import tic_tac_toe
 try:
   # pylint: disable=g-import-not-at-top
   from open_spiel.python.games import pokerkit_wrapper
+  # repeated_pokerkit depends on pokerkit_wrapper; if the former cannot be
+  # imported there is no point importing the latter.
+  from open_spiel.python.games import repeated_pokerkit
   # pylint: enable=g-import-not-at-top
 except ImportError as e:
   # Initialize to None on failure to ensure that this won't trigger NameError
   # later if someone tries to check for the module's presence.
   print(f"Optional module pokerkit_wrapper was not importable: {e}")
   pokerkit_wrapper = None
+  repeated_pokerkit = None
   pass

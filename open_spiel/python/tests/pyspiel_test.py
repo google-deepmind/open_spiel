@@ -26,7 +26,8 @@ import pyspiel
 
 _FULLY_OPTIONAL_PYTHON_GAMES = frozenset([
     "python_pokerkit_wrapper",
-    "python_pokerkit_wrapper_acpc_style"
+    "python_pokerkit_wrapper_acpc_style",
+    "python_repeated_pokerkit"
 ])
 # Specify game names in alphabetical order, to make the test easier to read.
 # "Mandatory" = neither optional nor included only if certain flags are set.

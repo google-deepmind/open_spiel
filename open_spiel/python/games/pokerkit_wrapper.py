@@ -178,7 +178,7 @@ _GAME_TYPE = pyspiel.GameType(
     min_num_players=2,  # Arbitrarily chosen to match universal_poker
     provides_information_state_string=True,
     provides_observation_string=True,
-    # See discussion in cl/798600930 for justification on not implementing them.
+    # Tensors are not yet supported. Instead use the corresponding strings.
     provides_information_state_tensor=False,
     provides_observation_tensor=False,
     # TODO: b/437724266 - determine what this value does and whether it should
@@ -516,6 +516,7 @@ class PokerkitWrapper(pyspiel.Game):
     def in_scope_for_variant(k):
       return k in inspect.signature(poker_variant_class).parameters.keys()
 
+    assert _parse_values(params.get("stack_sizes")) == self.stack_sizes
     game_args = {
         k: v
         for k, v in {
@@ -660,18 +661,27 @@ class PokerkitWrapperState(pyspiel.State):
     game.raise_error_if_player_out_of_range(player)
 
     if self.is_terminal():
-      return []
+      raise ValueError(
+          f"Attempted to get legal actions for player {player} when the"
+          " game is terminal."
+      )
+
+    # player is not the active player, and so can't take any actions.
+    if player != wrapped_state.actor_index:
+      raise ValueError(
+          f"Attempted to get legal actions for player {player} when the current"
+          f" player is {wrapped_state.actor_index}."
+      )
+
     if not (
         wrapped_state.can_check_or_call()
         or wrapped_state.can_fold()
         or wrapped_state.can_complete_bet_or_raise_to()
     ):
-      # currently in a chance node, so players can't take any actions.
-      return []
-
-    # player is not the active player, and so can't take any actions.
-    if player != wrapped_state.actor_index:
-      return []
+      raise ValueError(
+          f"Attempted to get legal actions for player {player} when the"
+          " player is not in a position to check, fold, or bet/raise."
+      )
 
     actions = []
 
@@ -771,14 +781,81 @@ class PokerkitWrapperState(pyspiel.State):
       assert set(valid_bet_sizes).isdisjoint(FOLD_AND_CHECK_OR_CALL_ACTIONS)
       actions.extend(valid_bet_sizes)
 
+    assert actions
     return sorted(actions)
 
   def chance_outcomes(self):
-    """Returns the possible chance outcomes and their probabilities."""
+    """Returns the possible chance outcomes and their probabilities.
+
+    NOTE: Pokerkit has a known-issue of returning certain mucked cards in N>2
+    player games. As such, we additionally ourselves 'double check' to ensure
+    that there are no cards being incorrectly returned by pokerkit itself. And
+    in such cases either A. remove such offending cards, or B. raise an error
+    (respectively depending on whether it's this exact 'mucked card' known issue
+    vs something else).)
+
+    Raises:
+      RuntimeError: If `pokerkit.State.get_dealable_cards()` returns cards that
+        are determined to be non-dealable, even after resolving a known issue
+        with mucked cards.
+    """
     assert self.is_chance_node()
+    wrapped_state: pokerkit.State = self._wrapped_state
+    # pokerkit has a bug in get_dealable_cards() where it sometimes returns
+    # cards in N>2 player games that were already dealt to a different player if
+    # that player mucked. We want to filter those out here to avoid bugs
+    # in our code later when applying the action (at which point pokerkit will
+    # correctly raise an error sayign that the card is not recommened to be
+    # dealt).
+    # Flattened list of hole cards
+    flattened_hole_cards = []
+    for sublist in wrapped_state.hole_cards:
+      flattened_hole_cards.extend(sublist)
+    flattened_board_cards = []
+    for sublist in wrapped_state.board_cards:
+      flattened_board_cards.extend(sublist)
+    double_checked_used_cards = set(wrapped_state.deck) - set(
+        flattened_hole_cards
+        + flattened_board_cards
+        + wrapped_state.burn_cards
+        + wrapped_state.mucked_cards
+    )
+    pokerkit_computed_dealable_cards = set(wrapped_state.get_dealable_cards())
+    if pokerkit_computed_dealable_cards != double_checked_used_cards:
+      logging.warning(
+          "pokerkit.State.get_dealable_cards() did not return the same set of"
+          " cards as the set of used cards. %s != %s",
+          pokerkit_computed_dealable_cards,
+          double_checked_used_cards,
+      )
+    # Make sure that there's no bugs where *our* logic forgets to filter out
+    # cards vs pokerkit's logic
+    assert double_checked_used_cards.issubset(pokerkit_computed_dealable_cards)
+
+    for card in pokerkit_computed_dealable_cards - double_checked_used_cards:
+      if card in wrapped_state.mucked_cards:
+        logging.warning(
+            "Confirmed incorrectly-dealable card is an instance of known issue"
+            " in pokerkit (card %s is one of the mucked_card). ***REMOVING "
+            "CARD %s FROM THE RETURNED CARDS AS A WORKAROUD.****",
+            card,
+            card,
+        )
+        pokerkit_computed_dealable_cards.remove(card)
+    if pokerkit_computed_dealable_cards != double_checked_used_cards:
+      raise RuntimeError(
+          "pokerkit.State.get_dealable_cards() still contains cards that we "
+          " have determined should not be dealable - even after removing some "
+          " cards that were included due to known issues with pokerkit. This"
+          " means there are likely MORE problems in pokerkit that we have no"
+          " identified yet! Post-'surgery' get_dealable_cards() was"
+          f" {pokerkit_computed_dealable_cards}, but when double-checking"
+          " ourselves we determined the list should instead be"
+          f" {double_checked_used_cards}"
+      )
+
     outcomes = sorted([
-        self.get_game().card_to_int[c]
-        for c in self._wrapped_state.get_dealable_cards()
+        self.get_game().card_to_int[c] for c in pokerkit_computed_dealable_cards
     ])
     p = 1.0 / len(outcomes)
     return [(o, p) for o in outcomes]
@@ -824,19 +901,27 @@ class PokerkitWrapperState(pyspiel.State):
           f"{wrapped_state.can_deal_hole()} "
           f"{wrapped_state.can_deal_board()}"
       )
-    if wrapped_state.can_deal_hole():
-      if wrapped_state.can_deal_board():
-        raise ValueError(
-            "Chance node with both dealable hole and board cards: "
-            f"{wrapped_state.can_deal_hole()} "
-            f"{wrapped_state.can_deal_board()}"
-        )
+    # If these ever fail it means that wrapped_state.get_dealable_cards()
+    # gave us a card that it shouldn't have!
+    # assert card_from_action not in wrapped_state.mucked_cards
+    assert card_from_action not in wrapped_state.burn_cards
+    assert card_from_action not in wrapped_state.board_cards
+    for player_hole_cards in wrapped_state.hole_cards:
+      assert card_from_action not in player_hole_cards
+
+    if wrapped_state.can_deal_hole() and wrapped_state.can_deal_board():
+      raise ValueError(
+          "Chance node with both dealable hole and board cards: "
+          f"{wrapped_state.can_deal_hole()} "
+          f"{wrapped_state.can_deal_board()}"
+      )
+    elif wrapped_state.can_deal_hole():
       wrapped_state.deal_hole(card_from_action)
     elif wrapped_state.can_deal_board():
       wrapped_state.deal_board(card_from_action)
     else:
       raise ValueError(
-          "Chance node with no dealable cards: "
+          "Chance node has dealable card, but cannot deal hole or board cards :"
           f"{wrapped_state.can_deal_hole()} "
           f"{wrapped_state.can_deal_board()}"
       )
@@ -844,6 +929,7 @@ class PokerkitWrapperState(pyspiel.State):
   def _action_to_string(self, player, action):
     wrapped_state: pokerkit.State = self._wrapped_state
     if self.is_chance_node():
+      assert player is not None
       assert player < 0
       if wrapped_state.can_deal_hole():
         return f"Deal Hole Card: {self.get_game().int_to_card[action]}"
@@ -898,18 +984,15 @@ class PokerkitWrapperState(pyspiel.State):
       )
 
   def is_terminal(self):
-    # .status will be False IFF the game has not started or if it's been
-    # terminated. As such, by ruling out game not being started we can verify
-    # if we are in a terminal state.
-    #
-    # For more details, see the comments in pokerkit/state.py.
-    game_never_started = (
-        self._wrapped_state.can_deal_hole() and not self._wrapped_state.status
-    )
-    if game_never_started:
-      return False
-
-    return not self._wrapped_state.status
+    # .status is True if the state is not terminal, as per
+    # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State.status,
+    assert self._wrapped_state.status is not None
+    is_terminal = not self._wrapped_state.status
+    if is_terminal:
+      assert isinstance(
+          self._wrapped_state.operations[-1], pokerkit.ChipsPulling
+      )
+    return is_terminal
 
   def is_chance_node(self):
     # Chance nodes should only refer to situations where a card is being dealt
@@ -1325,7 +1408,7 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
       # Note: we have to manually increment i only during matching operations
       # since the Pokerkit operations don't necessarily line up with the
       # universal_poker action_sequence. (There will be other irrelevant things
-      # like e.g. BlindOrStradlePostiong, BetCollection, etc).
+      # like e.g. BlindOrStradlePosting, BetCollection, etc).
       if isinstance(operation, pokerkit.CheckingOrCalling):
         self.tensor[offset + i * 2] = 1.0
         self.tensor[offset + (i * 2) + 1] = 0.0
@@ -1358,9 +1441,11 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
       # THE TENSOR HERE.
       #
       # See also this comment from universal_poker.cc:
+      # pylint: disable=g-bad-todo (copied from UniversalPoker)
       # """"
       # TODO(author2): Should this be 11?
       # """"
+      # pylint: enable=g-bad-todo
       if isinstance(operation, pokerkit.Folding):
         self.tensor[offset + i * 2] = 0.0
         self.tensor[offset + (i * 2) + 1] = 0.0
