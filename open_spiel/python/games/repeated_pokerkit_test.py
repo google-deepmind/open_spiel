@@ -15,9 +15,11 @@
 # Lint as python3
 """Tests for OpenSpiel 'Repeated' PokerkitWrapper."""
 
+import itertools
 import random
 
 from absl.testing import absltest
+from absl.testing import parameterized
 import pokerkit
 
 from open_spiel.python.games import pokerkit_wrapper
@@ -38,9 +40,58 @@ CLUB = pokerkit.Suit.CLUB
 HEART = pokerkit.Suit.HEART
 DIAMOND = pokerkit.Suit.DIAMOND
 
+# E.g.
+# [
+#   {variant: "NoLimitTexasHoldem"}
+#   {variant: "FixedLimitTexasHoldem"}
+#   ...
+# ]
+_ALL_VARIANTS = [
+    {"variant": variant}
+    for variant in pokerkit_wrapper.SUPPORTED_VARIANT_MAP.keys()
+]
+# E.g.
+# [
+#   {variant: "NoLimitTexasHoldem", reset_stacks: True},
+#   {variant: "NoLimitTexasHoldem", reset_stacks: False},
+#   {variant: "FixedLimitTexasHoldem", reset_stacks: True},
+#   {variant: "FixedLimitTexasHoldem", reset_stacks: False},
+#   ...
+# ]
+_ALL_VARIANTS_CASH_AND_TOURNAMENT_PARAMS = [
+    params | {"reset_stacks": reset_stacks}
+    for params, reset_stacks in itertools.product(_ALL_VARIANTS, [True, False])
+]
 
-class RepeatedPokerkitTest(absltest.TestCase):
+
+class RepeatedPokerkitTest(parameterized.TestCase):
   """Test the OpenSpiel game 'Repeated Pokerkit'."""
+
+  def _load_repeated_pokerkit_game_with_variant(self, variant, params):
+    """Loads a repeated_pokerkit game with variant-specific param filtering."""
+    use_bring_in = variant in pokerkit_wrapper.VARIANT_PARAM_USAGE["bring_in"]
+    use_blinds = (
+        variant
+        in pokerkit_wrapper.VARIANT_PARAM_USAGE["raw_blinds_or_straddles"]
+    )
+    use_fixed_bet_sizes = (
+        variant in pokerkit_wrapper.VARIANT_PARAM_USAGE["small_bet"]
+    )
+    if use_fixed_bet_sizes:
+      self.assertIn(variant, pokerkit_wrapper.VARIANT_PARAM_USAGE["big_bet"])
+
+    if not use_bring_in:
+      params["pokerkit_game_params"].pop("bring_in")
+    if not use_blinds:
+      self.assertTrue(use_bring_in and use_fixed_bet_sizes)
+      params["pokerkit_game_params"].pop("blinds")
+      params["rotate_dealer"] = False
+    if not use_fixed_bet_sizes:
+      self.assertTrue(use_blinds and not use_bring_in)
+      params["pokerkit_game_params"].pop("small_bet")
+      params["pokerkit_game_params"].pop("big_bet")
+
+    return pyspiel.load_game("python_repeated_pokerkit", params)
 
   def test_parse_blind_schedule(self):
     blind_schedule_str = "1,1,2;2,2,3"
@@ -69,32 +120,66 @@ class RepeatedPokerkitTest(absltest.TestCase):
     )
     pyspiel.random_sim_test(game, num_sims=5, serialize=False, verbose=True)
 
-  def test_random_sim_cash_game_6max(self):
-    # Note the reset_stacks=True
-    game = pyspiel.load_game(
-        "python_repeated_pokerkit("
-        "max_num_hands=20,reset_stacks=True,rotate_dealer=True,"
-        "pokerkit_game_params=python_pokerkit_wrapper("
-        "num_players=6,blinds=5 10,"
-        "stack_sizes=1000 1000 1000 1000 1000 1000))"
-    )
-    pyspiel.random_sim_test(game, num_sims=3, serialize=False, verbose=True)
+  @parameterized.parameters(*_ALL_VARIANTS_CASH_AND_TOURNAMENT_PARAMS)
+  def test_random_sim_all_variants_cash_and_tournament_headsup(
+      self,
+      variant,
+      # True -> cash game, False -> tournament
+      reset_stacks,
+  ):
+    params = {
+        "max_num_hands": 10,
+        "reset_stacks": reset_stacks,
+        "rotate_dealer": True,
+        "pokerkit_game_params": {
+            "name": "python_pokerkit_wrapper",
+            "variant": variant,
+            "num_players": 2,
+            "blinds": "2 4",
+            "bring_in": 4,
+            "small_bet": 8,
+            "big_bet": 16,
+            "stack_sizes": "64 64",
+        },
+    }
+    game = self._load_repeated_pokerkit_game_with_variant(variant, params)
+    # NOTE: Consider carefully before increasing num_sims any further. As of
+    # 2025, num_sims=3 is already pushing it (and e.g. num_sims=5 takes ~50%
+    # longer than num_sims=3 does).
+    pyspiel.random_sim_test(game, num_sims=3, serialize=False, verbose=False)
 
-  def test_random_sim_tournament_6max(self):
-    # Note the reset_stacks=False
-    game = pyspiel.load_game(
-        "python_repeated_pokerkit("
-        "max_num_hands=20,reset_stacks=False,rotate_dealer=True,"
-        "pokerkit_game_params=python_pokerkit_wrapper("
-        "num_players=6,blinds=5 10,"
-        "stack_sizes=1000 1000 1000 1000 1000 1000))"
-    )
-    pyspiel.random_sim_test(game, num_sims=3, serialize=False, verbose=True)
+  @parameterized.parameters(*_ALL_VARIANTS_CASH_AND_TOURNAMENT_PARAMS)
+  def test_random_sim_all_variants_cash_and_tournament_6max(
+      self,
+      variant,
+      # True -> cash game, False -> tournament
+      reset_stacks,
+  ):
+    params = {
+        "max_num_hands": 3,
+        "reset_stacks": reset_stacks,
+        "rotate_dealer": True,
+        "pokerkit_game_params": {
+            "name": "python_pokerkit_wrapper",
+            "variant": variant,
+            "num_players": 6,
+            "blinds": "2 4",
+            "bring_in": 4,
+            "small_bet": 8,
+            "big_bet": 16,
+            "stack_sizes": "30 30 30 30 30 30",
+        },
+    }
+    game = self._load_repeated_pokerkit_game_with_variant(variant, params)
+    # NOTE: Consider carefully before increasing num_sims any further. As of
+    # 2025, num_sims=2 is already pushing it (and e.g. num_sims=3 takes ~50%
+    # longer than num_sims=2 does).
+    pyspiel.random_sim_test(game, num_sims=2, serialize=False, verbose=False)
 
   def test_blind_schedule_progression(self):
     blind_schedule_str = "1,10,20;2,20,40;1,50,100;1,1000,1000"
     params = {
-        "max_num_hands": 1000,
+        "max_num_hands": 100,
         "reset_stacks": False,
         "rotate_dealer": True,
         "blind_schedule": blind_schedule_str,
@@ -244,10 +329,8 @@ class RepeatedPokerkitTest(absltest.TestCase):
 # - blind schedule becoming higher than all players' remaining stacks. (THIS IS
 #   A KNOWN ISSUE - in that case, all players are currently marked as eliminated
 #   instead of being forced all-in)
-# - having reset_stacks=True
 # - reaching a low max_num_hands limit
 # - multiple players busting out (especially edge cases)
-# - other games besides no limit texas hold'em
 # - returns()'s values being correct when reaching terminal state
 
 

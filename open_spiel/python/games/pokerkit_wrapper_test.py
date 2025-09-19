@@ -75,20 +75,20 @@ class PokerkitWrapperTest(absltest.TestCase):
   # _somewhat_ correct. (Not intended to be exhaustive!) ---
 
   def test_bring_in_usage(self):
-    variants = pokerkit_wrapper._VARIANT_PARAM_USAGE["bring_in"]
+    variants = pokerkit_wrapper.VARIANT_PARAM_USAGE["bring_in"]
     self.assertIn(pokerkit.FixedLimitRazz.__name__, variants)
     self.assertIn(pokerkit.FixedLimitSevenCardStud.__name__, variants)
     self.assertNotIn(pokerkit.NoLimitTexasHoldem.__name__, variants)
 
   def test_small_bet_usage(self):
-    variants = pokerkit_wrapper._VARIANT_PARAM_USAGE["small_bet"]
+    variants = pokerkit_wrapper.VARIANT_PARAM_USAGE["small_bet"]
     self.assertIn(pokerkit.FixedLimitTexasHoldem.__name__, variants)
     self.assertIn(pokerkit.FixedLimitSevenCardStud.__name__, variants)
     self.assertIn(pokerkit.FixedLimitRazz.__name__, variants)
     self.assertNotIn(pokerkit.NoLimitTexasHoldem.__name__, variants)
 
   def test_big_bet_usage(self):
-    variants = pokerkit_wrapper._VARIANT_PARAM_USAGE["big_bet"]
+    variants = pokerkit_wrapper.VARIANT_PARAM_USAGE["big_bet"]
     self.assertIn(pokerkit.FixedLimitTexasHoldem.__name__, variants)
     self.assertIn(pokerkit.FixedLimitSevenCardStud.__name__, variants)
     self.assertNotIn(pokerkit.NoLimitTexasHoldem.__name__, variants)

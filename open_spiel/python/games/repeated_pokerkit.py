@@ -28,12 +28,14 @@ from absl import logging
 import numpy as np
 import pokerkit
 
+from open_spiel.python.games import pokerkit_wrapper
 import pyspiel
+
 
 dataclass = dataclasses.dataclass
 DEFAULT_NUM_HANDS = 1
 INACTIVE_PLAYER_SEAT = -1
-INVALID_BLIND_VALUE = -1
+INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE = -1
 
 
 @dataclass
@@ -41,6 +43,19 @@ class BlindLevel:
   num_hands: int
   small_blind: int
   big_blind: int
+
+
+@dataclass
+class BetSizeLevel:
+  num_hands: int
+  small_bet_size: int
+  big_bet_size: int
+
+
+@dataclass
+class BringInLevel:
+  num_hands: int
+  bring_in: int
 
 
 # WARNING: pickle serialization/deserialization of this does not work properly
@@ -61,6 +76,8 @@ _DEFAULT_PARAMS = {
     "reset_stacks": False,
     "rotate_dealer": True,
     "blind_schedule": "",
+    "bet_size_schedule": "",
+    "bring_in_schedule": "",
     "first_button_player": (
         # Will be changed to the last player if not overridden.
         -1
@@ -91,6 +108,42 @@ _GAME_TYPE = pyspiel.GameType(
 )
 
 
+def _split_level_schedule_string(
+    schedule_str: str, expected_level_parts: int
+) -> list[list[str]]:
+  """Splits a level schedule string into a 2-D list of strings.
+
+  Parsed schedule strings are of the form
+    <level_1>;<level_2>;...;<level_n>
+  where each level is of the form
+    <substring_1>,<substring_2>,<substring_3>
+
+  Args:
+    schedule_str: The schedule string to split. The format is a
+      semicolon-separated list of inner levels, where each level is a
+      comma-separated tuple of `expected_level_parts` substrings.
+    expected_level_parts: The expected number of comma-separated substrings
+      within each level.
+
+  Returns:
+    A 2-D list of strings, where the first dimension corresponds to the levels
+    and the second dimension corresponds to the substrings within each level.
+  """
+  if not schedule_str:
+    return []
+  levels_str = schedule_str.removesuffix(";").split(";")
+  levels = [level.split(",") for level in levels_str]
+
+  for level in levels:
+    if len(level) != expected_level_parts:
+      raise ValueError(
+          f"Invalid schedule string: {schedule_str}. Expected format is"
+          " <level_1>;<level_2>;...;<level_n> where each level is a"
+          f" comma-separated tuple of {expected_level_parts} substrings."
+      )
+  return levels
+
+
 def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
   """Parses a blind schedule string into a list of BlindLevel objects.
 
@@ -113,14 +166,8 @@ def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
     return []
 
   blind_levels = []
-  for level in blind_schedule_str.removesuffix(";").split(";"):
-    parts = level.split(",")
-    if len(parts) != 3:
-      raise ValueError(
-          f"Invalid blind level: {level}. Expected format is"
-          " <num_hands>,<small_blind>,<big_blind>."
-      )
-    num_hands, small_blind, big_blind = [int(p) for p in parts]
+  for level_parts in _split_level_schedule_string(blind_schedule_str, 3):
+    num_hands, small_blind, big_blind = [int(p) for p in level_parts]
     blind_levels.append(
         BlindLevel(
             num_hands,
@@ -129,6 +176,58 @@ def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
         )
     )
   return blind_levels
+
+
+def parse_bet_size_schedule(bet_size_schedule_str: str) -> list[BetSizeLevel]:
+  """Parses a bet-size schedule string into a list of BetSizeLevel objects.
+
+  Parsed bet-size schedule strings are of the form
+    <bet_size_level_1>;...;<bet_size_level_n>
+  where each bet-size level is of the form
+    <num_hands>,<small_bet_size>,<big_bet_size>
+
+  Args:
+    bet_size_schedule_str: A string specifying the bet-size schedule. The format
+      is a semicolon-separated list of bet-size levels, where each level is a
+      comma-separated tuple of `num_hands`, `small_bet_size`, and
+      `big_bet_size`.
+
+  Returns:
+    A list of BetSizeLevel objects parsed from the input string.
+  """
+  if not bet_size_schedule_str:
+    return []
+
+  bet_sizes = []
+  for level_parts in _split_level_schedule_string(bet_size_schedule_str, 3):
+    num_hands, small_bet_size, big_bet_size = [int(p) for p in level_parts]
+    bet_sizes.append(BetSizeLevel(num_hands, small_bet_size, big_bet_size))
+  return bet_sizes
+
+
+def parse_bring_in_schedule(bring_in_schedule_str: str) -> list[BringInLevel]:
+  """Parses a bring-in schedule string into a list of BringInLevel objects.
+
+  Parsed bring-in schedule strings are of the form
+    <bring_in_level_1>;...;<bring_in_level_n>
+  where each bring-in level is of the form
+    <num_hands>,<bring_in>
+
+  Args:
+    bring_in_schedule_str: A string specifying the bring-in schedule. The format
+      is a semicolon-separated list of bring-in levels, where each level is a
+      comma-separated tuple of `num_hands` and `bring_in`.
+
+  Returns:
+    A list of BringInLevel objects parsed from the input string.
+  """
+  if not bring_in_schedule_str:
+    return []
+  bring_ins = []
+  for level_parts in _split_level_schedule_string(bring_in_schedule_str, 2):
+    num_hands, bring_in = [int(p) for p in level_parts]
+    bring_ins.append(BringInLevel(num_hands, bring_in))
+  return bring_ins
 
 
 # TODO: b/437724266 - Refactor to remove direct usage of protected fields and
@@ -167,18 +266,29 @@ class RepeatedPokerkit(pyspiel.Game):
         Whether to rotate the dealer at the start of each hand (which for
         pokerkit actually means rotating *the seats* so that the Button is the
         last stack provided to pokerkit). This defaults to true as it is always
-        done in practice.
+        done in practice. NOTE: We will ignore this parameter being False if the
+        resulting dealer player busts out when reset_stacks is False and there
+        are still additional hands to play. I.e. in that situation the next
+        not-yet-busted player will become the dealer going forwards.
     "blind_schedule": string (optional)
-      Specifies the blind schedule for playing a tournament. The format is:
-      <blind_level_1>;<blind_level_2>;...<blind_level_n> where each blind level
-      is of the form <num_hands>,<small_blind>,<big_blind>. If play continues
-      beyond the number of hands specified in the last blind level, the last
-      blind level will continue to be used.
-      TODO: b/444333187 - Add support for bring_in/small_bet/big_bet also
-      increasing in the same way (for games besides NoLimitTexasHoldem), either
-      here or in another parameter. As well as generally not requiring that the
-      wrapped pokerkit has actually set its blinds field for games that do not
-      actually use 'blinds' in the first place.
+        Specifies the blind schedule for playing a tournament. The format is:
+        <blind_level_1>;<blind_level_2>;...<blind_level_n> where each blind
+        level is of the form <num_hands>,<small_blind>,<big_blind>. If play
+        continues beyond the number of hands specified in the last blind level,
+        the last blind level will continue to be used.
+    "bet_size_schedule": string (optional)
+        Specifies the bet-size schedule for playing a tournament. The format is:
+        <bet_size_level_1>;<bet_size_level_2>;...<bet_size_level_n> where each
+        bet-size level is of the form
+        <num_hands>,<small_bet_size>,<big_bet_size>.  If play continues beyond
+        the number of hands specified in the last bet-size level, the last
+        bet-size level will continue to be used.
+    "bring_in_schedule": string (optional)
+        Specifies the bring-in schedule for playing a tournament. The format is:
+        <bring_in_level_1>;<bring_in_level_2>;...<bring_in_level_n> where each
+        bring-in level is of the form <num_hands>,<bring_in>. If play continues
+        beyond the number of hands specified in the last bring-in level, the
+        last bring-in level will continue to be used.
     "first_button_player": int (optional, default=-1)
         The player ID of the first player that will be the last seat, and
         therefore the Button, when performing seat assignments for the very
@@ -215,17 +325,19 @@ class RepeatedPokerkit(pyspiel.Game):
   complex and highly error-prone when using dead button rules.
 
   WARNING: This implementation diverges from standard tournament play in the
-  following respect: players who cannot post a big blind are eliminated.
-  This stems from the underlying implementation, which requires all players'
-  starting stacks to be at least one big blind.
+  following respect: players who cannot post a big blind (or bring in if the
+  poker game variant has no big blind) are eliminated. This behavior exists
+  solely for historical reasons (i.e. when ported from RepeatedPoker). In theory
+  pokerkit should allow us to remove it and more-faithfully simulate games where
+  players can play a hand despite having less than one big blind.
   This can result in the total rewards not adding up to the number of total
   chips to start the tournament, so users should not rely on this assumption.
 
-  TODO: b/444333187: There is a known issue where if blinds become higher than
-  all remaining players, they are all 'eliminated' rather than being forced
-  all-in. We should adjust the elimination logic here and in the RepeatedPoker
-  game to instead force players all-in if they cannot post a big blind, and only
-  removing them from the game entirely if they have exactly 0 chips remaining. 
+  TODO: b/444333187: adjust the elimination logic here to instead allow players
+  to be forced all-in by bring_in or blinds, even if they cannot post a big
+  blind or bring-in. And only 'eliminate' them from the game if they have
+  *exactly* 0 chips remaining at the end of a hand. (Consider sub-classing if
+  desiring to match RepeatedPoker / ACPC behavior exactly in those spots.)
   """
 
   def __init__(self, params=None):
@@ -239,6 +351,8 @@ class RepeatedPokerkit(pyspiel.Game):
     self._reset_stacks = params.get("reset_stacks")
     self._rotate_dealer = params.get("rotate_dealer")
     self._blind_schedule = params.get("blind_schedule")
+    self._bet_size_schedule = params.get("bet_size_schedule")
+    self._bring_in_schedule = params.get("bring_in_schedule")
 
     self._base_game_params = params.get("pokerkit_game_params")
     if not self._base_game_params:
@@ -300,8 +414,7 @@ class RepeatedPokerkit(pyspiel.Game):
     constant in the case of resetting stacks, but otherwise will increase as
     stack sizes increases. Players can bet more than their opponent's stack
     size, so the upper bound is set to the total number of chips. This isn't a
-    tight upper bound, since the opponent must have had at least one big blind
-    to start hand, but it's very close and should not matter for practical
+    tight upper bound, but it's very close and should not matter for practical
     purposes.
     """
     if self._reset_stacks:
@@ -385,8 +498,12 @@ class RepeatedPokerkitState(pyspiel.State):
     self._dealer = pyspiel.PlayerId.INVALID
     self._seat_to_player: dict[int, int] = None
     self._player_to_seat: dict[int, int] = None
-    self._small_blind = INVALID_BLIND_VALUE
-    self._big_blind = INVALID_BLIND_VALUE
+    self._small_blind = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+    self._big_blind = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+    self._small_bet_size = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+    self._big_bet_size = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+    self._bring_in = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+
     self._wrapped_state_hand_histories: list[str] = []
     # 2-D list where each inner list has length _num_players
     self._hand_returns: list[list[float]] = [[0.0] * game.num_players()]
@@ -455,36 +572,106 @@ class RepeatedPokerkitState(pyspiel.State):
           f" {self._num_active_players} active players upon initialization."
       )
 
-    self._blind_schedule_levels = parse_blind_schedule(game._blind_schedule)
+    self._blind_schedule_levels: list[BlindLevel] = parse_blind_schedule(
+        game._blind_schedule
+    )
+    self._bet_size_schedule_levels: list[BetSizeLevel] = (
+        parse_bet_size_schedule(game._bet_size_schedule)
+    )
+    self._bring_in_schedule_levels: list[BringInLevel] = (
+        parse_bring_in_schedule(game._bring_in_schedule)
+    )
     if game._blind_schedule and not self._blind_schedule_levels:
       raise ValueError("Failed to parse blind schedule.")
+    if game._bet_size_schedule and not self._bet_size_schedule_levels:
+      raise ValueError("Failed to parse bet-size schedule.")
+    if game._bring_in_schedule and not self._bring_in_schedule_levels:
+      raise ValueError("Failed to parse bring-in schedule.")
 
-    if self._blind_schedule_levels:
-      self._small_blind = self._blind_schedule_levels[0].small_blind
-      self._big_blind = self._blind_schedule_levels[0].big_blind
-    elif not self._blind_schedule_levels:
-      # Identify the small and big blind from the underlying pokerkit game.
-      blinds = self.pokerkit_wrapper_state._wrapped_state.blinds_or_straddles
-      num_blinds = 0
-      for blind in blinds:
-        if blind > 0:
-          num_blinds += 1
-          if self._small_blind == INVALID_BLIND_VALUE:
-            self._small_blind = blind
-          else:
-            self._big_blind = max(self._small_blind, blind)
-            self._small_blind = min(self._small_blind, blind)
-      assert num_blinds == 2
-      assert self._small_blind > 0
-      assert self._big_blind > 0
-    else:
-      raise RuntimeError(
-          "Blind schedule levels are both not set and set. This should be"
-          " impossible."
+    variant = game._base_game_params.get("variant")
+    uses_blinds = (
+        # NOTE: Assumes that if not specified, the default pokerkit_wrapper game
+        # variant is going to be a Texas Holdem style game with blinds.
+        variant is None
+        or variant
+        in pokerkit_wrapper.VARIANT_PARAM_USAGE["raw_blinds_or_straddles"]
+    )
+    if uses_blinds:
+      if self._blind_schedule_levels:
+        self._small_blind = self._blind_schedule_levels[0].small_blind
+        self._big_blind = self._blind_schedule_levels[0].big_blind
+      elif self.pokerkit_wrapper_state._wrapped_state.blinds_or_straddles:
+        # Identify the small and big blind from the underlying pokerkit game.
+        # (When set, it's always a list of integers with length equal to the
+        # number of players in the pokerkit game)
+        blinds = self.pokerkit_wrapper_state._wrapped_state.blinds_or_straddles
+        num_blinds = 0
+        for blind in blinds:
+          if blind > 0:
+            num_blinds += 1
+            if self._small_blind == INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE:
+              self._small_blind = blind
+            else:
+              self._big_blind = max(self._small_blind, blind)
+              self._small_blind = min(self._small_blind, blind)
+        if (
+            any([blind != 0 for blind in blinds])
+            or len(blinds) != self.num_players()
+        ):
+          assert num_blinds == 2
+          assert self._small_blind > 0
+          assert self._big_blind > 0
+      else:
+        # Many game variants (correctly) have no blinds.
+        pass
+
+    if not uses_blinds and game._rotate_dealer:
+      raise ValueError(
+          "Attempting to rotate dealers in a poker variant that does not have "
+          " a rotating Button position. This is not supported. Poker variant "
+          f" was: {variant}"
       )
 
+    betting_structure = (
+        self.pokerkit_wrapper_state._wrapped_state.betting_structure
+    )
+    if self._bet_size_schedule_levels:
+      if betting_structure != pokerkit.state.BettingStructure.FIXED_LIMIT:
+        raise ValueError(
+            "Attempting to use a bet-size schedule, but the underlying pokerkit"
+            " game does not have a fixed-limit betting structure. Aborting to"
+            " avoid setting bet sizes to inaccurate values."
+        )
+      self._small_bet_size = self._bet_size_schedule_levels[0].small_bet_size
+      self._big_bet_size = self._bet_size_schedule_levels[0].big_bet_size
+    elif betting_structure == pokerkit.state.BettingStructure.FIXED_LIMIT:
+      self._small_bet_size = self.pokerkit_wrapper_state.get_game().params.get(
+          "small_bet"
+      )
+      self._big_bet_size = self.pokerkit_wrapper_state.get_game().params.get(
+          "big_bet"
+      )
+    else:
+      # Other game variants (correctly) have no bet sizes.
+      logging.info("Found no small_bet or big_bet.")
+      pass
+    if self._bring_in_schedule_levels:
+      if betting_structure != pokerkit.state.BettingStructure.FIXED_LIMIT:
+        raise ValueError(
+            "Attempting to use a bring-in schedule, but the underlying pokerkit"
+            " game does not have a fixed-limit betting structure. Aborting to"
+            " avoid setting bring-in to inaccurate values."
+        )
+      self._bring_in = self._bring_in_schedule_levels[0].bring_in
+    elif betting_structure == pokerkit.state.BettingStructure.FIXED_LIMIT:
+      self._bring_in = self.pokerkit_wrapper_state._wrapped_state.bring_in
+    else:
+      # Other game variants (correctly) have no bring-in.
+      logging.info("Found no bring_in.")
+      pass
+
     self.update_seat_rotation()
-    self.update_blinds()
+    self.update_blinds_bet_sizes_and_or_bring_in()
     self.update_pokerkit_wrapper()
     return
 
@@ -541,11 +728,20 @@ class RepeatedPokerkitState(pyspiel.State):
     """
     if self.get_game()._reset_stacks:
       return
+    # Sometimes there isn't a blind because there is instead a bring-in (e.g.
+    # stud poker). We fall-back to using the bring-in in such cases.
+    busted_if_less_chips = (
+        self._big_blind
+        if self._big_blind != INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+        else self._bring_in
+    )
+    assert busted_if_less_chips > 0
+
     self._player_to_seat = {}
     self._seat_to_player = {}
     next_open_seat = 0
     for player in range(self.num_players()):
-      if self._stacks[player] < self._big_blind:
+      if self._stacks[player] < busted_if_less_chips:
         self._player_to_seat[player] = INACTIVE_PLAYER_SEAT
       else:
         self._player_to_seat[player] = next_open_seat
@@ -563,7 +759,13 @@ class RepeatedPokerkitState(pyspiel.State):
     Raises:
       RuntimeError: If an infinite loop is detected when rotating the dealer.
     """
-    if not self.get_game()._rotate_dealer:
+    if (
+        not self.get_game()._rotate_dealer
+        # We MUST rotate the dealer position if the current dealer has busted
+        # out (even if rotate_dealer is False). Otherwise we will be unable to
+        # compute a proper seat rotation later on.
+        and self._player_to_seat[self._dealer] != INACTIVE_PLAYER_SEAT
+    ):
       return
 
     # Make sure our seat <-> player mappings are consistent prior to rotating.
@@ -598,7 +800,9 @@ class RepeatedPokerkitState(pyspiel.State):
     Note: deliberately does NOT depend on self._rotate_dealer being True. This
     is because it is entirely valid for a game to not rotate dealers after each
     hand, while still _starting_ with a specific non-default rotation / button
-    player that is not the first or last player ID.
+    player that is not the first or last player ID. Similarly, even if we don't
+    _normally_ rotate dealer with that setting set to False, in practice we may
+    still have to rotate dealer in the event that the dealer busts out.
 
     Typically called during 1. initialization and 2. immediately after the
     dealer has been updated, following the end of a hand.
@@ -665,28 +869,46 @@ class RepeatedPokerkitState(pyspiel.State):
     assert all([player >= 0 for player in self._seat_to_player])
     assert len(self._seat_to_player) == self._num_active_players
 
-  def update_blinds(self):
+  def update_blinds_bet_sizes_and_or_bring_in(self):
     """Updates the blinds for the next hand.
 
     Port of RepeatedPokerState::UpdateBlinds, with a couple of changes to
-    accomodate pokerkit's differences from ACPC.
+    accomodate pokerkit's differences from ACPC + also support small_bet,
+    big_bet, and bring_in for other poker variants.
     """
     # (No need to update seat assignments for blinds like in
     # RepeatedPoker.UpdateBlinds. Since pokerkit instead directly maps each
     # stack to table position based on index, which we're handling elsewhere
     # via seat rotations.)
 
-    if self._blind_schedule_levels:
-      num_hands = 0
-      for level in self._blind_schedule_levels:
-        if self._hand_number < num_hands + level.num_hands:
-          self._small_blind = level.small_blind
-          self._big_blind = level.big_blind
-          return
-        num_hands += level.num_hands
-      # If we've exceeded the schedule, use the last level.
-      self._small_blind = self._blind_schedule_levels[-1].small_blind
-      self._big_blind = self._blind_schedule_levels[-1].big_blind
+    def update_blind_bring_in_or_bet_size(level):
+      if isinstance(level, BlindLevel):
+        self._small_blind = level.small_blind
+        self._big_blind = level.big_blind
+      elif isinstance(level, BetSizeLevel):
+        self._small_bet_size = level.small_bet_size
+        self._big_bet_size = level.big_bet_size
+      elif isinstance(level, BringInLevel):
+        self._bring_in = level.bring_in
+      else:
+        raise ValueError(f"Unsupported schedule level type: {type(level)}")
+
+    for schedule in [
+        self._blind_schedule_levels,
+        self._bring_in_schedule_levels,
+        self._bet_size_schedule_levels,
+    ]:
+      if schedule:
+        num_hands = 0
+        for level in schedule:
+          if self._hand_number < num_hands + level.num_hands:
+            update_blind_bring_in_or_bet_size(level)
+            break
+          num_hands += level.num_hands
+        else:
+          # If we've exceeded the schedule (and never break-d above), use the
+          # last level.
+          update_blind_bring_in_or_bet_size(schedule[-1])
 
   def update_pokerkit_wrapper(self):
     """Updates the underlying PokerkitWrapper and State.
@@ -705,11 +927,29 @@ class RepeatedPokerkitState(pyspiel.State):
         stacks[self._player_to_seat[p]] = self._stacks[p]
     self._pokerkit_game_params["stack_sizes"] = " ".join(str(s) for s in stacks)
 
-    # TODO: b/444333187 - support these a bit better if there are more than 2
-    # blinds / more than just small blind and big blind.
-    self._pokerkit_game_params["blinds"] = (
-        f"{self._small_blind} {self._big_blind}"
-    )
+    if (
+        self._small_blind != INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+        or self._big_blind != INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
+    ):
+      self._pokerkit_game_params["blinds"] = (
+          f"{self._small_blind} {self._big_blind}"
+      )
+    else:
+      if "blinds" in self._pokerkit_game_params:
+        del self._pokerkit_game_params["blinds"]
+
+    # Unlike blinds or stack_sizes, the remaining params are all individually
+    # passed in. Allowing us to easily handle them all in the exact same way.
+    def set_or_remove_from_params(param, value):
+      if value != INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE:
+        self._pokerkit_game_params[param] = value
+      else:
+        if param in self._pokerkit_game_params:
+          del self._pokerkit_game_params[param]
+
+    set_or_remove_from_params("bring_in", self._bring_in)
+    set_or_remove_from_params("small_bet", self._small_bet_size)
+    set_or_remove_from_params("big_bet", self._big_bet_size)
 
     # No need to determine a 'first player' like in
     # RepeatedPoker::UpdateUniversalPoker seat we handle this all via seat
@@ -752,7 +992,7 @@ class RepeatedPokerkitState(pyspiel.State):
       return
     self.update_dealer()
     self.update_seat_rotation()
-    self.update_blinds()
+    self.update_blinds_bet_sizes_and_or_bring_in()
     self.update_pokerkit_wrapper()
 
   def current_player(self):
@@ -826,9 +1066,7 @@ class RepeatedPokerkitState(pyspiel.State):
   def _action_to_string(self, player, action):
     if self.is_chance_node():
       if player != pyspiel.PlayerId.CHANCE:
-        raise ValueError(
-            "Chance actions must be played by the chance player."
-        )
+        raise ValueError("Chance actions must be played by the chance player.")
       # Deliberately NOT mapping to seats. Chance nodes don't have a seat and
       # will use the same ID value here + in the pokerkit_wrapper_state at all
       # times (unlike our 'real' players).
@@ -934,6 +1172,7 @@ class RepeatedPokerkitObserver:
     return pokerkit_wrapper_observer.string_from(
         state.pokerkit_wrapper_state, seat_id
     )
+
 
 # TODO: b/437724266 - remove once no longer disabling at the top of this file.
 # pylint: enable=protected-access

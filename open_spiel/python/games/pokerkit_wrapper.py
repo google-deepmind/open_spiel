@@ -74,7 +74,7 @@ _SUPPORTED_VARIANT_CLASSES = [
     # "Pot Limit Omaha (PLO)"
     pokerkit.PotLimitOmahaHoldem,
 ]
-_SUPPORTED_VARIANT_MAP = {
+SUPPORTED_VARIANT_MAP = {
     # e.g. { "NoLimitTexasHoldem": pokerkit.NoLimitTexasHoldem, ... }
     variant.__name__: variant
     for variant in _SUPPORTED_VARIANT_CLASSES
@@ -99,12 +99,12 @@ _VARIANTS_SUPPORTING_ACPC_STYLE = [
 def _get_variants_supporting_param(param_name: str) -> list[str]:
   return [
       name
-      for name, cls in _SUPPORTED_VARIANT_MAP.items()
+      for name, cls in SUPPORTED_VARIANT_MAP.items()
       if param_name in inspect.signature(cls).parameters.keys()
   ]
 
 
-_VARIANT_PARAM_USAGE = {
+VARIANT_PARAM_USAGE = {
     param: _get_variants_supporting_param(param)
     for param in [
         "bring_in",
@@ -270,7 +270,7 @@ class PokerkitWrapper(pyspiel.Game):
     del params
 
     variant = self.params.get("variant")
-    if variant not in _SUPPORTED_VARIANT_MAP:
+    if variant not in SUPPORTED_VARIANT_MAP:
       raise ValueError(f"Unknown poker variant: {variant}")
 
     # **** **** **** **** **** **** **** **** **** **** **** **** **** ****
@@ -330,7 +330,7 @@ class PokerkitWrapper(pyspiel.Game):
       raise ValueError("Big Blind must be at least 2: ", self.blinds)
 
     assert self.params["small_bet"] < self.params["big_bet"]
-    if variant in _VARIANT_PARAM_USAGE["bring_in"]:
+    if variant in VARIANT_PARAM_USAGE["bring_in"]:
       assert self.params["bring_in"] < self.params["small_bet"]
 
     # This is such a common + confusing mistake that it's helpful to at least
@@ -346,8 +346,8 @@ class PokerkitWrapper(pyspiel.Game):
           param1 in definitely_overriden
           and param2 not in definitely_overriden
           and (
-              variant in _VARIANT_PARAM_USAGE[param1]
-              or variant in _VARIANT_PARAM_USAGE[param2]
+              variant in VARIANT_PARAM_USAGE[param1]
+              or variant in VARIANT_PARAM_USAGE[param2]
           )
       ):
         logging.warning(
@@ -509,7 +509,7 @@ class PokerkitWrapper(pyspiel.Game):
     # instead grab the values we need via getters.
     params = self.params
     variant = params.get("variant")
-    poker_variant_class = _SUPPORTED_VARIANT_MAP.get(variant)
+    poker_variant_class = SUPPORTED_VARIANT_MAP.get(variant)
     if not poker_variant_class:
       raise ValueError(f"Unknown / unsupported poker variant: {variant}")
 
@@ -742,12 +742,25 @@ class PokerkitWrapperState(pyspiel.State):
             current_street.min_completion_betting_or_raising_amount
         )
         if only_valid_bet < street_minimum_size:
-          # In 2-person games, the only way for this to happen is if the player
-          # doesn't actually have enough chips left in their stack and so is
-          # shoving. So we can trivially verify that this isn't happening
-          # incorrectly.
+          # In 2-person games, the only way for this to happen is if the
+          # effective stack size is less than the bet size and the player is
+          # (effectively) shoving. So we can trivially verify that this isn't
+          # happening incorrectly.
+          #
+          # NOTE: This cares about _effective_ stack size, not the player's
+          # actual stack size! Since this behavior also happens when the *other*
+          # player's stack size is less than the minimum for the street.
           if game.num_players() == 2:
-            assert only_valid_bet == wrapped_state.stacks[player]
+            if only_valid_bet != wrapped_state.get_effective_stack(player):
+              raise RuntimeError(
+                  f"Player {player} has effective stack size of"
+                  f" {wrapped_state.get_effective_stack(player)} (and has"
+                  f" 'real' stack size of {wrapped_state.stacks[player]} chips)"
+                  f"  but only valid bet is {only_valid_bet}, which is"
+                  " unexpectedly less than the minimum value for the current"
+                  " street AND also doesn't equal their effective stack size."
+                  f" {street_minimum_size}."
+              )
           # In 3+ person games, this is significantly more complicated to verify
           # since side-pots can significantly complicate the math, especially
           # in fixed-limit games. Any asserts we could write here would be
