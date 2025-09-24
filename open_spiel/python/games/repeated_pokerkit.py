@@ -1106,7 +1106,7 @@ class RepeatedPokerkitObserver:
       # information_state_* if not specified. Since `perfect_recall` in practice
       # chooses between information_state_* vs observation_* from the
       # perspective of OpenSpiel. See e.g.
-      # google3/third_party/open_spiel/python/algorithms/generate_playthrough.py
+      # python/algorithms/generate_playthrough.py
       self.iig_obs_types = pyspiel.IIGObservationType(perfect_recall=False)
     self.params = params
 
