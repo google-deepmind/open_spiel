@@ -310,17 +310,20 @@ class Buffer:
     self.total_seen = self.buffer_state.total_seen
 
   def sample(self, count: int) -> Any:
-    if self.buffer.can_sample(self.buffer_state, count):
+    if True: #self.buffer.can_sample(self.buffer_state, count):
       self._rng, rng = jax.random.split(self._rng)
+
+      buffer_state = self.buffer_state.replace(experience=jax.lax.cond(
+          self.sequential,
+          lambda x, rng: x,
+          lambda x, rng: jax.tree.map(lambda y: jax.random.permutation(rng, y, axis=0), x),
+          self.buffer_state.experience, rng
+        )
+      )
 
       # indices are returned for debug purposes only
       self.buffer_state, batch, indices = self.buffer.sample( # pylint: disable=possibly-unused-variable
-        self.buffer_state, self._rng, count) 
+        buffer_state, self._rng, count) 
 
       # To keep experiences at random, let them be shuffled
-      return jax.lax.cond(
-        self.sequential,
-        lambda x, rng: x,
-        lambda x, rng: jax.tree.map(lambda y: jax.random.permutation(rng, y, axis=0), x),
-        batch.experience, rng
-      )
+      return batch.experience

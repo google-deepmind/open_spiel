@@ -78,7 +78,7 @@ class Activation(nn.Module):
     
 class MLPBlock(nn.Module):
 
-  def __init__(self, in_features: int, out_features: int, activation: str, seed: int = 0):
+  def __init__(self, in_features: int, out_features: int, activation: str, seed: int = 0) -> None:
 
     self.activation = Activation(activation)
     self.dense_layer = nn.Linear(in_features, out_features, rngs=nn.Rngs(seed))
@@ -90,7 +90,7 @@ class MLPBlock(nn.Module):
   
 class ConvBlock(nn.Module):
   
-  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0):
+  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0) -> None:
 
     self.conv = nn.Conv(in_features, out_features, kernel_size=kernel_size, padding="SAME", rngs=nn.Rngs(seed))
     self.activation = Activation(activation) 
@@ -110,7 +110,7 @@ class ConvBlock(nn.Module):
     return y
 
 class ResidualBlock(nn.Module):
-  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0):
+  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0) -> None:
 
     self.conv1 = ConvBlock(in_features, out_features, kernel_size, activation, seed) 
     self.conv2 = ConvBlock(out_features, out_features, kernel_size, None, seed) #activation's applied separately
@@ -272,9 +272,6 @@ class AlphaZeroModel(nn.Module):
     self.policy_head = PolicyHead((*input_shape[:-1], nn_width), nn_width, output_size, model_type, activation, seed=seed)
     self.value_head = ValueHead((*input_shape[:-1], nn_width), nn_width, model_type, activation, seed=seed)
 
-  @functools.partial(
-    nn.vmap, in_axes=(None, 0), axis_name='batch', out_axes=(0, 0)
-  )
   def __call__(self, observations: chex.Array) -> tuple[chex.Array, chex.Array]:
 
     x = self.torso(observations)
@@ -283,6 +280,9 @@ class AlphaZeroModel(nn.Module):
 
     return policy_logits, value_out
 
+@nn.vmap(in_axes=(None, 0), axis_name="batch")
+def forward(model, x):
+  return model(x)
 
 #modified train state
 class TrainState(train_state.TrainState):
@@ -357,10 +357,10 @@ class Model:
     def update_step_fn(state, observations, legals_mask, policy_targets, value_targets):
       
       def loss_fn(params, observations, legals_mask, policy_targets, value_targets):
-        model = nn.merge(state.graphdef, params, state.batch_stats)
+        model = nn.merge(state.graphdef, params, state.batch_stats, copy=True)
         model.train()
 
-        policy_logits, value_preds = model(observations)
+        policy_logits, value_preds = forward(model, observations)
         policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
         policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
@@ -403,7 +403,7 @@ class Model:
     return jax.tree.map(jnp.shape, flat_params)
   
   def print_trainable_variables(self):
-    nn.display(self._model)
+    # nn.display(self._model)
     flat_params, _ = jax.tree.flatten(self._state.params)
     for i, p in enumerate(flat_params):
       print(f"Param {i}: {p.shape}")
@@ -415,7 +415,7 @@ class Model:
     observation = jnp.array(observation, dtype=jnp.float32)
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
-    policy_logits, value = model(observation)
+    policy_logits, value = forward(model, observation)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
     policy = nn.softmax(policy_logits, axis=-1)

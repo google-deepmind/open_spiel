@@ -337,7 +337,7 @@ def evaluator(*, game, config, logger, queue):
 def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
   logger.also_to_stdout = True
-  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size, sequential=True) #only this
+  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size, sequential=False) #only this
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
@@ -424,8 +424,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     # but the model state is not explicit
     for _ in range(len(replay_buffer) // config.train_batch_size):
       data = replay_buffer.sample(config.train_batch_size)
-      if data:
-        losses.append(model.update(data))
+      losses.append(model.update(data))
 
     # Always save a checkpoint, either for keeping or for loading the weights to
     # the actors. We only allow numbers, so use -1 as "latest".

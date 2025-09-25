@@ -117,7 +117,6 @@ class ModelTest(parameterized.TestCase):
     AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types)
   )
   def test_model_learns_optimal(self, api_version: str, model_type: str):
-    print(api_version, model_type)
     game = pyspiel.load_game("tic_tac_toe")
     solve_game(game.new_initial_state())
 

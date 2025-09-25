@@ -21,7 +21,7 @@ from open_spiel.python.algorithms.alpha_zero import alpha_zero
 from open_spiel.python.algorithms.alpha_zero.utils import api_selector, AVIALABLE_APIS
 from open_spiel.python.utils import spawn
 
-flags.DEFINE_enum("device", "cpu", ["cpu", "gpu", "mps"],
+flags.DEFINE_enum("device", "cpu", ["cpu", "gpu"],
                   "What type of device should be used for training?.\
                   The corresponding jax version has to be installed")
 
@@ -29,10 +29,10 @@ flags.DEFINE_enum("nn_api_version", "linen", ["linen", "nnx"],
                   "What type of flax api should be used for training?.\
                   Currently, linen and nnx are supported")
 
-flags.DEFINE_string("game", "connect_four", "Name of the game.")
+flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
-flags.DEFINE_integer("max_simulations", 300, "How many simulations to run.")
-flags.DEFINE_integer("train_batch_size", 2 ** 3, "Batch size for learning.")
+flags.DEFINE_integer("max_simulations", 100, "How many simulations to run.")
+flags.DEFINE_integer("train_batch_size", 2, "Batch size for learning.")
 flags.DEFINE_integer("replay_buffer_size", 2 ** 9,
                      "How many states to store in the replay buffer.")
 flags.DEFINE_integer("replay_buffer_reuse", 3,
@@ -48,12 +48,12 @@ flags.DEFINE_integer("temperature_drop", 10,  # Less than AZ due to short games.
 flags.DEFINE_enum("nn_model", "resnet", api_selector(AVIALABLE_APIS[0]).Model.valid_model_types,
                   "What type of model should be used?.")
 flags.DEFINE_integer("nn_width", 2 ** 7, "How wide should the network be.")
-flags.DEFINE_integer("nn_depth", 10, "How deep should the network be.")
+flags.DEFINE_integer("nn_depth", 6, "How deep should the network be.")
 flags.DEFINE_string("path", None, "Where to save checkpoints.")
 flags.DEFINE_integer("checkpoint_freq", 100, "Save a checkpoint every N steps.")
 flags.DEFINE_integer("actors", 2, "How many actors to run.")
 flags.DEFINE_integer("evaluators", 1, "How many evaluators to run.")
-flags.DEFINE_integer("evaluation_window", 100,
+flags.DEFINE_integer("evaluation_window", 10,
                      "How many games to average results over.")
 flags.DEFINE_integer(
     "eval_levels", 7,
