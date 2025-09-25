@@ -32,9 +32,9 @@ import pandas as pd
 from open_spiel.python.utils import gfile
 
 X_AXIS = {
-    "step": "step",
-    "time": "time_rel_h",
-    "states": "total_states",
+  "step": "step",
+  "time": "time_rel_h",
+  "states": "total_states",
 }
 
 flags.DEFINE_string("path", None,
@@ -71,7 +71,7 @@ def print_columns(strings, max_width=MAX_WIDTH):
 
 def load_jsonl_data(filename):
   with gfile.Open(filename) as f:
-    return [json.loads(l) for l in f.readlines()]
+    return [json.loads(ljson) for ljson in f.readlines()]
 
 
 def sub_sample(data, count):
