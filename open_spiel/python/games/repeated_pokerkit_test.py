@@ -324,11 +324,73 @@ class RepeatedPokerkitTest(parameterized.TestCase):
         [80, 190],
     )
 
+  def test_eliminates_players_at_exactly_zero_chips(self):
+    params = {
+        "max_num_hands": 3,
+        "reset_stacks": False,
+        "rotate_dealer": True,
+        "pokerkit_game_params": {
+            "name": "python_pokerkit_wrapper",
+            "num_players": 3,
+            "blinds": "10 20",
+            "stack_sizes": "100 100 100",  # Players 0 1 2: SB BB BTN
+        },
+    }
+    game = pyspiel.load_game("python_repeated_pokerkit", params)
+    state = game.new_initial_state()
+
+    # Deal each player two random cards (choice doesn't matter)
+    # 3 players * 2 hole cards => 6 chance nodes
+    for _ in range(6):
+      action = random.choice([o for o, _ in state.chance_outcomes()])
+      state.apply_action(action)
+
+    # P3 BTN raises to *almost* all-in (1 chip behind)
+    state.apply_action(99)
+    # P1 SB Shoves all-in
+    state.apply_action(100)
+    # P2 BB folds => 80 chips left
+    state.apply_action(ACTION_FOLD)
+    # BTN folds => 1 chip left (should not bust). BB wins the pot and the next
+    # hand starts.
+    self.assertEqual(state._hand_number, 0)
+    state.apply_action(ACTION_FOLD)
+    self.assertEqual(state._hand_number, 1)
+    self.assertEqual(state._stacks, [219, 80, 1])
+
+    # Ensure *three* players here are still active, not just two.
+    self.assertEqual(state.num_players(), 3)
+    self.assertEqual(state._num_active_players, 3)
+    # Similarly: 3 players * 2 hole cards => 6 chance nodes
+    for _ in range(6):
+      self.assertTrue(state.is_chance_node())
+      self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
+      action = random.choice([o for o, _ in state.chance_outcomes()])
+      state.apply_action(action)
+
+      # Double check again that nothing unexpectedly changes out from underneath
+      # us here as we apply actions.
+      self.assertEqual(state.num_players(), 3)
+      self.assertEqual(state._num_active_players, 3)
+
+    # P1 BTN bets 40
+    state.apply_action(40)
+    # P2 SB calls
+    state.apply_action(ACTION_CHECK_OR_CALL)
+    # P3 BB was already all-in due to having less than one Big Blind, so
+    # gameplay should immediately procede to dealing the flop despite there
+    # being 3 players.
+    self.assertTrue(state.is_chance_node())
+
+    # Definitely excessive, but triple checking this again just to be certain.
+    self.assertEqual(state.num_players(), 3)
+    self.assertEqual(state._num_active_players, 3)
+
 
 # TODO: b/444333187 - Add tests for the following behaviors:
-# - blind schedule becoming higher than all players' remaining stacks. (THIS IS
-#   A KNOWN ISSUE - in that case, all players are currently marked as eliminated
-#   instead of being forced all-in)
+# - blind schedule becoming higher than all players' remaining stacks. (This was
+#   a known issue previously, though may be fixed now that we no longer are
+#   eliminating players with less than one Big Blind.)
 # - reaching a low max_num_hands limit
 # - multiple players busting out (especially edge cases)
 # - returns()'s values being correct when reaching terminal state

@@ -318,26 +318,18 @@ class RepeatedPokerkit(pyspiel.Game):
    2. At least 2 rounds.
   Both of these are very standard assumptions for poker as played in practice.
 
-  Note: we use simplified moving button rules. See
+  NOTE: we use simplified moving button rules. See
   https://en.wikipedia.org/wiki/Betting_in_poker#When_a_player_in_the_blinds_leaves_the_game
   This is common in online poker games generally speaking, and it is used here
   because the logic for remapping each hand to a gamedef becomes quite
   complex and highly error-prone when using dead button rules.
 
-  WARNING: This implementation diverges from standard tournament play in the
-  following respect: players who cannot post a big blind (or bring in if the
-  poker game variant has no big blind) are eliminated. This behavior exists
-  solely for historical reasons (i.e. when ported from RepeatedPoker). In theory
-  pokerkit should allow us to remove it and more-faithfully simulate games where
-  players can play a hand despite having less than one big blind.
-  This can result in the total rewards not adding up to the number of total
-  chips to start the tournament, so users should not rely on this assumption.
-
-  TODO: b/444333187: adjust the elimination logic here to instead allow players
-  to be forced all-in by bring_in or blinds, even if they cannot post a big
-  blind or bring-in. And only 'eliminate' them from the game if they have
-  *exactly* 0 chips remaining at the end of a hand. (Consider sub-classing if
-  desiring to match RepeatedPoker / ACPC behavior exactly in those spots.)
+  NOTE: This implementation differs from RepeatedPoker in that it *does* support
+  normal tournament rules for players with stack sizes less than one Big Blind.
+  (Specifically: we allow players to stay in and play as per normal, rather than
+  automatically eliminating them in such cases. This means that the total
+  rewards should always add up to the number of total chips when the tournament
+  started, as would be assumed for typical poker tournaments.)
   """
 
   def __init__(self, params=None):
@@ -728,20 +720,15 @@ class RepeatedPokerkitState(pyspiel.State):
     """
     if self.get_game()._reset_stacks:
       return
-    # Sometimes there isn't a blind because there is instead a bring-in (e.g.
-    # stud poker). We fall-back to using the bring-in in such cases.
-    busted_if_less_chips = (
-        self._big_blind
-        if self._big_blind != INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
-        else self._bring_in
-    )
-    assert busted_if_less_chips > 0
 
     self._player_to_seat = {}
     self._seat_to_player = {}
     next_open_seat = 0
     for player in range(self.num_players()):
-      if self._stacks[player] < busted_if_less_chips:
+      # Worst case the player should have 0 chips left; if they have a negative
+      # number then there was likely a major bug in the game logic elsewhere.
+      assert(self._stacks[player] >= 0)
+      if self._stacks[player] == 0:
         self._player_to_seat[player] = INACTIVE_PLAYER_SEAT
       else:
         self._player_to_seat[player] = next_open_seat
