@@ -211,6 +211,14 @@ def can_sample(
       | can_sample_if_full
       | can_sample_if_full_circular
   )
+  flags = dict(
+    can_sample_read_less=can_sample_read_less,
+    can_sample_read_greater=can_sample_read_greater,
+    read_index_greater_than_write=(read_index_greater_than_write & ~max_length_reached),
+    can_sample_if_full=can_sample_if_full,
+    can_sample_if_full_circular=can_sample_if_full_circular
+  )
+  jax.debug.print("Sampling flags: {x}", x=flags)
 
   return can_sample
 
@@ -310,12 +318,14 @@ class Buffer:
     self.total_seen = self.buffer_state.total_seen
 
   def sample(self, count: int) -> Any:
-    if self.buffer.can_sample(self.buffer_state, count):
+    if True: #self.buffer.can_sample(self.buffer_state, count):
+      self.buffer.can_sample(self.buffer_state, count)
       self._rng, rng = jax.random.split(self._rng)
 
       # indices are returned for debug purposes only
       self.buffer_state, batch, indices = self.buffer.sample( # pylint: disable=possibly-unused-variable
         self.buffer_state, self._rng, count) 
+      print("sampled:", indices)
 
       # To keep experiences at random, let them be shuffled
       return jax.lax.cond(
