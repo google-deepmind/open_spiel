@@ -59,12 +59,12 @@ def clone_dependencies():
   
   for dir_name, commit_hash in special_checkouts:
     if os.path.exists(dir_name):
-      print(f"🔄 Checking out specific commit for {dir_name}...")
+      print(f" Checking out specific commit for {dir_name}...")
       try:
         subprocess.check_call(["git", "checkout", commit_hash], cwd=dir_name)
-        print(f"✅ Successfully checked out {dir_name} commit")
+        print(f" Successfully checked out {dir_name} commit")
       except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to checkout {dir_name}: {e}")
+        print(f" Failed to checkout {dir_name}: {e}")
         raise
 
 
