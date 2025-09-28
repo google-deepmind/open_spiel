@@ -107,7 +107,7 @@ jobs:
       shell: bash
       run: |
         python -m pip install dist/*.whl
-        python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('✅ OpenSpiel works! Game:', game.get_type().short_name)"
+        python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
         
     - name: Run comprehensive tests
       shell: bash
