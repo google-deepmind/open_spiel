@@ -656,6 +656,9 @@ class PokerkitWrapperState(pyspiel.State):
       return self._wrapped_state.actor_index
 
   def _legal_actions(self, player):
+    return self._legal_actions_base(player)
+
+  def _legal_actions_base(self, player):
     wrapped_state: pokerkit.State = self._wrapped_state
     game: PokerkitWrapper = self.get_game()
     game.raise_error_if_player_out_of_range(player)
@@ -877,7 +880,11 @@ class PokerkitWrapperState(pyspiel.State):
     wrapped_state: pokerkit.State = self._wrapped_state
     # Handling player actions first since it's the more striaghtforward case.
     if not self.is_chance_node():
-      if action not in self.legal_actions():
+      # NOTE: using the _base version of the method directly. Since even in
+      # situations where legal_actions is overridden, we still want to avoid
+      # using the overriding class's actions (which could be different in
+      # situations where we're 'mapping' actions in some way).
+      if action not in self._legal_actions_base(self.current_player()):
         raise ValueError(
             f"Attempted to apply illegal action {action} to player"
             f" {self.current_player()}. Legal actions were"
@@ -1243,7 +1250,22 @@ class PokerkitWrapperObserver:
 
 # --- "ACPC-style" PokerkitWrapper subclass to mimick UniversalPoker ---
 class PokerkitWrapperAcpcStyle(PokerkitWrapper):
-  """A subclass of PokerkitWrapper that mimicks ACPC-wrapping UniversalPoker."""
+  """Subclass that mimics ACPC-wrapping UniversalPoker action handling.
+
+  NOTE: To compare with UniversalPoker, please use the PHH hand history and/or
+  'returns' array as your source of truth.
+
+  - only action handling (applying actions, listing legal actions, converting
+    actions to strings) is modified. The info/observation tensors and strings
+    will exactly match that of an un-subclassed PokerkitWrapper - and therefore
+    will NOT match UniversalPoker.
+
+  - action_to_string's only change is to interpet the provided
+    action as an ACPC-style action; it will simply map the action back to a
+    pokerkit style action before returning the string as per usual (i.e. it will
+    not make any other changes to the output string, e.g. to match
+    universal_poker).
+  """
 
   def __init__(self, params=None):
     if (
@@ -1286,383 +1308,421 @@ class PokerkitWrapperAcpcStyle(PokerkitWrapper):
     length += max_num_raises * (num_players - 1)
     return length
 
-  def observation_tensor_shape(self) -> list[int]:
-    return [2 * (self.num_players() + self.deck_size)]
+  def game_type(self):
+    return _GAME_TYPE_ACPC_STYLE
 
   def new_initial_state(self):
     return PokerkitWrapperAcpcStyleState(self)
 
-  def make_py_observer(self, iig_obs_type=None, params=None):
-    return PokerkitWrapperAcpcStyleObserver(self, iig_obs_type, params)
-
-  def game_type(self):
-    return _GAME_TYPE_ACPC_STYLE
-
-  def information_state_tensor_size(self):
-    num_players = self.num_players()
-    max_game_length = self.max_game_length()
-    max_chance_outcomes = self.max_chance_outcomes()
-    # --- Initialize the tensor (with length matching universal_poker's) ---
-    #
-    # Specifically: shape should match InformationStateTensorShape() in
-    # universal_poker.cc.
-    return num_players + 2 * max_chance_outcomes + (2 + 1) * max_game_length
-
 
 class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
-  """State class for PokerkitWrapperAcpcStyle."""
+  """Represents an _OpenSpiel_ 'state' for the PokerkitWrapper game.
 
-  def information_state_tensor(self, player):
-    """See spiel.h.
+  As described by the name, this class indeed wraps a `pokerkit.State` object
+  and provides the necessary interface for OpenSpiel's `pyspiel.State`.
+  """
 
-    TODO: b/434776281 - Move this into the Observer and use it properly for
-    games that have specified their iig_obs_types.perfect_recall to True.
+  def __init__(self, game):
+    """Constructor; should only be called by Game.new_initial_state."""
+    super().__init__(game)
+    current_payoffs = self._wrapped_state.payoffs
+    self._action_converter = ToAcpcActionConverter(
+        num_players=game.num_players(),
+        initial_contributions={
+            # Payoffs should contain the negative initial contributions from
+            # blinds and/or straddles, antes, and/or bring-ins. Hence it's
+            # easier to just use it rather than checking the relevant values for
+            # the given game variant.
+            p: -1 * current_payoffs[p]
+            for p in range(game.num_players())
+        },
+    )
+    self._pokerkit_action_to_acpc_style_mapping = {}
+    self._acpc_action_to_pokerkit_action_mapping = {}
+    self._refresh_action_mappings_if_player_node()
 
-    Deliberately matches UniversalPokerState::InformationStateTensor in
-    universal_poker.cc as much as realistically possible.
+  def _refresh_action_mappings_if_player_node(self):
+    """Refreshes the action mappings if we are at a player node.
 
-    Layout is as follows:
+    NOTE: should be called upon initializaiton + immediately *after* applying
+    any action - not at the start of e.g. _apply_action. This is because we use
+    these maps in multiple mostly-pure functions such as action_to_string() and
+    _legal_actions(). Otherwise we would have to call this function at the
+    start of each of those functions, i.e. regenerating the dict every time they
+    are called (which would be inefficient and much less elegant).
+    """
+    if self.is_chance_node() or self.is_terminal():
+      return
 
-    my player number: num_players bits
-    my cards: Initial deck size bits (1 means you have the card), i.e.
-              MaxChanceOutcomes() = NumSuits * NumRanks
-    public cards: Same as above, but for the public cards.
-     action sequence: (max game length)*2 bits (fold/raise/call/all-in)
-     action sequence sizings: (max game length) integers with value >= 0,
-                               0 when corresponding to 'deal' or 'check'.
+    assert not self.is_chance_node() and not self.is_terminal()
+    current_player = self.current_player()
+    # NOTE: not calling self._legal_actions() or self._action_to_string(). Since
+    # those depends on these maps *having already been updated* + are in the
+    # world of ACPC-style actions we're trying to support, instead of the
+    # pokerkit-style actions we have at this point.
+    pokerkit_style_actions = super()._legal_actions(current_player)
+    pokerkit_style_action_strings = [
+        super()._action_to_string(current_player, action)
+        for action in pokerkit_style_actions
+    ]
+    self._pokerkit_action_to_acpc_style_mapping = (
+        self._action_converter.create_action_map(
+            current_player,
+            pokerkit_style_actions,
+            pokerkit_style_action_strings,
+        )
+    )
+    self._acpc_action_to_pokerkit_action_mapping = {
+        v: k for k, v in self._pokerkit_action_to_acpc_style_mapping.items()
+    }
 
-    (+ another initial deck size * num_players bits for 'up-cards' in bring-in
-      variants, ie games that also have public hole cards)
+  def to_pokerkit_action(self, acpc_style_action):
+    return self._acpc_action_to_pokerkit_action_mapping[acpc_style_action]
+
+  def to_acpc_action(self, pokerkit_style_action):
+    return self._pokerkit_action_to_acpc_style_mapping[pokerkit_style_action]
+
+  def _action_to_string(self, player, action):
+    """Returns the string representation of an ACPC style action.
+
+    NOTE: Maps ACPC Style actions to a Pokerkit Style actions, then returns the
+    base class's _action_to_string(). Does NOT attempt to make the output string
+    exactly match that of UniversalPoker.
 
     Args:
-      player: The player ID for whom to generate the information state tensor.
-
-    Returns:
-      A numpy array representing the information state for the given player.
-
-    Raises:
-      RuntimeError: If player is out of range.
+      player: The player for whom the action string is generated.
+      action: The ACPC-style action.
     """
-    if player < 0:
-      raise RuntimeError("player >= 0")
-    elif player >= self.get_game().num_players():
-      raise RuntimeError("player <")
-    game = self.get_game()
-    game.raise_error_if_player_out_of_range(player)
+    if self.is_chance_node():
+      return super()._action_to_string(player, action)
+    if self.is_terminal():
+      raise ValueError("Cannot convert action to string for a terminal state.")
 
-    wrapped_state = self._wrapped_state
-    num_players = game.num_players()
-    deck_size = game.deck_size
-    max_game_length = game.max_game_length()
-
-    tensor_length = game.information_state_tensor_size()
-
-    # TODO: b/437724266 - consider adding this back in later if supporting
-    # other variants in this fashion
-    # if <game is bring in variant>:
-    # tensor_length += num_players * max_chance_outcomes
-    self.tensor = np.zeros(tensor_length, dtype=np.float32)
-
-    # --- Fill in the tensor ---
-    offset = 0
-    # Mark who I am.
-    self.tensor[player] = 1.0
-    offset += num_players
-
-    # Mark my private cards
-    # (Note: it may be much more efficient to iterate over the cards of the
-    # player, rather than iterating over all the cards. Consider updasting if
-    # this causes a performance bottleneck in the future.)
-    #
-    # Technically we could probably use 'hole_cards' since we're never going to
-    # be a poker variant with public hole cards (like e.g. 'bring-in' variants),
-    # but in case this gets copy/pasted elsewhere it's probably good to be
-    # defensive and explicitly use 'down_cards' instad.
-    my_hole_cards = list(wrapped_state.get_down_cards(player))
-    for card, i in game.card_to_int.items():
-      if card in my_hole_cards:
-        self.tensor[offset + i] = 1.0
-    offset += deck_size
-
-    # Mark the public cards
-    board_cards = wrapped_state.board_cards
-    # Board cards are nested inside a list, so we need to flatten them first.
-    board_cards = [card[0] for card in board_cards]
-    for card, i in game.card_to_int.items():
-      if card in board_cards:
-        self.tensor[offset + i] = 1.0
-    offset += deck_size
-
-    i = 0
-    # Must be separate since universal_poker action_sequence doesn't actually
-    # include entries for chance nodes (e.g. dealing cards).
-    for operation in wrapped_state.operations:
-      # Goal: mark action sequences to match Pokerkit as follows:
-      # - Call = 1 0
-      # - Raise = 0 1
-      # - All-in = 1 1
-      # - Fold = 0 0
-      # - Deal = 0 0
-      #
-      # plus, (for legacy reasons) the corresponding *unabstracted* sizings
-      # another max_game_length down in the vector (ie no longer as 0s or 1s).
-      #
-      # In total this will take up (2 + 1) * max_game_length entries.
-      #
-      # Relevant player operations in Pokerkit include:
-      # - CompletionBettingOrRaisingTo
-      # - CheckingOrCalling
-      # - Folding
-      #
-      # Relevant card operations in Pokerkit include:
-      # - HoleDealing
-      # - BoardDealing
-      #
-      # Note: we have to manually increment i only during matching operations
-      # since the Pokerkit operations don't necessarily line up with the
-      # universal_poker action_sequence. (There will be other irrelevant things
-      # like e.g. BlindOrStradlePosting, BetCollection, etc).
-      if isinstance(operation, pokerkit.CheckingOrCalling):
-        self.tensor[offset + i * 2] = 1.0
-        self.tensor[offset + (i * 2) + 1] = 0.0
-        # Judging by universal_poker.h, it sounds like universal_poker only
-        # records '0' for call sizings?? In which case, we should actaully *NOT*
-        # record the size here...
-        #
-        # self.tensor[
-        #     offset + choice_index + max_game_length*2] = operation.amount
-        #
-        # In the future we may want to record it anyways though. And, regardless
-        # we do need to incrememnt choice_index since it DOES show up in the
-        # sequence / takes a slot in the tensor (just, left to 0).
-        i += 1
-      if isinstance(operation, pokerkit.CompletionBettingOrRaisingTo):
-        # WARNING: we don't distinguish between 'all in' and normal raise
-        # here, which means it won't exactly match universal_poker's tensor.
-        self.tensor[offset + i * 2] = 0.0
-        self.tensor[offset + (i * 2) + 1] = 1.0
-        # Also mark the unabstracted action sequence sizings
-        # WARNING: this is the amount *being raised at this moment*, not the
-        # total contribution by the player across the course of the game up to
-        # this point (Which is what universal_poker records here).
-        #
-        # TODO: b/437611559 - Consider updating to match universal_poker's
-        # tensor.
-        self.tensor[offset + i + max_game_length * 2] = operation.amount
-        i += 1
-      # WARNING: THIS MAKES IT VERY DIFFICULT TO TELL FOLDING FROM DEALING IN
-      # THE TENSOR HERE.
-      #
-      # See also this comment from universal_poker.cc:
-      # pylint: disable=g-bad-todo (copied from UniversalPoker)
-      # """"
-      # TODO(author2): Should this be 11?
-      # """"
-      # pylint: enable=g-bad-todo
-      if isinstance(operation, pokerkit.Folding):
-        self.tensor[offset + i * 2] = 0.0
-        self.tensor[offset + (i * 2) + 1] = 0.0
-        # Folds get 0 in the tensor, so no need to mutate anything here...
-        # ... but they do TAKE UP A SLOT so we need to increment i still
-        i += 1
-      # max_game_length * 2 for one-hot encoding of fold/raise/call.
-      if isinstance(operation, pokerkit.HoleDealing) or isinstance(
-          operation, pokerkit.BoardDealing
-      ):
-        self.tensor[offset + i * 2] = 0.0
-        self.tensor[offset + (i * 2) + 1] = 0.0
-        i += 1
-    # *2 for the hone-hot encoding fold/raise/call, plus *1 for the sizings.
-    offset += max_game_length * 3
-
-    # TODO: b/437724266 - consider adding this back in later if supporting
-    # other variants in this fashion
-    # if <game is bring in variant>:
-    #   for p in range(num_players):
-    #     up_cards = wrapped_state.get_up_cards(p)
-    #     for card, i in game.card_to_int.items():
-    #       if card in up_cards:
-    #         self.tensor[offset + i] = 1.0
-    #   offset += num_players * max_chance_outcomes
-
-    assert tensor_length == offset
-    return self.tensor
-
-  # TODO: b/434776281 - Move this into the Observer and use it properly for
-  # games that have specified their iig_obs_types.perfect_recall to True.
-  def information_state_string(self, player):
-    if player < 0:
-      raise RuntimeError("player >= 0")
-    elif player >= self.get_game().num_players():
-      raise RuntimeError("player <")
-    pot = 0
-    for p in self._wrapped_state.pots:
-      if player in p.player_indices:
-        # NOTE: Might need to be adjusted in the future if we add support for
-        # ranked games, as this technically includes BOTH ranked AND unraked
-        # amounts. For more details see
-        # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.Pot
-        # (e.g. you might need to change it to p.unraked_amount.)
-        pot += p.amount
-    for pl in range(self.get_game().num_players()):
-      if pl != player:
-        pot += self._wrapped_state.bets[pl]
-    remaining_money: str = " ".join(
-        [str(s) for s in self._wrapped_state.stacks]
-    )
-    betting_sequence = []
-    for operation in self._wrapped_state.operations:
-      if isinstance(operation, pokerkit.CheckingOrCalling):
-        betting_sequence.append("c")
-      elif isinstance(operation, pokerkit.Folding):
-        betting_sequence.append("f")
-      elif isinstance(operation, pokerkit.CompletionBettingOrRaisingTo):
-        betting_sequence.append(f"r{operation.amount}")
-    betting_sequence = "".join(betting_sequence)
-    street_index = self._wrapped_state.street_index
-    private = " ".join([
-        str(c.rank) + str(c.suit)
-        for c in self._wrapped_state.get_censored_hole_cards(player)
-    ])
-    board = " ".join([
-        str(c[0].rank) + str(c[0].suit) for c in self._wrapped_state.board_cards
-    ])
-    return (
-        f"[Round {street_index}]"
-        f"[Player: {player}]"
-        f"[Pot: {pot}]"
-        f"[Money: {remaining_money}]"
-        f"[Private:{private}]"
-        f"[Public: {board}]"
-        f"[Sequences: {betting_sequence}]"
-    )
-
-
-class PokerkitWrapperAcpcStyleObserver(PokerkitWrapperObserver):
-  """Observer class for PokerkitWrapperAcpcStyle."""
-
-  def __init__(self, game, iig_obs_type, params):
-    super().__init__(game, iig_obs_type, params)
-    # Reinitialize tensor based on ACPC game shape
-    self.tensor_size = game.observation_tensor_shape()
-    self.tensor = np.zeros(self.tensor_size, dtype=np.float32)
-    self.dict = {}
-
-  def set_from(self, state, player) -> None:
-    """Updates `tensor` and `dict` to reflect `state` from PoV of `player`.
-
-    TODO: b/434776281 - Add proper support for iig_obs_types.perfect_recall
-    to return the information state tensor here instead of always just returning
-    the observation tensor.
-
-    WARNING: THIS OCCURS VIA MUTATION! Note how unlike with the C++ functions,
-    this function doesn't return anything (here, and generally all the other
-    python Observer stuff too).
-
-    Intentionally designed to mimick the logic in
-    UniversalPokerState::ObservationTensor (which is per-player).
-
-    Args:
-      state: The `PokerkitWrapperState` to observe.
-      player: The player ID for whom to generate the observation.
-
-    Returns:
-      None. This method updates the internal `tensor` and `dict` in place.
-    """
-    game = state.get_game()
-    game.raise_error_if_player_out_of_range(player)
-
-    # TODO: b/437724266 - add mutation of the 'dict' thing as well (in addition
-    # to just the tensor like we're doing currently).
-
-    self.tensor.fill(0)
-    game = state.get_game()
-    wrapped_state_clone: pokerkit.State = state.deepcopy_wrapped_state()
-    num_players = game.num_players()
-    num_cards = len(wrapped_state_clone.deck)
-
-    offset = 0
-    # Mark who I am.
-    self.tensor[player] = 1.0
-    offset += num_players
-
-    # Mark private hole cards
-    for card in wrapped_state_clone.get_down_cards(player):
-      self.tensor[offset + game.card_to_int[card]] = 1.0
-    offset += num_cards
-
-    # Mark the public cards
-    for card in wrapped_state_clone.board_cards:
-      self.tensor[offset + game.card_to_int[card[0]]] = 1.0
-    offset += num_cards
-
-    # Mark the contribution of each player to the pot.
-    for p in range(num_players):
-      contribution = (
-          wrapped_state_clone.starting_stacks[p] - wrapped_state_clone.stacks[p]
+    if action not in self._acpc_action_to_pokerkit_action_mapping:
+      assert action in self.legal_actions(player)
+      raise ValueError(
+          f"Action {action} is not a valid ACPC style action. Expected legal"
+          f" actions are: {self.legal_actions(player)}"
       )
-      self.tensor[offset + p] = float(contribution)
-    offset += num_players
-    assert offset == self.tensor_size[0]
+    assert not (self.is_chance_node() or self.is_terminal())
+    assert action in self._acpc_action_to_pokerkit_action_mapping
+    return super()._action_to_string(
+        player, self._acpc_action_to_pokerkit_action_mapping[action]
+    )
+
+  def _legal_actions(self, player: int) -> list[int]:
+    """Returns the legal actions in ACPC style.
+
+    Obtains the list of pokerkit-style actions from the base class, then
+    converts them all to ACPC style.
+
+    Args:
+      player: The player for whom to get the legal actions.
+
+    Returns:
+      A list of legal actions in ACPC style.
+    """
+    pokerkit_style_legal_actions = super()._legal_actions(player)
+    if self.is_chance_node() or self.is_terminal():
+      return pokerkit_style_legal_actions
+    else:
+      return [self.to_acpc_action(a) for a in pokerkit_style_legal_actions]
+
+  def _apply_action(self, action):
+    """Apply ACPC-style actions.
+
+    Aplies ACPC actions by converting them to Pokerkit style actions and then
+    passing them to the base class's _apply_action(). Also perorms various
+    validation checks and bookkeeping.
+
+    Args:
+      action: The ACPC-style action to apply.
+    """
+    if self.is_chance_node():
+      self._action_converter.track_chance_node()
+      super()._apply_action(action)
+
+      # Refresh so that the *next* action will be handled correctly.
+      self._refresh_action_mappings_if_player_node()
+      return
+
+    if self.is_terminal():
+      raise ValueError("Cannot apply action to a terminal state.")
+
+    assert not (self.is_chance_node() or self.is_terminal())
+    pokerkit_style_action = self._acpc_action_to_pokerkit_action_mapping[action]
+
+    # Avoid bugs due to accidentally using the unconverted action (which is
+    # ACPC-style still at this point)
+    acpc_style_action = action
+    del action
+    if pokerkit_style_action == ACTION_FOLD:
+      super()._apply_action(pokerkit_style_action)
+      self._refresh_action_mappings_if_player_node()
+      return
+
+    if pokerkit_style_action == ACTION_CHECK_OR_CALL:
+      size = self._wrapped_state.checking_or_calling_amount
+    elif pokerkit_style_action > ACTION_CHECK_OR_CALL:
+      # Handling completion bet or raise-to. *Usually* the action is the size,
+      # but there are rare exceptions.
+      size = pokerkit_style_action
+      # NOTE: the first call is using super() meaning it will interpret the
+      # action as a *pokerkit style* action! Not an ACPC style action, like we
+      # would get it using self.action_to_string().
+      if (
+          not super()
+          ._action_to_string(self.current_player(), pokerkit_style_action)
+          .endswith(f"Bet/Raise to {size}")
+      ):
+        # Currently there is only one very specific edge case where this is
+        # allowed: betting exactly one chip.
+        assert (
+            super()
+            ._action_to_string(self.current_player(), pokerkit_style_action)
+            .endswith("Bet/Raise to 1 [ALL-IN EDGECASE]")
+        )
+        size = 1
+      # NOTE: now double-checking using the *subclassed* action_to_string()
+      # method, hence passing in the acpc_style_action.
+      assert self._action_to_string(
+          self.current_player(), acpc_style_action
+      ).endswith(f"Bet/Raise to {size}")
+    else:
+      raise ValueError(
+          "Action must be a check, call, completion bet, or raise-to."
+      )
+    assert size is not None
+
+    self._action_converter.track_pokerkit_style_player_action(
+        self.current_player(), pokerkit_style_action, size
+    )
+    super()._apply_action(pokerkit_style_action)
+    self._refresh_action_mappings_if_player_node()
     return
 
-  def string_from(self, state, player) -> str:
-    """Observation of `state` from the PoV of `player`, as a string.
 
-    TODO: b/434776281 - Add proper support for iig_obs_types.perfect_recall
-    to return the information state tensor here instead of always just returning
-    the observation tensor.
+class ToAcpcActionConverter:
+  """Helper class to convert PokerKit-style actions to ACPC-style actions.
+
+  Specifically: PokerKit's betting actions generally mean "raise this player's
+  contribution for *this* street to X". This differs from ACPC's betting actions
+  which generally represent "raise this player's toatal contribution across all
+  streets to X". This class helps track contributions to allow us to convert
+  between these two styles as needed in PokerKitWrapperACPCStyle.
+  """
+
+  def __init__(
+      self,
+      num_players: int,
+      initial_contributions: dict[int, float],
+  ):
+    if num_players is None:
+      raise ValueError("num_players must be specified.")
+    if num_players <= 1:
+      raise ValueError("num_players must be at least 2.")
+    if initial_contributions is None:
+      raise ValueError("initial_contributions must be specified.")
+
+    self._num_players = num_players
+    self._per_street_contributions: list[dict[int, float]] = [
+        {p: 0.0 for p in range(self._num_players)} | initial_contributions
+    ]
+
+    for p in range(num_players):
+      assert p in self._per_street_contributions[0]
+    if len(self._per_street_contributions[0]) != num_players:
+      raise ValueError(
+          "After merging in initial_contributions, expected"
+          f" {num_players} players. Instead got"
+          f" {len(initial_contributions)} players."
+      )
+
+    # NOTE: Defaults to False since we also default self.current_street to 0 and
+    # don't want track_chance_node() to increment the street
+    # counter if people call it prior to any player actions, e.g. dealing cards
+    # in Hold'em preflop chance nodes.
+    self._ready_to_increment_street = False
+
+  def track_chance_node(self):
+    """Handles bookkeeping related to chance nodes potentially changing street.
+
+    Specifically: increments the street IFF we have not tracked any additional
+    contributions since the last time we incremented the street.
+
+    In practice, users can call this function every time they are processing
+    a chance node (and trust it will increment only once to the next street, on
+    the first such call).
+
+    Raises:
+      RuntimeError: If the street is incremented past the maximum number of
+        streets.
+    """
+    if not self._ready_to_increment_street:
+      # E.g. called a second or third time when dealing the 3 flop cards.
+      return
+    # else:
+    self._ready_to_increment_street = False
+    self._per_street_contributions.append(
+        {p: 0.0 for p in range(self._num_players)}
+    )
+
+  def track_pokerkit_style_player_action(
+      self, player, pokerkit_style_action, size
+  ):
+    """Tracks a completion bet or raise, or check or call, for the given player.
+
+    Stores information for the given action **assuming said action is NOT in
+    ACPC stlye**, and marks that the street is ready to be incremented upon the
+    next chance node.
+
+    (If you want to track an action that is in ACPC style, please first convert
+    it to the non-ACPC 'normal' PokerkitWrapper action before calling this
+    method!)
+
+    NOTE: Size should not necessarily equal the pokerkit_style_action (even if
+    it does for most bets). In particular:
+    - Size should be 0 for checks
+    - Size should equal the 'calling amount' for calls.
+    - Size should equal the amount completion-bet or raised-to. (This is
+      _usually_ equal to the action, but there are exceptions: e.g. in
+      situations where betting 1 chip is allowed.)
 
     Args:
-      state: The `PokerkitWrapperState` to observe.
-      player: The player ID for whom to generate the observation. (Private hole
-        cards may be 'censored' for all other players.)
-
-    Returns:
-      A string representation of the observation from the player's perspective.
+      player: The index of the player who performed the action.
+      pokerkit_style_action: The action taken by the player, using the
+        PokerkitWrapper's action encoding (e.g., ACTION_FOLD,
+        ACTION_CHECK_OR_CALL, or a bet/raise amount).
+      size: The numerical value associated with the action. This is 0 for folds
+        and checks, the calling amount for calls, and the total amount being
+        bet/raised to for completion bets or raises.
     """
-    game = state.get_game()
-    game.raise_error_if_player_out_of_range(player)
+    if size < 0:
+      raise ValueError("Size must be non-negative.")
 
-    # Note: we're mainly just using this for read access. So, if this is too
-    # inefficient, as an optimization we could instead just directly access the
-    # protected variable (i.e. deliberately disregarding its protected-ness) -
-    # i.e. so long as we're careful to avoid ever mutating it from inside this
-    # function.
-    wrapped_state_clone: pokerkit.State = state.deepcopy_wrapped_state()
-    pot = 0
-    for p in wrapped_state_clone.pots:
-      if player in p.player_indices:
-        # NOTE: Might need to be adjusted in the future if we add support for
-        # ranked games, as this technically includes BOTH ranked AND unraked
-        # amounts. For more details see
-        # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.Pot
-        # (e.g. you might need to change it to p.unraked_amount.)
-        pot += p.amount
-    for pl in range(state.get_game().num_players()):
-      if pl != player:
-        pot += wrapped_state_clone.bets[pl]
-    remaining_money: str = " ".join(
-        [str(s) for s in wrapped_state_clone.stacks]
+    # The caller may still have additional contributions on this street, but we
+    # can at least guarantee that on the *next* chance node it will be a
+    # different street.
+    self._ready_to_increment_street = True
+    if pokerkit_style_action in FOLD_AND_CHECK_OR_CALL_ACTIONS and size == 0:
+      pass  # Fold and check contribute no additional chips from their stack.
+      return
+    elif pokerkit_style_action == ACTION_FOLD:  # and size != 0
+      raise ValueError("FOLD actions should be passed as 0 size.")
+    elif pokerkit_style_action == ACTION_CHECK_OR_CALL:  # and size != 0
+      # This MUST be a call if we've reacehd this point, since checks
+      # (i.e. size == 0) should have been handled above already above.
+      assert(size > 0)
+      # NOTE: Adding, not replacing, since call sizes in pokerkit are defined
+      # as the *additional* contribution on the current street (unlike
+      # completion bets or raises).
+      self._per_street_contributions[-1][player] += size
+    elif pokerkit_style_action > max(FOLD_AND_CHECK_OR_CALL_ACTIONS):
+      if pokerkit_style_action != size and not (
+          pokerkit_style_action == 2 and size == 1
+      ):
+        raise ValueError(
+            "pokerkit_style_action must equal size for completion bets or"
+            " raise-tos (except very special cases whereaction 2 can mean 'bet"
+            f" 1 chip'). Got action {pokerkit_style_action} and size"
+            f" {size} instead."
+        )
+      # Completion bet or raise-to. (Note how unlike calls, this is effectively
+      # "replacing" the contribution for the current street, not just adding to
+      # it.)
+      self._per_street_contributions[-1][player] = size
+    else:
+      raise ValueError(
+          "pokerkit_style_action must be a fold, check, or call. Got action"
+          f" {pokerkit_style_action} instead."
+      )
+
+  def create_action_map(
+      self,
+      player: int,
+      pokerkit_style_actions: list[int],
+      pokerkit_style_action_strings: list[str],
+  ) -> dict[int, int]:
+    """Creates an dict mapping Pokerkit-style actions to Acpc-style actions."""
+    if len(pokerkit_style_actions) != len(pokerkit_style_action_strings):
+      raise ValueError(
+          "pokerkit_style_actions and action_strings must have the same length."
+      )
+    pokerkit_action_and_string_pairs = list(
+        zip(pokerkit_style_actions, pokerkit_style_action_strings)
     )
-    street_index = wrapped_state_clone.street_index
-    private = " ".join([
-        str(c.rank) + str(c.suit)
-        for c in wrapped_state_clone.get_censored_hole_cards(player)
-    ])
-    # Total contribution to the pot by the player.
-    contribution = (
-        wrapped_state_clone.starting_stacks[player]
-        - wrapped_state_clone.stacks[player]
+
+    for (
+        pokerkit_style_action,
+        pokerkit_style_action_string,
+    ) in pokerkit_action_and_string_pairs:
+      if pokerkit_style_action not in FOLD_AND_CHECK_OR_CALL_ACTIONS:
+        expected_bet_raise_string = "Bet/Raise to"
+        if expected_bet_raise_string not in pokerkit_style_action_string:
+          raise ValueError(
+              f"Action string does not contain '{expected_bet_raise_string}'."
+              f" Got action string: {pokerkit_style_action_string}"
+          )
+
+    # This is the main purpose for having this separate function: it allows us
+    # to calculate the total prior street contribution once, rather than having
+    # to do so for every single action.
+    current_street = len(self._per_street_contributions) - 1
+    # NOTE: exclusive slice to avoid including the current street's
+    # contributions in the sum here.
+    prior_street_contributions = self._per_street_contributions[:current_street]
+    total_prior_street_contribution = int(sum(
+        contribution[player] for contribution in prior_street_contributions
+    ))
+    pokerkit_action_to_acpc_action_mapping = {
+        pokerkit_style_action: self._convert_action_to_acpc_style(
+            pokerkit_style_action,
+            pokerkit_style_action_string,
+            total_prior_street_contribution,
+        )
+        for pokerkit_style_action, pokerkit_style_action_string in pokerkit_action_and_string_pairs
+    }
+    # All our actions should be unique by definition. If not, there's likely a
+    # but in our logic.
+    assert len(pokerkit_action_to_acpc_action_mapping.keys()) == len(
+        set(pokerkit_action_to_acpc_action_mapping.keys())
     )
-    return (
-        f"[Round {street_index}]"
-        f"[Player: {player}]"
-        f"[Pot: {pot}]"
-        f"[Money: {remaining_money}]"
-        f"[Private:{private}]"
-        f"[PlayerContribution: {contribution}]"
+    assert len(pokerkit_action_to_acpc_action_mapping.values()) == len(
+        set(pokerkit_action_to_acpc_action_mapping.values())
     )
+    return pokerkit_action_to_acpc_action_mapping
+
+  def _convert_action_to_acpc_style(
+      self,
+      pokerkit_style_action: int,
+      pokerkit_style_action_string: str,
+      total_prior_street_contribution: float,
+  ) -> int:
+    """Helper convert indvidiual actions for convert_pokerkit_style_actions."""
+    if pokerkit_style_action in FOLD_AND_CHECK_OR_CALL_ACTIONS:
+      # Fold and check_or_call actions are always hardcoded to the same values
+      # in ACPC style and pokerkit style, so no need to convert the action in
+      # any way.
+      return pokerkit_style_action
+
+    # Completion Bet or Raise-to
+    #
+    # NOTE: This is the one place where we usually have to convert actions!
+    # I.e. ACPC-style and pokerkit-style actions primarily differ only in this
+    # specific point.
+    pokerkit_action_size = pokerkit_style_action
+
+    # Handle a very specific edge-case where the player is allowed to bet
+    # exactly one chip via a special '2' action (to avoid conflict with
+    # the ACTION_CHECK_OR_CALL value of 1).
+    if pokerkit_style_action == 2 and pokerkit_style_action_string.endswith(
+        "Bet/Raise to 1 [ALL-IN EDGECASE]"
+    ):
+      pokerkit_action_size = 1
+    assert (
+        f"Bet/Raise to {pokerkit_action_size}" in pokerkit_style_action_string
+    )
+    return pokerkit_action_size + total_prior_street_contribution
 
 
 # ------------------------------------------------------------------------------

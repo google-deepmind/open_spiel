@@ -110,6 +110,8 @@ set(GAME_SOURCES
   latent_ttt/latent_ttt.h
   leduc_poker/leduc_poker.cc
   leduc_poker/leduc_poker.h
+  leduc_poker/repeated_leduc_poker.cc
+  leduc_poker/repeated_leduc_poker.h
   lewis_signaling/lewis_signaling.cc
   lewis_signaling/lewis_signaling.h
   liars_dice/liars_dice.cc
@@ -615,6 +617,10 @@ add_test(quoridor_test quoridor_test)
 add_executable(rbc_test rbc/rbc_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(rbc_test rbc_test)
+
+add_executable(repeated_leduc_poker_test leduc_poker/repeated_leduc_poker_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(repeated_leduc_poker_test repeated_leduc_poker_test)
 
 add_executable(sheriff_test sheriff/sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

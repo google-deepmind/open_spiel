@@ -136,6 +136,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "python_liars_poker",
     "quoridor",
     "repeated_game",
+    "repeated_leduc_poker",
     "rbc",
     "restricted_nash_response",
     "sheriff",
