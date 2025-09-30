@@ -44,6 +44,10 @@ SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = [
     "dou_dizhu",  # https://github.com/google-deepmind/open_spiel/issues/1358
     "quoridor",  # https://github.com/google-deepmind/open_spiel/issues/1349
+    # https://github.com/google-deepmind/open_spiel/issues/1373
+    "python_pokerkit_wrapper_acpc_style",
+    # Disabling while python_pokerkit_wrapper is disabled.
+    "python_repeated_pokerkit",
 ]
 
 # A list of games to exclude testing pickle serialization of the 'game type'

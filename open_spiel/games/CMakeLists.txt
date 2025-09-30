@@ -334,9 +334,10 @@ add_executable(breakthrough_test breakthrough/breakthrough_test.cc ${OPEN_SPIEL_
                $<TARGET_OBJECTS:tests>)
 add_test(breakthrough_test breakthrough_test)
 
-add_executable(bridge_test bridge/bridge_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(bridge_test bridge_test)
+# Disabled until we reduce the length. See #1371.
+# add_executable(bridge_test bridge/bridge_test.cc ${OPEN_SPIEL_OBJECTS}
+#                $<TARGET_OBJECTS:tests>)
+# add_test(bridge_test bridge_test)
 
 add_executable(catch_test catch/catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
