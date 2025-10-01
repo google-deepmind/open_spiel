@@ -77,9 +77,28 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: pp*
-      CIBW_BEFORE_TEST: python -m pip install --upgrade pip
+      CIBW_BEFORE_BUILD: |
+        echo "=== Disk space before build ===" && df -h
+        find /tmp -name "pip-*" -type d -exec rm -rf {} + 2>/dev/null || true
+        find /root/.cache -type f -delete 2>/dev/null || true
+        pip cache purge 2>/dev/null || true
+        echo "=== Cleaned up, disk space now ===" && df -h
+      CIBW_BEFORE_TEST: |
+        echo "=== Disk space before test ===" && df -h
+        find /tmp -name "pip-*" -type d -exec rm -rf {} + 2>/dev/null || true
+        find /root/.cache -type f -delete 2>/dev/null || true
+        pip cache purge 2>/dev/null || true
+        python -m pip install --upgrade pip --no-cache-dir
+        echo "=== Cleaned up, disk space now ===" && df -h
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
-      CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
+      CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }} PIP_NO_CACHE_DIR=1
+      CIBW_BEFORE_BUILD_ALL: |
+        echo "=== Initial container disk space ===" && df -h
+        yum clean all 2>/dev/null || apt-get clean 2>/dev/null || true
+        rm -rf /var/cache/yum/* 2>/dev/null || true
+        rm -rf /var/lib/apt/lists/* 2>/dev/null || true
+        find /tmp -mindepth 1 -delete 2>/dev/null || true
+        echo "=== After system cleanup ===" && df -h
 
     steps:
       - uses: actions/checkout@v4
