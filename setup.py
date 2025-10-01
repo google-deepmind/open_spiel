@@ -30,9 +30,9 @@ def clone_dependencies():
   deps = [
       ("pybind11", "https://github.com/pybind/pybind11.git", ["-b", "master", "--single-branch", "--depth", "1"]),
       ("open_spiel/abseil-cpp", "https://github.com/abseil/abseil-cpp.git", ["-b", "20250127.1", "--single-branch", "--depth", "1"]),
-      ("open_spiel/json", "https://github.com/nlohmann/json.git", ["-b", "master"]),
-      ("open_spiel/pybind11_json", "https://github.com/pybind/pybind11_json.git", ["-b", "master"]),
-      ("open_spiel/pybind11_abseil", "https://github.com/pybind/pybind11_abseil.git", ["-b", "master"]),
+      ("open_spiel/json", "https://github.com/nlohmann/json.git", ["-b", "master", "--single-branch", "--depth", "1"]),
+      ("open_spiel/pybind11_json", "https://github.com/pybind/pybind11_json.git", ["-b", "master", "--single-branch", "--depth", "1"]),
+      ("open_spiel/pybind11_abseil", "https://github.com/pybind/pybind11_abseil.git", ["-b", "master", "--single-branch", "--depth", "1"]),
       ("open_spiel/games/bridge/double_dummy_solver", "https://github.com/jblespiau/dds.git", ["-b", "develop", "--single-branch", "--depth", "1"])
   ]
   

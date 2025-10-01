@@ -119,22 +119,3 @@ jobs:
       with:
         name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
         path: dist/*.whl
-
-  upload_pypi:
-    needs: [build_wheels]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: wheels-*
-        path: dist
-        merge-multiple: true
-
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
-        packages-dir: dist/
