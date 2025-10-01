@@ -86,7 +86,7 @@
 #include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
-#define PYSPIEL_VERSION "1.6.1"
+#define PYSPIEL_VERSION "1.6.2"
 
 // Flags governing Open Spiel behaviour
 ABSL_FLAG(bool, log_exceptions_to_stderr, true,
