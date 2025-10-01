@@ -409,6 +409,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)
       .def("serialize", &Game::Serialize)
+      .def("to_string", &Game::ToString)
       .def("make_observer",
            [](std::shared_ptr<const Game> game, IIGObservationType iig_obs_type,
               const GameParameters& params) {

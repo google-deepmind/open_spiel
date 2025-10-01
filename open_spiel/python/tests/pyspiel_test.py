@@ -136,6 +136,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "python_liars_poker",
     "quoridor",
     "repeated_game",
+    "repeated_leduc_poker",
     "rbc",
     "restricted_nash_response",
     "sheriff",
@@ -264,6 +265,10 @@ class PyspielTest(parameterized.TestCase):
     self.assertFalse(state.is_chance_node())
     self.assertFalse(state.is_terminal())
     self.assertEqual(state.legal_actions(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
+
+  def test_game_string(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    self.assertEqual(str(game), game.to_string())
 
   def test_game_parameters_from_string_empty(self):
     self.assertEqual(pyspiel.game_parameters_from_string(""), {})
