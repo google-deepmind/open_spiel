@@ -66,15 +66,6 @@ jobs:
           OS_PYTHON_VERSION: 3.11
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp39-macosx_arm64 cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64
-        # Windows support - your original goal  
-        - os: windows-latest
-          NAME: "Windows"
-          OS_TYPE: "Windows"
-          CI_PYBIN: python
-          OS_PYTHON_VERSION: 3.10
-          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
-          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64 cp313-win_amd64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -89,9 +80,7 @@ jobs:
       CIBW_SKIP: pp*
 
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
-      CIBW_TEST_COMMAND_LINUX: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
-      CIBW_TEST_COMMAND_MACOS: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
-      CIBW_TEST_COMMAND_WINDOWS: python -c "import open_spiel.python.rl_environment; print('OpenSpiel basic test passed')"
+      CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
 
@@ -101,16 +90,15 @@ jobs:
       - name: Install
         run: |
           pwd
-          [[ "${OS_TYPE}" != "Windows" ]] && uname -a
+          uname -a
           [[ "${OS_TYPE}" = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
           [[ "${OS_TYPE}" = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
-          [[ "${OS_TYPE}" != "Windows" ]] && which g++
-          [[ "${OS_TYPE}" != "Windows" ]] && g++ --version
-          [[ "${OS_TYPE}" != "Windows" ]] && chmod +x install.sh
+          which g++
+          g++ --version
+          chmod +x install.sh
           # This is needed to grab OpenSpiel dependencies.
           [[ "${OS_TYPE}" = "Darwin" ]] && ./install.sh `which python${OS_PYTHON_VERSION}`
           [[ "${OS_TYPE}" = "Linux" ]] && ./install.sh `which python3`
-          [[ "${OS_TYPE}" = "Windows" ]] && echo "Windows detected - dependencies managed by setup.py"
           # These are necessary to install what is necessary for the build and for the full tests below.
           ${CI_PYBIN} -m venv ./venv
           source ./venv/bin/activate
@@ -145,10 +133,8 @@ jobs:
       # such as Tensorflow, PyTorch, and JAX.
       - name: Install bdist_wheel and full tests
         run: |
-          [[ "${OS_TYPE}" != "Windows" ]] && source ./venv/bin/activate
-          [[ "${OS_TYPE}" = "Windows" ]] && .\\venv\\Scripts\\activate
-          [[ "${OS_TYPE}" != "Windows" ]] && ./open_spiel/scripts/test_wheel.sh full `pwd` python
-          [[ "${OS_TYPE}" = "Windows" ]] && echo "Windows full tests - basic import test" && python -c "import open_spiel.python.rl_environment; print('OpenSpiel Windows test passed')"
+          source ./venv/bin/activate
+          ./open_spiel/scripts/test_wheel.sh full `pwd` python
 
       - uses: actions/upload-artifact@v4
         with:
