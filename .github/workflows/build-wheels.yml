@@ -1,12 +1,8 @@
-name: Build Wheels
+name: Build Wheels (DISABLED - use wheels.yml instead)
 
+# Disabled to avoid conflicts with wheels.yml - remove this file once wheels.yml is stable
 on:
-  push:
-    branches: [ master, main ]
-    tags: [ 'v*' ]
-  pull_request:
-    branches: [ master, main ]
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger only
 
 jobs:
   build_wheels:
