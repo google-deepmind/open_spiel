@@ -174,6 +174,9 @@ class RepeatedPokerGame : public Game {
   int MaxChanceOutcomes() const override {
     return base_game_->MaxChanceOutcomes();
   }
+  int MaxChanceNodesInHistory() const override {
+    return max_num_hands_ * base_game_->MaxChanceNodesInHistory();
+  }
   double MinUtility() const override;
   double MaxUtility() const override;
   absl::optional<double> UtilitySum() const override { return 0; };
