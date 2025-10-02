@@ -699,7 +699,7 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
     self.assertIn(10000.0, returns)
     self.assertIn(-10000.0, returns)
 
-  def test_action_mapping_acpc_style(self):
+  def test_universal_poker_port_player_action_mapping_acpc_style(self):
     params = {
         "variant": "NoLimitTexasHoldem",
         "num_players": 3,
@@ -708,6 +708,10 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
     }
     game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
     state = game.new_initial_state()
+    # NOTE: Chance action ints would not actually match universal_poker since
+    # pokerkit deals hole cards more 'realistically' than universal_poker. For
+    # more details see the # pokerkit_wrapper_acpc_style docstring. (That said,
+    # this fact is irrelevant for this test.)
     state.apply_action(game.card_to_int[Card(ACE, CLUB)])
     state.apply_action(game.card_to_int[Card(DEUCE, SPADE)])
     state.apply_action(game.card_to_int[Card(SEVEN, HEART)])
@@ -744,7 +748,7 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
     state.apply_action(ACTION_CHECK_OR_CALL)  # P1 checks
     self.assertEqual(state.legal_actions(), expected_actions)
     state.apply_action(90)  # P2 bets 30. The ACPC-style action is 90 (30 + 60
-                            # from pre-flop).
+    # from pre-flop).
 
     state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls
     state.apply_action(ACTION_CHECK_OR_CALL)  # P1 calls
@@ -789,6 +793,264 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
     # - P1 lost the 90 they had contributed before folding.
     # - P2 lost all 2000.
     self.assertEqual(state.returns(), [2090.0, -90.0, -2000.0])
+
+  def test_universal_poker_port_full_nl_betting_test1(self):
+    """Ported from universal_poker_test.cc FullNLBettingTest1."""
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 2,
+        "blinds": "1 2",
+        "stack_sizes": "20 20",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
+    state = game.new_initial_state()
+    self.assertEqual(game.num_distinct_actions(), 21)
+
+    # Deal hole cards
+    # NOTE: Will not actually match universal_poker since pokerkit deals hole
+    # cards more 'realistically' than universal_poker (see the
+    # pokerkit_wrapper_acpc_style docstring for more details. That said, this
+    # shouldn't matter much for the test - both players are still going to end
+    # up getting 2s, just with different suits, which isn't relevant given the
+    # board runout being four 3s and one 4).
+    for _ in range(4):
+      state.apply_action(state.chance_outcomes()[0][0])
+
+    # Check valid raise actions, smallest valid raise is double the big blind.
+    legal_actions = state.legal_actions()
+    self.assertNotIn(3, legal_actions)
+    for i in range(4, 21):
+      self.assertIn(i, legal_actions)
+    self.assertNotIn(21, legal_actions)
+
+    state.apply_action(ACTION_CHECK_OR_CALL)  # call big blind
+    state.apply_action(ACTION_CHECK_OR_CALL)  # check big blind
+
+    # Deal flop
+    for _ in range(3):
+      state.apply_action(state.chance_outcomes()[0][0])
+
+    # Check valid raise actions again.
+    legal_actions = state.legal_actions()
+    self.assertNotIn(3, legal_actions)
+    for i in range(4, 21):
+      self.assertIn(i, legal_actions)
+    self.assertNotIn(21, legal_actions)
+
+    # Each player keeps min raising until one is all in.
+    for i in range(4, 21, 2):
+      state.apply_action(i)
+
+    state.apply_action(ACTION_CHECK_OR_CALL)  # call last raise
+
+    # Deal turn and river
+    state.apply_action(state.chance_outcomes()[0][0])
+    state.apply_action(state.chance_outcomes()[0][0])
+
+    # Hand is a draw with deterministic card deal.
+    self.assertEqual(state.returns()[0], 0.0)
+    self.assertEqual(state.returns()[1], 0.0)
+
+    # TODO: b/444333187 - test the PHH looks as expected to mimic the C++ test
+    # this was ported from.
+
+  def test_universal_poker_port_full_nl_betting_test2(self):
+    """Ported from universal_poker_test.cc FullNLBettingTest2."""
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 2,
+        "blinds": "50 100",
+        "stack_sizes": "10000 10000",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
+    state = game.new_initial_state()
+    self.assertEqual(game.num_distinct_actions(), 10001)
+
+    while state.is_chance_node():
+      state.apply_action(state.legal_actions()[0])  # Deal hole cards
+
+    # Check valid raise actions
+    legal_actions = state.legal_actions()
+    self.assertNotIn(199, legal_actions)
+    for i in range(200, 10001):
+      self.assertIn(i, legal_actions)
+    self.assertNotIn(10001, legal_actions)
+
+    state.apply_action(5100)  # Bet just over half stack.
+    # Raise must double the size of the bet.
+    # Only legal actions are fold, call, all-in.
+    self.assertCountEqual(
+        state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL, 10000]
+    )
+
+    state.apply_action(ACTION_CHECK_OR_CALL)
+
+    # Deal flop
+    for _ in range(3):
+      state.apply_action(state.chance_outcomes()[0][0])
+
+    # New round of betting, min bet is big blind.
+    # Total commitment pre-flop was 5100. Min-bet is 100 on this street, so
+    # ACPC-style action is 5100 + 100 = 5200.
+    legal_actions = state.legal_actions()
+    self.assertNotIn(5199, legal_actions)
+    for i in range(5200, 10001):
+      self.assertIn(i, legal_actions)
+
+    state.apply_action(5200)  # Min bet
+
+    # Now we can raise by at least the big blind.
+    legal_actions = state.legal_actions()
+    for i in range(5300, 10001):
+      self.assertIn(i, legal_actions)
+
+    state.apply_action(ACTION_CHECK_OR_CALL)  # Call.
+
+    # Deal turn.
+    state.apply_action(state.chance_outcomes()[0][0])
+
+    state.apply_action(5400)  # Bet 2 big blinds (200). 5200 + 200 = 5400
+    state.apply_action(5600)  # Raise to 4 big blinds (400).
+    state.apply_action(5900)  # Reraise to 7 big blinds.
+    # Now a reraise must increase by at least 3 more big blinds.
+
+    legal_actions = state.legal_actions()
+    self.assertNotIn(6199, legal_actions)
+    for i in range(6200, 10001):
+      self.assertIn(i, legal_actions)
+    state.apply_action(ACTION_CHECK_OR_CALL)  # Call.
+
+    # Deal river
+    state.apply_action(state.chance_outcomes()[0][0])
+
+    # New round of betting so we can bet as small as one BB (100).
+    legal_actions = state.legal_actions()
+    self.assertNotIn(5999, legal_actions)
+    for i in range(6000, 10001):
+      self.assertIn(i, legal_actions)
+
+    state.apply_action(10000)  # All-in
+    state.apply_action(ACTION_FOLD)
+    self.assertEqual(state.returns(), [5900.0, -5900.0])
+
+  def test_universal_poker_port_full_nl_betting_test3(self):
+    """Ported from universal_poker_test.cc FullNLBettingTest3."""
+    # NOTE: universal_poker uses atypical turn order and blind structures
+    # that pokerkit does not support. This test is adapted to standard poker
+    # rules.
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 3,
+        # NOTE: Cannot match C++ test which was backwards (BB SB 2111 order).
+        # But, in practice this doesn't actaully matter.
+        "blinds": "50 100",
+        "stack_sizes": "500 1000 2000",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
+    state = game.new_initial_state()
+
+    # Pokerkit deals players more 'realistically' than universal_poker, i.e.
+    # each player gets their first hole card before any player gets their second
+    # hole card. As such, to match universal_poker we have to deal the cards in
+    # a specific order ourselves (rather than 'all 2c 2h 2d 2s 3c 3d').
+    expected_hole_cards = [
+        Card(DEUCE, CLUB),
+        Card(DEUCE, HEART),
+        Card(TREY, CLUB),
+        Card(DEUCE, DIAMOND),
+        Card(DEUCE, SPADE),
+        Card(TREY, DIAMOND),
+    ]
+    for card in expected_hole_cards:
+      state.apply_action(game.card_to_int[card])
+      self.assertLess(game.card_to_int[card], 7)
+
+    # Preflop
+    state.apply_action(ACTION_CHECK_OR_CALL)  # P2 (BTN) calls big blind
+    state.apply_action(ACTION_CHECK_OR_CALL)  # P0 (SB) calls big blind
+    state.apply_action(ACTION_CHECK_OR_CALL)  # P1 (BB) checks
+
+    # Here+below, additionally verifying that card actions match the C++ test.
+    # (Which they should since )
+    # Deal flop
+    expected_flop_cards = [
+        Card(TREY, HEART),
+        Card(TREY, SPADE),
+        Card(FOUR, CLUB),
+    ]
+    while state.is_chance_node():
+      flop_card = state.legal_actions()[0]
+      self.assertEqual(flop_card, game.card_to_int[expected_flop_cards.pop(0)])
+      state.apply_action(flop_card)
+
+    def check_valid_actions_range_from(min_raise, max_raise_exclusive):
+      self.assertNotIn(min_raise - 1, state.legal_actions())
+      for i in range(min_raise, max_raise_exclusive):
+        self.assertIn(i, state.legal_actions())
+      self.assertNotIn(max_raise_exclusive, state.legal_actions())
+
+    # Postflop assert all raise increments are valid
+    check_valid_actions_range_from(200, 501)
+    state.apply_action(ACTION_CHECK_OR_CALL)  # P0 (SB) checks
+
+    check_valid_actions_range_from(200, 1001)
+    state.apply_action(ACTION_CHECK_OR_CALL)  # P1 (BB) checks
+
+    check_valid_actions_range_from(200, 2001)
+    state.apply_action(200)  # P2 (BTN) min raises
+
+    check_valid_actions_range_from(300, 501)
+    state.apply_action(500)  # SB short stack goes all-in
+
+    check_valid_actions_range_from(800, 1001)
+    state.apply_action(800)  # BB min raises
+
+    check_valid_actions_range_from(1000, 2001)
+    state.apply_action(2000)  # BTN all-in
+
+    # Can only check or call
+    self.assertEqual(state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL])
+    state.apply_action(ACTION_CHECK_OR_CALL)  # call
+
+    turn_and_river_cards = [
+        Card(FOUR, DIAMOND),
+        Card(FOUR, HEART),
+    ]
+    while state.is_chance_node():
+      card = state.legal_actions()[0]
+      self.assertEqual(card, game.card_to_int[turn_and_river_cards.pop(0)])
+      state.apply_action(card)
+
+    self.assertEqual(state.returns(), [-500.0, -1000.0, 1500.0])
+
+  def test_to_string_at_chance_nodes(self):
+    params = {
+        "variant": "FixedLimitTexasHoldem",
+        "num_players": 2,
+        "blinds": "5 10",
+        "small_bet": 10,
+        "big_bet": 20,
+        "stack_sizes": "20000 20000",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
+    state = game.new_initial_state()
+    # NOTE: order is shuffled to match universal_poker since pokerkit deals hole
+    # cards more 'realistically' than universal_poker. (See the
+    # pokerkit_wrapper_acpc_style docstring for more details.)
+    hole_card_action_sequence = [10, 12, 11, 13]
+    for action in hole_card_action_sequence:
+      action_string = state.action_to_string(pyspiel.PlayerId.CHANCE, action)
+      # Print mainly to match universal_poker_test.cc. (Though, it IS also nice
+      # to prove that this did actually give us something we can actually use
+      # here.)
+      print("Applying action" f" ({action_string})")
+      state.apply_action(action)
+
+    # If we've reached this point without crashing / without the game breaking
+    # then we've succeeded! (So this asssert isn't technically necessary ...
+    # though it is nice to have to verify the game is still working fine here.)
+    self.assertFalse(state.is_terminal())
+
 
 if __name__ == "__main__":
   absltest.main()

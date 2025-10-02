@@ -1265,6 +1265,14 @@ class PokerkitWrapperAcpcStyle(PokerkitWrapper):
     pokerkit style action before returning the string as per usual (i.e. it will
     not make any other changes to the output string, e.g. to match
     universal_poker).
+
+  NOTE: Unlike universal_poker, this actually handles hole-card dealing
+  'properly' for real-world poker games, i.e. each player gets their first hole
+  card before any player gets their second hole card. You will need to shuffle
+  the order with which hole cards are dealt to simulate the same exact game.
+  (That said, the decks - and therefore chance actions - are the same for any
+  given card between this and universal_poker, so doing so should be
+  straightforward.)
   """
 
   def __init__(self, params=None):
@@ -1366,7 +1374,7 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
         for action in pokerkit_style_actions
     ]
     self._pokerkit_action_to_acpc_style_mapping = (
-        self._action_converter.create_action_map(
+        self._action_converter.create_player_action_map(
             current_player,
             pokerkit_style_actions,
             pokerkit_style_action_strings,
@@ -1612,7 +1620,7 @@ class ToAcpcActionConverter:
     elif pokerkit_style_action == ACTION_CHECK_OR_CALL:  # and size != 0
       # This MUST be a call if we've reacehd this point, since checks
       # (i.e. size == 0) should have been handled above already above.
-      assert(size > 0)
+      assert size > 0
       # NOTE: Adding, not replacing, since call sizes in pokerkit are defined
       # as the *additional* contribution on the current street (unlike
       # completion bets or raises).
@@ -1637,7 +1645,7 @@ class ToAcpcActionConverter:
           f" {pokerkit_style_action} instead."
       )
 
-  def create_action_map(
+  def create_player_action_map(
       self,
       player: int,
       pokerkit_style_actions: list[int],
@@ -1671,9 +1679,9 @@ class ToAcpcActionConverter:
     # NOTE: exclusive slice to avoid including the current street's
     # contributions in the sum here.
     prior_street_contributions = self._per_street_contributions[:current_street]
-    total_prior_street_contribution = int(sum(
-        contribution[player] for contribution in prior_street_contributions
-    ))
+    total_prior_street_contribution = int(
+        sum(contribution[player] for contribution in prior_street_contributions)
+    )
     pokerkit_action_to_acpc_action_mapping = {
         pokerkit_style_action: self._convert_action_to_acpc_style(
             pokerkit_style_action,
