@@ -24,6 +24,7 @@ import pokerkit
 from open_spiel.python.games import pokerkit_wrapper
 import pyspiel
 
+
 PokerkitWrapper = pokerkit_wrapper.PokerkitWrapper
 PokerkitWrapperAcpcStyle = pokerkit_wrapper.PokerkitWrapperAcpcStyle
 
@@ -59,7 +60,6 @@ class PokerkitWrapperTest(absltest.TestCase):
   # TODO: b/437724266 - add additional tests for the following:
   # - sidepot handling in general
   # - sidepots where the next bet will be exactly 1 chip (if possible?)
-  # - all-ins with exactly 1 chip left in stack
   # - all-ins in simple multiway situations with varying stack sizes
   # - all-ins in fixed-limit games with sidepots
   # - shortdeck ("6+") poker card dealing
@@ -236,14 +236,7 @@ class PokerkitWrapperTest(absltest.TestCase):
     for params in scenarios:
       with self.subTest(variant=params["variant"]):
         game = pyspiel.load_game("python_pokerkit_wrapper", params)
-        state = game.new_initial_state()
-        while not state.is_terminal():
-          if state.is_chance_node():
-            action = random.choice([o for o, p in state.chance_outcomes()])
-          else:
-            action = random.choice(state.legal_actions())
-          state.apply_action(action)
-        self.assertAlmostEqual(sum(state.returns()), 0.0)
+        pyspiel.random_sim_test(game, num_sims=3, serialize=False, verbose=True)
 
   def test_action_space_equals_max_stack_size(self):
     obj: PokerkitWrapper = PokerkitWrapper(
@@ -640,6 +633,7 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
             "blinds": "500 1000",
             "stack_sizes": "200 200 1000 4000",
         },
+        # --- Bet size edge cases ---
         # Both players forced all-in from blinds
         {
             "variant": "NoLimitTexasHoldem",
@@ -653,19 +647,106 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
             "blinds": "500 1000",
             "stack_sizes": "200 200",
         },
+        # Encourage situations where player are likely to be betting 1 chip
+        # to verify that we gracefully handle any edge cases.
+        # TODO: b/437724266 - split out into separate tests just for this edge
+        # case. Also run multiple times (fail on any failures) and/or
+        # hand-choose bet sizes to force these edge cases.
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 4,
+            "blinds": "1 2",
+            "stack_sizes": "7 7 5 5",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 9,
+            "blinds": "1 2",
+            "stack_sizes": "100 100 1 2 1 3 3 3 3",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 9,
+            "blinds": "1 2",
+            "stack_sizes": "3 3 3 3 3 3 3 3 3",
+        },
+        {
+            "variant": "NoLimitTexasHoldem",
+            "num_players": 9,
+            "blinds": "1 2",
+            "stack_sizes": "3 3 1 1 2 2 2 1 1",
+        },
     ]
 
     for params in scenarios:
       with self.subTest(variant=params["variant"]):
         game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
-        state = game.new_initial_state()
-        while not state.is_terminal():
-          if state.is_chance_node():
-            action = random.choice([o for o, p in state.chance_outcomes()])
-          else:
-            action = random.choice(state.legal_actions())
-          state.apply_action(action)
-        self.assertAlmostEqual(sum(state.returns()), 0.0)
+        pyspiel.random_sim_test(game, num_sims=3, serialize=False, verbose=True)
+
+  def test_regression_single_chip_shove_action_to_string(self):
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 9,
+        "blinds": "1 2",
+        "stack_sizes": "100 100 1 2 1 3 3 3 3",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
+    state = game.new_initial_state()
+    player_actions = [0, 0, 0, 1, 0, 0, 1, 31, 85, 0, 0, 1, 96, 1, 99, 1]
+    while state.is_chance_node() or player_actions:
+      # Specific cards don't matter since the error hapened before showdown.
+      if state.is_chance_node():
+        action = random.choice([o for o, _ in state.chance_outcomes()])
+      else:
+        action = player_actions.pop(0)
+      state.apply_action(action)
+
+    # Now we've reached the specific edge case. The player has one chip behind
+    # and is able to either check or shove all-in with this one last chip.
+    self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 100])
+    self.assertEqual(
+        state.action_to_string(ACTION_CHECK_OR_CALL), "Player 0: Check"
+    )
+    self.assertEqual(
+        state.action_to_string(100),
+        "Player 0: Bet/Raise to 1 [ALL-IN EDGECASE]",
+    )
+    # Shove all-in
+    state.apply_action(100)
+
+  def test_single_chip_alllin_headsup(self):
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 2,
+        "blinds": "1 2",
+        "stack_sizes": "100 100",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper_acpc_style", params)
+    state = game.new_initial_state()
+    player_actions = [1, 1, 99, 1]
+    while state.is_chance_node() or player_actions:
+      # Specific cards don't matter since the error hapened before showdown.
+      if state.is_chance_node():
+        action = state.chance_outcomes()[0][0]
+      else:
+        action = player_actions.pop(0)
+      state.apply_action(action)
+
+    # Now we've reached the specific edge case. The player has one chip behind
+    # and is able to either check or shove all-in with this one last chip.
+    self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 100])
+    self.assertEqual(
+        state.action_to_string(ACTION_CHECK_OR_CALL), "Player 0: Check"
+    )
+    self.assertEqual(
+        state.action_to_string(100),
+        "Player 0: Bet/Raise to 1 [ALL-IN EDGECASE]",
+    )
+    # Shove all-in
+    state.apply_action(100)
+    state.apply_action(ACTION_CHECK_OR_CALL)
+    while not state.is_terminal():
+      state.apply_action(state.chance_outcomes()[0][0])
 
   def test_utility_calculation_in_all_in(self):
     """Verifies correct raw chip payoffs in a deterministic all-in."""
@@ -1043,7 +1124,7 @@ class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
       # Print mainly to match universal_poker_test.cc. (Though, it IS also nice
       # to prove that this did actually give us something we can actually use
       # here.)
-      print("Applying action" f" ({action_string})")
+      print(f"Applying action ({action_string})")
       state.apply_action(action)
 
     # If we've reached this point without crashing / without the game breaking
