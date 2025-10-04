@@ -1406,8 +1406,18 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
     # world of ACPC-style actions we're trying to support, instead of the
     # pokerkit-style actions we have at this point.
     pokerkit_style_actions = super()._legal_actions(current_player)
+    # NOTE: *also* deliberately NOT calling super()._action_to_string(). Doing
+    # so has (surprisingly!) flaked inside the general-purpose OpenSpiel
+    # test_game_sim (i.e. test_game_sim_python_pokerkit_wrapper_acpc_style) with
+    # `TypeError: super(type, obj): obj must be an instance or subtype of type`.
+    #
+    # The reason appears to be due to an edge case around how python handles
+    # scoping inside of list comprehensions.
+    #
+    # For more details on the error, see
+    # https://github.com/google-deepmind/open_spiel/actions/runs/18138757383/job/51624123398#step:6:3415
     pokerkit_style_action_strings = [
-        super()._action_to_string(current_player, action)
+        self._action_to_string_base(current_player, action)
         for action in pokerkit_style_actions
     ]
     self._pokerkit_action_to_acpc_style_mapping = (
