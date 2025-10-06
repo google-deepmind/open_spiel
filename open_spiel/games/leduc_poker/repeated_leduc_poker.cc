@@ -124,19 +124,36 @@ std::string RepeatedLeducPokerState::ToString() const {
 }
 bool RepeatedLeducPokerState::IsTerminal() const { return is_terminal_; }
 
-// TODO(jhtschultz): Give out rewards at the end of each hand?
 std::vector<double> RepeatedLeducPokerState::Returns() const {
   SPIEL_CHECK_EQ(hand_number_ + 1, hand_returns_.size());
   std::vector<double> returns(num_players_, 0.0);
-  if (!IsTerminal()) {
-    return returns;
-  }
   for (const auto& hand_returns : hand_returns_) {
     for (int i = 0; i < num_players_; ++i) {
       returns[i] += hand_returns[i];
     }
   }
+
+  if (between_hands_) {
+    // For players who have not had their turn yet in the between-hands state,
+    // we subtract the last hand's returns, because they have not been
+    // rewarded yet. This is to ensure that Returns() is consistent with the
+    // sum of Rewards() over time. The current player is the one whose reward
+    // is being issued.
+    for (int p = CurrentPlayer() + 1; p < num_players_; ++p) {
+      returns[p] -= hand_returns_.back()[p];
+    }
+  }
+
   return returns;
+}
+
+std::vector<double> RepeatedLeducPokerState::Rewards() const {
+  SPIEL_CHECK_EQ(hand_number_ + 1, hand_returns_.size());
+  std::vector<double> rewards(num_players_, 0.0);
+  if (between_hands_) {
+    rewards[CurrentPlayer()] = hand_returns_.back()[CurrentPlayer()];
+  }
+  return rewards;
 }
 
 std::string RepeatedLeducPokerState::InformationStateString(
@@ -199,6 +216,11 @@ void RepeatedLeducPokerState::DoApplyAction(Action action) {
     SPIEL_CHECK_EQ(action, kContinueAction);
     num_players_acted_this_turn_++;
     if (num_players_acted_this_turn_ == num_players_) {
+      if (hand_number_ + 1 == num_hands_) {
+        between_hands_ = false;
+        is_terminal_ = true;
+        return;
+      }
       StartNewHand();
     }
     return;
@@ -218,19 +240,15 @@ void RepeatedLeducPokerState::DoApplyAction(Action action) {
 
 void RepeatedLeducPokerState::GoToBetweenHandsState() {
   UpdateStacks();
-  if (hand_number_ + 1 == num_hands_) {
-    is_terminal_ = true;
-    return;
-  }
   between_hands_ = true;
   num_players_acted_this_turn_ = 0;
 }
 
 void RepeatedLeducPokerState::StartNewHand() {
   hand_number_++;
-  hand_returns_.push_back(std::vector<double>(num_players_, 0.0));
   between_hands_ = false;
   num_players_acted_this_turn_ = 0;
+  hand_returns_.push_back(std::vector<double>(num_players_, 0.0));
   UpdateLeducPoker();
 }
 

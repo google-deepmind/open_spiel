@@ -87,9 +87,17 @@ void PlaythroughTest() {
   SPIEL_CHECK_FLOAT_EQ(leduc_state->Returns()[0], 7);
   SPIEL_CHECK_FLOAT_EQ(leduc_state->Returns()[1], -7);
 
+  // Rewards are issued one player at a time in the between-hands state.
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 7);
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[1], 0);
+
   // "Continue" actions
   state->ApplyAction(kContinueAction);  // P0
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 0);
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[1], -7);
+
   state->ApplyAction(kContinueAction);  // P1
 
   // Hand 2 starts.
@@ -111,6 +119,25 @@ void PlaythroughTest() {
   // P0 bets, P1 folds.
   state->ApplyAction(ActionType::kRaise);
   state->ApplyAction(ActionType::kFold);
+
+  // Hand 2 is over, but the game is not.
+  SPIEL_CHECK_FALSE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+
+  // Check rewards for hand 2.
+  leduc_state = repeated_state->GetLeducState();
+  SPIEL_CHECK_FLOAT_EQ(leduc_state->Returns()[0], 1);
+  SPIEL_CHECK_FLOAT_EQ(leduc_state->Returns()[1], -1);
+
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 1);
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[1], 0);
+
+  // "Continue" actions to end the game.
+  state->ApplyAction(kContinueAction);  // P0
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 0);
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[1], -1);
+  state->ApplyAction(kContinueAction);  // P1
 
   // Game is over now, because it was the last hand.
   SPIEL_CHECK_TRUE(state->IsTerminal());
