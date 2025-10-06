@@ -13,8 +13,14 @@
 // limitations under the License.
 
 #include "open_spiel/games/leduc_poker/leduc_poker.h"
+#include <functional>
+#include <memory>
+#include <vector>
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -57,6 +63,33 @@ void PolicyTest() {
   }
 }
 
+void StartingPlayerTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("leduc_poker", {{"players", GameParameter(3)},
+                               {"starting_player", GameParameter(1)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  // In 3-player Leduc, deck is J,Q,K,A of 2 suits.
+  // J=0,1; Q=2,3; K=4,5; A=6,7
+  state->ApplyAction(0);  // P0 gets J
+  state->ApplyAction(2);  // P1 gets Q
+  state->ApplyAction(4);  // P2 gets K
+
+  // Round 1 betting. Starting player is 1.
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(ActionType::kFold);   // P1 folds.
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(ActionType::kRaise);  // P2 raises.
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(ActionType::kCall);   // P0 calls.
+
+  // Round 2, deal public card.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(3);  // Public card is a Q.
+  // Player 1 folded, so player 2 should be next.
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+}
+
 }  // namespace
 }  // namespace leduc_poker
 }  // namespace open_spiel
@@ -64,4 +97,5 @@ void PolicyTest() {
 int main(int argc, char** argv) {
   open_spiel::leduc_poker::BasicLeducTests();
   open_spiel::leduc_poker::PolicyTest();
+  open_spiel::leduc_poker::StartingPlayerTest();
 }
