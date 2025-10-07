@@ -16,7 +16,6 @@
 """Tests for OpenSpiel game wrapper for Pokerkit."""
 
 import random
-import unittest
 
 from absl.testing import absltest
 import pokerkit
@@ -594,7 +593,7 @@ class PokerkitWrapperTest(absltest.TestCase):
     )
 
 
-class PokerkitWrapperAcpcStyleTest(unittest.TestCase):
+class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
   """Test the OpenSpiel game wrapper for Pokerkit."""
 
   # TODO: b/437724266 - port over more OpenSpiel universal_poker tests to verify
