@@ -143,7 +143,6 @@ class PolicyHead(nn.Module):
     ) -> None:
     *space_features, in_features = input_shape
 
-    self.torso = None
     if model_type == "mlp":
       self.torso = MLPBlock(in_features, nn_width, activation, seed)
     else:
@@ -173,7 +172,7 @@ class ValueHead(nn.Module):
     ) -> None:
     
     *space_features, in_features = input_shape
-    self.torso = None
+
     if model_type == "mlp":
       self.torso = MLPBlock(in_features, nn_width, activation, seed)
     else:
