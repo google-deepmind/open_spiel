@@ -15,6 +15,7 @@
 # Lint as python3
 """Tests for OpenSpiel game wrapper for Pokerkit."""
 
+import json
 import random
 
 from absl.testing import absltest
@@ -1130,6 +1131,211 @@ class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
     # then we've succeeded! (So this asssert isn't technically necessary ...
     # though it is nice to have to verify the game is still working fine here.)
     self.assertFalse(state.is_terminal())
+
+  def test_default_state_struct_values(self):
+    game = pyspiel.load_game("python_pokerkit_wrapper")
+    state = game.new_initial_state()
+    # The first state is a chance node dealing cards.
+    self.assertTrue(state.is_chance_node())
+    state_struct = state.to_struct()
+    self.assertIsInstance(
+        state_struct, pyspiel.pokerkit_wrapper.PokerkitStateStruct
+    )
+    self.assertEqual(state_struct.current_player, pyspiel.PlayerId.CHANCE)
+    self.assertFalse(state_struct.is_terminal)
+    self.assertIsInstance(state_struct.observation, list)
+    self.assertLen(state_struct.observation, game.num_players())
+    self.assertIn("Player: 0", state_struct.observation[0])
+    self.assertTrue(state_struct.legal_actions)
+    self.assertLen(state_struct.stacks, game.num_players())
+    self.assertLen(state_struct.bets, game.num_players())
+    self.assertIsInstance(state_struct.board_cards, list)
+    self.assertIsInstance(state_struct.hole_cards, list)
+    self.assertIsInstance(state_struct.pots, list)
+    self.assertIsInstance(state_struct.burn_cards, list)
+    self.assertIsInstance(state_struct.mucked_cards, list)
+
+  def test_create_struct_and_access_members(self):
+    """Tests direct creation of the underlying pyspiel PokerkitStateStruct.
+
+    This test could technically go elsewhere as it's not really testing the
+    actual pokerkit_wrapper code, but this is a very convenient place to put it.
+    (And, it is useful to have our tests clearly show if the underlying
+    StateStruct we're using has any problems.)
+    """
+    state_struct = pyspiel.pokerkit_wrapper.PokerkitStateStruct()
+
+    # Test default values (or some initial state if constructor sets them)
+    self.assertEqual(
+        state_struct.current_player, 0
+    )  # Or whatever the C++ default is
+    self.assertFalse(state_struct.is_terminal)
+    self.assertEqual(state_struct.observation, [])
+
+    # Modify members from Python
+    state_struct.observation = ["obs1", "obs2"]
+    state_struct.legal_actions = [0, 2, 4]
+    state_struct.current_player = 1
+    state_struct.is_terminal = True
+    state_struct.stacks = [100, 200]
+    state_struct.bets = [10, 0]
+    state_struct.board_cards = [5, 6, 7]
+    state_struct.hole_cards = [[1, 2], [3, 4]]
+
+    # Verify modifications
+    self.assertEqual(state_struct.observation, ["obs1", "obs2"])
+    self.assertEqual(state_struct.legal_actions, [0, 2, 4])
+    self.assertEqual(state_struct.current_player, 1)
+    self.assertTrue(state_struct.is_terminal)
+    self.assertEqual(state_struct.stacks, [100, 200])
+    self.assertEqual(state_struct.bets, [10, 0])
+    self.assertEqual(state_struct.board_cards, [5, 6, 7])
+    self.assertEqual(state_struct.hole_cards, [[1, 2], [3, 4]])
+
+  def test_pokerkit_wrapper_state_to_struct_and_json(self):
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 2,
+        "blinds": "50 100",
+        "stack_sizes": "1000 1000",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper", params)
+    state = game.new_initial_state()
+
+    # Deal hole cards
+    state.apply_action(game.card_to_int[Card(ACE, CLUB)])  # P0 c1
+    state.apply_action(game.card_to_int[Card(ACE, DIAMOND)])  # P1 c1
+    state.apply_action(game.card_to_int[Card(KING, CLUB)])  # P0 c2
+    state.apply_action(game.card_to_int[Card(KING, DIAMOND)])  # P1 c2
+    state.apply_action(ACTION_CHECK_OR_CALL)
+    state.apply_action(ACTION_CHECK_OR_CALL)
+
+    # Deal flop
+    state.apply_action(game.card_to_int[Card(QUEEN, CLUB)])
+    state.apply_action(game.card_to_int[Card(JACK, CLUB)])
+    state.apply_action(game.card_to_int[Card(TEN, CLUB)])
+
+    state.apply_action(200)  # BB raises to 200 post-flop
+    state.apply_action(500)  # SB/BTN re-raises to 500
+    state.apply_action(800)  # BB re-re-raises to 800
+
+    state_struct = state.to_struct()
+    json_str = state.to_json()
+    self.assertEqual(json_str, state_struct.to_json())
+    self.assertIsInstance(json_str, str)
+
+    try:
+      data = json.loads(json_str)
+    except json.JSONDecodeError as e:
+      self.fail(f"Failed to parse JSON {json_str}, error was: {e}")
+
+    self.assertEqual(state_struct.current_player, 1)
+    self.assertEqual(data["current_player"], 1)
+
+    self.assertEqual(state_struct.is_terminal, False)
+    self.assertFalse(data["is_terminal"])
+
+    self.assertEqual(state_struct.stacks, [100, 400])
+    self.assertEqual(data["stacks"], [100, 400])
+
+    self.assertEqual(state_struct.bets, [800, 500])
+    self.assertEqual(data["bets"], [800, 500])
+
+    self.assertEqual(
+        state_struct.board_cards,
+        [
+            game.card_to_int[c]
+            for c in [Card(QUEEN, CLUB), Card(JACK, CLUB), Card(TEN, CLUB)]
+        ],
+    )
+    self.assertLen(data["board_cards"], 3)
+
+    board_cards_json = [game.int_to_card[c] for c in data["board_cards"]]
+    board_cards_struct = [game.int_to_card[c] for c in state_struct.board_cards]
+    self.assertEqual(
+        board_cards_json,
+        [Card(QUEEN, CLUB), Card(JACK, CLUB), Card(TEN, CLUB)],
+    )
+    self.assertEqual(board_cards_struct, board_cards_json)
+
+    self.assertEqual(
+        state_struct.hole_cards,
+        [
+            [game.card_to_int[c] for c in [Card(ACE, CLUB), Card(KING, CLUB)]],
+            [
+                game.card_to_int[c]
+                for c in [Card(ACE, DIAMOND), Card(KING, DIAMOND)]
+            ],
+        ],
+    )
+    self.assertLen(data["hole_cards"], 2)
+    p0_hole_cards = [game.int_to_card[c] for c in data["hole_cards"][0]]
+    p1_hole_cards = [game.int_to_card[c] for c in data["hole_cards"][1]]
+    self.assertEqual(p0_hole_cards, [Card(ACE, CLUB), Card(KING, CLUB)])
+    self.assertEqual(p1_hole_cards, [Card(ACE, DIAMOND), Card(KING, DIAMOND)])
+
+    self.assertEqual(state_struct.pots, [200])
+    self.assertLen(data["pots"], 1)
+    self.assertEqual(data["pots"][0], 200)
+
+  def test_pokerkit_wrapper_state_to_struct_and_json_when_terminal(self):
+    """Tests the ToJson() method inherited from StateStruct."""
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 2,
+        "blinds": "50 100",
+        "stack_sizes": "1000 1000",
+    }
+    game = pyspiel.load_game("python_pokerkit_wrapper", params)
+    state = game.new_initial_state()
+
+    while not state.is_terminal():
+      if not state.is_chance_node():
+        state.apply_action(ACTION_FOLD)  # SB/BTN will immediately fold
+      else:
+        state.apply_action(state.legal_actions()[0])
+
+    state_struct = state.to_struct()
+    json_str = state.to_json()
+    self.assertEqual(json_str, state_struct.to_json())
+    self.assertIsInstance(json_str, str)
+
+    try:
+      data = json.loads(json_str)
+    except json.JSONDecodeError as e:
+      self.fail(f"Failed to parse JSON {json_str}, error was: {e}")
+
+    self.assertEqual(data["current_player"], pyspiel.PlayerId.TERMINAL)
+    self.assertEqual(state_struct.current_player, pyspiel.PlayerId.TERMINAL)
+
+    self.assertTrue(data["is_terminal"])
+    self.assertTrue(state_struct.is_terminal)
+
+    self.assertEmpty(data["legal_actions"])
+    self.assertEmpty(state_struct.legal_actions)
+
+    self.assertEqual(data["stacks"], [1050, 950])
+    self.assertEqual(state_struct.stacks, [1050, 950])
+
+    self.assertEqual(data["bets"], [0, 0])
+    self.assertEqual(state_struct.bets, [0, 0])
+
+    self.assertEmpty(data["board_cards"])
+    self.assertEqual(state_struct.board_cards, [])
+
+    # Only BB's cards; SB/BTN mucked upon folding.
+    self.assertEqual(data["hole_cards"], [[0, 2], []])
+    self.assertEqual(state_struct.hole_cards, [[0, 2], []])
+
+    self.assertEqual(data["pots"], [0])
+    self.assertEqual(state_struct.pots, [0])
+
+    self.assertEmpty(data["burn_cards"])
+    self.assertEqual(state_struct.burn_cards, [])
+
+    # As mentioned above, SB's cards were mucked upon folding.
+    self.assertEqual(data["mucked_cards"], [1, 3])
+    self.assertEqual(state_struct.mucked_cards, [1, 3])
 
 
 if __name__ == "__main__":

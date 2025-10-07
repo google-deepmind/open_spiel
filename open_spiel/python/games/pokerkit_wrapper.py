@@ -1083,6 +1083,51 @@ class PokerkitWrapperState(pyspiel.State):
     """Create and return a deepcopy of the 'wrapped' pokerkit.state."""
     return copy.deepcopy(self._wrapped_state)
 
+  def to_struct(self) -> pyspiel.pokerkit_wrapper.PokerkitStateStruct:
+    legal_actions = []
+    if not self.is_terminal():
+      legal_actions = self.legal_actions()
+    observer = self.get_game().make_py_observer()
+    obs_strs = [
+        observer.string_from(self, p)
+        for p in range(self.get_game().num_players())
+    ]
+    game = self.get_game()
+    stacks = [int(s) for s in self._wrapped_state.stacks]
+    bets = [int(b) for b in self._wrapped_state.bets]
+
+    flattened_board_cards = []
+    for sublist in self._wrapped_state.board_cards:
+      flattened_board_cards.extend(sublist)
+    board_cards = [game.card_to_int[c] for c in flattened_board_cards]
+
+    hole_cards = [
+        [game.card_to_int[c] for c in hc_list]
+        for hc_list in self._wrapped_state.hole_cards
+    ]
+    pots = [int(p.amount) for p in self._wrapped_state.pots]
+    burn_cards = [game.card_to_int[c] for c in self._wrapped_state.burn_cards]
+    mucked_cards = [
+        game.card_to_int[c] for c in self._wrapped_state.mucked_cards
+    ]
+
+    cpp_state_struct = pyspiel.pokerkit_wrapper.PokerkitStateStruct()
+    cpp_state_struct.observation = obs_strs
+    cpp_state_struct.legal_actions = legal_actions
+    cpp_state_struct.current_player = self.current_player()
+    cpp_state_struct.is_terminal = self.is_terminal()
+    cpp_state_struct.stacks = stacks
+    cpp_state_struct.bets = bets
+    cpp_state_struct.board_cards = board_cards
+    cpp_state_struct.hole_cards = hole_cards
+    cpp_state_struct.pots = pots
+    cpp_state_struct.burn_cards = burn_cards
+    cpp_state_struct.mucked_cards = mucked_cards
+    return cpp_state_struct
+
+  def to_json(self) -> str:
+    return self.to_struct().to_json()
+
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
     state: pokerkit.State = self._wrapped_state
