@@ -1070,6 +1070,21 @@ class RepeatedPokerkitState(pyspiel.State):
   def __str__(self):
     return f"Hand number: {self._hand_number}\n{self.pokerkit_wrapper_state}"
 
+  def to_struct(self) -> pyspiel.pokerkit_wrapper.PokerkitStateStruct:
+    """Returns the current pokerkit_wrapper state struct.
+
+    TODO: b/437724266 - We will likely want to come back and implement
+    something a bit more robust here, potentially creating + binding a separate
+    C++ StateStruct altogether. Since currently this does not provide any
+    information whatsoever about prior hands, nor does it deal with our mapping
+    from seats to players - it simply returns the StateStruct provided by the
+    underlying PokerkitWrapperState.
+    """
+    return self.pokerkit_wrapper_state.to_struct()
+
+  def to_json(self) -> str:
+    return self.to_struct().to_json()
+
 
 class RepeatedPokerkitObserver:
   """RepeatedPokerkit "Observer" for creating per-player state tensors and strings."""
@@ -1153,7 +1168,6 @@ class RepeatedPokerkitObserver:
     return pokerkit_wrapper_observer.string_from(
         state.pokerkit_wrapper_state, seat_id
     )
-
 
 # TODO: b/437724266 - remove once no longer disabling at the top of this file.
 # pylint: enable=protected-access

@@ -16,6 +16,7 @@
 """Tests for OpenSpiel 'Repeated' PokerkitWrapper."""
 
 import itertools
+import json
 import random
 
 from absl.testing import absltest
@@ -409,6 +410,96 @@ class RepeatedPokerkitTest(parameterized.TestCase):
     # Definitely excessive, but triple checking this again just to be certain.
     self.assertEqual(state.num_players(), 3)
     self.assertEqual(state._num_active_players, 3)
+
+  def test_pokerkit_state_to_struct_to_json_two_hands(self):
+    params = {
+        "max_num_hands": 2,
+        "reset_stacks": False,
+        "rotate_dealer": True,
+        "pokerkit_game_params": {
+            "name": "python_pokerkit_wrapper",
+            "num_players": 2,
+            "blinds": "50 100",
+            "stack_sizes": "1000 1000",
+        },
+    }
+    game = pyspiel.load_game("python_repeated_pokerkit", params)
+    state = game.new_initial_state()
+    self.assertEqual(state._hand_number, 0)
+
+    state_struct = state.to_struct()
+    state_json = state.to_json()
+    self.assertEqual(state_struct.to_json(), state_json)
+
+    # --- First hand (hand 0) ---
+    self.assertIsInstance(state_json, str)
+    try:
+      data_h0 = json.loads(state_json)
+    except json.JSONDecodeError as e:
+      self.fail(f"Failed to parse JSON {state_json}, error: {e}")
+
+    self.assertEqual(data_h0["is_terminal"], False)
+    self.assertEqual(
+        state.pokerkit_wrapper_state.is_terminal(), data_h0["is_terminal"]
+    )
+    self.assertEqual(data_h0["current_player"], pyspiel.PlayerId.CHANCE)
+    self.assertEqual(
+        state.pokerkit_wrapper_state.current_player(), data_h0["current_player"]
+    )
+    # Stacks in pokerkit state are after blinds: 1000-50=950, 1000-100=900
+    self.assertEqual(data_h0["stacks"], [900, 950])
+    self.assertEqual(state_struct.stacks, data_h0["stacks"])
+    self.assertEqual(data_h0["bets"], [100, 50])
+    self.assertEqual(state_struct.bets, data_h0["bets"])
+
+    # Play until hand is over, having P1 fold immediately preflop.
+    while state._hand_number == 0:
+      if state.is_chance_node():
+        state.apply_action(state.chance_outcomes()[0][0])
+      else:
+        state.apply_action(ACTION_FOLD)
+
+    # --- Second hand (hand 1) ---
+    self.assertEqual(state._hand_number, 1)
+    state_struct_h1 = state.to_struct()
+    state_json_h1 = state.to_json()
+    self.assertEqual(state_struct_h1.to_json(), state_json_h1)
+    self.assertIsInstance(state_json_h1, str)
+    try:
+      data_h1 = json.loads(state_json_h1)
+    except json.JSONDecodeError as e:
+      self.fail(f"Failed to parse JSON {state_json_h1}, error: {e}")
+
+    self.assertEqual(data_h1["is_terminal"], False)
+    self.assertEqual(state_struct_h1.is_terminal, data_h1["is_terminal"])
+    self.assertEqual(data_h1["current_player"], pyspiel.PlayerId.CHANCE)
+    self.assertEqual(state_struct_h1.current_player, data_h1["current_player"])
+    # Before blinds, since P1 won last hand (ie last hand's P0 prior to
+    # rotation) the stacks would be 950, 1050. Following blinds that would put
+    # us here at 850, 1000.
+    self.assertEqual(data_h1["stacks"], [850, 1000])
+    self.assertEqual(state_struct_h1.stacks, data_h1["stacks"])
+    self.assertEqual(data_h1["bets"], [100, 50])
+    self.assertEqual(state_struct_h1.bets, data_h1["bets"])
+
+    # Finally double check we can reach terminal state as expected
+    while not state.is_terminal():
+      if state.is_chance_node():
+        state.apply_action(state.chance_outcomes()[0][0])
+      else:
+        state.apply_action(ACTION_FOLD)
+
+    state_struct_terminal = state.to_struct()
+    state_json_terminal = state.to_json()
+    self.assertIsInstance(state_json_terminal, str)
+    try:
+      data_terminal = json.loads(state_json_terminal)
+    except json.JSONDecodeError as e:
+      self.fail(f"Failed to parse JSON {state_json_terminal}, error: {e}")
+    self.assertTrue(data_terminal["is_terminal"], True)
+    self.assertEqual(
+        state_struct_terminal.is_terminal, data_terminal["is_terminal"]
+    )
 
 
 # TODO: b/444333187 - Add tests for the following behaviors:

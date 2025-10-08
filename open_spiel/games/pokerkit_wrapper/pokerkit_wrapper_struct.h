@@ -25,6 +25,7 @@ namespace open_spiel {
 namespace pokerkit_wrapper {
 
 struct PokerkitStateStruct : StateStruct {
+  // TODO: b/437724266 - consider including player hand histories (PHHs) here.
   std::vector<std::string> observation = {};
   std::vector<int> legal_actions = {};
   int current_player = 0;
