@@ -169,6 +169,7 @@ set(GAME_SOURCES
   phantom_ttt/phantom_ttt.h
   pig/pig.cc
   pig/pig.h
+  pokerkit_wrapper/pokerkit_wrapper_struct.h
   quoridor/quoridor.cc
   quoridor/quoridor.h
   rbc/rbc.cc
@@ -610,6 +611,10 @@ add_test(phantom_ttt_test phantom_ttt_test)
 add_executable(pig_test pig/pig_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(pig_test pig_test)
+
+add_executable(pokerkit_wrapper_struct_test pokerkit_wrapper/pokerkit_wrapper_struct_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(pokerkit_wrapper_struct_test pokerkit_wrapper_struct_test)
 
 add_executable(quoridor_test quoridor/quoridor_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
