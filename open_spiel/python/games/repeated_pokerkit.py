@@ -108,42 +108,8 @@ _GAME_TYPE = pyspiel.GameType(
 )
 
 
-def _split_level_schedule_string(
-    schedule_str: str, expected_level_parts: int
-) -> list[list[str]]:
-  """Splits a level schedule string into a 2-D list of strings.
-
-  Parsed schedule strings are of the form
-    <level_1>;<level_2>;...;<level_n>
-  where each level is of the form
-    <substring_1>,<substring_2>,<substring_3>
-
-  Args:
-    schedule_str: The schedule string to split. The format is a
-      semicolon-separated list of inner levels, where each level is a
-      comma-separated tuple of `expected_level_parts` substrings.
-    expected_level_parts: The expected number of comma-separated substrings
-      within each level.
-
-  Returns:
-    A 2-D list of strings, where the first dimension corresponds to the levels
-    and the second dimension corresponds to the substrings within each level.
-  """
-  if not schedule_str:
-    return []
-  levels_str = schedule_str.removesuffix(";").split(";")
-  levels = [level.split(",") for level in levels_str]
-
-  for level in levels:
-    if len(level) != expected_level_parts:
-      raise ValueError(
-          f"Invalid schedule string: {schedule_str}. Expected format is"
-          " <level_1>;<level_2>;...;<level_n> where each level is a"
-          f" comma-separated tuple of {expected_level_parts} substrings."
-      )
-  return levels
-
-
+# TODO(jhtschultz): Consider extracting common parsing logic into a separate
+# helper function.
 def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
   """Parses a blind schedule string into a list of BlindLevel objects.
 
@@ -152,12 +118,12 @@ def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
   Parses blind schedule string of the form
     <blind_level_1>;...;<blind_level_n>
   where each blind level is of the form
-    <num_hands>,<small_blind>,<big_blind>
+    <num_hands>:<small_blind>/<big_blind>
 
   Args:
     blind_schedule_str: A string specifying the blind schedule. The format is a
       semicolon-separated list of blind levels, where each level is a
-      comma-separated tuple of `num_hands`, `small_blind`, and `big_blind`.
+      colon-separated tuple of `num_hands` and `<small_blind>/<big_blind>`.
 
   Returns:
     A list of BlindLevel objects parsed from the input string.
@@ -166,8 +132,17 @@ def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
     return []
 
   blind_levels = []
-  for level_parts in _split_level_schedule_string(blind_schedule_str, 3):
-    num_hands, small_blind, big_blind = [int(p) for p in level_parts]
+  levels_str = blind_schedule_str.removesuffix(";").split(";")
+  for level_str in levels_str:
+    parts = level_str.split(":")
+    if len(parts) != 2:
+      raise ValueError(f"Invalid blind schedule string: {blind_schedule_str}")
+    blinds = parts[1].split("/")
+    if len(blinds) != 2:
+      raise ValueError(f"Invalid blind schedule string: {blind_schedule_str}")
+    num_hands = int(parts[0])
+    small_blind = int(blinds[0])
+    big_blind = int(blinds[1])
     blind_levels.append(
         BlindLevel(
             num_hands,
@@ -184,13 +159,12 @@ def parse_bet_size_schedule(bet_size_schedule_str: str) -> list[BetSizeLevel]:
   Parsed bet-size schedule strings are of the form
     <bet_size_level_1>;...;<bet_size_level_n>
   where each bet-size level is of the form
-    <num_hands>,<small_bet_size>,<big_bet_size>
+    <num_hands>:<small_bet_size>/<big_bet_size>
 
   Args:
     bet_size_schedule_str: A string specifying the bet-size schedule. The format
       is a semicolon-separated list of bet-size levels, where each level is a
-      comma-separated tuple of `num_hands`, `small_bet_size`, and
-      `big_bet_size`.
+      colon-separated tuple of `num_hands` & `<small_bet_size>/<big_bet_size>`.
 
   Returns:
     A list of BetSizeLevel objects parsed from the input string.
@@ -199,8 +173,21 @@ def parse_bet_size_schedule(bet_size_schedule_str: str) -> list[BetSizeLevel]:
     return []
 
   bet_sizes = []
-  for level_parts in _split_level_schedule_string(bet_size_schedule_str, 3):
-    num_hands, small_bet_size, big_bet_size = [int(p) for p in level_parts]
+  levels_str = bet_size_schedule_str.removesuffix(";").split(";")
+  for level_str in levels_str:
+    parts = level_str.split(":")
+    if len(parts) != 2:
+      raise ValueError(
+          f"Invalid bet-size schedule string: {bet_size_schedule_str}"
+      )
+    bet_size_parts = parts[1].split("/")
+    if len(bet_size_parts) != 2:
+      raise ValueError(
+          f"Invalid bet-size schedule string: {bet_size_schedule_str}"
+      )
+    num_hands = int(parts[0])
+    small_bet_size = int(bet_size_parts[0])
+    big_bet_size = int(bet_size_parts[1])
     bet_sizes.append(BetSizeLevel(num_hands, small_bet_size, big_bet_size))
   return bet_sizes
 
@@ -211,12 +198,12 @@ def parse_bring_in_schedule(bring_in_schedule_str: str) -> list[BringInLevel]:
   Parsed bring-in schedule strings are of the form
     <bring_in_level_1>;...;<bring_in_level_n>
   where each bring-in level is of the form
-    <num_hands>,<bring_in>
+    <num_hands>:<bring_in>
 
   Args:
     bring_in_schedule_str: A string specifying the bring-in schedule. The format
       is a semicolon-separated list of bring-in levels, where each level is a
-      comma-separated tuple of `num_hands` and `bring_in`.
+      colon-separated tuple of `num_hands` and `bring_in`.
 
   Returns:
     A list of BringInLevel objects parsed from the input string.
@@ -224,8 +211,15 @@ def parse_bring_in_schedule(bring_in_schedule_str: str) -> list[BringInLevel]:
   if not bring_in_schedule_str:
     return []
   bring_ins = []
-  for level_parts in _split_level_schedule_string(bring_in_schedule_str, 2):
-    num_hands, bring_in = [int(p) for p in level_parts]
+  levels_str = bring_in_schedule_str.removesuffix(";").split(";")
+  for level_str in levels_str:
+    parts = level_str.split(":")
+    if len(parts) != 2:
+      raise ValueError(
+          f"Invalid bring-in schedule string: {bring_in_schedule_str}"
+      )
+    num_hands = int(parts[0])
+    bring_in = int(parts[1])
     bring_ins.append(BringInLevel(num_hands, bring_in))
   return bring_ins
 
@@ -273,20 +267,20 @@ class RepeatedPokerkit(pyspiel.Game):
     "blind_schedule": string (optional)
         Specifies the blind schedule for playing a tournament. The format is:
         <blind_level_1>;<blind_level_2>;...<blind_level_n> where each blind
-        level is of the form <num_hands>,<small_blind>,<big_blind>. If play
+        level is of the form <num_hands>:<small_blind>/<big_blind>. If play
         continues beyond the number of hands specified in the last blind level,
         the last blind level will continue to be used.
     "bet_size_schedule": string (optional)
         Specifies the bet-size schedule for playing a tournament. The format is:
         <bet_size_level_1>;<bet_size_level_2>;...<bet_size_level_n> where each
         bet-size level is of the form
-        <num_hands>,<small_bet_size>,<big_bet_size>.  If play continues beyond
+        <num_hands>:<small_bet_size>/<big_bet_size>.  If play continues beyond
         the number of hands specified in the last bet-size level, the last
         bet-size level will continue to be used.
     "bring_in_schedule": string (optional)
         Specifies the bring-in schedule for playing a tournament. The format is:
         <bring_in_level_1>;<bring_in_level_2>;...<bring_in_level_n> where each
-        bring-in level is of the form <num_hands>,<bring_in>. If play continues
+        bring-in level is of the form <num_hands>:<bring_in>. If play continues
         beyond the number of hands specified in the last bring-in level, the
         last bring-in level will continue to be used.
     "first_button_player": int (optional, default=-1)

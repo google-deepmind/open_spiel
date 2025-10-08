@@ -48,7 +48,7 @@
 //  "blind_schedule" string (optional)
 //    Specifies the blind schedule for playing a tournament. The format is:
 //    <blind_level_1>;<blind_level_2>;...<blind_level_n> where each blind level
-//    is of the form <num_hands>,<small_blind>,<big_blind>. If play continues
+//    is of the form <num_hands>:<small_blind>/<big_blind>. If play continues
 //    beyond the number of hands specified in the last blind level, the last
 //    blind level will continue to be used.
 

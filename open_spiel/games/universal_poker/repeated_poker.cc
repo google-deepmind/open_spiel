@@ -74,7 +74,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // Parses blind schedule string of the form
 // <blind_level_1>;...;<blind_level_n>
 // where each blind level is of the form
-// <num_hands>,<small_blind>,<big_blind>
+// <num_hands>:<small_blind>/<big_blind>
 std::vector<BlindLevel> ParseBlindSchedule(
     const std::string& blind_schedule_str) {
   std::vector<BlindLevel> blind_levels;
@@ -84,12 +84,14 @@ std::vector<BlindLevel> ParseBlindSchedule(
   std::vector<std::string> levels = absl::StrSplit(
       absl::StripSuffix(blind_schedule_str, ";"), ';');
   for (const auto& level : levels) {
-    std::vector<std::string> parts = absl::StrSplit(level, ',');
-    SPIEL_CHECK_EQ(parts.size(), 3);
+    std::vector<std::string> parts = absl::StrSplit(level, ':');
+    SPIEL_CHECK_EQ(parts.size(), 2);
+    std::vector<std::string> blinds = absl::StrSplit(parts[1], '/');
+    SPIEL_CHECK_EQ(parts.size(), 2);
     blind_levels.push_back({
         .num_hands = std::stoi(parts[0]),
-        .small_blind = std::stoi(parts[1]),
-        .big_blind = std::stoi(parts[2]),
+        .small_blind = std::stoi(blinds[0]),
+        .big_blind = std::stoi(blinds[1]),
     });
   }
   return blind_levels;

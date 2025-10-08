@@ -94,7 +94,7 @@ class RepeatedPokerkitTest(parameterized.TestCase):
     return pyspiel.load_game("python_repeated_pokerkit", params)
 
   def test_parse_blind_schedule(self):
-    blind_schedule_str = "1,1,2;2,2,3"
+    blind_schedule_str = "1:1/2;2:2/3"
     blind_schedule = repeated_pokerkit.parse_blind_schedule(blind_schedule_str)
     self.assertLen(blind_schedule, 2)
     self.assertEqual(blind_schedule[0].num_hands, 1)
@@ -103,6 +103,30 @@ class RepeatedPokerkitTest(parameterized.TestCase):
     self.assertEqual(blind_schedule[1].num_hands, 2)
     self.assertEqual(blind_schedule[1].small_blind, 2)
     self.assertEqual(blind_schedule[1].big_blind, 3)
+
+  def test_parse_bet_size_schedule(self):
+    bet_size_schedule_str = "1:10/20;2:20/30"
+    bet_size_schedule = repeated_pokerkit.parse_bet_size_schedule(
+        bet_size_schedule_str
+    )
+    self.assertLen(bet_size_schedule, 2)
+    self.assertEqual(bet_size_schedule[0].num_hands, 1)
+    self.assertEqual(bet_size_schedule[0].small_bet_size, 10)
+    self.assertEqual(bet_size_schedule[0].big_bet_size, 20)
+    self.assertEqual(bet_size_schedule[1].num_hands, 2)
+    self.assertEqual(bet_size_schedule[1].small_bet_size, 20)
+    self.assertEqual(bet_size_schedule[1].big_bet_size, 30)
+
+  def test_parse_bring_in_schedule(self):
+    bring_in_schedule_str = "1:5;2:10"
+    bring_in_schedule = repeated_pokerkit.parse_bring_in_schedule(
+        bring_in_schedule_str
+    )
+    self.assertLen(bring_in_schedule, 2)
+    self.assertEqual(bring_in_schedule[0].num_hands, 1)
+    self.assertEqual(bring_in_schedule[0].bring_in, 5)
+    self.assertEqual(bring_in_schedule[1].num_hands, 2)
+    self.assertEqual(bring_in_schedule[1].bring_in, 10)
 
   def test_random_sim_cash_game_headsup(self):
     # Note the reset_stacks=True
@@ -177,7 +201,7 @@ class RepeatedPokerkitTest(parameterized.TestCase):
     pyspiel.random_sim_test(game, num_sims=2, serialize=False, verbose=False)
 
   def test_blind_schedule_progression(self):
-    blind_schedule_str = "1,10,20;2,20,40;1,50,100;1,1000,1000"
+    blind_schedule_str = "1:10/20;2:20/40;1:50/100;1:1000/1000"
     params = {
         "max_num_hands": 100,
         "reset_stacks": False,

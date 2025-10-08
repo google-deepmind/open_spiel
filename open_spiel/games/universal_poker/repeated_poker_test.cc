@@ -15,6 +15,7 @@
 #include "open_spiel/games/universal_poker/repeated_poker.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
@@ -54,7 +55,7 @@ void BlindScheduleTest() {
                 {"reset_stacks", GameParameter(false)},
                 {"rotate_dealer", GameParameter(true)},
                 {"blind_schedule", GameParameter(
-                    "10,100,200;20,200,400;50,400,800;")},
+                    "10:100/200;20:200/400;50:400/800;")},
                 {"universal_poker_game_string",
                  GameParameterFromString(open_spiel::HunlGameString(
                      "fullgame"))}});
@@ -98,6 +99,23 @@ void BlindScheduleTest() {
   SPIEL_CHECK_EQ(state->Returns(), std::vector<double>(2, 0.0));
 }
 
+void SerializationTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("repeated_poker",
+               {{"max_num_hands", GameParameter(100)},
+                {"reset_stacks", GameParameter(false)},
+                {"rotate_dealer", GameParameter(true)},
+                {"blind_schedule", GameParameter(
+                    "10:100/200;20:200/400;50:400/800;")},
+                {"universal_poker_game_string",
+                 GameParameterFromString(open_spiel::HunlGameString(
+                     "fullgame"))}});
+  std::string game_str = game->ToString();
+  std::shared_ptr<const Game> game2 = LoadGame(game_str);
+  std::string game_str2 = game->ToString();
+  SPIEL_CHECK_EQ(game_str, game_str2);
+}
+
 }  // namespace
 }  // namespace repeated_poker
 }  // namespace universal_poker
@@ -108,4 +126,5 @@ int main(int argc, char **argv) {
   absl::ParseCommandLine(argc, argv);
   open_spiel::universal_poker::repeated_poker::BasicRepeatedPokerTest();
   open_spiel::universal_poker::repeated_poker::BlindScheduleTest();
+  open_spiel::universal_poker::repeated_poker::SerializationTest();
 }
