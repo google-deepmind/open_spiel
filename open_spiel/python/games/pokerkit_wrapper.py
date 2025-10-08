@@ -1245,6 +1245,7 @@ class PokerkitWrapperObserver:
         else draw_statuses[current_street_index]
     )
     pots: pokerkit.Pot = [p for p in wrapped_state_do_not_mutate.pots]
+    bets: list[int] = wrapped_state_do_not_mutate.bets
     player_next_to_act: int = wrapped_state_do_not_mutate.actor_index
 
     # --- NOTE: the following '_cards' on the state here are all generators, so
@@ -1275,6 +1276,7 @@ class PokerkitWrapperObserver:
         f"||Current Street discard/draw performed: {draw_status}\n"
         f"||Next Player to act: {player_next_to_act}\n"
         f"||Pot(s): {pots} \n"
+        f"||Bets: {bets}\n"
         f"||Board Cards: {public_board_cards}\n"
         f"||Player's Private Hole Cards: {private_down_cards}\n"
         # NOTE: This is intentionally the same for all observing players. I.e.
