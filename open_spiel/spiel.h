@@ -915,11 +915,14 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // The maximum number of chance nodes occurring in any history of the game.
   // This is typically something like the number of times dice are rolled.
+  // For deterministic games, this is 0, otherwise it defaults to the max game
+  // length as a loose upper bound.
   virtual int MaxChanceNodesInHistory() const {
     if (GetType().chance_mode == GameType::ChanceMode::kDeterministic) {
       return 0;
+    } else {
+      return MaxGameLength();
     }
-    SpielFatalError("MaxChanceNodesInHistory() is not implemented");
   }
 
   // The maximum number of moves in the game. The value State::MoveNumber()
