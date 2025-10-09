@@ -25,11 +25,19 @@ namespace open_spiel {
 namespace pokerkit_wrapper {
 
 struct PokerkitStateStruct : StateStruct {
-  // TODO: b/437724266 - consider including player hand histories (PHHs) here.
   std::vector<std::string> observation = {};
   std::vector<int> legal_actions = {};
   int current_player = 0;
   bool is_terminal = false;
+
+  // The following fields are derived from pokerkit.state.State, i.e.
+  // https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State
+  //
+  // For example:
+  // https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State.stacks
+  // https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State.bets
+  // https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State.pots
+  // and so on.
   std::vector<int> stacks = {};
   std::vector<int> bets = {};
   std::vector<int> board_cards = {};
@@ -37,6 +45,14 @@ struct PokerkitStateStruct : StateStruct {
   std::vector<int> pots = {};
   std::vector<int> burn_cards = {};
   std::vector<int> mucked_cards = {};
+
+  // PHH (Poker Hand History) actions from each players' perspective.
+  // Derived from pokerkit.HandHistory.from_game_state(...).
+  //
+  // For more details on PHH see the following docs:
+  // https://phh.readthedocs.io/en/stable/required.html
+  // https://pokerkit.readthedocs.io/en/stable/notation.html#writing-hands
+  std::vector<std::vector<std::string>> poker_hand_histories = {};
 
   PokerkitStateStruct() = default;
   explicit PokerkitStateStruct(const std::string& json_str) {
@@ -51,7 +67,8 @@ struct PokerkitStateStruct : StateStruct {
   NLOHMANN_DEFINE_TYPE_INTRUSIVE(PokerkitStateStruct, observation,
                                  legal_actions, current_player, is_terminal,
                                  stacks, bets, board_cards, hole_cards, pots,
-                                 burn_cards, mucked_cards);
+                                 burn_cards, mucked_cards,
+                                 poker_hand_histories);
 };
 
 }  // namespace pokerkit_wrapper

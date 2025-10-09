@@ -38,5 +38,7 @@ void open_spiel::bind_pokerkit_state_struct(py::module& m) {
       .def_readwrite("hole_cards", &PokerkitStateStruct::hole_cards)
       .def_readwrite("pots", &PokerkitStateStruct::pots)
       .def_readwrite("burn_cards", &PokerkitStateStruct::burn_cards)
-      .def_readwrite("mucked_cards", &PokerkitStateStruct::mucked_cards);
+      .def_readwrite("mucked_cards", &PokerkitStateStruct::mucked_cards)
+      .def_readwrite("poker_hand_histories",
+                     &PokerkitStateStruct::poker_hand_histories);
 }

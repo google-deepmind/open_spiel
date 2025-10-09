@@ -1181,6 +1181,7 @@ class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
     state_struct.bets = [10, 0]
     state_struct.board_cards = [5, 6, 7]
     state_struct.hole_cards = [[1, 2], [3, 4]]
+    state_struct.poker_hand_histories = [["phh1"], ["phh2"]]
 
     # Verify modifications
     self.assertEqual(state_struct.observation, ["obs1", "obs2"])
@@ -1191,6 +1192,7 @@ class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
     self.assertEqual(state_struct.bets, [10, 0])
     self.assertEqual(state_struct.board_cards, [5, 6, 7])
     self.assertEqual(state_struct.hole_cards, [[1, 2], [3, 4]])
+    self.assertEqual(state_struct.poker_hand_histories, [["phh1"], ["phh2"]])
 
   def test_pokerkit_wrapper_state_to_struct_and_json(self):
     params = {
@@ -1278,6 +1280,17 @@ class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
     self.assertLen(data["pots"], 1)
     self.assertEqual(data["pots"][0], 200)
 
+    self.assertLen(state_struct.poker_hand_histories, 2)
+    # Per-player view of P1's hole cards (P1 uncensored, P2 censored)
+    self.assertEqual(state_struct.poker_hand_histories[0][0], "d dh p1 AcKc")
+    self.assertEqual(state_struct.poker_hand_histories[1][0], "d dh p1 ????")
+    # Per-player view of P2's hole cards (P1 censored, P2 uncensored)
+    self.assertEqual(state_struct.poker_hand_histories[0][1], "d dh p2 ????")
+    self.assertEqual(state_struct.poker_hand_histories[1][1], "d dh p2 AdKd")
+
+    # For anyone curious about what a non-trivial PHH actually looks like here.
+    print(f"state_struct PHH: {state_struct.poker_hand_histories}")
+
   def test_pokerkit_wrapper_state_to_struct_and_json_when_terminal(self):
     """Tests the ToJson() method inherited from StateStruct."""
     params = {
@@ -1336,6 +1349,16 @@ class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
     # As mentioned above, SB's cards were mucked upon folding.
     self.assertEqual(data["mucked_cards"], [1, 3])
     self.assertEqual(state_struct.mucked_cards, [1, 3])
+
+    # p1 has 2c2h since first + third card in unshuffled deck
+    # p2 has 2d2s since second + fourth card in unshuffled deck
+    self.assertEqual(
+        state_struct.poker_hand_histories,
+        [
+            ["d dh p1 2c2h", "d dh p2 ????", "p2 f"],
+            ["d dh p1 ????", "d dh p2 2d2s", "p2 f"],
+        ],
+    )
 
 
 if __name__ == "__main__":

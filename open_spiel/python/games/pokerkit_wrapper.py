@@ -1087,6 +1087,11 @@ class PokerkitWrapperState(pyspiel.State):
     legal_actions = []
     if not self.is_terminal():
       legal_actions = self.legal_actions()
+    # TODO(jhtschultz): If having the PHHs embeded in the observation string
+    # would be helpful pass in pyspiel.IIGObservationType(perfect_recall=True))
+    # here instead.
+    # (Either way we'll already be putting the PHHs on the struct directly
+    # though, so doing so probably isn't _necessary_ - see below for details.)
     observer = self.get_game().make_py_observer()
     obs_strs = [
         observer.string_from(self, p)
@@ -1111,6 +1116,18 @@ class PokerkitWrapperState(pyspiel.State):
         game.card_to_int[c] for c in self._wrapped_state.mucked_cards
     ]
 
+    # Technically we can get these 'for free' on the observation strings above
+    # by using a perfect_recall observer there. But in practice these are
+    # important enough that it's nice to have them be explicitly available as a
+    # first-class citizen on the actual struct.
+    perfect_recall_observer = self.get_game().make_py_observer(
+        pyspiel.IIGObservationType(perfect_recall=True)
+    )
+    poker_hand_histories: list[list[str]] = [
+        perfect_recall_observer.poker_hand_history_actions(self, p)
+        for p in range(self.get_game().num_players())
+    ]
+
     cpp_state_struct = pyspiel.pokerkit_wrapper.PokerkitStateStruct()
     cpp_state_struct.observation = obs_strs
     cpp_state_struct.legal_actions = legal_actions
@@ -1123,6 +1140,7 @@ class PokerkitWrapperState(pyspiel.State):
     cpp_state_struct.pots = pots
     cpp_state_struct.burn_cards = burn_cards
     cpp_state_struct.mucked_cards = mucked_cards
+    cpp_state_struct.poker_hand_histories = poker_hand_histories
     return cpp_state_struct
 
   def to_json(self) -> str:
@@ -1169,7 +1187,7 @@ class PokerkitWrapperObserver:
     self.tensor = np.array([])
     self.dict = {}
 
-  def _poker_hand_history_actions(self, state, player) -> list[str]:
+  def poker_hand_history_actions(self, state, player) -> list[str]:
     """Returns PHH (Poker Hand History) actions from player's perspective."""
     game = state.get_game()
     game.raise_error_if_player_out_of_range(player)
@@ -1318,7 +1336,7 @@ class PokerkitWrapperObserver:
       # I.e. construct the 'information state string' (by simply merging the
       # observation string with the PHH actions).
       phh_action_string = ",".join(
-          self._poker_hand_history_actions(state, player)
+          self.poker_hand_history_actions(state, player)
       )
       return f"{observation_string}\n||PHH Actions: {phh_action_string}"
     else:

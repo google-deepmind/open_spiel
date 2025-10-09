@@ -39,6 +39,7 @@ void TestPokerkitStateStructDefaults() {
   SPIEL_CHECK_EQ(s.pots.size(), 0);
   SPIEL_CHECK_EQ(s.burn_cards.size(), 0);
   SPIEL_CHECK_EQ(s.mucked_cards.size(), 0);
+  SPIEL_CHECK_EQ(s.poker_hand_histories.size(), 0);
 }
 
 void TestToJsonBase() {
@@ -54,6 +55,7 @@ void TestToJsonBase() {
   state_struct.pots = {11};
   state_struct.burn_cards = {7};
   state_struct.mucked_cards = {8};
+  state_struct.poker_hand_histories = {{"phh_test_a"}, {"phh_test_b"}};
 
   nlohmann::json expected_json;
   expected_json["observation"] = std::vector<std::string>{"json_test"};
@@ -67,6 +69,8 @@ void TestToJsonBase() {
   expected_json["pots"] = std::vector<int>{11};
   expected_json["burn_cards"] = std::vector<int>{7};
   expected_json["mucked_cards"] = std::vector<int>{8};
+  expected_json["poker_hand_histories"] =
+      std::vector<std::vector<std::string>>{{"phh_test_a"}, {"phh_test_b"}};
 
   nlohmann::json actual_json = state_struct.to_json_base();
   SPIEL_CHECK_EQ(actual_json, expected_json);
