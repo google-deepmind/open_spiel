@@ -63,8 +63,8 @@ fi
 if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" ]]; then
     ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
-    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-macosx_10_9_x86_64.whl
+  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
+    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp310-cp310-macosx_10_9_x86_64.whl
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.11" ]]; then
     # Run on the xlarge macs for arm64
     ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp311-cp311-macosx_11_0_arm64.whl
