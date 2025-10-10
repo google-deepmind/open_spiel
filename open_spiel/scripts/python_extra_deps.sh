@@ -74,10 +74,15 @@ elif verlt $PY_VER 3.13; then
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.4.26 jaxlib==0.4.26 dm-haiku==0.0.12 optax==0.2.2 chex==0.1.86 rlax==0.1.6 distrax==0.1.5"
   export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.26.4 tensorflow==2.16.1 tensorflow_datasets==4.9.7 keras==3.1.1"
   export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.8.4 mock==5.1.0 nashpy==0.0.41 scipy==1.11.4 testresources==2.0.1 cvxopt==1.3.2 cvxpy==1.4.2 ecos==2.0.13 osqp==1.0.4 clu==0.0.11 flax==0.8.2 pokerkit==0.6.3"
-else
+elif verlt $PY_VER 3.14; then
   echo "Detected Python version 3.13"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.6.0"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.5.0 jaxlib==0.5.0 dm-haiku==0.0.13 optax==0.2.4 chex==0.1.88 rlax==0.1.6 distrax==0.1.5 flax==0.10.3"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.10.0 mock==5.1.0 nashpy==0.0.41 scipy==1.15.2 testresources==2.0.1 cvxopt==1.3.2 cvxpy==1.6.1 ecos==2.0.14 osqp==1.0.4 clu==0.0.11 tensorflow_datasets==4.9.3 pokerkit==0.6.3"
+else
+  echo "Detected Python version 3.14"
+  export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.8.0"
+  export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.7.2 jaxlib==0.7.2 dm-haiku==0.0.15 optax==0.2.6 chex==0.1.91 rlax==0.1.8 distrax==0.1.7 flax==0.12.0"
   export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.10.0 mock==5.1.0 nashpy==0.0.41 scipy==1.15.2 testresources==2.0.1 cvxopt==1.3.2 cvxpy==1.6.1 ecos==2.0.14 osqp==1.0.4 clu==0.0.11 tensorflow_datasets==4.9.3 pokerkit==0.6.3"
 fi
 

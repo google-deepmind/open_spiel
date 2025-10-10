@@ -35,7 +35,7 @@ jobs:
           OS_PYTHON_VERSION: 3.10
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64
+          CIBW_BUILD: cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
         # These must use the old abseil
         - os: macOS-13
           NAME: "MacOS13_Python_lte_3.11"
@@ -53,7 +53,7 @@ jobs:
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           OS_PYTHON_VERSION: 3.12
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64
+          CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64 cp314-macosx_x86_64
         # Setting to the new M1 runners to build the _arm64 wheels
         # https://github.blog/2023-10-02-introducing-the-new-apple-silicon-powered-m1-macos-larger-runner-for-github-actions/
         # Disabling now that the OpenSpiel 1.4 wheels are on PyPI because these xlarge machines are
@@ -64,7 +64,7 @@ jobs:
         #   CI_PYBIN: python3.11
         #   OS_PYTHON_VERSION: 3.11
         #   CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-        #   CIBW_BUILD: cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64
+        #   CIBW_BUILD: cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64 cp313-macosx_arm64 cp314-macosx_arm64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -109,7 +109,7 @@ jobs:
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine
-          python -m pip install cibuildwheel==2.22.0
+          python -m pip install cibuildwheel==3.2.0
       - name: Build sdist
         run: |
           source ./venv/bin/activate
