@@ -11,7 +11,7 @@ struct PlayerAction
     action::Int64
 end
 
-@wrapmodule(LIB_OPEN_SPIEL)
+@wrapmodule(() -> LIB_OPEN_SPIEL)
 
 include("patch.jl")
 

@@ -11,38 +11,38 @@ end
 
 @testset "create game" begin
     game = load_game("kuhn_poker")
-    game_info = get_type(game)
+    game_info = get_type(game[])
     @test information(game_info) == IMPERFECT_INFORMATION
-    @test num_players(game) == 2
+    @test num_players(game[]) == 2
 end
 
 @testset "play kuhn_poker" begin
     game = load_game("kuhn_poker")
-    state = new_initial_state(game)
-    @test is_chance_node(state) == true
-    @test is_initial_state(state) == true
-    @test chance_outcomes(state) == [0 => 1/3, 1 => 1/3, 2 => 1/3]
+    state = new_initial_state(game[])
+    @test is_chance_node(state[]) == true
+    @test is_initial_state(state[]) == true
+    @test chance_outcomes(state[]) == [0 => 1/3, 1 => 1/3, 2 => 1/3]
 
-    apply_action(state, 1)
-    @test is_chance_node(state) == true
-    @test is_initial_state(state) == false
-    @test chance_outcomes(state) == [0 => 1/2, 2 => 1/2]
+    apply_action(state[], 1)
+    @test is_chance_node(state[]) == true
+    @test is_initial_state(state[]) == false
+    @test chance_outcomes(state[]) == [0 => 1/2, 2 => 1/2]
 
-    apply_action(state, 2)
-    @test is_chance_node(state) == false
-    @test is_initial_state(state) == false
-    @test legal_actions(state) == [0, 1]
+    apply_action(state[], 2)
+    @test is_chance_node(state[]) == false
+    @test is_initial_state(state[]) == false
+    @test legal_actions(state[]) == [0, 1]
 
-    @test length(full_history(state)) == 2
+    @test length(full_history(state[])) == 2
 end
 
 @testset "tic_tac_toe" begin
     game = load_game("tic_tac_toe")
-    state = new_initial_state(game)
-    @test is_chance_node(state) == false
-    @test is_terminal(state) == false
-    @test is_initial_state(state) == true
-    @test legal_actions(state) == 0:8
+    state = new_initial_state(game[])
+    @test is_chance_node(state[]) == false
+    @test is_terminal(state[]) == false
+    @test is_initial_state(state[]) == true
+    @test legal_actions(state[]) == 0:8
 end
 
 @testset "GameParameter" begin
@@ -63,20 +63,20 @@ end
 
 @testset "simultaneous game history" begin
     game = load_game("coop_box_pushing")
-    state = new_initial_state(game)
-    apply_action(state, 0)
-    state2 = new_initial_state(game)
-    apply_action(state2, fill(0, num_players(game)))
-    @test history(state) == history(state2)
+    state = new_initial_state(game[])
+    apply_action(state[], 0)
+    state2 = new_initial_state(game[])
+    apply_action(state2[], fill(0, num_players(game[])))
+    @test history(state[]) == history(state2[])
 end
 
 @testset "Matrixrame" begin
-    matrix_blotto = load_matrix_game("blotto")
+    matrix_blotto = load_matrix_game("blotto")[]
     @test num_rows(matrix_blotto) == 66
     @test num_cols(matrix_blotto) == 66
 
-    kuhn_game = load_game("kuhn_poker")
-    kuhn_matrix_game = extensive_to_matrix_game(kuhn_game)
+    kuhn_game = load_game("kuhn_poker")[]
+    kuhn_matrix_game = extensive_to_matrix_game(kuhn_game)[]
     @test num_rows(kuhn_matrix_game) == 64
     @test num_cols(kuhn_matrix_game) == 64
 end

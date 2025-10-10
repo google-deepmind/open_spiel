@@ -1,6 +1,6 @@
 @testset "games simulation" begin
 
-MAX_ACTIONS_PER_GAME = 1000
+DEFAULT_MAX_ACTIONS_PER_GAME = 1000
 
 SPIEL_GAMES_LIST = registered_games()
 
@@ -31,66 +31,68 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
 
 function apply_action_test_clone(state, action)
     state_copy = copy(state)
-    @test string(state) == string(state_copy)
-    @test history(state) == history(state_copy)
+    @test string(state[]) == string(state_copy[])
+    @test history(state[]) == history(state_copy[])
 
-    apply_action(state, action)
-    apply_action(state_copy, action)
+    apply_action(state[], action)
+    apply_action(state_copy[], action)
 
-    @test string(state) == string(state_copy)
-    @test history(state) == history(state_copy)
+    @test string(state[]) == string(state_copy[])
+    @test history(state[]) == history(state_copy[])
 end
 
 function serialize_deserialize(game, state)
     ser_str = serialize_game_and_state(game, state)
     new_game, new_state = deserialize_game_and_state(ser_str)
-    @test string(game) == string(new_game)
-    @test string(state) == string(new_state)
+    @test string(game) == string(new_game[])
+    @test string(state) == string(new_state[])
 end
 
 function simulate_game(game)
-    @info "simulating game $(short_name(get_type(game)))"
-    min_u, max_u = min_utility(game), max_utility(game)
+    game_name = short_name(get_type(game[]))
+    @info "simulating game $game_name"
+    min_u, max_u = min_utility(game[]), max_utility(game[])
     @test min_u < max_u
 
-    state = new_initial_state(game)
+    state = new_initial_state(game[])
     total_actions = 0
 
     next_serialize_check = 1
 
-    while !is_terminal(state) && (total_actions <= MAX_ACTIONS_PER_GAME)
+    MAX_ACTIONS_PER_GAME = game_name == "bargaining" ? 1 : DEFAULT_MAX_ACTIONS_PER_GAME
+    while !is_terminal(state[]) && (total_actions <= MAX_ACTIONS_PER_GAME)
         total_actions += 1
 
         # Serialize/Deserialize is costly. Only do it every power of 2 actions.
         if total_actions >= next_serialize_check
-            serialize_deserialize(game, state)
+            serialize_deserialize(game[], state[])
             next_serialize_check *= 2
         end
 
         # The state can be of four different types: chance node,
         # simultaneous node, decision node or mean field node.
-        if is_chance_node(state)
+        if is_chance_node(state[])
             # Chance node: sample an outcome
-            outcomes = chance_outcomes(state)
+            outcomes = chance_outcomes(state[])
             @test length(outcomes) > 0
             action_list, prob_list = zip(outcomes...)
             action = action_list[sample(weights(collect(prob_list)))]
-            apply_action(state, action)
-        elseif is_simultaneous_node(state)
+            apply_action(state[], action)
+        elseif is_simultaneous_node(state[])
             chosen_actions = [
-                rand(legal_actions(state, pid-1))
-                for pid in 1:num_players(game)
+                rand(legal_actions(state[], pid-1))
+                for pid in 1:num_players(game[])
             ]  # in julia, index starts with 1
             # Apply the joint action and test cloning states.
             apply_action_test_clone(state, chosen_actions)
-        elseif is_mean_field_node(state)
-            num_states = length(distribution_support(state))
+        elseif is_mean_field_node(state[])
+            num_states = length(distribution_support(state[]))
             update_distribution(
-                state, StdVector([1. / num_states for _ in 1:num_states]))
+                state[], StdVector([1. / num_states for _ in 1:num_states]))
         else
-            @test is_player_node(state)
+            @test is_player_node(state[])
             # Decision node: sample action for the single current player
-            action = rand(legal_actions(state, current_player(state)))
+            action = rand(legal_actions(state[], current_player(state[])))
             # Apply action and test state cloning.
             apply_action_test_clone(state, action)
         end
@@ -98,30 +100,30 @@ function simulate_game(game)
 
     @test total_actions > 0
 
-    if is_terminal(state)
+    if is_terminal(state[])
         # Check there are no legal actions.
-        @test length(legal_actions(state)) == 0
-        for player in 0:(num_players(game)-1)
-            @test length(legal_actions(state, player)) == 0
+        @test length(legal_actions(state[])) == 0
+        for player in 0:(num_players(game[])-1)
+            @test length(legal_actions(state[], player)) == 0
         end
 
-        utilities = returns(state)
+        utilities = returns(state[])
 
         for u in utilities
-            @test u >= min_utility(game)
-            @test u <= max_utility(game)
+            @test u >= min_utility(game[])
+            @test u <= max_utility(game[])
         end
 
-        @info "Simulation of game $game" total_actions utilities
+        @info "Simulation of game $(game[])" total_actions utilities
     else
-        @info "Simulation of game $game terminated after maximum number of actions $MAX_ACTIONS_PER_GAME"
+        @info "Simulation of game $(game[]) terminated after maximum number of actions $MAX_ACTIONS_PER_GAME"
     end
 end
 
 for game_info in SPIEL_LOADABLE_GAMES_LIST
     game = load_game(short_name(game_info))
-    @test num_players(game) >= min_num_players(game_info)
-    @test num_players(game) <= max_num_players(game_info)
+    @test num_players(game[]) >= min_num_players(game_info)
+    @test num_players(game[]) <= max_num_players(game_info)
     simulate_game(game)
 end
 

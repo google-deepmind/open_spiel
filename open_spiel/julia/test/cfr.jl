@@ -1,7 +1,7 @@
 @testset "cfr" begin
 
 function test_nash_kuhn_poker(game, policy)
-    game_values = expected_returns(new_initial_state(game), policy, -1)
+    game_values = expected_returns(new_initial_state(game[])[], policy[], -1)
 
     # 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
     nash_value = 1.0 / 18.0
@@ -11,11 +11,11 @@ function test_nash_kuhn_poker(game, policy)
     @test isapprox(game_values[2], nash_value, atol=eps)
 end
 
-test_exploitability_kuhn_poker(game, policy) = @test exploitability(game, policy) <= 0.05
+test_exploitability_kuhn_poker(game, policy) = @test exploitability(game[], policy[]) <= 0.05
 
 @testset "CFRSolver" begin
     game = load_game("kuhn_poker")
-    solver = CFRSolver(game)
+    solver = CFRSolver(game[])
     for _ in 1:300
         evaluate_and_update_policy(solver)
     end
@@ -26,7 +26,7 @@ end
 
 @testset "CFRPlusSolver" begin
     game = load_game("kuhn_poker")
-    solver = CFRPlusSolver(game)
+    solver = CFRPlusSolver(game[])
     for _ in 1:200
         evaluate_and_update_policy(solver)
     end
