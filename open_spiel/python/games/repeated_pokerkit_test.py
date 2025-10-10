@@ -467,20 +467,48 @@ if IMPORTED_ALL_LIBRARIES:
       except json.JSONDecodeError as e:
         self.fail(f"Failed to parse JSON {state_json}, error: {e}")
 
+      self.assertEqual(state_struct.hand_number, 0)
+      self.assertEqual(data_h0["hand_number"], 0)
+      self.assertEqual(state_struct.is_terminal, False)
       self.assertEqual(data_h0["is_terminal"], False)
+      self.assertEqual(state_struct.stacks, [1000, 1000])
+      self.assertEqual(data_h0["stacks"], [1000, 1000])
+      self.assertEqual(state_struct.dealer, 1)
+      self.assertEqual(data_h0["dealer"], 1)
+      self.assertEqual(state_struct.seat_to_player, {0: 0, 1: 1})
+      self.assertEqual(data_h0["seat_to_player"], [[0, 0], [1, 1]])
+      self.assertEqual(state_struct.player_to_seat, {0: 0, 1: 1})
+      self.assertEqual(data_h0["player_to_seat"], [[0, 0], [1, 1]])
+      self.assertEqual(state_struct.small_blind, 50)
+      self.assertEqual(data_h0["small_blind"], 50)
+      self.assertEqual(state_struct.big_blind, 100)
+      self.assertEqual(data_h0["big_blind"], 100)
+      self.assertEqual(state_struct.small_bet_size, -1)
+      self.assertEqual(data_h0["small_bet_size"], -1)
+      self.assertEqual(state_struct.big_bet_size, -1)
+      self.assertEqual(data_h0["big_bet_size"], -1)
+      self.assertEqual(state_struct.bring_in, -1)
+      self.assertEqual(data_h0["bring_in"], -1)
+      self.assertEqual(state_struct.hand_returns, [[0.0, 0.0]])
+      self.assertEqual(data_h0["hand_returns"], [[0.0, 0.0]])
+
+      pk_state_struct_h0 = state_struct.pokerkit_state_struct
+      pk_data_h0 = data_h0["pokerkit_state_struct"]
+
+      self.assertEqual(pk_data_h0["is_terminal"], False)
       self.assertEqual(
-          state.pokerkit_wrapper_state.is_terminal(), data_h0["is_terminal"]
+          state.pokerkit_wrapper_state.is_terminal(), pk_data_h0["is_terminal"]
       )
-      self.assertEqual(data_h0["current_player"], pyspiel.PlayerId.CHANCE)
+      self.assertEqual(pk_data_h0["current_player"], pyspiel.PlayerId.CHANCE)
       self.assertEqual(
           state.pokerkit_wrapper_state.current_player(),
-          data_h0["current_player"],
+          pk_data_h0["current_player"],
       )
       # Stacks in pokerkit state are after blinds: 1000-50=950, 1000-100=900
-      self.assertEqual(data_h0["stacks"], [900, 950])
-      self.assertEqual(state_struct.stacks, data_h0["stacks"])
-      self.assertEqual(data_h0["bets"], [100, 50])
-      self.assertEqual(state_struct.bets, data_h0["bets"])
+      self.assertEqual(pk_data_h0["stacks"], [900, 950])
+      self.assertEqual(pk_state_struct_h0.stacks, pk_data_h0["stacks"])
+      self.assertEqual(pk_data_h0["bets"], [100, 50])
+      self.assertEqual(pk_state_struct_h0.bets, pk_data_h0["bets"])
 
       # Play until hand is over, having P1 fold immediately preflop.
       while state._hand_number == 0:
@@ -500,25 +528,63 @@ if IMPORTED_ALL_LIBRARIES:
       except json.JSONDecodeError as e:
         self.fail(f"Failed to parse JSON {state_json_h1}, error: {e}")
 
+      self.assertEqual(state_struct_h1.hand_number, 1)
+      self.assertEqual(data_h1["hand_number"], 1)
+      self.assertEqual(state_struct_h1.is_terminal, False)
       self.assertEqual(data_h1["is_terminal"], False)
-      self.assertEqual(state_struct_h1.is_terminal, data_h1["is_terminal"])
-      self.assertEqual(data_h1["current_player"], pyspiel.PlayerId.CHANCE)
+      # P1 folded in hand 0, so P0 wins 50 from P1.
+      # Stacks before hand 1: P0=1000+50=1050, P1=1000-50=950.
+      self.assertEqual(state_struct_h1.stacks, [1050, 950])
+      self.assertEqual(data_h1["stacks"], [1050, 950])
+      self.assertEqual(state_struct_h1.dealer, 0)
+      self.assertEqual(data_h1["dealer"], 0)
+      self.assertEqual(state_struct_h1.seat_to_player, {0: 1, 1: 0})
+      self.assertEqual(data_h1["seat_to_player"], [[0, 1], [1, 0]])
+      self.assertEqual(state_struct_h1.player_to_seat, {0: 1, 1: 0})
+      self.assertEqual(data_h1["player_to_seat"], [[0, 1], [1, 0]])
+      self.assertEqual(state_struct_h1.small_blind, 50)
+      self.assertEqual(data_h1["small_blind"], 50)
+      self.assertEqual(state_struct_h1.big_blind, 100)
+      self.assertEqual(data_h1["big_blind"], 100)
+      self.assertEqual(state_struct_h1.small_bet_size, -1)
+      self.assertEqual(data_h1["small_bet_size"], -1)
+      self.assertEqual(state_struct_h1.big_bet_size, -1)
+      self.assertEqual(data_h1["big_bet_size"], -1)
+      self.assertEqual(state_struct_h1.bring_in, -1)
+      self.assertEqual(data_h1["bring_in"], -1)
       self.assertEqual(
-          state_struct_h1.current_player, data_h1["current_player"]
+          state_struct_h1.hand_returns, [[50.0, -50.0], [0.0, 0.0]]
       )
-      # Before blinds, since P1 won last hand (ie last hand's P0 prior to
-      # rotation) the stacks would be 950, 1050. Following blinds that would put
-      # us here at 850, 1000.
-      self.assertEqual(data_h1["stacks"], [850, 1000])
-      self.assertEqual(state_struct_h1.stacks, data_h1["stacks"])
-      self.assertEqual(data_h1["bets"], [100, 50])
-      self.assertEqual(state_struct_h1.bets, data_h1["bets"])
+      self.assertEqual(data_h1["hand_returns"], [[50.0, -50.0], [0.0, 0.0]])
+
+      pk_state_struct_h1 = state_struct_h1.pokerkit_state_struct
+      pk_data_h1 = data_h1["pokerkit_state_struct"]
+
+      self.assertEqual(pk_data_h1["is_terminal"], False)
+      self.assertEqual(
+          pk_state_struct_h1.is_terminal, pk_data_h1["is_terminal"]
+      )
+      self.assertEqual(pk_data_h1["current_player"], pyspiel.PlayerId.CHANCE)
+      self.assertEqual(
+          pk_state_struct_h1.current_player, pk_data_h1["current_player"]
+      )
+      # Dealer rotates, P1 was dealer in hand 0, so P0 is dealer in hand 1.
+      # Heads-up: dealer is SB. P0=SB=50, P1=BB=100.
+      # Pokerkit state stacks based on seats:
+      # P0 is seat 1 (SB), stack 1050-50=1000
+      # P1 is seat 0 (BB), stack 950-100=850
+      self.assertEqual(pk_data_h1["stacks"], [850, 1000])
+      self.assertEqual(pk_state_struct_h1.stacks, pk_data_h1["stacks"])
+      self.assertEqual(pk_data_h1["bets"], [100, 50])
+      self.assertEqual(pk_state_struct_h1.bets, pk_data_h1["bets"])
 
       # Finally double check we can reach terminal state as expected
       while not state.is_terminal():
         if state.is_chance_node():
           state.apply_action(state.chance_outcomes()[0][0])
         else:
+          # Now this time the other player folds - meaning we're inverting what
+          # just happened last hand.
           state.apply_action(ACTION_FOLD)
 
       state_struct_terminal = state.to_struct()
@@ -532,6 +598,23 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertEqual(
           state_struct_terminal.is_terminal, data_terminal["is_terminal"]
       )
+      self.assertEqual(
+          state_struct_terminal.hand_returns, [[50.0, -50.0], [-50.0, 50.0]]
+      )
+      self.assertEqual(
+          data_terminal["hand_returns"], [[50.0, -50.0], [-50.0, 50.0]]
+      )
+      self.assertEqual(state_struct_terminal.stacks, [1000, 1000])
+      self.assertEqual(data_terminal["stacks"], [1000, 1000])
+
+      # Max hands was 2, so it shouldn't have progressed past hand 1 and the
+      # players shouldn't have rotated.
+      self.assertEqual(state_struct_terminal.hand_number, 1)
+      self.assertEqual(data_terminal["hand_number"], 1)
+      self.assertEqual(state_struct_terminal.seat_to_player, {0: 1, 1: 0})
+      self.assertEqual(data_terminal["seat_to_player"], [[0, 1], [1, 0]])
+      self.assertEqual(state_struct_terminal.player_to_seat, {0: 1, 1: 0})
+      self.assertEqual(data_terminal["player_to_seat"], [[0, 1], [1, 0]])
 
   # TODO: b/444333187 - Add tests for the following behaviors:
   # - blind schedule becoming higher than all players' remaining stacks. (This

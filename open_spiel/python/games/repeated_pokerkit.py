@@ -482,8 +482,8 @@ class RepeatedPokerkitState(pyspiel.State):
     # PokerkitWrapperState.
     self._stacks: list[int] = None
     self._dealer = pyspiel.PlayerId.INVALID
-    self._seat_to_player: dict[int, int] = None
-    self._player_to_seat: dict[int, int] = None
+    self._seat_to_player: dict[int, int] = {}
+    self._player_to_seat: dict[int, int] = {}
     self._small_blind = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
     self._big_blind = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
     self._small_bet_size = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
@@ -493,8 +493,6 @@ class RepeatedPokerkitState(pyspiel.State):
     self._wrapped_state_hand_histories: list[str] = []
     # 2-D list where each inner list has length _num_players
     self._hand_returns: list[list[float]] = [[0.0] * game.num_players()]
-    self._player_to_seat = {}
-    self._seat_to_player = {}
 
     super().__init__(game)
 
@@ -962,6 +960,9 @@ class RepeatedPokerkitState(pyspiel.State):
     # Terminate or start a new hand
     if self._hand_number + 1 == self.get_game()._max_num_hands:
       self._is_terminal = True
+      # Necessary to ensure that if returning stacks inside to_struct() that it
+      # gets the correct final stacks when in a terminal state.
+      self.update_stacks()
       return
     self._hand_number += 1
     self._hand_returns.append([0.0] * self.num_players())
@@ -1070,17 +1071,23 @@ class RepeatedPokerkitState(pyspiel.State):
   def __str__(self):
     return f"Hand number: {self._hand_number}\n{self.pokerkit_wrapper_state}"
 
-  def to_struct(self) -> pyspiel.pokerkit_wrapper.PokerkitStateStruct:
-    """Returns the current pokerkit_wrapper state struct.
-
-    TODO: b/437724266 - We will likely want to come back and implement
-    something a bit more robust here, potentially creating + binding a separate
-    C++ StateStruct altogether. Since currently this does not provide any
-    information whatsoever about prior hands, nor does it deal with our mapping
-    from seats to players - it simply returns the StateStruct provided by the
-    underlying PokerkitWrapperState.
-    """
-    return self.pokerkit_wrapper_state.to_struct()
+  def to_struct(self) -> pyspiel.repeated_pokerkit.RepeatedPokerkitStateStruct:
+    """Returns the current repeated_pokerkit state struct."""
+    struct = pyspiel.repeated_pokerkit.RepeatedPokerkitStateStruct()
+    struct.pokerkit_state_struct = self.pokerkit_wrapper_state.to_struct()
+    struct.hand_number = self._hand_number
+    struct.is_terminal = self._is_terminal
+    struct.stacks = self._stacks
+    struct.dealer = self._dealer
+    struct.seat_to_player = self._seat_to_player
+    struct.player_to_seat = self._player_to_seat
+    struct.small_blind = self._small_blind
+    struct.big_blind = self._big_blind
+    struct.small_bet_size = self._small_bet_size
+    struct.big_bet_size = self._big_bet_size
+    struct.bring_in = self._bring_in
+    struct.hand_returns = self._hand_returns
+    return struct
 
   def to_json(self) -> str:
     return self.to_struct().to_json()

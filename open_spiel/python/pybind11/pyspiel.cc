@@ -61,6 +61,7 @@
 #include "open_spiel/python/pybind11/games_tiny_bridge.h"
 #include "open_spiel/python/pybind11/games_trade_comm.h"
 #include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
+#include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -722,7 +723,8 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_tic_tac_toe(m);
   init_pyspiel_games_tiny_bridge(m);
   init_pyspiel_games_trade_comm(m);
-  bind_pokerkit_state_struct(m);  // C++ struct for a Python game.
+  bind_pokerkit_state_struct(m);           // C++ struct for a Python game.
+  bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
 
