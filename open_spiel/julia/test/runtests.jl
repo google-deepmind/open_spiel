@@ -8,6 +8,7 @@ function evaluate_bots(
     state::Union{Ptr{Nothing}, CxxPtr{<:State}, CxxWrap.StdLib.UniquePtrAllocated{State}},
     bots::Vector{<:Bot},
     seed::Int)
+    state = state[]
 
     rng = MersenneTwister(seed)
 
