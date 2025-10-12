@@ -96,7 +96,7 @@ jobs:
           [[ "${OS_TYPE}" = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
           [[ "${OS_TYPE}" = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
           # Needed for cvxopt
-          [[ "${OS_TYPE}" = "Darwin" ]] && brew install suite-sparse@7.11.0
+          [[ "${OS_TYPE}" = "Darwin" ]] && brew install suite-sparse
           which g++
           g++ --version
           chmod +x install.sh
