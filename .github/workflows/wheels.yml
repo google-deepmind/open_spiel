@@ -72,7 +72,7 @@ jobs:
           OS_PYTHON_VERSION: 3.12
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp314-macosx_x86_64
+          CIBW_BUILD: cp313-macosx_arm64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -132,7 +132,7 @@ jobs:
         run: |
           [[ "${OS_TYPE}" = "Darwin" ]] && xcodebuild -version
           source ./venv/bin/activate
-          CIBUILDWHEEL_PRERELEASE_PYTHONS=1 python -m cibuildwheel --print-build-identifiers --output-dir wheelhouse
+          python -m cibuildwheel --print-build-identifiers --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
