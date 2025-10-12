@@ -52,6 +52,7 @@ jobs:
           CI_PYBIN: python3.13
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           OS_PYTHON_VERSION: 3.13
+          CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64 cp314-macosx_x86_64
         # Setting to the new M1 runners to build the _arm64 wheels
@@ -74,6 +75,7 @@ jobs:
       OS_TYPE: ${{ matrix.OS_TYPE }}
       OS_PYTHON_VERSION: ${{ matrix.OS_PYTHON_VERSION }}
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
+      CIBW_ENABLE: ${{ matrix.CIBW_ENABLE }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
