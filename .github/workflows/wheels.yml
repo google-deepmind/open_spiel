@@ -67,17 +67,15 @@ jobs:
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64 cp313-macosx_arm64
-        # Oct 12th: Python 3.14 not available on MacOS yet in cibuildwheel, it seems.
-        #- os: macOS-14
-        #  NAME: "MacOS14_Python_gte_3.12"
-        #  OS_TYPE: "Darwin"
-        #  CI_PYBIN: python3.12
-        #  OPEN_SPIEL_ABSL_VERSION: "20250127.1"
-        #  OS_PYTHON_VERSION: 3.12
-        #  CIBW_VERSION: 3.2.1
-        #  CIBW_ENABLE: all
-        #  CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-        #  CIBW_BUILD: cp314-macosx_arm64
+        - os: macOS-15
+          NAME: "MacOS15_Python_gte_3.13"
+          OS_TYPE: "Darwin"
+          CI_PYBIN: python3.13
+          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
+          OS_PYTHON_VERSION: 3.13
+          CIBW_VERSION: 3.2.1
+          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp314-macosx_arm64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
