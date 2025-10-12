@@ -68,11 +68,11 @@ jobs:
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64 cp313-macosx_arm64
         - os: macOS-15
-          NAME: "MacOS15_Python_gte_3.13"
+          NAME: "MacOS15_Python_3.14"
           OS_TYPE: "Darwin"
-          CI_PYBIN: python3.13
+          CI_PYBIN: python3.14
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
-          OS_PYTHON_VERSION: 3.13
+          OS_PYTHON_VERSION: 3.14
           CIBW_VERSION: 3.2.1
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp314-macosx_arm64
