@@ -73,6 +73,14 @@ if [[ "$MODE" = "full" ]]; then
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
     file=`ls wheelhouse/open_spiel-*-cp312-cp312-*.whl`
     ${PYBIN} -m pip install $file
+  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.13" ]]; then
+    # file=`ls wheelhouse/open_spiel-*-cp312-cp312-*.whl`
+    # ${PYBIN} -m pip install $file
+    print "Skipping full tests as no wheels built for this case."
+    exit 0
+  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.14" ]]; then
+    file=`ls wheelhouse/open_spiel-*-cp314-cp314-*.whl`
+    ${PYBIN} -m pip install $file
   else
     echo "Config not found for full tests"
     exit -1
