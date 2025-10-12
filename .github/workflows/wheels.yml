@@ -59,7 +59,7 @@ jobs:
           CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64
         - os: macos-14
           OS_TYPE: "Darwin"
-          CI_PYBIN: python3.13
+          CI_PYBIN: python3.12
           OS_PYTHON_VERSION: 3.12
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
