@@ -49,7 +49,7 @@ jobs:
           CIBW_BUILD: cp310-macosx_x86_64 cp311-macosx_x86_64
         # These use the new abseil
         - os: macOS-14-intel
-          NAME: "MacOS15_Python_gte_3.12"
+          NAME: "MacOS14_Python_gte_3.12"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.13
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
