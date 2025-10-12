@@ -132,7 +132,7 @@ jobs:
         run: |
           [[ "${OS_TYPE}" = "Darwin" ]] && xcodebuild -version
           source ./venv/bin/activate
-          python -m cibuildwheel --print-build-identifiers --output-dir wheelhouse
+          CIBUILDWHEEL_PRERELEASE_PYTHONS=1 python -m cibuildwheel --print-build-identifiers --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
