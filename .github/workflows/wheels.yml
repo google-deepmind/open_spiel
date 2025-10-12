@@ -95,6 +95,8 @@ jobs:
           uname -a
           [[ "${OS_TYPE}" = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
           [[ "${OS_TYPE}" = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
+          # Needed for cvxopt
+          [[ "${OS_TYPE}" = "Darwin" ]] && brew install suite-sparse
           which g++
           g++ --version
           chmod +x install.sh
