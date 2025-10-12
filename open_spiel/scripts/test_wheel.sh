@@ -30,9 +30,6 @@ fi
 MODE=$1
 PROJDIR=$2
 
-VERSION=`cat $PROJDIR/setup.py  | grep "version=" | sed -n 's/version="\(.*\)",/\1/p' | sed -e 's/\w*//g'`
-echo "Test Wheels: OpenSpiel version $VERSION"
-
 uname -a
 OS=`uname -a | awk '{print $1}'`
 
@@ -65,14 +62,17 @@ fi
 
 if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" ]]; then
-    ${PYBIN} -m pip install wheelhouse/open_spiel-$VERSION-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+    file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl`
+    ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
-    ${PYBIN} -m pip install wheelhouse/open_spiel-$VERSION-cp310-cp310-macosx_10_9_x86_64.whl
+    file=`ls wheelhouse/open_spiel-*-cp310-cp310-macosx_10_9_x86_64.whl`
+    ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.11" ]]; then
-    # Run on the xlarge macs for arm64
-    ${PYBIN} -m pip install wheelhouse/open_spiel-$VERSION-cp311-cp311-macosx_11_0_arm64.whl
+    file=`ls wheelhouse/open_spiel-*-cp311-cp311-macosx_11_0_arm64.whl`
+    ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
-    ${PYBIN} -m pip install wheelhouse/open_spiel-$VERSION-cp312-cp312-macosx_10_13_x86_64.whl
+    file=`ls wheelhouse/open_spiel-*-cp312-cp312-macosx_10_13_x86_64.whl`
+    ${PYBIN} -m pip install $file
   else
     echo "Config not found for full tests"
     exit -1
