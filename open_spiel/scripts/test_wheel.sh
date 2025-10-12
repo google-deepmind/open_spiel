@@ -30,7 +30,7 @@ fi
 MODE=$1
 PROJDIR=$2
 
-VERSION=`cat $PROJDIR/setup.py  | grep "version=" | sed -n 's/version="\(.*\)",/\1/p'`
+VERSION=`cat $PROJDIR/setup.py  | grep "version=" | sed -n 's/version="\(.*\)",/\1/p' | sed -e 's/\w*//g'`
 echo "Test Wheels: OpenSpiel version $VERSION"
 
 uname -a
