@@ -76,7 +76,6 @@ jobs:
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
-      CIBW_SKIP: pp*
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
