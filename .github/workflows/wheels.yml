@@ -48,7 +48,7 @@ jobs:
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-macosx_x86_64 cp311-macosx_x86_64
         # These use the new abseil
-        - os: macOS-14-intel
+        - os: macOS-14
           NAME: "MacOS14_Python_gte_3.12"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.13
