@@ -62,16 +62,16 @@ fi
 
 if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl`
+    file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux*.whl`
     ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp310-cp310-macosx_10_9_x86_64.whl`
+    file=`ls wheelhouse/open_spiel-*-cp310-cp310-*.whl`
     ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.11" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp311-cp311-macosx_11_0_arm64.whl`
+    file=`ls wheelhouse/open_spiel-*-cp311-cp311-*.whl`
     ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-macosx_10_13_x86_64.whl`
+    file=`ls wheelhouse/open_spiel-*-cp312-cp312-*.whl`
     ${PYBIN} -m pip install $file
   else
     echo "Config not found for full tests"
