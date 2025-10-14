@@ -536,7 +536,7 @@ if IMPORTED_ALL_LIBRARIES:
       # Double check that the call action was indeed one big blind less
       self.assertIn(
           "(20)",
-          state._action_to_string(state.current_player(), ACTION_CHECK_OR_CALL),
+          state.action_to_string(state.current_player(), ACTION_CHECK_OR_CALL),
       )
       # Check the wrapped pokerkit state agrees with the returned legal actions.
       # (Accessing the ._wrapped_state directly is a bit of a hack, but in
@@ -583,40 +583,80 @@ if IMPORTED_ALL_LIBRARIES:
       # to be handled correctly (mapping 1 chip shove to action 2).
       # (P0 cannot fold since pokerkit doesn't allow folding when not actually
       # facing an opponent's bet.)
-      self.assertEqual(
-          state._legal_actions(state._wrapped_state.actor_index),
-          [ACTION_CHECK_OR_CALL, 2],
-      )
-      self.assertIn("[ALL-IN EDGECASE]", state._action_to_string(0, 2))
-      self.assertIn("Bet/Raise to 1", state._action_to_string(0, 2))
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 2])
+      self.assertIn("[ALL-IN EDGECASE]", state.action_to_string(2))
+      self.assertIn("Bet/Raise to 1", state.action_to_string(2))
       state.apply_action(2)
 
       # Verify that the 2 actually mapped to a bet of 1 chip / that the next
       # players get entirely normal fold/check_or_call actions.
       self.assertEqual(wrapped_state.stacks, [0, 1, 1])
       self.assertEqual(
-          state._legal_actions(state._wrapped_state.actor_index),
-          [ACTION_FOLD, ACTION_CHECK_OR_CALL],
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL]
       )
-      self.assertEqual(
-          state._action_to_string(
-              wrapped_state.actor_index, ACTION_CHECK_OR_CALL
-          ),
-          "Call(1)",
-      )
+      self.assertEqual(state.action_to_string(ACTION_CHECK_OR_CALL), "Call(1)")
       state.apply_action(ACTION_FOLD)
 
       self.assertEqual(wrapped_state.stacks, [0, 1, 1])
       self.assertEqual(
-          state._legal_actions(state._wrapped_state.actor_index),
+          state.legal_actions(),
           [ACTION_FOLD, ACTION_CHECK_OR_CALL],
       )
+      self.assertEqual(state.action_to_string(ACTION_CHECK_OR_CALL), "Call(1)")
+
+    def test_smaller_effective_stack_size_does_not_limit_bet_actions(self):
+      # Proves that we don't need to consider the 'single chip shoves' edge
+      # case as a result of *other* players having only one chip in their stack.
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 3,
+          "blinds": "10 20",
+          "stack_sizes": "25 21 21",
+      }
+      game = pyspiel.load_game("python_pokerkit_wrapper", params)
+      state = game.new_initial_state()
+      wrapped_state: pokerkit.State = state._wrapped_state
+      while state.is_chance_node():
+        state.apply_action(
+            random.choice([o for o, _ in state.chance_outcomes()])
+        )
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      while state.is_chance_node():
+        state.apply_action(
+            random.choice([o for o, _ in state.chance_outcomes()])
+        )
+      self.assertEqual(wrapped_state.stacks, [5, 1, 1])
       self.assertEqual(
-          state._action_to_string(
-              wrapped_state.actor_index, ACTION_CHECK_OR_CALL
-          ),
-          "Call(1)",
+          state.legal_actions(), [ACTION_CHECK_OR_CALL, 2, 3, 4, 5]
       )
+      self.assertIn("Check", state.action_to_string(ACTION_CHECK_OR_CALL))
+      for i in range(2, 6):
+        self.assertEndsWith(state.action_to_string(i), f"Bet/Raise to {i}")
+
+      # Proof that we can actually bet values that aren't either a shove or
+      # the minimum action.
+      state.apply_action(3)
+
+      # Verify that the 3 actually mapped to a bet of 3 chips / that the next
+      # players get entirely normal fold/check_or_call actions.
+      self.assertEqual(wrapped_state.stacks, [2, 1, 1])
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL]
+      )
+      self.assertEqual(state.action_to_string(ACTION_CHECK_OR_CALL), "Call(1)")
+      state.apply_action(ACTION_FOLD)
+
+      self.assertEqual(wrapped_state.stacks, [2, 1, 1])
+      self.assertEqual(
+          state.legal_actions(),
+          [ACTION_FOLD, ACTION_CHECK_OR_CALL],
+      )
+      self.assertEqual(state.action_to_string(ACTION_CHECK_OR_CALL), "Call(1)")
+      state.apply_action(ACTION_FOLD)
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [40, -20, -20])
 
   class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
     """Test the OpenSpiel game wrapper for Pokerkit."""
