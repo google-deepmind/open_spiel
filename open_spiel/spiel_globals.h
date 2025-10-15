@@ -22,7 +22,7 @@ namespace open_spiel {
 
 // Player ids are 0, 1, 2, ...
 // Negative numbers are used for various special values.
-enum PlayerId {
+enum PlayerId : int {
   // Player 0 is always valid, and is used in single-player games.
   kDefaultPlayerId = 0,
   // The fixed player id for chance/nature.
