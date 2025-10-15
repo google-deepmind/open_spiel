@@ -55,8 +55,16 @@ if IMPORTED_ALL_LIBRARIES:
   ACE = pokerkit.Rank.ACE
   DEUCE = pokerkit.Rank.DEUCE
   KING = pokerkit.Rank.KING
+  QUEEN = pokerkit.Rank.QUEEN
+  JACK = pokerkit.Rank.JACK
+  TEN = pokerkit.Rank.TEN
+  NINE = pokerkit.Rank.NINE
+  EIGHT = pokerkit.Rank.EIGHT
   SEVEN = pokerkit.Rank.SEVEN
   SIX = pokerkit.Rank.SIX
+  FIVE = pokerkit.Rank.FIVE
+  FOUR = pokerkit.Rank.FOUR
+  TREY = pokerkit.Rank.TREY
   SPADE = pokerkit.Suit.SPADE
   CLUB = pokerkit.Suit.CLUB
   HEART = pokerkit.Suit.HEART
@@ -289,6 +297,149 @@ if IMPORTED_ALL_LIBRARIES:
         self.assertBetween(state._hand_number, current_hand, current_hand + 1)
         current_hand = state._hand_number
 
+    def test_initially_scheduled_blinds_larger_than_stacks(self):
+      blind_schedule_str = "1:200/400"
+      params = {
+          "max_num_hands": 1,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "blind_schedule": blind_schedule_str,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 2,
+              "blinds": "1 2",  # Initial blinds should be overridden
+              "stack_sizes": "100 100",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+      self.assertEqual(state._hand_number, 0)
+      self.assertEqual(state._small_blind, 200)
+      self.assertEqual(state._big_blind, 400)
+      self.assertEqual(state._stacks, [100, 100])
+      # With 2 players, player 1 is dealer/SB and player 0 is BB in hand 0.
+      # P1 posts SB=min(100, 200)=100, P0 posts BB=min(100, 400)=100.
+      # Both players are all-in.
+      # Pokerkit state stacks are seat-based. If P0=seat0=BB, P1=seat1=SB:
+      # Seat 0 stack: 100-100=0. Seat 1 stack: 100-100=0.
+      self.assertEqual(
+          state.pokerkit_wrapper_state._wrapped_state.stacks, [0, 0]
+      )
+      self.assertEqual(
+          state.pokerkit_wrapper_state._wrapped_state.bets, [100, 100]
+      )
+
+      # 4 chance nodes for hole cards
+      for _ in range(4):
+        self.assertTrue(state.is_chance_node())
+        action = random.choice([o for o, _ in state.chance_outcomes()])
+        state.apply_action(action)
+
+      # After hole cards, betting round should be skipped as players are all in,
+      # and board cards should be dealt.
+      # 5 chance nodes for board cards
+      for _ in range(5):
+        self.assertTrue(state.is_chance_node())
+        action = random.choice([o for o, _ in state.chance_outcomes()])
+        state.apply_action(action)
+
+      self.assertTrue(state.is_terminal())
+
+    def test_later_stage_blinds_larger_than_stacks(self):
+      blind_schedule_str = "1:1/2;1:200/400"
+      params = {
+          "max_num_hands": 5,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "blind_schedule": blind_schedule_str,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 2,
+              "blinds": "1 2",
+              "stack_sizes": "100 100",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+      state_struct = state.to_struct()
+      self.assertEqual(state_struct.hand_number, 0)
+      self.assertEqual(state_struct.stacks, [100, 100])
+      self.assertEqual(state_struct.dealer, 1)
+      self.assertEqual(state_struct.small_blind, 1)
+      self.assertEqual(state_struct.big_blind, 2)
+
+      # 4 chance nodes for hole cards
+      for _ in range(4):
+        self.assertTrue(state.is_chance_node())
+        action = random.choice([o for o, _ in state.chance_outcomes()])
+        state.apply_action(action)
+
+      # SB immediately folds preflop to start the second hand with higher
+      # blinds.
+      state.apply_action(ACTION_FOLD)
+
+      self.assertFalse(state.is_terminal())
+      self.assertTrue(state.is_chance_node())
+      state_struct = state.to_struct()
+      self.assertEqual(state_struct.hand_number, 1)
+      self.assertEqual(state_struct.stacks, [101, 99])
+      self.assertEqual(state_struct.dealer, 0)
+      self.assertEqual(state_struct.small_blind, 200)
+      self.assertEqual(state_struct.big_blind, 400)
+
+      # 4 chance nodes for hole cards first, but then afterwards betting round
+      # should be skipped as players are all in, and board cards should be
+      # dealt, meaning +5 more chance nodes => 9 total chance nodes.
+      #
+      # Unlike before, we can't have a player fold so to have a deterministic
+      # winner we need to choose the specific cards ourselves.
+      # Result should be AA778 winning vs 77668 (with the 22 being counterfeit)
+      dealt_cards = [
+          Card(ACE, SPADE),
+          Card(DEUCE, SPADE),
+          Card(ACE, HEART),
+          Card(DEUCE, DIAMOND),
+          Card(SIX, CLUB),  # Flop 1
+          Card(SIX, HEART),  # Flop 2
+          Card(SEVEN, SPADE),  # Flop 3
+          Card(SEVEN, HEART),  # Turn
+          Card(EIGHT, DIAMOND),  # River
+      ]
+      for card in dealt_cards:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      self.assertFalse(state.is_terminal())
+      state_struct = state.to_struct()
+      self.assertEqual(state_struct.hand_number, 2)
+      self.assertEqual(state_struct.stacks, [2, 198])
+      self.assertEqual(state_struct.small_blind, 200)
+      self.assertEqual(state_struct.big_blind, 400)
+
+      # Same again as before, but to accomodate dealer button rotation we have
+      # to reverse the hole cards.
+      dealt_cards = [
+          Card(DEUCE, SPADE),
+          Card(ACE, SPADE),
+          Card(DEUCE, DIAMOND),
+          Card(ACE, HEART),
+          Card(SIX, CLUB),  # Flop 1
+          Card(SIX, HEART),  # Flop 2
+          Card(SEVEN, SPADE),  # Flop 3
+          Card(SEVEN, HEART),  # Turn
+          Card(EIGHT, DIAMOND),  # River
+      ]
+      for card in dealt_cards:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      self.assertTrue(state.is_terminal())
+      state_struct = state.to_struct()
+      self.assertEqual(state_struct.hand_number, 3)
+      self.assertEqual(state_struct.stacks, [0, 200])
+      self.assertEqual(state_struct.small_blind, 200)
+      self.assertEqual(state_struct.big_blind, 400)
+
     def test_stacks_carried_over(self):
       params = {
           "max_num_hands": 3,
@@ -439,6 +590,280 @@ if IMPORTED_ALL_LIBRARIES:
       # Definitely excessive, but triple checking this again just to be certain.
       self.assertEqual(state.num_players(), 3)
       self.assertEqual(state._num_active_players, 3)
+
+    def test_multiway_all_but_one_players_bust_simultaneously(self):
+      params = {
+          "max_num_hands": 2,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 3,
+              "blinds": "10 20",
+              "stack_sizes": "100 100 100",  # Players 0 1 2: SB BB BTN
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+
+      # Hand 0: P0 wins, P1 and P2 bust.
+      # 3 players: P0=SB, P1=BB, P2=BTN
+      self.assertEqual(state._hand_number, 0)
+      self.assertEqual(state._stacks, [100, 100, 100])
+
+      # Hole cards:
+      # P0: Ac As
+      # P1: Kc Ks
+      # P2: Qc Qs
+      hole_cards = [
+          Card(ACE, CLUB),
+          Card(KING, CLUB),
+          Card(QUEEN, CLUB),
+          Card(ACE, SPADE),
+          Card(KING, SPADE),
+          Card(QUEEN, SPADE),
+      ]
+      for card in hole_cards:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      self.assertEqual(state.current_player(), 2)  # P2 BTN acts first preflop
+
+      # P2 BTN raises all-in to 100
+      state.apply_action(100)
+      # P0 SB calls all-in (has 90 behind, action is for 100)
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      # P1 BB calls all-in (has 80 behind, action is for 100)
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # Flop, turn, river
+      board = [
+          Card(TREY, HEART),
+          Card(FOUR, DIAMOND),
+          Card(SIX, SPADE),
+          Card(SEVEN, HEART),
+          Card(EIGHT, HEART),
+      ]
+      for card in board:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      # Hand 0 finished, P0 won, P1 and P2 busted.
+      # With only 1 player left, game should be terminal.
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state._hand_number, 1)
+      self.assertEqual(state._stacks, [300, 0, 0])
+      self.assertEqual(state._num_active_players, 1)
+
+    def test_6max_3players_bust_then_split_pot(self):
+      params = {
+          "max_num_hands": 2,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 6,
+              "blinds": "10 20",
+              "stack_sizes": "100 100 100 100 100 100",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+
+      # Hand 0: 4-way all-in preflop, P0 wins, P1,P2,P3 bust.
+      # 6 players: P0=SB, P1=BB, P2=UTG, P3=MP, P4=CO, P5=BTN
+      self.assertEqual(state._hand_number, 0)
+      self.assertEqual(state._stacks, [100] * 6)
+
+      # Hole cards:
+      # P0: Ac As
+      # P1: Kc Ks
+      # P2: Qc Qs
+      # P3: Jc Js
+      # P4: 2c 2s
+      # P5: 3c 3s
+      hole_cards_h0 = [
+          Card(ACE, CLUB),
+          Card(KING, CLUB),
+          Card(QUEEN, CLUB),
+          Card(JACK, CLUB),
+          Card(DEUCE, CLUB),
+          Card(TREY, CLUB),
+          Card(ACE, SPADE),
+          Card(KING, SPADE),
+          Card(QUEEN, SPADE),
+          Card(JACK, SPADE),
+          Card(DEUCE, SPADE),
+          Card(TREY, SPADE),
+      ]
+      for card in hole_cards_h0:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      self.assertEqual(state.current_player(), 2)  # P2 UTG acts first preflop
+
+      # P2 UTG raises all-in to 100
+      state.apply_action(100)
+      # P3 MP calls all-in
+      self.assertEqual(state.current_player(), 3)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      # P4 CO folds
+      self.assertEqual(state.current_player(), 4)
+      state.apply_action(ACTION_FOLD)
+      # P5 BTN folds
+      self.assertEqual(state.current_player(), 5)
+      state.apply_action(ACTION_FOLD)
+      # P0 SB calls all-in
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      # P1 BB calls all-in
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # Board cards
+      board_h0 = [
+          Card(SEVEN, DIAMOND),
+          Card(SEVEN, SPADE),
+          Card(SEVEN, CLUB),
+          Card(EIGHT, DIAMOND),
+          Card(EIGHT, HEART),
+      ]
+      for card in board_h0:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      # Hand 0 finished. P0 won 300 chips. P1,P2,P3 busted.
+      # Players 0,4,5 remain active.
+      self.assertEqual(state._hand_number, 1)
+      self.assertEqual(state._stacks, [400, 0, 0, 0, 100, 100])
+      self.assertEqual(state._num_active_players, 3)
+      self.assertFalse(state.is_terminal())
+
+      # Hand 1: Players 0,4,5 play. 3-way split pot.
+      # P0=BTN, P4=SB, P5=BB. Stacks: P0=400, P4=100, P5=100. Blinds 10/20.
+      # Active players sorted are 0,4,5 -> player_map {0:0, 1:4, 2:5}, so
+      # seat0=P0, seat1=P4, seat2=P5.
+      # P0 is dealer, so P4 is SB, P5 is BB.
+      # Hole cards for hand 1:
+      # P0: 2h 3h, P4: 4s 5s, P5: 6c 7c
+      hole_cards_h1 = [
+          Card(DEUCE, HEART),  # P0 card 1
+          Card(FOUR, SPADE),  # P4 card 1
+          Card(SIX, CLUB),  # P5 card 1
+          Card(TREY, HEART),  # P0 card 2
+          Card(FIVE, SPADE),  # P4 card 2
+          Card(SEVEN, CLUB),  # P5 card 2
+      ]
+      for card in hole_cards_h1:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      # Players 0,4,5 are active. P0=BTN, P4=SB, P5=BB.
+      # P0 P4 and P5 all raise as much as possible (or call) to force an all-in
+      # situation.
+      # In 3-handed, BTN acts first preflop.
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(max(state.legal_actions()))
+      self.assertEqual(state.current_player(), 4)
+      state.apply_action(max(state.legal_actions()))
+      self.assertEqual(state.current_player(), 5)
+      state.apply_action(max(state.legal_actions()))
+
+      # Board Ad Kd Qd Jd Td - royal flush on board.
+      board_h1 = [
+          Card(ACE, DIAMOND),
+          Card(KING, DIAMOND),
+          Card(QUEEN, DIAMOND),
+          Card(JACK, DIAMOND),
+          Card(TEN, DIAMOND),
+      ]
+      for card in board_h1:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[card])
+
+      # Hand 1 finished, split pot. Stacks unchanged.
+      # max_num_hands will have been reached, so game should be terminal and
+      # the hand number should remain the same as before.
+      self.assertEqual(state._hand_number, 1)
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state._stacks, [400, 0, 0, 0, 100, 100])
+      self.assertEqual(state._num_active_players, 3)
+      self.assertEqual(
+          state.returns(), [300.0, -100.0, -100.0, -100.0, 0.0, 0.0]
+      )
+
+    def test_max_num_hands_limit(self):
+      """Tests that the game terminates when max_num_hands is reached."""
+      params = {
+          "max_num_hands": 1,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 2,
+              "blinds": "50 100",
+              "stack_sizes": "1000 1000",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+      self.assertEqual(state._hand_number, 0)
+      self.assertFalse(state.is_terminal())
+
+      # Play one hand: SB folds immediately preflop.
+      # 4 chance nodes for hole cards
+      for _ in range(4):
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.chance_outcomes()[0][0])
+
+      self.assertFalse(state.is_chance_node())
+      # P1 is SB and folds.
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_FOLD)
+
+      # Hand is over, max_num_hands=1 is reached, game should be terminal.
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state._hand_number, 0)
+      # P1 is SB in hand 0 and folded. P0 is BB.
+      # P1 stack: 1000 - 50 = 950. P0 stack: 1000 + 50 = 1050.
+      self.assertEqual(state._stacks, [1050, 950])
+
+    def test_returns_in_terminal_state(self):
+      """Tests that returns() are correct when state is terminal."""
+      params = {
+          "max_num_hands": 1,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 2,
+              "blinds": "50 100",
+              "stack_sizes": "1000 1000",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+      self.assertEqual(state._hand_number, 0)
+      self.assertFalse(state.is_terminal())
+
+      # Play one hand: SB folds immediately preflop.
+      # 4 chance nodes for hole cards
+      for _ in range(4):
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.chance_outcomes()[0][0])
+
+      self.assertFalse(state.is_chance_node())
+      # P1 is SB and folds.
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_FOLD)
+
+      # Hand is over, max_num_hands=1 is reached, game should be terminal.
+      self.assertTrue(state.is_terminal())
+      # P1 is SB in hand 0 and folded. P0 is BB.
+      # P1 stack: 1000 - 50 = 950. P0 stack: 1000 + 50 = 1050.
+      self.assertEqual(state.returns(), [50.0, -50.0])
 
     def test_pokerkit_state_to_struct_to_json_two_hands(self):
       params = {
@@ -616,13 +1041,6 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertEqual(state_struct_terminal.player_to_seat, {0: 1, 1: 0})
       self.assertEqual(data_terminal["player_to_seat"], [[0, 1], [1, 0]])
 
-  # TODO: b/444333187 - Add tests for the following behaviors:
-  # - blind schedule becoming higher than all players' remaining stacks. (This
-  #   was a known issue previously, though may be fixed now that we no longer
-  #   are eliminating players with less than one Big Blind.)
-  # - reaching a low max_num_hands limit
-  # - multiple players busting out (especially edge cases)
-  # - returns()'s values being correct when reaching terminal state
 
 if __name__ == "__main__":
   if IMPORTED_ALL_LIBRARIES:
