@@ -77,7 +77,7 @@ elif verlt $PY_VER 3.13; then
 elif verlt $PY_VER 3.14; then
   echo "Detected Python version 3.13"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.6.0"
-  export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.5.0 jaxlib==0.5.0 dm-haiku==0.0.13 optax==0.2.4 chex==0.1.88 rlax==0.1.6 distrax==0.1.5 flax==0.10.3"
+  export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.4.38 jaxlib==0.4.38 dm-haiku==0.0.13 optax==0.2.4 chex==0.1.88 rlax==0.1.6 distrax==0.1.5 flax==0.10.3"
   export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.10.0 mock==5.1.0 nashpy==0.0.41 scipy==1.15.2 testresources==2.0.1 cvxopt==1.3.2 cvxpy==1.6.1 ecos==2.0.14 osqp==1.0.4 clu==0.0.11 tensorflow_datasets==4.9.3 pokerkit==0.6.3"
 else
   # TODO(author5). Added in #1381, but not working yet. Come back to this.

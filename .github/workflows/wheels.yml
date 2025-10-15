@@ -34,6 +34,8 @@ jobs:
           CI_PYBIN: python3
           OS_PYTHON_VERSION: 3.10
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
+          CIBW_VERSION: 3.2.1
+          CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
         # These must use the old abseil
@@ -43,6 +45,7 @@ jobs:
           CI_PYBIN: "python3.10"
           OS_PYTHON_VERSION: "3.10"
           OPEN_SPIEL_ABSL_VERSION: "20230125.0"
+          CIBW_VERSION: 2.23.3
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-macosx_x86_64 cp311-macosx_x86_64
         # These use the new abseil
@@ -52,19 +55,27 @@ jobs:
           CI_PYBIN: python3.12
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           OS_PYTHON_VERSION: 3.12
+          CIBW_VERSION: 3.2.1
+          CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64 cp314-macosx_x86_64
-        # Setting to the new M1 runners to build the _arm64 wheels
-        # https://github.blog/2023-10-02-introducing-the-new-apple-silicon-powered-m1-macos-larger-runner-for-github-actions/
-        # Disabling now that the OpenSpiel 1.4 wheels are on PyPI because these xlarge machines are
-        # quite costly... we don't want to run these on every PR.
-        # TODO(author5): Set this to macos-13 once these runners are no longer in beta
-        # - os: macos-13-xlarge
-        #   OS_TYPE: "Darwin"
-        #   CI_PYBIN: python3.11
-        #   OS_PYTHON_VERSION: 3.11
-        #   CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-        #   CIBW_BUILD: cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64 cp313-macosx_arm64 cp314-macosx_arm64
+          CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64
+        - os: macos-14
+          OS_TYPE: "Darwin"
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
+          CIBW_VERSION: 3.2.1
+          CIBW_ENABLE: all
+          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64 cp313-macosx_arm64
+        - os: macOS-15
+          NAME: "MacOS15_Python_3.13"
+          OS_TYPE: "Darwin"
+          CI_PYBIN: python3.13
+          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
+          OS_PYTHON_VERSION: 3.13
+          CIBW_VERSION: 3.2.1
+          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp314-macosx_arm64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -74,15 +85,18 @@ jobs:
       OS_TYPE: ${{ matrix.OS_TYPE }}
       OS_PYTHON_VERSION: ${{ matrix.OS_PYTHON_VERSION }}
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
+      CIBW_VERSION: ${{ matrix.CIBW_VERSION }}
+      CIBW_ENABLE: ${{ matrix.CIBW_ENABLE }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
-      CIBW_SKIP: pp*
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
 
       - name: Install
         run: |
@@ -109,7 +123,7 @@ jobs:
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine
-          python -m pip install cibuildwheel==2.23.3
+          python -m pip install cibuildwheel==${CIBW_VERSION}
       - name: Build sdist
         run: |
           source ./venv/bin/activate
