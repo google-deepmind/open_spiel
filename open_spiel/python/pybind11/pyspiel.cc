@@ -253,7 +253,11 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("TERMINAL", open_spiel::kTerminalPlayerId)
       .value("CHANCE", open_spiel::kChancePlayerId)
       .value("MEAN_FIELD", open_spiel::kMeanFieldPlayerId)
-      .value("SIMULTANEOUS", open_spiel::kSimultaneousPlayerId);
+      .value("SIMULTANEOUS", open_spiel::kSimultaneousPlayerId)
+      .def("__int__",
+           [](open_spiel::PlayerId p) { return static_cast<int>(p); })
+      .def("__index__",
+           [](open_spiel::PlayerId p) { return static_cast<int>(p); });
 
   py::class_<GameInfo> game_info(m, "GameInfo");
   game_info
