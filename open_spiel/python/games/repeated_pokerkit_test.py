@@ -529,6 +529,171 @@ if IMPORTED_ALL_LIBRARIES:
           [80, 190],
       )
 
+    def test_stack_rotation_multiway(self):
+      params = {
+          "max_num_hands": 10,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 4,
+              "blinds": "1 2",
+              "stack_sizes": "200 200 200 200",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+      # Each time Seat 0 / SB will win the hand. So in the next hand we should
+      # be seeing the BTN / Seat 3 (which is their new seat post rotation)
+      # gaining the chips, while everyone else has lost some.
+      board = [
+          Card(ACE, DIAMOND),
+          Card(KING, DIAMOND),
+          Card(QUEEN, DIAMOND),
+          Card(JACK, HEART),
+          Card(SEVEN, HEART),
+      ]
+      hole_cards = [
+          Card(ACE, SPADE),  # SB card 0
+          Card(KING, SPADE),
+          Card(QUEEN, SPADE),
+          Card(JACK, SPADE),
+          Card(ACE, CLUB),  # SB Card 1
+          Card(KING, CLUB),
+          Card(QUEEN, CLUB),
+          Card(JACK, CLUB),
+      ]
+      expected_dealers = [3, 0, 1, 2, 3, 0, 1, 2, 3, 0]
+
+      # RepeatedPokerkit only updates stacks at the end of each hand and keeps
+      # them all unrotated.
+      expected_stacks_repeated_pokerkit = [
+          [200, 200, 200, 200],
+          [215, 195, 195, 195],  # P0 won last hand (as SB), + 15 chips
+          [210, 210, 190, 190],  # P1 won last hand (as SB), + 15 chips
+          [205, 205, 205, 185],  # P2 won last hand (as SB), + 15 chips
+          # 'Symmetry' of win/loss naturally results in us reaching the same
+          # game state we had at the start.
+          [200, 200, 200, 200],  # P3 won last hand (as SB), + 15 chips
+          [215, 195, 195, 195],  # P0 won last hand (as SB), + 15 chips
+          [210, 210, 190, 190],  # P1 won last hand (as SB), + 15 chips
+          [205, 205, 205, 185],  # P2 won last hand (as SB), + 15 chips
+          # Again, same symmetry.
+          [200, 200, 200, 200],  # P3 won last hand (as SB), + 15 chips
+          [215, 195, 195, 195],  # P0 won last hand (as SB), + 15 chips
+          [210, 210, 190, 190],  # P1 won last hand (as SB), + 15 chips
+      ]
+      # The PokerkitWrapper however will have rotated, plus by the time we're
+      # checking, already removed additional chips to handle the blinds.
+      expected_stacks_pokerkit_wrapper = [
+          [199, 198, 200, 200],
+          [194, 193, 195, 215],
+          [189, 188, 210, 210],
+          [184, 203, 205, 205],
+          # 'Symmetry' of win/loss naturally results in us reaching the same
+          # game state we had at the start.
+          [199, 198, 200, 200],
+          [194, 193, 195, 215],
+          [189, 188, 210, 210],
+          [184, 203, 205, 205],
+          # Again, same symmetry.
+          [199, 198, 200, 200],
+          [194, 193, 195, 215],
+          # After the tenth hand we reach max_num_hands and so won't ever have
+          # started the next hand, meaning the rotation will still match the
+          # last hand and blinds won't have been removed. Hence this differs
+          # from above.
+          # (Note however how the *rotation* still differs from the unrotated
+          # RepeatedPokerkit's stacks above at this point!)
+          [210, 190, 190, 210],
+      ]
+
+      for i in range(10):
+        self.assertEqual(state._hand_number, i)
+        self.assertEqual(state._dealer, expected_dealers[i])
+
+        # RepeatedPokerkit's stacks should only care about the results following
+        # the end of the prior hand + generally are not rotated.
+        self.assertEqual(state._stacks, expected_stacks_repeated_pokerkit[i])
+        self.assertEqual(
+            state.to_struct().stacks,
+            expected_stacks_repeated_pokerkit[i],
+        )
+        # Pokerkit's stacks should include the exact current situation in the
+        # current hand, meaning they will have already removed chips coming from
+        # the blinds AND will also be rotated.
+        self.assertEqual(
+            state.pokerkit_wrapper_state._wrapped_state.stacks,
+            expected_stacks_pokerkit_wrapper[i],
+        )
+        self.assertEqual(
+            state.to_struct().pokerkit_state_struct.stacks,
+            expected_stacks_pokerkit_wrapper[i],
+        )
+
+        # Deal hole cards: 4 players * 2 cards = 8 chance nodes
+        for i in range(8):
+          self.assertTrue(state.is_chance_node())
+          state.apply_action(
+              state.pokerkit_wrapper_game.card_to_int[hole_cards[i]]
+          )
+
+        # Preflop betting: call around to BB
+        self.assertFalse(state.is_chance_node())
+        for _ in range(4):
+          state.apply_action(ACTION_CHECK_OR_CALL)
+
+        # Flop
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[board[0]])
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[board[1]])
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[board[2]])
+
+        # Flop betting: first player bets 3, everyone calls. This means all
+        # players have contributed 5 chips total.
+        state.apply_action(3)
+        state.apply_action(ACTION_CHECK_OR_CALL)
+        state.apply_action(ACTION_CHECK_OR_CALL)
+        state.apply_action(ACTION_CHECK_OR_CALL)
+
+        # Turn
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[board[3]])
+        # Turn betting: check around
+        for _ in range(4):
+          state.apply_action(ACTION_CHECK_OR_CALL)
+
+        # River
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(state.pokerkit_wrapper_game.card_to_int[board[4]])
+        # River betting: check around
+        for _ in range(4):
+          state.apply_action(ACTION_CHECK_OR_CALL)
+
+      self.assertEqual(state._hand_number, 9)
+      self.assertTrue(state.is_terminal())
+
+      final_stacks_index = 10
+      assert final_stacks_index == len(expected_stacks_repeated_pokerkit) - 1
+      self.assertEqual(
+          state._stacks, expected_stacks_repeated_pokerkit[final_stacks_index]
+      )
+      self.assertEqual(
+          state.to_struct().stacks,
+          expected_stacks_repeated_pokerkit[final_stacks_index],
+      )
+      self.assertEqual(
+          state.pokerkit_wrapper_state._wrapped_state.stacks,
+          expected_stacks_pokerkit_wrapper[final_stacks_index],
+      )
+      self.assertEqual(
+          state.to_struct().pokerkit_state_struct.stacks,
+          expected_stacks_pokerkit_wrapper[final_stacks_index],
+      )
+
     def test_eliminates_players_at_exactly_zero_chips(self):
       params = {
           "max_num_hands": 3,
