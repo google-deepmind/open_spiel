@@ -73,13 +73,6 @@ if IMPORTED_ALL_LIBRARIES:
 
   class PokerkitWrapperTest(absltest.TestCase):
     """Test the OpenSpiel game wrapper for Pokerkit."""
-
-    # TODO: b/437724266 - add additional tests for the following:
-    # - sidepot handling in general
-    # - sidepots where the next bet will be exactly 1 chip (if possible?)
-    # - all-ins in simple multiway situations with varying stack sizes
-    # - all-ins in fixed-limit games with sidepots
-    # - shortdeck ("6+") poker card dealing
     # - razz poker hand evaluation working as expected / differing from seven
     #   card stud
     # - seven card stud gameplay actually different from texas holdem, including
@@ -280,6 +273,15 @@ if IMPORTED_ALL_LIBRARIES:
       obj = PokerkitWrapper(params={"variant": "NoLimitTexasHoldem"})
       self.assertEqual(obj.deck_size, 52)
 
+    def test_shortdeck_deck(self):
+      obj = PokerkitWrapper(params={"variant": "NoLimitShortDeckHoldem"})
+      self.assertEqual(obj.deck_size, 36)
+      self.assertLen(obj.card_to_int, 36)
+      self.assertLen(obj.int_to_card, 36)
+      self.assertIn(Card(SIX, CLUB), obj.card_to_int)
+      self.assertNotIn(Card(FIVE, CLUB), obj.card_to_int)
+      self.assertNotIn(Card(DEUCE, CLUB), obj.card_to_int)
+
     def test_card_to_int_lookups_match_for_nolimit_holdem(self):
       obj = PokerkitWrapper(params={"variant": "NoLimitTexasHoldem"})
       self.assertLen(obj.card_to_int, 52)
@@ -434,6 +436,645 @@ if IMPORTED_ALL_LIBRARIES:
       wrapped_state_copy = obj.new_initial_state().deepcopy_wrapped_state()
       for street in wrapped_state_copy.streets:
         self.assertFalse(street.card_burning_status)
+
+    def test_default_state_struct_values(self):
+      game = pyspiel.load_game("python_pokerkit_wrapper")
+      state = game.new_initial_state()
+      # The first state is a chance node dealing cards.
+      self.assertTrue(state.is_chance_node())
+      state_struct = state.to_struct()
+      self.assertIsInstance(
+          state_struct, pyspiel.pokerkit_wrapper.PokerkitStateStruct
+      )
+      self.assertEqual(state_struct.current_player, pyspiel.PlayerId.CHANCE)
+      self.assertFalse(state_struct.is_terminal)
+      self.assertIsInstance(state_struct.observation, list)
+      self.assertLen(state_struct.observation, game.num_players())
+      self.assertIn("Player: 0", state_struct.observation[0])
+      self.assertTrue(state_struct.legal_actions)
+      self.assertLen(state_struct.stacks, game.num_players())
+      self.assertLen(state_struct.bets, game.num_players())
+      self.assertIsInstance(state_struct.board_cards, list)
+      self.assertIsInstance(state_struct.hole_cards, list)
+      self.assertIsInstance(state_struct.pots, list)
+      self.assertIsInstance(state_struct.burn_cards, list)
+      self.assertIsInstance(state_struct.mucked_cards, list)
+
+    def test_create_struct_and_access_members(self):
+      """Tests direct creation of the underlying pyspiel PokerkitStateStruct.
+
+      This test could technically go elsewhere as it's not really testing the
+      actual pokerkit_wrapper code, but this is a very convenient place to put
+      it.
+      (And, it is useful to have our tests clearly show if the underlying
+      StateStruct we're using has any problems.)
+      """
+      state_struct = pyspiel.pokerkit_wrapper.PokerkitStateStruct()
+
+      # Test default values (or some initial state if constructor sets them)
+      self.assertEqual(
+          state_struct.current_player, 0
+      )  # Or whatever the C++ default is
+      self.assertFalse(state_struct.is_terminal)
+      self.assertEqual(state_struct.observation, [])
+
+      # Modify members from Python
+      state_struct.observation = ["obs1", "obs2"]
+      state_struct.legal_actions = [0, 2, 4]
+      state_struct.current_player = 1
+      state_struct.is_terminal = True
+      state_struct.stacks = [100, 200]
+      state_struct.bets = [10, 0]
+      state_struct.board_cards = [5, 6, 7]
+      state_struct.hole_cards = [[1, 2], [3, 4]]
+      state_struct.poker_hand_histories = [["phh1"], ["phh2"]]
+
+      # Verify modifications
+      self.assertEqual(state_struct.observation, ["obs1", "obs2"])
+      self.assertEqual(state_struct.legal_actions, [0, 2, 4])
+      self.assertEqual(state_struct.current_player, 1)
+      self.assertTrue(state_struct.is_terminal)
+      self.assertEqual(state_struct.stacks, [100, 200])
+      self.assertEqual(state_struct.bets, [10, 0])
+      self.assertEqual(state_struct.board_cards, [5, 6, 7])
+      self.assertEqual(state_struct.hole_cards, [[1, 2], [3, 4]])
+      self.assertEqual(state_struct.poker_hand_histories, [["phh1"], ["phh2"]])
+
+    def test_pokerkit_wrapper_state_to_struct_and_json(self):
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 2,
+          "blinds": "50 100",
+          "stack_sizes": "1000 1000",
+      }
+      game = pyspiel.load_game("python_pokerkit_wrapper", params)
+      state = game.new_initial_state()
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[Card(ACE, CLUB)])  # P0 c1
+      state.apply_action(game.card_to_int[Card(ACE, DIAMOND)])  # P1 c1
+      state.apply_action(game.card_to_int[Card(KING, CLUB)])  # P0 c2
+      state.apply_action(game.card_to_int[Card(KING, DIAMOND)])  # P1 c2
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # Deal flop
+      state.apply_action(game.card_to_int[Card(QUEEN, CLUB)])
+      state.apply_action(game.card_to_int[Card(JACK, CLUB)])
+      state.apply_action(game.card_to_int[Card(TEN, CLUB)])
+
+      state.apply_action(200)  # BB raises to 200 post-flop
+      state.apply_action(500)  # SB/BTN re-raises to 500
+      state.apply_action(800)  # BB re-re-raises to 800
+
+      state_struct = state.to_struct()
+      json_str = state.to_json()
+      self.assertEqual(json_str, state_struct.to_json())
+      self.assertIsInstance(json_str, str)
+
+      try:
+        data = json.loads(json_str)
+      except json.JSONDecodeError as e:
+        self.fail(f"Failed to parse JSON {json_str}, error was: {e}")
+
+      self.assertEqual(state_struct.current_player, 1)
+      self.assertEqual(data["current_player"], 1)
+
+      self.assertEqual(state_struct.is_terminal, False)
+      self.assertFalse(data["is_terminal"])
+
+      self.assertEqual(state_struct.stacks, [100, 400])
+      self.assertEqual(data["stacks"], [100, 400])
+
+      self.assertEqual(state_struct.bets, [800, 500])
+      self.assertEqual(data["bets"], [800, 500])
+
+      self.assertEqual(
+          state_struct.board_cards,
+          [
+              game.card_to_int[c]
+              for c in [Card(QUEEN, CLUB), Card(JACK, CLUB), Card(TEN, CLUB)]
+          ],
+      )
+      self.assertLen(data["board_cards"], 3)
+
+      board_cards_json = [game.int_to_card[c] for c in data["board_cards"]]
+      board_cards_struct = [
+          game.int_to_card[c] for c in state_struct.board_cards
+      ]
+      self.assertEqual(
+          board_cards_json,
+          [Card(QUEEN, CLUB), Card(JACK, CLUB), Card(TEN, CLUB)],
+      )
+      self.assertEqual(board_cards_struct, board_cards_json)
+
+      self.assertEqual(
+          state_struct.hole_cards,
+          [
+              [
+                  game.card_to_int[c]
+                  for c in [Card(ACE, CLUB), Card(KING, CLUB)]
+              ],
+              [
+                  game.card_to_int[c]
+                  for c in [Card(ACE, DIAMOND), Card(KING, DIAMOND)]
+              ],
+          ],
+      )
+      self.assertLen(data["hole_cards"], 2)
+      p0_hole_cards = [game.int_to_card[c] for c in data["hole_cards"][0]]
+      p1_hole_cards = [game.int_to_card[c] for c in data["hole_cards"][1]]
+      self.assertEqual(p0_hole_cards, [Card(ACE, CLUB), Card(KING, CLUB)])
+      self.assertEqual(p1_hole_cards, [Card(ACE, DIAMOND), Card(KING, DIAMOND)])
+
+      self.assertEqual(state_struct.pots, [200])
+      self.assertLen(data["pots"], 1)
+      self.assertEqual(data["pots"][0], 200)
+
+      self.assertLen(state_struct.poker_hand_histories, 2)
+      # Per-player view of P1's hole cards (P1 uncensored, P2 censored)
+      self.assertEqual(state_struct.poker_hand_histories[0][0], "d dh p1 AcKc")
+      self.assertEqual(state_struct.poker_hand_histories[1][0], "d dh p1 ????")
+      # Per-player view of P2's hole cards (P1 censored, P2 uncensored)
+      self.assertEqual(state_struct.poker_hand_histories[0][1], "d dh p2 ????")
+      self.assertEqual(state_struct.poker_hand_histories[1][1], "d dh p2 AdKd")
+
+      # For anyone curious about what a non-trivial PHH actually looks like
+      # here.
+      print(f"state_struct PHH: {state_struct.poker_hand_histories}")
+
+    def test_pokerkit_wrapper_state_to_struct_and_json_when_terminal(self):
+      """Tests the ToJson() method inherited from StateStruct."""
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 2,
+          "blinds": "50 100",
+          "stack_sizes": "1000 1000",
+      }
+      game = pyspiel.load_game("python_pokerkit_wrapper", params)
+      state = game.new_initial_state()
+
+      while not state.is_terminal():
+        if not state.is_chance_node():
+          state.apply_action(ACTION_FOLD)  # SB/BTN will immediately fold
+        else:
+          state.apply_action(state.legal_actions()[0])
+
+      state_struct = state.to_struct()
+      json_str = state.to_json()
+      self.assertEqual(json_str, state_struct.to_json())
+      self.assertIsInstance(json_str, str)
+
+      try:
+        data = json.loads(json_str)
+      except json.JSONDecodeError as e:
+        self.fail(f"Failed to parse JSON {json_str}, error was: {e}")
+
+      self.assertEqual(data["current_player"], pyspiel.PlayerId.TERMINAL)
+      self.assertEqual(state_struct.current_player, pyspiel.PlayerId.TERMINAL)
+
+      self.assertTrue(data["is_terminal"])
+      self.assertTrue(state_struct.is_terminal)
+
+      self.assertEmpty(data["legal_actions"])
+      self.assertEmpty(state_struct.legal_actions)
+
+      self.assertEqual(data["stacks"], [1050, 950])
+      self.assertEqual(state_struct.stacks, [1050, 950])
+
+      self.assertEqual(data["bets"], [0, 0])
+      self.assertEqual(state_struct.bets, [0, 0])
+
+      self.assertEmpty(data["board_cards"])
+      self.assertEqual(state_struct.board_cards, [])
+
+      # Only BB's cards; SB/BTN mucked upon folding.
+      self.assertEqual(data["hole_cards"], [[0, 2], []])
+      self.assertEqual(state_struct.hole_cards, [[0, 2], []])
+
+      self.assertEqual(data["pots"], [0])
+      self.assertEqual(state_struct.pots, [0])
+
+      self.assertEmpty(data["burn_cards"])
+      self.assertEqual(state_struct.burn_cards, [])
+
+      # As mentioned above, SB's cards were mucked upon folding.
+      self.assertEqual(data["mucked_cards"], [1, 3])
+      self.assertEqual(state_struct.mucked_cards, [1, 3])
+
+      # p1 has 2c2h since first + third card in unshuffled deck
+      # p2 has 2d2s since second + fourth card in unshuffled deck
+      self.assertEqual(
+          state_struct.poker_hand_histories,
+          [
+              ["d dh p1 2c2h", "d dh p2 ????", "p2 f"],
+              ["d dh p1 ????", "d dh p2 2d2s", "p2 f"],
+          ],
+      )
+
+    def test_side_pot_nlhe_one_all_in_player(self):
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 3,
+          "blinds": "5 10",
+          "stack_sizes": "50 200 200",
+      }
+      game = PokerkitWrapper(params)
+      state = game.new_initial_state()
+
+      # Cards
+      p0_cards = [Card(ACE, SPADE), Card(ACE, CLUB)]
+      p1_cards = [Card(KING, SPADE), Card(KING, CLUB)]
+      p2_cards = [Card(QUEEN, SPADE), Card(QUEEN, CLUB)]
+      board = [
+          Card(DEUCE, HEART),
+          Card(TREY, HEART),
+          Card(FOUR, CLUB),
+          Card(FIVE, CLUB),
+          Card(EIGHT, SPADE),
+      ]
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[p0_cards[0]])
+      state.apply_action(game.card_to_int[p1_cards[0]])
+      state.apply_action(game.card_to_int[p2_cards[0]])
+      state.apply_action(game.card_to_int[p0_cards[1]])
+      state.apply_action(game.card_to_int[p1_cards[1]])
+      state.apply_action(game.card_to_int[p2_cards[1]])
+
+      # Preflop betting
+      # P0 SB 50, P1 BB 200, P2 BTN 200
+      # P0 posts 5 (45 left), P1 posts 10 (190 left)
+      # P2 acts first
+      self.assertEqual(state.current_player(), 2)
+      state.apply_action(50)  # P2 raises to 50
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls 45 all-in
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(200)  # P1 raises to 200
+      self.assertEqual(state.current_player(), 2)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P2 calls 200
+
+      # Deal flop
+      state.apply_action(game.card_to_int[board[0]])
+      state.apply_action(game.card_to_int[board[1]])
+      state.apply_action(game.card_to_int[board[2]])
+
+      # P0 is all in for 50. P1 and P2 are all in for 200.
+      # Main pot: 150. Side pot: 300.
+      state.apply_action(game.card_to_int[board[3]])  # Turn
+      state.apply_action(game.card_to_int[board[4]])  # River
+
+      self.assertTrue(state.is_terminal())
+      # P0 wins main pot 150 with AA. Payoff 100.
+      # P1 wins side pot 300 with KK vs QQ. Payoff 100.
+      # P2 loses 200. Payoff -200.
+      self.assertEqual(state.returns(), [100.0, 100.0, -200.0])
+
+    def test_side_pot_nlhe_two_all_in_players_different_streets(self):
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 3,
+          "blinds": "5 10",
+          "stack_sizes": "100 100 20",
+      }
+      game = PokerkitWrapper(params)
+      state = game.new_initial_state()
+
+      # Cards
+      p0_cards = [Card(ACE, HEART), Card(ACE, DIAMOND)]
+      p1_cards = [Card(KING, HEART), Card(KING, DIAMOND)]
+      p2_cards = [Card(DEUCE, SPADE), Card(DEUCE, CLUB)]
+      board = [
+          Card(TREY, HEART),
+          Card(FOUR, HEART),
+          Card(FIVE, HEART),
+          Card(EIGHT, HEART),
+          Card(NINE, DIAMOND),
+      ]
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[p0_cards[0]])
+      state.apply_action(game.card_to_int[p1_cards[0]])
+      state.apply_action(game.card_to_int[p2_cards[0]])
+      state.apply_action(game.card_to_int[p0_cards[1]])
+      state.apply_action(game.card_to_int[p1_cards[1]])
+      state.apply_action(game.card_to_int[p2_cards[1]])
+
+      # Preflop betting
+      # P0 SB 100, P1 BB 100, P2 BTN 20
+      # P0 posts 5 (95 left), P1 posts 10 (90 left)
+      # P2 acts first
+      self.assertEqual(state.current_player(), 2)
+      state.apply_action(20)  # P2 raises all-in to 20
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls 20
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 calls 20
+
+      # Flop: 3h 4h 5h
+      state.apply_action(game.card_to_int[board[0]])
+      state.apply_action(game.card_to_int[board[1]])
+      state.apply_action(game.card_to_int[board[2]])
+
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(80)  # P0 bets 80 all-in
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 calls 80 all-in
+
+      # Turn: 6h
+      state.apply_action(game.card_to_int[board[3]])
+      # River: 8d
+      state.apply_action(game.card_to_int[board[4]])
+
+      self.assertTrue(state.is_terminal())
+
+      # P0 flush wins main pot 60 and side pot 160 with AA. Payoff 120.
+      # P1 loses 100. Payoff -100.
+      # P2 loses 20. Payoff -20.
+      self.assertEqual(state.returns(), [120.0, -100.0, -20.0])
+
+    def test_side_pot_with_one_chip_bet(self):
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 3,
+          "blinds": "10 20",
+          "stack_sizes": "21 22 100",
+      }
+      game = PokerkitWrapper(params)
+      state = game.new_initial_state()
+
+      # Cards
+      p0_cards = [Card(ACE, CLUB), Card(ACE, DIAMOND)]
+      p1_cards = [Card(KING, CLUB), Card(KING, DIAMOND)]
+      p2_cards = [Card(QUEEN, CLUB), Card(QUEEN, DIAMOND)]
+      board = [
+          Card(FOUR, CLUB),
+          Card(FIVE, CLUB),
+          Card(SIX, SPADE),
+          Card(EIGHT, DIAMOND),
+          Card(TEN, HEART),
+      ]
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[p0_cards[0]])
+      state.apply_action(game.card_to_int[p1_cards[0]])
+      state.apply_action(game.card_to_int[p2_cards[0]])
+      state.apply_action(game.card_to_int[p0_cards[1]])
+      state.apply_action(game.card_to_int[p1_cards[1]])
+      state.apply_action(game.card_to_int[p2_cards[1]])
+
+      # Preflop betting
+      # P0 SB 21, P1 BB 22, P2 BTN 100
+      # P0 posts 10 (11 left), P1 posts 20 (2 left)
+      # P2 acts first
+      self.assertEqual(state.current_player(), 2)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P2 calls 20, 80 left
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls 10, 1 left
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 checks, 2 left
+
+      # Stacks: P0=1, P1=2, P2=80
+      self.assertEqual(state._wrapped_state.stacks, [1, 2, 80])
+
+      # Deal flop
+      state.apply_action(game.card_to_int[board[0]])
+      state.apply_action(game.card_to_int[board[1]])
+      state.apply_action(game.card_to_int[board[2]])
+
+      # Flop betting
+      # P0 acts first
+      self.assertEqual(state.current_player(), 0)
+      # P0 can check or bet 1.
+      # If P0 bets 1, it's an all-in mapped to action '2'.
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 2])
+      state.apply_action(2)  # P0 shoves for 1.
+      self.assertEqual(state._wrapped_state.stacks, [0, 2, 80])
+
+      # P1 to act.
+      self.assertEqual(state.current_player(), 1)
+      # P1 needs to call 1 chip.
+      self.assertEqual(state._wrapped_state.checking_or_calling_amount, 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 calls 1. 1 left.
+      self.assertEqual(state._wrapped_state.stacks, [0, 1, 80])
+
+      # P2 to act.
+      self.assertEqual(state.current_player(), 2)
+      # P2 needs to call 1 chip.
+      self.assertEqual(state._wrapped_state.checking_or_calling_amount, 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P2 calls 1. 79 left.
+      self.assertEqual(state._wrapped_state.stacks, [0, 1, 79])
+
+      # P0 is all-in. When P2 calls, flop betting round ends because P0 is
+      # all-in and P1/P2 have called.
+      # This moves to a chance node for turn dealing.
+      self.assertTrue(state.is_chance_node())
+      state.apply_action(game.card_to_int[board[3]])  # Deal turn
+
+      # Turn betting round begins. P1 should be next to act.
+      self.assertEqual(state.current_player(), 1)
+      # P1 has 1 chip and can bet it.
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 2])
+      state.apply_action(2)  # P1 bets 1, all-in
+      self.assertEqual(state._wrapped_state.stacks, [0, 0, 79])
+
+      # P2 to act.
+      self.assertEqual(state.current_player(), 2)
+      # P2 needs to call 1 chip to be in side pot.
+      self.assertEqual(state._wrapped_state.checking_or_calling_amount, 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P2 calls 1.
+      self.assertEqual(state._wrapped_state.stacks, [0, 0, 78])
+
+      # Deal river
+      self.assertTrue(state.is_chance_node())
+      state.apply_action(game.card_to_int[board[4]])
+
+      if not state.is_terminal():
+        state._wrapped_state.end_hand()
+
+      self.assertTrue(state.is_terminal())
+      # P0 wins main pot of 63 with AA for 42 profit.
+      # P1 wins side pot of 2 with KK vs QQ for -20 profit.
+      # P2 loses 22.
+      self.assertEqual(state.returns(), [42.0, -20.0, -22.0])
+
+    def test_side_pot_nlhe_three_all_in_players(self):
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 4,
+          "blinds": "5 10",
+          "stack_sizes": "50 120 150 200",
+      }
+      game = PokerkitWrapper(params)
+      state = game.new_initial_state()
+
+      # Cards
+      p0_cards = [Card(ACE, SPADE), Card(ACE, CLUB)]
+      p1_cards = [Card(KING, SPADE), Card(KING, CLUB)]
+      p2_cards = [Card(QUEEN, SPADE), Card(QUEEN, CLUB)]
+      p3_cards = [Card(JACK, SPADE), Card(JACK, CLUB)]
+      board = [
+          Card(DEUCE, HEART),
+          Card(TREY, HEART),
+          Card(SIX, DIAMOND),
+          Card(EIGHT, DIAMOND),
+          Card(TEN, SPADE),
+      ]
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[p0_cards[0]])
+      state.apply_action(game.card_to_int[p1_cards[0]])
+      state.apply_action(game.card_to_int[p2_cards[0]])
+      state.apply_action(game.card_to_int[p3_cards[0]])
+      state.apply_action(game.card_to_int[p0_cards[1]])
+      state.apply_action(game.card_to_int[p1_cards[1]])
+      state.apply_action(game.card_to_int[p2_cards[1]])
+      state.apply_action(game.card_to_int[p3_cards[1]])
+
+      # Preflop betting
+      # P0 SB 50, P1 BB 120, P2 UTG 150, P3 BTN 200
+      # P0 posts 5 (45 left), P1 posts 10 (110 left)
+      # P2 acts first
+      self.assertEqual(state.current_player(), 2)
+      state.apply_action(150)  # P2 raises all-in to 150
+      self.assertEqual(state.current_player(), 3)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P3 calls 150
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls 45 all-in
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 calls 110 all-in
+
+      # Deal flop
+      state.apply_action(game.card_to_int[board[0]])
+      state.apply_action(game.card_to_int[board[1]])
+      state.apply_action(game.card_to_int[board[2]])
+
+      # Deal turn
+      state.apply_action(game.card_to_int[board[3]])
+      # Deal river
+      state.apply_action(game.card_to_int[board[4]])
+
+      if not state.is_terminal():
+        state._wrapped_state.end_hand()
+      self.assertTrue(state.is_terminal())
+      # P0 wins main pot 200 with AA. Payoff 150.
+      # P1 wins side pot 1 (210) with KK. Payoff 90.
+      # P2 wins side pot 2 (60) with QQ. Payoff -90.
+      # P3 loses 150. Payoff -150.
+      self.assertEqual(state.returns(), [150.0, 90.0, -90.0, -150.0])
+
+    def test_side_pot_flhe_one_all_in_player(self):
+      params = {
+          "variant": "FixedLimitTexasHoldem",
+          "num_players": 3,
+          "blinds": "5 10",
+          "small_bet": 10,
+          "big_bet": 20,
+          "stack_sizes": "25 100 100",
+      }
+      game = PokerkitWrapper(params)
+      state = game.new_initial_state()
+
+      # Cards
+      p0_cards = [Card(ACE, CLUB), Card(ACE, DIAMOND)]
+      p1_cards = [Card(KING, CLUB), Card(KING, DIAMOND)]
+      p2_cards = [Card(QUEEN, CLUB), Card(QUEEN, DIAMOND)]
+      board = [
+          Card(DEUCE, HEART),
+          Card(TREY, HEART),
+          Card(SIX, DIAMOND),
+          Card(EIGHT, DIAMOND),
+          Card(TEN, SPADE),
+      ]
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[p0_cards[0]])
+      state.apply_action(game.card_to_int[p1_cards[0]])
+      state.apply_action(game.card_to_int[p2_cards[0]])
+      state.apply_action(game.card_to_int[p0_cards[1]])
+      state.apply_action(game.card_to_int[p1_cards[1]])
+      state.apply_action(game.card_to_int[p2_cards[1]])
+
+      # Preflop betting
+      # P0 SB 25, P1 BB 100, P2 BTN 100
+      # P0 posts 5 (20 left), P1 posts 10 (90 left)
+      # P2 acts first
+      self.assertEqual(state.current_player(), 2)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P2 calls 10
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls 5, 15 left
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 checks
+
+      # Deal flop
+      state.apply_action(game.card_to_int[board[0]])
+      state.apply_action(game.card_to_int[board[1]])
+      state.apply_action(game.card_to_int[board[2]])
+
+      # Flop betting. small bet = 10.
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 checks
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 checks
+      self.assertEqual(state.current_player(), 2)
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 10])
+      state.apply_action(10)  # P2 bets 10.
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls 10. 5 left.
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 calls 10.
+
+      # Deal turn
+      state.apply_action(game.card_to_int[board[3]])
+
+      # Turn betting. big bet = 20.
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 checks
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 checks
+      self.assertEqual(state.current_player(), 2)
+      self.assertEqual(
+          state._wrapped_state.betting_structure,
+          pokerkit.state.BettingStructure.FIXED_LIMIT,
+      )
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 20])
+      state.apply_action(20)  # P2 bets 20.
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL]
+      )
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P0 calls 5 all-in.
+      self.assertEqual(state.current_player(), 1)
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL, 40]
+      )
+      state.apply_action(40)  # P1 raises to 40.
+      self.assertEqual(state.current_player(), 2)
+      self.assertEqual(state._wrapped_state.checking_or_calling_amount, 20)
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL, 60]
+      )
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P2 calls 20.
+
+      # Deal river
+      state.apply_action(game.card_to_int[board[4]])
+
+      # River betting.
+      self.assertEqual(state.current_player(), 1)
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 20])
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P1 checks
+      self.assertEqual(state.current_player(), 2)
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 20])
+      state.apply_action(ACTION_CHECK_OR_CALL)  # P2 checks
+
+      if not state.is_terminal():
+        state._wrapped_state.end_hand()
+      self.assertTrue(state.is_terminal())
+      # P0 wins main pot 75 with AA. Payoff 50.
+      # P1 wins side pot 70 with KK vs QQ. Payoff 10.
+      # P2 loses 60. Payoff -60.
+      self.assertEqual(state.returns(), [50.0, 10.0, -60.0])
 
     def test_utility_equal_stacks_multiway(self):
       scenarios = [
@@ -1207,243 +1848,6 @@ if IMPORTED_ALL_LIBRARIES:
       # though it is nice to have to verify the game is still working fine
       # here.)
       self.assertFalse(state.is_terminal())
-
-    # TODO: b/437724266 - this test + a couple others should be part of the main
-    # PokerkitWrapper tests, not the ACPCStyle tests.
-    def test_default_state_struct_values(self):
-      game = pyspiel.load_game("python_pokerkit_wrapper")
-      state = game.new_initial_state()
-      # The first state is a chance node dealing cards.
-      self.assertTrue(state.is_chance_node())
-      state_struct = state.to_struct()
-      self.assertIsInstance(
-          state_struct, pyspiel.pokerkit_wrapper.PokerkitStateStruct
-      )
-      self.assertEqual(state_struct.current_player, pyspiel.PlayerId.CHANCE)
-      self.assertFalse(state_struct.is_terminal)
-      self.assertIsInstance(state_struct.observation, list)
-      self.assertLen(state_struct.observation, game.num_players())
-      self.assertIn("Player: 0", state_struct.observation[0])
-      self.assertTrue(state_struct.legal_actions)
-      self.assertLen(state_struct.stacks, game.num_players())
-      self.assertLen(state_struct.bets, game.num_players())
-      self.assertIsInstance(state_struct.board_cards, list)
-      self.assertIsInstance(state_struct.hole_cards, list)
-      self.assertIsInstance(state_struct.pots, list)
-      self.assertIsInstance(state_struct.burn_cards, list)
-      self.assertIsInstance(state_struct.mucked_cards, list)
-
-    def test_create_struct_and_access_members(self):
-      """Tests direct creation of the underlying pyspiel PokerkitStateStruct.
-
-      This test could technically go elsewhere as it's not really testing the
-      actual pokerkit_wrapper code, but this is a very convenient place to put
-      it.
-      (And, it is useful to have our tests clearly show if the underlying
-      StateStruct we're using has any problems.)
-      """
-      state_struct = pyspiel.pokerkit_wrapper.PokerkitStateStruct()
-
-      # Test default values (or some initial state if constructor sets them)
-      self.assertEqual(
-          state_struct.current_player, 0
-      )  # Or whatever the C++ default is
-      self.assertFalse(state_struct.is_terminal)
-      self.assertEqual(state_struct.observation, [])
-
-      # Modify members from Python
-      state_struct.observation = ["obs1", "obs2"]
-      state_struct.legal_actions = [0, 2, 4]
-      state_struct.current_player = 1
-      state_struct.is_terminal = True
-      state_struct.stacks = [100, 200]
-      state_struct.bets = [10, 0]
-      state_struct.board_cards = [5, 6, 7]
-      state_struct.hole_cards = [[1, 2], [3, 4]]
-      state_struct.poker_hand_histories = [["phh1"], ["phh2"]]
-
-      # Verify modifications
-      self.assertEqual(state_struct.observation, ["obs1", "obs2"])
-      self.assertEqual(state_struct.legal_actions, [0, 2, 4])
-      self.assertEqual(state_struct.current_player, 1)
-      self.assertTrue(state_struct.is_terminal)
-      self.assertEqual(state_struct.stacks, [100, 200])
-      self.assertEqual(state_struct.bets, [10, 0])
-      self.assertEqual(state_struct.board_cards, [5, 6, 7])
-      self.assertEqual(state_struct.hole_cards, [[1, 2], [3, 4]])
-      self.assertEqual(state_struct.poker_hand_histories, [["phh1"], ["phh2"]])
-
-    def test_pokerkit_wrapper_state_to_struct_and_json(self):
-      params = {
-          "variant": "NoLimitTexasHoldem",
-          "num_players": 2,
-          "blinds": "50 100",
-          "stack_sizes": "1000 1000",
-      }
-      game = pyspiel.load_game("python_pokerkit_wrapper", params)
-      state = game.new_initial_state()
-
-      # Deal hole cards
-      state.apply_action(game.card_to_int[Card(ACE, CLUB)])  # P0 c1
-      state.apply_action(game.card_to_int[Card(ACE, DIAMOND)])  # P1 c1
-      state.apply_action(game.card_to_int[Card(KING, CLUB)])  # P0 c2
-      state.apply_action(game.card_to_int[Card(KING, DIAMOND)])  # P1 c2
-      state.apply_action(ACTION_CHECK_OR_CALL)
-      state.apply_action(ACTION_CHECK_OR_CALL)
-
-      # Deal flop
-      state.apply_action(game.card_to_int[Card(QUEEN, CLUB)])
-      state.apply_action(game.card_to_int[Card(JACK, CLUB)])
-      state.apply_action(game.card_to_int[Card(TEN, CLUB)])
-
-      state.apply_action(200)  # BB raises to 200 post-flop
-      state.apply_action(500)  # SB/BTN re-raises to 500
-      state.apply_action(800)  # BB re-re-raises to 800
-
-      state_struct = state.to_struct()
-      json_str = state.to_json()
-      self.assertEqual(json_str, state_struct.to_json())
-      self.assertIsInstance(json_str, str)
-
-      try:
-        data = json.loads(json_str)
-      except json.JSONDecodeError as e:
-        self.fail(f"Failed to parse JSON {json_str}, error was: {e}")
-
-      self.assertEqual(state_struct.current_player, 1)
-      self.assertEqual(data["current_player"], 1)
-
-      self.assertEqual(state_struct.is_terminal, False)
-      self.assertFalse(data["is_terminal"])
-
-      self.assertEqual(state_struct.stacks, [100, 400])
-      self.assertEqual(data["stacks"], [100, 400])
-
-      self.assertEqual(state_struct.bets, [800, 500])
-      self.assertEqual(data["bets"], [800, 500])
-
-      self.assertEqual(
-          state_struct.board_cards,
-          [
-              game.card_to_int[c]
-              for c in [Card(QUEEN, CLUB), Card(JACK, CLUB), Card(TEN, CLUB)]
-          ],
-      )
-      self.assertLen(data["board_cards"], 3)
-
-      board_cards_json = [game.int_to_card[c] for c in data["board_cards"]]
-      board_cards_struct = [
-          game.int_to_card[c] for c in state_struct.board_cards
-      ]
-      self.assertEqual(
-          board_cards_json,
-          [Card(QUEEN, CLUB), Card(JACK, CLUB), Card(TEN, CLUB)],
-      )
-      self.assertEqual(board_cards_struct, board_cards_json)
-
-      self.assertEqual(
-          state_struct.hole_cards,
-          [
-              [
-                  game.card_to_int[c]
-                  for c in [Card(ACE, CLUB), Card(KING, CLUB)]
-              ],
-              [
-                  game.card_to_int[c]
-                  for c in [Card(ACE, DIAMOND), Card(KING, DIAMOND)]
-              ],
-          ],
-      )
-      self.assertLen(data["hole_cards"], 2)
-      p0_hole_cards = [game.int_to_card[c] for c in data["hole_cards"][0]]
-      p1_hole_cards = [game.int_to_card[c] for c in data["hole_cards"][1]]
-      self.assertEqual(p0_hole_cards, [Card(ACE, CLUB), Card(KING, CLUB)])
-      self.assertEqual(p1_hole_cards, [Card(ACE, DIAMOND), Card(KING, DIAMOND)])
-
-      self.assertEqual(state_struct.pots, [200])
-      self.assertLen(data["pots"], 1)
-      self.assertEqual(data["pots"][0], 200)
-
-      self.assertLen(state_struct.poker_hand_histories, 2)
-      # Per-player view of P1's hole cards (P1 uncensored, P2 censored)
-      self.assertEqual(state_struct.poker_hand_histories[0][0], "d dh p1 AcKc")
-      self.assertEqual(state_struct.poker_hand_histories[1][0], "d dh p1 ????")
-      # Per-player view of P2's hole cards (P1 censored, P2 uncensored)
-      self.assertEqual(state_struct.poker_hand_histories[0][1], "d dh p2 ????")
-      self.assertEqual(state_struct.poker_hand_histories[1][1], "d dh p2 AdKd")
-
-      # For anyone curious about what a non-trivial PHH actually looks like
-      # here.
-      print(f"state_struct PHH: {state_struct.poker_hand_histories}")
-
-    def test_pokerkit_wrapper_state_to_struct_and_json_when_terminal(self):
-      """Tests the ToJson() method inherited from StateStruct."""
-      params = {
-          "variant": "NoLimitTexasHoldem",
-          "num_players": 2,
-          "blinds": "50 100",
-          "stack_sizes": "1000 1000",
-      }
-      game = pyspiel.load_game("python_pokerkit_wrapper", params)
-      state = game.new_initial_state()
-
-      while not state.is_terminal():
-        if not state.is_chance_node():
-          state.apply_action(ACTION_FOLD)  # SB/BTN will immediately fold
-        else:
-          state.apply_action(state.legal_actions()[0])
-
-      state_struct = state.to_struct()
-      json_str = state.to_json()
-      self.assertEqual(json_str, state_struct.to_json())
-      self.assertIsInstance(json_str, str)
-
-      try:
-        data = json.loads(json_str)
-      except json.JSONDecodeError as e:
-        self.fail(f"Failed to parse JSON {json_str}, error was: {e}")
-
-      self.assertEqual(data["current_player"], pyspiel.PlayerId.TERMINAL)
-      self.assertEqual(state_struct.current_player, pyspiel.PlayerId.TERMINAL)
-
-      self.assertTrue(data["is_terminal"])
-      self.assertTrue(state_struct.is_terminal)
-
-      self.assertEmpty(data["legal_actions"])
-      self.assertEmpty(state_struct.legal_actions)
-
-      self.assertEqual(data["stacks"], [1050, 950])
-      self.assertEqual(state_struct.stacks, [1050, 950])
-
-      self.assertEqual(data["bets"], [0, 0])
-      self.assertEqual(state_struct.bets, [0, 0])
-
-      self.assertEmpty(data["board_cards"])
-      self.assertEqual(state_struct.board_cards, [])
-
-      # Only BB's cards; SB/BTN mucked upon folding.
-      self.assertEqual(data["hole_cards"], [[0, 2], []])
-      self.assertEqual(state_struct.hole_cards, [[0, 2], []])
-
-      self.assertEqual(data["pots"], [0])
-      self.assertEqual(state_struct.pots, [0])
-
-      self.assertEmpty(data["burn_cards"])
-      self.assertEqual(state_struct.burn_cards, [])
-
-      # As mentioned above, SB's cards were mucked upon folding.
-      self.assertEqual(data["mucked_cards"], [1, 3])
-      self.assertEqual(state_struct.mucked_cards, [1, 3])
-
-      # p1 has 2c2h since first + third card in unshuffled deck
-      # p2 has 2d2s since second + fourth card in unshuffled deck
-      self.assertEqual(
-          state_struct.poker_hand_histories,
-          [
-              ["d dh p1 2c2h", "d dh p2 ????", "p2 f"],
-              ["d dh p1 ????", "d dh p2 2d2s", "p2 f"],
-          ],
-      )
 
 
 if __name__ == "__main__":

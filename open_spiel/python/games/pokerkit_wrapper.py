@@ -103,7 +103,6 @@ def _get_variants_supporting_param(param_name: str) -> list[str]:
       if param_name in inspect.signature(cls).parameters.keys()
   ]
 
-
 VARIANT_PARAM_USAGE = {
     param: _get_variants_supporting_param(param)
     for param in [
@@ -1028,11 +1027,6 @@ class PokerkitWrapperState(pyspiel.State):
           - contribution_on_prior_streets_or_non_bets
           == 1
       )
-      # TODO: b/437724266 - Investigate whether it might be possible for this to
-      # happen as part of an all-in that's raising to *two* chips instead of one
-      # chip if the player had previously contributed N-1 chips from blinds (or
-      # something similar?) on this street. (Worst case it would just have
-      # the number be off by one chip, but still worth fixing if so!)
       return f"Player {player}: Bet/Raise to 1 [ALL-IN EDGECASE]"
     else:
       raise ValueError(
