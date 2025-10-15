@@ -73,16 +73,9 @@ if IMPORTED_ALL_LIBRARIES:
 
   class PokerkitWrapperTest(absltest.TestCase):
     """Test the OpenSpiel game wrapper for Pokerkit."""
-    # - razz poker hand evaluation working as expected / differing from seven
-    #   card stud
-    # - seven card stud gameplay actually different from texas holdem, including
-    #   hand evaluation
-    # - hand mucking / displaying unmucked hands that reach showdown properly
-    # - censoring private hole cards in the observer strings
 
     # --- Lightweight testing to verify that the 'usage' directories are at
     # least _somewhat_ correct. (Not intended to be exhaustive!) ---
-
     def test_bring_in_usage(self):
       variants = pokerkit_wrapper.VARIANT_PARAM_USAGE["bring_in"]
       self.assertIn(pokerkit.FixedLimitRazz.__name__, variants)
@@ -890,12 +883,11 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertTrue(state.is_chance_node())
       state.apply_action(game.card_to_int[board[4]])
 
-      if not state.is_terminal():
-        state._wrapped_state.end_hand()
+      # Hand should immediately proceded to showdown since everyone is all-in.
 
       self.assertTrue(state.is_terminal())
-      # P0 wins main pot of 63 with AA for 42 profit.
-      # P1 wins side pot of 2 with KK vs QQ for -20 profit.
+      # P0 wins main pot of 21*3 => 63 with AA for 42 profit.
+      # P1 wins side pot of (22-21)*2 => 2 with KK vs QQ for -20 profit.
       # P2 loses 22.
       self.assertEqual(state.returns(), [42.0, -20.0, -22.0])
 
@@ -1298,6 +1290,196 @@ if IMPORTED_ALL_LIBRARIES:
       state.apply_action(ACTION_FOLD)
       self.assertTrue(state.is_terminal())
       self.assertEqual(state.returns(), [40, -20, -20])
+
+    def test_razz_vs_seven_card_stud_eval(self):
+      card_sequence = [
+          Card(ACE, HEART),
+          Card(DEUCE, SPADE),
+          Card(DEUCE, HEART),
+          Card(TREY, SPADE),
+          Card(TREY, HEART),
+          Card(FOUR, SPADE),  # 3rd street
+          Card(FOUR, HEART),
+          Card(FIVE, SPADE),  # 4th street
+          Card(FIVE, HEART),
+          Card(SIX, SPADE),  # 5th street
+          Card(SIX, HEART),
+          Card(SEVEN, SPADE),  # 6th street
+          Card(SEVEN, HEART),
+          Card(EIGHT, SPADE),  # 7th street
+      ]
+
+      def play_to_showdown(game, state, cards):
+        card_iterator = iter(cards)
+        while not state.is_terminal():
+          if state.is_chance_node():
+            card_to_deal = next(card_iterator)
+            state.apply_action(game.card_to_int[card_to_deal])
+          else:
+            legal_actions = state.legal_actions()
+            if ACTION_CHECK_OR_CALL in legal_actions:
+              state.apply_action(ACTION_CHECK_OR_CALL)
+            else:
+              min_bet_action = min(
+                  a for a in legal_actions if a > ACTION_CHECK_OR_CALL
+              )
+              state.apply_action(min_bet_action)
+        return state.returns()
+
+      # Test with Razz
+      razz_params = {
+          "variant": "FixedLimitRazz",
+          "num_players": 2,
+          "stack_sizes": "2000 2000",
+          "bring_in": 5,
+          "small_bet": 10,
+          "big_bet": 20,
+      }
+      razz_game = PokerkitWrapper(razz_params)
+      razz_state = razz_game.new_initial_state()
+      razz_returns = play_to_showdown(razz_game, razz_state, card_sequence)
+      # P0 has 5432A, P1 has 65432. P0 wins in Razz.
+      self.assertGreater(razz_returns[0], 0)
+      self.assertLess(razz_returns[1], 0)
+
+      # Test with Seven Card Stud
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "2000 2000",
+          "bring_in": 5,
+          "small_bet": 10,
+          "big_bet": 20,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      stud_state = stud_game.new_initial_state()
+      stud_returns = play_to_showdown(stud_game, stud_state, card_sequence)
+      # P0 has 7h SF, P1 has 8s SF. P1 wins in 7-card stud.
+      self.assertLess(stud_returns[0], 0)
+      self.assertGreater(stud_returns[1], 0)
+
+    def test_hand_mucking_at_showdown(self):
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 2,
+          "blinds": "5 10",
+          "stack_sizes": "200 200",
+      }
+      game = PokerkitWrapper(params)
+      state = game.new_initial_state()
+
+      # Cards
+      p0_cards = [Card(EIGHT, HEART), Card(EIGHT, DIAMOND)]
+      p1_cards = [Card(NINE, SPADE), Card(NINE, CLUB)]
+      board = [
+          Card(DEUCE, CLUB),
+          Card(TREY, DIAMOND),
+          Card(FOUR, SPADE),
+          Card(SIX, HEART),
+          Card(TEN, CLUB),
+      ]
+      board_iter = iter(board)
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[p0_cards[0]])
+      state.apply_action(game.card_to_int[p1_cards[0]])
+      state.apply_action(game.card_to_int[p0_cards[1]])
+      state.apply_action(game.card_to_int[p1_cards[1]])
+
+      # Preflop: P1 (SB / BTN) calls, P0 (BB) checks.
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # Flop
+      self.assertTrue(state.is_chance_node())
+      state.apply_action(game.card_to_int[next(board_iter)])
+      self.assertTrue(state.is_chance_node())
+      state.apply_action(game.card_to_int[next(board_iter)])
+      self.assertTrue(state.is_chance_node())
+      state.apply_action(game.card_to_int[next(board_iter)])
+      # P0 checks, P1 checks.
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # Turn
+      self.assertTrue(state.is_chance_node())
+      state.apply_action(game.card_to_int[next(board_iter)])
+      # P0 checks, P1 checks.
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # River
+      self.assertTrue(state.is_chance_node())
+      state.apply_action(game.card_to_int[next(board_iter)])
+      # P0 checks, P1 checks.
+      self.assertEqual(state.current_player(), 0)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertEqual(state.current_player(), 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      self.assertTrue(state.is_terminal())
+      # P1 loses with 99, P0 loses with 88 and should muck.
+      self.assertEqual(state.returns(), [-10.0, 10.0])
+      self.assertCountEqual(state._wrapped_state.mucked_cards, p0_cards)
+      # Check hole cards to see who mucked.
+      # P0 mucked, P1 showed.
+      self.assertEqual(state._wrapped_state.hole_cards[0], [])
+      self.assertCountEqual(state._wrapped_state.hole_cards[1], p1_cards)
+
+    def test_observer_string_censors_opponent_hole_cards(self):
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 2,
+          "blinds": "5 10",
+          "stack_sizes": "200 200",
+      }
+      game = PokerkitWrapper(params)
+      state = game.new_initial_state()
+
+      # Cards
+      p0_cards = [Card(ACE, CLUB), Card(KING, CLUB)]
+      p1_cards = [Card(QUEEN, DIAMOND), Card(JACK, DIAMOND)]
+
+      # Deal hole cards
+      state.apply_action(game.card_to_int[p0_cards[0]])
+      state.apply_action(game.card_to_int[p1_cards[0]])
+      state.apply_action(game.card_to_int[p0_cards[1]])
+      state.apply_action(game.card_to_int[p1_cards[1]])
+
+      # Preflop: P0 calls, P1 checks to reach flop and have some actions.
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # Flop
+      state.apply_action(game.card_to_int[Card(DEUCE, HEART)])
+      state.apply_action(game.card_to_int[Card(TREY, HEART)])
+      state.apply_action(game.card_to_int[Card(FOUR, HEART)])
+
+      observer = game.make_py_observer(
+          pyspiel.IIGObservationType(perfect_recall=True)
+      )
+
+      # Check observation string for player 0
+      obs_str_p0 = observer.string_from(state, 0)
+      phh_p0 = [
+          s for s in obs_str_p0.split("||") if s.startswith("PHH Actions:")
+      ][0]
+      self.assertIn("d dh p1 AcKc", phh_p0)
+      self.assertIn("d dh p2 ????", phh_p0)
+
+      # Check observation string for player 1
+      obs_str_p1 = observer.string_from(state, 1)
+      phh_p1 = [
+          s for s in obs_str_p1.split("||") if s.startswith("PHH Actions:")
+      ][0]
+      self.assertIn("d dh p1 ????", phh_p1)
+      self.assertIn("d dh p2 QdJd", phh_p1)
 
   class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
     """Test the OpenSpiel game wrapper for Pokerkit."""
