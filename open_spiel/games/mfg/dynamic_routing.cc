@@ -111,7 +111,7 @@ std::unique_ptr<State> MeanFieldRoutingGame::DeserializeState(
                      properties.size()));
   }
   int current_time_step;
-  open_spiel::PlayerId player_id;
+  int player_id;
   bool is_chance_init, is_terminal, vehicle_at_destination,
       vehicle_without_legal_action;
   int waiting_time;
@@ -139,7 +139,7 @@ std::unique_ptr<MeanFieldRoutingGameState> MeanFieldRoutingGameState::Create(
     std::shared_ptr<const Game> game, double time_step_length,
     std::vector<OriginDestinationDemand>* od_demand, Network* network,
     bool perform_sanity_checks, int current_time_step,
-    open_spiel::PlayerId player_id, bool is_chance_init, bool is_terminal,
+    int player_id, bool is_chance_init, bool is_terminal,
     bool vehicle_at_destination, bool vehicle_without_legal_action,
     int waiting_time, double vehicle_final_travel_time,
     std::string vehicle_location, std::string vehicle_destination) {
@@ -170,7 +170,7 @@ MeanFieldRoutingGameState::CreateNewInitialState(
   return MeanFieldRoutingGameState::Create(
       game, time_step_length, od_demand, network, perform_sanity_checks,
       /* current_time_step= */ 0,
-      /* player_id = */ open_spiel::PlayerId::kChancePlayerId,
+      /* player_id = */ kChancePlayerId,
       /* is_chance_init = */ true,
       /* is_terminal = */ false,
       /* vehicle_at_destination = */ false,
@@ -185,7 +185,7 @@ MeanFieldRoutingGameState::MeanFieldRoutingGameState(
     std::shared_ptr<const Game> game, double time_step_length,
     std::vector<OriginDestinationDemand>* od_demand, Network* network,
     bool perform_sanity_checks, int current_time_step,
-    open_spiel::PlayerId player_id, bool is_chance_init, bool is_terminal,
+    int player_id, bool is_chance_init, bool is_terminal,
     bool vehicle_at_destination, bool vehicle_without_legal_action,
     int waiting_time, double vehicle_final_travel_time,
     std::string vehicle_location, std::string vehicle_destination,
@@ -219,12 +219,12 @@ std::string MeanFieldRoutingGameState::StateToString(
   if (is_chance_init_) {
     return "initial chance node";
   }
-  if (player_id == PlayerId::kDefaultPlayerId ||
-      player_id == PlayerId::kTerminalPlayerId) {
+  if (player_id == kDefaultPlayerId ||
+      player_id == kTerminalPlayerId) {
     time = absl::StrCat(time_step);
-  } else if (player_id == PlayerId::kMeanFieldPlayerId) {
+  } else if (player_id == kMeanFieldPlayerId) {
     time = absl::StrFormat("%d_mean_field", time_step);
-  } else if (player_id == PlayerId::kChancePlayerId) {
+  } else if (player_id == kChancePlayerId) {
     time = absl::StrFormat("%d_chance", time_step);
   } else {
     SpielFatalError(
@@ -274,11 +274,11 @@ std::vector<Action> MeanFieldRoutingGameState::LegalActions() const {
 void MeanFieldRoutingGameState::DoApplyAction(Action action) {
   if (perform_sanity_checks_) {
     SPIEL_CHECK_TRUE(!IsTerminal());
-    SPIEL_CHECK_NE(current_player_id_, PlayerId::kMeanFieldPlayerId);
+    SPIEL_CHECK_NE(current_player_id_, kMeanFieldPlayerId);
   }
   switch (current_player_id_) {
-    case PlayerId::kChancePlayerId: {
-      current_player_id_ = PlayerId::kDefaultPlayerId;
+    case kChancePlayerId: {
+      current_player_id_ = kDefaultPlayerId;
       SPIEL_CHECK_EQ(is_chance_init_, true);
       auto od_demand = od_demand_->at(action);
       vehicle_destination_ = od_demand.vehicle.destination;
@@ -288,8 +288,8 @@ void MeanFieldRoutingGameState::DoApplyAction(Action action) {
       is_chance_init_ = false;
       break;
     }
-    case PlayerId::kDefaultPlayerId: {
-      current_player_id_ = PlayerId::kMeanFieldPlayerId;
+    case kDefaultPlayerId: {
+      current_player_id_ = kMeanFieldPlayerId;
       if (!vehicle_without_legal_action_) {
         if (waiting_time_ > 0) {
           waiting_time_ -= 1;
@@ -320,7 +320,7 @@ void MeanFieldRoutingGameState::DoApplyAction(Action action) {
 
   if (current_time_step_ >= GetGame()->MaxGameLength()) {
     is_terminal_ = true;
-    current_player_id_ = PlayerId::kTerminalPlayerId;
+    current_player_id_ = kTerminalPlayerId;
     if (!vehicle_at_destination_) {
       vehicle_final_travel_time_ = -1 * GetGame()->MinUtility();
     }
@@ -329,8 +329,8 @@ void MeanFieldRoutingGameState::DoApplyAction(Action action) {
 
 std::string MeanFieldRoutingGameState::ActionToString(Player player,
                                                       Action action) const {
-  SPIEL_CHECK_NE(player, PlayerId::kMeanFieldPlayerId);
-  if (player == PlayerId::kChancePlayerId) {
+  SPIEL_CHECK_NE(player, kMeanFieldPlayerId);
+  if (player == kChancePlayerId) {
     SPIEL_CHECK_TRUE(is_chance_init_);
     return absl::StrFormat("Vehicle is assigned to population %d", action);
   }
@@ -390,7 +390,7 @@ std::vector<std::string> MeanFieldRoutingGameState::DistributionSupport() {
       std::string destination = od.vehicle.destination;
       std::string value =
           StateToString(vehicle_location_, current_time_step_,
-                        PlayerId::kMeanFieldPlayerId, waiting_time, destination,
+                        kMeanFieldPlayerId, waiting_time, destination,
                         /*ret = */ 0.0);
       dist.push_back(value);
     }
@@ -402,13 +402,13 @@ std::vector<std::string> MeanFieldRoutingGameState::DistributionSupport() {
 
 void MeanFieldRoutingGameState::UpdateDistribution(
     const std::vector<double>& distribution) {
-  if (current_player_id_ == PlayerId::kTerminalPlayerId) {
+  if (current_player_id_ == kTerminalPlayerId) {
     return;
   }
   if (perform_sanity_checks_) {
-    SPIEL_CHECK_EQ(current_player_id_, PlayerId::kMeanFieldPlayerId);
+    SPIEL_CHECK_EQ(current_player_id_, kMeanFieldPlayerId);
   }
-  current_player_id_ = PlayerId::kDefaultPlayerId;
+  current_player_id_ = kDefaultPlayerId;
 
   if (!vehicle_without_legal_action_) {
     double normed_density_on_vehicle_link = 0;
@@ -431,9 +431,9 @@ void MeanFieldRoutingGameState::UpdateDistribution(
 }
 
 ActionsAndProbs MeanFieldRoutingGameState::ChanceOutcomes() const {
-  SPIEL_CHECK_NE(current_player_id_, PlayerId::kMeanFieldPlayerId);
+  SPIEL_CHECK_NE(current_player_id_, kMeanFieldPlayerId);
   if (perform_sanity_checks_) {
-    SPIEL_CHECK_EQ(current_player_id_, PlayerId::kChancePlayerId);
+    SPIEL_CHECK_EQ(current_player_id_, kChancePlayerId);
     SPIEL_CHECK_TRUE(is_chance_init_);
   }
   return chance_outcomes_;

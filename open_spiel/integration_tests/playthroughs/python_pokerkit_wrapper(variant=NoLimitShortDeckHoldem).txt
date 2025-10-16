@@ -40,7 +40,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: "
 InformationStateString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: "
 ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]"
@@ -62,7 +62,7 @@ History() = [24]
 HistoryString() = "24"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: [Qc]\n||Per-player Hole Cards (public view): [[??], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: d dh p1 Qc"
 InformationStateString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: d dh p1 ??"
 ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: [Qc]\n||Per-player Hole Cards (public view): [[??], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]"
@@ -138,7 +138,7 @@ History() = [24, 27, 13, 9, 1172, 0]
 HistoryString() = "24, 27, 13, 9, 1172, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "Player: 0\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(1,))] \n||Bets: [0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [??, ??]]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 2010]\n||PHH Actions: d dh p1 Qc9d,d dh p2 ????,p2 cbr 1172,p1 f"
 InformationStateString(1) = "Player: 1\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(1,))] \n||Bets: [0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Qs, 8d]\n||Per-player Hole Cards (public view): [[], [??, ??]]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 2010]\n||PHH Actions: d dh p1 ????,d dh p2 Qs8d,p2 cbr 1172,p1 f"
 ObservationString(0) = "Player: 0\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(1,))] \n||Bets: [0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [??, ??]]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 2010]"

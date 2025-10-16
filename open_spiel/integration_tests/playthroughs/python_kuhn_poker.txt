@@ -39,7 +39,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "p0"
 InformationStateString(1) = "p1"
 InformationStateTensor(0).player: ◉◯
@@ -77,7 +77,7 @@ History() = [1]
 HistoryString() = "1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "p0 card:1"
 InformationStateString(1) = "p1"
 InformationStateTensor(0).player: ◉◯
@@ -193,7 +193,7 @@ History() = [1, 2, 0, 0]
 HistoryString() = "1, 2, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "p0 card:1 pp"
 InformationStateString(1) = "p1 card:2 pp"
 InformationStateTensor(0).player: ◉◯

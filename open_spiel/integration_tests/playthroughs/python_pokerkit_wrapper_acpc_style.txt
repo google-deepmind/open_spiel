@@ -40,7 +40,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: "
 InformationStateString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: "
 ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]"
@@ -62,7 +62,7 @@ History() = [25]
 HistoryString() = "25"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: [8d]\n||Per-player Hole Cards (public view): [[??], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: d dh p1 8d"
 InformationStateString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]\n||PHH Actions: d dh p1 ??"
 ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [10, 5]\n||Board Cards: []\n||Player's Private Hole Cards: [8d]\n||Per-player Hole Cards (public view): [[??], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [1990, 1995]"
@@ -204,7 +204,7 @@ History() = [25, 45, 50, 41, 412, 1718, 2000, 1, 2, 15, 28, 35, 27]
 HistoryString() = "25, 45, 50, 41, 412, 1718, 2000, 1, 2, 15, 28, 35, 27"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "Player: 0\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(0,))] \n||Bets: [0, 0]\n||Board Cards: [[2h], [5s], [9c], [Ts], [8s]]\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[8d, Ah], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [4000, 0]\n||PHH Actions: d dh p1 8dAh,d dh p2 ????,p2 cbr 412,p1 cbr 1718,p2 cbr 2000,p1 cc,p2 sm KdQd,p1 sm 8dAh,d db 2h5s9cTs8s"
 InformationStateString(1) = "Player: 1\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(0,))] \n||Bets: [0, 0]\n||Board Cards: [[2h], [5s], [9c], [Ts], [8s]]\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[8d, Ah], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [4000, 0]\n||PHH Actions: d dh p1 ????,d dh p2 KdQd,p2 cbr 412,p1 cbr 1718,p2 cbr 2000,p1 cc,p2 sm KdQd,p1 sm 8dAh,d db 2h5s9cTs8s"
 ObservationString(0) = "Player: 0\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(0,))] \n||Bets: [0, 0]\n||Board Cards: [[2h], [5s], [9c], [Ts], [8s]]\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[8d, Ah], []]\n||Per-player Starting Stacks: (2000, 2000)\n||Per-player Current Stacks: [4000, 0]"

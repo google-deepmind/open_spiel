@@ -37,7 +37,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "position_init_1"
@@ -88,7 +88,7 @@ History() = [32, 3]
 HistoryString() = "32, 3"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "32, 3"
 InformationStateString(1) = "32, 3"
 ObservationString(0) = "(pop=1, t=0_a_mu, pos=[4 3])"
@@ -113,7 +113,7 @@ History() = [32, 3, 4]
 HistoryString() = "32, 3, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "32, 3, 4"
 InformationStateString(1) = "32, 3, 4"
 ObservationString(0) = "(pop=1, t=1_a, pos=[4 3])"
@@ -168,7 +168,7 @@ History() = [32, 3, 4, 2, 2]
 HistoryString() = "32, 3, 4, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "32, 3, 4, 2, 2"
 InformationStateString(1) = "32, 3, 4, 2, 2"
 ObservationString(0) = "(pop=1, t=2_a, pos=[4 5])"
@@ -223,7 +223,7 @@ History() = [32, 3, 4, 2, 2, 2, 3]
 HistoryString() = "32, 3, 4, 2, 2, 2, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "32, 3, 4, 2, 2, 2, 3"
 InformationStateString(1) = "32, 3, 4, 2, 2, 2, 3"
 ObservationString(0) = "(pop=1, t=3_a, pos=[4 4])"
@@ -328,7 +328,7 @@ History() = [32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0]
 HistoryString() = "32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0"
 InformationStateString(1) = "32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0"
 ObservationString(0) = "(pop=1, t=10_a, pos=[2 2])"
