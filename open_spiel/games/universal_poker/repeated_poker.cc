@@ -15,6 +15,7 @@
 #include "open_spiel/games/universal_poker/repeated_poker.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -320,10 +321,33 @@ void RepeatedPokerState::DoApplyAction(Action action) {
     hand_returns_.back()[p] = universal_poker_state_->Returns()[i];
   }
   auto& acpc_state = universal_poker_state_->acpc_state();
-  acpc_hand_histories_.push_back(acpc_state.ToString());
+  // The acpc_state.ToString() contains extra lines about money spent by
+  // players, which don't provide unique information, so we split by newline and
+  // take only the first line, which is the proper ACPC string.
+  std::vector<std::string> acpc_state_lines = absl::StrSplit(
+      acpc_state.ToString(), '\n');
+  std::vector<std::string> acpc_state_parts = absl::StrSplit(
+      acpc_state_lines[0], absl::MaxSplits(':', 2));
+  std::string acpc_betting_and_cards = acpc_state_parts[2];
+  std::vector<double> seat_returns = universal_poker_state_->Returns();
+  std::vector<int64_t> long_returns;
+  long_returns.reserve(seat_returns.size());
+  for (double r : seat_returns) long_returns.push_back(static_cast<int64_t>(r));
+  std::string returns_str = absl::StrJoin(long_returns, "|");
+  std::vector<std::string> player_names;
+  player_names.reserve(seat_returns.size());
+  for (int i = 0; i < seat_returns.size(); ++i) {
+    player_names.push_back(absl::StrCat("Player", seat_to_player_.at(i)));
+  }
+  std::string player_names_str = absl::StrJoin(player_names, "|");
+  acpc_hand_histories_.push_back(
+      absl::StrCat("STATE:", hand_number_, ":", acpc_betting_and_cards, ":",
+                   returns_str, ":", player_names_str));
+
   // Terminate or start a new hand.
   if (hand_number_ + 1 == max_num_hands_) {
     is_terminal_ = true;
+    UpdateStacks();
     return;
   }
   hand_number_++;

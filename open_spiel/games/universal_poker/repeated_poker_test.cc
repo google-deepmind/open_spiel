@@ -116,6 +116,112 @@ void SerializationTest() {
   SPIEL_CHECK_EQ(game_str, game_str2);
 }
 
+void MaxNumHandsTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("repeated_poker",
+               {{"max_num_hands", GameParameter(1)},
+                {"reset_stacks", GameParameter(false)},
+                {"rotate_dealer", GameParameter(true)},
+                {"universal_poker_game_string",
+                 GameParameterFromString(open_spiel::HunlGameString(
+                     "fullgame"))}});
+  std::unique_ptr<State> state_ = game->NewInitialState();
+  RepeatedPokerState* state = dynamic_cast<RepeatedPokerState*>(state_.get());
+  SPIEL_CHECK_EQ(state->HandNumber(), 0);
+  SPIEL_CHECK_FALSE(state->IsTerminal());
+
+  // Deal cards
+  for (int i = 0; i < 4; ++i) {
+    SPIEL_CHECK_TRUE(state->IsChanceNode());
+    state->ApplyAction(state->ChanceOutcomes()[0].first);
+  }
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  // P0 is SB and folds.
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(0);  // Fold
+
+  // Hand is over, max_num_hands=1 is reached, game should be terminal.
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->HandNumber(), 0);
+  // P0 is BB in hand 0 and folded. P1 is SB.
+  // P0 stack: 20000 - 50 = 19950. P1 stack: 20000 + 50 = 20050.
+  std::vector<double> expected_returns = {50.0, -50.0};
+  SPIEL_CHECK_EQ(state->Returns(), expected_returns);
+}
+
+void StacksAndRotationTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("repeated_poker",
+               {{"max_num_hands", GameParameter(3)},
+                {"reset_stacks", GameParameter(false)},
+                {"rotate_dealer", GameParameter(true)},
+                {"universal_poker_game_string",
+                 GameParameterFromString(open_spiel::HunlGameString(
+                     "fullgame"))}});
+  std::unique_ptr<State> state_ = game->NewInitialState();
+  RepeatedPokerState* state = dynamic_cast<RepeatedPokerState*>(state_.get());
+
+  // Hand 0
+  SPIEL_CHECK_EQ(state->HandNumber(), 0);
+  SPIEL_CHECK_EQ(state->Dealer(), 1);
+  SPIEL_CHECK_EQ(state->SmallBlindSeat(), 1);
+  SPIEL_CHECK_EQ(state->BigBlindSeat(), 0);
+  SPIEL_CHECK_EQ(state->PlayerToSeat(0), 0);
+  SPIEL_CHECK_EQ(state->PlayerToSeat(1), 1);
+
+  for (int i = 0; i < 4; ++i) {
+    state->ApplyAction(state->ChanceOutcomes()[0].first);
+  }
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(0);  // P1 folds
+
+  // Hand 1
+  SPIEL_CHECK_EQ(state->HandNumber(), 1);
+  SPIEL_CHECK_EQ(state->Dealer(), 0);
+  SPIEL_CHECK_EQ(state->SmallBlindSeat(), 0);
+  SPIEL_CHECK_EQ(state->BigBlindSeat(), 1);
+  SPIEL_CHECK_EQ(state->PlayerToSeat(0), 0);
+  SPIEL_CHECK_EQ(state->PlayerToSeat(1), 1);
+  std::vector<int> expected_stacks = {20050, 19950};
+  SPIEL_CHECK_EQ(state->Stacks(), expected_stacks);
+  for (int i = 0; i < 4; ++i) {
+    state->ApplyAction(state->ChanceOutcomes()[0].first);
+  }
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(200);  // P0 raises to 200
+  state->ApplyAction(1);  // P1 calls
+  state->ApplyAction(state->ChanceOutcomes()[0].first);  // Flop
+  state->ApplyAction(state->ChanceOutcomes()[0].first);  // Flop
+  state->ApplyAction(state->ChanceOutcomes()[0].first);  // Flop
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(state->StringToAction("player=1 move=Bet300"));
+  state->ApplyAction(0);  // P0 folds
+
+  // Hand 1
+  expected_stacks = {19850, 20150};
+  SPIEL_CHECK_EQ(state->Stacks(), expected_stacks);
+  SPIEL_CHECK_EQ(state->HandNumber(), 2);
+  SPIEL_CHECK_EQ(state->Dealer(), 1);
+  SPIEL_CHECK_EQ(state->SmallBlindSeat(), 1);
+  SPIEL_CHECK_EQ(state->BigBlindSeat(), 0);
+  SPIEL_CHECK_EQ(state->PlayerToSeat(0), 0);
+  SPIEL_CHECK_EQ(state->PlayerToSeat(1), 1);
+  for (int i = 0; i < 4; ++i) {
+    state->ApplyAction(state->ChanceOutcomes()[0].first);
+  }
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(0);  // P1 folds
+  expected_stacks = {19900, 20100};
+  SPIEL_CHECK_EQ(state->Stacks(), expected_stacks);
+
+  // End of game
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->HandNumber(), 2);
+  std::vector<double> expected_returns = {-100.0, 100.0};
+  SPIEL_CHECK_EQ(state->Returns(), expected_returns);
+}
+
 }  // namespace
 }  // namespace repeated_poker
 }  // namespace universal_poker
@@ -127,4 +233,6 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::repeated_poker::BasicRepeatedPokerTest();
   open_spiel::universal_poker::repeated_poker::BlindScheduleTest();
   open_spiel::universal_poker::repeated_poker::SerializationTest();
+  open_spiel::universal_poker::repeated_poker::MaxNumHandsTest();
+  open_spiel::universal_poker::repeated_poker::StacksAndRotationTest();
 }

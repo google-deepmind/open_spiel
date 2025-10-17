@@ -115,6 +115,7 @@ class RepeatedPokerState : public State {
   std::unique_ptr<UniversalPokerState> GetUniversalPokerState() const {
     return std::make_unique<UniversalPokerState>(*universal_poker_state_);
   }
+  int HandNumber() const { return hand_number_; }
   int Dealer() const { return dealer_; }
   int SmallBlind() const { return small_blind_; }
   int BigBlind() const { return big_blind_; }
@@ -153,6 +154,11 @@ class RepeatedPokerState : public State {
   int big_blind_ = kInvalidBlindValue;
   int small_blind_seat_ = kInactivePlayerSeat;
   int big_blind_seat_ = kInactivePlayerSeat;
+  // We adopt a slight variant of the ACPC format for the hand histories:
+  // STATE:<hand_number>:<betting_and_cards>:<returns>:<player_names>
+  // This was introduced by Brown and Sandholm when releasing hands played by
+  // Pluribus. See
+  // https://www.science.org/doi/10.1126/science.aay2400#supplementary-materials
   std::vector<std::string> acpc_hand_histories_{};
   std::vector<std::vector<double>> hand_returns_{
       std::vector<double>(num_players_, 0.0)};
