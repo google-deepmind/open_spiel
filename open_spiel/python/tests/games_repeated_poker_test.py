@@ -61,4 +61,7 @@ class GamesRepeatedPokerTest(absltest.TestCase):
 
 
 if __name__ == "__main__":
-  absltest.main()
+  if "universal_poker" in pyspiel.registered_names():
+    absltest.main()
+  else:
+    print("universal_poker is not registered. Skipping test.")
