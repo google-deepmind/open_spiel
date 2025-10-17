@@ -99,6 +99,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
 
 if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      pybind11/games_repeated_poker.cc
+      pybind11/games_repeated_poker.h
       pybind11/games_universal_poker.cc
       pybind11/games_universal_poker.h
   )
@@ -251,6 +253,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
+  tests/games_repeated_poker_test.py
   tests/games_sim_test.py
   tests/games_tic_tac_toe_test.py
   tests/policy_test.py

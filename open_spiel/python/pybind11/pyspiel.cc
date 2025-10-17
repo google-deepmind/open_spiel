@@ -85,6 +85,7 @@
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
 #endif
 #if OPEN_SPIEL_BUILD_WITH_ACPC
+#include "open_spiel/python/pybind11/games_repeated_poker.h"
 #include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
@@ -752,6 +753,7 @@ PYBIND11_MODULE(pyspiel, m) {
 #endif
 #if OPEN_SPIEL_BUILD_WITH_ACPC
   init_pyspiel_games_universal_poker(m);  // Universal poker game.
+  init_pyspiel_games_repeated_poker(m);  // Repeated poker game.
 #endif
 }  // NOLINT
 

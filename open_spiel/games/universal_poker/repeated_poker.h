@@ -124,6 +124,9 @@ class RepeatedPokerState : public State {
   int DealerSeat() const { return player_to_seat_.at(dealer_); }
   int SmallBlindSeat() const { return small_blind_seat_; }
   int BigBlindSeat() const { return big_blind_seat_; }
+  std::vector<std::string> AcpcHandHistories() const {
+    return acpc_hand_histories_;
+  }
 
  protected:
   void DoApplyAction(Action action) override;
