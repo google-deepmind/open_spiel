@@ -82,6 +82,7 @@ _DEFAULT_PARAMS = {
         # Will be changed to the last player if not overridden.
         -1
     ),
+    "record_full_hand_histories": True,
 }
 
 _GAME_TYPE = pyspiel.GameType(
@@ -299,6 +300,12 @@ class RepeatedPokerkit(pyspiel.Game):
           0, the BB the player with ID 1, the UTG player with ID 2 ... the BTN
           the player with ID 2)
         and so on.
+    "record_full_hand_histories": bool (optional, default=True)
+        Whether to record full resulting per-player PokerkitHandHistory-s (PHH)
+        at the end of each hand. These tend to be extremely useful, but can
+        take up large amounts of memory when the number of hands is very large.
+        Consider setting this to False if you run into memory issues, especially
+        when attempting to serialize this game.
 
   Returns are calculated by summing the returns for each hand.
 
@@ -329,6 +336,7 @@ class RepeatedPokerkit(pyspiel.Game):
   def __init__(self, params=None):
     self.params = params
     self._pokerkit_game_params = {}
+    self._record_full_hand_histories = params.get("record_full_hand_histories")
     self._max_num_hands = params.get("max_num_hands")
     if not self._max_num_hands or not isinstance(self._max_num_hands, int):
       raise ValueError(
@@ -490,7 +498,7 @@ class RepeatedPokerkitState(pyspiel.State):
     self._big_bet_size = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
     self._bring_in = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
 
-    self._wrapped_state_hand_histories: list[str] = []
+    self._wrapped_state_hand_histories: list[list[list[str]]] = []
     # 2-D list where each inner list has length _num_players
     self._hand_returns: list[list[float]] = [[0.0] * game.num_players()]
 
@@ -949,14 +957,22 @@ class RepeatedPokerkitState(pyspiel.State):
     if not self.pokerkit_wrapper_state.is_terminal():
       return
 
+    # NOTE: Past this point we are starting a new hand!
     assert not self.pokerkit_wrapper_state._wrapped_state.status
-
     # Record hand-level information.
     for i, per_seat_returns in enumerate(self.pokerkit_wrapper_state.returns()):
       player: int = self._seat_to_player[i]
       self._hand_returns[-1][player] = per_seat_returns
-    wrapped_state = self.pokerkit_wrapper_state._wrapped_state
-    self._wrapped_state_hand_histories.append(str(wrapped_state))
+
+    if self.get_game()._record_full_hand_histories:
+      # "histories" in the plural since each of these function calls will return
+      # a separate history from the perspective of each individual player in the
+      # hand. (And each of those histories is itself a list of strings - so in
+      # practice this will look like list[list[list[str]]])
+      # NOTE: This can require a very large amount of memory for large games
+      # with many hands and/or players!
+      self._wrapped_state_hand_histories.append(
+          self.pokerkit_wrapper_state.to_struct().poker_hand_histories)
     # Terminate or start a new hand
     if self._hand_number + 1 == self.get_game()._max_num_hands:
       self._is_terminal = True

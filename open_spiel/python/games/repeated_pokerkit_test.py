@@ -1030,6 +1030,76 @@ if IMPORTED_ALL_LIBRARIES:
       # P1 stack: 1000 - 50 = 950. P0 stack: 1000 + 50 = 1050.
       self.assertEqual(state.returns(), [50.0, -50.0])
 
+    def test_record_full_hand_histories_true(self):
+      params = {
+          "max_num_hands": 20,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "record_full_hand_histories": True,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 2,
+              "blinds": "50 100",
+              "stack_sizes": "1000 1000",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+      self.assertEqual(state._hand_number, 0)
+      self.assertEmpty(state._wrapped_state_hand_histories)
+
+      # Play a couple hands where SB folds immediately preflop.
+      for _ in range(10):
+        # 4 chance nodes for hole cards
+        for _ in range(4):
+          state.apply_action(state.chance_outcomes()[0][0])
+        state.apply_action(ACTION_FOLD)
+
+      # Crux of the test: we should have 10 hand histories recorded here.
+      self.assertEqual(state._hand_number, 10)
+      self.assertLen(state._wrapped_state_hand_histories, 10)
+      for hand_history in state._wrapped_state_hand_histories:
+        self.assertNotEmpty(hand_history)
+      self.assertEqual(
+          state._wrapped_state_hand_histories[0][0],
+          # Expected p1 hand history, first hand (p2 hand is censored)
+          ["d dh p1 2c2h", "d dh p2 ????", "p2 f"],
+      )
+      self.assertEqual(
+          state._wrapped_state_hand_histories[0][1],
+          # Expected p2 hand history, first hand (p1 hand is censored)
+          ["d dh p1 ????", "d dh p2 2d2s", "p2 f"],
+      )
+
+    def test_record_full_hand_histories_false(self):
+      params = {
+          "max_num_hands": 20,
+          "reset_stacks": False,
+          "rotate_dealer": True,
+          "record_full_hand_histories": False,
+          "pokerkit_game_params": {
+              "name": "python_pokerkit_wrapper",
+              "num_players": 2,
+              "blinds": "50 100",
+              "stack_sizes": "1000 1000",
+          },
+      }
+      game = pyspiel.load_game("python_repeated_pokerkit", params)
+      state = game.new_initial_state()
+      self.assertEqual(state._hand_number, 0)
+      self.assertEmpty(state._wrapped_state_hand_histories)
+
+      # Play a couple hands where SB folds immediately preflop.
+      for _ in range(10):
+        # 4 chance nodes for hole cards
+        for _ in range(4):
+          state.apply_action(state.chance_outcomes()[0][0])
+        state.apply_action(ACTION_FOLD)
+
+      # Crux of the test: still no hand histories recorded here.
+      self.assertEqual(state._hand_number, 10)
+      self.assertEmpty(state._wrapped_state_hand_histories)
+
     def test_pokerkit_state_to_struct_to_json_two_hands(self):
       params = {
           "max_num_hands": 2,
