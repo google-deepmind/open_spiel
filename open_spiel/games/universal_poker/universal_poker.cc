@@ -185,6 +185,10 @@ const GameType kGameType{
         // "fcpa" for fold, check/call, bet pot and all in (default).
         // Use "fullgame" for the unabstracted game.
         {"bettingAbstraction", GameParameter(std::string("fcpa"))},
+        // Number of simulations to run when calling CalculateOdds. Defaults to
+        // 0, which means that the odds of winning will not be calculated, to
+        // maintain performance by avoiding the overhead of the simulations.
+        {"calcOddsNumSims", GameParameter(0)},
 
         // ------------------------------------------------------------------------
         // Following parameters are used to specify specific subgame.
@@ -231,8 +235,12 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
             /*num_ranks=*/acpc_game_->NumRanksDeck()),
       cur_player_(kChancePlayerId),
       possibleActions_(ACTION_DEAL),
-      betting_abstraction_(static_cast<const UniversalPokerGame *>(game.get())
-                               ->betting_abstraction()) {
+      betting_abstraction_(
+          static_cast<const UniversalPokerGame *>(game.get())
+              ->betting_abstraction()),
+      calc_odds_num_sims_(
+          static_cast<const UniversalPokerGame *>(game.get())
+              ->calc_odds_num_sims()) {
   // -- Optionally apply subgame parameters. -----------------------------------
   // Pot size.
   const int pot_size = game->GetParameters().at("potSize").int_value();
@@ -1043,6 +1051,50 @@ double UniversalPokerState::GetTotalReward(Player player) const {
   return acpc_state_.ValueOfState(player);
 }
 
+std::unique_ptr<StateStruct> UniversalPokerState::ToStruct() const {
+  std::mt19937 rng;
+  auto rv = std::make_unique<UniversalPokerStateStruct>();
+  rv->acpc_state = acpc_state_.ToString();
+  rv->current_player = CurrentPlayer();
+  for (int blind : acpc_game_->blinds()) {
+    rv->blinds.push_back(blind);
+  }
+  std::string betting_history;
+  for (int r = 0; r <= acpc_state_.GetRound(); ++r) {
+    if (r > 0) absl::StrAppend(&betting_history, "/");
+    absl::StrAppend(&betting_history, acpc_state_.BettingSequence(r));
+  }
+  rv->betting_history = betting_history;
+  for (Player p = 0; p < num_players_; ++p) {
+    rv->player_contributions.push_back(acpc_state_.CurrentSpent(p));
+  }
+  rv->pot_size = acpc_state_.TotalSpent();
+  for (Player p = 0; p < num_players_; ++p) {
+    rv->starting_stacks.push_back(acpc_game_->StackSize(p));
+  }
+  logic::CardSet board_cards_set = BoardCards();
+  rv->board_cards = board_cards_set.ToString();
+  for (Player p = 0; p < num_players_; ++p) {
+    logic::CardSet hole_cards_set = HoleCards(p);
+    rv->player_hands.push_back(hole_cards_set.ToString());
+    logic::CardSet combined_cards = hole_cards_set;
+    for (uint8_t card : board_cards_set.ToCardArray()) {
+      combined_cards.AddCard(card);
+    }
+    logic::CardSet best_five_cards = combined_cards.GetBest5Cards();
+    rv->best_hand_rank_types.push_back(
+        logic::HandRankToString(best_five_cards.GetHandRank()));
+    rv->best_five_card_hands.push_back(best_five_cards.ToString());
+  }
+
+  if (calc_odds_num_sims_ > 0) {
+    // We use a default-constructed mt19937 here for determinism in tests.
+    std::mt19937 rng;
+    rv->odds = CalculateOdds(calc_odds_num_sims_, rng);
+  }
+  return rv;
+}
+
 std::unique_ptr<State> UniversalPokerState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
   std::unique_ptr<HistoryDistribution> potential_histories =
@@ -1208,7 +1260,8 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
       acpc_game_(gameDesc_),
       potSize_(ParameterValue<int>("potSize")),
       boardCards_(ParameterValue<std::string>("boardCards")),
-      handReaches_(ParameterValue<std::string>("handReaches")) {
+      handReaches_(ParameterValue<std::string>("handReaches")),
+      calc_odds_num_sims_(ParameterValue<int>("calcOddsNumSims", 0)) {
   std::string betting_abstraction =
       ParameterValue<std::string>("bettingAbstraction");
   if (betting_abstraction == "fc") {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/python/pybind11/games_repeated_poker.h"
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -25,12 +26,27 @@ namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::universal_poker::repeated_poker::RepeatedPokerState;
+using open_spiel::universal_poker::repeated_poker::RepeatedPokerStateStruct;
 
-namespace open_spiel {
-void init_pyspiel_games_repeated_poker(py::module& m) {
-  py::module_ repeated_poker = m.def_submodule("repeated_poker");
+void open_spiel::init_pyspiel_games_repeated_poker(py::module& m) {
+  py::module sub = m.def_submodule("repeated_poker");
 
-  py::classh<RepeatedPokerState, State>(repeated_poker, "RepeatedPokerState")
+  py::class_<RepeatedPokerStateStruct, StateStruct>(
+      sub, "RepeatedPokerStateStruct")
+      .def(py::init<>())
+      .def_readwrite("hand_number", &RepeatedPokerStateStruct::hand_number)
+      .def_readwrite("max_num_hands", &RepeatedPokerStateStruct::max_num_hands)
+      .def_readwrite("stacks", &RepeatedPokerStateStruct::stacks)
+      .def_readwrite("dealer", &RepeatedPokerStateStruct::dealer)
+      .def_readwrite("small_blind", &RepeatedPokerStateStruct::small_blind)
+      .def_readwrite("big_blind", &RepeatedPokerStateStruct::big_blind)
+      .def_readwrite("hand_returns", &RepeatedPokerStateStruct::hand_returns)
+      .def_readwrite("current_universal_poker_json",
+                     &RepeatedPokerStateStruct::current_universal_poker_json)
+      .def_readwrite("prev_universal_poker_json",
+                     &RepeatedPokerStateStruct::prev_universal_poker_json);
+
+  py::classh<RepeatedPokerState, State>(sub, "RepeatedPokerState")
       .def("dealer", &RepeatedPokerState::Dealer)
       .def("small_blind", &RepeatedPokerState::SmallBlind)
       .def("big_blind", &RepeatedPokerState::BigBlind)
@@ -41,7 +57,6 @@ void init_pyspiel_games_repeated_poker(py::module& m) {
       .def("small_blind_seat", &RepeatedPokerState::SmallBlindSeat)
       .def("big_blind_seat", &RepeatedPokerState::BigBlindSeat)
       .def("acpc_hand_histories", &RepeatedPokerState::AcpcHandHistories)
-      // Pickle support
       .def(py::pickle(
           [](const RepeatedPokerState& state) {  // __getstate__
             return SerializeGameAndState(*state.GetGame(), state);
@@ -53,5 +68,3 @@ void init_pyspiel_games_repeated_poker(py::module& m) {
                 game_and_state.second.release());
           }));
 }
-}  // namespace open_spiel
-
