@@ -33,6 +33,7 @@
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -71,6 +72,35 @@ enum StateActionType {
 constexpr StateActionType ALL_ACTIONS[5] = {
     ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET, ACTION_ALL_IN};
 
+struct UniversalPokerStateStruct : StateStruct {
+  std::string acpc_state;
+  int current_player;
+  std::vector<int> blinds;
+  std::string betting_history;
+  std::vector<int> player_contributions;
+  int pot_size;
+  std::vector<int> starting_stacks;
+  std::vector<std::string> player_hands;
+  std::string board_cards;
+  std::vector<std::string> best_hand_rank_types;
+  std::vector<std::string> best_five_card_hands;
+  std::vector<double> odds;
+
+  UniversalPokerStateStruct() = default;
+  explicit UniversalPokerStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override {
+    return *this;
+  }
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(
+      UniversalPokerStateStruct, acpc_state, current_player, blinds,
+      betting_history, player_contributions, pot_size, starting_stacks,
+      player_hands, board_cards, best_hand_rank_types,
+      best_five_card_hands, odds);
+};
+
 class UniversalPokerState : public State {
  public:
   explicit UniversalPokerState(std::shared_ptr<const Game> game);
@@ -92,6 +122,7 @@ class UniversalPokerState : public State {
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
 
   // The probability of taking each possible action in a particular info state.
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -113,6 +144,8 @@ class UniversalPokerState : public State {
   // percentage.
   std::vector<double> CalculateOdds(int num_simulations,
                                     std::mt19937& rng) const;
+  int calc_odds_num_sims() const { return calc_odds_num_sims_; }
+  void SetCalcOddsNumSims(int num_sims) { calc_odds_num_sims_ = num_sims; }
 
   const acpc_cpp::ACPCState &acpc_state() const { return acpc_state_; }
   const BettingAbstraction &betting() const { return betting_abstraction_; }
@@ -175,6 +208,7 @@ class UniversalPokerState : public State {
   std::vector <std::pair <Action, double>> DistributeHandCardsInSubgame() const;
   bool IsDistributingSingleCard() const;
   std::vector <int> GetEncodingBase() const;
+  int calc_odds_num_sims_;
 };
 
 class UniversalPokerGame : public Game {
@@ -201,6 +235,7 @@ class UniversalPokerGame : public Game {
   double MaxCommitment() const;
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
   std::string parseParameters(const GameParameters &map);
+  int calc_odds_num_sims() const { return calc_odds_num_sims_; }
 
  private:
   std::string gameDesc_;
@@ -212,6 +247,7 @@ class UniversalPokerGame : public Game {
   BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
   int big_blind_;
   int max_stack_size_;
+  int calc_odds_num_sims_;
 };
 
 // Only supported for UniversalPoker. Randomly plays an action from a fixed list

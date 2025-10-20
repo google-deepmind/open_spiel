@@ -1155,6 +1155,64 @@ void CalculateOddsTestTerminalState() {
   SPIEL_CHECK_LT(std::abs(equities[3] - 1.0), 0.0001);
 }
 
+void TestStateStruct() {
+  std::shared_ptr<const Game> game = LoadGame(HunlGameString("fullgame"));
+  std::unique_ptr<State> state = game->NewInitialState();
+  UniversalPokerState* up_state = down_cast<UniversalPokerState*>(state.get());
+  std::unique_ptr<StateStruct> state_struct = up_state->ToStruct();
+  SPIEL_CHECK_EQ(state_struct->ToJson(), up_state->ToJson());
+  UniversalPokerStateStruct* up_state_struct =
+      down_cast<UniversalPokerStateStruct*>(state_struct.get());
+  SPIEL_CHECK_EQ(up_state_struct->current_player, kChancePlayerId);
+  SPIEL_CHECK_EQ(up_state_struct->blinds, std::vector<int>({100, 50}));
+  SPIEL_CHECK_EQ(up_state_struct->betting_history, "");
+  SPIEL_CHECK_EQ(up_state_struct->pot_size, 150);
+  SPIEL_CHECK_EQ(up_state_struct->starting_stacks,
+                 std::vector<int>({20000, 20000}));
+  SPIEL_CHECK_EQ(up_state_struct->board_cards.size(), 0);
+  SPIEL_CHECK_EQ(up_state_struct->player_hands.size(), 2);
+  SPIEL_CHECK_TRUE(up_state_struct->player_hands[0].empty());
+  SPIEL_CHECK_TRUE(up_state_struct->player_hands[1].empty());
+  SPIEL_CHECK_EQ(up_state_struct->player_contributions.size(), 2);
+  SPIEL_CHECK_EQ(up_state_struct->player_contributions[0], 100);
+  SPIEL_CHECK_EQ(up_state_struct->player_contributions[1], 50);
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types.size(), 2);
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types[0], "High Card");
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types[1], "High Card");
+  SPIEL_CHECK_EQ(up_state_struct->best_five_card_hands.size(), 2);
+  SPIEL_CHECK_TRUE(up_state_struct->best_five_card_hands[0].empty());
+  SPIEL_CHECK_TRUE(up_state_struct->best_five_card_hands[1].empty());
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal As"));
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal Ac"));
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal Ks"));
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal Kc"));
+  state->ApplyAction(state->StringToAction("player=1 move=Bet300"));
+  state->ApplyAction(state->StringToAction("player=0 move=Bet1000"));
+  state->ApplyAction(state->StringToAction("player=1 move=Call"));
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal Qc"));
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal Js"));
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal Tc"));
+  state->ApplyAction(state->StringToAction("player=0 move=Call"));
+  state_struct = up_state->ToStruct();
+  up_state_struct = down_cast<UniversalPokerStateStruct*>(state_struct.get());
+  SPIEL_CHECK_EQ(up_state_struct->board_cards, "QcJsTc");
+  SPIEL_CHECK_EQ(up_state_struct->player_hands[0], "AsAc");
+  SPIEL_CHECK_EQ(up_state_struct->player_hands[1], "KsKc");
+  SPIEL_CHECK_EQ(up_state_struct->player_contributions[0], 1000);
+  SPIEL_CHECK_EQ(up_state_struct->player_contributions[1], 1000);
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types.size(), 2);
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types[0], "Pair");
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types[1], "Pair");
+  SPIEL_CHECK_EQ(up_state_struct->best_five_card_hands[0], "AsAcQcJsTc");
+  SPIEL_CHECK_EQ(up_state_struct->best_five_card_hands[1], "KsKcQcJsTc");
+  state->ApplyAction(state->StringToAction("player=1 move=Call"));
+  state->ApplyAction(state->StringToAction("player=-1 move=Deal 9c"));
+  state_struct = up_state->ToStruct();
+  up_state_struct = down_cast<UniversalPokerStateStruct*>(state_struct.get());
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types[0], "Pair");
+  SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types[1], "Straight");
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -1198,4 +1256,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::CalculateOddsTest3p();
   open_spiel::universal_poker::CalculateOddsTestInitialState();
   open_spiel::universal_poker::CalculateOddsTestTerminalState();
+  open_spiel::universal_poker::TestStateStruct();
 }

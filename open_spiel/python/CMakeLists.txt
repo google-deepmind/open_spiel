@@ -256,6 +256,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_repeated_poker_test.py
   tests/games_sim_test.py
   tests/games_tic_tac_toe_test.py
+  tests/games_universal_poker_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
