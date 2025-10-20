@@ -20,6 +20,7 @@ import logging
 import random
 
 from absl.testing import absltest
+from absl.testing import parameterized
 
 # Hack to handle an inability to import pokerkit gracefully. Necessary since
 # OpenSpiel may support earlier versions of python that pokerkit doesn't.
@@ -71,7 +72,7 @@ if IMPORTED_ALL_LIBRARIES:
   ACTION_CHECK_OR_CALL = pokerkit_wrapper.ACTION_CHECK_OR_CALL
   FOLD_AND_CHECK_OR_CALL_ACTIONS = [ACTION_FOLD, ACTION_CHECK_OR_CALL]
 
-  class PokerkitWrapperTest(absltest.TestCase):
+  class PokerkitWrapperTest(parameterized.TestCase):
     """Test the OpenSpiel game wrapper for Pokerkit."""
 
     # --- Lightweight testing to verify that the 'usage' directories are at
@@ -1231,19 +1232,21 @@ if IMPORTED_ALL_LIBRARIES:
       state.apply_action(ACTION_FOLD)
 
       self.assertEqual(wrapped_state.stacks, [0, 1, 1])
-      self.assertEqual(
-          state.legal_actions(),
-          [ACTION_FOLD, ACTION_CHECK_OR_CALL],
-      )
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
       self.assertEqual(state.action_to_string(ACTION_CHECK_OR_CALL), "Call(1)")
 
-    def test_smaller_effective_stack_size_does_not_limit_bet_actions(self):
+    def test_postflop_smaller_effective_stack_size_does_not_limit_bet_actions(
+        self,
+    ):
       # Proves that we don't need to consider the 'single chip shoves' edge
       # case as a result of *other* players having only one chip in their stack.
       params = {
           "variant": "NoLimitTexasHoldem",
           "num_players": 3,
           "blinds": "10 20",
+          # NOTE: Remember that the first player to act preflop will be the
+          # third stack, but the first player to act *postflop* will be the 1st
+          # stack (25 chips).
           "stack_sizes": "25 21 21",
       }
       game = pyspiel.load_game("python_pokerkit_wrapper", params)
@@ -1253,6 +1256,8 @@ if IMPORTED_ALL_LIBRARIES:
         state.apply_action(
             random.choice([o for o, _ in state.chance_outcomes()])
         )
+      # BTN acts first preflop
+      self.assertEqual(state.current_player(), 2)
       state.apply_action(ACTION_CHECK_OR_CALL)
       state.apply_action(ACTION_CHECK_OR_CALL)
       state.apply_action(ACTION_CHECK_OR_CALL)
@@ -1260,6 +1265,9 @@ if IMPORTED_ALL_LIBRARIES:
         state.apply_action(
             random.choice([o for o, _ in state.chance_outcomes()])
         )
+
+      # SB acts first postflop
+      self.assertEqual(state.current_player(), 0)
       self.assertEqual(wrapped_state.stacks, [5, 1, 1])
       self.assertEqual(
           state.legal_actions(), [ACTION_CHECK_OR_CALL, 2, 3, 4, 5]
@@ -1290,6 +1298,85 @@ if IMPORTED_ALL_LIBRARIES:
       state.apply_action(ACTION_FOLD)
       self.assertTrue(state.is_terminal())
       self.assertEqual(state.returns(), [40, -20, -20])
+
+    def test_preflop_smaller_effective_stack_size_does_not_limit_bet_actions(
+        self,
+    ):
+      # Proves that we don't need to consider the 'single chip shoves' edge
+      # case as a result of *other* players having only one chip in their stack.
+      params = {
+          "variant": "NoLimitTexasHoldem",
+          "num_players": 3,
+          "blinds": "10 20",
+          # NOTE: Remember that the first player to act preflop will be the
+          # third stack, but the first player to act *postflop* will be the 1st
+          # stack (25 chips).
+          "stack_sizes": "11 21 25",
+      }
+      game = pyspiel.load_game("python_pokerkit_wrapper", params)
+      state = game.new_initial_state()
+      wrapped_state: pokerkit.State = state._wrapped_state
+      while state.is_chance_node():
+        state.apply_action(
+            random.choice([o for o, _ in state.chance_outcomes()])
+        )
+      # BTN acts first preflop
+      self.assertEqual(state.current_player(), 2)
+      self.assertEqual(wrapped_state.stacks, [1, 1, 25])
+      self.assertEqual(
+          state.legal_actions(),
+          [ACTION_FOLD, ACTION_CHECK_OR_CALL, 21, 22, 23, 24, 25],
+      )
+      self.assertEqual(state.action_to_string(ACTION_CHECK_OR_CALL), "Call(20)")
+      for i in range(21, 26):
+        self.assertEndsWith(state.action_to_string(i), f"Bet/Raise to {i}")
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      # ... and only now do we loop back around to the SB / player 0, ...
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(wrapped_state.stacks, [1, 1, 5])
+      self.assertEqual(
+          state.legal_actions(),
+          # NOTE: 11 chips, not 21! Meaning they cannot re-raise - just calling
+          # will already be putting them all-in.
+          [ACTION_FOLD, ACTION_CHECK_OR_CALL],
+      )
+      self.assertEqual(state.action_to_string(ACTION_CHECK_OR_CALL), "Call(1)")
+      self.assertEqual(state._wrapped_state.checking_or_calling_amount, 1)
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      self.assertEqual(state.current_player(), 1)
+      self.assertEqual(wrapped_state.stacks, [0, 1, 5])
+      self.assertEqual(
+          state.action_to_string(ACTION_CHECK_OR_CALL), "Player 1: Check"
+      )
+      # Note that BB by definition cannot fold since nobody has raised over
+      # their Big-blind yet. So they can only check or re-raise.
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 21])
+      # Extra asserts just to make extra sure that the underlying pokerkit state
+      # is behaving as expected.
+      self.assertFalse(state._wrapped_state.can_complete_bet_or_raise_to(1))
+      self.assertFalse(state._wrapped_state.can_complete_bet_or_raise_to(20))
+      self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to(21))
+      self.assertEqual(state.action_to_string(21), "Player 1: Bet/Raise to 21")
+      state.apply_action(21)
+
+      self.assertEqual(wrapped_state.stacks, [0, 0, 5])
+      self.assertEqual(
+          state.legal_actions(),
+          [ACTION_FOLD, ACTION_CHECK_OR_CALL],
+      )
+      state.apply_action(ACTION_FOLD)  # BTN folds
+
+      # Both SB and BB are already all-in so the hand should be over once we go
+      # deal all the board cards.
+      self.assertFalse(state.is_terminal())
+      self.assertTrue(state.is_chance_node())
+      while state.is_chance_node():
+        state.apply_action(
+            random.choice([o for o, _ in state.chance_outcomes()])
+        )
+      self.assertTrue(state.is_terminal())
 
     def test_razz_vs_seven_card_stud_eval(self):
       card_sequence = [
@@ -1481,7 +1568,552 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertIn("d dh p1 ????", phh_p1)
       self.assertIn("d dh p2 QdJd", phh_p1)
 
-  class PokerkitWrapperAcpcStyleTest(absltest.TestCase):
+    def test_regression_includes_action_1_to_post_bring_in(self):
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "2000 2000",
+          # Normally each of these is double the smaller, e.g. 5 10 20. But in
+          # this case it's useful to offset them a little more so that in the
+          # event of any bugs we can clearly determine which of these parameters
+          # are controlling what behavior in the game logic.
+          "bring_in": 30,
+          "small_bet": 70,
+          "big_bet": 175,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      state = stud_game.new_initial_state()
+
+      # Unlike NLHE, 7 card stud has down cards and up cards. Where each player
+      # should gets *three* total cards instead of two.
+      p0_down1 = Card(ACE, DIAMOND)
+      p0_down2 = Card(KING, DIAMOND)
+      p0_up1 = Card(DEUCE, SPADE)
+      p0_up2 = Card(QUEEN, CLUB)
+
+      p1_down1 = Card(ACE, HEART)
+      p1_down2 = Card(KING, HEART)
+      p1_up1 = Card(TREY, SPADE)
+      p1_up2 = Card(EIGHT, SPADE)
+
+      card_sequence_street3 = [
+          p0_down1,
+          p1_down1,
+          p0_down2,
+          p1_down2,
+          p0_up1,
+          p1_up1,
+      ]
+      card_sequence_street4 = [p0_up2, p1_up2]
+      for card in card_sequence_street3:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Check no board cards are dealt in stud
+      self.assertEqual(state._wrapped_state.board_cards, [])
+
+      # P0 has 2s upcard (lowest), P1 has 3s upcard. So by the rules of 7 card
+      # stud, P0 must act first: either posting the bring-in or betting the
+      # small bet, and is *not* allowed to simply fold/check/call here.
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(state.legal_actions(), [1, 70])
+      self.assertEqual(state.action_to_string(1), "Player 0: Post Bring-in 30")
+      self.assertEqual(state.action_to_string(70), "Player 0: Bet/Raise to 70")
+      state.apply_action(1)
+
+      # P1 should be able to fold, call, or 'complete' the small bet (since
+      # P0 only posted the bring-in, not the full small bet of 70)
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL, 70]
+      )
+      state.apply_action(70)
+
+      # P0 can only fold or re-raise by the small bet (70 + 70 => 140). Notably
+      # this is adding more chips than earlier when only 'completing' the small
+      # bet was allowed (as opposed to raising by it).
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL, 140]
+      )
+      state.apply_action(140)
+
+      # And finally P1 can either fold or (re-)re-raise by the small bet 140
+      # + 70 => 210. Which is again larger than earlier when they were
+      # 'completing' the small bet.
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL, 210]
+      )
+      state.apply_action(210)
+
+      state.apply_action(ACTION_CHECK_OR_CALL)
+
+      for card in card_sequence_street4:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Double check that bring_in only affects the prior street (i.e. the
+      # 3rd street) and not betting on later streets like this one.
+      self.assertEqual(state.current_player(), 0)
+      self.assertFalse(state.is_terminal())
+      # small_bet => 70, not 30 (bring_in)
+      self.assertEqual(state.legal_actions(), [ACTION_CHECK_OR_CALL, 70])
+      self.assertEqual(state._action_to_string(0, 1), "Player 0: Check")
+      state.apply_action(70)
+
+      self.assertEqual(state.current_player(), 1)
+      self.assertFalse(state.is_terminal())
+      # small_bet + small_bet => 140
+      self.assertEqual(
+          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL, 140]
+      )
+      state.apply_action(ACTION_FOLD)
+
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [210, -210])
+
+    @parameterized.parameters(1, 50)
+    def test_two_actions_same_result_if_bringin_equals_stack(
+        self, chosen_action_at_state_allowing_bring_in
+    ):
+      """Verifies our 1 'Post Bring-in' does the same as betting 50 chips here.
+
+      Context: If the bring-in is equal to (or less than) their stack, this hits
+      an edge case: pokerkit allows for *either* calling post_bring_in() OR
+      betting for the same result here. But, they technically are different
+      function calls in pokerkit / will be getting mapped to different actions.
+      The goal of this test is to verify that both actions actually end up doing
+      the same thing.
+
+      Args:
+        chosen_action_at_state_allowing_bring_in: The action chosen at the state
+          where both "Post Bring-in" and "Bet/Raise to" are legal and *should*
+          result in the same outcome.
+      """
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "50 50",
+          "bring_in": 50,
+          "small_bet": 100,
+          "big_bet": 200,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      state = stud_game.new_initial_state()
+
+      # Unlike NLHE, 7 card stud has down cards and up cards. Where each player
+      # should gets *three* total cards instead of two. Additionally, the up
+      # cards control the player betting order, so it's useful to explicitly
+      # define these all.
+      p0_down1 = Card(ACE, DIAMOND)
+      p0_down2 = Card(KING, DIAMOND)
+      p0_up1 = Card(DEUCE, SPADE)
+      p1_down1 = Card(ACE, HEART)
+      p1_down2 = Card(KING, HEART)
+      p1_up1 = Card(TREY, SPADE)
+      card_sequence_street3 = [
+          p0_down1,
+          p1_down1,
+          p0_down2,
+          p1_down2,
+          p0_up1,
+          p1_up1,
+      ]
+      for card in card_sequence_street3:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Check no board cards are dealt in stud
+      self.assertEqual(state._wrapped_state.board_cards, [])
+
+      # P0 has 2s upcard (lowest), P1 has 3s upcard. So by the rules of 7 card
+      # stud, P0 must act first.
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(state.legal_actions(), [1, 50])
+      self.assertEqual(state.action_to_string(1), "Player 0: Post Bring-in 50")
+      self.assertEqual(state.action_to_string(50), "Player 0: Bet/Raise to 50")
+      # Double checking that we're indeed in the edge case we were worried about
+      self.assertTrue(state._wrapped_state.can_post_bring_in())
+      self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to())
+      self.assertEqual(state._wrapped_state.effective_bring_in_amount, 50)
+      self.assertEqual(
+          state._wrapped_state.min_completion_betting_or_raising_to_amount, 50
+      )
+      # **** This is where the two parameterized test cases diverge! Notably,
+      # despite choosing different actions the *results* should be exactly the
+      # same past this point. ****
+      state.apply_action(chosen_action_at_state_allowing_bring_in)
+
+      # P1 should only be able to fold or call
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      state.apply_action(ACTION_FOLD)
+
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [0, 0])
+
+    @parameterized.parameters(1, 10)
+    def test_two_actions_same_result_if_bringin_greater_than_stack(
+        self, chosen_action_at_state_allowing_bring_in
+    ):
+      """Verifies our 1 'Post Bring-in' does the same as betting 10 chips here.
+
+      Context: If the bring-in is less than (or equal to) their stack, this hits
+      an edge case: pokerkit allows for *either* calling post_bring_in() OR
+      betting for the same result here. But, they technically are different
+      function calls in pokerkit / will be getting mapped to different actions.
+      The goal of this test is to verify that both actions actually end up doing
+      the same thing.
+
+      Args:
+        chosen_action_at_state_allowing_bring_in: The action chosen at the state
+          where both "Post Bring-in" and "Bet/Raise to" are legal and *should*
+          result in the same outcome.
+      """
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "10 10",
+          "bring_in": 50,
+          "small_bet": 100,
+          "big_bet": 200,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      state = stud_game.new_initial_state()
+
+      # Unlike NLHE, 7 card stud has down cards and up cards. Where each player
+      # should gets *three* total cards instead of two. Additionally, the up
+      # cards control the player betting order, so it's useful to explicitly
+      # define these all.
+      p0_down1 = Card(ACE, DIAMOND)
+      p0_down2 = Card(KING, DIAMOND)
+      p0_up1 = Card(DEUCE, SPADE)
+      p1_down1 = Card(ACE, HEART)
+      p1_down2 = Card(KING, HEART)
+      p1_up1 = Card(TREY, SPADE)
+      card_sequence_street3 = [
+          p0_down1,
+          p1_down1,
+          p0_down2,
+          p1_down2,
+          p0_up1,
+          p1_up1,
+      ]
+      for card in card_sequence_street3:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Check no board cards are dealt in stud
+      self.assertEqual(state._wrapped_state.board_cards, [])
+
+      # P0 has 2s upcard (lowest), P1 has 3s upcard. So by the rules of 7 card
+      # stud, P0 must act first.
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(state.legal_actions(), [1, 10])
+      self.assertEqual(state.action_to_string(1), "Player 0: Post Bring-in 10")
+      self.assertEqual(state.action_to_string(10), "Player 0: Bet/Raise to 10")
+      # Double checking that we're indeed in the edge case we were worried about
+      self.assertTrue(state._wrapped_state.can_post_bring_in())
+      self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to())
+      self.assertEqual(state._wrapped_state.effective_bring_in_amount, 10)
+      self.assertEqual(
+          state._wrapped_state.min_completion_betting_or_raising_to_amount, 10
+      )
+      # **** This is where the two parameterized test cases diverge! Notably,
+      # despite choosing different actions the *results* should be exactly the
+      # same past this point. ****
+      state.apply_action(chosen_action_at_state_allowing_bring_in)
+
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      state.apply_action(ACTION_FOLD)
+
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [0, 0])
+
+    @parameterized.parameters(1, 10)
+    def test_two_actions_same_result_if_bringin_between_stack_and_effective_stack(
+        self, chosen_action_at_state_allowing_bring_in
+    ):
+      """Verifies our 1 'Post Bring-in' does the same as betting 50 chips here.
+
+      For more context, see the above 'test_two_actions_same_result...'
+      functions. This test verifies an additional edge case beyond that in the
+      above tests about whether the same results hold true if only the
+      *effective* stack is less than the bring_in, but the actual player's stack
+      is larger. (And, while it does, also cleanly demonstrates how the action
+      mapping doesn't care about the first player's actual stack size being
+      larger; only the effective stack matters.)
+
+      Args:
+        chosen_action_at_state_allowing_bring_in: The action chosen at the state
+          where both "Post Bring-in" and "Bet/Raise to" are legal and *should*
+          result in the same outcome.
+      """
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "500 10",
+          "bring_in": 50,
+          "small_bet": 100,
+          "big_bet": 200,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      state = stud_game.new_initial_state()
+
+      # Unlike NLHE, 7 card stud has down cards and up cards. Where each player
+      # should gets *three* total cards instead of two. Additionally, the up
+      # cards control the player betting order, so it's useful to explicitly
+      # define these all.
+      p0_down1 = Card(ACE, DIAMOND)
+      p0_down2 = Card(KING, DIAMOND)
+      p0_up1 = Card(DEUCE, SPADE)
+      p1_down1 = Card(ACE, HEART)
+      p1_down2 = Card(KING, HEART)
+      p1_up1 = Card(TREY, SPADE)
+      card_sequence_street3 = [
+          p0_down1,
+          p1_down1,
+          p0_down2,
+          p1_down2,
+          p0_up1,
+          p1_up1,
+      ]
+      for card in card_sequence_street3:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Check no board cards are dealt in stud
+      self.assertEqual(state._wrapped_state.board_cards, [])
+
+      # P0 has 2s upcard (lowest), P1 has 3s upcard. So by the rules of 7 card
+      # stud, P0 must act first.
+      self.assertEqual(state.current_player(), 0)
+      # Double checking that we didn't mix up which player had which stack above
+      # and that their effective stack is indeed much smaller.
+      self.assertEqual(state._wrapped_state.stacks[0], 500)
+      self.assertEqual(state._wrapped_state.get_effective_stack(0), 10)
+
+      self.assertEqual(state.legal_actions(), [1, 10])
+      # NOTE: Interestingly the value of the *effective_bring_in* in pokerkit
+      # actually doesn't reflect the effective stack - which differs from
+      # everything else, including the betting values! (And yet, despite this
+      # all being different, in practice they should still always produce the
+      # exact same results here.)
+      self.assertEqual(state.action_to_string(1), "Player 0: Post Bring-in 50")
+      self.assertEqual(state.action_to_string(10), "Player 0: Bet/Raise to 10")
+
+      # Double checking that we're indeed in the edge case we were worried about
+      self.assertTrue(state._wrapped_state.can_post_bring_in())
+      self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to())
+      # NOTE: As above, this is counterintuitive but expected and harmless (so
+      # long as e.g. we don't put in any overly-aggressive asserts ourselves).
+      self.assertEqual(state._wrapped_state.effective_bring_in_amount, 50)
+      self.assertEqual(
+          state._wrapped_state.min_completion_betting_or_raising_to_amount, 10
+      )
+      # **** This is where the two parameterized test cases diverge! Notably,
+      # despite choosing different actions the *results* should be exactly the
+      # same past this point. ****
+      state.apply_action(chosen_action_at_state_allowing_bring_in)
+
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      state.apply_action(ACTION_FOLD)
+
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [0, 0])
+
+    @parameterized.parameters(1, 2)
+    def test_bring_in_action_still_1_when_mapping_stack_size_1_shove_to_2(
+        self, chosen_action_at_state_allowing_bring_in
+    ):
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "1 1",
+          "bring_in": 50,
+          "small_bet": 100,
+          "big_bet": 200,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      state = stud_game.new_initial_state()
+      p0_down1 = Card(ACE, DIAMOND)
+      p0_down2 = Card(KING, DIAMOND)
+      p0_up1 = Card(DEUCE, SPADE)
+      p1_down1 = Card(ACE, HEART)
+      p1_down2 = Card(KING, HEART)
+      p1_up1 = Card(TREY, SPADE)
+      card_sequence_street3 = [
+          p0_down1,
+          p1_down1,
+          p0_down2,
+          p1_down2,
+          p0_up1,
+          p1_up1,
+      ]
+      for card in card_sequence_street3:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Check no board cards are dealt in stud
+      self.assertEqual(state._wrapped_state.board_cards, [])
+
+      # P0 has 2s upcard (lowest), P1 has 3s upcard. So by the rules of 7 card
+      # stud, P0 must act first.
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(state.legal_actions(), [1, 2])
+      # ** Key part of this test - even if bet/raises get remapped bring-in
+      # should not be affected **
+      self.assertEqual(state.action_to_string(1), "Player 0: Post Bring-in 1")
+      self.assertEqual(
+          state.action_to_string(2),
+          "Player 0: Bet/Raise to 1 [ALL-IN EDGECASE]",
+      )
+      # Double checking that we're indeed in the edge case we were worried about
+      self.assertTrue(state._wrapped_state.can_post_bring_in())
+      self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to())
+      self.assertEqual(state._wrapped_state.effective_bring_in_amount, 1)
+      self.assertEqual(
+          state._wrapped_state.min_completion_betting_or_raising_to_amount, 1
+      )
+
+      # **** This is where the two parameterized test cases diverge! Notably,
+      # despite choosing different actions the *results* should be exactly the
+      # same past this point. ****
+      state.apply_action(chosen_action_at_state_allowing_bring_in)
+
+      # P1 should only be able to fold or call since they also have 1 chip.
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      state.apply_action(ACTION_FOLD)
+
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [0, 0])
+
+    @parameterized.parameters(1, 2)
+    def test_regression_bring_in_1_when_only_effective_stack_is_1(
+        self, chosen_action_at_state_allowing_bring_in
+    ):
+      """Only effective stack is 1 => the player's actual stack is NOT 1."""
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "300 1",
+          "bring_in": 50,
+          "small_bet": 100,
+          "big_bet": 200,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      state = stud_game.new_initial_state()
+      p0_down1 = Card(ACE, DIAMOND)
+      p0_down2 = Card(KING, DIAMOND)
+      p0_up1 = Card(DEUCE, SPADE)
+      p1_down1 = Card(ACE, HEART)
+      p1_down2 = Card(KING, HEART)
+      p1_up1 = Card(TREY, SPADE)
+      card_sequence_street3 = [
+          p0_down1,
+          p1_down1,
+          p0_down2,
+          p1_down2,
+          p0_up1,
+          p1_up1,
+      ]
+      for card in card_sequence_street3:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Check no board cards are dealt in stud
+      self.assertEqual(state._wrapped_state.board_cards, [])
+
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(state.legal_actions(), [1, 2])
+      self.assertEqual(state.action_to_string(1), "Player 0: Post Bring-in 50")
+
+      # "Remapped" action 2 avoids conflicting with the bring_in action just
+      # like how it would normally avoid conflicting with ACTION_CHECK_OR_CALL.
+      # (See # the relevant logic / comments in pokerkit_wrapper.py for more
+      # detail on how this works + why it's correct.)
+      self.assertEqual(
+          state.action_to_string(2),
+          "Player 0: Bet/Raise to 1 [ALL-IN EDGECASE]",
+      )
+
+      # Double checking that we're indeed in the edge case we were worried about
+      self.assertTrue(state._wrapped_state.can_post_bring_in())
+      self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to())
+      self.assertEqual(state._wrapped_state.effective_bring_in_amount, 50)
+      self.assertEqual(
+          state._wrapped_state.min_completion_betting_or_raising_to_amount, 1
+      )
+      # **** This is where the two parameterized test cases diverge! Notably,
+      # despite choosing different actions the *results* should be exactly the
+      # same past this point. ****
+      state.apply_action(chosen_action_at_state_allowing_bring_in)
+
+      # P1 should only be able to fold or call since they also have 1 chip.
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      state.apply_action(ACTION_FOLD)
+
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [0, 0])
+
+    def test_bring_in_2_does_not_map_to_bet_1_if_effective_stack_is_2(self):
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "300 2",
+          "bring_in": 50,
+          "small_bet": 100,
+          "big_bet": 200,
+      }
+      stud_game = PokerkitWrapper(stud_params)
+      state = stud_game.new_initial_state()
+      p0_down1 = Card(ACE, DIAMOND)
+      p0_down2 = Card(KING, DIAMOND)
+      p0_up1 = Card(DEUCE, SPADE)
+      p1_down1 = Card(ACE, HEART)
+      p1_down2 = Card(KING, HEART)
+      p1_up1 = Card(TREY, SPADE)
+      card_sequence_street3 = [
+          p0_down1,
+          p1_down1,
+          p0_down2,
+          p1_down2,
+          p0_up1,
+          p1_up1,
+      ]
+      for card in card_sequence_street3:
+        self.assertTrue(state.is_chance_node())
+        state.apply_action(stud_game.card_to_int[card])
+
+      # Check no board cards are dealt in stud
+      self.assertEqual(state._wrapped_state.board_cards, [])
+
+      self.assertEqual(state.current_player(), 0)
+      self.assertEqual(state.legal_actions(), [1, 2])
+      # NOTE: effective_bring_in doesn't care about effective stacks!
+      self.assertEqual(state.action_to_string(1), "Player 0: Post Bring-in 50")
+
+      # ** First important main part of the test - making sure this action 2
+      # isn't being billed as a 'shove for 1 chip' action in its string **
+      self.assertEqual(state.action_to_string(2), "Player 0: Bet/Raise to 2")
+
+      # Double checking that we're indeed in the edge case we were worried about
+      self.assertTrue(state._wrapped_state.can_post_bring_in())
+      self.assertTrue(state._wrapped_state.can_complete_bet_or_raise_to())
+      # NOTE: effective_bring_in doesn't care about effective stacks!
+      self.assertEqual(state._wrapped_state.effective_bring_in_amount, 50)
+      self.assertEqual(
+          state._wrapped_state.min_completion_betting_or_raising_to_amount, 2
+      )
+
+      # ** Second important main part of the test - making sure this action 2
+      # is actually being _interpreted_ properly when applied. **
+      state.apply_action(2)
+
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      state.apply_action(ACTION_FOLD)
+
+      self.assertTrue(state.is_terminal())
+      self.assertEqual(state.returns(), [0, 0])
+
+  class PokerkitWrapperAcpcStyleTest(parameterized.TestCase):
     """Test the OpenSpiel game wrapper for Pokerkit."""
 
     # TODO: b/437724266 - port over more OpenSpiel universal_poker tests to
@@ -1696,9 +2328,7 @@ if IMPORTED_ALL_LIBRARIES:
       # PokerkitWrapper - since on all following streets both players will have
       # contributed chips on this street (and thus ACPC style actions will be
       # different).
-      expected_actions = [ACTION_FOLD, ACTION_CHECK_OR_CALL] + list(
-          range(100, 2001)
-      )
+      expected_actions = FOLD_AND_CHECK_OR_CALL_ACTIONS + list(range(100, 2001))
       self.assertEqual(state.legal_actions(), expected_actions)
       state.apply_action(ACTION_CHECK_OR_CALL)  # P1 calls
 
@@ -1752,13 +2382,9 @@ if IMPORTED_ALL_LIBRARIES:
       state.apply_action(2000)  # P0 shoves
 
       # And so finally P1 and P2 can only fold or call.
-      self.assertEqual(
-          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL]
-      )
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
       state.apply_action(ACTION_FOLD)  # P1 folds
-      self.assertEqual(
-          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL]
-      )
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
       state.apply_action(ACTION_CHECK_OR_CALL)  # P2 calls
 
       self.assertTrue(state.is_terminal())
@@ -1986,9 +2612,7 @@ if IMPORTED_ALL_LIBRARIES:
       state.apply_action(2000)  # BTN all-in
 
       # Can only check or call
-      self.assertEqual(
-          state.legal_actions(), [ACTION_FOLD, ACTION_CHECK_OR_CALL]
-      )
+      self.assertEqual(state.legal_actions(), FOLD_AND_CHECK_OR_CALL_ACTIONS)
       state.apply_action(ACTION_CHECK_OR_CALL)  # call
 
       turn_and_river_cards = [
