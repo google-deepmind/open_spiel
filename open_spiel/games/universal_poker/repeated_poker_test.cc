@@ -20,10 +20,12 @@
 
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/json/include/nlohmann/json_fwd.hpp"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 #include "open_spiel/utils/init.h"
@@ -222,6 +224,35 @@ void StacksAndRotationTest() {
   SPIEL_CHECK_EQ(state->Returns(), expected_returns);
 }
 
+void TestStateStruct() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "repeated_poker", {{"max_num_hands", GameParameter(100)},
+                         {"reset_stacks", GameParameter(true)},
+                         {"rotate_dealer", GameParameter(true)},
+                         {"universal_poker_game_string",
+                          GameParameterFromString(
+                              open_spiel::HunlGameString("fullgame"))}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  RepeatedPokerState* rp_state = down_cast<RepeatedPokerState*>(state.get());
+  std::unique_ptr<StateStruct> state_struct = rp_state->ToStruct();
+  SPIEL_CHECK_EQ(state_struct->ToJson(), rp_state->ToJson());
+  RepeatedPokerStateStruct* rp_state_struct =
+      down_cast<RepeatedPokerStateStruct*>(state_struct.get());
+  SPIEL_CHECK_EQ(rp_state_struct->hand_number, 0);
+  SPIEL_CHECK_EQ(rp_state_struct->max_num_hands, 100);
+  SPIEL_CHECK_EQ(rp_state_struct->stacks, std::vector<int>({20000, 20000}));
+  SPIEL_CHECK_EQ(rp_state_struct->dealer, 1);
+  SPIEL_CHECK_EQ(rp_state_struct->small_blind, 50);
+  SPIEL_CHECK_EQ(rp_state_struct->big_blind, 100);
+  SPIEL_CHECK_EQ(rp_state_struct->hand_returns.size(), 1);
+  SPIEL_CHECK_EQ(rp_state_struct->hand_returns[0],
+                 std::vector<double>({0.0, 0.0}));
+  nlohmann::json up_json =
+      nlohmann::json::parse(rp_state_struct->current_universal_poker_json);
+  SPIEL_CHECK_EQ(up_json["current_player"], kChancePlayerId);
+  SPIEL_CHECK_EQ(rp_state_struct->prev_universal_poker_json, "");
+}
+
 }  // namespace
 }  // namespace repeated_poker
 }  // namespace universal_poker
@@ -235,4 +266,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::repeated_poker::SerializationTest();
   open_spiel::universal_poker::repeated_poker::MaxNumHandsTest();
   open_spiel::universal_poker::repeated_poker::StacksAndRotationTest();
+  open_spiel::universal_poker::repeated_poker::TestStateStruct();
 }

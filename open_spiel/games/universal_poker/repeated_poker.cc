@@ -181,6 +181,7 @@ RepeatedPokerState::RepeatedPokerState(const RepeatedPokerState& other)
       universal_poker_state_(std::unique_ptr<UniversalPokerState>(
           dynamic_cast<UniversalPokerState*>(
               other.universal_poker_state_->Clone().release()))),
+      prev_universal_poker_json_(other.prev_universal_poker_json_),
       hand_number_(other.hand_number_),
       max_num_hands_(other.max_num_hands_),
       is_terminal_(other.is_terminal_),
@@ -315,6 +316,7 @@ void RepeatedPokerState::DoApplyAction(Action action) {
   if (!universal_poker_state_->IsTerminal()) {
     return;
   }
+  prev_universal_poker_json_ = universal_poker_state_->ToJson();
   // Record hand-level information.
   for (int i = 0; i < universal_poker_state_->Returns().size(); ++i) {
     Player p = seat_to_player_.at(i);
@@ -389,10 +391,7 @@ std::vector<double> RepeatedPokerState::Returns() const {
 }
 
 std::string RepeatedPokerState::ToString() const {
-  return absl::StrCat(
-      "Hand number: ", hand_number_, "\n",
-      universal_poker_state_->ToString()
-  );
+  return ToStruct()->ToJson();
 }
 
 std::string RepeatedPokerState::ObservationString(Player player) const {
@@ -410,6 +409,20 @@ std::string RepeatedPokerState::ObservationString(Player player) const {
 
 std::unique_ptr<State> RepeatedPokerState::Clone() const {
   return std::unique_ptr<State>(new RepeatedPokerState(*this));
+}
+
+std::unique_ptr<StateStruct> RepeatedPokerState::ToStruct() const {
+  auto rv = std::make_unique<RepeatedPokerStateStruct>();
+  rv->hand_number = hand_number_;
+  rv->max_num_hands = max_num_hands_;
+  rv->stacks = stacks_;
+  rv->dealer = dealer_;
+  rv->small_blind = small_blind_;
+  rv->big_blind = big_blind_;
+  rv->hand_returns = hand_returns_;
+  rv->current_universal_poker_json = universal_poker_state_->ToJson();
+  rv->prev_universal_poker_json = prev_universal_poker_json_;
+  return rv;
 }
 
 RepeatedPokerGame::RepeatedPokerGame(const GameParameters& params)

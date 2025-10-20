@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/universal_poker.h"
 #include "open_spiel/spiel.h"
@@ -88,6 +89,30 @@ struct BlindLevel {
   int big_blind;
 };
 
+struct RepeatedPokerStateStruct : StateStruct {
+  int hand_number;
+  int max_num_hands;
+  std::vector<int> stacks;
+  Player dealer;
+  int small_blind;
+  int big_blind;
+  std::vector<std::vector<double>> hand_returns;
+  std::string current_universal_poker_json;
+  std::string prev_universal_poker_json;
+
+  RepeatedPokerStateStruct() = default;
+  explicit RepeatedPokerStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override { return *this; }
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(RepeatedPokerStateStruct, hand_number,
+                                 max_num_hands, stacks, dealer, small_blind,
+                                 big_blind, hand_returns,
+                                 current_universal_poker_json,
+                                 prev_universal_poker_json);
+};
+
 class RepeatedPokerState : public State {
  public:
   RepeatedPokerState(std::shared_ptr<const Game> game,
@@ -104,6 +129,7 @@ class RepeatedPokerState : public State {
   bool IsTerminal() const override { return is_terminal_; };
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override {
     return universal_poker_state_->LegalActions();
@@ -136,6 +162,7 @@ class RepeatedPokerState : public State {
   std::string universal_poker_game_string_;
   GameParameters universal_poker_game_params_;
   std::unique_ptr<UniversalPokerState> universal_poker_state_;
+  std::string prev_universal_poker_json_ = "";
   int hand_number_ = 0;
   int max_num_hands_ = 0;
   bool is_terminal_ = false;

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 from absl.testing import absltest
 import numpy as np
 
@@ -58,6 +59,36 @@ class GamesRepeatedPokerTest(absltest.TestCase):
     self.assertLen(state.acpc_hand_histories(), 3)
     for history in state.acpc_hand_histories():
       self.assertIsInstance(history, str)
+
+  def test_state_struct(self):
+    acpc_game_string = pyspiel.hunl_game_string("fullgame")
+    game_string = (
+        f"repeated_poker(universal_poker_game_string={acpc_game_string},"
+        "max_num_hands=100,reset_stacks=True,rotate_dealer=True)")
+    game = pyspiel.load_game(game_string)
+    state = game.new_initial_state()
+    state_struct = state.to_struct()
+    self.assertEqual(state_struct.hand_number, 0)
+    self.assertEqual(state_struct.max_num_hands, 100)
+    self.assertEqual(state_struct.stacks, [20000, 20000])
+    self.assertEqual(state_struct.dealer, 1)
+    self.assertEqual(state_struct.small_blind, 50)
+    self.assertEqual(state_struct.big_blind, 100)
+    self.assertLen(state_struct.hand_returns, 1)
+    self.assertEqual(state_struct.hand_returns[0], [0.0, 0.0])
+    up_json = json.loads(state_struct.current_universal_poker_json)
+    self.assertEqual(up_json["current_player"], pyspiel.PlayerId.CHANCE)
+    self.assertEqual(state_struct.prev_universal_poker_json, "")
+    state.apply_action(state.string_to_action("player=-1 move=Deal 2c"))
+    state.apply_action(state.string_to_action("player=-1 move=Deal 2d"))
+    state.apply_action(state.string_to_action("player=-1 move=Deal Tc"))
+    state.apply_action(state.string_to_action("player=-1 move=Deal 2s"))
+    state.apply_action(state.string_to_action("player=1 move=Bet300"))
+    state.apply_action(state.string_to_action("player=0 move=Fold"))
+    self.assertEqual(state.returns(), [0.0, 0.0])
+    state_struct = state.to_struct()
+    prev_up_json = json.loads(state_struct.prev_universal_poker_json)
+    self.assertEqual(prev_up_json["player_hands"], ["2d2c", "Tc2s"])
 
 
 if __name__ == "__main__":
