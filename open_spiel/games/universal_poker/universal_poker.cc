@@ -1095,6 +1095,109 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   return dist;
 }
 
+std::vector<double> UniversalPokerState::CalculateOdds(
+    int num_simulations, std::mt19937& rng) const {
+  std::vector<double> win_percentages(NumPlayers(), 0.0);
+  std::vector<double> draw_percentages(NumPlayers(), 0.0);
+  std::vector<Player> active_players;
+  for (Player p = 0; p < NumPlayers(); ++p) {
+    if (acpc_state_.raw_state().playerFolded[p] == 0) {
+      active_players.push_back(p);
+    }
+  }
+
+  if (active_players.size() == 1) {
+    win_percentages[active_players[0]] = 1.0;
+  } else if (active_players.size() > 1) {
+    std::vector<int> num_hole_cards_to_deal(NumPlayers());
+    std::vector<logic::CardSet> hole_cards(NumPlayers());
+    int num_board_cards_to_deal =
+        acpc_game_->GetTotalNbBoardCards() - board_cards_dealt_;
+    logic::CardSet board = BoardCards();
+    logic::CardSet known_cards = board;
+    for (Player p : active_players) {
+      hole_cards[p] = HoleCards(p);
+      for (uint8_t card : hole_cards[p].ToCardArray()) {
+        known_cards.AddCard(card);
+      }
+      num_hole_cards_to_deal[p] =
+          acpc_game_->GetNbHoleCardsRequired() - hole_cards[p].NumCards();
+    }
+
+    std::vector<double> win_counts(NumPlayers(), 0.0);
+    std::vector<double> draw_counts(NumPlayers(), 0.0);
+
+    for (int sim = 0; sim < num_simulations; ++sim) {
+      // Fresh deck.
+      logic::CardSet deck_to_sample(acpc_game_->NumSuitsDeck(),
+                                    acpc_game_->NumRanksDeck());
+      // Remove known cards from the deck.
+      for (uint8_t card : known_cards.ToCardArray()) {
+        deck_to_sample.RemoveCard(card);
+      }
+      std::vector<uint8_t> deck_cards = deck_to_sample.ToCardArray();
+      std::shuffle(deck_cards.begin(), deck_cards.end(), rng);
+      // Deal hole cards if needed.
+      std::vector<logic::CardSet> sim_hole_cards = hole_cards;
+      int deck_idx = 0;
+      for (Player p : active_players) {
+        for (int i = 0; i < num_hole_cards_to_deal[p]; ++i) {
+          sim_hole_cards[p].AddCard(deck_cards[deck_idx++]);
+          // The only time we should be simulating hole cards is before the
+          // initial deal has completed. Therefore, the board should be empty.
+          SPIEL_CHECK_EQ(board.NumCards(), 0);
+        }
+      }
+
+      logic::CardSet dealt_board_cards = board;
+      for (int i = 0; i < num_board_cards_to_deal; ++i) {
+        dealt_board_cards.AddCard(deck_cards[deck_idx++]);
+      }
+
+      std::vector<int> ranks;
+      ranks.reserve(active_players.size());
+      int max_rank = -1;
+      for (Player p : active_players) {
+        logic::CardSet hand_plus_board = sim_hole_cards[p];
+        for (uint8_t card : dealt_board_cards.ToCardArray())
+          hand_plus_board.AddCard(card);
+        int rank = hand_plus_board.RankCards();
+        ranks.push_back(rank);
+        if (rank > max_rank) {
+          max_rank = rank;
+        }
+      }
+
+      std::vector<Player> winners;
+      for (int i = 0; i < active_players.size(); ++i) {
+        if (ranks[i] == max_rank) {
+          winners.push_back(active_players[i]);
+        }
+      }
+
+      if (winners.size() == 1) {
+        win_counts[winners[0]] += 1.0;
+      } else {
+        for (Player p : winners) {
+          draw_counts[p] += 1.0;
+        }
+      }
+    }
+
+    for (Player p : active_players) {
+      win_percentages[p] = win_counts[p] / num_simulations;
+      draw_percentages[p] = draw_counts[p] / num_simulations;
+    }
+  }
+
+  std::vector<double> result(2 * NumPlayers());
+  for (Player p = 0; p < NumPlayers(); ++p) {
+    result[2*p] = win_percentages[p];
+    result[2*p+1] = draw_percentages[p];
+  }
+  return result;
+}
+
 /**
  * Universal Poker Game Constructor
  * @param params

@@ -107,6 +107,13 @@ class UniversalPokerState : public State {
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const;
 
+  // Calculates win/draw probabilities for each active player via Monte Carlo
+  // simulation. Returns a vector of size 2 * NumPlayers(), where for each
+  // player p, result[2*p] is win percentage and result[2*p+1] is draw
+  // percentage.
+  std::vector<double> CalculateOdds(int num_simulations,
+                                    std::mt19937& rng) const;
+
   const acpc_cpp::ACPCState &acpc_state() const { return acpc_state_; }
   const BettingAbstraction &betting() const { return betting_abstraction_; }
 
