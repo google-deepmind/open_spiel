@@ -56,6 +56,7 @@ void TestRepeatedPokerkitStateStructDefaults() {
   SPIEL_CHECK_EQ(pokerkit_state_struct.burn_cards.size(), 0);
   SPIEL_CHECK_EQ(pokerkit_state_struct.mucked_cards.size(), 0);
   SPIEL_CHECK_EQ(pokerkit_state_struct.poker_hand_histories.size(), 0);
+  SPIEL_CHECK_EQ(pokerkit_state_struct.full_acpc_logs.size(), 0);
 }
 
 void TestToJsonBase() {
@@ -86,6 +87,12 @@ void TestToJsonBase() {
   pokerkit_state_struct.burn_cards = {7};
   pokerkit_state_struct.mucked_cards = {8};
   pokerkit_state_struct.poker_hand_histories = {{"phh_test_a"}, {"phh_test_b"}};
+  pokerkit_state_struct.full_acpc_logs = {{{"S->", "MATCHSTATE:blah"}}};
+  pokerkit_state_struct.blinds = {1, 2};
+  pokerkit_state_struct.acpc_betting_history = "betting_history_test";
+  pokerkit_state_struct.player_contributions = {1, 10};
+  pokerkit_state_struct.pot_size = 11;
+  pokerkit_state_struct.starting_stacks = {11, 20};
 
   nlohmann::json expected_json;
   expected_json["hand_number"] = 1;
@@ -116,6 +123,17 @@ void TestToJsonBase() {
   expected_json["pokerkit_state_struct"]["mucked_cards"] = std::vector<int>{8};
   expected_json["pokerkit_state_struct"]["poker_hand_histories"] =
       std::vector<std::vector<std::string>>{{"phh_test_a"}, {"phh_test_b"}};
+  expected_json["pokerkit_state_struct"]["full_acpc_logs"] =
+      std::vector<std::vector<std::vector<std::string>>>{
+          {{"S->", "MATCHSTATE:blah"}}};
+  expected_json["pokerkit_state_struct"]["blinds"] = std::vector<int>{1, 2};
+  expected_json["pokerkit_state_struct"]["acpc_betting_history"] =
+      "betting_history_test";
+  expected_json["pokerkit_state_struct"]["player_contributions"] =
+      std::vector<int>{1, 10};
+  expected_json["pokerkit_state_struct"]["pot_size"] = 11;
+  expected_json["pokerkit_state_struct"]["starting_stacks"] =
+      std::vector<int>{11, 20};
 
   nlohmann::json actual_json = state_struct.to_json_base();
   SPIEL_CHECK_EQ(actual_json["pokerkit_state_struct"],
@@ -125,6 +143,8 @@ void TestToJsonBase() {
 
 void TestToJsonString() {
   RepeatedPokerkitStateStruct state_struct;
+  state_struct.hand_number = 3;
+  state_struct.is_terminal = true;
   state_struct.pokerkit_state_struct.current_player = 1;
   state_struct.pokerkit_state_struct.is_terminal = true;
 
@@ -132,6 +152,10 @@ void TestToJsonString() {
 
   // Parse it back to validate
   nlohmann::json parsed_json = nlohmann::json::parse(json_str);
+
+  SPIEL_CHECK_EQ(parsed_json["hand_number"], 3);
+  SPIEL_CHECK_EQ(parsed_json["is_terminal"], true);
+
   auto parsed_pokerkit_state_struct = parsed_json["pokerkit_state_struct"];
   SPIEL_CHECK_EQ(parsed_pokerkit_state_struct["current_player"], 1);
   SPIEL_CHECK_EQ(parsed_pokerkit_state_struct["is_terminal"], true);

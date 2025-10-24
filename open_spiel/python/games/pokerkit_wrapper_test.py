@@ -453,6 +453,12 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertIsInstance(state_struct.pots, list)
       self.assertIsInstance(state_struct.burn_cards, list)
       self.assertIsInstance(state_struct.mucked_cards, list)
+      self.assertEqual(state_struct.full_acpc_logs, [[], []])
+      self.assertEqual(state_struct.acpc_betting_history, "")
+      self.assertLen(state_struct.blinds, 2)
+      self.assertLen(state_struct.player_contributions, game.num_players())
+      self.assertGreaterEqual(state_struct.pot_size, 0)
+      self.assertLen(state_struct.starting_stacks, game.num_players())
 
     def test_create_struct_and_access_members(self):
       """Tests direct creation of the underlying pyspiel PokerkitStateStruct.
@@ -482,6 +488,12 @@ if IMPORTED_ALL_LIBRARIES:
       state_struct.board_cards = [5, 6, 7]
       state_struct.hole_cards = [[1, 2], [3, 4]]
       state_struct.poker_hand_histories = [["phh1"], ["phh2"]]
+      state_struct.full_acpc_logs = [[["S->", "MATCHSTATE:blah"]]]
+      state_struct.blinds = [1, 2]
+      state_struct.acpc_betting_history = "betting_history_test"
+      state_struct.player_contributions = [10, 0]
+      state_struct.pot_size = 10
+      state_struct.starting_stacks = [100, 200]
 
       # Verify modifications
       self.assertEqual(state_struct.observation, ["obs1", "obs2"])
@@ -493,6 +505,16 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertEqual(state_struct.board_cards, [5, 6, 7])
       self.assertEqual(state_struct.hole_cards, [[1, 2], [3, 4]])
       self.assertEqual(state_struct.poker_hand_histories, [["phh1"], ["phh2"]])
+      self.assertEqual(
+          state_struct.full_acpc_logs, [[["S->", "MATCHSTATE:blah"]]]
+      )
+      self.assertEqual(state_struct.blinds, [1, 2])
+      self.assertEqual(
+          state_struct.acpc_betting_history, "betting_history_test"
+      )
+      self.assertEqual(state_struct.player_contributions, [10, 0])
+      self.assertEqual(state_struct.pot_size, 10)
+      self.assertEqual(state_struct.starting_stacks, [100, 200])
 
     def test_pokerkit_wrapper_state_to_struct_and_json(self):
       params = {
@@ -585,6 +607,15 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertLen(data["pots"], 1)
       self.assertEqual(data["pots"][0], 200)
 
+      self.assertEqual(state_struct.blinds, [50, 100])
+      self.assertEqual(data["blinds"], [50, 100])
+      self.assertEqual(state_struct.starting_stacks, [1000, 1000])
+      self.assertEqual(data["starting_stacks"], [1000, 1000])
+      self.assertEqual(state_struct.player_contributions, [900, 600])
+      self.assertEqual(data["player_contributions"], [900, 600])
+      self.assertEqual(state_struct.pot_size, 1500)
+      self.assertEqual(data["pot_size"], 1500)
+
       self.assertLen(state_struct.poker_hand_histories, 2)
       # Per-player view of P1's hole cards (P1 uncensored, P2 censored)
       self.assertEqual(state_struct.poker_hand_histories[0][0], "d dh p1 AcKc")
@@ -593,9 +624,37 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertEqual(state_struct.poker_hand_histories[0][1], "d dh p2 ????")
       self.assertEqual(state_struct.poker_hand_histories[1][1], "d dh p2 AdKd")
 
-      # For anyone curious about what a non-trivial PHH actually looks like
-      # here.
-      print(f"state_struct PHH: {state_struct.poker_hand_histories}")
+      self.assertNotEmpty(state_struct.full_acpc_logs)
+      self.assertNotEmpty(data["full_acpc_logs"])
+      self.assertEqual(state_struct.full_acpc_logs, data["full_acpc_logs"])
+      self.assertLen(state_struct.full_acpc_logs, 2)
+
+      # We expect SB to call and BB to check pre-flop, i.e. 'cc' pre-flop.
+      # Then (since ACPC tracks total contributions, not per street
+      # contributions) we expect P0's bet 200 raises to 300 total across the
+      # hand, P1 raise to 500 raise to total 600, and P0 raise to 800 totals
+      # 900.
+      self.assertEqual(state_struct.acpc_betting_history, "cc/r300r600r900")
+
+      # P0's view, right before the last bet
+      self.assertEqual(
+          state_struct.full_acpc_logs[0][-3:],
+          [
+              ["S->", "MATCHSTATE:0:0:cc/r300r600:AcKc|/QcJcTc\r\n"],
+              ["<-C", "MATCHSTATE:0:0:cc/r300r600:AcKc|/QcJcTc:r900\r\n"],
+              ["S->", "MATCHSTATE:0:0:cc/r300r600r900:AcKc|/QcJcTc\r\n"],
+          ],
+      )
+
+      # P1's view, right before the last bet
+      self.assertEqual(
+          state_struct.full_acpc_logs[1][-3:],
+          [
+              ["<-C", "MATCHSTATE:1:0:cc/r300:|AdKd/QcJcTc:r600\r\n"],
+              ["S->", "MATCHSTATE:1:0:cc/r300r600:|AdKd/QcJcTc\r\n"],
+              ["S->", "MATCHSTATE:1:0:cc/r300r600r900:|AdKd/QcJcTc\r\n"],
+          ],
+      )
 
     def test_pokerkit_wrapper_state_to_struct_and_json_when_terminal(self):
       """Tests the ToJson() method inherited from StateStruct."""
@@ -656,6 +715,15 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertEqual(data["mucked_cards"], [1, 3])
       self.assertEqual(state_struct.mucked_cards, [1, 3])
 
+      self.assertEqual(state_struct.blinds, [50, 100])
+      self.assertEqual(data["blinds"], [50, 100])
+      self.assertEqual(state_struct.starting_stacks, [1000, 1000])
+      self.assertEqual(data["starting_stacks"], [1000, 1000])
+      self.assertEqual(state_struct.player_contributions, [-50, 50])
+      self.assertEqual(data["player_contributions"], [-50, 50])
+      self.assertEqual(state_struct.pot_size, 0)
+      self.assertEqual(data["pot_size"], 0)
+
       # p1 has 2c2h since first + third card in unshuffled deck
       # p2 has 2d2s since second + fourth card in unshuffled deck
       self.assertEqual(
@@ -663,6 +731,24 @@ if IMPORTED_ALL_LIBRARIES:
           [
               ["d dh p1 2c2h", "d dh p2 ????", "p2 f"],
               ["d dh p1 ????", "d dh p2 2d2s", "p2 f"],
+          ],
+      )
+      self.assertNotEmpty(state_struct.full_acpc_logs)
+      self.assertNotEmpty(data["full_acpc_logs"])
+      self.assertEqual(state_struct.full_acpc_logs, data["full_acpc_logs"])
+      self.assertLen(state_struct.full_acpc_logs, 2)
+      self.assertEqual(
+          state_struct.full_acpc_logs,
+          [
+              [
+                  ["S->", "MATCHSTATE:0:0::2c2h|\r\n"],
+                  ["S->", "MATCHSTATE:0:0:f:2c2h|\r\n"],
+              ],
+              [
+                  ["S->", "MATCHSTATE:1:0::|2d2s\r\n"],
+                  ["<-C", "MATCHSTATE:1:0::|2d2s:f\r\n"],
+                  ["S->", "MATCHSTATE:1:0:f:|2d2s\r\n"],
+              ],
           ],
       )
 

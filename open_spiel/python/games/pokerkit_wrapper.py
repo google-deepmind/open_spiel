@@ -28,6 +28,7 @@ implementation in the C++ codebase, but only supports:
 - Limit Texas Hold'em
 """
 
+from collections.abc import Iterator
 import copy
 import dataclasses
 import decimal
@@ -1010,8 +1011,7 @@ class PokerkitWrapperState(pyspiel.State):
       # Handle edge case where we've 'mapped' a bet of 1 chip to action 2 to
       # avoid conflicting with reserved actions.
       elif (  # wrapped_state.can_complete_bet_or_raise_to(action) == False
-          action == 2
-          and wrapped_state.can_complete_bet_or_raise_to(1)
+          action == 2 and wrapped_state.can_complete_bet_or_raise_to(1)
       ):
         assert wrapped_state.min_completion_betting_or_raising_to_amount == 1
         assert wrapped_state.max_completion_betting_or_raising_to_amount == 1
@@ -1123,6 +1123,94 @@ class PokerkitWrapperState(pyspiel.State):
     cpp_state_struct.burn_cards = burn_cards
     cpp_state_struct.mucked_cards = mucked_cards
     cpp_state_struct.poker_hand_histories = poker_hand_histories
+
+    # -- The following fields are used for compatibility with code that is using
+    # UniversalPokerStateStruct. --
+
+    blinds = [int(b) for b in game.blinds]
+    starting_stacks = [int(s) for s in self._wrapped_state.starting_stacks]
+    # TODO(claytondrazner): Verify that this pot_size calculation matches the
+    # one used to fill the equivalent out in Universal Poker.
+    pot_size = int(self._wrapped_state.total_pot_amount)
+    player_contributions = [
+        int(
+            self._wrapped_state.starting_stacks[i]
+            - self._wrapped_state.stacks[i]
+        )
+        for i in range(self.get_game().num_players())
+    ]
+    cpp_state_struct.blinds = blinds
+    cpp_state_struct.player_contributions = player_contributions
+    cpp_state_struct.pot_size = pot_size
+    cpp_state_struct.starting_stacks = starting_stacks
+
+    # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.notation.HandHistory.to_acpc_protocol
+    full_acpc_logs: list[list[tuple[str, str]]] = [
+        [] for _ in range(self.get_game().num_players())
+    ]
+    acpc_betting_history = ""
+    fake_hand_number_to_avoid_error = 0
+
+    # If the game hasn't actually dealt players' cards yet, or maybe also in
+    # some other situations, attempting to get the ACPC state from pokerkit
+    # will result in an ValueError here.
+    if self.get_game().params.get("variant") in _VARIANTS_SUPPORTING_ACPC_STYLE:
+      for player in range(self.get_game().num_players()):
+        try:
+          # For more details + an example of what's in this tuple see:
+          # https://pokerkit.readthedocs.io/en/stable/_static/protocol.pdf
+          # (The 'S->' or '<-C' is in index 0, everything else in index 1)
+          acpc_hand_history_uncensored: Iterator[tuple[str, str]] = (
+              pokerkit.HandHistory.from_game_state(
+                  # pylint: disable=protected-access
+                  # NOTE: Technically has card burning enabled! But should be
+                  # close enough for our purposes here - in practice still
+                  # results in the same string.
+                  self.get_game()._wrapped_game_template_factory(),
+                  # pylint: enable=protected-access
+                  self._wrapped_state,
+              ).to_acpc_protocol(player, fake_hand_number_to_avoid_error)
+          )
+          assert not full_acpc_logs[player]
+          full_acpc_logs[player] = list(acpc_hand_history_uncensored)
+
+        # Intended use case: catching *pokerkit's* ValueErrors. Since it throws
+        # them in many many cases, e.g. if players have no hole cards yet.
+        except ValueError as e:
+          logging.warning(
+              "Failed to get ACPC state so leaving it set to default. Game"
+              " variant is %s, caught error is %s",
+              self.get_game().params.get("variant"),
+              e,
+          )
+          pass
+
+      # E.g.
+      # "MATCHSTATE:1:31:r300r900c/r1800r3600r9000c/r20000c/:KsJs|JdTc/6dJc9c/Kh/Qc"
+      latest_message_match_state = ""
+      # 'or 0' because .actor_index can be None so we need a sane fallback.
+      arbitrary_acpc_player = self._wrapped_state.actor_index or 0
+      for _, match_state in full_acpc_logs[arbitrary_acpc_player]:
+        latest_message_match_state = match_state
+      if latest_message_match_state:
+        if not latest_message_match_state.startswith("MATCHSTATE:"):
+          raise ValueError(
+              "Last message doesn't begin with 'MATCHSTATE:' in string:"
+              f" {latest_message_match_state}"
+          )
+
+        # E.g. "r300r900c/r1800r3600r9000c/r20000c/"
+        # TODO(jhtschultz) - we could leave in the "MATCHSTATE:"" or replace
+        # it with "STATE:" here if downstream code expects it that way.
+        acpc_betting_history = (
+            latest_message_match_state.split("MATCHSTATE:")[1]
+            .strip()
+            .split(":")[2]
+        )
+
+    cpp_state_struct.full_acpc_logs = full_acpc_logs
+    cpp_state_struct.acpc_betting_history = acpc_betting_history
+
     return cpp_state_struct
 
   def to_json(self) -> str:
