@@ -202,29 +202,26 @@ std::unique_ptr<StateStruct> ConnectFourState::ToStruct() const {
       board[r][c] = StateToString(CellAt(r, c));
     }
   }
-  std::string current_player = PlayerToString(CurrentPlayer());
-  bool is_terminal = IsTerminal();
-  std::string winner = "";
-  if (is_terminal) {
+  ConnectFourStateStruct rv;
+  rv.board = board;
+  rv.current_player = PlayerToString(CurrentPlayer());
+  rv.is_terminal = IsTerminal();
+  rv.winner = "";
+  if (rv.is_terminal) {
     switch (outcome_) {
       case Outcome::kPlayer1:
-        winner = "x";
+        rv.winner = "x";
         break;
       case Outcome::kPlayer2:
-        winner = "o";
+        rv.winner = "o";
         break;
       case Outcome::kDraw:
-        winner = "draw";
+        rv.winner = "draw";
         break;
       default:
         SpielFatalError("Game is terminal but outcome is unknown.");
     }
   }
-  ConnectFourStateStruct rv;
-  rv.board = board;
-  rv.current_player = current_player;
-  rv.is_terminal = is_terminal;
-  rv.winner = winner;
   return std::make_unique<ConnectFourStateStruct>(rv);
 }
 
