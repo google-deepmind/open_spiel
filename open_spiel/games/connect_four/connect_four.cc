@@ -46,8 +46,8 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
-};
+    /*parameter_specification=*/{{"rows", GameParameter(kDefaultNumRows)},
+                                  {"columns", GameParameter(kDefaultNumCols)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new ConnectFourGame(params));
@@ -95,11 +95,11 @@ std::string StateToString(CellState state) {
 }  // namespace
 
 CellState& ConnectFourState::CellAt(int row, int col) {
-  return board_[row * kCols + col];
+  return board_[row * static_cast<const ConnectFourGame&>(*game_).cols() + col];
 }
 
 CellState ConnectFourState::CellAt(int row, int col) const {
-  return board_[row * kCols + col];
+  return board_[row * static_cast<const ConnectFourGame&>(*game_).cols() + col];
 }
 
 int ConnectFourState::CurrentPlayer() const {
@@ -111,7 +111,9 @@ int ConnectFourState::CurrentPlayer() const {
 }
 
 void ConnectFourState::DoApplyAction(Action move) {
-  SPIEL_CHECK_EQ(CellAt(kRows - 1, move), CellState::kEmpty);
+  SPIEL_CHECK_EQ(
+      CellAt(static_cast<const ConnectFourGame&>(*game_).rows() - 1, move),
+      CellState::kEmpty);
   int row = 0;
   while (CellAt(row, move) != CellState::kEmpty) ++row;
   CellAt(row, move) = PlayerToState(CurrentPlayer());
@@ -129,8 +131,9 @@ std::vector<Action> ConnectFourState::LegalActions() const {
   // Can move in any non-full column.
   std::vector<Action> moves;
   if (IsTerminal()) return moves;
-  for (int col = 0; col < kCols; ++col) {
-    if (CellAt(kRows - 1, col) == CellState::kEmpty) moves.push_back(col);
+  const auto& game = static_cast<const ConnectFourGame&>(*game_);
+  for (int col = 0; col < game.cols(); ++col) {
+    if (CellAt(game.rows() - 1, col) == CellState::kEmpty) moves.push_back(col);
   }
   return moves;
 }
@@ -149,7 +152,8 @@ bool ConnectFourState::HasLineFrom(Player player, int row, int col) const {
 
 bool ConnectFourState::HasLineFromInDirection(Player player, int row, int col,
                                               int drow, int dcol) const {
-  if (row + 3 * drow >= kRows || col + 3 * dcol >= kCols ||
+  const auto& game = static_cast<const ConnectFourGame&>(*game_);
+  if (row + 3 * drow >= game.rows() || col + 3 * dcol >= game.cols() ||
       row + 3 * drow < 0 || col + 3 * dcol < 0)
     return false;
   CellState c = PlayerToState(player);
@@ -163,8 +167,9 @@ bool ConnectFourState::HasLineFromInDirection(Player player, int row, int col,
 
 bool ConnectFourState::HasLine(Player player) const {
   CellState c = PlayerToState(player);
-  for (int col = 0; col < kCols; ++col) {
-    for (int row = 0; row < kRows; ++row) {
+  const auto& game = static_cast<const ConnectFourGame&>(*game_);
+  for (int col = 0; col < game.cols(); ++col) {
+    for (int row = 0; row < game.rows(); ++row) {
       if (CellAt(row, col) == c && HasLineFrom(player, row, col)) return true;
     }
   }
@@ -172,21 +177,24 @@ bool ConnectFourState::HasLine(Player player) const {
 }
 
 bool ConnectFourState::IsFull() const {
-  for (int col = 0; col < kCols; ++col) {
-    if (CellAt(kRows - 1, col) == CellState::kEmpty) return false;
+  const auto& game = static_cast<const ConnectFourGame&>(*game_);
+  for (int col = 0; col < game.cols(); ++col) {
+    if (CellAt(game.rows() - 1, col) == CellState::kEmpty) return false;
   }
   return true;
 }
 
 ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game)
     : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
+  const auto& parent_game = static_cast<const ConnectFourGame&>(*game);
+  board_.assign(parent_game.rows() * parent_game.cols(), CellState::kEmpty);
 }
 
 std::string ConnectFourState::ToString() const {
   std::string str;
-  for (int row = kRows - 1; row >= 0; --row) {
-    for (int col = 0; col < kCols; ++col) {
+  const auto& game = static_cast<const ConnectFourGame&>(*game_);
+  for (int row = game.rows() - 1; row >= 0; --row) {
+    for (int col = 0; col < game.cols(); ++col) {
       str.append(StateToString(CellAt(row, col)));
     }
     str.append("\n");
@@ -195,10 +203,11 @@ std::string ConnectFourState::ToString() const {
 }
 
 std::unique_ptr<StateStruct> ConnectFourState::ToStruct() const {
+  const auto& game = static_cast<const ConnectFourGame&>(*game_);
   std::vector<std::vector<std::string>> board(
-      kRows, std::vector<std::string>(kCols));
-  for (int r = 0; r < kRows; ++r) {
-    for (int c = 0; c < kCols; ++c) {
+      game.rows(), std::vector<std::string>(game.cols()));
+  for (int r = 0; r < game.rows(); ++r) {
+    for (int c = 0; c < game.cols(); ++c) {
       board[r][c] = StateToString(CellAt(r, c));
     }
   }
@@ -265,10 +274,12 @@ void ConnectFourState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  TensorView<2> view(values, {kCellStates, kNumCells}, true);
-
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{PlayerRelative(board_[cell], player), cell}] = 1.0;
+  const auto& game = static_cast<const ConnectFourGame&>(*game_);
+  TensorView<3> view(values, {kCellStates, game.rows(), game.cols()}, true);
+  for (int r = 0; r < game.rows(); ++r) {
+    for (int c = 0; c < game.cols(); ++c) {
+      view[{PlayerRelative(CellAt(r, c), player), r, c}] = 1.0;
+    }
   }
 }
 
@@ -277,14 +288,18 @@ std::unique_ptr<State> ConnectFourState::Clone() const {
 }
 
 ConnectFourGame::ConnectFourGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      rows_(ParameterValue<int>("rows")),
+      cols_(ParameterValue<int>("columns")) {}
 
 ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game,
                                    const std::string& str)
     : State(game) {
+  const auto& parent_game = static_cast<const ConnectFourGame&>(*game);
+  board_.resize(parent_game.rows() * parent_game.cols());
   int xs = 0;
   int os = 0;
-  int r = 5;
+  int r = parent_game.rows() - 1;
   int c = 0;
   for (const char ch : str) {
     switch (ch) {
@@ -302,7 +317,7 @@ ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game,
     }
     if (ch == '.' || ch == 'x' || ch == 'o') {
       ++c;
-      if (c >= kCols) {
+      if (c >= parent_game.cols()) {
         r--;
         c = 0;
       }
