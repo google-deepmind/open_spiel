@@ -179,6 +179,20 @@ void ArbitrarySizeTests() {
                {{"rows", GameParameter(7)}, {"columns", GameParameter(8)}});
   SPIEL_CHECK_EQ(game_7x8->MaxGameLength(), 56);
   testing::RandomSimTest(*game_7x8, 10);
+
+  // Test connect-5 on a 6x7 board.
+  std::shared_ptr<const Game> game_c5 =
+      LoadGame("connect_four", {{"x_in_row", GameParameter(5)}});
+  auto state_c5 = game_c5->NewInitialState();
+  // Vertical win for p0
+  for (int i = 0; i < 4; ++i) {
+    state_c5->ApplyAction(0);  // x
+    state_c5->ApplyAction(1);  // o
+  }
+  SPIEL_CHECK_FALSE(state_c5->IsTerminal());
+  state_c5->ApplyAction(0);  // x wins
+  SPIEL_CHECK_TRUE(state_c5->IsTerminal());
+  SPIEL_CHECK_EQ(state_c5->Returns(), (std::vector<double>{1.0, -1.0}));
 }
 
 }  // namespace

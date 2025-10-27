@@ -15,7 +15,6 @@
 #ifndef OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
 #define OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
 
-#include <array>
 #include <functional>
 #include <memory>
 #include <ostream>
@@ -44,6 +43,7 @@ namespace connect_four {
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultNumRows = 6;
 inline constexpr int kDefaultNumCols = 7;
+inline constexpr int kDefaultXInRow = 4;
 inline constexpr int kCellStates =
     1 + kNumPlayers;  // player 0, player 1, empty
 
@@ -146,10 +146,12 @@ class ConnectFourGame : public Game {
 
   int rows() const { return rows_; }
   int cols() const { return cols_; }
+  int x_in_row() const { return x_in_row_; }
 
  private:
-  int rows_;
-  int cols_;
+  const int rows_;
+  const int cols_;
+  const int x_in_row_;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {

@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Connect Four"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["columns", "rows"]
+GameType.parameter_specification = ["columns", "rows", "x_in_row"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 7
 PolicyTensorShape() = [7]
 MaxChanceOutcomes() = 0
-GetParameters() = {columns=7,rows=6}
+GetParameters() = {columns=7,rows=6,x_in_row=4}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0

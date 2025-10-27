@@ -14,7 +14,6 @@
 
 #include "open_spiel/games/connect_four/connect_four.h"
 
-#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -46,8 +45,10 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{{"rows", GameParameter(kDefaultNumRows)},
-                                  {"columns", GameParameter(kDefaultNumCols)}}};
+    /*parameter_specification=*/
+    {{"rows", GameParameter(kDefaultNumRows)},
+     {"columns", GameParameter(kDefaultNumCols)},
+     {"x_in_row", GameParameter(kDefaultXInRow)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new ConnectFourGame(params));
@@ -153,11 +154,13 @@ bool ConnectFourState::HasLineFrom(Player player, int row, int col) const {
 bool ConnectFourState::HasLineFromInDirection(Player player, int row, int col,
                                               int drow, int dcol) const {
   const auto& game = static_cast<const ConnectFourGame&>(*game_);
-  if (row + 3 * drow >= game.rows() || col + 3 * dcol >= game.cols() ||
-      row + 3 * drow < 0 || col + 3 * dcol < 0)
+  const int x_in_row = game.x_in_row();
+  if (row + (x_in_row - 1) * drow >= game.rows() ||
+      col + (x_in_row - 1) * dcol >= game.cols() ||
+      row + (x_in_row - 1) * drow < 0 || col + (x_in_row - 1) * dcol < 0)
     return false;
   CellState c = PlayerToState(player);
-  for (int i = 0; i < 4; ++i) {
+  for (int i = 0; i < x_in_row; ++i) {
     if (CellAt(row, col) != c) return false;
     row += drow;
     col += dcol;
@@ -290,7 +293,8 @@ std::unique_ptr<State> ConnectFourState::Clone() const {
 ConnectFourGame::ConnectFourGame(const GameParameters& params)
     : Game(kGameType, params),
       rows_(ParameterValue<int>("rows")),
-      cols_(ParameterValue<int>("columns")) {}
+      cols_(ParameterValue<int>("columns")),
+      x_in_row_(ParameterValue<int>("x_in_row")) {}
 
 ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game,
                                    const std::string& str)
