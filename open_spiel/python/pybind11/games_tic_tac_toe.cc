@@ -25,6 +25,7 @@ namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::tic_tac_toe::CellState;
+using open_spiel::tic_tac_toe::TicTacToeObservationStruct;
 using open_spiel::tic_tac_toe::TicTacToeState;
 using open_spiel::tic_tac_toe::TicTacToeStateStruct;
 
@@ -44,6 +45,14 @@ void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
       .def(py::init<std::string>())
       .def_readwrite("current_player", &TicTacToeStateStruct::current_player)
       .def_readwrite("board", &TicTacToeStateStruct::board);
+
+  py::class_<TicTacToeObservationStruct, open_spiel::ObservationStruct>(
+      tic_tac_toe, "TicTacToeObservationStruct")
+      .def(py::init<>())
+      .def(py::init<std::string>())
+      .def_readwrite("current_player",
+                     &TicTacToeObservationStruct::current_player)
+      .def_readwrite("board", &TicTacToeObservationStruct::board);
 
   py::enum_<CellState>(tic_tac_toe, "CellState")
       .value("EMPTY", CellState::kEmpty)

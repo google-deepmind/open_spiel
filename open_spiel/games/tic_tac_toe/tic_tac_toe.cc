@@ -167,17 +167,43 @@ std::string TicTacToeState::ToString() const {
 }
 
 std::unique_ptr<StateStruct> TicTacToeState::ToStruct() const {
-  TicTacToeStateStruct rv;
+  auto rv = std::make_unique<TicTacToeStateStruct>();
   std::vector<std::string> board;
   board.reserve(board_.size());
   for (const CellState& cell : board_) {
     board.push_back(StateToString(cell));
   }
-  rv.current_player = PlayerToString(CurrentPlayer());
-  rv.board = board;
-  return std::make_unique<TicTacToeStateStruct>(rv);
+  rv->current_player = PlayerToString(CurrentPlayer());
+  rv->board = board;
+  return rv;
 }
 
+std::unique_ptr<ObservationStruct> TicTacToeState::ToObservationStruct(
+    Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return std::make_unique<TicTacToeObservationStruct>(this->ToJson());
+}
+
+std::unique_ptr<ActionStruct> TicTacToeState::ActionToStruct(
+    Player player, Action action_id) const {
+  auto action_struct = std::make_unique<TicTacToeActionStruct>();
+  action_struct->row = action_id / kNumCols;
+  action_struct->col = action_id % kNumCols;
+  return action_struct;
+}
+
+Action TicTacToeState::StructToAction(
+    const ActionStruct& action_struct) const {
+  const auto* ttt_action_struct =
+      dynamic_cast<const TicTacToeActionStruct*>(&action_struct);
+  SPIEL_CHECK_TRUE(ttt_action_struct != nullptr);
+  SPIEL_CHECK_GE(ttt_action_struct->row, 0);
+  SPIEL_CHECK_LT(ttt_action_struct->row, kNumRows);
+  SPIEL_CHECK_GE(ttt_action_struct->col, 0);
+  SPIEL_CHECK_LT(ttt_action_struct->col, kNumCols);
+  return ttt_action_struct->row * kNumCols + ttt_action_struct->col;
+}
 
 bool TicTacToeState::IsTerminal() const {
   return outcome_ != kInvalidPlayer || IsFull();

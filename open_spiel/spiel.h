@@ -29,6 +29,7 @@
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/utils/nlohmann_json.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
@@ -209,23 +210,31 @@ using HistoryDistribution =
 class Game;
 class Observer;
 
-// Structured information specifying the state of a game.
+// Structured information about a game.
 // Added to the API as part of Open Spiel 2.0:
 // https://github.com/google-deepmind/open_spiel/issues/1340.
-// The StateStruct makes explicit and provides an easy interface to the
-// information encoded in the state string. Accessible via the State::ToStruct
-// and State::ToJson methods.
-struct StateStruct {
-  virtual ~StateStruct() = default;
-  StateStruct() = default;
-  StateStruct(std::string json);
+// The GameStruct makes explicit and provides an easy interface to the
+// information encoded in the state, observation, and action strings.
+struct GameStruct {
+  virtual ~GameStruct() = default;
+  GameStruct() = default;
 
-  std::string ToJson() const {
-    return to_json_base().dump();
-  }
+  std::string ToJson() const { return to_json_base().dump(); }
 
   virtual nlohmann::json to_json_base() const = 0;
 };
+
+// Structured information specifying the state of a game.
+// Accessible via the State::ToStruct and State::ToJson methods.
+struct StateStruct : public GameStruct {};
+
+// Structured information specifying an observation of the game state for a
+// particular player in imperfect information games.
+// Accessible via the State::ToObservationStruct method.
+struct ObservationStruct : public GameStruct {};
+
+// Structured information specifying an action for a player in a game.
+struct ActionStruct : public GameStruct {};
 
 // An abstract class that represents a state of the game.
 class State {
@@ -262,6 +271,12 @@ class State {
 
   // Helper versions of ApplyAction that first does a legality check.
   virtual void ApplyActionWithLegalityCheck(Action action_id);
+
+  // Applies an action in its structured format.
+  // The default implementation will fatal error. Games that support this
+  // should override it, map the struct to an integer action id, and then call
+  // ApplyAction.
+  virtual void ApplyActionStruct(const ActionStruct& action_struct);
 
   // `LegalActions(Player player)` is valid for all nodes in all games,
   // returning an empty list for players who don't act at this state. The
@@ -324,6 +339,19 @@ class State {
                                 const std::string& action_str) const;
   Action StringToAction(const std::string& action_str) const {
     return StringToAction(CurrentPlayer(), action_str);
+  }
+
+  // Converts an action to a structured format.
+  virtual std::unique_ptr<ActionStruct> ActionToStruct(
+      Player player, Action action_id) const {
+    SpielFatalError("ActionToStruct not implemented.");
+  }
+  std::unique_ptr<ActionStruct> ActionToStruct(Action action_id) const {
+    return ActionToStruct(CurrentPlayer(), action_id);
+  }
+
+  virtual Action StructToAction(const ActionStruct& action_struct) const {
+    SpielFatalError("StructToAction not implemented.");
   }
 
   // Returns a string representation of the state. Also used as in the default
@@ -593,6 +621,19 @@ class State {
     return ObservationTensor(CurrentPlayer());
   }
   void ObservationTensor(Player player, std::vector<float>* values) const;
+
+  // Returns a structured representation of an observation for `player`.
+  //
+  // Implementations should start with (and it's tested in api_test.py):
+  //   SPIEL_CHECK_GE(player, 0);
+  //   SPIEL_CHECK_LT(player, num_players_);
+  virtual std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const {
+    SpielFatalError("ToObservationStruct not implemented!");
+  }
+  std::unique_ptr<ObservationStruct> ToObservationStruct() const {
+    return ToObservationStruct(CurrentPlayer());
+  }
 
   // Return a copy of this state.
   virtual std::unique_ptr<State> Clone() const = 0;
