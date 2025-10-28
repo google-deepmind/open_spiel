@@ -195,7 +195,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="1.6.2",
+    version="1.6.8",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",
@@ -204,7 +204,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/deepmind/open_spiel",
     install_requires=_get_requirements(req_file),
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt},
     zip_safe=False,

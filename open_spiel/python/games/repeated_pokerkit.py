@@ -82,6 +82,7 @@ _DEFAULT_PARAMS = {
         # Will be changed to the last player if not overridden.
         -1
     ),
+    "record_full_hand_histories": True,
 }
 
 _GAME_TYPE = pyspiel.GameType(
@@ -108,42 +109,8 @@ _GAME_TYPE = pyspiel.GameType(
 )
 
 
-def _split_level_schedule_string(
-    schedule_str: str, expected_level_parts: int
-) -> list[list[str]]:
-  """Splits a level schedule string into a 2-D list of strings.
-
-  Parsed schedule strings are of the form
-    <level_1>;<level_2>;...;<level_n>
-  where each level is of the form
-    <substring_1>,<substring_2>,<substring_3>
-
-  Args:
-    schedule_str: The schedule string to split. The format is a
-      semicolon-separated list of inner levels, where each level is a
-      comma-separated tuple of `expected_level_parts` substrings.
-    expected_level_parts: The expected number of comma-separated substrings
-      within each level.
-
-  Returns:
-    A 2-D list of strings, where the first dimension corresponds to the levels
-    and the second dimension corresponds to the substrings within each level.
-  """
-  if not schedule_str:
-    return []
-  levels_str = schedule_str.removesuffix(";").split(";")
-  levels = [level.split(",") for level in levels_str]
-
-  for level in levels:
-    if len(level) != expected_level_parts:
-      raise ValueError(
-          f"Invalid schedule string: {schedule_str}. Expected format is"
-          " <level_1>;<level_2>;...;<level_n> where each level is a"
-          f" comma-separated tuple of {expected_level_parts} substrings."
-      )
-  return levels
-
-
+# TODO(jhtschultz): Consider extracting common parsing logic into a separate
+# helper function.
 def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
   """Parses a blind schedule string into a list of BlindLevel objects.
 
@@ -152,12 +119,12 @@ def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
   Parses blind schedule string of the form
     <blind_level_1>;...;<blind_level_n>
   where each blind level is of the form
-    <num_hands>,<small_blind>,<big_blind>
+    <num_hands>:<small_blind>/<big_blind>
 
   Args:
     blind_schedule_str: A string specifying the blind schedule. The format is a
       semicolon-separated list of blind levels, where each level is a
-      comma-separated tuple of `num_hands`, `small_blind`, and `big_blind`.
+      colon-separated tuple of `num_hands` and `<small_blind>/<big_blind>`.
 
   Returns:
     A list of BlindLevel objects parsed from the input string.
@@ -166,8 +133,17 @@ def parse_blind_schedule(blind_schedule_str: str) -> list[BlindLevel]:
     return []
 
   blind_levels = []
-  for level_parts in _split_level_schedule_string(blind_schedule_str, 3):
-    num_hands, small_blind, big_blind = [int(p) for p in level_parts]
+  levels_str = blind_schedule_str.removesuffix(";").split(";")
+  for level_str in levels_str:
+    parts = level_str.split(":")
+    if len(parts) != 2:
+      raise ValueError(f"Invalid blind schedule string: {blind_schedule_str}")
+    blinds = parts[1].split("/")
+    if len(blinds) != 2:
+      raise ValueError(f"Invalid blind schedule string: {blind_schedule_str}")
+    num_hands = int(parts[0])
+    small_blind = int(blinds[0])
+    big_blind = int(blinds[1])
     blind_levels.append(
         BlindLevel(
             num_hands,
@@ -184,13 +160,12 @@ def parse_bet_size_schedule(bet_size_schedule_str: str) -> list[BetSizeLevel]:
   Parsed bet-size schedule strings are of the form
     <bet_size_level_1>;...;<bet_size_level_n>
   where each bet-size level is of the form
-    <num_hands>,<small_bet_size>,<big_bet_size>
+    <num_hands>:<small_bet_size>/<big_bet_size>
 
   Args:
     bet_size_schedule_str: A string specifying the bet-size schedule. The format
       is a semicolon-separated list of bet-size levels, where each level is a
-      comma-separated tuple of `num_hands`, `small_bet_size`, and
-      `big_bet_size`.
+      colon-separated tuple of `num_hands` & `<small_bet_size>/<big_bet_size>`.
 
   Returns:
     A list of BetSizeLevel objects parsed from the input string.
@@ -199,8 +174,21 @@ def parse_bet_size_schedule(bet_size_schedule_str: str) -> list[BetSizeLevel]:
     return []
 
   bet_sizes = []
-  for level_parts in _split_level_schedule_string(bet_size_schedule_str, 3):
-    num_hands, small_bet_size, big_bet_size = [int(p) for p in level_parts]
+  levels_str = bet_size_schedule_str.removesuffix(";").split(";")
+  for level_str in levels_str:
+    parts = level_str.split(":")
+    if len(parts) != 2:
+      raise ValueError(
+          f"Invalid bet-size schedule string: {bet_size_schedule_str}"
+      )
+    bet_size_parts = parts[1].split("/")
+    if len(bet_size_parts) != 2:
+      raise ValueError(
+          f"Invalid bet-size schedule string: {bet_size_schedule_str}"
+      )
+    num_hands = int(parts[0])
+    small_bet_size = int(bet_size_parts[0])
+    big_bet_size = int(bet_size_parts[1])
     bet_sizes.append(BetSizeLevel(num_hands, small_bet_size, big_bet_size))
   return bet_sizes
 
@@ -211,12 +199,12 @@ def parse_bring_in_schedule(bring_in_schedule_str: str) -> list[BringInLevel]:
   Parsed bring-in schedule strings are of the form
     <bring_in_level_1>;...;<bring_in_level_n>
   where each bring-in level is of the form
-    <num_hands>,<bring_in>
+    <num_hands>:<bring_in>
 
   Args:
     bring_in_schedule_str: A string specifying the bring-in schedule. The format
       is a semicolon-separated list of bring-in levels, where each level is a
-      comma-separated tuple of `num_hands` and `bring_in`.
+      colon-separated tuple of `num_hands` and `bring_in`.
 
   Returns:
     A list of BringInLevel objects parsed from the input string.
@@ -224,8 +212,15 @@ def parse_bring_in_schedule(bring_in_schedule_str: str) -> list[BringInLevel]:
   if not bring_in_schedule_str:
     return []
   bring_ins = []
-  for level_parts in _split_level_schedule_string(bring_in_schedule_str, 2):
-    num_hands, bring_in = [int(p) for p in level_parts]
+  levels_str = bring_in_schedule_str.removesuffix(";").split(";")
+  for level_str in levels_str:
+    parts = level_str.split(":")
+    if len(parts) != 2:
+      raise ValueError(
+          f"Invalid bring-in schedule string: {bring_in_schedule_str}"
+      )
+    num_hands = int(parts[0])
+    bring_in = int(parts[1])
     bring_ins.append(BringInLevel(num_hands, bring_in))
   return bring_ins
 
@@ -273,20 +268,20 @@ class RepeatedPokerkit(pyspiel.Game):
     "blind_schedule": string (optional)
         Specifies the blind schedule for playing a tournament. The format is:
         <blind_level_1>;<blind_level_2>;...<blind_level_n> where each blind
-        level is of the form <num_hands>,<small_blind>,<big_blind>. If play
+        level is of the form <num_hands>:<small_blind>/<big_blind>. If play
         continues beyond the number of hands specified in the last blind level,
         the last blind level will continue to be used.
     "bet_size_schedule": string (optional)
         Specifies the bet-size schedule for playing a tournament. The format is:
         <bet_size_level_1>;<bet_size_level_2>;...<bet_size_level_n> where each
         bet-size level is of the form
-        <num_hands>,<small_bet_size>,<big_bet_size>.  If play continues beyond
+        <num_hands>:<small_bet_size>/<big_bet_size>.  If play continues beyond
         the number of hands specified in the last bet-size level, the last
         bet-size level will continue to be used.
     "bring_in_schedule": string (optional)
         Specifies the bring-in schedule for playing a tournament. The format is:
         <bring_in_level_1>;<bring_in_level_2>;...<bring_in_level_n> where each
-        bring-in level is of the form <num_hands>,<bring_in>. If play continues
+        bring-in level is of the form <num_hands>:<bring_in>. If play continues
         beyond the number of hands specified in the last bring-in level, the
         last bring-in level will continue to be used.
     "first_button_player": int (optional, default=-1)
@@ -305,6 +300,12 @@ class RepeatedPokerkit(pyspiel.Game):
           0, the BB the player with ID 1, the UTG player with ID 2 ... the BTN
           the player with ID 2)
         and so on.
+    "record_full_hand_histories": bool (optional, default=True)
+        Whether to record full resulting per-player PokerkitHandHistory-s (PHH)
+        at the end of each hand. These tend to be extremely useful, but can
+        take up large amounts of memory when the number of hands is very large.
+        Consider setting this to False if you run into memory issues, especially
+        when attempting to serialize this game.
 
   Returns are calculated by summing the returns for each hand.
 
@@ -335,6 +336,7 @@ class RepeatedPokerkit(pyspiel.Game):
   def __init__(self, params=None):
     self.params = params
     self._pokerkit_game_params = {}
+    self._record_full_hand_histories = params.get("record_full_hand_histories")
     self._max_num_hands = params.get("max_num_hands")
     if not self._max_num_hands or not isinstance(self._max_num_hands, int):
       raise ValueError(
@@ -488,19 +490,17 @@ class RepeatedPokerkitState(pyspiel.State):
     # PokerkitWrapperState.
     self._stacks: list[int] = None
     self._dealer = pyspiel.PlayerId.INVALID
-    self._seat_to_player: dict[int, int] = None
-    self._player_to_seat: dict[int, int] = None
+    self._seat_to_player: dict[int, int] = {}
+    self._player_to_seat: dict[int, int] = {}
     self._small_blind = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
     self._big_blind = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
     self._small_bet_size = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
     self._big_bet_size = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
     self._bring_in = INVALID_BLIND_BET_SIZE_OR_BRING_IN_VALUE
 
-    self._wrapped_state_hand_histories: list[str] = []
+    self._wrapped_state_hand_histories: list[list[list[str]]] = []
     # 2-D list where each inner list has length _num_players
     self._hand_returns: list[list[float]] = [[0.0] * game.num_players()]
-    self._player_to_seat = {}
-    self._seat_to_player = {}
 
     super().__init__(game)
 
@@ -957,17 +957,28 @@ class RepeatedPokerkitState(pyspiel.State):
     if not self.pokerkit_wrapper_state.is_terminal():
       return
 
+    # NOTE: Past this point we are starting a new hand!
     assert not self.pokerkit_wrapper_state._wrapped_state.status
-
     # Record hand-level information.
     for i, per_seat_returns in enumerate(self.pokerkit_wrapper_state.returns()):
       player: int = self._seat_to_player[i]
       self._hand_returns[-1][player] = per_seat_returns
-    wrapped_state = self.pokerkit_wrapper_state._wrapped_state
-    self._wrapped_state_hand_histories.append(str(wrapped_state))
+
+    if self.get_game()._record_full_hand_histories:
+      # "histories" in the plural since each of these function calls will return
+      # a separate history from the perspective of each individual player in the
+      # hand. (And each of those histories is itself a list of strings - so in
+      # practice this will look like list[list[list[str]]])
+      # NOTE: This can require a very large amount of memory for large games
+      # with many hands and/or players!
+      self._wrapped_state_hand_histories.append(
+          self.pokerkit_wrapper_state.to_struct().poker_hand_histories)
     # Terminate or start a new hand
     if self._hand_number + 1 == self.get_game()._max_num_hands:
       self._is_terminal = True
+      # Necessary to ensure that if returning stacks inside to_struct() that it
+      # gets the correct final stacks when in a terminal state.
+      self.update_stacks()
       return
     self._hand_number += 1
     self._hand_returns.append([0.0] * self.num_players())
@@ -1076,6 +1087,27 @@ class RepeatedPokerkitState(pyspiel.State):
   def __str__(self):
     return f"Hand number: {self._hand_number}\n{self.pokerkit_wrapper_state}"
 
+  def to_struct(self) -> pyspiel.repeated_pokerkit.RepeatedPokerkitStateStruct:
+    """Returns the current repeated_pokerkit state struct."""
+    struct = pyspiel.repeated_pokerkit.RepeatedPokerkitStateStruct()
+    struct.pokerkit_state_struct = self.pokerkit_wrapper_state.to_struct()
+    struct.hand_number = self._hand_number
+    struct.is_terminal = self._is_terminal
+    struct.stacks = self._stacks
+    struct.dealer = self._dealer
+    struct.seat_to_player = self._seat_to_player
+    struct.player_to_seat = self._player_to_seat
+    struct.small_blind = self._small_blind
+    struct.big_blind = self._big_blind
+    struct.small_bet_size = self._small_bet_size
+    struct.big_bet_size = self._big_bet_size
+    struct.bring_in = self._bring_in
+    struct.hand_returns = self._hand_returns
+    return struct
+
+  def to_json(self) -> str:
+    return self.to_struct().to_json()
+
 
 class RepeatedPokerkitObserver:
   """RepeatedPokerkit "Observer" for creating per-player state tensors and strings."""
@@ -1159,7 +1191,6 @@ class RepeatedPokerkitObserver:
     return pokerkit_wrapper_observer.string_from(
         state.pokerkit_wrapper_state, seat_id
     )
-
 
 # TODO: b/437724266 - remove once no longer disabling at the top of this file.
 # pylint: enable=protected-access

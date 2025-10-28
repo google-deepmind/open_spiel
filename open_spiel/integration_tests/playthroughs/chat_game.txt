@@ -40,7 +40,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "\n\nFull Dialogue\n\n"
 InformationStateString(1) = "\n\nFull Dialogue\n\n"
 InformationStateTensor(0).player_id: ◉◯◯◯◯◯◯◯◯◯
@@ -965,7 +965,7 @@ History() = [0, 4]
 HistoryString() = "0, 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "\n\nFull Dialogue\n\n\n\n############################\nEmail:\nfrom: Bob\nto: Suzy\ncc: Everyone\n############################\n\nHi Suzy,\n\nI hope you are well,\n\nBest,\n\nBob"
 InformationStateString(1) = "\n\nFull Dialogue\n\n\n\n############################\nEmail:\nfrom: Bob\nto: Suzy\ncc: Everyone\n############################\n\nHi Suzy,\n\nI hope you are well,\n\nBest,\n\nBob"
 InformationStateTensor(0).player_id: ◉◯◯◯◯◯◯◯◯◯
@@ -1880,7 +1880,7 @@ History() = [0, 4, 0, 0]
 HistoryString() = "0, 4, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "\n\nFull Dialogue\n\n\n\n############################\nEmail:\nfrom: Bob\nto: Suzy\ncc: Everyone\n############################\n\nHi Suzy,\n\nI hope you are well,\n\nBest,\n\nBob\n\n############################\nEmail:\nfrom: Suzy\nto: Bob\ncc: \n############################\n\n\nThat all sounds good to me.\n"
 InformationStateString(1) = "\n\nFull Dialogue\n\n\n\n############################\nEmail:\nfrom: Bob\nto: Suzy\ncc: Everyone\n############################\n\nHi Suzy,\n\nI hope you are well,\n\nBest,\n\nBob\n\n############################\nEmail:\nfrom: Suzy\nto: Bob\ncc: \n############################\n\n\nThat all sounds good to me.\n"
 InformationStateTensor(0).player_id: ◉◯◯◯◯◯◯◯◯◯

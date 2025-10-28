@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/universal_poker.h"
 #include "open_spiel/spiel.h"
@@ -48,7 +49,7 @@
 //  "blind_schedule" string (optional)
 //    Specifies the blind schedule for playing a tournament. The format is:
 //    <blind_level_1>;<blind_level_2>;...<blind_level_n> where each blind level
-//    is of the form <num_hands>,<small_blind>,<big_blind>. If play continues
+//    is of the form <num_hands>:<small_blind>/<big_blind>. If play continues
 //    beyond the number of hands specified in the last blind level, the last
 //    blind level will continue to be used.
 
@@ -88,6 +89,30 @@ struct BlindLevel {
   int big_blind;
 };
 
+struct RepeatedPokerStateStruct : StateStruct {
+  int hand_number;
+  int max_num_hands;
+  std::vector<int> stacks;
+  Player dealer;
+  int small_blind;
+  int big_blind;
+  std::vector<std::vector<double>> hand_returns;
+  std::string current_universal_poker_json;
+  std::string prev_universal_poker_json;
+
+  RepeatedPokerStateStruct() = default;
+  explicit RepeatedPokerStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override { return *this; }
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(RepeatedPokerStateStruct, hand_number,
+                                 max_num_hands, stacks, dealer, small_blind,
+                                 big_blind, hand_returns,
+                                 current_universal_poker_json,
+                                 prev_universal_poker_json);
+};
+
 class RepeatedPokerState : public State {
  public:
   RepeatedPokerState(std::shared_ptr<const Game> game,
@@ -104,6 +129,7 @@ class RepeatedPokerState : public State {
   bool IsTerminal() const override { return is_terminal_; };
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override {
     return universal_poker_state_->LegalActions();
@@ -115,6 +141,7 @@ class RepeatedPokerState : public State {
   std::unique_ptr<UniversalPokerState> GetUniversalPokerState() const {
     return std::make_unique<UniversalPokerState>(*universal_poker_state_);
   }
+  int HandNumber() const { return hand_number_; }
   int Dealer() const { return dealer_; }
   int SmallBlind() const { return small_blind_; }
   int BigBlind() const { return big_blind_; }
@@ -124,6 +151,9 @@ class RepeatedPokerState : public State {
   int DealerSeat() const { return player_to_seat_.at(dealer_); }
   int SmallBlindSeat() const { return small_blind_seat_; }
   int BigBlindSeat() const { return big_blind_seat_; }
+  std::vector<std::string> AcpcHandHistories() const {
+    return acpc_hand_histories_;
+  }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -132,6 +162,7 @@ class RepeatedPokerState : public State {
   std::string universal_poker_game_string_;
   GameParameters universal_poker_game_params_;
   std::unique_ptr<UniversalPokerState> universal_poker_state_;
+  std::string prev_universal_poker_json_ = "";
   int hand_number_ = 0;
   int max_num_hands_ = 0;
   bool is_terminal_ = false;
@@ -150,6 +181,11 @@ class RepeatedPokerState : public State {
   int big_blind_ = kInvalidBlindValue;
   int small_blind_seat_ = kInactivePlayerSeat;
   int big_blind_seat_ = kInactivePlayerSeat;
+  // We adopt a slight variant of the ACPC format for the hand histories:
+  // STATE:<hand_number>:<betting_and_cards>:<returns>:<player_names>
+  // This was introduced by Brown and Sandholm when releasing hands played by
+  // Pluribus. See
+  // https://www.science.org/doi/10.1126/science.aay2400#supplementary-materials
   std::vector<std::string> acpc_hand_histories_{};
   std::vector<std::vector<double>> hand_returns_{
       std::vector<double>(num_players_, 0.0)};
@@ -173,6 +209,9 @@ class RepeatedPokerGame : public Game {
   int NumDistinctActions() const override;
   int MaxChanceOutcomes() const override {
     return base_game_->MaxChanceOutcomes();
+  }
+  int MaxChanceNodesInHistory() const override {
+    return max_num_hands_ * base_game_->MaxChanceNodesInHistory();
   }
   double MinUtility() const override;
   double MaxUtility() const override;

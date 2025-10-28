@@ -103,7 +103,6 @@ def _get_variants_supporting_param(param_name: str) -> list[str]:
       if param_name in inspect.signature(cls).parameters.keys()
   ]
 
-
 VARIANT_PARAM_USAGE = {
     param: _get_variants_supporting_param(param)
     for param in [
@@ -114,6 +113,8 @@ VARIANT_PARAM_USAGE = {
         "max_completion_betting_or_raising_count",
     ]
 }
+
+_ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING = "Bet/Raise to 1 [ALL-IN EDGECASE]"
 
 # WARNING: do not use comma-containing string param values here. Also, do not
 # use strings for single-value integers. Instead respectively use space (" ")
@@ -906,9 +907,14 @@ class PokerkitWrapperState(pyspiel.State):
           assert wrapped_state.stacks[wrapped_state.actor_index] == 1
           assert wrapped_state.can_complete_bet_or_raise_to(1)
           assert wrapped_state.stacks[wrapped_state.actor_index] == 1
-          assert "Bet/Raise to 1 [ALL-IN EDGECASE]" in self.action_to_string(
+          action_string = self._action_to_string_base(
               wrapped_state.actor_index, action
           )
+          if _ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING not in action_string:
+            raise ValueError(
+                f"Expected to find {_ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING} for"
+                f" action {action} but got action string {action_string}"
+            )
           wrapped_state.complete_bet_or_raise_to(1)
       return
 
@@ -946,7 +952,25 @@ class PokerkitWrapperState(pyspiel.State):
           f"{wrapped_state.can_deal_board()}"
       )
 
+  # TODO: b/437724266 - update string structure (not bet sizings!) to match
+  # universal_poker/universal_poker.cc ActionToString where practical. E.g.
+  # 'Deal {card}' and 'player={player} move={move}'.
   def _action_to_string(self, player, action):
+    """Returns the string representation of an action.
+
+    Assumes that input player actions corresponding to completion-bets or raises
+    are in 'Pokerkit' style rather than 'ACPC' style, i.e. raising to a total
+    contribution on the current street only (rather than a total contribution
+    across all streets).
+
+    Args:
+      player: The player for whom the action string is generated.
+      action: The action to convert to a string.
+    """
+    return self._action_to_string_base(player, action)
+
+  def _action_to_string_base(self, player, action):
+    """Core "base" logic from above, separated to bypass method overrides."""
     wrapped_state: pokerkit.State = self._wrapped_state
     if self.is_chance_node():
       assert player is not None
@@ -973,13 +997,12 @@ class PokerkitWrapperState(pyspiel.State):
       amount = wrapped_state.checking_or_calling_amount
       return f"Player {player}: Check" if amount == 0 else f"Call({amount})"
     elif action >= 0 and action not in FOLD_AND_CHECK_OR_CALL_ACTIONS:
-      if wrapped_state.stacks[player] != 1:
+      if not (action == 2 and wrapped_state.stacks[player] == 1):
         return f"Player {player}: Bet/Raise to {action}"
 
-      # In this very specific edge case, we likely mapped a shove size of 1 chip
-      # to action 2 to avoid conflicting with reserved actions. For more details
-      # see the comment in _legal_actions().
-      assert action == 2
+      # EDGE CASE: If stack size is 1 and action is 2, this is likely a case
+      # where the action was 'remapped' from 1 to 2 to avoid collision with
+      # CHECK_OR_CALL action.
       assert wrapped_state.min_completion_betting_or_raising_to_amount == 1
       assert wrapped_state.max_completion_betting_or_raising_to_amount == 1
       # As per the docs:
@@ -989,11 +1012,19 @@ class PokerkitWrapperState(pyspiel.State):
       #
       # Bets on the other hand has the positive amounts the player already
       # contributed on this street.
-      contribution_on_prior_streets = -1 * (
+      #
+      # TODO: b/437724266 - figure out whether things like blinds or bring_in
+      # (which have laready been subtracted from starting_stacks by this point)
+      # will or will not show up in the bets list, and how that may affect this
+      # in preflop situations specifically. Since, although in practice this
+      # appears to work + the tests aren't flakey, to be safe we should
+      # investigate and document exactly what is happening in this spot.
+      contribution_on_prior_streets_or_non_bets = -1 * (
           wrapped_state.payoffs[player] + wrapped_state.bets[player]
       )
       assert (
-          wrapped_state.starting_stacks[player] - contribution_on_prior_streets
+          wrapped_state.starting_stacks[player]
+          - contribution_on_prior_streets_or_non_bets
           == 1
       )
       return f"Player {player}: Bet/Raise to 1 [ALL-IN EDGECASE]"
@@ -1046,6 +1077,69 @@ class PokerkitWrapperState(pyspiel.State):
     """Create and return a deepcopy of the 'wrapped' pokerkit.state."""
     return copy.deepcopy(self._wrapped_state)
 
+  def to_struct(self) -> pyspiel.pokerkit_wrapper.PokerkitStateStruct:
+    legal_actions = []
+    if not self.is_terminal():
+      legal_actions = self.legal_actions()
+    # TODO(jhtschultz): If having the PHHs embeded in the observation string
+    # would be helpful pass in pyspiel.IIGObservationType(perfect_recall=True))
+    # here instead.
+    # (Either way we'll already be putting the PHHs on the struct directly
+    # though, so doing so probably isn't _necessary_ - see below for details.)
+    observer = self.get_game().make_py_observer()
+    obs_strs = [
+        observer.string_from(self, p)
+        for p in range(self.get_game().num_players())
+    ]
+    game = self.get_game()
+    stacks = [int(s) for s in self._wrapped_state.stacks]
+    bets = [int(b) for b in self._wrapped_state.bets]
+
+    flattened_board_cards = []
+    for sublist in self._wrapped_state.board_cards:
+      flattened_board_cards.extend(sublist)
+    board_cards = [game.card_to_int[c] for c in flattened_board_cards]
+
+    hole_cards = [
+        [game.card_to_int[c] for c in hc_list]
+        for hc_list in self._wrapped_state.hole_cards
+    ]
+    pots = [int(p.amount) for p in self._wrapped_state.pots]
+    burn_cards = [game.card_to_int[c] for c in self._wrapped_state.burn_cards]
+    mucked_cards = [
+        game.card_to_int[c] for c in self._wrapped_state.mucked_cards
+    ]
+
+    # Technically we can get these 'for free' on the observation strings above
+    # by using a perfect_recall observer there. But in practice these are
+    # important enough that it's nice to have them be explicitly available as a
+    # first-class citizen on the actual struct.
+    perfect_recall_observer = self.get_game().make_py_observer(
+        pyspiel.IIGObservationType(perfect_recall=True)
+    )
+    poker_hand_histories: list[list[str]] = [
+        perfect_recall_observer.poker_hand_history_actions(self, p)
+        for p in range(self.get_game().num_players())
+    ]
+
+    cpp_state_struct = pyspiel.pokerkit_wrapper.PokerkitStateStruct()
+    cpp_state_struct.observation = obs_strs
+    cpp_state_struct.legal_actions = legal_actions
+    cpp_state_struct.current_player = self.current_player()
+    cpp_state_struct.is_terminal = self.is_terminal()
+    cpp_state_struct.stacks = stacks
+    cpp_state_struct.bets = bets
+    cpp_state_struct.board_cards = board_cards
+    cpp_state_struct.hole_cards = hole_cards
+    cpp_state_struct.pots = pots
+    cpp_state_struct.burn_cards = burn_cards
+    cpp_state_struct.mucked_cards = mucked_cards
+    cpp_state_struct.poker_hand_histories = poker_hand_histories
+    return cpp_state_struct
+
+  def to_json(self) -> str:
+    return self.to_struct().to_json()
+
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
     state: pokerkit.State = self._wrapped_state
@@ -1087,7 +1181,7 @@ class PokerkitWrapperObserver:
     self.tensor = np.array([])
     self.dict = {}
 
-  def _poker_hand_history_actions(self, state, player) -> list[str]:
+  def poker_hand_history_actions(self, state, player) -> list[str]:
     """Returns PHH (Poker Hand History) actions from player's perspective."""
     game = state.get_game()
     game.raise_error_if_player_out_of_range(player)
@@ -1163,6 +1257,7 @@ class PokerkitWrapperObserver:
         else draw_statuses[current_street_index]
     )
     pots: pokerkit.Pot = [p for p in wrapped_state_do_not_mutate.pots]
+    bets: list[int] = wrapped_state_do_not_mutate.bets
     player_next_to_act: int = wrapped_state_do_not_mutate.actor_index
 
     # --- NOTE: the following '_cards' on the state here are all generators, so
@@ -1193,6 +1288,7 @@ class PokerkitWrapperObserver:
         f"||Current Street discard/draw performed: {draw_status}\n"
         f"||Next Player to act: {player_next_to_act}\n"
         f"||Pot(s): {pots} \n"
+        f"||Bets: {bets}\n"
         f"||Board Cards: {public_board_cards}\n"
         f"||Player's Private Hole Cards: {private_down_cards}\n"
         # NOTE: This is intentionally the same for all observing players. I.e.
@@ -1234,7 +1330,7 @@ class PokerkitWrapperObserver:
       # I.e. construct the 'information state string' (by simply merging the
       # observation string with the PHH actions).
       phh_action_string = ",".join(
-          self._poker_hand_history_actions(state, player)
+          self.poker_hand_history_actions(state, player)
       )
       return f"{observation_string}\n||PHH Actions: {phh_action_string}"
     else:
@@ -1265,6 +1361,14 @@ class PokerkitWrapperAcpcStyle(PokerkitWrapper):
     pokerkit style action before returning the string as per usual (i.e. it will
     not make any other changes to the output string, e.g. to match
     universal_poker).
+
+  NOTE: Unlike universal_poker, this actually handles hole-card dealing
+  'properly' for real-world poker games, i.e. each player gets their first hole
+  card before any player gets their second hole card. You will need to shuffle
+  the order with which hole cards are dealt to simulate the same exact game.
+  (That said, the decks - and therefore chance actions - are the same for any
+  given card between this and universal_poker, so doing so should be
+  straightforward.)
   """
 
   def __init__(self, params=None):
@@ -1361,12 +1465,22 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
     # world of ACPC-style actions we're trying to support, instead of the
     # pokerkit-style actions we have at this point.
     pokerkit_style_actions = super()._legal_actions(current_player)
+    # NOTE: *also* deliberately NOT calling super()._action_to_string(). Doing
+    # so has (surprisingly!) flaked inside the general-purpose OpenSpiel
+    # test_game_sim (i.e. test_game_sim_python_pokerkit_wrapper_acpc_style) with
+    # `TypeError: super(type, obj): obj must be an instance or subtype of type`.
+    #
+    # The reason appears to be due to an edge case around how python handles
+    # scoping inside of list comprehensions.
+    #
+    # For more details on the error, see
+    # https://github.com/google-deepmind/open_spiel/actions/runs/18138757383/job/51624123398#step:6:3415
     pokerkit_style_action_strings = [
-        super()._action_to_string(current_player, action)
+        self._action_to_string_base(current_player, action)
         for action in pokerkit_style_actions
     ]
     self._pokerkit_action_to_acpc_style_mapping = (
-        self._action_converter.create_action_map(
+        self._action_converter.create_player_action_map(
             current_player,
             pokerkit_style_actions,
             pokerkit_style_action_strings,
@@ -1399,13 +1513,11 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
       raise ValueError("Cannot convert action to string for a terminal state.")
 
     if action not in self._acpc_action_to_pokerkit_action_mapping:
-      assert action in self.legal_actions(player)
       raise ValueError(
           f"Action {action} is not a valid ACPC style action. Expected legal"
           f" actions are: {self.legal_actions(player)}"
       )
     assert not (self.is_chance_node() or self.is_terminal())
-    assert action in self._acpc_action_to_pokerkit_action_mapping
     return super()._action_to_string(
         player, self._acpc_action_to_pokerkit_action_mapping[action]
     )
@@ -1424,6 +1536,7 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
     """
     pokerkit_style_legal_actions = super()._legal_actions(player)
     if self.is_chance_node() or self.is_terminal():
+      logging.warning("called legal_actions in chance node or terminal state.")
       return pokerkit_style_legal_actions
     else:
       return [self.to_acpc_action(a) for a in pokerkit_style_legal_actions]
@@ -1437,6 +1550,10 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
 
     Args:
       action: The ACPC-style action to apply.
+
+    Raises:
+      RuntimeError: If the action string does not match the expected format
+        after conversion.
     """
     if self.is_chance_node():
       self._action_converter.track_chance_node()
@@ -1480,14 +1597,26 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
         assert (
             super()
             ._action_to_string(self.current_player(), pokerkit_style_action)
-            .endswith("Bet/Raise to 1 [ALL-IN EDGECASE]")
+            .endswith(_ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING)
         )
         size = 1
-      # NOTE: now double-checking using the *subclassed* action_to_string()
-      # method, hence passing in the acpc_style_action.
-      assert self._action_to_string(
+
+      # NOTE: earlier we were checking the string using the **non-acpc** base
+      # class handling. Pay attention to how we're doing self._action_to_string
+      # now, not super()._action_to_string().
+      action_string_from_acpc_action = self._action_to_string(
           self.current_player(), acpc_style_action
-      ).endswith(f"Bet/Raise to {size}")
+      )
+      if not action_string_from_acpc_action.removesuffix(
+          " [ALL-IN EDGECASE]"
+      ).endswith(f"Bet/Raise to {size}"):
+        raise RuntimeError(
+            f"Resulting action string {action_string_from_acpc_action} for"
+            f" ACPC-style action {acpc_style_action} does not end as expected."
+            f" Size is {size} and pokerkit-style action was"
+            f" {pokerkit_style_action}.",
+        )
+
     else:
       raise ValueError(
           "Action must be a check, call, completion bet, or raise-to."
@@ -1612,7 +1741,7 @@ class ToAcpcActionConverter:
     elif pokerkit_style_action == ACTION_CHECK_OR_CALL:  # and size != 0
       # This MUST be a call if we've reacehd this point, since checks
       # (i.e. size == 0) should have been handled above already above.
-      assert(size > 0)
+      assert size > 0
       # NOTE: Adding, not replacing, since call sizes in pokerkit are defined
       # as the *additional* contribution on the current street (unlike
       # completion bets or raises).
@@ -1637,7 +1766,7 @@ class ToAcpcActionConverter:
           f" {pokerkit_style_action} instead."
       )
 
-  def create_action_map(
+  def create_player_action_map(
       self,
       player: int,
       pokerkit_style_actions: list[int],
@@ -1652,6 +1781,7 @@ class ToAcpcActionConverter:
         zip(pokerkit_style_actions, pokerkit_style_action_strings)
     )
 
+    # Check that the input action and action strings match as expected.
     for (
         pokerkit_style_action,
         pokerkit_style_action_string,
@@ -1671,9 +1801,9 @@ class ToAcpcActionConverter:
     # NOTE: exclusive slice to avoid including the current street's
     # contributions in the sum here.
     prior_street_contributions = self._per_street_contributions[:current_street]
-    total_prior_street_contribution = int(sum(
-        contribution[player] for contribution in prior_street_contributions
-    ))
+    total_prior_street_contribution = int(
+        sum(contribution[player] for contribution in prior_street_contributions)
+    )
     pokerkit_action_to_acpc_action_mapping = {
         pokerkit_style_action: self._convert_action_to_acpc_style(
             pokerkit_style_action,
@@ -1710,15 +1840,21 @@ class ToAcpcActionConverter:
     # NOTE: This is the one place where we usually have to convert actions!
     # I.e. ACPC-style and pokerkit-style actions primarily differ only in this
     # specific point.
-    pokerkit_action_size = pokerkit_style_action
-
-    # Handle a very specific edge-case where the player is allowed to bet
-    # exactly one chip via a special '2' action (to avoid conflict with
-    # the ACTION_CHECK_OR_CALL value of 1).
-    if pokerkit_style_action == 2 and pokerkit_style_action_string.endswith(
-        "Bet/Raise to 1 [ALL-IN EDGECASE]"
-    ):
-      pokerkit_action_size = 1
+    #
+    # The "all-in for one chip" edge case is the only situation where in a
+    # pokerkit style action a completion-bet or raise size is different from the
+    # action's value.
+    is_special_edge_case_betting_one_chip = (
+        pokerkit_style_action == 2
+        and pokerkit_style_action_string.endswith(
+            _ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING
+        )
+    )
+    pokerkit_action_size = (
+        pokerkit_style_action
+        if not is_special_edge_case_betting_one_chip
+        else 1
+    )
     assert (
         f"Bet/Raise to {pokerkit_action_size}" in pokerkit_style_action_string
     )

@@ -37,7 +37,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = ""
 ObservationString(0) = "Before initial chance node"
 ObservationTensor(0).location: ◉◯◯◯◯◯◯◯
@@ -58,7 +58,7 @@ History() = [0]
 HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
+CurrentPlayer() = 0
 InformationStateString(0) = "0"
 ObservationString(0) = "Location=O->A, waiting_time=0, t=0, destination='D->E'"
 ObservationTensor(0).location: ◯◯◯◯◯◯◯◉
@@ -80,7 +80,7 @@ History() = [0, 2]
 HistoryString() = "0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "0, 2"
 ObservationString(0) = "Location=A->C, waiting_time=-1, t=1_mean_field, destination='D->E'"
 ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
@@ -101,7 +101,7 @@ History() = [0, 2]
 HistoryString() = "0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
+CurrentPlayer() = 0
 InformationStateString(0) = "0, 2"
 ObservationString(0) = "Location=A->C, waiting_time=3, t=1, destination='D->E'"
 ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
@@ -123,7 +123,7 @@ History() = [0, 2, 0]
 HistoryString() = "0, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "0, 2, 0"
 ObservationString(0) = "Location=A->C, waiting_time=2, t=2_mean_field, destination='D->E'"
 ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
@@ -144,7 +144,7 @@ History() = [0, 2, 0]
 HistoryString() = "0, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
+CurrentPlayer() = 0
 InformationStateString(0) = "0, 2, 0"
 ObservationString(0) = "Location=A->C, waiting_time=2, t=2, destination='D->E'"
 ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
@@ -166,7 +166,7 @@ History() = [0, 2, 0, 0]
 HistoryString() = "0, 2, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "0, 2, 0, 0"
 ObservationString(0) = "Location=A->C, waiting_time=1, t=3_mean_field, destination='D->E'"
 ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
@@ -239,7 +239,7 @@ History() = [0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0]
 HistoryString() = "0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0"
 ObservationString(0) = "Arrived at D->E, with arrival time 8, t=10_mean_field"
 ObservationTensor(0).location: ◯◯◯◯◯◯◉◯

@@ -37,7 +37,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = ""
 ObservationString(0) = "initial"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -56,7 +56,7 @@ History() = [15]
 HistoryString() = "15"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
+CurrentPlayer() = 0
 InformationStateString(0) = "15"
 ObservationString(0) = "(15, 0)"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
@@ -76,7 +76,7 @@ History() = [15, 0]
 HistoryString() = "15, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "15, 0"
 ObservationString(0) = "(5, 0)_a_mu"
 ObservationTensor(0).x: ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -95,7 +95,7 @@ History() = [15, 0, 20]
 HistoryString() = "15, 0, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "15, 0, 20"
 ObservationString(0) = "(15, 1)_a"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
@@ -114,7 +114,7 @@ History() = [15, 0, 20]
 HistoryString() = "15, 0, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
+CurrentPlayer() = 0
 InformationStateString(0) = "15, 0, 20"
 ObservationString(0) = "(15, 1)"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
@@ -138,7 +138,7 @@ History() = [15, 0, 20, 9, 16]
 HistoryString() = "15, 0, 20, 9, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "15, 0, 20, 9, 16"
 ObservationString(0) = "(20, 2)_a"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
@@ -157,7 +157,7 @@ History() = [15, 0, 20, 9, 16]
 HistoryString() = "15, 0, 20, 9, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
+CurrentPlayer() = 0
 InformationStateString(0) = "15, 0, 20, 9, 16"
 ObservationString(0) = "(20, 2)"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
@@ -181,7 +181,7 @@ History() = [15, 0, 20, 9, 16, 14, 16]
 HistoryString() = "15, 0, 20, 9, 16, 14, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "15, 0, 20, 9, 16, 14, 16"
 ObservationString(0) = "(9, 3)_a"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
@@ -284,7 +284,7 @@ History() = [15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4,
 HistoryString() = "15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4, 6, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
+CurrentPlayer() = 0
 InformationStateString(0) = "15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4, 6, 4"
 ObservationString(0) = "(0, 10)"
 ObservationTensor(0).x: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -308,7 +308,7 @@ History() = [15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4,
 HistoryString() = "15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4, 6, 4, 6, 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4, 6, 4, 6, 10"
 ObservationString(0) = "(17, 11)_a"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
@@ -431,7 +431,7 @@ History() = [15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4,
 HistoryString() = "15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4, 6, 4, 6, 10, 16, 11, 20, 20, 19, 18, 0, 8, 17, 14, 6, 16, 4, 10, 2, 18, 3, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "15, 0, 20, 9, 16, 14, 16, 17, 11, 3, 1, 13, 18, 7, 8, 17, 7, 15, 4, 6, 4, 6, 10, 16, 11, 20, 20, 19, 18, 0, 8, 17, 14, 6, 16, 4, 10, 2, 18, 3, 20"
 ObservationString(0) = "(17, 20)_a"
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯

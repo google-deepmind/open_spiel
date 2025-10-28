@@ -15,6 +15,7 @@
 #include "open_spiel/games/universal_poker/repeated_poker.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -74,7 +75,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // Parses blind schedule string of the form
 // <blind_level_1>;...;<blind_level_n>
 // where each blind level is of the form
-// <num_hands>,<small_blind>,<big_blind>
+// <num_hands>:<small_blind>/<big_blind>
 std::vector<BlindLevel> ParseBlindSchedule(
     const std::string& blind_schedule_str) {
   std::vector<BlindLevel> blind_levels;
@@ -84,12 +85,14 @@ std::vector<BlindLevel> ParseBlindSchedule(
   std::vector<std::string> levels = absl::StrSplit(
       absl::StripSuffix(blind_schedule_str, ";"), ';');
   for (const auto& level : levels) {
-    std::vector<std::string> parts = absl::StrSplit(level, ',');
-    SPIEL_CHECK_EQ(parts.size(), 3);
+    std::vector<std::string> parts = absl::StrSplit(level, ':');
+    SPIEL_CHECK_EQ(parts.size(), 2);
+    std::vector<std::string> blinds = absl::StrSplit(parts[1], '/');
+    SPIEL_CHECK_EQ(parts.size(), 2);
     blind_levels.push_back({
         .num_hands = std::stoi(parts[0]),
-        .small_blind = std::stoi(parts[1]),
-        .big_blind = std::stoi(parts[2]),
+        .small_blind = std::stoi(blinds[0]),
+        .big_blind = std::stoi(blinds[1]),
     });
   }
   return blind_levels;
@@ -178,6 +181,7 @@ RepeatedPokerState::RepeatedPokerState(const RepeatedPokerState& other)
       universal_poker_state_(std::unique_ptr<UniversalPokerState>(
           dynamic_cast<UniversalPokerState*>(
               other.universal_poker_state_->Clone().release()))),
+      prev_universal_poker_json_(other.prev_universal_poker_json_),
       hand_number_(other.hand_number_),
       max_num_hands_(other.max_num_hands_),
       is_terminal_(other.is_terminal_),
@@ -312,16 +316,40 @@ void RepeatedPokerState::DoApplyAction(Action action) {
   if (!universal_poker_state_->IsTerminal()) {
     return;
   }
+  prev_universal_poker_json_ = universal_poker_state_->ToJson();
   // Record hand-level information.
   for (int i = 0; i < universal_poker_state_->Returns().size(); ++i) {
     Player p = seat_to_player_.at(i);
     hand_returns_.back()[p] = universal_poker_state_->Returns()[i];
   }
   auto& acpc_state = universal_poker_state_->acpc_state();
-  acpc_hand_histories_.push_back(acpc_state.ToString());
+  // The acpc_state.ToString() contains extra lines about money spent by
+  // players, which don't provide unique information, so we split by newline and
+  // take only the first line, which is the proper ACPC string.
+  std::vector<std::string> acpc_state_lines = absl::StrSplit(
+      acpc_state.ToString(), '\n');
+  std::vector<std::string> acpc_state_parts = absl::StrSplit(
+      acpc_state_lines[0], absl::MaxSplits(':', 2));
+  std::string acpc_betting_and_cards = acpc_state_parts[2];
+  std::vector<double> seat_returns = universal_poker_state_->Returns();
+  std::vector<int64_t> long_returns;
+  long_returns.reserve(seat_returns.size());
+  for (double r : seat_returns) long_returns.push_back(static_cast<int64_t>(r));
+  std::string returns_str = absl::StrJoin(long_returns, "|");
+  std::vector<std::string> player_names;
+  player_names.reserve(seat_returns.size());
+  for (int i = 0; i < seat_returns.size(); ++i) {
+    player_names.push_back(absl::StrCat("Player", seat_to_player_.at(i)));
+  }
+  std::string player_names_str = absl::StrJoin(player_names, "|");
+  acpc_hand_histories_.push_back(
+      absl::StrCat("STATE:", hand_number_, ":", acpc_betting_and_cards, ":",
+                   returns_str, ":", player_names_str));
+
   // Terminate or start a new hand.
   if (hand_number_ + 1 == max_num_hands_) {
     is_terminal_ = true;
+    UpdateStacks();
     return;
   }
   hand_number_++;
@@ -363,10 +391,7 @@ std::vector<double> RepeatedPokerState::Returns() const {
 }
 
 std::string RepeatedPokerState::ToString() const {
-  return absl::StrCat(
-      "Hand number: ", hand_number_, "\n",
-      universal_poker_state_->ToString()
-  );
+  return ToStruct()->ToJson();
 }
 
 std::string RepeatedPokerState::ObservationString(Player player) const {
@@ -384,6 +409,20 @@ std::string RepeatedPokerState::ObservationString(Player player) const {
 
 std::unique_ptr<State> RepeatedPokerState::Clone() const {
   return std::unique_ptr<State>(new RepeatedPokerState(*this));
+}
+
+std::unique_ptr<StateStruct> RepeatedPokerState::ToStruct() const {
+  auto rv = std::make_unique<RepeatedPokerStateStruct>();
+  rv->hand_number = hand_number_;
+  rv->max_num_hands = max_num_hands_;
+  rv->stacks = stacks_;
+  rv->dealer = dealer_;
+  rv->small_blind = small_blind_;
+  rv->big_blind = big_blind_;
+  rv->hand_returns = hand_returns_;
+  rv->current_universal_poker_json = universal_poker_state_->ToJson();
+  rv->prev_universal_poker_json = prev_universal_poker_json_;
+  return rv;
 }
 
 RepeatedPokerGame::RepeatedPokerGame(const GameParameters& params)

@@ -15,18 +15,22 @@
 #include "open_spiel/games/leduc_poker/leduc_poker.h"
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <numeric>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -51,7 +55,8 @@ const GameType kGameType{/*short_name=*/"leduc_poker",
                          /*parameter_specification=*/
                          {{"players", GameParameter(kDefaultPlayers)},
                           {"action_mapping", GameParameter(false)},
-                          {"suit_isomorphism", GameParameter(false)}}};
+                          {"suit_isomorphism", GameParameter(false)},
+                          {"starting_player", GameParameter(kDefaultStartingPlayer)}}};  // NOLINT
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LeducGame(params));
@@ -238,7 +243,7 @@ class LeducObserver : public Observer {
 };
 
 LeducState::LeducState(std::shared_ptr<const Game> game, bool action_mapping,
-                       bool suit_isomorphism)
+                       bool suit_isomorphism, int starting_player)
     : State(game),
       cur_player_(kChancePlayerId),
       num_calls_(0),
@@ -271,7 +276,8 @@ LeducState::LeducState(std::shared_ptr<const Game> game, bool action_mapping,
       action_mapping_(action_mapping),
       // Players cannot distinguish between cards of different suits with the
       // same rank.
-      suit_isomorphism_(suit_isomorphism) {
+      suit_isomorphism_(suit_isomorphism),
+      starting_player_(starting_player) {
   // Cards by value (0-6 for standard 2-player game, kInvalidCard if no longer
   // in the deck.)
   deck_.resize(deck_size_);
@@ -565,24 +571,22 @@ std::vector<std::pair<Action, double>> LeducState::ChanceOutcomes() const {
 }
 
 int LeducState::NextPlayer() const {
-  // If we are on a chance node, it is the first player to play
-  int current_real_player;
+  Player player_to_start_search_from;
   if (cur_player_ == kChancePlayerId) {
-    current_real_player = -1;
+    // Start of a betting round. Player to act is starting_player_ or the first
+    // non-folded player after them. We start the search from the player before.
+    player_to_start_search_from =
+        (starting_player_ + num_players_ - 1) % num_players_;
   } else {
-    current_real_player = cur_player_;
+    player_to_start_search_from = cur_player_;
   }
-  // Go to the next player who's still in.
-  for (int i = 1; i < num_players_; ++i) {
-    Player player = (current_real_player + i) % num_players_;
 
-    SPIEL_CHECK_TRUE(player >= 0);
-    SPIEL_CHECK_TRUE(player < num_players_);
+  for (int i = 1; i <= num_players_; ++i) {
+    Player player = (player_to_start_search_from + i) % num_players_;
     if (!folded_[player]) {
       return player;
     }
   }
-
   SpielFatalError("Error in LeducState::NextPlayer(), should not get here.");
 }
 
@@ -735,8 +739,8 @@ void LeducState::SetPrivate(Player player, Action move) {
   --deck_size_;
   ++private_cards_dealt_;
 
-  // When all private cards are dealt, move to player 0.
-  if (private_cards_dealt_ == num_players_) cur_player_ = 0;
+  // When all private cards are dealt, move to starting_player_.
+  if (private_cards_dealt_ == num_players_) cur_player_ = starting_player_;
 }
 
 std::unique_ptr<State> LeducState::ResampleFromInfostate(
@@ -780,7 +784,8 @@ LeducGame::LeducGame(const GameParameters& params)
       num_players_(ParameterValue<int>("players")),
       total_cards_((num_players_ + 1) * kNumSuits),
       action_mapping_(ParameterValue<bool>("action_mapping")),
-      suit_isomorphism_(ParameterValue<bool>("suit_isomorphism")) {
+      suit_isomorphism_(ParameterValue<bool>("suit_isomorphism")),
+      starting_player_(ParameterValue<int>("starting_player")) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
   default_observer_ = std::make_shared<LeducObserver>(kDefaultObsType);
@@ -788,9 +793,11 @@ LeducGame::LeducGame(const GameParameters& params)
 }
 
 std::unique_ptr<State> LeducGame::NewInitialState() const {
-  return absl::make_unique<LeducState>(shared_from_this(),
-                                       /*action_mapping=*/action_mapping_,
-                                       /*suit_isomorphism=*/suit_isomorphism_);
+  return absl::make_unique<LeducState>(
+      shared_from_this(),
+      /*action_mapping=*/action_mapping_,
+      /*suit_isomorphism=*/suit_isomorphism_,
+      /*starting_player=*/starting_player_);
 }
 
 int LeducGame::MaxChanceOutcomes() const {

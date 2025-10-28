@@ -80,8 +80,6 @@ class TicTacToeTest(absltest.TestCase):
             '+ GameType.short_name = "python_tic_tac_toe"\n',
             '- ToString() = "tic_tac_toe()"\n',
             '+ ToString() = "python_tic_tac_toe()"\n',
-            "- CurrentPlayer() = -4\n",
-            "+ CurrentPlayer() = PlayerId.TERMINAL\n",
             "- Returns() = [0, 0]\n",
             "+ Returns() = [0, -0]\n",
         })

@@ -33,19 +33,25 @@
 //     "suit_isomorphism"  bool   player observations do not distinguish
 //                                between cards of different suits with
 //                                the same rank              (default = false)
+//     "starting_player"  int     player to start each betting round
+//                                (default = 0)
 
 #ifndef OPEN_SPIEL_GAMES_LEDUC_POKER_H_
 #define OPEN_SPIEL_GAMES_LEDUC_POKER_H_
 
-#include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace leduc_poker {
@@ -54,6 +60,7 @@ namespace leduc_poker {
 
 inline constexpr int kInvalidCard = -10000;
 inline constexpr int kDefaultPlayers = 2;
+inline constexpr int kDefaultStartingPlayer = 0;
 inline constexpr int kNumSuits = 2;
 inline constexpr int kFirstRaiseAmount = 2;
 inline constexpr int kSecondRaiseAmount = 4;
@@ -71,8 +78,8 @@ enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
 
 class LeducState : public State {
  public:
-  explicit LeducState(std::shared_ptr<const Game> game,
-                      bool action_mapping, bool suit_isomorphism);
+  explicit LeducState(std::shared_ptr<const Game> game, bool action_mapping,
+                      bool suit_isomorphism, int starting_player);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move) const override;
@@ -198,6 +205,10 @@ class LeducState : public State {
   // Players cannot distinguish between cards of different suits with the same
   // rank.
   bool suit_isomorphism_;
+  // The player to start each betting round. In the second round, if the
+  // starting player has folded, action begins with the first non-folded player
+  // after the starting player.
+  int starting_player_;
 };
 
 class LeducGame : public Game {
@@ -247,6 +258,7 @@ class LeducGame : public Game {
   // Players cannot distinguish between cards of different suits with the same
   // rank.
   bool suit_isomorphism_;
+  int starting_player_;
 };
 
 // Returns policy that always folds.

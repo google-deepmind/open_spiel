@@ -28,19 +28,7 @@ MaxGameLength() = 2180
 ToString() = "repeated_poker(max_num_hands=10,reset_stacks=True,rotate_dealer=True,universal_poker_game_string=universal_poker(betting=nolimit,bettingAbstraction=fullgame,blind=100 50,firstPlayer=2 1 1 1,numBoardCards=0 3 1 1,numHoleCards=2,numPlayers=2,numRanks=13,numRounds=4,numSuits=4,stack=20000 20000))"
 
 # State 0
-# Hand number: 0
-# BettingAbstraction: FULLGAME
-# P0 Cards:
-# P1 Cards:
-# BoardCards
-# PossibleCardsToDeal AsAhAdAcKsKhKdKcQsQhQdQcJsJhJdJcTsThTdTc9s9h9d9c8s8h8d8c7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d4c3s3h3d3c2s2h2d2c
-# Node type?: Chance node
-# ]
-# Round: 0
-# ACPC State: STATE:0::2c2c|2c2c
-# Spent: [P0: 100  P1: 50  ]
-#
-# Action Sequence:
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0::2c2c|2c2c\\nSpent: [P0: 100  P1: 50  ]\\n\",\"best_five_card_hands\":[\"\",\"\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":-1,\"odds\":[],\"player_contributions\":[100,50],\"player_hands\":[\"\",\"\"],\"pot_size\":150,\"starting_stacks\":[20000,20000]}","dealer":1,"hand_number":0,"hand_returns":[[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -57,19 +45,7 @@ StringLegalActions() = ["player=-1 move=Deal 2c", "player=-1 move=Deal 2d", "pla
 action: 31
 
 # State 1
-# Hand number: 0
-# BettingAbstraction: FULLGAME
-# P0 Cards: 9s
-# P1 Cards:
-# BoardCards
-# PossibleCardsToDeal AsAhAdAcKsKhKdKcQsQhQdQcJsJhJdJcTsThTdTc9h9d9c8s8h8d8c7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d4c3s3h3d3c2s2h2d2c
-# Node type?: Chance node
-# ]
-# Round: 0
-# ACPC State: STATE:0::9s2c|2c2c
-# Spent: [P0: 100  P1: 50  ]
-#
-# Action Sequence: d
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0::9s2c|2c2c\\nSpent: [P0: 100  P1: 50  ]\\n\",\"best_five_card_hands\":[\"9s\",\"\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":-1,\"odds\":[],\"player_contributions\":[100,50],\"player_hands\":[\"9s\",\"\"],\"pot_size\":150,\"starting_stacks\":[20000,20000]}","dealer":1,"hand_number":0,"hand_returns":[[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31]
 HistoryString() = "31"
@@ -94,18 +70,7 @@ action: 23
 action: 9
 
 # State 4
-# Hand number: 0
-# BettingAbstraction: FULLGAME
-# P0 Cards: Ts9s
-# P1 Cards: 7s4d
-# BoardCards
-# Node type?: Player node for player 1
-# ]
-# Round: 0
-# ACPC State: STATE:0::9sTs|7s4d
-# Spent: [P0: 100  P1: 50  ]
-#
-# Action Sequence: dddd
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0::9sTs|7s4d\\nSpent: [P0: 100  P1: 50  ]\\n\",\"best_five_card_hands\":[\"Ts9s\",\"7s4d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":1,\"odds\":[],\"player_contributions\":[100,50],\"player_hands\":[\"Ts9s\",\"7s4d\"],\"pot_size\":150,\"starting_stacks\":[20000,20000]}","dealer":1,"hand_number":0,"hand_returns":[[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9]
 HistoryString() = "31, 35, 23, 9"
@@ -123,18 +88,7 @@ StringLegalActions() = ["player=1 move=Fold", "player=1 move=Call", "player=1 mo
 action: 6900
 
 # State 5
-# Hand number: 0
-# BettingAbstraction: FULLGAME
-# P0 Cards: Ts9s
-# P1 Cards: 7s4d
-# BoardCards
-# Node type?: Player node for player 0
-# ]
-# Round: 0
-# ACPC State: STATE:0:r6900:9sTs|7s4d
-# Spent: [P0: 100  P1: 6900  ]
-#
-# Action Sequence: ddddp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r6900:9sTs|7s4d\\nSpent: [P0: 100  P1: 6900  ]\\n\",\"best_five_card_hands\":[\"Ts9s\",\"7s4d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r6900\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":0,\"odds\":[],\"player_contributions\":[100,6900],\"player_hands\":[\"Ts9s\",\"7s4d\"],\"pot_size\":7000,\"starting_stacks\":[20000,20000]}","dealer":1,"hand_number":0,"hand_returns":[[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900]
 HistoryString() = "31, 35, 23, 9, 6900"
@@ -152,18 +106,7 @@ StringLegalActions() = ["player=0 move=Fold", "player=0 move=Call", "player=0 mo
 action: 15246
 
 # State 6
-# Hand number: 0
-# BettingAbstraction: FULLGAME
-# P0 Cards: Ts9s
-# P1 Cards: 7s4d
-# BoardCards
-# Node type?: Player node for player 1
-# ]
-# Round: 0
-# ACPC State: STATE:0:r6900r15246:9sTs|7s4d
-# Spent: [P0: 15246  P1: 6900  ]
-#
-# Action Sequence: ddddpp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r6900r15246:9sTs|7s4d\\nSpent: [P0: 15246  P1: 6900  ]\\n\",\"best_five_card_hands\":[\"Ts9s\",\"7s4d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r6900r15246\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":1,\"odds\":[],\"player_contributions\":[15246,6900],\"player_hands\":[\"Ts9s\",\"7s4d\"],\"pot_size\":22146,\"starting_stacks\":[20000,20000]}","dealer":1,"hand_number":0,"hand_returns":[[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246]
 HistoryString() = "31, 35, 23, 9, 6900, 15246"
@@ -197,18 +140,7 @@ action: 40
 action: 1
 
 # State 11
-# Hand number: 1
-# BettingAbstraction: FULLGAME
-# P0 Cards: Ah7s
-# P1 Cards: Qc2d
-# BoardCards
-# Node type?: Player node for player 0
-# ]
-# Round: 0
-# ACPC State: STATE:0::Ah7s|Qc2d
-# Spent: [P0: 50  P1: 100  ]
-#
-# Action Sequence: dddd
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0::Ah7s|Qc2d\\nSpent: [P0: 50  P1: 100  ]\\n\",\"best_five_card_hands\":[\"Ah7s\",\"Qc2d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"\",\"blinds\":[50,100],\"board_cards\":\"\",\"current_player\":0,\"odds\":[],\"player_contributions\":[50,100],\"player_hands\":[\"Ah7s\",\"Qc2d\"],\"pot_size\":150,\"starting_stacks\":[20000,20000]}","dealer":0,"hand_number":1,"hand_returns":[[6900.0,-6900.0],[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r6900r15246f:9sTs|7s4d\\nSpent: [P0: 15246  P1: 6900  ]\\n\",\"best_five_card_hands\":[\"Ts9s\",\"7s4d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r6900r15246f\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[15246,6900],\"player_hands\":[\"Ts9s\",\"7s4d\"],\"pot_size\":22146,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1"
@@ -226,18 +158,7 @@ StringLegalActions() = ["player=0 move=Fold", "player=0 move=Call", "player=0 mo
 action: 4756
 
 # State 12
-# Hand number: 1
-# BettingAbstraction: FULLGAME
-# P0 Cards: Ah7s
-# P1 Cards: Qc2d
-# BoardCards
-# Node type?: Player node for player 1
-# ]
-# Round: 0
-# ACPC State: STATE:0:r4756:Ah7s|Qc2d
-# Spent: [P0: 4756  P1: 100  ]
-#
-# Action Sequence: ddddp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r4756:Ah7s|Qc2d\\nSpent: [P0: 4756  P1: 100  ]\\n\",\"best_five_card_hands\":[\"Ah7s\",\"Qc2d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r4756\",\"blinds\":[50,100],\"board_cards\":\"\",\"current_player\":1,\"odds\":[],\"player_contributions\":[4756,100],\"player_hands\":[\"Ah7s\",\"Qc2d\"],\"pot_size\":4856,\"starting_stacks\":[20000,20000]}","dealer":0,"hand_number":1,"hand_returns":[[6900.0,-6900.0],[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r6900r15246f:9sTs|7s4d\\nSpent: [P0: 15246  P1: 6900  ]\\n\",\"best_five_card_hands\":[\"Ts9s\",\"7s4d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r6900r15246f\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[15246,6900],\"player_hands\":[\"Ts9s\",\"7s4d\"],\"pot_size\":22146,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756"
@@ -255,18 +176,7 @@ StringLegalActions() = ["player=1 move=Fold", "player=1 move=Call", "player=1 mo
 action: 13562
 
 # State 13
-# Hand number: 1
-# BettingAbstraction: FULLGAME
-# P0 Cards: Ah7s
-# P1 Cards: Qc2d
-# BoardCards
-# Node type?: Player node for player 0
-# ]
-# Round: 0
-# ACPC State: STATE:0:r4756r13562:Ah7s|Qc2d
-# Spent: [P0: 4756  P1: 13562  ]
-#
-# Action Sequence: ddddpp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r4756r13562:Ah7s|Qc2d\\nSpent: [P0: 4756  P1: 13562  ]\\n\",\"best_five_card_hands\":[\"Ah7s\",\"Qc2d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r4756r13562\",\"blinds\":[50,100],\"board_cards\":\"\",\"current_player\":0,\"odds\":[],\"player_contributions\":[4756,13562],\"player_hands\":[\"Ah7s\",\"Qc2d\"],\"pot_size\":18318,\"starting_stacks\":[20000,20000]}","dealer":0,"hand_number":1,"hand_returns":[[6900.0,-6900.0],[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r6900r15246f:9sTs|7s4d\\nSpent: [P0: 15246  P1: 6900  ]\\n\",\"best_five_card_hands\":[\"Ts9s\",\"7s4d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r6900r15246f\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[15246,6900],\"player_hands\":[\"Ts9s\",\"7s4d\"],\"pot_size\":22146,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562"
@@ -408,18 +318,7 @@ action: 8519
 action: 16770
 
 # State 45
-# Hand number: 3
-# BettingAbstraction: FULLGAME
-# P0 Cards: 6c2d
-# P1 Cards: 9s6h
-# BoardCards
-# Node type?: Player node for player 1
-# ]
-# Round: 0
-# ACPC State: STATE:0:r2226r8519r16770:2d6c|6h9s
-# Spent: [P0: 16770  P1: 8519  ]
-#
-# Action Sequence: ddddppp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r2226r8519r16770:2d6c|6h9s\\nSpent: [P0: 16770  P1: 8519  ]\\n\",\"best_five_card_hands\":[\"6c2d\",\"9s6h\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r2226r8519r16770\",\"blinds\":[50,100],\"board_cards\":\"\",\"current_player\":1,\"odds\":[],\"player_contributions\":[16770,8519],\"player_hands\":[\"6c2d\",\"9s6h\"],\"pot_size\":25289,\"starting_stacks\":[20000,20000]}","dealer":0,"hand_number":3,"hand_returns":[[6900.0,-6900.0],[20000.0,-20000.0],[0.0,0.0],[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r18370r20000c///:6hJc|4cJh/7cAc9h/7d/Js\\nSpent: [P0: 20000  P1: 20000  ]\\n\",\"best_five_card_hands\":[\"AcJsJc7d7c\",\"AcJsJh7d7c\"],\"best_hand_rank_types\":[\"Two Pair\",\"Two Pair\"],\"betting_history\":\"r18370r20000c///\",\"blinds\":[100,50],\"board_cards\":\"AcJs9h7d7c\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[20000,20000],\"player_hands\":[\"Jc6h\",\"Jh4c\"],\"pot_size\":40000,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770"
@@ -477,18 +376,7 @@ action: 2
 action: 6661
 
 # State 56
-# Hand number: 4
-# BettingAbstraction: FULLGAME
-# P0 Cards: QhTs
-# P1 Cards: 7s2h
-# BoardCards
-# Node type?: Player node for player 0
-# ]
-# Round: 0
-# ACPC State: STATE:0:r6661:TsQh|7s2h
-# Spent: [P0: 100  P1: 6661  ]
-#
-# Action Sequence: ddddp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r6661:TsQh|7s2h\\nSpent: [P0: 100  P1: 6661  ]\\n\",\"best_five_card_hands\":[\"QhTs\",\"7s2h\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r6661\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":0,\"odds\":[],\"player_contributions\":[100,6661],\"player_hands\":[\"QhTs\",\"7s2h\"],\"pot_size\":6761,\"starting_stacks\":[20000,20000]}","dealer":1,"hand_number":4,"hand_returns":[[6900.0,-6900.0],[20000.0,-20000.0],[0.0,0.0],[-16770.0,16770.0],[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r2226r8519r16770c/r18573f:2d6c|6h9s/6d7s4h\\nSpent: [P0: 16770  P1: 18573  ]\\n\",\"best_five_card_hands\":[\"7s6d6c4h2d\",\"9s7s6h6d4h\"],\"best_hand_rank_types\":[\"Pair\",\"Pair\"],\"betting_history\":\"r2226r8519r16770c/r18573f\",\"blinds\":[50,100],\"board_cards\":\"7s6d4h\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[16770,18573],\"player_hands\":[\"6c2d\",\"9s6h\"],\"pot_size\":35343,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661"
@@ -630,18 +518,7 @@ action: 19233
 action: 20000
 
 # State 88
-# Hand number: 7
-# BettingAbstraction: FULLGAME
-# P0 Cards: 6d4c
-# P1 Cards: Tc2d
-# BoardCards
-# Node type?: Player node for player 1
-# ]
-# Round: 0
-# ACPC State: STATE:0:r6473r19233r20000:4c6d|Tc2d
-# Spent: [P0: 20000  P1: 19233  ]
-#
-# Action Sequence: ddddppp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r6473r19233r20000:4c6d|Tc2d\\nSpent: [P0: 20000  P1: 19233  ]\\n\",\"best_five_card_hands\":[\"6d4c\",\"Tc2d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r6473r19233r20000\",\"blinds\":[50,100],\"board_cards\":\"\",\"current_player\":1,\"odds\":[],\"player_contributions\":[20000,19233],\"player_hands\":[\"6d4c\",\"Tc2d\"],\"pot_size\":39233,\"starting_stacks\":[20000,20000]}","dealer":0,"hand_number":7,"hand_returns":[[6900.0,-6900.0],[20000.0,-20000.0],[0.0,0.0],[-16770.0,16770.0],[-15715.0,15715.0],[-20000.0,20000.0],[17519.0,-17519.0],[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r17519r20000f:Qc5d|9c3d\\nSpent: [P0: 20000  P1: 17519  ]\\n\",\"best_five_card_hands\":[\"Qc5d\",\"9c3d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r17519r20000f\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[20000,17519],\"player_hands\":[\"Qc5d\",\"9c3d\"],\"pot_size\":37519,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661, 15715, 20000, 0, 32, 23, 46, 39, 18972, 1, 38, 19, 3, 19275, 19878, 20000, 1, 43, 28, 40, 13, 28, 5, 17519, 20000, 0, 8, 17, 32, 1, 6473, 19233, 20000]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661, 15715, 20000, 0, 32, 23, 46, 39, 18972, 1, 38, 19, 3, 19275, 19878, 20000, 1, 43, 28, 40, 13, 28, 5, 17519, 20000, 0, 8, 17, 32, 1, 6473, 19233, 20000"
@@ -727,18 +604,7 @@ action: 1000
 action: 4491
 
 # State 106
-# Hand number: 9
-# BettingAbstraction: FULLGAME
-# P0 Cards: 8h5c
-# P1 Cards: Js8d
-# BoardCards
-# Node type?: Player node for player 0
-# ]
-# Round: 0
-# ACPC State: STATE:0:r1000r4491:8h5c|8dJs
-# Spent: [P0: 1000  P1: 4491  ]
-#
-# Action Sequence: ddddpp
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r1000r4491:8h5c|8dJs\\nSpent: [P0: 1000  P1: 4491  ]\\n\",\"best_five_card_hands\":[\"8h5c\",\"Js8d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r1000r4491\",\"blinds\":[50,100],\"board_cards\":\"\",\"current_player\":0,\"odds\":[],\"player_contributions\":[1000,4491],\"player_hands\":[\"8h5c\",\"Js8d\"],\"pot_size\":5491,\"starting_stacks\":[20000,20000]}","dealer":0,"hand_number":9,"hand_returns":[[6900.0,-6900.0],[20000.0,-20000.0],[0.0,0.0],[-16770.0,16770.0],[-15715.0,15715.0],[-20000.0,20000.0],[17519.0,-17519.0],[-20000.0,20000.0],[-100.0,100.0],[0.0,0.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r12181f:Jc2c|7dAh\\nSpent: [P0: 100  P1: 12181  ]\\n\",\"best_five_card_hands\":[\"Jc2c\",\"Ah7d\"],\"best_hand_rank_types\":[\"High Card\",\"High Card\"],\"betting_history\":\"r12181f\",\"blinds\":[100,50],\"board_cards\":\"\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[100,12181],\"player_hands\":[\"Jc2c\",\"Ah7d\"],\"pot_size\":12281,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = False
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661, 15715, 20000, 0, 32, 23, 46, 39, 18972, 1, 38, 19, 3, 19275, 19878, 20000, 1, 43, 28, 40, 13, 28, 5, 17519, 20000, 0, 8, 17, 32, 1, 6473, 19233, 20000, 1, 6, 49, 30, 33, 50, 36, 0, 21, 50, 12181, 0, 26, 12, 25, 39, 1000, 4491]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661, 15715, 20000, 0, 32, 23, 46, 39, 18972, 1, 38, 19, 3, 19275, 19878, 20000, 1, 43, 28, 40, 13, 28, 5, 17519, 20000, 0, 8, 17, 32, 1, 6473, 19233, 20000, 1, 6, 49, 30, 33, 50, 36, 0, 21, 50, 12181, 0, 26, 12, 25, 39, 1000, 4491"
@@ -788,20 +654,7 @@ action: 20000
 action: 0
 
 # State 115
-# Hand number: 9
-# BettingAbstraction: FULLGAME
-# P0 Cards: 8h5c
-# P1 Cards: Js8d
-# BoardCards Ts5s5d
-# P0 Reward: -17129
-# P1 Reward: 17129
-# Node type?: Terminal Node!
-# ]
-# Round: 1
-# ACPC State: STATE:0:r1000r4491r13207c/r13398r17129r20000f:8h5c|8dJs/Ts5d5s
-# Spent: [P0: 17129  P1: 20000  ]
-#
-# Action Sequence: ddddpppcdddpppf
+# {"big_blind":100,"current_universal_poker_json":"{\"acpc_state\":\"STATE:0:r1000r4491r13207c/r13398r17129r20000f:8h5c|8dJs/Ts5d5s\\nSpent: [P0: 17129  P1: 20000  ]\\n\",\"best_five_card_hands\":[\"Ts8h5s5d5c\",\"JsTs8d5s5d\"],\"best_hand_rank_types\":[\"Three of a Kind\",\"Pair\"],\"betting_history\":\"r1000r4491r13207c/r13398r17129r20000f\",\"blinds\":[50,100],\"board_cards\":\"Ts5s5d\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[17129,20000],\"player_hands\":[\"8h5c\",\"Js8d\"],\"pot_size\":37129,\"starting_stacks\":[20000,20000]}","dealer":0,"hand_number":9,"hand_returns":[[6900.0,-6900.0],[20000.0,-20000.0],[0.0,0.0],[-16770.0,16770.0],[-15715.0,15715.0],[-20000.0,20000.0],[17519.0,-17519.0],[-20000.0,20000.0],[-100.0,100.0],[-17129.0,17129.0]],"max_num_hands":10,"prev_universal_poker_json":"{\"acpc_state\":\"STATE:0:r1000r4491r13207c/r13398r17129r20000f:8h5c|8dJs/Ts5d5s\\nSpent: [P0: 17129  P1: 20000  ]\\n\",\"best_five_card_hands\":[\"Ts8h5s5d5c\",\"JsTs8d5s5d\"],\"best_hand_rank_types\":[\"Three of a Kind\",\"Pair\"],\"betting_history\":\"r1000r4491r13207c/r13398r17129r20000f\",\"blinds\":[50,100],\"board_cards\":\"Ts5s5d\",\"current_player\":-4,\"odds\":[],\"player_contributions\":[17129,20000],\"player_hands\":[\"8h5c\",\"Js8d\"],\"pot_size\":37129,\"starting_stacks\":[20000,20000]}","small_blind":50,"stacks":[20000,20000]}
 IsTerminal() = True
 History() = [31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661, 15715, 20000, 0, 32, 23, 46, 39, 18972, 1, 38, 19, 3, 19275, 19878, 20000, 1, 43, 28, 40, 13, 28, 5, 17519, 20000, 0, 8, 17, 32, 1, 6473, 19233, 20000, 1, 6, 49, 30, 33, 50, 36, 0, 21, 50, 12181, 0, 26, 12, 25, 39, 1000, 4491, 13207, 1, 35, 13, 15, 13398, 17129, 20000, 0]
 HistoryString() = "31, 35, 23, 9, 6900, 15246, 0, 50, 23, 40, 1, 4756, 13562, 1, 3, 39, 47, 14583, 18193, 1, 46, 19036, 19933, 20000, 1, 51, 18, 36, 8, 38, 18370, 20000, 1, 20, 48, 30, 21, 39, 1, 16, 18, 31, 2226, 8519, 16770, 1, 17, 23, 10, 18573, 0, 35, 42, 23, 2, 6661, 15715, 20000, 0, 32, 23, 46, 39, 18972, 1, 38, 19, 3, 19275, 19878, 20000, 1, 43, 28, 40, 13, 28, 5, 17519, 20000, 0, 8, 17, 32, 1, 6473, 19233, 20000, 1, 6, 49, 30, 33, 50, 36, 0, 21, 50, 12181, 0, 26, 12, 25, 39, 1000, 4491, 13207, 1, 35, 13, 15, 13398, 17129, 20000, 0"

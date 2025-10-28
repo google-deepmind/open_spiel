@@ -14,7 +14,9 @@
 
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 
+#include <cstddef>
 #include <cstdint>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -137,27 +139,88 @@ int CardSet::RankCards() const {
   return rankCardset(csNative);
 }
 
-std::vector<CardSet> CardSet::SampleCards(int nbCards) {
-  std::vector<CardSet> combinations;
+HandRankType CardSet::GetHandRank() const {
+  int rank = RankCards();
+  if (rank >= kHandClassStraightFlush) return kStraightFlush;
+  if (rank >= kHandClassFourOfAKind) return kFourOfAKind;
+  if (rank >= kHandClassFullHouse) return kFullHouse;
+  if (rank >= kHandClassFlush) return kFlush;
+  if (rank >= kHandClassStraight) return kStraight;
+  if (rank >= kHandClassThreeOfAKind) return kThreeOfAKind;
+  if (rank >= kHandClassTwoPair) return kTwoPair;
+  if (rank >= kHandClassPair) return kPair;
+  return kHighCard;
+}
 
-  uint64_t p = 0;
-  for (int i = 0; i < nbCards; ++i) {
-    p += (1 << i);
+CardSet CardSet::GetBest5Cards() const {
+  if (NumCards() <= 5) {
+    return *this;
   }
-  // Enumerates all the uint64_t integers that with nbCards 1-bits.
-  // The final n is ignored. It is fine as long as the rank < 16.
-  for (uint64_t n = bit_twiddle_permute(p); n > p;
-       p = n, n = bit_twiddle_permute(p)) {
-    // Checks whether the CardSet represented by p is inside the CardSet.
-    uint64_t combo = p & cs.cards;
-    if (__builtin_popcountl(combo) == nbCards) {
-      CardSet c;
-      c.cs.cards = combo;
-      combinations.emplace_back(c);
+
+  std::vector<CardSet> subsets = Combinations(5);
+  CardSet best_subset = subsets[0];
+  int max_rank = best_subset.RankCards();
+
+  for (size_t i = 1; i < subsets.size(); ++i) {
+    int rank = subsets[i].RankCards();
+    if (rank > max_rank) {
+      max_rank = rank;
+      best_subset = subsets[i];
     }
   }
+  return best_subset;
+}
 
-  // std::cout << "combinations.size() " << combinations.size() << std::endl;
+std::string HandRankToString(HandRankType rank) {
+  switch (rank) {
+    case kHighCard:
+      return "High Card";
+    case kPair:
+      return "Pair";
+    case kTwoPair:
+      return "Two Pair";
+    case kThreeOfAKind:
+      return "Three of a Kind";
+    case kStraight:
+      return "Straight";
+    case kFlush:
+      return "Flush";
+    case kFullHouse:
+      return "Full House";
+    case kFourOfAKind:
+      return "Four of a Kind";
+    case kStraightFlush:
+      return "Straight Flush";
+    default:
+      SpielFatalError("Unknown hand rank type");
+  }
+}
+
+std::vector<CardSet> CardSet::Combinations(int nbCards) const {
+  std::vector<CardSet> combinations;
+  std::vector<uint8_t> cards = ToCardArray();
+  SPIEL_CHECK_GE(nbCards, 0);
+  if (nbCards > cards.size()) {
+    return combinations;
+  }
+  if (nbCards == 0) {
+    combinations.emplace_back();
+    return combinations;
+  }
+
+  std::vector<bool> selection(cards.size());
+  std::fill(selection.begin() + cards.size() - nbCards, selection.end(), true);
+
+  do {
+    CardSet c;
+    for (size_t i = 0; i < cards.size(); ++i) {
+      if (selection[i]) {
+        c.AddCard(cards[i]);
+      }
+    }
+    combinations.push_back(c);
+  } while (std::next_permutation(selection.begin(), selection.end()));
+
   return combinations;
 }
 

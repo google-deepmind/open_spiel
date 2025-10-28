@@ -67,6 +67,10 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_leduc_poker.h
   pybind11/games_negotiation.cc
   pybind11/games_negotiation.h
+  pybind11/games_pokerkit_wrapper.cc
+  pybind11/games_pokerkit_wrapper.h
+  pybind11/games_repeated_pokerkit.cc
+  pybind11/games_repeated_pokerkit.h
   pybind11/games_spades.cc
   pybind11/games_spades.h
   pybind11/games_tarok.cc
@@ -95,6 +99,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
 
 if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      pybind11/games_repeated_poker.cc
+      pybind11/games_repeated_poker.h
       pybind11/games_universal_poker.cc
       pybind11/games_universal_poker.h
   )
@@ -223,6 +229,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
   games/liars_poker_test.py
+  games/pokerkit_wrapper_test.py
   games/team_dominoes_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
@@ -246,8 +253,10 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
+  tests/games_repeated_poker_test.py
   tests/games_sim_test.py
   tests/games_tic_tac_toe_test.py
+  tests/games_universal_poker_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py

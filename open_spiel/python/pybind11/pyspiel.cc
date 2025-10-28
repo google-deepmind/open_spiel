@@ -60,6 +60,8 @@
 #include "open_spiel/python/pybind11/games_tic_tac_toe.h"
 #include "open_spiel/python/pybind11/games_tiny_bridge.h"
 #include "open_spiel/python/pybind11/games_trade_comm.h"
+#include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
+#include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -83,10 +85,11 @@
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
 #endif
 #if OPEN_SPIEL_BUILD_WITH_ACPC
+#include "open_spiel/python/pybind11/games_repeated_poker.h"
 #include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
-#define PYSPIEL_VERSION "1.6.2"
+#define PYSPIEL_VERSION "1.6.8"
 
 // Flags governing Open Spiel behaviour
 ABSL_FLAG(bool, log_exceptions_to_stderr, true,
@@ -120,10 +123,33 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
+static py::object CreatePlayerIdIntEnum(py::module_ m) {
+  py::object enum_mod = py::module_::import("enum");
+  py::object IntEnum  = enum_mod.attr("IntEnum");
+  std::string modname = py::str(m.attr("__name__"));
+
+  py::dict members;
+  members["DEFAULT_PLAYER_ID"] =
+      py::int_(open_spiel::kDefaultPlayerId);
+  members["INVALID"] = py::int_(open_spiel::kInvalidPlayer);
+  members["TERMINAL"] = py::int_(open_spiel::kTerminalPlayerId);
+  members["CHANCE"] = py::int_(open_spiel::kChancePlayerId);
+  members["MEAN_FIELD"] = py::int_(open_spiel::kMeanFieldPlayerId);
+  members["SIMULTANEOUS"] =
+      py::int_(open_spiel::kSimultaneousPlayerId);
+
+  py::object PlayerId = IntEnum("PlayerId", members,
+                                py::arg("module") = modname);
+  m.attr("PlayerId") = PlayerId;
+  return PlayerId;
+}
+
 // Definition of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
   m.attr("__version__") = PYSPIEL_VERSION;
+
+  m.attr("PlayerId") = CreatePlayerIdIntEnum(m);
 
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");
@@ -244,14 +270,6 @@ PYBIND11_MODULE(pyspiel, m) {
   py::enum_<GameType::RewardModel>(game_type, "RewardModel")
       .value("REWARDS", GameType::RewardModel::kRewards)
       .value("TERMINAL", GameType::RewardModel::kTerminal);
-
-  py::enum_<open_spiel::PlayerId>(m, "PlayerId")
-      .value("DEFAULT_PLAYER_ID", open_spiel::kDefaultPlayerId)
-      .value("INVALID", open_spiel::kInvalidPlayer)
-      .value("TERMINAL", open_spiel::kTerminalPlayerId)
-      .value("CHANCE", open_spiel::kChancePlayerId)
-      .value("MEAN_FIELD", open_spiel::kMeanFieldPlayerId)
-      .value("SIMULTANEOUS", open_spiel::kSimultaneousPlayerId);
 
   py::class_<GameInfo> game_info(m, "GameInfo");
   game_info
@@ -721,6 +739,8 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_tic_tac_toe(m);
   init_pyspiel_games_tiny_bridge(m);
   init_pyspiel_games_trade_comm(m);
+  bind_pokerkit_state_struct(m);           // C++ struct for a Python game.
+  bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
 
@@ -733,6 +753,7 @@ PYBIND11_MODULE(pyspiel, m) {
 #endif
 #if OPEN_SPIEL_BUILD_WITH_ACPC
   init_pyspiel_games_universal_poker(m);  // Universal poker game.
+  init_pyspiel_games_repeated_poker(m);  // Repeated poker game.
 #endif
 }  // NOLINT
 
