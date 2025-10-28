@@ -77,8 +77,6 @@ if [[ "$MODE" = "full" ]]; then
     fi
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
     ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-macosx_10_9_x86_64.whl
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux*.whl`
-    ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
     file=`ls wheelhouse/open_spiel-*-cp310-cp310-*.whl`
     ${PYBIN} -m pip install $file
