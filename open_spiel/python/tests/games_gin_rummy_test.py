@@ -14,7 +14,7 @@
 
 """Tests for the game-specific functions for gin rummy."""
 
-
+import json
 from absl.testing import absltest
 
 import pyspiel
@@ -115,6 +115,49 @@ class GamesGinRummyTest(absltest.TestCase):
     self.assertEqual(utils.all_layoffs([65], [3]), [4])
     self.assertEqual(utils.meld_to_int([0, 1, 2]), 65)
     self.assertEqual(utils.int_to_meld[65], [0, 1, 2])
+
+  def test_structs(self):
+    game = pyspiel.load_game('gin_rummy')
+    state = game.new_initial_state()
+    actions = [
+        11, 4, 5, 6, 21, 22, 23, 12, 25, 38, 1, 14, 27, 40, 7, 20, 33, 8, 19,
+        13, 36
+    ]
+    for action in actions:
+      state.apply_action(action)
+
+    # State struct
+    state_struct = state.to_struct()
+    self.assertEqual(state_struct.to_json(), state.to_json())
+    self.assertEqual(state_struct.phase, 'FirstUpcard')
+    self.assertEqual(state_struct.current_player, 'Player_0')
+    self.assertEqual(state_struct.stock_size, 31)
+    self.assertEqual(state_struct.upcard, 'Jd')
+    self.assertLen(state_struct.hands[0], 10)
+    self.assertLen(state_struct.hands[1], 10)
+    state_json = state.to_json()
+    self.assertEqual(
+        json.dumps(json.loads(state_json), sort_keys=True),
+        json.dumps(
+            json.loads(gin_rummy.GinRummyStateStruct(state_json).to_json()),
+            sort_keys=True))
+
+    # Observation struct
+    obs_struct = state.to_observation_struct(0)
+    self.assertEqual(obs_struct.phase, 'FirstUpcard')
+    self.assertEqual(obs_struct.current_player, 'Player_0')
+    self.assertEqual(obs_struct.stock_size, 31)
+    self.assertEqual(obs_struct.upcard, 'Jd')
+    self.assertLen(obs_struct.hands[0], 10)
+    self.assertEqual(obs_struct.hands[1], ['XX'] * 10)
+    self.assertEqual(obs_struct.deadwood[1], -1)
+    self.assertEqual(obs_struct.observing_player, 0)
+    obs_json = obs_struct.to_json()
+    self.assertEqual(
+        json.dumps(json.loads(obs_json), sort_keys=True),
+        json.dumps(
+            json.loads(gin_rummy.GinRummyObservationStruct(obs_json).to_json()),
+            sort_keys=True))
 
 
 if __name__ == '__main__':

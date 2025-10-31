@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/observer.h"
@@ -675,6 +676,60 @@ void DeckSizeTests() {
   testing::RandomSimTest(*game, 10);
 }
 
+void TestStructs() {
+  auto game = LoadGame("gin_rummy");
+  auto state = game->NewInitialState();
+  // Apply some actions to get a non-initial state.
+  std::vector<Action> initial_actions = {
+      11, 4,  5, 6,  21, 22, 23, 12, 25, 38,  // P0 hand
+      1,  14, 27, 40, 7,  20, 33, 8,  19, 13,  // P1 hand
+      36                                      // upcard
+  };
+  for (auto action : initial_actions) state->ApplyAction(action);
+
+  GinRummyState* gr_state = static_cast<GinRummyState*>(state.get());
+  auto state_struct = gr_state->ToStruct();
+
+  // Test state/state_struct -> json string.
+  SPIEL_CHECK_EQ(state_struct->ToJson(), gr_state->ToJson());
+
+  // Check some fields in the struct
+  GinRummyStateStruct* gr_struct =
+      static_cast<GinRummyStateStruct*>(state_struct.get());
+  SPIEL_CHECK_EQ(gr_struct->phase, "FirstUpcard");
+  SPIEL_CHECK_EQ(gr_struct->current_player, "Player_0");
+  SPIEL_CHECK_EQ(gr_struct->stock_size, 31);
+  SPIEL_CHECK_EQ(gr_struct->upcard.value(), "Jd");
+  SPIEL_CHECK_EQ(gr_struct->hands[0].size(), 10);
+  SPIEL_CHECK_EQ(gr_struct->hands[1].size(), 10);
+
+  // Test json string -> state_struct
+  std::string state_json = gr_state->ToJson();
+  SPIEL_CHECK_EQ(nlohmann::json::parse(state_json).dump(),
+                 GinRummyStateStruct(state_json).ToJson());
+
+  auto obs_struct = gr_state->ToObservationStruct(0);
+
+  // Check fields in the observation struct for player 0.
+  GinRummyObservationStruct* gr_obs_struct =
+      static_cast<GinRummyObservationStruct*>(obs_struct.get());
+  SPIEL_CHECK_EQ(gr_obs_struct->phase, gr_struct->phase);
+  SPIEL_CHECK_EQ(gr_obs_struct->current_player, gr_struct->current_player);
+  SPIEL_CHECK_EQ(gr_obs_struct->stock_size, gr_struct->stock_size);
+  SPIEL_CHECK_EQ(gr_obs_struct->upcard, gr_struct->upcard);
+  SPIEL_CHECK_EQ(gr_obs_struct->hands[0], gr_struct->hands[0]);
+  SPIEL_CHECK_EQ(gr_obs_struct->deadwood[0], gr_struct->deadwood[0]);
+  SPIEL_CHECK_EQ(gr_obs_struct->hands[1].size(), 10);
+  SPIEL_CHECK_EQ(gr_obs_struct->hands[1][0], "XX");
+  SPIEL_CHECK_EQ(gr_obs_struct->deadwood[1], -1);
+  SPIEL_CHECK_EQ(gr_obs_struct->observing_player, 0);
+
+  // Test json string -> obs_struct
+  std::string obs_json = obs_struct->ToJson();
+  SPIEL_CHECK_EQ(nlohmann::json::parse(obs_json).dump(),
+                 GinRummyObservationStruct(obs_json).ToJson());
+}
+
 }  // namespace
 }  // namespace gin_rummy
 }  // namespace open_spiel
@@ -693,5 +748,6 @@ int main(int argc, char** argv) {
   open_spiel::gin_rummy::DeckSizeTests();
   open_spiel::gin_rummy::ResampleFromInfostateTest();
   open_spiel::gin_rummy::ResampleFromInfostateKnownCardsTest();
+  open_spiel::gin_rummy::TestStructs();
   std::cout << "Gin rummy tests passed!" << std::endl;
 }
