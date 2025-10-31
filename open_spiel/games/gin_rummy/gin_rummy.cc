@@ -27,6 +27,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/game_parameters.h"
@@ -301,7 +302,7 @@ GinRummyState::GinRummyState(std::shared_ptr<const Game> game, bool oklahoma,
       deck_(num_ranks * num_suits, true) {
   aohs_.reserve(kNumPlayers);
   for (Player player = 0; player < kNumPlayers; ++player) {
-    std::vector<std::pair<std::optional<Action>, std::string>> aoh;
+    std::vector<std::pair<absl::optional<Action>, std::string>> aoh;
     aoh.push_back({{}, ObservationString(player)});
     aohs_.push_back(open_spiel::ActionObservationHistory(player, aoh));
   }
@@ -346,7 +347,7 @@ void GinRummyState::DoApplyAction(Action action) {
       SpielFatalError("Invalid game phase.");
   }
   for (Player player = 0; player < NumPlayers(); ++player) {
-    std::optional<Action> a = {};
+    absl::optional<Action> a = {};
     if (current_player == player) a = action;
     aohs_[player].Extend(a, ObservationString(player));
   }
@@ -404,7 +405,7 @@ void GinRummyState::ApplyFirstUpcardAction(Action action) {
     SPIEL_CHECK_TRUE(pass_on_first_upcard_[0] && pass_on_first_upcard_[1]);
     prev_upcard_ = upcard_;
     discard_pile_.push_back(upcard_.value());
-    upcard_ = std::nullopt;
+    upcard_ = absl::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -436,7 +437,7 @@ void GinRummyState::ApplyDrawAction(Action action) {
     // longer in play and goes to the top of the discard pile.
     prev_upcard_ = upcard_;
     if (upcard_.has_value()) discard_pile_.push_back(upcard_.value());
-    upcard_ = std::nullopt;
+    upcard_ = absl::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -812,7 +813,7 @@ void GinRummyState::UpcardToHand(Player player) {
   int card = upcard_.value();
   hands_[player].push_back(card);
   known_cards_[player][card] = true;
-  upcard_ = std::nullopt;
+  upcard_ = absl::nullopt;
 }
 
 void GinRummyState::RemoveFromHand(Player player, Action card) {
@@ -1042,7 +1043,7 @@ GinRummyGame::GinRummyGame(const GameParameters& params)
 }
 
 std::shared_ptr<Observer> GinRummyGame::MakeObserver(
-    std::optional<IIGObservationType> iig_obs_type,
+    absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
   if (!params.empty()) SpielFatalError("Observation params not supported");
   return std::make_shared<GinRummyObserver>(
