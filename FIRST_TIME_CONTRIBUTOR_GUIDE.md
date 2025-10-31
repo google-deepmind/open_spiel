@@ -322,9 +322,8 @@ xcode-select --install
 ### Step 2: Clone the Repository
 
 ```bash
-git clone https://github.com/deepmind/open_spiel.git
+git clone https://github.com/google-deepmind/open_spiel.git
 cd open_spiel
-```
 
 ### Step 3: Run Installation Script
 
@@ -353,7 +352,23 @@ pip install -r requirements.txt
 
 # Install OpenSpiel in development mode
 pip install -e .
+
+# Set up PYTHONPATH (IMPORTANT!)
+# This ensures Python can find OpenSpiel modules
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+export PYTHONPATH=$PYTHONPATH:$(pwd)/build/python
+
+# To make PYTHONPATH permanent in your virtual environment,
+# add these lines to venv/bin/activate (after the 'export PATH' line):
+echo 'export PYTHONPATH=$PYTHONPATH:'$(pwd) >> venv/bin/activate
+echo 'export PYTHONPATH=$PYTHONPATH:'$(pwd)'/build/python' >> venv/bin/activate
+
+# Now PYTHONPATH will be set automatically every time you activate the venv!
 ```
+
+**Important Note:** If you skip setting `PYTHONPATH`, you'll encounter import errors like `ModuleNotFoundError: No module named 'pyspiel'` or `ImportError: No module named 'open_spiel'`. The PYTHONPATH must point to:
+1. The repository root (for `open_spiel` package)
+2. The `build/python` directory (for compiled C++ bindings like `pyspiel`)
 
 ### Step 6: Test Your Installation
 
