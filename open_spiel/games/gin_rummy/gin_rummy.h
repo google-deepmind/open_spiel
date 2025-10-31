@@ -50,6 +50,7 @@
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
@@ -188,9 +189,9 @@ class GinRummyState : public State {
   // Used for Python bindings.
   Phase CurrentPhase() const { return phase_; }
   bool FinishedLayoffs() const { return finished_layoffs_ ; }
-  std::optional<int> Upcard() const { return upcard_; }
-  std::optional<int> PrevUpcard() const { return prev_upcard_; }
-  std::optional<int> KnockCard() const { return knock_card_; }
+  absl::optional<int> Upcard() const { return upcard_; }
+  absl::optional<int> PrevUpcard() const { return prev_upcard_; }
+  absl::optional<int> KnockCard() const { return knock_card_; }
   int StockSize() const { return stock_size_; }
   std::vector<std::vector<int>> Hands() const { return hands_; }
   std::vector<std::vector<int>> KnownCards() const;
@@ -251,8 +252,8 @@ class GinRummyState : public State {
   Player cur_player_ = kChancePlayerId;
   Player prev_player_ = kChancePlayerId;
   bool finished_layoffs_ = false;
-  std::optional<int> upcard_;
-  std::optional<int> prev_upcard_;  // Used to track repeated moves.
+  absl::optional<int> upcard_;
+  absl::optional<int> prev_upcard_;  // Used to track repeated moves.
   int stock_size_;                   // Number of cards remaining in stock.
   // True if the prev player drew the upcard only to immediately discard it.
   // If both players do this in succession the game is declared a draw.
@@ -305,7 +306,7 @@ class GinRummyGame : public Game {
   double MaxUtility() const override {
     return kMaxPossibleDeadwood + gin_bonus_;
   }
-  std::optional<double> UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new GinRummyState(shared_from_this(), oklahoma_, knock_card_,
@@ -322,7 +323,7 @@ class GinRummyGame : public Game {
     return num_ranks_ * num_suits_ - kWallStockSize;
   }
   std::shared_ptr<Observer> MakeObserver(
-      std::optional<IIGObservationType> iig_obs_type,
+      absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const override;
 
   std::shared_ptr<GinRummyObserver> default_observer_;

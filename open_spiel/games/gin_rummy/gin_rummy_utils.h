@@ -16,9 +16,10 @@
 #define OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
 
 #include <map>
-#include <optional>
 #include <string>
 #include <vector>
+
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -67,7 +68,7 @@ struct GinRummyUtils {
   const std::map<int, VecInt> int_to_meld;
   const std::map<VecInt, int> meld_to_int;
 
-  std::string CardString(std::optional<int> card) const;
+  std::string CardString(absl::optional<int> card) const;
   std::string HandToString(const VecInt &cards) const;
 
   int CardInt(std::string card) const;
@@ -100,7 +101,7 @@ struct GinRummyUtils {
 
   VecVecInt BestMeldGroup(const VecInt &cards) const;
 
-  int MinDeadwood(VecInt hand, std::optional<int> card) const;
+  int MinDeadwood(VecInt hand, absl::optional<int> card) const;
   int MinDeadwood(const VecInt &hand) const;
 
   int RankMeldLayoff(const VecInt &meld) const;
