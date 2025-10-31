@@ -61,45 +61,61 @@ def load_game_with_error_handling(game_string):
     A pyspiel.Game object.
 
   Raises:
-    ValueError: If the game cannot be loaded, with suggestions for fixes.
+    SystemExit: If the game cannot be loaded, prints error and exits.
   """
   try:
     return pyspiel.load_game(game_string)
-  except (pyspiel.SpielError, RuntimeError) as e:
+  except (pyspiel.SpielError, RuntimeError, Exception) as e:
     # Get list of all registered games for suggestions
-    all_games_types = pyspiel.registered_games()
-    # Convert GameType objects to strings (short names)
-    all_games = [game.short_name for game in all_games_types]
+    try:
+      all_games_types = pyspiel.registered_games()
+      # Convert GameType objects to strings (short names)
+      all_games = [game.short_name for game in all_games_types]
+    except (AttributeError, Exception):
+      # Fallback if registered_games doesn't work as expected
+      all_games = []
     
     # Extract just the game name (before any parameters)
     game_name = game_string.split("(")[0].strip()
     
     # Find similar game names using fuzzy matching
-    suggestions = difflib.get_close_matches(
-        game_name, all_games, n=5, cutoff=0.4
-    )
+    suggestions = []
+    if all_games:
+      try:
+        suggestions = difflib.get_close_matches(
+            game_name, all_games, n=5, cutoff=0.4
+        )
+      except (TypeError, Exception):
+        # Ignore errors in fuzzy matching
+        pass
     
     # Build a helpful error message
-    error_msg = f"\n{'='*70}\n"
-    error_msg += f"ERROR: Failed to load game '{game_string}'\n"
-    error_msg += f"{'='*70}\n"
-    error_msg += f"\nOriginal error: {str(e)}\n"
+    separator = "=" * 70
+    error_msg = "\n{0}\n".format(separator)
+    error_msg += "ERROR: Failed to load game '{0}'\n".format(game_string)
+    error_msg += "{0}\n".format(separator)
+    error_msg += "\nOriginal error: {0}\n".format(str(e))
     
     if suggestions:
-      error_msg += f"\n Did you mean one of these games?\n"
+      error_msg += "\nDid you mean one of these games?\n"
       for i, suggestion in enumerate(suggestions, 1):
-        error_msg += f"   {i}. {suggestion}\n"
-    else:
-      error_msg += f"\n No similar game names found.\n"
+        error_msg += "   {0}. {1}\n".format(i, suggestion)
+    elif all_games:
+      error_msg += "\nNo similar game names found.\n"
     
-    error_msg += f"\n Tips:\n"
-    error_msg += f"   - Game names are case-sensitive\n"
-    error_msg += f"   - Use underscores (e.g., 'tic_tac_toe' not 'tictactoe')\n"
-    error_msg += f"   - Check parameter syntax: game_name(param1=value1,param2=value2)\n"
-    error_msg += f"\n To see all {len(all_games)} available games, run:\n"
-    error_msg += f"   python -c \"import pyspiel; print(pyspiel.registered_games())\"\n"
-    error_msg += f"\n   Or use --help to see common examples.\n"
-    error_msg += f"{'='*70}\n"
+    error_msg += "\nTips:\n"
+    error_msg += "   - Game names are case-sensitive\n"
+    error_msg += "   - Use underscores (e.g., 'tic_tac_toe' not 'tictactoe')\n"
+    error_msg += "   - Check parameter syntax: game_name(param1=value1,param2=value2)\n"
+    
+    if all_games:
+      error_msg += "\nTo see all {0} available games, run:\n".format(
+          len(all_games))
+      error_msg += "   python -c \"import pyspiel; "
+      error_msg += "print(pyspiel.registered_games())\"\n"
+    
+    error_msg += "\n   Or use --help to see common examples.\n"
+    error_msg += "{0}\n".format(separator)
     
     # Print to stderr for better visibility
     print(error_msg, file=sys.stderr)
@@ -113,17 +129,18 @@ def main(_):
 
   action_string = None
 
-  print("\n" + "="*70)
-  print(f"Creating game: '{FLAGS.game_string}'")
-  print("="*70 + "\n")
+  separator = "=" * 70
+  print("\n{0}".format(separator))
+  print("Creating game: '{0}'".format(FLAGS.game_string))
+  print("{0}\n".format(separator))
   
   # Load game with improved error handling
   game = load_game_with_error_handling(FLAGS.game_string)
   
   # Print game information
-  print(f"✓ Successfully loaded game: {game.get_type().short_name}")
-  print(f"  Players: {game.num_players()}")
-  print(f"  Type: {game.get_type().dynamics}")
+  print("Successfully loaded game: {0}".format(game.get_type().short_name))
+  print("  Players: {0}".format(game.num_players()))
+  print("  Type: {0}".format(game.get_type().dynamics))
   print()
 
   # Create the initial state
@@ -148,7 +165,7 @@ def main(_):
     
     # Safety check to prevent infinite loops
     if move_count > max_moves:
-      print(f"\n WARNING: Reached maximum move limit ({max_moves})",
+      print("\nWARNING: Reached maximum move limit ({0})".format(max_moves),
             file=sys.stderr)
       print("The game may be stuck in an infinite loop.", file=sys.stderr)
       sys.exit(1)
@@ -172,7 +189,9 @@ def main(_):
         for pid in range(game.num_players()):
           legal_actions = state.legal_actions(pid)
           if not legal_actions:
-            raise ValueError(f"No legal actions for player {pid} in simultaneous node")
+            raise ValueError(
+                "No legal actions for player {0} in simultaneous node".format(
+                    pid))
           chosen_actions.append(np.random.choice(legal_actions))
         print("Chosen actions: ", [
             state.action_to_string(pid, action)
@@ -183,9 +202,9 @@ def main(_):
         # Decision node: sample action for the single current player
         legal_actions = state.legal_actions(state.current_player())
         if not legal_actions:
-          print(f"\n ERROR: No legal actions for player {state.current_player()}",
-                file=sys.stderr)
-          print(f"Current state:\n{state}", file=sys.stderr)
+          print("\nERROR: No legal actions for player {0}".format(
+              state.current_player()), file=sys.stderr)
+          print("Current state:\n{0}".format(state), file=sys.stderr)
           sys.exit(1)
         
         action = random.choice(legal_actions)
@@ -195,20 +214,21 @@ def main(_):
         state.apply_action(action)
       print(str(state))
     except Exception as e:
-      print(f"\n ERROR during game play at move {move_count}: {e}",
-            file=sys.stderr)
-      print(f"Current state:\n{state}", file=sys.stderr)
+      print("\nERROR during game play at move {0}: {1}".format(
+          move_count, e), file=sys.stderr)
+      print("Current state:\n{0}".format(state), file=sys.stderr)
       print("\nThis might be a bug in the game implementation.", file=sys.stderr)
       raise
 
   # Game is now done. Print utilities for each player
-  print("\n" + "="*70)
-  print(f" Game finished after {move_count} moves!")
-  print("="*70)
+  separator = "=" * 70
+  print("\n{0}".format(separator))
+  print("Game finished after {0} moves!".format(move_count))
+  print("{0}".format(separator))
   
   try:
     returns = state.returns()
-    print("\n Final Results:")
+    print("\nFinal Results:")
     for pid in range(game.num_players()):
       result = returns[pid]
       if result > 0:
@@ -217,9 +237,9 @@ def main(_):
         outcome = "Lost"
       else:
         outcome = "Draw"
-      print(f"   Player {pid}: {result:+.2f} {outcome}")
+      print("   Player {0}: {1:+.2f} ({2})".format(pid, result, outcome))
   except Exception as e:
-    print(f"\n  WARNING: Could not retrieve final returns: {e}",
+    print("\nWARNING: Could not retrieve final returns: {0}".format(e),
           file=sys.stderr)
     print("The game finished but final scores are unavailable.", file=sys.stderr)
 
