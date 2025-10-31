@@ -15,7 +15,6 @@
 #ifndef OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
 #define OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
 
-#include <array>
 #include <functional>
 #include <memory>
 #include <ostream>
@@ -42,9 +41,9 @@ namespace connect_four {
 
 // Constants.
 inline constexpr int kNumPlayers = 2;
-inline constexpr int kRows = 6;
-inline constexpr int kCols = 7;
-inline constexpr int kNumCells = kRows * kCols;
+inline constexpr int kDefaultNumRows = 6;
+inline constexpr int kDefaultNumCols = 7;
+inline constexpr int kDefaultXInRow = 4;
 inline constexpr int kCellStates =
     1 + kNumPlayers;  // player 0, player 1, empty
 
@@ -125,14 +124,14 @@ class ConnectFourState : public State {
   bool IsFull() const;         // Is the board full?
   Player current_player_ = 0;  // Player zero goes first
   Outcome outcome_ = Outcome::kUnknown;
-  std::array<CellState, kNumCells> board_;
+  std::vector<CellState> board_;
 };
 
 // Game object.
 class ConnectFourGame : public Game {
  public:
   explicit ConnectFourGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kCols; }
+  int NumDistinctActions() const override { return cols_; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ConnectFourState(shared_from_this()));
   }
@@ -141,9 +140,18 @@ class ConnectFourGame : public Game {
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, kRows, kCols};
+    return {kCellStates, rows_, cols_};
   }
-  int MaxGameLength() const override { return kNumCells; }
+  int MaxGameLength() const override { return rows_ * cols_; }
+
+  int rows() const { return rows_; }
+  int cols() const { return cols_; }
+  int x_in_row() const { return x_in_row_; }
+
+ private:
+  const int rows_;
+  const int cols_;
+  const int x_in_row_;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {

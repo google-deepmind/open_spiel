@@ -416,6 +416,10 @@ void State::ApplyActionsWithLegalityChecks(const std::vector<Action>& actions) {
   ApplyActions(actions);
 }
 
+void State::ApplyActionStruct(const ActionStruct& action_struct) {
+  ApplyAction(StructToAction(action_struct));
+}
+
 std::vector<int> State::LegalActionsMask(Player player) const {
   int length = (player == kChancePlayerId) ? game_->MaxChanceOutcomes()
                                            : num_distinct_actions_;

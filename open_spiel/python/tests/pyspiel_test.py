@@ -414,6 +414,39 @@ class PyspielTest(parameterized.TestCase):
       game2 = pyspiel.deserialize_game(serialized_game)
       self.assertEqual(str(game), str(game2))
 
+  def test_game_structs(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    state = game.new_initial_state()
+
+    # Test ActionStruct
+    action = state.legal_actions()[0]
+    action_struct = state.action_to_struct(action)
+    self.assertIsNotNone(action_struct)
+    self.assertIsInstance(action_struct, pyspiel.GameStruct)
+    self.assertIsInstance(action_struct, pyspiel.ActionStruct)
+    json_str = action_struct.to_json()
+    self.assertIn('"row":', json_str)
+    self.assertIn('"col":', json_str)
+
+    # Test StructToAction
+    self.assertEqual(action, state.struct_to_action(action_struct))
+
+    # Test StateStruct
+    state_struct = state.to_struct()
+    self.assertIsNotNone(state_struct)
+    self.assertIsInstance(state_struct, pyspiel.GameStruct)
+    self.assertIsInstance(state_struct, pyspiel.StateStruct)
+    json_str = state_struct.to_json()
+    self.assertIn('"board":', json_str)
+
+    # Test ObservationStruct
+    observation_struct = state.to_observation_struct()
+    self.assertIsNotNone(observation_struct)
+    self.assertIsInstance(observation_struct, pyspiel.GameStruct)
+    self.assertIsInstance(observation_struct, pyspiel.ObservationStruct)
+    json_str = observation_struct.to_json()
+    self.assertIn('"board":', json_str)
+
 
 if __name__ == "__main__":
   absltest.main()

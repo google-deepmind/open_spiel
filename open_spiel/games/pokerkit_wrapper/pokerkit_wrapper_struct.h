@@ -54,6 +54,31 @@ struct PokerkitStateStruct : StateStruct {
   // https://pokerkit.readthedocs.io/en/stable/notation.html#writing-hands
   std::vector<std::vector<std::string>> poker_hand_histories = {};
 
+  // Holds each per-player ACPC log returned by
+  // pokerkit.HandHistory.to_acpc_protocol(...). Each index in the outer vector
+  // corresponds to player, each index in the middle vector corresponds to one
+  // line in the ACPC log, and the inner-most vector has length two wehre the 0
+  // index is either 'S->' or '<-C' and the 1 index the 'MATCHSTATE:....'
+  // string.
+  //
+  // For more details on general ACPC protocol see the 'Examples' section at the
+  // end of
+  // https://pokerkit.readthedocs.io/en/stable/_static/protocol.pdf
+  //
+  // NOTE: Only supported for games like Texas Hold'em; not supported for games
+  // like 7 Card Stud that have a bring-in.
+  std::vector<std::vector<std::vector<std::string>>> full_acpc_logs = {};
+
+  // -- The following fields are used for compatibility with code that is using
+  // UniversalPokerStateStruct. --
+  std::vector<int> blinds = {};
+  // NOTE: Only supported for games like Texas Hold'em; not supported for games
+  // like 7 Card Stud that have a bring-in.
+  std::string acpc_betting_history = "";
+  std::vector<int> player_contributions = {};
+  int pot_size = 0;
+  std::vector<int> starting_stacks = {};
+
   PokerkitStateStruct() = default;
   explicit PokerkitStateStruct(const std::string& json_str) {
     nlohmann::json::parse(json_str).get_to(*this);
@@ -68,7 +93,10 @@ struct PokerkitStateStruct : StateStruct {
                                  legal_actions, current_player, is_terminal,
                                  stacks, bets, board_cards, hole_cards, pots,
                                  burn_cards, mucked_cards,
-                                 poker_hand_histories);
+                                 poker_hand_histories,
+                                 full_acpc_logs, blinds,
+                                 acpc_betting_history, player_contributions,
+                                 pot_size, starting_stacks);
 };
 
 }  // namespace pokerkit_wrapper

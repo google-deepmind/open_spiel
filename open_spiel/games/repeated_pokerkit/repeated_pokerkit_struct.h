@@ -31,6 +31,13 @@ inline constexpr int kInvalidBlindBetSizeOrBringIn = -1;
 
 struct RepeatedPokerkitStateStruct : StateStruct {
   pokerkit_wrapper::PokerkitStateStruct pokerkit_state_struct = {};
+  // TODO: b/444333187 - Consider saving the prior pokerkit_wrapper's
+  // to_struct() here, so that that if full hand-histories are disabled
+  // users can still find out what happened in terminal states.
+  //
+  // E.g. have it be empty on the first hand, and otherwise the state of the
+  // previous hand at the end of said hand (after it reached terminal state).
+  // pokerkit_wrapper::PokerkitStateStruct previous_pokerkit_state_struct = {};
   int hand_number = 0;
   bool is_terminal = false;
   std::vector<int> stacks = {};

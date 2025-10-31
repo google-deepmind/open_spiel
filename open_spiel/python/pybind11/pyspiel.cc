@@ -288,9 +288,14 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("utility_sum", &GameInfo::utility_sum)
       .def_readonly("max_game_length", &GameInfo::max_game_length);
 
-  py::class_<StateStruct> state_struct(m, "StateStruct");
-  state_struct
-      .def("to_json", &StateStruct::ToJson);
+  py::class_<GameStruct> game_struct(m, "GameStruct");
+  game_struct.def("to_json", &GameStruct::ToJson);
+
+  py::class_<StateStruct, GameStruct>(m, "StateStruct");
+
+  py::class_<ObservationStruct, GameStruct>(m, "ObservationStruct");
+
+  py::class_<ActionStruct, GameStruct>(m, "ActionStruct");
 
   m.attr("INVALID_ACTION") = py::int_(open_spiel::kInvalidAction);
 
@@ -310,6 +315,11 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("apply_action_with_legality_check",
            py::overload_cast<Action>(
                &State::ApplyActionWithLegalityCheck))
+      .def("apply_actions", &State::ApplyActions)
+      .def("apply_actions_with_legality_checks",
+           &State::ApplyActionsWithLegalityChecks)
+      .def("apply_action_struct", &State::ApplyActionStruct)
+      .def("undo_action", &State::UndoAction)
       .def("legal_actions",
            (std::vector<open_spiel::Action>(State::*)(int) const) &
                State::LegalActions)
@@ -329,6 +339,13 @@ PYBIND11_MODULE(pyspiel, m) {
                State::StringToAction)
       .def("string_to_action",
            (Action(State::*)(const std::string&) const) & State::StringToAction)
+      .def("action_to_struct",
+           (std::unique_ptr<ActionStruct>(State::*)(Player, Action) const) &
+               State::ActionToStruct)
+      .def("action_to_struct",
+           (std::unique_ptr<ActionStruct>(State::*)(Action) const) &
+               State::ActionToStruct)
+      .def("struct_to_action", &State::StructToAction)
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
       .def("to_string", &State::ToString)
@@ -366,12 +383,15 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::vector<float>(State::*)(int) const) & State::ObservationTensor)
       .def("observation_tensor",
            (std::vector<float>(State::*)() const) & State::ObservationTensor)
+      .def("to_observation_struct",
+           (std::unique_ptr<ObservationStruct>(State::*)(Player) const) &
+               State::ToObservationStruct,
+           py::arg("player"))
+      .def("to_observation_struct",
+           (std::unique_ptr<ObservationStruct>(State::*)() const) &
+               State::ToObservationStruct)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
-      .def("undo_action", &State::UndoAction)
-      .def("apply_actions", &State::ApplyActions)
-      .def("apply_actions_with_legality_checks",
-           &State::ApplyActionsWithLegalityChecks)
       .def("num_distinct_actions", &State::NumDistinctActions)
       .def("num_players", &State::NumPlayers)
       .def("chance_outcomes", &State::ChanceOutcomes)

@@ -15,11 +15,16 @@
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 
 #include <algorithm>
+#include <cstring>
+#include <optional>
 #include <set>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/spiel.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -42,7 +47,7 @@ int GinRummyUtils::CardRank(int card) const { return card % num_ranks; }
 constexpr char kRankChar[] = "A23456789TJQK";
 constexpr char kSuitChar[] = "scdh";
 
-std::string GinRummyUtils::CardString(absl::optional<int> card) const {
+std::string GinRummyUtils::CardString(std::optional<int> card) const {
   if (!card.has_value()) return "XX";
   SPIEL_CHECK_GE(card.value(), 0);
   SPIEL_CHECK_LT(card.value(), num_cards);
@@ -315,7 +320,7 @@ VecVecInt GinRummyUtils::BestMeldGroup(const VecInt &cards) const {
 }
 
 // Minimum deadwood count over all meld groups.
-int GinRummyUtils::MinDeadwood(VecInt hand, absl::optional<int> card) const {
+int GinRummyUtils::MinDeadwood(VecInt hand, std::optional<int> card) const {
   if (card.has_value()) hand.push_back(card.value());
   return MinDeadwood(hand);
 }
@@ -390,7 +395,7 @@ VecInt GinRummyUtils::LegalMelds(const VecInt &hand, int knock_card) const {
 
 // Returns the legal discards when a player has knocked. Normally a player can
 // discard any card in their hand. When a player knocks, however, they must
-// discard a card that preseves the ability to arrange the hand so that the
+// discard a card that preserves the ability to arrange the hand so that the
 // total deadwood is less than the knock card.
 VecInt GinRummyUtils::LegalDiscards(const VecInt &hand, int knock_card) const {
   std::set<int> legal_discards;

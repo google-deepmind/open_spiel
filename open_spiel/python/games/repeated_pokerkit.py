@@ -727,7 +727,7 @@ class RepeatedPokerkitState(pyspiel.State):
     for player in range(self.num_players()):
       # Worst case the player should have 0 chips left; if they have a negative
       # number then there was likely a major bug in the game logic elsewhere.
-      assert(self._stacks[player] >= 0)
+      assert self._stacks[player] >= 0
       if self._stacks[player] == 0:
         self._player_to_seat[player] = INACTIVE_PLAYER_SEAT
       else:
@@ -937,6 +937,12 @@ class RepeatedPokerkitState(pyspiel.State):
     set_or_remove_from_params("bring_in", self._bring_in)
     set_or_remove_from_params("small_bet", self._small_bet_size)
     set_or_remove_from_params("big_bet", self._big_bet_size)
+
+    # TODO(b/444333187): Consider saving the prior pokerkit_wrapper's
+    # to_struct() here, so that that if full hand-histories are disabled
+    # users can still find out what happened in terminal states. E.g.
+    # self._previous_pokerkit_wrapper_state_struct = (
+    #   self.pokerkit_wrapper_state.to_struct())
 
     # No need to determine a 'first player' like in
     # RepeatedPoker::UpdateUniversalPoker seat we handle this all via seat
@@ -1191,6 +1197,7 @@ class RepeatedPokerkitObserver:
     return pokerkit_wrapper_observer.string_from(
         state.pokerkit_wrapper_state, seat_id
     )
+
 
 # TODO: b/437724266 - remove once no longer disabling at the top of this file.
 # pylint: enable=protected-access

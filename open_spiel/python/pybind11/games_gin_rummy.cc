@@ -37,6 +37,30 @@ using gin_rummy::GinRummyGame;
 using gin_rummy::GinRummyState;
 using gin_rummy::GinRummyUtils;
 
+// GinRummyStateStruct and GinRummyObservationStruct contain the same fields,
+//
+// the hands and deadwood fields. The hands field is a list of lists of ints,
+// whereas the deadwood field is a list of ints.
+namespace {
+template <typename T, typename... Args>
+void DefReadWriteGinRummyFields(py::class_<T, Args...>& c) {
+  c.def_readwrite("phase", &T::phase)
+      .def_readwrite("current_player", &T::current_player)
+      .def_readwrite("knock_card", &T::knock_card)
+      .def_readwrite("upcard", &T::upcard)
+      .def_readwrite("prev_upcard", &T::prev_upcard)
+      .def_readwrite("stock_size", &T::stock_size)
+      .def_readwrite("hands", &T::hands)
+      .def_readwrite("discard_pile", &T::discard_pile)
+      .def_readwrite("deadwood", &T::deadwood)
+      .def_readwrite("knocked", &T::knocked)
+      .def_readwrite("pass_on_first_upcard", &T::pass_on_first_upcard)
+      .def_readwrite("layed_melds", &T::layed_melds)
+      .def_readwrite("layoffs", &T::layoffs)
+      .def_readwrite("finished_layoffs", &T::finished_layoffs);
+}
+}  // namespace
+
 void init_pyspiel_games_gin_rummy(py::module& m) {
   py::module_ gin_rummy = m.def_submodule("gin_rummy");
 
@@ -76,6 +100,20 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .value("GAME_OVER", gin_rummy::Phase::kGameOver)
       .export_values();
 
+  py::class_<gin_rummy::GinRummyStateStruct, open_spiel::StateStruct>
+      state_struct_class(gin_rummy, "GinRummyStateStruct");
+  state_struct_class.def(py::init<>()).def(py::init<std::string>());
+  DefReadWriteGinRummyFields(state_struct_class);
+
+  py::class_<gin_rummy::GinRummyObservationStruct,
+             open_spiel::ObservationStruct>
+      obs_struct_class(gin_rummy, "GinRummyObservationStruct");
+  obs_struct_class.def(py::init<>()).def(py::init<std::string>());
+  DefReadWriteGinRummyFields(obs_struct_class);
+  obs_struct_class.def_readwrite(
+      "observing_player",
+      &gin_rummy::GinRummyObservationStruct::observing_player);
+
   py::classh<GinRummyState, State> state_class(gin_rummy, "GinRummyState");
   state_class
       .def("current_phase", &GinRummyState::CurrentPhase)
@@ -93,6 +131,8 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .def("pass_on_first_upcard", &GinRummyState::PassOnFirstUpcard)
       .def("layed_melds", &GinRummyState::LayedMelds)
       .def("layoffs", &GinRummyState::Layoffs)
+      .def("to_struct", &GinRummyState::ToStruct)
+      .def("to_observation_struct", &GinRummyState::ToObservationStruct)
       // Pickle support
       .def(py::pickle(
           [](const GinRummyState& state) {  // __getstate__

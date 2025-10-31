@@ -28,6 +28,7 @@ implementation in the C++ codebase, but only supports:
 - Limit Texas Hold'em
 """
 
+from collections.abc import Iterator
 import copy
 import dataclasses
 import decimal
@@ -102,6 +103,7 @@ def _get_variants_supporting_param(param_name: str) -> list[str]:
       for name, cls in SUPPORTED_VARIANT_MAP.items()
       if param_name in inspect.signature(cls).parameters.keys()
   ]
+
 
 VARIANT_PARAM_USAGE = {
     param: _get_variants_supporting_param(param)
@@ -215,7 +217,12 @@ _GAME_TYPE_ACPC_STYLE = pyspiel.GameType(
 # NOTE: FOLD and CHECK_OR_CALL deliberately chosen to match kFold and kCall in
 # universal_poker so that it's easier to port code over from it.
 ACTION_FOLD = 0
-ACTION_CHECK_OR_CALL = 1
+# ACTION_CHECK_OR_CALL and ACTION_POST_BRING_IN can never both be valid actions
+# at the same time so this is safe. Since by definition bring-ins are spots
+# where a player is being forced to make a bet of some sort.
+_ACTION_CHECK_OR_CALL_OR_POST_BRING_IN = 1
+ACTION_CHECK_OR_CALL = _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN
+ACTION_POST_BRING_IN = _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN
 FOLD_AND_CHECK_OR_CALL_ACTIONS = [ACTION_FOLD, ACTION_CHECK_OR_CALL]
 
 # NOTE: with one exception (see below), all player actions with value >= 2 will
@@ -226,12 +233,13 @@ FOLD_AND_CHECK_OR_CALL_ACTIONS = [ACTION_FOLD, ACTION_CHECK_OR_CALL]
 # it as declaring a total contribution of X chips across **all** streets", i.e.
 # the entire hand).
 
-# NOTE: As a result of using action `1` to handle ACTION_CHECK_OR_CALL, we have
-# to handle bet sizes of 1 chip via special-case 'mapping' them to another
-# action value. This can can happen in exactly one case: when a player has a
-# single chip left in their stack and wants to shove all-in. (We prevent bet
-# sizes < 2 in all other situations by ensuring that we only ever provide
-# pokerkit min_bet and small_bet parameters of size >= 2.)
+# NOTE: As a result of using action `1` to handle
+# _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN, we have to handle bet sizes of 1 chip
+# via special-case 'mapping' them to another action value. This can can happen
+# in exactly one case: when a player has a single chip left in their stack and
+# wants to shove all-in. (We prevent bet sizes < 2 in all other situations by
+# ensuring that we only ever provide pokerkit min_bet and small_bet parameters
+# of size >= 2.)
 
 
 def _parse_values(param_str) -> list[int | decimal.Decimal]:
@@ -692,8 +700,13 @@ class PokerkitWrapperState(pyspiel.State):
     # Handling player nodes first since they're the most straightforward.
     if wrapped_state.can_fold():
       actions.append(ACTION_FOLD)
-    if wrapped_state.can_check_or_call():
-      actions.append(ACTION_CHECK_OR_CALL)
+    # In practice this will technically always be true for the current game
+    # variants we support. Since by definition bring-in posting is the only time
+    # where a player is making a forced bet / where a player can neither check
+    # nor call. That said, we keep this check here to be future-proof + help
+    # make things more readable.
+    if wrapped_state.can_check_or_call() or wrapped_state.can_post_bring_in():
+      actions.append(_ACTION_CHECK_OR_CALL_OR_POST_BRING_IN)
     if wrapped_state.can_complete_bet_or_raise_to():
       valid_bet_sizes = []
       betting_structure = wrapped_state.betting_structure
@@ -732,61 +745,41 @@ class PokerkitWrapperState(pyspiel.State):
           amount not in FOLD_AND_CHECK_OR_CALL_ACTIONS
           for amount in valid_bet_sizes
       )
+      if valid_bet_sizes:
+        # Ideally we would check *all* of these values, but doing so could be
+        # expensive if the length of allowed bet sizes is too large.
+        assert wrapped_state.can_complete_bet_or_raise_to(min(valid_bet_sizes))
+        assert wrapped_state.can_complete_bet_or_raise_to(max(valid_bet_sizes))
 
       if len(valid_bet_sizes) == 1:
         only_valid_bet = valid_bet_sizes[0]
+        # Sometimes we can get into situations where pokerkit allows betting a
+        # surprisingly small value, e.g. less than the 'typical' minimum bet
+        # size for a given street. These asserts are here to give us confidence
+        # that whenever we are in such a situation that these bets actually
+        # were a result of the bounds pokerkit provided to us....
         assert only_valid_bet == min_bet and only_valid_bet == max_bet
-        current_street: pokerkit.Street = wrapped_state.streets[
-            wrapped_state.street_index
-        ]
-        # "Global minimum" size for the current street, regardless of player.
-        # TODO: b/437724266 - double check this actually is independent from
-        # player!
-        street_minimum_size = (
-            current_street.min_completion_betting_or_raising_amount
+        # ... + that indeed neither lesser nor greater bets would have been
+        # legal.
+        assert not wrapped_state.can_complete_bet_or_raise_to(
+            only_valid_bet + 1
         )
-        if only_valid_bet < street_minimum_size:
-          # In 2-person games, the only way for this to happen is if the
-          # effective stack size is less than the bet size and the player is
-          # (effectively) shoving. So we can trivially verify that this isn't
-          # happening incorrectly.
-          #
-          # NOTE: This cares about _effective_ stack size, not the player's
-          # actual stack size! Since this behavior also happens when the *other*
-          # player's stack size is less than the minimum for the street.
-          if game.num_players() == 2:
-            if only_valid_bet != wrapped_state.get_effective_stack(player):
-              raise RuntimeError(
-                  f"Player {player} has effective stack size of"
-                  f" {wrapped_state.get_effective_stack(player)} (and has"
-                  f" 'real' stack size of {wrapped_state.stacks[player]} chips)"
-                  f"  but only valid bet is {only_valid_bet}, which is"
-                  " unexpectedly less than the minimum value for the current"
-                  " street AND also doesn't equal their effective stack size."
-                  f" {street_minimum_size}."
-              )
-          # In 3+ person games, this is significantly more complicated to verify
-          # since side-pots can significantly complicate the math, especially
-          # in fixed-limit games. Any asserts we could write here would be
-          # overly bug-prone + require significant testing anyways.
-          pass
+        if only_valid_bet - 1 not in FOLD_AND_CHECK_OR_CALL_ACTIONS:
+          assert not wrapped_state.can_complete_bet_or_raise_to(
+              only_valid_bet - 1
+          )
 
       # Handle edge case in both no limit and fixed limit where the player has
-      # so few chips that a legal bet would have conflicted with one of our
-      # reserved actions, and so got filtered out above.
-      if not valid_bet_sizes and wrapped_state.stacks[player] > 0:
-        # If the stack size is non-zero, then we *should* be in a situation
-        # where we were going to try to bet 1 chip, which got filtered out due
-        # to it being in the reserved actions set. (Anything else would mean
-        # there's a bug in our code above.)
-        assert wrapped_state.stacks[player] == 1
+      # so few chips that their only legal bet would have conflicted with one of
+      # our reserved actions, and so got filtered out above.
+      if not valid_bet_sizes and wrapped_state.can_complete_bet_or_raise_to(1):
         assert min_bet == 1 and max_bet == 1
         # This decision to map to 2 is arbitrary! We could alternatively have
         # mapped to any other (reasonably small) positive integer not in the
         # reserved actions set.
         logging.warning(
             "Mapping shove size 1 chip to action 2 in legal_actions to avoid"
-            " conflict with 'reserved' actions.",
+            " conflict with a 'reserved' action.",
         )
         valid_bet_sizes.append(2)
 
@@ -894,9 +887,17 @@ class PokerkitWrapperState(pyspiel.State):
 
       if action == ACTION_FOLD:
         wrapped_state.fold()
-      elif action == ACTION_CHECK_OR_CALL:
-        wrapped_state.check_or_call()
+      elif action == _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN:
+        if wrapped_state.can_check_or_call():
+          wrapped_state.check_or_call()
+        elif wrapped_state.can_post_bring_in():
+          wrapped_state.post_bring_in()
+        else:
+          raise ValueError(
+              f"Action was {action}, but cannot check_or_call or post_bring_in."
+          )
       else:
+        current_player = wrapped_state.actor_index
         if wrapped_state.can_complete_bet_or_raise_to(action):
           wrapped_state.complete_bet_or_raise_to(action)
         else:
@@ -904,12 +905,9 @@ class PokerkitWrapperState(pyspiel.State):
           # where we remapped the shove to action 2 to avoid conflicting with
           # reserved actions.
           assert action == 2
-          assert wrapped_state.stacks[wrapped_state.actor_index] == 1
+          assert not wrapped_state.can_complete_bet_or_raise_to(2)
           assert wrapped_state.can_complete_bet_or_raise_to(1)
-          assert wrapped_state.stacks[wrapped_state.actor_index] == 1
-          action_string = self._action_to_string_base(
-              wrapped_state.actor_index, action
-          )
+          action_string = self._action_to_string_base(current_player, action)
           if _ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING not in action_string:
             raise ValueError(
                 f"Expected to find {_ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING} for"
@@ -993,46 +991,36 @@ class PokerkitWrapperState(pyspiel.State):
     assert player == wrapped_state.actor_index
     if action == ACTION_FOLD:
       return f"Player {player}: Fold"
-    elif action == ACTION_CHECK_OR_CALL:
-      amount = wrapped_state.checking_or_calling_amount
-      return f"Player {player}: Check" if amount == 0 else f"Call({amount})"
+    elif action == _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN:
+      if wrapped_state.can_check_or_call():
+        amount = wrapped_state.checking_or_calling_amount
+        return f"Player {player}: Check" if amount == 0 else f"Call({amount})"
+      elif wrapped_state.can_post_bring_in():
+        return (
+            f"Player {player}: Post Bring-in"
+            f" {wrapped_state.effective_bring_in_amount}"
+        )
+      else:
+        raise ValueError(
+            f"Action was {_ACTION_CHECK_OR_CALL_OR_POST_BRING_IN}, but cannot"
+            " check_or_call or post_bring_in."
+        )
     elif action >= 0 and action not in FOLD_AND_CHECK_OR_CALL_ACTIONS:
-      if not (action == 2 and wrapped_state.stacks[player] == 1):
+      if wrapped_state.can_complete_bet_or_raise_to(action):
         return f"Player {player}: Bet/Raise to {action}"
-
-      # EDGE CASE: If stack size is 1 and action is 2, this is likely a case
-      # where the action was 'remapped' from 1 to 2 to avoid collision with
-      # CHECK_OR_CALL action.
-      assert wrapped_state.min_completion_betting_or_raising_to_amount == 1
-      assert wrapped_state.max_completion_betting_or_raising_to_amount == 1
-      # As per the docs:
-      # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State.payoffs
-      # "Negated versions of these values can be thought of as contributions
-      # to the hand by the individual players."
-      #
-      # Bets on the other hand has the positive amounts the player already
-      # contributed on this street.
-      #
-      # TODO: b/437724266 - figure out whether things like blinds or bring_in
-      # (which have laready been subtracted from starting_stacks by this point)
-      # will or will not show up in the bets list, and how that may affect this
-      # in preflop situations specifically. Since, although in practice this
-      # appears to work + the tests aren't flakey, to be safe we should
-      # investigate and document exactly what is happening in this spot.
-      contribution_on_prior_streets_or_non_bets = -1 * (
-          wrapped_state.payoffs[player] + wrapped_state.bets[player]
-      )
-      assert (
-          wrapped_state.starting_stacks[player]
-          - contribution_on_prior_streets_or_non_bets
-          == 1
-      )
-      return f"Player {player}: Bet/Raise to 1 [ALL-IN EDGECASE]"
-    else:
-      raise ValueError(
-          f"Invalid action {action} for player {player}. 'legal actions' was "
-          f" {self.legal_actions()}"
-      )
+      # Handle edge case where we've 'mapped' a bet of 1 chip to action 2 to
+      # avoid conflicting with reserved actions.
+      elif (  # wrapped_state.can_complete_bet_or_raise_to(action) == False
+          action == 2 and wrapped_state.can_complete_bet_or_raise_to(1)
+      ):
+        assert wrapped_state.min_completion_betting_or_raising_to_amount == 1
+        assert wrapped_state.max_completion_betting_or_raising_to_amount == 1
+        return f"Player {player}: {_ALL_IN_FOR_ONE_CHIP_EDGECASE_STRING}"
+      else:
+        raise ValueError(
+            f"Invalid action {action} for player {player}. 'legal actions' was "
+            f" {self.legal_actions()}"
+        )
 
   def is_terminal(self):
     # .status is True if the state is not terminal, as per
@@ -1135,6 +1123,94 @@ class PokerkitWrapperState(pyspiel.State):
     cpp_state_struct.burn_cards = burn_cards
     cpp_state_struct.mucked_cards = mucked_cards
     cpp_state_struct.poker_hand_histories = poker_hand_histories
+
+    # -- The following fields are used for compatibility with code that is using
+    # UniversalPokerStateStruct. --
+
+    blinds = [int(b) for b in game.blinds]
+    starting_stacks = [int(s) for s in self._wrapped_state.starting_stacks]
+    # TODO(claytondrazner): Verify that this pot_size calculation matches the
+    # one used to fill the equivalent out in Universal Poker.
+    pot_size = int(self._wrapped_state.total_pot_amount)
+    player_contributions = [
+        int(
+            self._wrapped_state.starting_stacks[i]
+            - self._wrapped_state.stacks[i]
+        )
+        for i in range(self.get_game().num_players())
+    ]
+    cpp_state_struct.blinds = blinds
+    cpp_state_struct.player_contributions = player_contributions
+    cpp_state_struct.pot_size = pot_size
+    cpp_state_struct.starting_stacks = starting_stacks
+
+    # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.notation.HandHistory.to_acpc_protocol
+    full_acpc_logs: list[list[tuple[str, str]]] = [
+        [] for _ in range(self.get_game().num_players())
+    ]
+    acpc_betting_history = ""
+    fake_hand_number_to_avoid_error = 0
+
+    # If the game hasn't actually dealt players' cards yet, or maybe also in
+    # some other situations, attempting to get the ACPC state from pokerkit
+    # will result in an ValueError here.
+    if self.get_game().params.get("variant") in _VARIANTS_SUPPORTING_ACPC_STYLE:
+      for player in range(self.get_game().num_players()):
+        try:
+          # For more details + an example of what's in this tuple see:
+          # https://pokerkit.readthedocs.io/en/stable/_static/protocol.pdf
+          # (The 'S->' or '<-C' is in index 0, everything else in index 1)
+          acpc_hand_history_uncensored: Iterator[tuple[str, str]] = (
+              pokerkit.HandHistory.from_game_state(
+                  # pylint: disable=protected-access
+                  # NOTE: Technically has card burning enabled! But should be
+                  # close enough for our purposes here - in practice still
+                  # results in the same string.
+                  self.get_game()._wrapped_game_template_factory(),
+                  # pylint: enable=protected-access
+                  self._wrapped_state,
+              ).to_acpc_protocol(player, fake_hand_number_to_avoid_error)
+          )
+          assert not full_acpc_logs[player]
+          full_acpc_logs[player] = list(acpc_hand_history_uncensored)
+
+        # Intended use case: catching *pokerkit's* ValueErrors. Since it throws
+        # them in many many cases, e.g. if players have no hole cards yet.
+        except ValueError as e:
+          logging.warning(
+              "Failed to get ACPC state so leaving it set to default. Game"
+              " variant is %s, caught error is %s",
+              self.get_game().params.get("variant"),
+              e,
+          )
+          pass
+
+      # E.g.
+      # "MATCHSTATE:1:31:r300r900c/r1800r3600r9000c/r20000c/:KsJs|JdTc/6dJc9c/Kh/Qc"
+      latest_message_match_state = ""
+      # 'or 0' because .actor_index can be None so we need a sane fallback.
+      arbitrary_acpc_player = self._wrapped_state.actor_index or 0
+      for _, match_state in full_acpc_logs[arbitrary_acpc_player]:
+        latest_message_match_state = match_state
+      if latest_message_match_state:
+        if not latest_message_match_state.startswith("MATCHSTATE:"):
+          raise ValueError(
+              "Last message doesn't begin with 'MATCHSTATE:' in string:"
+              f" {latest_message_match_state}"
+          )
+
+        # E.g. "r300r900c/r1800r3600r9000c/r20000c/"
+        # TODO(jhtschultz) - we could leave in the "MATCHSTATE:"" or replace
+        # it with "STATE:" here if downstream code expects it that way.
+        acpc_betting_history = (
+            latest_message_match_state.split("MATCHSTATE:")[1]
+            .strip()
+            .split(":")[2]
+        )
+
+    cpp_state_struct.full_acpc_logs = full_acpc_logs
+    cpp_state_struct.acpc_betting_history = acpc_betting_history
+
     return cpp_state_struct
 
   def to_json(self) -> str:
@@ -1578,9 +1654,13 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
       self._refresh_action_mappings_if_player_node()
       return
 
-    if pokerkit_style_action == ACTION_CHECK_OR_CALL:
+    # NOTE: bring-in variants are not currently supported in ACPC style, so we
+    # don't need to worry about that here. However, _if_ we were to later add
+    # support for them, we'd need to similarly update this to consider
+    # situations where a player uses this action to post a bring-in.
+    if pokerkit_style_action == _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN:
       size = self._wrapped_state.checking_or_calling_amount
-    elif pokerkit_style_action > ACTION_CHECK_OR_CALL:
+    elif pokerkit_style_action > _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN:
       # Handling completion bet or raise-to. *Usually* the action is the size,
       # but there are rare exceptions.
       size = pokerkit_style_action
@@ -1721,7 +1801,7 @@ class ToAcpcActionConverter:
       player: The index of the player who performed the action.
       pokerkit_style_action: The action taken by the player, using the
         PokerkitWrapper's action encoding (e.g., ACTION_FOLD,
-        ACTION_CHECK_OR_CALL, or a bet/raise amount).
+        _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN, or a bet/raise amount).
       size: The numerical value associated with the action. This is 0 for folds
         and checks, the calling amount for calls, and the total amount being
         bet/raised to for completion bets or raises.
@@ -1738,7 +1818,7 @@ class ToAcpcActionConverter:
       return
     elif pokerkit_style_action == ACTION_FOLD:  # and size != 0
       raise ValueError("FOLD actions should be passed as 0 size.")
-    elif pokerkit_style_action == ACTION_CHECK_OR_CALL:  # and size != 0
+    elif pokerkit_style_action == _ACTION_CHECK_OR_CALL_OR_POST_BRING_IN:
       # This MUST be a call if we've reacehd this point, since checks
       # (i.e. size == 0) should have been handled above already above.
       assert size > 0
