@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <cstring>
-#include <optional>
 #include <set>
 #include <string>
 #include <utility>
@@ -24,6 +23,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -47,7 +47,7 @@ int GinRummyUtils::CardRank(int card) const { return card % num_ranks; }
 constexpr char kRankChar[] = "A23456789TJQK";
 constexpr char kSuitChar[] = "scdh";
 
-std::string GinRummyUtils::CardString(std::optional<int> card) const {
+std::string GinRummyUtils::CardString(absl::optional<int> card) const {
   if (!card.has_value()) return "XX";
   SPIEL_CHECK_GE(card.value(), 0);
   SPIEL_CHECK_LT(card.value(), num_cards);
@@ -320,7 +320,7 @@ VecVecInt GinRummyUtils::BestMeldGroup(const VecInt &cards) const {
 }
 
 // Minimum deadwood count over all meld groups.
-int GinRummyUtils::MinDeadwood(VecInt hand, std::optional<int> card) const {
+int GinRummyUtils::MinDeadwood(VecInt hand, absl::optional<int> card) const {
   if (card.has_value()) hand.push_back(card.value());
   return MinDeadwood(hand);
 }
