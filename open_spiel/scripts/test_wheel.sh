@@ -62,8 +62,21 @@ fi
 
 if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux*.whl`
-    ${PYBIN} -m pip install $file
+    # Dynamically detect Python version and install matching wheel
+    PYTHON_VERSION=$(${PYBIN} --version 2>&1 | awk '{print $2}' | cut -d. -f1,2 | tr -d '.')
+    echo "Detected Python version: ${PYTHON_VERSION}, installing matching wheel"
+    WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl 2>/dev/null | head -1)
+    if [[ -f "$WHEEL_FILE" ]]; then
+      echo "Installing wheel: $WHEEL_FILE"
+      ${PYBIN} -m pip install "$WHEEL_FILE"
+    else
+      echo "ERROR: No wheel found for Python ${PYTHON_VERSION}"
+      echo "Available wheels:"
+      ls wheelhouse/open_spiel-*-manylinux_2_17_x86_64.manylinux2014_x86_64.whl 2>/dev/null || echo "No wheels found"
+      exit 1
+    fi
+  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
+    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-macosx_10_9_x86_64.whl
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
     file=`ls wheelhouse/open_spiel-*-cp310-cp310-*.whl`
     ${PYBIN} -m pip install $file
