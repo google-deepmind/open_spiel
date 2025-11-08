@@ -364,9 +364,9 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
         outcomes.Add(p1_outcome > 0 ? 0 : (p1_outcome < 0 ? 1 : 2));
 
         for (const Trajectory::State& state : trajectory->states) {
-          replay_buffer.Add(VPNetModel::TrainInputs{state.legal_actions,
-                                                    state.observation,
-                                                    state.policy, p1_outcome});
+          replay_buffer.Add(VPNetModel::TrainInputs{
+              state.legal_actions, state.observation, state.policy,
+              trajectory->returns[state.current_player]});
           num_states += 1;
         }
 
