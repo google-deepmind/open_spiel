@@ -21,7 +21,9 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
@@ -82,6 +84,13 @@ std::string PlayerToString(Player player) {
     default:
       return DefaultPlayerString(player);
   }
+}
+
+CellState StringToCellState(const std::string& s) {
+  if (s == "x") return CellState::kCross;
+  if (s == "o") return CellState::kNought;
+  if (s == ".") return CellState::kEmpty;
+  SpielFatalError(absl::StrCat("Invalid cell string: ", s));
 }
 
 std::string StateToString(CellState state) {
@@ -260,6 +269,71 @@ std::string TicTacToeGame::ActionToString(Player player,
                                           Action action_id) const {
   return absl::StrCat(StateToString(PlayerToState(player)), "(",
                       action_id / kNumCols, ",", action_id % kNumCols, ")");
+}
+
+TicTacToeState::TicTacToeState(const std::shared_ptr<const Game> game,
+                               const nlohmann::json& json) : State(game) {
+  std::fill(begin(board_), end(board_), CellState::kEmpty);
+
+  TicTacToeStateStruct state_struct(json);
+  if (state_struct.board.size() != kNumCells) {
+    SpielFatalError(absl::StrFormat("Invalid board size: expected %d, got %d",
+                                    kNumCells, state_struct.board.size()));
+  }
+  num_moves_ = 0;
+  int num_x = 0;
+  int num_o = 0;
+  for (Action action = 0; action < state_struct.board.size(); ++action) {
+    CellState cell_state = StringToCellState(state_struct.board[action]);
+    if (cell_state != CellState::kEmpty) {
+      board_[action] = cell_state;
+      num_moves_++;
+      if (cell_state == CellState::kCross) {
+        num_x++;
+      } else {
+        num_o++;
+      }
+    }
+  }
+  if (num_x < num_o || num_x > num_o + 1) {
+    SpielFatalError(absl::StrFormat(
+        "Invalid board state: invalid number of pieces, got x = %d, o = %d",
+        num_x, num_o));
+  }
+  current_player_ = (num_x == num_o ? 0 : 1);
+
+  bool x_wins = HasLine(0);
+  bool o_wins = HasLine(1);
+
+  if (x_wins && o_wins) {
+    SpielFatalError("Invalid board state: both players have a line.");
+  }
+
+  if (x_wins) {
+    if (num_x != num_o + 1) {
+      SpielFatalError(absl::StrFormat(
+          "Invalid board state: x has a line, but number of pieces is "
+          "inconsistent, got x = %d, o = %d",
+          num_x, num_o));
+    }
+    outcome_ = 0;
+  } else if (o_wins) {
+    if (num_x != num_o) {
+      SpielFatalError(absl::StrFormat(
+          "Invalid board state: o has a line, but number of pieces is "
+          "inconsistent, got x = %d, o = %d",
+          num_x, num_o));
+    }
+    outcome_ = 1;
+  } else {
+    outcome_ = kInvalidPlayer;
+  }
+
+  if (state_struct.current_player != PlayerToString(CurrentPlayer())) {
+    SpielFatalError(absl::StrCat("Invalid current player: expected ",
+                                 PlayerToString(CurrentPlayer()),
+                                 ", got ", state_struct.current_player));
+  }
 }
 
 TicTacToeGame::TicTacToeGame(const GameParameters& params)

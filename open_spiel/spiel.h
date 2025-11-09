@@ -847,6 +847,17 @@ class Game : public std::enable_shared_from_this<Game> {
     SpielFatalError("NewInitialState from string is not implemented.");
   }
 
+  // Overload for string literals to resolve ambiguity with nlohmann::json.
+  std::unique_ptr<State> NewInitialState(const char* str) const {
+    return NewInitialState(std::string(str));
+  }
+
+  // Return a new state from json.
+  virtual std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const {
+    SpielFatalError("NewInitialState from state json is not implemented.");
+  }
+
   // Returns newly allocated initial states. In most cases, this will be a
   // single state.
   // Games with multi-population mean field dynamics have multiple initial
