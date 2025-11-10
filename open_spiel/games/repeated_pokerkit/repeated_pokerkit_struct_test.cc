@@ -55,8 +55,8 @@ void TestRepeatedPokerkitStateStructDefaults() {
   SPIEL_CHECK_EQ(pokerkit_state_struct.pots.size(), 0);
   SPIEL_CHECK_EQ(pokerkit_state_struct.burn_cards.size(), 0);
   SPIEL_CHECK_EQ(pokerkit_state_struct.mucked_cards.size(), 0);
-  SPIEL_CHECK_EQ(pokerkit_state_struct.poker_hand_histories.size(), 0);
-  SPIEL_CHECK_EQ(pokerkit_state_struct.full_acpc_logs.size(), 0);
+  SPIEL_CHECK_EQ(pokerkit_state_struct.per_player_phh_actions.size(), 0);
+  SPIEL_CHECK_EQ(pokerkit_state_struct.per_player_acpc_logs.size(), 0);
 }
 
 void TestToJsonBase() {
@@ -86,10 +86,11 @@ void TestToJsonBase() {
   pokerkit_state_struct.pots = {11};
   pokerkit_state_struct.burn_cards = {7};
   pokerkit_state_struct.mucked_cards = {8};
-  pokerkit_state_struct.poker_hand_histories = {{"phh_test_a"}, {"phh_test_b"}};
-  pokerkit_state_struct.full_acpc_logs = {{{"S->", "MATCHSTATE:blah"}}};
+  pokerkit_state_struct.per_player_phh_actions = {{"phh_test_a"},
+                                                  {"phh_test_b"}};
+  pokerkit_state_struct.per_player_acpc_logs = {{{"S->", "MATCHSTATE:blah"}}};
   pokerkit_state_struct.blinds = {1, 2};
-  pokerkit_state_struct.acpc_betting_history = "betting_history_test";
+  pokerkit_state_struct.betting_history = "betting_history_test";
   pokerkit_state_struct.player_contributions = {1, 10};
   pokerkit_state_struct.pot_size = 11;
   pokerkit_state_struct.starting_stacks = {11, 20};
@@ -121,13 +122,13 @@ void TestToJsonBase() {
   expected_json["pokerkit_state_struct"]["pots"] = std::vector<int>{11};
   expected_json["pokerkit_state_struct"]["burn_cards"] = std::vector<int>{7};
   expected_json["pokerkit_state_struct"]["mucked_cards"] = std::vector<int>{8};
-  expected_json["pokerkit_state_struct"]["poker_hand_histories"] =
+  expected_json["pokerkit_state_struct"]["per_player_phh_actions"] =
       std::vector<std::vector<std::string>>{{"phh_test_a"}, {"phh_test_b"}};
-  expected_json["pokerkit_state_struct"]["full_acpc_logs"] =
+  expected_json["pokerkit_state_struct"]["per_player_acpc_logs"] =
       std::vector<std::vector<std::vector<std::string>>>{
           {{"S->", "MATCHSTATE:blah"}}};
   expected_json["pokerkit_state_struct"]["blinds"] = std::vector<int>{1, 2};
-  expected_json["pokerkit_state_struct"]["acpc_betting_history"] =
+  expected_json["pokerkit_state_struct"]["betting_history"] =
       "betting_history_test";
   expected_json["pokerkit_state_struct"]["player_contributions"] =
       std::vector<int>{1, 10};

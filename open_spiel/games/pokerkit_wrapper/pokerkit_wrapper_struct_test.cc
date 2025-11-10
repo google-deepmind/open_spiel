@@ -38,10 +38,10 @@ void TestPokerkitStateStructDefaults() {
   SPIEL_CHECK_EQ(s.pots.size(), 0);
   SPIEL_CHECK_EQ(s.burn_cards.size(), 0);
   SPIEL_CHECK_EQ(s.mucked_cards.size(), 0);
-  SPIEL_CHECK_EQ(s.poker_hand_histories.size(), 0);
-  SPIEL_CHECK_EQ(s.full_acpc_logs.size(), 0);
+  SPIEL_CHECK_EQ(s.per_player_phh_actions.size(), 0);
+  SPIEL_CHECK_EQ(s.per_player_acpc_logs.size(), 0);
   SPIEL_CHECK_EQ(s.blinds.size(), 0);
-  SPIEL_CHECK_EQ(s.acpc_betting_history, "");
+  SPIEL_CHECK_EQ(s.betting_history, "");
   SPIEL_CHECK_EQ(s.player_contributions.size(), 0);
   SPIEL_CHECK_EQ(s.pot_size, 0);
   SPIEL_CHECK_EQ(s.starting_stacks.size(), 0);
@@ -60,10 +60,10 @@ void TestToJsonBase() {
   state_struct.pots = {11};
   state_struct.burn_cards = {7};
   state_struct.mucked_cards = {8};
-  state_struct.poker_hand_histories = {{"phh_test_a"}, {"phh_test_b"}};
-  state_struct.full_acpc_logs = {{{"S->", "MATCHSTATE:blah"}}};
+  state_struct.per_player_phh_actions = {{"phh_test_a"}, {"phh_test_b"}};
+  state_struct.per_player_acpc_logs = {{{"S->", "MATCHSTATE:blah"}}};
   state_struct.blinds = {1, 2};
-  state_struct.acpc_betting_history = "betting_history_test";
+  state_struct.betting_history = "betting_history_test";
   state_struct.player_contributions = {1, 10};
   state_struct.pot_size = 11;
   state_struct.starting_stacks = {11, 20};
@@ -80,13 +80,13 @@ void TestToJsonBase() {
   expected_json["pots"] = std::vector<int>{11};
   expected_json["burn_cards"] = std::vector<int>{7};
   expected_json["mucked_cards"] = std::vector<int>{8};
-  expected_json["poker_hand_histories"] =
+  expected_json["per_player_phh_actions"] =
       std::vector<std::vector<std::string>>{{"phh_test_a"}, {"phh_test_b"}};
-  expected_json["full_acpc_logs"] =
+  expected_json["per_player_acpc_logs"] =
       std::vector<std::vector<std::vector<std::string>>>{
           {{"S->", "MATCHSTATE:blah"}}};
   expected_json["blinds"] = std::vector<int>{1, 2};
-  expected_json["acpc_betting_history"] = "betting_history_test";
+  expected_json["betting_history"] = "betting_history_test";
   expected_json["player_contributions"] = std::vector<int>{1, 10};
   expected_json["pot_size"] = 11;
   expected_json["starting_stacks"] = std::vector<int>{11, 20};
