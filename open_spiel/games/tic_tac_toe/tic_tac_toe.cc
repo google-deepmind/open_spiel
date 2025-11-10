@@ -334,6 +334,8 @@ TicTacToeState::TicTacToeState(const std::shared_ptr<const Game> game,
                                  PlayerToString(CurrentPlayer()),
                                  ", got ", state_struct.current_player));
   }
+
+  starting_state_str_ = this->ToJson();
 }
 
 TicTacToeGame::TicTacToeGame(const GameParameters& params)

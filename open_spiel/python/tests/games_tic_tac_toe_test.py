@@ -23,11 +23,13 @@ import pyspiel
 ttt = pyspiel.tic_tac_toe
 
 
-def make_game():
-  return pyspiel.load_game("tic_tac_toe")
-
-
 class GamesTicTacToeTest(parameterized.TestCase):
+
+  def setUp(self):
+    super().setUp()
+    self.game = pyspiel.load_game("tic_tac_toe")
+    self.ref_state = self.game.new_initial_state()
+    self.ref_state.apply_action(4)
 
   def test_constants(self):
     self.assertEqual(ttt.NUM_ROWS, 3)
@@ -57,14 +59,10 @@ class GamesTicTacToeTest(parameterized.TestCase):
     self.assertEqual(ttt.cellstate_to_string(cellstate), expected_string)
 
   def test_board_at(self):
-    game = make_game()
-    state = game.new_initial_state()
-    state.apply_action(4)
-    self.assertEqual(state.board_at(1, 1), ttt.CellState.CROSS)
+    self.assertEqual(self.ref_state.board_at(1, 1), ttt.CellState.CROSS)
 
   def test_board(self):
-    game = make_game()
-    state = game.new_initial_state()
+    state = self.game.new_initial_state()
     state.apply_action(0)
     state.apply_action(1)
     self.assertEqual(state.board(), [
@@ -72,17 +70,14 @@ class GamesTicTacToeTest(parameterized.TestCase):
         ttt.CellState.NOUGHT] + [ttt.CellState.EMPTY] * 7)
 
   def test_json(self):
-    game = make_game()
-    state = game.new_initial_state()
-    state.apply_action(4)
-    state_struct = state.to_struct()
+    state_struct = self.ref_state.to_struct()
     self.assertEqual(
         state_struct.board,
         [".", ".", ".", ".", "x", ".", ".", ".", "."],
     )
     self.assertEqual(state_struct.current_player, "o")
     json_from_struct = state_struct.to_json()
-    state_json = state.to_json()
+    state_json = self.ref_state.to_json()
     self.assertEqual(
         state_json,
         '{"board":[".",".",".",".","x",".",".",".","."],"current_player":"o"}',
@@ -124,12 +119,11 @@ class GamesTicTacToeTest(parameterized.TestCase):
   def test_state_to_from_dict(
       self, actions: list[int], expected_dict: dict[str, Any]
   ):
-    game = make_game()
-    state = game.new_initial_state()
+    state = self.game.new_initial_state()
     for action in actions:
       state.apply_action(action)
       # Test round trip.
-      new_state = game.new_initial_state(state.to_dict())
+      new_state = self.game.new_initial_state(state.to_dict())
       self.assertEqual(new_state.to_dict(), state.to_dict())
     state_dict = state.to_dict()
     self.assertEqual(state_dict, expected_dict)
@@ -191,10 +185,53 @@ class GamesTicTacToeTest(parameterized.TestCase):
       ),
   )
   def test_state_from_invalid_dict(self, invalid_dict: dict[str, Any]):
-    game = make_game()
     with self.assertRaises(pyspiel.SpielError):
-      game.new_initial_state(invalid_dict)
+      self.game.new_initial_state(invalid_dict)
 
+  def test_empty_starting_state(self):
+    state = self.game.new_initial_state()
+    state.apply_action(0)
+    state.apply_action(1)
+    state.apply_action(2)
+    self.assertIsNone(state.starting_state())
+    self.assertEmpty(state.starting_state_str())
+
+  def test_starting_state_from_dict(self):
+    state = self.game.new_initial_state(self.ref_state.to_dict())
+    self.assertEmpty(state.history())
+    self.assertEqual(str(state.starting_state()), str(self.ref_state))
+    self.assertEqual(state.starting_state_str(), self.ref_state.to_json())
+
+  def test_starting_state_from_json(self):
+    state = self.game.new_initial_state(self.ref_state.to_json())
+    self.assertEmpty(state.history())
+    self.assertEqual(str(state.starting_state()), str(self.ref_state))
+
+  def test_starting_state_unchanged_after_action(self):
+    state = self.game.new_initial_state(self.ref_state.to_dict())
+    state.apply_action(0)
+    self.assertEqual(str(state.starting_state()), str(self.ref_state))
+
+  def test_starting_state_unchanged_after_clone(self):
+    state = self.game.new_initial_state(self.ref_state.to_dict())
+    state.apply_action(0)
+    clone = state.clone()
+    self.assertEqual(str(clone.starting_state()), str(self.ref_state))
+
+  def test_state_serialization(self):
+    state = self.game.deserialize_state(self.ref_state.serialize())
+    self.assertEqual(str(state), str(self.ref_state))
+
+  def test_starting_state_serialization(self):
+    state_with_starting = self.game.new_initial_state(self.ref_state.to_dict())
+    state_after_serialization = self.game.deserialize_state(
+        state_with_starting.serialize()
+    )
+
+    self.assertEqual(
+        str(state_after_serialization.starting_state()), str(self.ref_state)
+    )
+    self.assertEmpty(state_after_serialization.history())
 
 if __name__ == "__main__":
   absltest.main()

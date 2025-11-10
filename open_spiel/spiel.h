@@ -790,6 +790,9 @@ class State {
   // should override this function.
   virtual int MeanFieldPopulation() const;
 
+  std::unique_ptr<State> StartingState() const;
+  std::string StartingStateStr() const { return starting_state_str_; }
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
@@ -809,6 +812,9 @@ class State {
   // Information that changes over the course of the game.
   std::vector<PlayerAction> history_;
   int move_number_;
+
+  // Optional json-serialized starting state that the history originates from.
+  std::string starting_state_str_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const State& state);
@@ -841,10 +847,10 @@ class Game : public std::enable_shared_from_this<Game> {
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
 
-  // Return a new state from a string description. This is an unspecified and
-  // unrestricted function to construct a new state from a string.
+  // Return a new state from a string description. Defaults to interpreting the
+  // string as json.
   virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
-    SpielFatalError("NewInitialState from string is not implemented.");
+    return NewInitialState(nlohmann::json::parse(str));
   }
 
   // Overload for string literals to resolve ambiguity with nlohmann::json.
@@ -1131,6 +1137,13 @@ class Game : public std::enable_shared_from_this<Game> {
       ABSL_GUARDED_BY(mutex_defaulted_parameters_);
   mutable absl::Mutex mutex_defaulted_parameters_;
 };
+
+inline std::unique_ptr<State> State::StartingState() const {
+  if (!starting_state_str_.empty()) {
+    return game_->NewInitialState(nlohmann::json::parse(starting_state_str_));
+  }
+  return nullptr;
+}
 
 #define CONCAT_(x, y) x##y
 #define CONCAT(x, y) CONCAT_(x, y)

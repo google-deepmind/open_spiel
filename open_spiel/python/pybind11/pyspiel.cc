@@ -399,6 +399,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("get_game", &State::GetGame)
       .def("get_type", &State::GetType)
       .def("serialize", &State::Serialize)
+      .def("starting_state", &State::StartingState)
+      .def("starting_state_str", &State::StartingStateStr)
       .def("resample_from_infostate", &State::ResampleFromInfostate)
       .def(py::pickle(              // Pickle support
           [](const State& state) {  // __getstate__
