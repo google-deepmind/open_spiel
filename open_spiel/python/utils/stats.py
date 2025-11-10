@@ -110,6 +110,8 @@ class SlidingWindowAccumulator(object):
         self._index = 0
 
   def mean(self):
+    if not self._values:
+      return 0
     return sum(self._values) / len(self._values)
 
 
