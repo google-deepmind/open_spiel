@@ -758,13 +758,27 @@ class PokerkitWrapperState(pyspiel.State):
         # surprisingly small value, e.g. less than the 'typical' minimum bet
         # size for a given street. These asserts are here to give us confidence
         # that whenever we are in such a situation that these bets actually
-        # were a result of the bounds pokerkit provided to us....
-        # TODO: b/459189170 - this may potentially be too strict if pokerkit
-        # allows for betting 1 chip in certain additional situations beyond
-        # single chip shoves (e.g. depending on how effective stack sizes work).
-        assert only_valid_bet == min_bet and only_valid_bet == max_bet
-        # ... + that indeed neither lesser nor greater bets would have been
-        # legal.
+        # were a result of the bounds pokerkit provided to us...
+        if not (
+            (only_valid_bet == min_bet and only_valid_bet == max_bet)
+            # (Edge case: handling situations where the only valid bet after
+            # filtering out bet size 1 is an *actual* bet of size 2. Since from
+            # pokerkit's perspective both sizes are valid here, but there will
+            # _correctly_ only be one single action in the array. Some of these
+            # checks are redundant with each other; we leave them in since
+            # normally we would be raising an exception, so we want to be extra
+            # cautious.)
+            or (
+                max_bet == 2
+                and max_bet == min_bet + 1
+                and min_bet == ACTION_CHECK_OR_CALL
+                and min_bet in FOLD_AND_CHECK_OR_CALL_ACTIONS
+            )
+        ):
+          raise ValueError(
+              "Expected only_valid_bet to be the min and max bet values"
+              f" {min_bet} and {max_bet} but got {only_valid_bet}."
+          )
         assert not wrapped_state.can_complete_bet_or_raise_to(
             only_valid_bet + 1
         )
@@ -1509,6 +1523,11 @@ class PokerkitWrapperObserver:
 # ------------------------------------------------------------------------------
 
 # TODO: b/434776281 - extract out PokerkitWrapperAcpcStyle into a separate file.
+# TODO: b/459073855 - PokerkitWrapperAcpcStyle doesn't require an extra 'forced'
+# check action in certain all-in spots involving different stacks sizes that
+# UniversalPoker does. This is probably ok (as everything is strategically
+# identical / neither is strictly "incorrect"), but we might want to add an
+# extra toggle to make this behavior exactly identical.
 # TODO: b/459193364 - add support for fractional pot splitting in N>=3 player
 # hands, ie the way that universal_poker does. (Adding it should be
 # straightforward; pokerkit already supports it, we just need to pass in only

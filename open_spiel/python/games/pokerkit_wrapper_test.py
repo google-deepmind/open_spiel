@@ -2829,9 +2829,28 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertFalse(state.is_terminal())
 
     # TODO: b/437724266 - Parameterize or add a similar test for limit holdem.
-    # TODO: b/437724266 - Parameterize or add a similar test with differing per
-    # player starting stack sizes.
-    def test_headsup_random_hands_match_universal_poker_gameplay(self):
+    @parameterized.parameters(
+        "100 100",
+        "25 100",
+        "100 25",
+        "99 100",
+        "100 99",
+        "98 100",
+        "100 98",
+        "97 100",
+        "100 97",
+        # Testing extremely small post-blind stacks (e.g. 11-10 => 1 chip left)
+        "100 11",
+        "11 100",
+        "100 12",
+        "12 100",
+        "100 13",
+        "13 100",
+        # Test having exactly one BB left in stacks post-blind
+        "100 20",
+        "20 100",
+    )
+    def test_headsup_random_hands_match_universal_poker_gameplay(self, stacks):
       universal_poker_game_string = (
           "universal_poker("
           "betting=nolimit,"
@@ -2844,7 +2863,7 @@ if IMPORTED_ALL_LIBRARIES:
           "numRanks=13,"
           "numRounds=4,"
           "numSuits=4,"
-          "stack=100 100)"
+          f"stack={stacks})"
       )
       universal_poker_game = pyspiel.load_game(universal_poker_game_string)
       pokerkit_game = PokerkitWrapperAcpcStyle(
@@ -2852,14 +2871,28 @@ if IMPORTED_ALL_LIBRARIES:
               "variant": "NoLimitTexasHoldem",
               "num_players": 2,
               "blinds": "5 10",
-              "stack_sizes": "100 100",
+              "stack_sizes": " ".join(stacks.split(" ")[::-1]),
           }
       )
+      min_stack_size = min([int(s) for s in stacks.split(" ")])
+      max_stack_size = max([int(s) for s in stacks.split(" ")])
+
+      # The two games represent shoving over effective stack differently, and in
+      # ways that aren't easy to account for otherwise. So instead it's easier
+      # to just relax the strictness with which we do the assert when comparing
+      # betting histories.
+      def replace_all_shoves_with_min_stack(betting_history):
+        for size in range(min_stack_size, max_stack_size + 1):
+          if f"r{size}" in betting_history:
+            betting_history = betting_history.replace(
+                f"r{size}", f"r{min_stack_size}"
+            )
+        return betting_history
 
       # Each hand is quick so we can run a decent number of them without the
       # test taking too long.
-      number_random_hands = 125
-      for _ in range(number_random_hands):
+      number_hands_to_play = 5
+      for _ in range(number_hands_to_play):
         pokerkit_state = pokerkit_game.new_initial_state()
         universal_poker_state = universal_poker_game.new_initial_state()
         # pokerkit_wrapper and universal_poker deal hole cards differently -
@@ -2892,14 +2925,16 @@ if IMPORTED_ALL_LIBRARIES:
           up_struct = universal_poker_state.to_struct()
           pk_struct = pokerkit_state.to_struct()
           self.assertEqual(up_struct.current_player, pk_struct.current_player)
-          # Blinds should be in reverse order since otherwise the player number
-          # won't line up.
+          # Blinds and stacks should be in reverse order since otherwise the
+          # player number won't line up.
           self.assertEqual(up_struct.blinds, pk_struct.blinds[::-1])
-          self.assertEqual(up_struct.starting_stacks, pk_struct.starting_stacks)
+          self.assertEqual(
+              up_struct.starting_stacks, pk_struct.starting_stacks[::-1]
+          )
 
           self.assertEqual(
-              up_struct.betting_history,
-              pk_struct.betting_history,
+              replace_all_shoves_with_min_stack(up_struct.betting_history),
+              replace_all_shoves_with_min_stack(pk_struct.betting_history),
               f"universal_poker betting_history: {up_struct.betting_history},"
               f" pokerkit_wrapper betting_history: {pk_struct.betting_history},"
               " underlying operations were"
@@ -2918,19 +2953,136 @@ if IMPORTED_ALL_LIBRARIES:
                 universal_poker_state.chance_outcomes(),
                 pokerkit_state.chance_outcomes(),
             )
+
             random_action = random.choice(
                 [o for o, _ in pokerkit_state.chance_outcomes()]
             )
             universal_poker_state.apply_action(random_action)
             pokerkit_state.apply_action(random_action)
           else:
+            universal_poker_actions = universal_poker_state.legal_actions()
+            pokerkit_actions = pokerkit_state.legal_actions()
+            # Inside the assert, replacing actions that are larger than the
+            # smallest stack size with said value. Since doing so is
+            # strategically identical to shoving all-in, but the games handle
+            # them very differently and in ways that aren't easy to account for
+            # otherwise here.
             self.assertEqual(
-                universal_poker_state.legal_actions(),
-                pokerkit_state.legal_actions(),
+                set([
+                    action if action <= min_stack_size else min_stack_size
+                    for action in universal_poker_actions
+                ]),
+                set([
+                    action if action <= min_stack_size else min_stack_size
+                    for action in pokerkit_actions
+                ]),
             )
-            random_action = random.choice(pokerkit_state.legal_actions())
-            universal_poker_state.apply_action(random_action)
+            random_action = random.choice(pokerkit_actions)
             pokerkit_state.apply_action(random_action)
+            if random_action not in universal_poker_actions:
+              if min_stack_size in universal_poker_actions:
+                universal_poker_state.apply_action(min_stack_size)
+              else:
+                self.assertGreaterEqual(random_action, min_stack_size)
+                self.assertIn(max_stack_size, universal_poker_actions)
+                universal_poker_state.apply_action(max_stack_size)
+            else:
+              universal_poker_state.apply_action(random_action)
+
+    @parameterized.parameters(
+        "10 10",
+        "100 10",
+        "10 100",
+        "10 20",
+        "20 10",
+        "10 11",
+        "11 10",
+    )
+    def test_headsup_immediate_all_in_matches_universal_poker(self, stacks):
+      universal_poker_game_string = (
+          "universal_poker("
+          "betting=nolimit,"
+          "bettingAbstraction=fullgame,"
+          "blind=10 5,"
+          "firstPlayer=2 1 1 1,"
+          "numBoardCards=0 3 1 1,"
+          "numHoleCards=2,"
+          "numPlayers=2,"
+          "numRanks=13,"
+          "numRounds=4,"
+          "numSuits=4,"
+          f"stack={stacks})"
+      )
+      universal_poker_game = pyspiel.load_game(universal_poker_game_string)
+      pokerkit_game = PokerkitWrapperAcpcStyle(
+          params={
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 2,
+              "blinds": "5 10",
+              "stack_sizes": " ".join(stacks.split(" ")[::-1]),
+          }
+      )
+      pokerkit_state = pokerkit_game.new_initial_state()
+      universal_poker_state = universal_poker_game.new_initial_state()
+      # pokerkit_wrapper and universal_poker deal hole cards differently -
+      # pokerkit_wrapper rotates, universal_poker does all for each player
+      # one at a time.
+      hole_cards = range(4)
+      for card in hole_cards:
+        pokerkit_state.apply_action(card)
+      for per_player_pair in zip(hole_cards[0:2], hole_cards[2:4]):
+        universal_poker_state.apply_action(per_player_pair[0])
+        universal_poker_state.apply_action(per_player_pair[1])
+
+      # Ensure both players immediately contribute one big blind if they haven't
+      # already (forcing immediate showdown).
+      if (
+          not universal_poker_state.is_chance_node()
+          or not pokerkit_state.is_chance_node()
+      ):
+        universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+        pokerkit_state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertTrue(pokerkit_state.is_chance_node())
+      # NOTE: unlike pokerkit_wrapper which will automatically determine that
+      # the hand can procede immediately to showdown, universal_poker requires
+      # you to explicitly apply a second check action in certain cases (i.e.
+      # where the Big Blind has > 1 BB but the Small Blind does not). This also
+      # affects the betting history below too.
+      # TODO: b/459073855 - Consider whether this difference is actually
+      # problematic or not. And whether we want the ACPC style variant to start
+      # simulating this need for a check action...
+      if not universal_poker_state.is_chance_node():
+        universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+
+      for board_card in range(5, 10):
+        self.assertTrue(pokerkit_state.is_chance_node())
+        self.assertTrue(universal_poker_state.is_chance_node())
+        pokerkit_betting_history = pokerkit_state.to_struct().betting_history
+        universal_poker_betting_history = (
+            universal_poker_state.to_struct().betting_history
+        )
+        # As discussed above, the extra forced check by universal_poker does
+        # indeed show up here, causing a small discrepancy in betting history
+        # in certain cases.
+        if not (
+            pokerkit_betting_history == "c///"
+            and universal_poker_betting_history == "cc///"
+        ):
+          self.assertEqual(
+              universal_poker_betting_history, pokerkit_betting_history
+          )
+        self.assertEqual(
+            pokerkit_state.chance_outcomes(),
+            universal_poker_state.chance_outcomes(),
+        )
+        pokerkit_state.apply_action(board_card)
+        universal_poker_state.apply_action(board_card)
+
+      self.assertTrue(pokerkit_state.is_terminal())
+      self.assertTrue(universal_poker_state.is_terminal())
+      self.assertEqual(
+          universal_poker_state.returns(), pokerkit_state.returns()
+      )
 
     def test_4p_hand_generation_with_forced_check_call_until_turn(self):
       """Tests a few edge cases involving multiple players + check actions.
