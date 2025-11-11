@@ -25,6 +25,7 @@ class EloTest(absltest.TestCase):
   """Elo rating system tests."""
 
   def test_simple_case_meeple_pentathlon(self):
+    print("python_elo_from_numpy_matrices")
     # Meeple Pentathlon example from the VasE paper
     # (https://arxiv.org/abs/2312.03121)
     #    1: A > B > C
@@ -38,7 +39,8 @@ class EloTest(absltest.TestCase):
     self.assertLess(ratings[1], ratings[0])
     self.assertLess(ratings[1], ratings[2])
 
-    # Now, from match records.
+    print("pyspiel_elo_from_match_records")
+    # Now, directly from pyspiel from match records.
     match_records = []
     match_records.extend([pyspiel.elo.MatchRecord("A", "B")] * 4)
     match_records.extend([pyspiel.elo.MatchRecord("A", "C")] * 2)
@@ -46,14 +48,28 @@ class EloTest(absltest.TestCase):
     match_records.extend([pyspiel.elo.MatchRecord("B", "C")] * 2)
     match_records.extend([pyspiel.elo.MatchRecord("C", "A")] * 3)
     match_records.extend([pyspiel.elo.MatchRecord("C", "B")] * 3)
-    ratings_map = pyspiel.elo.compute_ratings_from_match_records(match_records)
+    ratings_map = pyspiel.elo.compute_ratings_from_match_records(
+        match_records)
     self.assertAlmostEqual(ratings_map["A"], ratings[0])
     self.assertAlmostEqual(ratings_map["B"], ratings[1])
     self.assertAlmostEqual(ratings_map["C"], ratings[2])
 
+    print("pyspiel_elo_from_match_records_with_draw")
+    # Now, add a draw between A and B. This now slightly tips the scale in favor
+    # of C > A.
+    match_records.extend([
+        pyspiel.elo.MatchRecord("A", "B", outcome=pyspiel.elo.MatchOutcome.DRAW)
+    ])
+    ratings_map = pyspiel.elo.compute_ratings_from_match_records(match_records)
+    self.assertGreater(ratings_map["C"], ratings_map["A"])
+
   def test_simple_case_direct_pyspiel(self):
+    print("pyspiel_elo_from_2d_lists_no_draws")
     # Simple case: a > b. First, specify the draws matrix. Calls the Elo
-    # wrapper directly.
+    # wrapper directly. Here there are 3 game outcomes:
+    #   - Game 1: a beats b
+    #   - Game 2: a beats b
+    #   - Game 3: b beats a
     ratings1 = pyspiel.elo.compute_ratings_from_matrices(
         win_matrix=[[0, 2], [1, 0]], draw_matrix=[[0, 0], [0, 0]]
     )
@@ -66,6 +82,15 @@ class EloTest(absltest.TestCase):
     )
     self.assertAlmostEqual(ratings1[0], ratings2[0], places=6)
     self.assertAlmostEqual(ratings1[1], ratings2[1], places=6)
+
+    print("pyspiel_elo_from_2d_lists_with_a_draw")
+    # Now let's add a draw between a and b.
+    # The rating for a in the case of no draws is larger
+    ratings3 = pyspiel.elo.compute_ratings_from_matrices(
+        win_matrix=[[0, 2], [1, 0]], draw_matrix=[[0, 1], [1, 0]]
+    )
+    self.assertGreater(ratings3[0], ratings3[1])
+    self.assertGreater(ratings1[0], ratings3[0])
 
 
 if __name__ == "__main__":
