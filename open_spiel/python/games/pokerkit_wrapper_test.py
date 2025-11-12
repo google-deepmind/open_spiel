@@ -3088,8 +3088,12 @@ if IMPORTED_ALL_LIBRARIES:
       """Tests a few edge cases involving multiple players + check actions.
 
       Particularly useful for verifying that we handle the betting history
-      properly even despite known issues around ACPC's handling of check-or-call
-      actions.
+      properly / do not over-rely on the ACPC logs in a way that delays check
+      or call actions from showing up in time.
+
+      Also demonstrates that if we don't go our of our way to enable fractional
+      pot splitting (see test below) the discrepency vs Universal Poker is still
+      bounded properly, ie in a 4 player NLHE game no more than 4/3 BBs.
       """
       universal_poker_game_string = (
           "universal_poker("
@@ -3145,14 +3149,141 @@ if IMPORTED_ALL_LIBRARIES:
 
           # Universal Poker returns fractional BigBlinds in cases where
           # pokerkit would 'unfairly' award the BigBlind to one specific player
-          # (in a way that would be difficult to exactly account for). But we
-          # can assume that even in the worst case where it happens twice in
-          # the hand with 3 players it can cause no more difference than
-          # (2 * 2/3) => 1.3333... BigBlinds.
+          # (in a way that would be difficult to exactly account for) when
+          # we passed in integer stack sizes instead of floats. But we
+          # can assume that even in the worst case this only results in a
+          # 1-(1/N) discrepency once per N-2 splits, totalling:
+          #   ((1-(1/N)) * N-2) => 1.333...
+          # delta for N=4.
           self.assertSequenceAlmostEqual(
               universal_poker_state.returns(),
               pokerkit_state.returns(),
               delta=1.34,
+          )
+
+          up_struct = universal_poker_state.to_struct()
+          pk_struct = pokerkit_state.to_struct()
+          self.assertEqual(up_struct.current_player, pk_struct.current_player)
+          self.assertEqual(up_struct.starting_stacks, pk_struct.starting_stacks)
+          self.assertEqual(
+              up_struct.betting_history,
+              pk_struct.betting_history,
+              f"up betting_history: {up_struct.betting_history},"
+              f" pk betting_history: {pk_struct.betting_history},"
+              " underlying operations were"
+              f" {list(pokerkit_state._wrapped_state.operations)}",
+          )
+          if pokerkit_state.is_terminal():
+            self.assertTrue(universal_poker_state.is_terminal())
+            break
+
+          self.assertEqual(
+              universal_poker_state.is_chance_node(),
+              pokerkit_state.is_chance_node(),
+          )
+          if pokerkit_state.is_chance_node():
+            self.assertEqual(
+                universal_poker_state.chance_outcomes(),
+                pokerkit_state.chance_outcomes(),
+            )
+            random_action = random.choice(
+                [o for o, _ in pokerkit_state.chance_outcomes()]
+            )
+            universal_poker_state.apply_action(random_action)
+            pokerkit_state.apply_action(random_action)
+          else:
+            self.assertEqual(
+                universal_poker_state.legal_actions(),
+                pokerkit_state.legal_actions(),
+            )
+            is_preflop_or_flop_betting = (
+                len(pokerkit_state._wrapped_state.board_cards) <= 3
+            )
+            if (
+                is_preflop_or_flop_betting
+                and ACTION_CHECK_OR_CALL in pokerkit_state.legal_actions()
+            ):
+              action = ACTION_CHECK_OR_CALL
+            else:
+              action = random.choice(pokerkit_state.legal_actions())
+            universal_poker_state.apply_action(action)
+            pokerkit_state.apply_action(action)
+
+    def test_can_have_fractional_pot_splitting_via_4p_post_turn_randomize(self):
+      """Tests a few edge cases involving multiple players + check actions.
+
+      Specifically: forces all 4 players to check/call until the turn, i.e.
+      preflop and on the flop, to get a wider variety of spots tested. And then
+      causes the players to play randomly while checking betting history and
+      the resulting returns() at the end of the game.
+
+      Particularly useful for making sure that:
+      - we can handle fractional pot splitting exactly like Universal Poker
+      - we handle check/call actions properly, and specifically aren't
+      over-relying on the ACPC logs (which as per the spec don't immediately
+      update for all players instantly upon check/call actions)
+
+      """
+      universal_poker_game_string = (
+          "universal_poker("
+          "betting=nolimit,"
+          "bettingAbstraction=fullgame,"
+          "blind=5 10 0 0,"
+          "firstPlayer=3 1 1 1,"
+          "numBoardCards=0 3 1 1,"
+          "numHoleCards=2,"
+          "numPlayers=4,"
+          "numRanks=13,"
+          "numRounds=4,"
+          "numSuits=4,"
+          "stack=100 100 100 100)"
+      )
+      universal_poker_game = pyspiel.load_game(universal_poker_game_string)
+      pokerkit_game = PokerkitWrapperAcpcStyle(
+          params={
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 4,
+              "blinds": "5.0 10.0",
+              # Floats to ensure fractional returns instead of floor division.
+              # For more details see
+              # https://pokerkit.readthedocs.io/en/stable/simulation.html#optional-divmod
+              "stack_sizes": "100.0 100.0 100.0 100.0",
+          }
+      )
+      # These hands aren't too too slow, so we can run a couple of them in a
+      # row here without the test taking too long.
+      for _ in range(25):
+        pokerkit_state = pokerkit_game.new_initial_state()
+        universal_poker_state = universal_poker_game.new_initial_state()
+        # pokerkit_wrapper and universal_poker deal hole cards differently -
+        # pokerkit_wrapper rotates, universal_poker does all for each player
+        # one at a time.
+        hole_cards = random.sample(range(52), 8)
+        for card in hole_cards:
+          pokerkit_state.apply_action(card)
+        for per_player_pair in zip(hole_cards[0:4], hole_cards[4:8]):
+          universal_poker_state.apply_action(per_player_pair[0])
+          universal_poker_state.apply_action(per_player_pair[1])
+
+        step = 0
+        while True:
+          step += 1
+          if step >= 400:  # Mostly-arbitrary limit.
+            self.fail(
+                "Detected probable infinite loop. Hand had a very large number"
+                " of actions."
+            )
+
+          self.assertEqual(
+              universal_poker_state.current_player(),
+              pokerkit_state.current_player(),
+          )
+
+          # Major crux of this test - when using float stack inputs we expect
+          # the returns here to *exactly* match Universal Poker's.
+          self.assertSequenceEqual(
+              universal_poker_state.returns(),
+              pokerkit_state.returns(),
           )
 
           up_struct = universal_poker_state.to_struct()
