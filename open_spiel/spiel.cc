@@ -15,6 +15,7 @@
 #include "open_spiel/spiel.h"
 
 #include <algorithm>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -49,7 +50,7 @@ constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
 constexpr const char* kSerializeGameSectionHeader = "[Game]";
 constexpr const char* kSerializeGameRNGStateSectionHeader = "[GameRNGState]";
 constexpr const char* kSerializeStateSectionHeader = "[State]";
-constexpr const std::string kSerializeStartingState = "starting_state=";
+constexpr const char* kSerializeStartingState = "starting_state=";
 
 // Returns the available parameter keys, to be used as a utility function.
 std::string ListValidParameters(
@@ -459,12 +460,13 @@ std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   SPIEL_CHECK_NE(game_type_.dynamics,
                  GameType::Dynamics::kMeanField);
 
+  int serialize_starting_state_str_len = std::strlen(kSerializeStartingState);
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   std::unique_ptr<State> state;
   bool skip_first_line = false;
-  if (!lines.empty() && lines[0].starts_with(kSerializeStartingState)) {
+  if (!lines.empty() && lines[0].find(kSerializeStartingState) == 0) {
     std::string starting_state_str =
-        lines[0].substr(kSerializeStartingState.size());
+        lines[0].substr(serialize_starting_state_str_len);
     state = NewInitialState(starting_state_str);
     skip_first_line = true;
   } else {
