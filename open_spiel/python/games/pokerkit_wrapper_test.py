@@ -2851,6 +2851,10 @@ if IMPORTED_ALL_LIBRARIES:
         "20 100",
     )
     def test_headsup_random_hands_match_universal_poker_gameplay(self, stacks):
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
       universal_poker_game_string = (
           "universal_poker("
           "betting=nolimit,"
@@ -2999,6 +3003,10 @@ if IMPORTED_ALL_LIBRARIES:
         "11 10",
     )
     def test_headsup_immediate_all_in_matches_universal_poker(self, stacks):
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
       universal_poker_game_string = (
           "universal_poker("
           "betting=nolimit,"
@@ -3095,6 +3103,10 @@ if IMPORTED_ALL_LIBRARIES:
       pot splitting (see test below) the discrepency vs Universal Poker is still
       bounded properly, ie in a 4 player NLHE game no more than 4/3 BBs.
       """
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
       universal_poker_game_string = (
           "universal_poker("
           "betting=nolimit,"
@@ -3224,6 +3236,10 @@ if IMPORTED_ALL_LIBRARIES:
       update for all players instantly upon check/call actions)
 
       """
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
       universal_poker_game_string = (
           "universal_poker("
           "betting=nolimit,"
@@ -3343,6 +3359,11 @@ if IMPORTED_ALL_LIBRARIES:
       (This specifically verifies that we recreate the exact
       "Two player no-limit Texas Hold'em" example.)
       """
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
+
       # Taken from the "Two player no-limit Texas Hold'em" example given at the
       # end of https://pokerkit.readthedocs.io/en/stable/_static/protocol.pdf,
       # except marked as hand 0 instead of hand 30 (0:0 not 0:30).
