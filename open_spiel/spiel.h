@@ -607,7 +607,12 @@ class State {
     return ObservationString(CurrentPlayer());
   }
 
-  // Returns the view of the game, preferably from `player`'s perspective.
+  // Returns player's of view of the game in a vector form.
+  //
+  // Note that while it is not strictly required, most perfect information
+  // games have player-independent observation tensors, and in some cases an
+  // "egocentric" flag can be passed to the game for observation tensors to be
+  // player-relative.
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
