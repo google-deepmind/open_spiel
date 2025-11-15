@@ -115,17 +115,17 @@ struct jlcxx::julia_type_factory<std::pair<K, V>> {
 };
 
 JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
-  jlcxx::stl::apply_stl<std::pair<open_spiel::Action, double>>(mod);
-  jlcxx::stl::apply_stl<std::vector<std::pair<open_spiel::Action, double>>>(
-      mod);
-  jlcxx::stl::apply_stl<std::vector<double>>(mod);
-  jlcxx::stl::apply_stl<std::vector<std::vector<double>>>(mod);
-  jlcxx::stl::apply_stl<std::vector<int>>(mod);
-  jlcxx::stl::apply_stl<std::vector<std::vector<int>>>(mod);
-  jlcxx::stl::apply_stl<std::vector<open_spiel::Action>>(mod);
+//   jlcxx::stl::apply_stl<std::pair<open_spiel::Action, double>>(mod);
+//   jlcxx::stl::apply_stl<std::vector<std::pair<open_spiel::Action, double>>>(
+//       mod);
+//   jlcxx::stl::apply_stl<std::vector<double>>(mod);
+//   jlcxx::stl::apply_stl<std::vector<std::vector<double>>>(mod);
+//   jlcxx::stl::apply_stl<std::vector<int>>(mod);
+//   jlcxx::stl::apply_stl<std::vector<std::vector<int>>>(mod);
+//   jlcxx::stl::apply_stl<std::vector<open_spiel::Action>>(mod);
 
   mod.map_type<open_spiel::State::PlayerAction>("PlayerAction");
-  jlcxx::stl::apply_stl<std::vector<open_spiel::State::PlayerAction>>(mod);
+//   jlcxx::stl::apply_stl<std::vector<open_spiel::State::PlayerAction>>(mod);
 
   mod.add_bits<open_spiel::GameParameter::Type>("GameParameterStateType",
                                                 jlcxx::julia_type("CppEnum"));
@@ -463,7 +463,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("get_policy", &open_spiel::Bot::GetPolicy)
       .method("step_with_policy", &open_spiel::Bot::StepWithPolicy);
 
-  jlcxx::stl::apply_stl<open_spiel::Bot*>(mod);
+//   jlcxx::stl::apply_stl<open_spiel::Bot*>(mod);
 
   mod.add_type<open_spiel::Policy>("Policy")
       .method("get_state_policy_as_parallel_vectors",
@@ -491,7 +491,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
                 return p.GetStatePolicy(state);
               });
 
-  jlcxx::stl::apply_stl<const open_spiel::Policy*>(mod);
+//   jlcxx::stl::apply_stl<const open_spiel::Policy*>(mod);
 
   mod.add_type<open_spiel::TabularPolicy>(
          "TabularPolicy", jlcxx::julia_base_type<open_spiel::Policy>())
@@ -510,7 +510,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
                 return p.GetStatePolicy(state);
               });
 
-  jlcxx::stl::apply_stl<open_spiel::TabularPolicy>(mod);
+//   jlcxx::stl::apply_stl<open_spiel::TabularPolicy>(mod);
 
   mod.method("get_empty_tabular_policy", &open_spiel::GetEmptyTabularPolicy);
   mod.method("get_uniform_policy", &open_spiel::GetUniformPolicy);
@@ -608,7 +608,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               [](open_spiel::algorithms::SearchNode& sn,
                  std::vector<double> outcome) { sn.outcome = outcome; });
 
-  jlcxx::stl::apply_stl<open_spiel::algorithms::SearchNode>(mod);
+//   jlcxx::stl::apply_stl<open_spiel::algorithms::SearchNode>(mod);
 
   mod.method("get_children", [](open_spiel::algorithms::SearchNode& sn) {
     return sn.children;
@@ -633,7 +633,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               &open_spiel::algorithms::MCTSBot::StepWithPolicy)
       .method("mcts_search", &open_spiel::algorithms::MCTSBot::MCTSearch);
 
-  jlcxx::stl::apply_stl<open_spiel::algorithms::MCTSBot*>(mod);
+//   jlcxx::stl::apply_stl<open_spiel::algorithms::MCTSBot*>(mod);
 
   mod.add_type<open_spiel::algorithms::TabularBestResponse>(
          "TabularBestResponse")
