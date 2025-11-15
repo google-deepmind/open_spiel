@@ -155,6 +155,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "twixt",
     "ultimate_tic_tac_toe",
     "y",
+    "yacht",
     "zerosum",
 ])
 
