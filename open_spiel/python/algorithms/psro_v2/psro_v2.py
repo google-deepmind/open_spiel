@@ -324,14 +324,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     training_parameters = [[] for _ in range(self._num_players)]
 
     for current_player in range(self._num_players):
-      if self.sample_from_marginals:
-        currently_used_policies = used_policies[current_player]
-        current_indexes = used_indexes[current_player]
-      else:
-        currently_used_policies = [
-            joint_policy[current_player] for joint_policy in used_policies
-        ]
-        current_indexes = used_indexes[current_player]
+      currently_used_policies = used_policies[current_player]
+      current_indexes = used_indexes[current_player]
 
       for i in range(len(currently_used_policies)):
         pol = currently_used_policies[i]
