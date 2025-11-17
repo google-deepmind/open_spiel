@@ -1,0 +1,64 @@
+name: PR smoke test
+
+on:
+  pull_request:
+    branches: [ master, main, develop ]
+  push:
+    branches: [ feature/**, fix/**, improve-** ]
+
+jobs:
+  smoke:
+    name: Python smoke checks (no C++ build)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Install runtime deps for examples
+        run: |
+          # Install the prebuilt OpenSpiel wheel to get pyspiel
+          python -m pip install --upgrade open_spiel
+          # Optional dev helpers
+          python -m pip install numpy absl-py
+
+      - name: Show environment info
+        run: |
+          python --version
+          python -c "import sys,site;print('sys.path:', sys.path);print('site-packages:', site.getsitepackages())"
+          python -c "import pyspiel; print('pyspiel:', pyspiel.__file__)"
+
+      - name: Run syntax checks
+        run: |
+          python -m py_compile \
+            open_spiel/python/examples/example.py \
+            open_spiel/python/examples/game_stats.py
+
+      - name: Run example scripts with pip wheel + local Python package
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/build/python
+        run: |
+          # Run the basic example
+          python open_spiel/python/examples/example.py --game_string=tic_tac_toe
+          # Run the game stats utility
+          python open_spiel/python/examples/game_stats.py --game_name=tic_tac_toe --num_samples=50
+
+      - name: JSON export smoke
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/build/python
+        run: |
+          python open_spiel/python/examples/game_stats.py --game_name=kuhn_poker --num_samples=50 --output_json=stats.json
+          test -s stats.json && echo "JSON export created: $(wc -c < stats.json) bytes"
