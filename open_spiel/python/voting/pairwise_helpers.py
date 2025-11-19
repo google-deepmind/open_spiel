@@ -14,13 +14,13 @@
 
 """Helpers for pairwise data sets."""
 
-import numpy as np
+from absl import logging
 from open_spiel.python.voting import base
 
 
 def balance_profile(
     profile: base.PreferenceProfile,
-    num_votes_per_matchup: int = None,
+    num_votes_per_matchup: int | None = None,
 ) -> base.PreferenceProfile:
   """Balances an uneven preference profile.
 
@@ -48,17 +48,19 @@ def balance_profile(
   if num_votes_per_matchup is None:
     num_votes_per_matchup = profile.pairwise_count_matrix().max()
 
-  print(f"num_votes_per_matchup: {num_votes_per_matchup}")
-
-  # Add I to the counts to prevent the divide-by-zero on the diagonal.
-  winrate_mat = pref_matrix.astype(float) / (profile_counts + np.eye(m))
+  assert num_votes_per_matchup is not None
+  assert num_votes_per_matchup > 0
   assert profile.alternatives == new_profile.alternatives
 
   for i in range(m):
     for j in range(i+1, m):
+      if profile_counts[i, j] == 0:
+        logging.warning("Skipping (i, j) with no votes: (%d, %d)", i, j)
+        continue
+      winrate_i_j = float(pref_matrix[i, j]) / profile_counts[i, j]
       alt_i = new_profile.alternatives[i]
       alt_j = new_profile.alternatives[j]
-      num_wins = int(round(winrate_mat[i, j] * num_votes_per_matchup))
+      num_wins = int(round(winrate_i_j * num_votes_per_matchup))
       num_losses = max(0, num_votes_per_matchup - num_wins)
       for _ in range(num_wins):
         new_profile.add_vote([alt_i, alt_j])
@@ -66,4 +68,3 @@ def balance_profile(
         new_profile.add_vote([alt_j, alt_i])
 
   return new_profile
-
