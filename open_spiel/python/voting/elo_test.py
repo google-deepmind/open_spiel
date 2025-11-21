@@ -36,6 +36,14 @@ class EloTest(parameterized.TestCase):
     self.assertAlmostEqual(ratings_map["C"], ratings_map["A"])
     self.assertLess(ratings_map["B"], ratings_map["C"])
 
+    # Now run it as a voting method using the same profile, and ensure that the
+    # ratings are the same.
+    method = elo.EloVoting()
+    outcome = method.run_election(profile)
+    self.assertAlmostEqual(outcome.get_score("A"), ratings_map["A"])
+    self.assertAlmostEqual(outcome.get_score("B"), ratings_map["B"])
+    self.assertAlmostEqual(outcome.get_score("C"), ratings_map["C"])
+
 
 if __name__ == "__main__":
   absltest.main()

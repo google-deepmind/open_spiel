@@ -42,3 +42,32 @@ def compute_ratings_from_preference_profile(
               )
           )
   return pyspiel.elo.compute_ratings_from_match_records(match_records, options)
+
+
+class EloVoting(base.AbstractVotingMethod):
+  """Implements Elo as a voting method."""
+
+  def __init__(
+      self,
+      smoothing_factor: float = pyspiel.elo.DEFAULT_SMOOTHING_FACTOR,
+      max_iterations: int = pyspiel.elo.DEFAULT_MAX_ITERATIONS,
+      convergence_delta: float = pyspiel.elo.DEFAULT_CONVERGENCE_DELTA):
+    self._smoothing_factor = smoothing_factor
+    self._max_iterations = max_iterations
+    self._convergence_delta = convergence_delta
+
+  def name(self) -> str:
+    return "elo"
+
+  def run_election(self, profile: base.PreferenceProfile) -> base.RankOutcome:
+    assert self.is_valid_profile(profile)
+    ratings_dict = compute_ratings_from_preference_profile(
+        profile, self._smoothing_factor, self._max_iterations,
+        self._convergence_delta,
+    )
+    sorted_ratings = sorted(ratings_dict.items(), key=lambda item: item[1],
+                            reverse=True)
+    outcome = base.RankOutcome()
+    outcome.unpack_from(sorted_ratings)
+    return outcome
+
