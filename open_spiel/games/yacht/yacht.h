@@ -1,5 +1,3 @@
-// Copyright 2019 DeepMind Technologies Limited
-//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,40 +19,40 @@
 
 #include "open_spiel/spiel.h"
 
-// A simple jeopardy dice game that includes chance nodes.
-// See http://cs.gettysburg.edu/projects/pig/index.html for details.
-// Also https://en.wikipedia.org/wiki/Pig_(dice_game)
+// Yacht is a category dice game where players roll 5 dice up to 3 times per
+// turn, choosing which dice to reroll after each roll. After the final roll,
+// they must place their result in one of 12 scoring categories. Each category
+// can only be used once per player. The game ends after all players have
+// filled all categories.
+
+// See Reiner Knizia's "Dice Games Properly Explained" for details.
 //
-// Piglet variant: Instead of increasing the running total by the roll results,
-// it is always increased by a fixed step size of 1 upon rolling anything higher
-// than a 1. [Note: Internally, this behaviour is modelled with only two chance
-// outcomes, rolling a 1 or rolling anything higher than that.]
-// Divide winscore by the average dice outcome != 1 (i.e. by diceoutcomes/2 + 1)
-// when enabling Piglet to play a game that's roughly equivalent to the
-// corresponding Pig game. The main advantage of this variant is thus a greatly
-// reduced state space, making the game accessible to tabular methods.
-// See also http://cs.gettysburg.edu/~tneller/papers/pig.zip. The original
-// Piglet variant described there is played with a fair coin and a winscore
-// of 10. This behaviour can be achieved by setting diceoutcomes = 2, winscore =
-// 10, piglet = true.
 //
 // Parameters:
-//     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
-//     "horizon"       int    max number of moves before draw (default = 1000)
 //     "players"       int    number of players               (default = 2)
-//     "winscore"      int    number of points needed to win  (default = 100)
-//     "piglet"        bool   is piglet variant enabled?      (default = false)
+//     "num_dice"      int    number of dice to roll          (default = 5)
+//     "dice_sides"    int    number of sides on each die     (default = 6)
+//     "rolls_per_turn" int   number of rolls per turn        (default = 3)
+//     "num_categories" int   number of scoring categories    (default = 12)
 
 namespace open_spiel {
 namespace yacht {
 
 class YachtGame;
 
+// Scoring category definition
+struct Category {
+  std::string name;
+  // Function to compute score given dice values
+  // Returns -1 if the dice don't satisfy the category requirements
+  int (*score_fn)(const std::vector<int>& dice);
+};
+
 class YachtState : public State {
  public:
   YachtState(const YachtState&) = default;
-  YachtState(std::shared_ptr<const Game> game, int dice_outcomes, int horizon,
-           int win_score, bool piglet);
+  YachtState(std::shared_ptr<const Game> game, int num_players, int num_dice,
+             int dice_sides, int rolls_per_turn, int num_categories);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
@@ -68,49 +66,100 @@ class YachtState : public State {
 
   std::unique_ptr<State> Clone() const override;
 
-  int score(const int player_id) const { return scores_[player_id]; }
-  int dice_outcomes() const { return dice_outcomes_; }
   std::vector<Action> LegalActions() const override;
+
+  // Accessors for testing
+  const std::vector<int>& dice() const { return dice_; }
+  int roll_count() const { return roll_count_; }
+  bool category_used(Player player, int category) const {
+    return category_used_[player][category];
+  }
+  int category_score(Player player, int category) const {
+    return category_scores_[player][category];
+  }
+  int total_score(Player player) const;
 
  protected:
   void DoApplyAction(Action move_id) override;
 
  private:
-  // Initialize to bad/invalid values. Use open_spiel::NewInitialState()
-  int dice_outcomes_ = -1;  // Number of different dice outcomes (eg, 6).
-  int horizon_ = -1;
-  int nplayers_ = -1;
-  int win_score_ = 0;
-  bool piglet_ = false;
+  // Game configuration
+  int num_players_ = -1;
+  int num_dice_ = 5;
+  int dice_sides_ = 6;
+  int rolls_per_turn_ = 3;
+  int num_categories_ = 12;
 
-  int total_moves_ = -1;    // Total num moves taken during the game.
-  Player cur_player_ = -1;  // Player to play.
-  int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
-                            // to remember whose is playing for next turn.
-                            // (cur_player will be the chance player's id.)
-  std::vector<int> scores_;  // Score for each player.
-  int turn_total_ = -1;
+  // Current turn state
+  std::vector<int> dice_;  // Current dice values (1-indexed, e.g., 1-6)
+  int roll_count_ = 0;     // Number of rolls taken this turn (0-3)
+  Player turn_player_ = 0; // Whose turn it is for making decisions
+  
+  // Game state
+  Player cur_player_ = 0;  // Current player (may be chance player)
+  int total_moves_ = 0;    // Total actions taken
+  
+  // Persistent scoring state
+  // category_scores_[player][category] = score for that category
+  // -1 means not yet filled
+  std::vector<std::vector<int>> category_scores_;
+  std::vector<std::vector<bool>> category_used_;  // Track which categories used
+  
+  // For chance nodes - remembers which dice to reroll
+  int pending_reroll_mask_ = 0;
+  
+  // Phase tracking
+  bool IsRollingPhase() const { return roll_count_ < rolls_per_turn_; }
+  bool IsScoringPhase() const { return roll_count_ >= rolls_per_turn_; }
+  
+  // Scoring helpers
+  int ComputeCategoryScore(int category, const std::vector<int>& dice) const;
+  
+  // Action space helpers
+  static constexpr int kFirstRerollAction = 0;
+  static constexpr int kLastRerollAction = 31;  // 2^5 - 1
+  static constexpr int kFirstCategoryAction = 32;
+  // kLastCategoryAction = kFirstCategoryAction + num_categories_ - 1
 };
 
 class YachtGame : public Game {
  public:
   explicit YachtGame(const GameParameters& params);
 
-  int NumDistinctActions() const override { return 2; }
+  // Actions 0-31 are reroll patterns (5-bit masks)
+  // Actions 32+ are category selections
+  int NumDistinctActions() const override { 
+    return 32 + num_categories_;  // 44 for standard Yacht
+  }
+  
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new YachtState(
-        shared_from_this(), dice_outcomes_, horizon_, win_score_, piglet_));
+        shared_from_this(), num_players_, num_dice_, dice_sides_,
+        rolls_per_turn_, num_categories_));
   }
-  int MaxChanceOutcomes() const override { return dice_outcomes_; }
+  
+  // Maximum number of distinct outcomes from a single chance event
+  // In Yacht, this is rolling all dice at once
+  int MaxChanceOutcomes() const override {
+    // When rolling N dice with S sides, there are S^N outcomes
+    // For 5 six-sided dice: 6^5 = 7776
+    int max_outcomes = 1;
+    for (int i = 0; i < num_dice_; ++i) {
+      max_outcomes *= dice_sides_;
+    }
+    return max_outcomes;
+  }
 
-  // There is arbitrarily chosen number to ensure the game is finite.
-  int MaxGameLength() const override { return horizon_; }
+  // Each turn has up to 3 rolls (3 chance nodes) + 1 category choice
+  // Total turns = num_players * num_categories
+  int MaxGameLength() const override {
+    return num_players_ * num_categories_ * (rolls_per_turn_ + 1);
+  }
 
-  // Every chance node is preceded by a decision node (roll)
-  // -> At most as many chance nodes as decision nodes.
-  // -> Up to as many chance nodes as decision nodes, if
-  //    every action is "roll" and player never 'falls'.
-  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
+  // Each turn has up to rolls_per_turn_ chance nodes
+  int MaxChanceNodesInHistory() const override {
+    return num_players_ * num_categories_ * rolls_per_turn_;
+  }
 
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -1; }
@@ -119,20 +168,15 @@ class YachtGame : public Game {
   std::vector<int> ObservationTensorShape() const override;
 
  private:
-  // Number of different dice outcomes, i.e. 6.
-  int dice_outcomes_;
-
-  // Maximum number of moves before draw.
-  int horizon_;
-
-  // Number of players in this game.
   int num_players_;
-
-  // The amount needed to win.
-  int win_score_;
-
-  // Whether Piglet variant is enabled (always move only 1 step forward)
-  bool piglet_;
+  int num_dice_;
+  int dice_sides_;
+  int rolls_per_turn_;
+  int num_categories_;
+  
+  // Category definitions (can be extended for variants)
+  std::vector<Category> categories_;
+  void InitializeCategories();
 };
 
 }  // namespace yacht

@@ -25,13 +25,10 @@ void BasicYachtTests() {
   testing::LoadGameTest("yacht");
   testing::ChanceOutcomesTest(*LoadGame("yacht"));
   testing::RandomSimTest(*LoadGame("yacht"), 100);
-  for (Player players = 3; players <= 5; players++) {
+  for (Player players = 2; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("yacht", {{"players", GameParameter(players)}}), 100);
   }
-  testing::RandomSimTest(*LoadGame("yacht", {{"winscore", GameParameter(25)},
-                                           {"piglet", GameParameter(true)}}),
-                         100);
 }
 
 }  // namespace
