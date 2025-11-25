@@ -322,20 +322,16 @@ std::string Move::ToSAN(const ChessBoard &board) const {
     absl::StrAppend(&move_text, SquareToString(to));
 
     // Encode the promotion type if we have a promotion.
-    switch (promotion_type) {
-      case PieceType::kEmpty:
-        break;
-      case PieceType::kQueen:
-      case PieceType::kRook:
-      case PieceType::kBishop:
-      case PieceType::kKnight:
-        absl::StrAppend(&move_text, "=", PieceTypeToString(promotion_type));
-        break;
-      case PieceType::kKing:
-      case PieceType::kPawn:
+    if (promotion_type != PieceType::kEmpty) {
+      if (promotion_type == PieceType::kPawn ||
+          (promotion_type == PieceType::kKing && !board.AllowKingPromotion())) {
         std::cerr << "Cannot promote to " << PieceTypeToString(promotion_type)
-                  << "! Only Q, R, B, N are allowed" << std::endl;
-        break;
+                  << "! Only Q, R, B, N"
+                  << (board.AllowKingPromotion() ? " K" : "" ) << " are allowed"
+                  << std::endl;
+      } else {
+        absl::StrAppend(&move_text, "=", PieceTypeToString(promotion_type));
+      }
     }
   }
 
@@ -364,10 +360,11 @@ std::string Move::ToSAN(const ChessBoard &board) const {
 }
 
 ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
-                       bool allow_pass_move)
+                       bool allow_pass_move, bool allow_king_promotion)
     : board_size_(board_size),
       king_in_check_allowed_(king_in_check_allowed),
       allow_pass_move_(allow_pass_move),
+      allow_king_promotion_(allow_king_promotion),
       to_play_(Color::kWhite),
       ep_square_(kInvalidSquare),
       irreversible_move_counter_(0),
@@ -378,7 +375,8 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
 
 /*static*/ absl::optional<ChessBoard> ChessBoard::BoardFromFEN(
     const std::string &fen, int board_size,
-    bool king_in_check_allowed, bool allow_pass_move) {
+    bool king_in_check_allowed, bool allow_pass_move,
+    bool allow_king_promotion) {
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
    *
@@ -390,7 +388,8 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
    *
    * Many FEN strings don't have the last two fields.
    */
-  ChessBoard board(board_size, king_in_check_allowed, allow_pass_move);
+  ChessBoard board(board_size, king_in_check_allowed, allow_pass_move,
+                   allow_king_promotion);
 
   std::vector<std::string> fen_parts = absl::StrSplit(fen, ' ');
 
@@ -647,6 +646,9 @@ void ChessBoard::GeneratePseudoLegalMoves(
                     YIELD(Move(sq, to, piece, PieceType::kRook));
                     YIELD(Move(sq, to, piece, PieceType::kBishop));
                     YIELD(Move(sq, to, piece, PieceType::kKnight));
+                    if (AllowKingPromotion()) {
+                      YIELD(Move(sq, to, piece, PieceType::kKing));
+                    }
                   } else {
                     YIELD(Move(sq, to, piece));
                   }
@@ -659,6 +661,9 @@ void ChessBoard::GeneratePseudoLegalMoves(
                     YIELD(Move(sq, to, piece, PieceType::kRook));
                     YIELD(Move(sq, to, piece, PieceType::kBishop));
                     YIELD(Move(sq, to, piece, PieceType::kKnight));
+                    if (AllowKingPromotion()) {
+                      YIELD(Move(sq, to, piece, PieceType::kKing));
+                    }
                   } else {
                     YIELD(Move(sq, to, piece));
                   }

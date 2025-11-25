@@ -223,9 +223,9 @@ enum class PrivateInfoType {
 // (mostly) non-overlapping public and private parts. They may overlap only for
 // the start of the game and time.
 //
-// The public observations correspond to information that all the players know
-// that all the players know, like upward-facing cards on a table.
-// Perfect information games, like Chess, have only public observations.
+// The public observations correspond to information that all the players know,
+// like upward-facing cards on a table. Perfect information games, like Chess,
+// have only public observations.
 //
 // All games have non-empty public observations. The minimum public
 // information is time: we assume that all the players can perceive absolute
