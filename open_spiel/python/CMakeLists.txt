@@ -61,6 +61,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_gin_rummy.h
   pybind11/games_go.cc
   pybind11/games_go.h
+  pybind11/games_hearts.cc
+  pybind11/games_hearts.h
   pybind11/games_kuhn_poker.cc
   pybind11/games_kuhn_poker.h
   pybind11/games_leduc_poker.cc
@@ -253,6 +255,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
+  tests/games_hearts_test.py
   tests/games_repeated_poker_test.py
   tests/games_sim_test.py
   tests/games_tic_tac_toe_test.py
