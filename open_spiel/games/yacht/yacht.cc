@@ -31,6 +31,7 @@ constexpr int kDefaultNumDice = 5;
 constexpr int kDefaultDiceSides = 6;
 constexpr int kDefaultRollsPerTurn = 3;
 constexpr int kDefaultNumCategories = 12;
+constexpr bool kDefaultSortDice = false;
 
 // Action encoding
 constexpr int kFirstRerollAction = 0;
@@ -75,6 +76,7 @@ const GameType kGameType{
         {"dice_sides", GameParameter(kDefaultDiceSides)},
         {"rolls_per_turn", GameParameter(kDefaultRollsPerTurn)},
         {"num_categories", GameParameter(kDefaultNumCategories)},
+        {"sort_dice", GameParameter(kDefaultSortDice)},
     }};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -181,13 +183,14 @@ int YachtState::ComputeCategoryScore(int category,
 
 YachtState::YachtState(std::shared_ptr<const Game> game, int num_players,
                        int num_dice, int dice_sides, int rolls_per_turn,
-                       int num_categories)
+                       int num_categories, bool sort_dice)
     : State(game),
       num_players_(num_players),
       num_dice_(num_dice),
       dice_sides_(dice_sides),
       rolls_per_turn_(rolls_per_turn),
-      num_categories_(num_categories) {
+      num_categories_(num_categories),
+      sort_dice_(sort_dice) {
   dice_.resize(num_dice_, 0);
   roll_count_ = 0;
   turn_player_ = 0;
@@ -311,7 +314,7 @@ std::string YachtState::ToString() const {
     result += absl::StrCat("\nPlayer ", p, " (total: ", total_score(p), "):\n");
     const std::vector<std::string> category_names = {
       "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes",
-      "3Kind", "4Kind", "Full", "SmStr", "LgStr", "Yacht"
+      "Chance", "4Kind", "Full", "SmStr", "LgStr", "Yacht"
     };
     for (int c = 0; c < num_categories_; c++) {
       if (category_used_[p][c]) {
@@ -383,6 +386,12 @@ void YachtState::DoApplyAction(Action move_id) {
         remaining /= dice_sides_;
       }
     }
+    
+    // Sort dice if requested
+    if (sort_dice_) {
+      std::sort(dice_.begin(), dice_.end());
+    }
+    
     roll_count_++;
     cur_player_ = turn_player_;
     pending_reroll_mask_ = 0;
@@ -480,7 +489,8 @@ YachtGame::YachtGame(const GameParameters& params)
       num_dice_(ParameterValue<int>("num_dice")),
       dice_sides_(ParameterValue<int>("dice_sides")),
       rolls_per_turn_(ParameterValue<int>("rolls_per_turn")),
-      num_categories_(ParameterValue<int>("num_categories")) {}
+      num_categories_(ParameterValue<int>("num_categories")),
+      sort_dice_(ParameterValue<bool>("sort_dice")) {}
 
 }  // namespace yacht
 }  // namespace open_spiel

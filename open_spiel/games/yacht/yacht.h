@@ -24,9 +24,16 @@
 // they must place their result in one of 12 scoring categories. Each category
 // can only be used once per player. The game ends after all players have
 // filled all categories.
-
-// See Reiner Knizia's "Dice Games Properly Explained" for details.
 //
+// Note: This is Yacht, not Yahtzee. Yacht has 12 categories and different
+// scoring rules (no bonus rules, no "Yahtzee bonus" for multiple Yahtzees).
+//
+// See Reiner Knizia's "Dice Games Properly Explained" for details on Yacht
+// and other category dice games.
+//
+// This implementation is designed to be extensible to other category dice
+// games (e.g., Generala, Yatzy) by making the scoring categories and game
+// rules configurable.
 //
 // Parameters:
 //     "players"       int    number of players               (default = 2)
@@ -34,6 +41,7 @@
 //     "dice_sides"    int    number of sides on each die     (default = 6)
 //     "rolls_per_turn" int   number of rolls per turn        (default = 3)
 //     "num_categories" int   number of scoring categories    (default = 12)
+//     "sort_dice"     bool   sort dice after rolling         (default = false)
 
 namespace open_spiel {
 namespace yacht {
@@ -52,7 +60,8 @@ class YachtState : public State {
  public:
   YachtState(const YachtState&) = default;
   YachtState(std::shared_ptr<const Game> game, int num_players, int num_dice,
-             int dice_sides, int rolls_per_turn, int num_categories);
+             int dice_sides, int rolls_per_turn, int num_categories,
+             bool sort_dice);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
@@ -89,6 +98,7 @@ class YachtState : public State {
   int dice_sides_ = 6;
   int rolls_per_turn_ = 3;
   int num_categories_ = 12;
+  bool sort_dice_ = false;
 
   // Current turn state
   std::vector<int> dice_;  // Current dice values (1-indexed, e.g., 1-6)
@@ -135,7 +145,7 @@ class YachtGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new YachtState(
         shared_from_this(), num_players_, num_dice_, dice_sides_,
-        rolls_per_turn_, num_categories_));
+        rolls_per_turn_, num_categories_, sort_dice_));
   }
   
   // Maximum number of distinct outcomes from a single chance event
@@ -173,6 +183,7 @@ class YachtGame : public Game {
   int dice_sides_;
   int rolls_per_turn_;
   int num_categories_;
+  bool sort_dice_;
   
   // Category definitions (can be extended for variants)
   std::vector<Category> categories_;
