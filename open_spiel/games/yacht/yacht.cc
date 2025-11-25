@@ -37,7 +37,7 @@ constexpr int kFirstRerollAction = 0;
 constexpr int kLastRerollAction = 31;  // 2^5 - 1
 constexpr int kFirstCategoryAction = 32;
 
-// Yacht category indices
+// Yacht category indices (per Knizia's rules)
 enum YachtCategory {
   kOnes = 0,
   kTwos = 1,
@@ -45,7 +45,7 @@ enum YachtCategory {
   kFours = 3,
   kFives = 4,
   kSixes = 5,
-  kThreeOfAKind = 6,
+  kChance = 6,
   kFourOfAKind = 7,
   kFullHouse = 8,
   kSmallStraight = 9,
@@ -116,7 +116,7 @@ bool IsStraight(const std::vector<int>& dice, int length) {
 
 }  // namespace
 
-// Scoring functions for Yacht categories
+// Scoring functions for Yacht categories (per Knizia's rules)
 int YachtState::ComputeCategoryScore(int category, 
                                      const std::vector<int>& dice) const {
   std::vector<int> counts = CountDice(dice);
@@ -136,12 +136,9 @@ int YachtState::ComputeCategoryScore(int category,
     case kSixes:
       return counts[6] * 6;
       
-    case kThreeOfAKind:
-      // Sum of all dice if at least 3 of a kind
-      for (int i = 1; i <= 6; i++) {
-        if (counts[i] >= 3) return total;
-      }
-      return 0;
+    case kChance:
+      // Sum of all dice (no requirement)
+      return total;
       
     case kFourOfAKind:
       // Sum of all dice if at least 4 of a kind
@@ -151,14 +148,14 @@ int YachtState::ComputeCategoryScore(int category,
       return 0;
       
     case kFullHouse:
-      // 25 points if 3 of one kind and 2 of another
+      // Sum of all dice if 3 of one kind and 2 of another
       {
         bool has_three = false, has_two = false;
         for (int i = 1; i <= 6; i++) {
           if (counts[i] == 3) has_three = true;
           if (counts[i] == 2) has_two = true;
         }
-        return (has_three && has_two) ? 25 : 0;
+        return (has_three && has_two) ? total : 0;
       }
       
     case kSmallStraight:
@@ -166,8 +163,8 @@ int YachtState::ComputeCategoryScore(int category,
       return IsStraight(dice, 4) ? 30 : 0;
       
     case kLargeStraight:
-      // 40 points for sequence of 5
-      return IsStraight(dice, 5) ? 40 : 0;
+      // 30 points for sequence of 5 (per Knizia, not 40 like Yahtzee)
+      return IsStraight(dice, 5) ? 30 : 0;
       
     case kYacht:
       // 50 points if all 5 dice are the same
@@ -233,7 +230,7 @@ std::string YachtState::ActionToString(Player player, Action move_id) const {
     int category = move_id - kFirstCategoryAction;
     const std::vector<std::string> category_names = {
       "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes",
-      "Three of a Kind", "Four of a Kind", "Full House",
+      "Chance", "Four of a Kind", "Full House",
       "Small Straight", "Large Straight", "Yacht"
     };
     return absl::StrCat("Score in ", category_names[category]);
