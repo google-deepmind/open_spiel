@@ -978,7 +978,7 @@ class RepeatedPokerkitState(pyspiel.State):
       # NOTE: This can require a very large amount of memory for large games
       # with many hands and/or players!
       self._wrapped_state_hand_histories.append(
-          self.pokerkit_wrapper_state.to_struct().poker_hand_histories)
+          self.pokerkit_wrapper_state.to_struct().per_player_phh_actions)
     # Terminate or start a new hand
     if self._hand_number + 1 == self.get_game()._max_num_hands:
       self._is_terminal = True

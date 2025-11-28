@@ -453,8 +453,8 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertIsInstance(state_struct.pots, list)
       self.assertIsInstance(state_struct.burn_cards, list)
       self.assertIsInstance(state_struct.mucked_cards, list)
-      self.assertEqual(state_struct.full_acpc_logs, [[], []])
-      self.assertEqual(state_struct.acpc_betting_history, "")
+      self.assertEqual(state_struct.per_player_acpc_logs, [[], []])
+      self.assertEqual(state_struct.betting_history, "")
       self.assertLen(state_struct.blinds, 2)
       self.assertLen(state_struct.player_contributions, game.num_players())
       self.assertGreaterEqual(state_struct.pot_size, 0)
@@ -487,10 +487,10 @@ if IMPORTED_ALL_LIBRARIES:
       state_struct.bets = [10, 0]
       state_struct.board_cards = [5, 6, 7]
       state_struct.hole_cards = [[1, 2], [3, 4]]
-      state_struct.poker_hand_histories = [["phh1"], ["phh2"]]
-      state_struct.full_acpc_logs = [[["S->", "MATCHSTATE:blah"]]]
+      state_struct.per_player_phh_actions = [["phh1"], ["phh2"]]
+      state_struct.per_player_acpc_logs = [[["S->", "MATCHSTATE:blah"]]]
       state_struct.blinds = [1, 2]
-      state_struct.acpc_betting_history = "betting_history_test"
+      state_struct.betting_history = "betting_history_test"
       state_struct.player_contributions = [10, 0]
       state_struct.pot_size = 10
       state_struct.starting_stacks = [100, 200]
@@ -504,14 +504,14 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertEqual(state_struct.bets, [10, 0])
       self.assertEqual(state_struct.board_cards, [5, 6, 7])
       self.assertEqual(state_struct.hole_cards, [[1, 2], [3, 4]])
-      self.assertEqual(state_struct.poker_hand_histories, [["phh1"], ["phh2"]])
       self.assertEqual(
-          state_struct.full_acpc_logs, [[["S->", "MATCHSTATE:blah"]]]
+          state_struct.per_player_phh_actions, [["phh1"], ["phh2"]]
+      )
+      self.assertEqual(
+          state_struct.per_player_acpc_logs, [[["S->", "MATCHSTATE:blah"]]]
       )
       self.assertEqual(state_struct.blinds, [1, 2])
-      self.assertEqual(
-          state_struct.acpc_betting_history, "betting_history_test"
-      )
+      self.assertEqual(state_struct.betting_history, "betting_history_test")
       self.assertEqual(state_struct.player_contributions, [10, 0])
       self.assertEqual(state_struct.pot_size, 10)
       self.assertEqual(state_struct.starting_stacks, [100, 200])
@@ -616,29 +616,37 @@ if IMPORTED_ALL_LIBRARIES:
       self.assertEqual(state_struct.pot_size, 1500)
       self.assertEqual(data["pot_size"], 1500)
 
-      self.assertLen(state_struct.poker_hand_histories, 2)
+      self.assertLen(state_struct.per_player_phh_actions, 2)
       # Per-player view of P1's hole cards (P1 uncensored, P2 censored)
-      self.assertEqual(state_struct.poker_hand_histories[0][0], "d dh p1 AcKc")
-      self.assertEqual(state_struct.poker_hand_histories[1][0], "d dh p1 ????")
-      # Per-player view of P2's hole cards (P1 censored, P2 uncensored)
-      self.assertEqual(state_struct.poker_hand_histories[0][1], "d dh p2 ????")
-      self.assertEqual(state_struct.poker_hand_histories[1][1], "d dh p2 AdKd")
-
-      self.assertNotEmpty(state_struct.full_acpc_logs)
-      self.assertNotEmpty(data["full_acpc_logs"])
-      self.assertEqual(state_struct.full_acpc_logs, data["full_acpc_logs"])
-      self.assertLen(state_struct.full_acpc_logs, 2)
-
-      # We expect SB to call and BB to check pre-flop, i.e. 'cc' pre-flop.
-      # Then (since ACPC tracks total contributions, not per street
-      # contributions) we expect P0's bet 200 raises to 300 total across the
-      # hand, P1 raise to 500 raise to total 600, and P0 raise to 800 totals
-      # 900.
-      self.assertEqual(state_struct.acpc_betting_history, "cc/r300r600r900")
-
-      # P0's view, right before the last bet
       self.assertEqual(
-          state_struct.full_acpc_logs[0][-3:],
+          state_struct.per_player_phh_actions[0][0], "d dh p1 AcKc"
+      )
+      self.assertEqual(
+          state_struct.per_player_phh_actions[1][0], "d dh p1 ????"
+      )
+      # Per-player view of P2's hole cards (P1 censored, P2 uncensored)
+      self.assertEqual(
+          state_struct.per_player_phh_actions[0][1], "d dh p2 ????"
+      )
+      self.assertEqual(
+          state_struct.per_player_phh_actions[1][1], "d dh p2 AdKd"
+      )
+
+      self.assertNotEmpty(state_struct.per_player_acpc_logs)
+      self.assertNotEmpty(data["per_player_acpc_logs"])
+      self.assertEqual(
+          state_struct.per_player_acpc_logs, data["per_player_acpc_logs"]
+      )
+      self.assertLen(state_struct.per_player_acpc_logs, 2)
+
+      # 200 500 800 for total contributions of 300 600 and 900 (after including
+      # the preflop big-blind both players put in when check_or_call-ing)
+      self.assertEqual(state_struct.betting_history, "cc/r200r500r800")
+
+      # P0's view, right before the last bet. This uses the total contributions
+      # so the numbers are expected to differ from above.
+      self.assertEqual(
+          state_struct.per_player_acpc_logs[0][-3:],
           [
               ["S->", "MATCHSTATE:0:0:cc/r300r600:AcKc|/QcJcTc\r\n"],
               ["<-C", "MATCHSTATE:0:0:cc/r300r600:AcKc|/QcJcTc:r900\r\n"],
@@ -648,13 +656,50 @@ if IMPORTED_ALL_LIBRARIES:
 
       # P1's view, right before the last bet
       self.assertEqual(
-          state_struct.full_acpc_logs[1][-3:],
+          state_struct.per_player_acpc_logs[1][-3:],
           [
               ["<-C", "MATCHSTATE:1:0:cc/r300:|AdKd/QcJcTc:r600\r\n"],
               ["S->", "MATCHSTATE:1:0:cc/r300r600:|AdKd/QcJcTc\r\n"],
               ["S->", "MATCHSTATE:1:0:cc/r300r600r900:|AdKd/QcJcTc\r\n"],
           ],
       )
+
+      # -- Make sure that postflop call actions are reported correctly --
+      # NOTE: This differs from how the actual ACPC spec works. Since here they
+      # should be position independent + always show the actions immediately.
+      state.apply_action(ACTION_CHECK_OR_CALL)
+      state_struct = state.to_struct()
+      # (i.e. this *correctly* differs from what would have been inside the
+      # ACPC logs at this moment / immediately reflects the call action.)
+      self.assertEqual(state_struct.betting_history, "cc/r200r500r800c/")
+
+      # Deal turn, no change
+      state.apply_action(state.legal_actions()[0])
+      self.assertEqual(state_struct.betting_history, "cc/r200r500r800c/")
+      # Check
+      state.apply_action(state.legal_actions()[0])
+      self.assertEqual(state.to_struct().betting_history, "cc/r200r500r800c/c")
+      # Check-back
+      state.apply_action(state.legal_actions()[0])
+      self.assertEqual(
+          state.to_struct().betting_history, "cc/r200r500r800c/cc/"
+      )
+      # Deal river, no change
+      state.apply_action(state.legal_actions()[0])
+      self.assertEqual(
+          state.to_struct().betting_history, "cc/r200r500r800c/cc/"
+      )
+      # Check
+      state.apply_action(state.legal_actions()[0])
+      self.assertEqual(
+          state.to_struct().betting_history, "cc/r200r500r800c/cc/c"
+      )
+      # Check-back
+      state.apply_action(state.legal_actions()[0])
+      self.assertEqual(
+          state.to_struct().betting_history, "cc/r200r500r800c/cc/cc"
+      )
+      self.assertTrue(state.is_terminal())
 
     def test_pokerkit_wrapper_state_to_struct_and_json_when_terminal(self):
       """Tests the ToJson() method inherited from StateStruct."""
@@ -727,18 +772,20 @@ if IMPORTED_ALL_LIBRARIES:
       # p1 has 2c2h since first + third card in unshuffled deck
       # p2 has 2d2s since second + fourth card in unshuffled deck
       self.assertEqual(
-          state_struct.poker_hand_histories,
+          state_struct.per_player_phh_actions,
           [
               ["d dh p1 2c2h", "d dh p2 ????", "p2 f"],
               ["d dh p1 ????", "d dh p2 2d2s", "p2 f"],
           ],
       )
-      self.assertNotEmpty(state_struct.full_acpc_logs)
-      self.assertNotEmpty(data["full_acpc_logs"])
-      self.assertEqual(state_struct.full_acpc_logs, data["full_acpc_logs"])
-      self.assertLen(state_struct.full_acpc_logs, 2)
+      self.assertNotEmpty(state_struct.per_player_acpc_logs)
+      self.assertNotEmpty(data["per_player_acpc_logs"])
       self.assertEqual(
-          state_struct.full_acpc_logs,
+          state_struct.per_player_acpc_logs, data["per_player_acpc_logs"]
+      )
+      self.assertLen(state_struct.per_player_acpc_logs, 2)
+      self.assertEqual(
+          state_struct.per_player_acpc_logs,
           [
               [
                   ["S->", "MATCHSTATE:0:0::2c2h|\r\n"],
@@ -1464,6 +1511,40 @@ if IMPORTED_ALL_LIBRARIES:
         )
       self.assertTrue(state.is_terminal())
 
+    def test_seven_card_stud_betting_history_with_immediate_all_in(self):
+      # Test with Seven Card Stud
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "20 20",
+          "bring_in": 5,
+          "small_bet": 10,
+          "big_bet": 20,
+      }
+      game = PokerkitWrapper(stud_params)
+      state = game.new_initial_state()
+      for _ in range(15):
+        state.apply_action(max(state.legal_actions()))
+      self.assertEqual(state.to_struct().betting_history, "r10r20c////")
+
+    def test_seven_card_stud_betting_history_with_second_street_allin(self):
+      # Test with Seven Card Stud
+      stud_params = {
+          "variant": "FixedLimitSevenCardStud",
+          "num_players": 2,
+          "stack_sizes": "50 50",
+          "bring_in": 5,
+          "small_bet": 10,
+          "big_bet": 20,
+      }
+      game = PokerkitWrapper(stud_params)
+      state = game.new_initial_state()
+      for _ in range(15):
+        state.apply_action(max(state.legal_actions()))
+      self.assertEqual(
+          state.to_struct().betting_history, "r10r20r30r40c/r10c///"
+      )
+
     def test_razz_vs_seven_card_stud_eval(self):
       card_sequence = [
           Card(ACE, HEART),
@@ -1514,6 +1595,9 @@ if IMPORTED_ALL_LIBRARIES:
       # P0 has 5432A, P1 has 65432. P0 wins in Razz.
       self.assertGreater(razz_returns[0], 0)
       self.assertLess(razz_returns[1], 0)
+      self.assertEqual(
+          razz_state.to_struct().betting_history, "b5c/cc/cc/cc/cc"
+      )
 
       # Test with Seven Card Stud
       stud_params = {
@@ -1530,6 +1614,9 @@ if IMPORTED_ALL_LIBRARIES:
       # P0 has 7h SF, P1 has 8s SF. P1 wins in 7-card stud.
       self.assertLess(stud_returns[0], 0)
       self.assertGreater(stud_returns[1], 0)
+      self.assertEqual(
+          stud_state.to_struct().betting_history, "b5c/cc/cc/cc/cc"
+      )
 
     def test_hand_mucking_at_showdown(self):
       params = {
@@ -2740,6 +2827,843 @@ if IMPORTED_ALL_LIBRARIES:
       # though it is nice to have to verify the game is still working fine
       # here.)
       self.assertFalse(state.is_terminal())
+
+    # TODO: b/437724266 - Parameterize or add a similar test for limit holdem.
+    @parameterized.parameters(
+        "100 100",
+        "25 100",
+        "100 25",
+        "99 100",
+        "100 99",
+        "98 100",
+        "100 98",
+        "97 100",
+        "100 97",
+        # Testing extremely small post-blind stacks (e.g. 11-10 => 1 chip left)
+        "100 11",
+        "11 100",
+        "100 12",
+        "12 100",
+        "100 13",
+        "13 100",
+        # Test having exactly one BB left in stacks post-blind
+        "100 20",
+        "20 100",
+    )
+    def test_headsup_random_hands_match_universal_poker_gameplay(self, stacks):
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
+      universal_poker_game_string = (
+          "universal_poker("
+          "betting=nolimit,"
+          "bettingAbstraction=fullgame,"
+          "blind=10 5,"
+          "firstPlayer=2 1 1 1,"
+          "numBoardCards=0 3 1 1,"
+          "numHoleCards=2,"
+          "numPlayers=2,"
+          "numRanks=13,"
+          "numRounds=4,"
+          "numSuits=4,"
+          f"stack={stacks})"
+      )
+      universal_poker_game = pyspiel.load_game(universal_poker_game_string)
+      pokerkit_game = PokerkitWrapperAcpcStyle(
+          params={
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 2,
+              "blinds": "5 10",
+              "stack_sizes": " ".join(stacks.split(" ")[::-1]),
+          }
+      )
+      min_stack_size = min([int(s) for s in stacks.split(" ")])
+      max_stack_size = max([int(s) for s in stacks.split(" ")])
+
+      # The two games represent shoving over effective stack differently, and in
+      # ways that aren't easy to account for otherwise. So instead it's easier
+      # to just relax the strictness with which we do the assert when comparing
+      # betting histories.
+      def replace_all_shoves_with_min_stack(betting_history):
+        for size in range(min_stack_size, max_stack_size + 1):
+          if f"r{size}" in betting_history:
+            betting_history = betting_history.replace(
+                f"r{size}", f"r{min_stack_size}"
+            )
+        return betting_history
+
+      # Each hand is quick so we can run a decent number of them without the
+      # test taking too long.
+      number_hands_to_play = 5
+      for _ in range(number_hands_to_play):
+        pokerkit_state = pokerkit_game.new_initial_state()
+        universal_poker_state = universal_poker_game.new_initial_state()
+        # pokerkit_wrapper and universal_poker deal hole cards differently -
+        # pokerkit_wrapper rotates, universal_poker does all for each player
+        # one at a time.
+        hole_cards = random.sample(range(52), 4)
+        for card in hole_cards:
+          pokerkit_state.apply_action(card)
+        for per_player_pair in zip(hole_cards[0:2], hole_cards[2:4]):
+          universal_poker_state.apply_action(per_player_pair[0])
+          universal_poker_state.apply_action(per_player_pair[1])
+
+        step = 0
+        while True:
+          step += 1
+          if step >= 200:  # Mostly-arbitrary limit.
+            self.fail(
+                "Detected probable infinite loop. Hand had a very large number"
+                " of actions."
+            )
+
+          self.assertEqual(
+              universal_poker_state.current_player(),
+              pokerkit_state.current_player(),
+          )
+          self.assertEqual(
+              universal_poker_state.returns(), pokerkit_state.returns()
+          )
+
+          up_struct = universal_poker_state.to_struct()
+          pk_struct = pokerkit_state.to_struct()
+          self.assertEqual(up_struct.current_player, pk_struct.current_player)
+          # Blinds and stacks should be in reverse order since otherwise the
+          # player number won't line up.
+          self.assertEqual(up_struct.blinds, pk_struct.blinds[::-1])
+          self.assertEqual(
+              up_struct.starting_stacks, pk_struct.starting_stacks[::-1]
+          )
+
+          self.assertEqual(
+              replace_all_shoves_with_min_stack(up_struct.betting_history),
+              replace_all_shoves_with_min_stack(pk_struct.betting_history),
+              f"universal_poker betting_history: {up_struct.betting_history},"
+              f" pokerkit_wrapper betting_history: {pk_struct.betting_history},"
+              " underlying operations were"
+              f" {list(pokerkit_state._wrapped_state.operations)}",
+          )
+          if pokerkit_state.is_terminal():
+            self.assertTrue(universal_poker_state.is_terminal())
+            break
+
+          self.assertEqual(
+              universal_poker_state.is_chance_node(),
+              pokerkit_state.is_chance_node(),
+          )
+          if pokerkit_state.is_chance_node():
+            self.assertEqual(
+                universal_poker_state.chance_outcomes(),
+                pokerkit_state.chance_outcomes(),
+            )
+
+            random_action = random.choice(
+                [o for o, _ in pokerkit_state.chance_outcomes()]
+            )
+            universal_poker_state.apply_action(random_action)
+            pokerkit_state.apply_action(random_action)
+          else:
+            universal_poker_actions = universal_poker_state.legal_actions()
+            pokerkit_actions = pokerkit_state.legal_actions()
+            # Inside the assert, replacing actions that are larger than the
+            # smallest stack size with said value. Since doing so is
+            # strategically identical to shoving all-in, but the games handle
+            # them very differently and in ways that aren't easy to account for
+            # otherwise here.
+            self.assertEqual(
+                set([
+                    action if action <= min_stack_size else min_stack_size
+                    for action in universal_poker_actions
+                ]),
+                set([
+                    action if action <= min_stack_size else min_stack_size
+                    for action in pokerkit_actions
+                ]),
+            )
+            random_action = random.choice(pokerkit_actions)
+            pokerkit_state.apply_action(random_action)
+            if random_action not in universal_poker_actions:
+              if min_stack_size in universal_poker_actions:
+                universal_poker_state.apply_action(min_stack_size)
+              else:
+                self.assertGreaterEqual(random_action, min_stack_size)
+                self.assertIn(max_stack_size, universal_poker_actions)
+                universal_poker_state.apply_action(max_stack_size)
+            else:
+              universal_poker_state.apply_action(random_action)
+
+    @parameterized.parameters(
+        "10 10",
+        "100 10",
+        "10 100",
+        "10 20",
+        "20 10",
+        "10 11",
+        "11 10",
+    )
+    def test_headsup_immediate_all_in_matches_universal_poker(self, stacks):
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
+      universal_poker_game_string = (
+          "universal_poker("
+          "betting=nolimit,"
+          "bettingAbstraction=fullgame,"
+          "blind=10 5,"
+          "firstPlayer=2 1 1 1,"
+          "numBoardCards=0 3 1 1,"
+          "numHoleCards=2,"
+          "numPlayers=2,"
+          "numRanks=13,"
+          "numRounds=4,"
+          "numSuits=4,"
+          f"stack={stacks})"
+      )
+      universal_poker_game = pyspiel.load_game(universal_poker_game_string)
+      pokerkit_game = PokerkitWrapperAcpcStyle(
+          params={
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 2,
+              "blinds": "5 10",
+              "stack_sizes": " ".join(stacks.split(" ")[::-1]),
+          }
+      )
+      pokerkit_state = pokerkit_game.new_initial_state()
+      universal_poker_state = universal_poker_game.new_initial_state()
+      # pokerkit_wrapper and universal_poker deal hole cards differently -
+      # pokerkit_wrapper rotates, universal_poker does all for each player
+      # one at a time.
+      hole_cards = range(4)
+      for card in hole_cards:
+        pokerkit_state.apply_action(card)
+      for per_player_pair in zip(hole_cards[0:2], hole_cards[2:4]):
+        universal_poker_state.apply_action(per_player_pair[0])
+        universal_poker_state.apply_action(per_player_pair[1])
+
+      # Ensure both players immediately contribute one big blind if they haven't
+      # already (forcing immediate showdown).
+      if (
+          not universal_poker_state.is_chance_node()
+          or not pokerkit_state.is_chance_node()
+      ):
+        universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+        pokerkit_state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertTrue(pokerkit_state.is_chance_node())
+      # NOTE: unlike pokerkit_wrapper which will automatically determine that
+      # the hand can procede immediately to showdown, universal_poker requires
+      # you to explicitly apply a second check action in certain cases (i.e.
+      # where the Big Blind has > 1 BB but the Small Blind does not). This also
+      # affects the betting history below too.
+      # TODO: b/459073855 - Consider whether this difference is actually
+      # problematic or not. And whether we want the ACPC style variant to start
+      # simulating this need for a check action...
+      if not universal_poker_state.is_chance_node():
+        universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+
+      for board_card in range(5, 10):
+        self.assertTrue(pokerkit_state.is_chance_node())
+        self.assertTrue(universal_poker_state.is_chance_node())
+        pokerkit_betting_history = pokerkit_state.to_struct().betting_history
+        universal_poker_betting_history = (
+            universal_poker_state.to_struct().betting_history
+        )
+        # As discussed above, the extra forced check by universal_poker does
+        # indeed show up here, causing a small discrepancy in betting history
+        # in certain cases.
+        if not (
+            pokerkit_betting_history == "c///"
+            and universal_poker_betting_history == "cc///"
+        ):
+          self.assertEqual(
+              universal_poker_betting_history, pokerkit_betting_history
+          )
+        self.assertEqual(
+            pokerkit_state.chance_outcomes(),
+            universal_poker_state.chance_outcomes(),
+        )
+        pokerkit_state.apply_action(board_card)
+        universal_poker_state.apply_action(board_card)
+
+      self.assertTrue(pokerkit_state.is_terminal())
+      self.assertTrue(universal_poker_state.is_terminal())
+      self.assertEqual(
+          universal_poker_state.returns(), pokerkit_state.returns()
+      )
+
+    def test_4p_hand_generation_with_forced_check_call_until_turn(self):
+      """Tests a few edge cases involving multiple players + check actions.
+
+      Particularly useful for verifying that we handle the betting history
+      properly / do not over-rely on the ACPC logs in a way that delays check
+      or call actions from showing up in time.
+
+      Also demonstrates that if we don't go our of our way to enable fractional
+      pot splitting (see test below) the discrepency vs Universal Poker is still
+      bounded properly, ie in a 4 player NLHE game no more than 4/3 BBs.
+      """
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
+      universal_poker_game_string = (
+          "universal_poker("
+          "betting=nolimit,"
+          "bettingAbstraction=fullgame,"
+          "blind=5 10 0 0,"
+          "firstPlayer=3 1 1 1,"
+          "numBoardCards=0 3 1 1,"
+          "numHoleCards=2,"
+          "numPlayers=4,"
+          "numRanks=13,"
+          "numRounds=4,"
+          "numSuits=4,"
+          "stack=100 100 100 100)"
+      )
+      universal_poker_game = pyspiel.load_game(universal_poker_game_string)
+      pokerkit_game = PokerkitWrapperAcpcStyle(
+          params={
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 4,
+              "blinds": "5 10",
+              "stack_sizes": "100 100 100 100",
+          }
+      )
+      # These hands aren't too too slow, so we can run a couple of them in a
+      # row here without the test taking too long.
+      for _ in range(25):
+        pokerkit_state = pokerkit_game.new_initial_state()
+        universal_poker_state = universal_poker_game.new_initial_state()
+        # pokerkit_wrapper and universal_poker deal hole cards differently -
+        # pokerkit_wrapper rotates, universal_poker does all for each player
+        # one at a time.
+        hole_cards = random.sample(range(52), 8)
+        for card in hole_cards:
+          pokerkit_state.apply_action(card)
+        for per_player_pair in zip(hole_cards[0:4], hole_cards[4:8]):
+          universal_poker_state.apply_action(per_player_pair[0])
+          universal_poker_state.apply_action(per_player_pair[1])
+
+        step = 0
+        while True:
+          step += 1
+          if step >= 400:  # Mostly-arbitrary limit.
+            self.fail(
+                "Detected probable infinite loop. Hand had a very large number"
+                " of actions."
+            )
+
+          self.assertEqual(
+              universal_poker_state.current_player(),
+              pokerkit_state.current_player(),
+          )
+
+          # Universal Poker returns fractional BigBlinds in cases where
+          # pokerkit would 'unfairly' award the BigBlind to one specific player
+          # (in a way that would be difficult to exactly account for) when
+          # we passed in integer stack sizes instead of floats. But we
+          # can assume that even in the worst case this only results in a
+          # 1-(1/N) discrepency once per N-2 splits, totalling:
+          #   ((1-(1/N)) * N-2) => 1.333...
+          # delta for N=4.
+          self.assertSequenceAlmostEqual(
+              universal_poker_state.returns(),
+              pokerkit_state.returns(),
+              delta=1.34,
+          )
+
+          up_struct = universal_poker_state.to_struct()
+          pk_struct = pokerkit_state.to_struct()
+          self.assertEqual(up_struct.current_player, pk_struct.current_player)
+          self.assertEqual(up_struct.starting_stacks, pk_struct.starting_stacks)
+          self.assertEqual(
+              up_struct.betting_history,
+              pk_struct.betting_history,
+              f"up betting_history: {up_struct.betting_history},"
+              f" pk betting_history: {pk_struct.betting_history},"
+              " underlying operations were"
+              f" {list(pokerkit_state._wrapped_state.operations)}",
+          )
+          if pokerkit_state.is_terminal():
+            self.assertTrue(universal_poker_state.is_terminal())
+            break
+
+          self.assertEqual(
+              universal_poker_state.is_chance_node(),
+              pokerkit_state.is_chance_node(),
+          )
+          if pokerkit_state.is_chance_node():
+            self.assertEqual(
+                universal_poker_state.chance_outcomes(),
+                pokerkit_state.chance_outcomes(),
+            )
+            random_action = random.choice(
+                [o for o, _ in pokerkit_state.chance_outcomes()]
+            )
+            universal_poker_state.apply_action(random_action)
+            pokerkit_state.apply_action(random_action)
+          else:
+            self.assertEqual(
+                universal_poker_state.legal_actions(),
+                pokerkit_state.legal_actions(),
+            )
+            is_preflop_or_flop_betting = (
+                len(pokerkit_state._wrapped_state.board_cards) <= 3
+            )
+            if (
+                is_preflop_or_flop_betting
+                and ACTION_CHECK_OR_CALL in pokerkit_state.legal_actions()
+            ):
+              action = ACTION_CHECK_OR_CALL
+            else:
+              action = random.choice(pokerkit_state.legal_actions())
+            universal_poker_state.apply_action(action)
+            pokerkit_state.apply_action(action)
+
+    def test_can_have_fractional_pot_splitting_via_4p_post_turn_randomize(self):
+      """Tests a few edge cases involving multiple players + check actions.
+
+      Specifically: forces all 4 players to check/call until the turn, i.e.
+      preflop and on the flop, to get a wider variety of spots tested. And then
+      causes the players to play randomly while checking betting history and
+      the resulting returns() at the end of the game.
+
+      Particularly useful for making sure that:
+      - we can handle fractional pot splitting exactly like Universal Poker
+      - we handle check/call actions properly, and specifically aren't
+      over-relying on the ACPC logs (which as per the spec don't immediately
+      update for all players instantly upon check/call actions)
+
+      """
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
+      universal_poker_game_string = (
+          "universal_poker("
+          "betting=nolimit,"
+          "bettingAbstraction=fullgame,"
+          "blind=5 10 0 0,"
+          "firstPlayer=3 1 1 1,"
+          "numBoardCards=0 3 1 1,"
+          "numHoleCards=2,"
+          "numPlayers=4,"
+          "numRanks=13,"
+          "numRounds=4,"
+          "numSuits=4,"
+          "stack=100 100 100 100)"
+      )
+      universal_poker_game = pyspiel.load_game(universal_poker_game_string)
+      pokerkit_game = PokerkitWrapperAcpcStyle(
+          params={
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 4,
+              "blinds": "5.0 10.0",
+              # Floats to ensure fractional returns instead of floor division.
+              # For more details see
+              # https://pokerkit.readthedocs.io/en/stable/simulation.html#optional-divmod
+              "stack_sizes": "100.0 100.0 100.0 100.0",
+          }
+      )
+      # These hands aren't too too slow, so we can run a couple of them in a
+      # row here without the test taking too long.
+      for _ in range(25):
+        pokerkit_state = pokerkit_game.new_initial_state()
+        universal_poker_state = universal_poker_game.new_initial_state()
+        # pokerkit_wrapper and universal_poker deal hole cards differently -
+        # pokerkit_wrapper rotates, universal_poker does all for each player
+        # one at a time.
+        hole_cards = random.sample(range(52), 8)
+        for card in hole_cards:
+          pokerkit_state.apply_action(card)
+        for per_player_pair in zip(hole_cards[0:4], hole_cards[4:8]):
+          universal_poker_state.apply_action(per_player_pair[0])
+          universal_poker_state.apply_action(per_player_pair[1])
+
+        step = 0
+        while True:
+          step += 1
+          if step >= 400:  # Mostly-arbitrary limit.
+            self.fail(
+                "Detected probable infinite loop. Hand had a very large number"
+                " of actions."
+            )
+
+          self.assertEqual(
+              universal_poker_state.current_player(),
+              pokerkit_state.current_player(),
+          )
+
+          # Major crux of this test - when using float stack inputs we expect
+          # the returns here to *exactly* match Universal Poker's.
+          self.assertSequenceEqual(
+              universal_poker_state.returns(),
+              pokerkit_state.returns(),
+          )
+
+          up_struct = universal_poker_state.to_struct()
+          pk_struct = pokerkit_state.to_struct()
+          self.assertEqual(up_struct.current_player, pk_struct.current_player)
+          self.assertEqual(up_struct.starting_stacks, pk_struct.starting_stacks)
+          self.assertEqual(
+              up_struct.betting_history,
+              pk_struct.betting_history,
+              f"up betting_history: {up_struct.betting_history},"
+              f" pk betting_history: {pk_struct.betting_history},"
+              " underlying operations were"
+              f" {list(pokerkit_state._wrapped_state.operations)}",
+          )
+          if pokerkit_state.is_terminal():
+            self.assertTrue(universal_poker_state.is_terminal())
+            break
+
+          self.assertEqual(
+              universal_poker_state.is_chance_node(),
+              pokerkit_state.is_chance_node(),
+          )
+          if pokerkit_state.is_chance_node():
+            self.assertEqual(
+                universal_poker_state.chance_outcomes(),
+                pokerkit_state.chance_outcomes(),
+            )
+            random_action = random.choice(
+                [o for o, _ in pokerkit_state.chance_outcomes()]
+            )
+            universal_poker_state.apply_action(random_action)
+            pokerkit_state.apply_action(random_action)
+          else:
+            self.assertEqual(
+                universal_poker_state.legal_actions(),
+                pokerkit_state.legal_actions(),
+            )
+            is_preflop_or_flop_betting = (
+                len(pokerkit_state._wrapped_state.board_cards) <= 3
+            )
+            if (
+                is_preflop_or_flop_betting
+                and ACTION_CHECK_OR_CALL in pokerkit_state.legal_actions()
+            ):
+              action = ACTION_CHECK_OR_CALL
+            else:
+              action = random.choice(pokerkit_state.legal_actions())
+            universal_poker_state.apply_action(action)
+            pokerkit_state.apply_action(action)
+
+    def test_acpc_logs_match_spec_when_differing_from_universal_poker(self):
+      """Verifies that delayed check/calls in pokerkit ACPC logs are all WAI.
+
+      See https://pokerkit.readthedocs.io/en/stable/_static/protocol.pdf,
+      specifically the examples at the end of the document.
+
+      (This specifically verifies that we recreate the exact
+      "Two player no-limit Texas Hold'em" example.)
+      """
+      # universal_poker is an optional dependency, so we need to check it's
+      # registered before trying to use it.
+      if "universal_poker" not in pyspiel.registered_names():
+        self.skipTest("universal_poker is not registered.")
+
+      # Taken from the "Two player no-limit Texas Hold'em" example given at the
+      # end of https://pokerkit.readthedocs.io/en/stable/_static/protocol.pdf,
+      # except marked as hand 0 instead of hand 30 (0:0 not 0:30).
+      expected_acpc_logs_p0 = [
+          ["S->", "MATCHSTATE:0:0::9s8h|\r\n"],
+          ["S->", "MATCHSTATE:0:0:c:9s8h|\r\n"],
+          ["<-C", "MATCHSTATE:0:0:c:9s8h|:c\r\n"],
+          ["S->", "MATCHSTATE:0:0:cc/:9s8h|/8c8d5c\r\n"],
+          ["<-C", "MATCHSTATE:0:0:cc/:9s8h|/8c8d5c:r250\r\n"],
+          ["S->", "MATCHSTATE:0:0:cc/r250:9s8h|/8c8d5c\r\n"],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/:9s8h|/8c8d5c/6s\r\n"],
+          ["<-C", "MATCHSTATE:0:0:cc/r250c/:9s8h|/8c8d5c/6s:r500\r\n"],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/r500:9s8h|/8c8d5c/6s\r\n"],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/r500c/:9s8h|/8c8d5c/6s/2d\r\n"],
+          [
+              "<-C",
+              "MATCHSTATE:0:0:cc/r250c/r500c/:9s8h|/8c8d5c/6s/2d:r1250\r\n",
+          ],
+          [
+              "S->",
+              "MATCHSTATE:0:0:cc/r250c/r500c/r1250:9s8h|/8c8d5c/6s/2d\r\n",
+          ],
+          [
+              "S->",
+              # NOTE: Since tournament rules, P1's hand actually just gets
+              # mucked instead of being shown. Causing this to correctly differ
+              # from what's written in the spec example (no 9c6h)
+              # "MATCHSTATE:0:0:cc/r250c/r500c/r1250c:9s8h|9c6h/8c8d5c/6s/2d\r\n",
+              "MATCHSTATE:0:0:cc/r250c/r500c/r1250c:9s8h|/8c8d5c/6s/2d\r\n",
+          ],
+      ]
+
+      universal_poker_game_string = (
+          "universal_poker("
+          "betting=nolimit,"
+          "bettingAbstraction=fullgame,"
+          "blind=10 5,"
+          "firstPlayer=2 1 1 1,"
+          "numBoardCards=0 3 1 1,"
+          "numHoleCards=2,"
+          "numPlayers=2,"
+          "numRanks=13,"
+          "numRounds=4,"
+          "numSuits=4,"
+          "stack=2000 2000)"
+      )
+      universal_poker_game = pyspiel.load_game(universal_poker_game_string)
+      pokerkit_game = PokerkitWrapperAcpcStyle(
+          params={
+              "variant": "NoLimitTexasHoldem",
+              "num_players": 2,
+              "blinds": "5 10",
+              "stack_sizes": "2000 2000",
+          }
+      )
+      pokerkit_state = pokerkit_game.new_initial_state()
+      universal_poker_state = universal_poker_game.new_initial_state()
+
+      hole_cards = [
+          pokerkit_game.card_to_int[card]
+          for card in [
+              pokerkit.Card(NINE, SPADE),  # p0 card 0
+              pokerkit.Card(NINE, CLUB),  # p1 card 0
+              pokerkit.Card(EIGHT, HEART),  # p0 card 1
+              pokerkit.Card(SIX, HEART),  # p1 card 1
+          ]
+      ]
+      for card in hole_cards:
+        pokerkit_state.apply_action(card)
+      for per_player_pair in zip(hole_cards[0:2], hole_cards[2:4]):
+        universal_poker_state.apply_action(per_player_pair[0])
+        universal_poker_state.apply_action(per_player_pair[1])
+      self.assertSequenceEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:1],
+      )
+
+      # NOTE: This is counterintuitive, but because it's a headsup game the
+      # first player to act is actually P1 (which is indeed SB/BTN despite the
+      # blind order being <SB BB>).
+      self.assertEqual(pokerkit_state.current_player(), 1)
+
+      # P1 (SB/BTN) checks, immediately shows up since it's not closing out the
+      # betting round / since P0 (BB) needs to act next...
+      pokerkit_state.apply_action(ACTION_CHECK_OR_CALL)
+      universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertSequenceEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:2],
+      )
+      # (redundant check to be DAMP + certain this is correct)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:c:9s8h|\r\n"],
+      )
+
+      # ...and we can confirm this is correct by observing that the other
+      self.assertSequenceEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[1],
+          [
+              ["S->", "MATCHSTATE:1:0::|9c6h\r\n"],
+              ["<-C", "MATCHSTATE:1:0::|9c6h:c\r\n"],
+              ["S->", "MATCHSTATE:1:0:c:|9c6h\r\n"],
+          ],
+      )
+      # (and that it's now P0 BB's turn)
+      self.assertEqual(pokerkit_state.current_player(), 0)
+
+      # Now, P0 checking will finish the betting round, but because we're
+      # looking at P0's view we'll still see the message to the server go out.
+      pokerkit_state.apply_action(ACTION_CHECK_OR_CALL)
+      universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertSequenceEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:3],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["<-C", "MATCHSTATE:0:0:c:9s8h|:c\r\n"],
+      )
+
+      # Dealing Flop
+      for action in [
+          pokerkit_game.card_to_int[card]
+          for card in [
+              pokerkit.Card(EIGHT, CLUB),
+              pokerkit.Card(EIGHT, DIAMOND),
+              pokerkit.Card(FIVE, CLUB),
+          ]
+      ]:
+        pokerkit_state.apply_action(action)
+        universal_poker_state.apply_action(action)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:4],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/:9s8h|/8c8d5c\r\n"],
+      )
+
+      # (proof that now it's P0 BB's turn first postflop)
+      self.assertEqual(pokerkit_state.current_player(), 0)
+
+      # Now, since we are looking via the perspective of P0 BB (first to act
+      # player) as we proved directly above, we'll see this raise 250's message
+      # to the server + that it's reflected immediately.
+      pokerkit_state.apply_action(250)
+      universal_poker_state.apply_action(250)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:6],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/r250:9s8h|/8c8d5c\r\n"],
+      )
+
+      # Now, naively we might expect to see the call already in the log (ie
+      # r250c). But, in reality with how ACPC spec is defined the opponent P1's
+      # call will not be reflected until the next street's card has been dealt!
+      pokerkit_state.apply_action(ACTION_CHECK_OR_CALL)
+      universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:6],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/r250:9s8h|/8c8d5c\r\n"],
+      )
+
+      # Dealing Turn
+      action = pokerkit_game.card_to_int[Card(SIX, SPADE)]
+      pokerkit_state.apply_action(action)
+      universal_poker_state.apply_action(action)
+      # NOW finally the flop's call action shows up! (along with the 6s turn)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:7],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/:9s8h|/8c8d5c/6s\r\n"],
+      )
+
+      # P0 bets 500 - rinse and repeat what happened on the flop
+      pokerkit_state.apply_action(500)
+      universal_poker_state.apply_action(500)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:9],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/r500:9s8h|/8c8d5c/6s\r\n"],
+      )
+
+      # P1 calls 500, but again doesn't show up in the logs until the river.
+      pokerkit_state.apply_action(ACTION_CHECK_OR_CALL)
+      universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:9],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/r500:9s8h|/8c8d5c/6s\r\n"],
+      )
+
+      # Which similarly doesn't match universal poker (along with other stuff)
+      # TODO: b/457647698 - Uncomment after fixing universal_poker. This
+      # currently results in
+      # ```
+      # AssertionError:
+      # - STATE:0:cc/r250c/r500c/:9s8h|9c6h/8c8d5c/6s/2c
+      # + STATE:0:cc/r250c/r500c/:9s8h|9c6h/8c8d5c/6s/
+      # ```
+      # We should investigate why 2c shows up here. (This seems like a potential
+      # bug in universal_poker's acpc_state and/or its to_string(), especially
+      # since this fake river card vanishes as expected imediately below when we
+      # deal the actual 2d river.)
+      # self.assertEqual(
+      #     universal_poker_state.to_struct().acpc_state,
+      #     "STATE:0:cc/r250c/r500c/:9s8h|9c6h/8c8d5c/6s/\n"
+      #     "Spent: [P0: 500  P1: 500  ]\n",
+      # )
+
+      # Dealing River
+      action = pokerkit_game.card_to_int[Card(DEUCE, DIAMOND)]
+      pokerkit_state.apply_action(action)
+      universal_poker_state.apply_action(action)
+      # Finally we see r500c instead of r500 (only along with the 2d river)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:10],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/r500c/:9s8h|/8c8d5c/6s/2d\r\n"],
+      )
+
+      # Double check universal_poker lines up as expected still too just in case
+      self.assertEqual(
+          universal_poker_state.to_struct().acpc_state,
+          "STATE:0:cc/r250c/r500c/:9s8h|9c6h/8c8d5c/6s/2d\n"
+          "Spent: [P0: 500  P1: 500  ]\n",
+      )
+
+      # And yet again, large bet => call. But difference is that now the hand
+      # ends after the raise is called, so we immediatley see the call show up!
+      pokerkit_state.apply_action(1250)
+      universal_poker_state.apply_action(1250)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:12],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          ["S->", "MATCHSTATE:0:0:cc/r250c/r500c/r1250:9s8h|/8c8d5c/6s/2d\r\n"],
+      )
+
+      pokerkit_state.apply_action(ACTION_CHECK_OR_CALL)
+      universal_poker_state.apply_action(ACTION_CHECK_OR_CALL)
+      # (i.e. this actually differs from above, unlike before!)
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0],
+          expected_acpc_logs_p0[0:13],
+      )
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[0][-1],
+          [
+              "S->",
+              # Note: despite being showdown, the other player's hand gets
+              # mucked instead of shown. This is correct given pokerkit's
+              # stricter 'tournament' rule set, but differs from the example
+              # given in the pokerkit docs.
+              "MATCHSTATE:0:0:cc/r250c/r500c/r1250c:9s8h|/8c8d5c/6s/2d\r\n",
+              # i.e. normally this would instead be:
+              # "MATCHSTATE:0:0:cc/r250c/r500c/r1250c:9s8h|9c6h/8c8d5c/6s/2d\r\n",
+          ],
+      )
+
+      # Verify that P1 on the other hand DOES get to see P0's hand as well at
+      # showdown.
+      self.assertEqual(
+          pokerkit_state.to_struct().per_player_acpc_logs[1][-1],
+          [
+              "S->",
+              "MATCHSTATE:1:0:cc/r250c/r500c/r1250c:9s8h|9c6h/8c8d5c/6s/2d\r\n",
+          ],
+      )
+
+      # Finally, prove that this all aligns with the Universal Poker's ToStruct
+      # results despite not literally matching exactly.
+      self.assertEqual(
+          universal_poker_state.to_struct().acpc_state,
+          "STATE:0:cc/r250c/r500c/r1250c:9s8h|9c6h/8c8d5c/6s/2d\n"
+          "Spent: [P0: 1250  P1: 1250  ]\n",
+      )
 
 
 if __name__ == "__main__":

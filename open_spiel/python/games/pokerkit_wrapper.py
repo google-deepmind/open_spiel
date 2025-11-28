@@ -34,6 +34,7 @@ import dataclasses
 import decimal
 import inspect
 import math
+import re
 
 from absl import logging
 import numpy as np
@@ -166,6 +167,11 @@ _DEFAULT_PARAMS = {
     # left of the dealer should be in the zeroth position while the player to
     # the immediate right of the dealer should be in the last position.
     # """
+    #
+    # You may provide floats here (e.g. 2000.0) instead of ints (e.g. 2000) to
+    # turn on fractional split pots. Otherwise (if provided integers) pots will
+    # never be split fractionally, i.e. in the same way pokerkit itself works:
+    # https://pokerkit.readthedocs.io/en/stable/simulation.html#optional-divmod
     "stack_sizes": "2000 2000",
 }
 
@@ -710,8 +716,8 @@ class PokerkitWrapperState(pyspiel.State):
     if wrapped_state.can_complete_bet_or_raise_to():
       valid_bet_sizes = []
       betting_structure = wrapped_state.betting_structure
-      min_bet = wrapped_state.min_completion_betting_or_raising_to_amount
-      max_bet = wrapped_state.max_completion_betting_or_raising_to_amount
+      min_bet = int(wrapped_state.min_completion_betting_or_raising_to_amount)
+      max_bet = int(wrapped_state.max_completion_betting_or_raising_to_amount)
       assert min_bet is not None and max_bet is not None
 
       if betting_structure == pokerkit.state.BettingStructure.FIXED_LIMIT:
@@ -757,10 +763,27 @@ class PokerkitWrapperState(pyspiel.State):
         # surprisingly small value, e.g. less than the 'typical' minimum bet
         # size for a given street. These asserts are here to give us confidence
         # that whenever we are in such a situation that these bets actually
-        # were a result of the bounds pokerkit provided to us....
-        assert only_valid_bet == min_bet and only_valid_bet == max_bet
-        # ... + that indeed neither lesser nor greater bets would have been
-        # legal.
+        # were a result of the bounds pokerkit provided to us...
+        if not (
+            (only_valid_bet == min_bet and only_valid_bet == max_bet)
+            # (Edge case: handling situations where the only valid bet after
+            # filtering out bet size 1 is an *actual* bet of size 2. Since from
+            # pokerkit's perspective both sizes are valid here, but there will
+            # _correctly_ only be one single action in the array. Some of these
+            # checks are redundant with each other; we leave them in since
+            # normally we would be raising an exception, so we want to be extra
+            # cautious.)
+            or (
+                max_bet == 2
+                and max_bet == min_bet + 1
+                and min_bet == ACTION_CHECK_OR_CALL
+                and min_bet in FOLD_AND_CHECK_OR_CALL_ACTIONS
+            )
+        ):
+          raise ValueError(
+              "Expected only_valid_bet to be the min and max bet values"
+              f" {min_bet} and {max_bet} but got {only_valid_bet}."
+          )
         assert not wrapped_state.can_complete_bet_or_raise_to(
             only_valid_bet + 1
         )
@@ -788,8 +811,10 @@ class PokerkitWrapperState(pyspiel.State):
       # having the .extend() for the entire can_complete_bet_or_raise_to()
       # handling at the very bottom down here is difficult to read + bug
       # prone).
-      assert set(valid_bet_sizes).isdisjoint(FOLD_AND_CHECK_OR_CALL_ACTIONS)
-      actions.extend(valid_bet_sizes)
+      valid_bet_size_ints = [int(v) for v in valid_bet_sizes]
+      assert set(valid_bet_size_ints).isdisjoint(FOLD_AND_CHECK_OR_CALL_ACTIONS)
+      actions.extend(valid_bet_size_ints)
+      assert all(a == int(a) for a in actions)
 
     assert actions
     return sorted(actions)
@@ -1050,11 +1075,20 @@ class PokerkitWrapperState(pyspiel.State):
 
     # Double check that this is consistent with the rest of pokerkit.State's
     # internal stack and starting_stack values to detect any bugs.
+    epsilon = 1e-7
     for player, payoff in enumerate(payoffs):
-      assert payoff == (
+      pokerkit_stack_difference = (
           self._wrapped_state.stacks[player]
           - self._wrapped_state.starting_stacks[player]
       )
+      if abs(float(payoff) - float(pokerkit_stack_difference)) > epsilon:
+        raise ValueError(
+            f"Payoff {payoff} for player {player} does not sufficiently match"
+            " internal pokerkit.State: differs too much from current stack"
+            f" {self._wrapped_state.stacks[player]} - starting_stack"
+            f" {self._wrapped_state.starting_stacks[player]} (i.e."
+            f" {pokerkit_stack_difference})"
+        )
 
     return payoffs
 
@@ -1064,6 +1098,116 @@ class PokerkitWrapperState(pyspiel.State):
   def deepcopy_wrapped_state(self) -> pokerkit.State:
     """Create and return a deepcopy of the 'wrapped' pokerkit.state."""
     return copy.deepcopy(self._wrapped_state)
+
+  def _get_betting_history(
+      self, action_converter: "ToAcpcActionConverter | None" = None
+  ) -> str:
+    """Returns betting history string, mimicking UniversalPoker's.
+
+    This betting history is intended to mimic the one provided by the
+    UniversalPoker game, except supporting more game variants besides just
+    Texas Hold'em. Note that we make the following modifications:
+    - we also include a 'b<amount>' for posting bring-ins (e.g. for 7 card stud)
+    - we always list completion-bet or raise sizes, even in limit games
+    - if action_converter is None, bet/raise amounts are per-street
+      contributions i.e. pokerkit-style, not acpc-style, and therefore not
+      matching the ones used by UniversalPoker. If a valid action_converter IS
+      provided then bet/raise amounts will be total contributions across all
+      streets, i.e. ACPC-style, and will matching the ones used by
+      UniversalPoker. (For more details see PokerkitWrapperAcpcStyle.)
+
+    Args:
+      action_converter: Optional ToAcpcActionConverter instance for ACPC-style
+        raise amounts. If left None, bet/raise amounts will instead be
+        per-street contributions i.e. pokerkit-style, not acpc-style. (Note:
+        must have been properly initialized / tracking all relevant actions up
+        to the current point. Otherwise the resulting sizes in the returned
+        betting history string will be incorrect.
+
+    Returns:
+      The betting history string (e.g. "b5c/cr10c/").
+    """
+    street_transitions = self._wrapped_state.street_count - 1
+    actions = []
+    street = 0
+    number_folds = 0
+    operations = list(self._wrapped_state.operations)
+    for i, operation in enumerate(operations):
+      next_operation = None if i + 1 == len(operations) else operations[i + 1]
+      # Handling the trailing "/" is surprisingly complicated without looking
+      # ahead to the next operation, especially with multiple players. So this
+      # approach surprisingly ends up being the best in practice.
+      append_slash_after_operation = (
+          (
+              isinstance(operation, pokerkit.Folding)
+              or isinstance(operation, pokerkit.CheckingOrCalling)
+              or isinstance(operation, pokerkit.CompletionBettingOrRaisingTo)
+              or isinstance(operation, pokerkit.BringInPosting)
+          )
+          and (
+              (
+                  next_operation
+                  and (
+                      isinstance(next_operation, pokerkit.BetCollection)
+                      # In certain cases, e.g. checks all around, there will be
+                      # no BetCollection operation but we still need a slash.
+                      or (isinstance(next_operation, pokerkit.BoardDealing))
+                      or (isinstance(next_operation, pokerkit.HoleDealing))
+                  )
+              )
+              # Also need to support to_struct() being called prior to the
+              # end of the hand. Fortunately in such cases it's actually
+              # _easier_ since every street is always separated by at least one
+              # chance node.
+              or (not next_operation and self.is_chance_node())
+          )
+          # Shouldn't add slashes if already at end of hand.
+          and not actions.count("/") >= street_transitions
+      )
+
+      if isinstance(operation, pokerkit.Folding):
+        number_folds += 1
+        actions.append("f")
+        if number_folds == self.get_game().num_players() - 1:
+          # To mimic universal poker, which skips putting any following "/" (or
+          # other actions) in the betting history if all players fold.
+          break
+      elif isinstance(operation, pokerkit.CheckingOrCalling):
+        actions.append("c")
+      elif isinstance(operation, pokerkit.CompletionBettingOrRaisingTo):
+        if action_converter:
+          player = operation.player_index
+          amount = operation.amount
+          total_prior_street_contribution = (
+              action_converter.get_total_contribution_before_street(
+                  street, player
+              )
+          )
+          acpc_amount = int(amount + total_prior_street_contribution)
+          actions.append(f"r{acpc_amount}")
+        else:
+          actions.append(f"r{operation.amount}")
+      elif isinstance(operation, pokerkit.BringInPosting):
+        actions.append(f"b{operation.amount}")
+
+      if append_slash_after_operation:
+        actions.append("/")
+        if action_converter:
+          street += 1
+
+      # To mimic universal_poker, which upon both players going all-in
+      # immediately appends a / for all remaining streets even if they haven't
+      # actually been dealt yet.
+      if actions.count("/") <= street_transitions:
+        if isinstance(operation, pokerkit.HoleCardsShowingOrMucking):
+          for _ in range(street_transitions - actions.count("/")):
+            actions.append("/")
+      else:
+        raise ValueError(
+            "Too many slashes in betting history so far:"
+            f" {''.join(actions)}. Underlying operations is {operations}"
+        )
+    return "".join(actions)
 
   def to_struct(self) -> pyspiel.pokerkit_wrapper.PokerkitStateStruct:
     legal_actions = []
@@ -1105,7 +1249,7 @@ class PokerkitWrapperState(pyspiel.State):
     perfect_recall_observer = self.get_game().make_py_observer(
         pyspiel.IIGObservationType(perfect_recall=True)
     )
-    poker_hand_histories: list[list[str]] = [
+    per_player_phh_actions: list[list[str]] = [
         perfect_recall_observer.poker_hand_history_actions(self, p)
         for p in range(self.get_game().num_players())
     ]
@@ -1122,7 +1266,7 @@ class PokerkitWrapperState(pyspiel.State):
     cpp_state_struct.pots = pots
     cpp_state_struct.burn_cards = burn_cards
     cpp_state_struct.mucked_cards = mucked_cards
-    cpp_state_struct.poker_hand_histories = poker_hand_histories
+    cpp_state_struct.per_player_phh_actions = per_player_phh_actions
 
     # -- The following fields are used for compatibility with code that is using
     # UniversalPokerStateStruct. --
@@ -1144,11 +1288,11 @@ class PokerkitWrapperState(pyspiel.State):
     cpp_state_struct.pot_size = pot_size
     cpp_state_struct.starting_stacks = starting_stacks
 
-    # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.notation.HandHistory.to_acpc_protocol
-    full_acpc_logs: list[list[tuple[str, str]]] = [
+    cpp_state_struct.betting_history = self._get_betting_history()
+
+    per_player_acpc_logs: list[list[tuple[str, str]]] = [
         [] for _ in range(self.get_game().num_players())
     ]
-    acpc_betting_history = ""
     fake_hand_number_to_avoid_error = 0
 
     # If the game hasn't actually dealt players' cards yet, or maybe also in
@@ -1157,22 +1301,23 @@ class PokerkitWrapperState(pyspiel.State):
     if self.get_game().params.get("variant") in _VARIANTS_SUPPORTING_ACPC_STYLE:
       for player in range(self.get_game().num_players()):
         try:
+          phh: pokerkit.HandHistory = pokerkit.HandHistory.from_game_state(
+              # pylint: disable=protected-access
+              # NOTE: Technically has card burning
+              # enabled! But should be close enough for our purposes here - in
+              # practice still results in the same string.
+              self.get_game()._wrapped_game_template_factory(),
+              # pylint: enable=protected-access
+              self._wrapped_state,
+          )
           # For more details + an example of what's in this tuple see:
           # https://pokerkit.readthedocs.io/en/stable/_static/protocol.pdf
           # (The 'S->' or '<-C' is in index 0, everything else in index 1)
           acpc_hand_history_uncensored: Iterator[tuple[str, str]] = (
-              pokerkit.HandHistory.from_game_state(
-                  # pylint: disable=protected-access
-                  # NOTE: Technically has card burning enabled! But should be
-                  # close enough for our purposes here - in practice still
-                  # results in the same string.
-                  self.get_game()._wrapped_game_template_factory(),
-                  # pylint: enable=protected-access
-                  self._wrapped_state,
-              ).to_acpc_protocol(player, fake_hand_number_to_avoid_error)
+              phh.to_acpc_protocol(player, fake_hand_number_to_avoid_error)
           )
-          assert not full_acpc_logs[player]
-          full_acpc_logs[player] = list(acpc_hand_history_uncensored)
+          assert not per_player_acpc_logs[player]
+          per_player_acpc_logs[player] = list(acpc_hand_history_uncensored)
 
         # Intended use case: catching *pokerkit's* ValueErrors. Since it throws
         # them in many many cases, e.g. if players have no hole cards yet.
@@ -1185,31 +1330,7 @@ class PokerkitWrapperState(pyspiel.State):
           )
           pass
 
-      # E.g.
-      # "MATCHSTATE:1:31:r300r900c/r1800r3600r9000c/r20000c/:KsJs|JdTc/6dJc9c/Kh/Qc"
-      latest_message_match_state = ""
-      # 'or 0' because .actor_index can be None so we need a sane fallback.
-      arbitrary_acpc_player = self._wrapped_state.actor_index or 0
-      for _, match_state in full_acpc_logs[arbitrary_acpc_player]:
-        latest_message_match_state = match_state
-      if latest_message_match_state:
-        if not latest_message_match_state.startswith("MATCHSTATE:"):
-          raise ValueError(
-              "Last message doesn't begin with 'MATCHSTATE:' in string:"
-              f" {latest_message_match_state}"
-          )
-
-        # E.g. "r300r900c/r1800r3600r9000c/r20000c/"
-        # TODO(jhtschultz) - we could leave in the "MATCHSTATE:"" or replace
-        # it with "STATE:" here if downstream code expects it that way.
-        acpc_betting_history = (
-            latest_message_match_state.split("MATCHSTATE:")[1]
-            .strip()
-            .split(":")[2]
-        )
-
-    cpp_state_struct.full_acpc_logs = full_acpc_logs
-    cpp_state_struct.acpc_betting_history = acpc_betting_history
+    cpp_state_struct.per_player_acpc_logs = per_player_acpc_logs
 
     return cpp_state_struct
 
@@ -1418,6 +1539,15 @@ class PokerkitWrapperObserver:
 # ------------------------------------------------------------------------------
 
 # TODO: b/434776281 - extract out PokerkitWrapperAcpcStyle into a separate file.
+# TODO: b/459073855 - PokerkitWrapperAcpcStyle doesn't require an extra 'forced'
+# check action in certain all-in spots involving different stacks sizes that
+# UniversalPoker does. This is probably ok (as everything is strategically
+# identical / neither is strictly "incorrect"), but we might want to add an
+# extra toggle to make this behavior exactly identical.
+# TODO: b/459193364 - add support for fractional pot splitting in N>=3 player
+# hands, ie the way that universal_poker does. (Adding it should be
+# straightforward; pokerkit already supports it, we just need to pass in only
+# non-integer stack sizes everywhere.)
 
 
 # --- "ACPC-style" PokerkitWrapper subclass to mimick UniversalPoker ---
@@ -1513,7 +1643,7 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
             # blinds and/or straddles, antes, and/or bring-ins. Hence it's
             # easier to just use it rather than checking the relevant values for
             # the given game variant.
-            p: -1 * current_payoffs[p]
+            p: decimal.Decimal(decimal.Decimal(-1.00) * current_payoffs[p])
             for p in range(game.num_players())
         },
     )
@@ -1710,6 +1840,27 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
     self._refresh_action_mappings_if_player_node()
     return
 
+  def to_struct(self) -> pyspiel.pokerkit_wrapper.PokerkitStateStruct:
+    """Override of to_struct() to adjust how betting_history displays raises."""
+    betting_history = self._get_betting_history(
+        action_converter=self._action_converter
+    )
+
+    output_struct = super().to_struct()
+    base_betting_history = output_struct.betting_history
+    output_struct.betting_history = betting_history
+
+    # Verify that the only difference is soley the size of the raises (i.e. the
+    # digits following an 'r' in the string).
+    base_non_digits = re.sub(r"r\d+", "r", base_betting_history)
+    acpc_non_digits = re.sub(r"r\d+", "r", output_struct.betting_history)
+    assert base_non_digits == acpc_non_digits, (
+        f"base: {base_betting_history} ({base_non_digits}), acpc-style:"
+        f" {output_struct.betting_history} ({acpc_non_digits})"
+    )
+
+    return output_struct
+
 
 class ToAcpcActionConverter:
   """Helper class to convert PokerKit-style actions to ACPC-style actions.
@@ -1724,7 +1875,7 @@ class ToAcpcActionConverter:
   def __init__(
       self,
       num_players: int,
-      initial_contributions: dict[int, float],
+      initial_contributions: dict[int, decimal.Decimal],
   ):
     if num_players is None:
       raise ValueError("num_players must be specified.")
@@ -1734,8 +1885,9 @@ class ToAcpcActionConverter:
       raise ValueError("initial_contributions must be specified.")
 
     self._num_players = num_players
-    self._per_street_contributions: list[dict[int, float]] = [
-        {p: 0.0 for p in range(self._num_players)} | initial_contributions
+    self._per_street_contributions: list[dict[int, decimal.Decimal]] = [
+        {p: decimal.Decimal("0.00") for p in range(self._num_players)}
+        | initial_contributions
     ]
 
     for p in range(num_players):
@@ -1752,6 +1904,48 @@ class ToAcpcActionConverter:
     # counter if people call it prior to any player actions, e.g. dealing cards
     # in Hold'em preflop chance nodes.
     self._ready_to_increment_street = False
+
+  def get_per_street_contribution(
+      self, street: int, player: int
+  ) -> decimal.Decimal:
+    """Returns a specific player's contribution to the pot on a given street.
+
+    NOTE: Depends on having properly tracked all actions through this point (via
+    e.g. track_chance_node and track_pokerkit_style_player_action).
+
+    Args:
+      street: The street index to get the contribution in.
+      player: The player index to get the contribution for.
+    """
+    if street >= len(self._per_street_contributions):
+      raise ValueError(
+          f"Street {street} is out of range. Expected street count is"
+          f" {len(self._per_street_contributions)}."
+      )
+    if player not in self._per_street_contributions[street]:
+      raise ValueError(
+          f"Player {player} is out of range. Expected player count is"
+          f" {len(self._per_street_contributions[0])}."
+      )
+    return decimal.Decimal(self._per_street_contributions[street][player])
+
+  def get_total_contribution_before_street(
+      self, street: int, player: int
+  ) -> decimal.Decimal:
+    """Returns a specific player's total contribution before street `street`."""
+    # +1 since we don't need to get anything on the *current* street, meaning
+    # it's ok if the street is exactly equal to the size / out of range by 1.
+    if street >= len(self._per_street_contributions) + 1:
+      raise ValueError(
+          f"Street {street} is out of range. Expected street count is"
+          f" {len(self._per_street_contributions)}."
+      )
+    total_contribution = decimal.Decimal(0.00)
+    for prior_street in range(street):
+      total_contribution += decimal.Decimal(
+          self.get_per_street_contribution(prior_street, player)
+      )
+    return total_contribution
 
   def track_chance_node(self):
     """Handles bookkeeping related to chance nodes potentially changing street.
@@ -1773,11 +1967,11 @@ class ToAcpcActionConverter:
     # else:
     self._ready_to_increment_street = False
     self._per_street_contributions.append(
-        {p: 0.0 for p in range(self._num_players)}
+        {p: decimal.Decimal(0.00) for p in range(self._num_players)}
     )
 
   def track_pokerkit_style_player_action(
-      self, player, pokerkit_style_action, size
+      self, player, pokerkit_style_action, size: int | decimal.Decimal
   ):
     """Tracks a completion bet or raise, or check or call, for the given player.
 
@@ -1881,8 +2075,11 @@ class ToAcpcActionConverter:
     # NOTE: exclusive slice to avoid including the current street's
     # contributions in the sum here.
     prior_street_contributions = self._per_street_contributions[:current_street]
-    total_prior_street_contribution = int(
-        sum(contribution[player] for contribution in prior_street_contributions)
+    total_prior_street_contribution = decimal.Decimal(
+        sum(
+            decimal.Decimal(contribution[player])
+            for contribution in prior_street_contributions
+        )
     )
     pokerkit_action_to_acpc_action_mapping = {
         pokerkit_style_action: self._convert_action_to_acpc_style(
@@ -1906,7 +2103,7 @@ class ToAcpcActionConverter:
       self,
       pokerkit_style_action: int,
       pokerkit_style_action_string: str,
-      total_prior_street_contribution: float,
+      total_prior_street_contribution: decimal.Decimal,
   ) -> int:
     """Helper convert indvidiual actions for convert_pokerkit_style_actions."""
     if pokerkit_style_action in FOLD_AND_CHECK_OR_CALL_ACTIONS:

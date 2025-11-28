@@ -99,6 +99,7 @@ struct TicTacToeActionStruct : public ActionStruct {
 class TicTacToeState : public State {
  public:
   TicTacToeState(std::shared_ptr<const Game> game);
+  TicTacToeState(std::shared_ptr<const Game> game, const nlohmann::json& json);
 
   TicTacToeState(const TicTacToeState&) = default;
   TicTacToeState& operator=(const TicTacToeState&) = default;
@@ -154,6 +155,10 @@ class TicTacToeGame : public Game {
   int NumDistinctActions() const override { return kNumCells; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new TicTacToeState(shared_from_this()));
+  }
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const {
+    return std::unique_ptr<State>(new TicTacToeState(shared_from_this(), json));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }

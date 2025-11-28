@@ -72,6 +72,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 // Includes needed for absl::optional.
 #include "pybind11/include/pybind11/detail/common.h"
@@ -398,6 +399,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("get_game", &State::GetGame)
       .def("get_type", &State::GetType)
       .def("serialize", &State::Serialize)
+      .def("starting_state", &State::StartingState)
+      .def("starting_state_str", &State::StartingStateStr)
       .def("resample_from_infostate", &State::ResampleFromInfostate)
       .def(py::pickle(              // Pickle support
           [](const State& state) {  // __getstate__
@@ -410,7 +413,11 @@ PYBIND11_MODULE(pyspiel, m) {
           }))
       .def("distribution_support", &State::DistributionSupport)
       .def("update_distribution", &State::UpdateDistribution)
-      .def("mean_field_population", &State::MeanFieldPopulation);
+      .def("mean_field_population", &State::MeanFieldPopulation)
+      .def("to_dict", [](const State& state) {
+        // Automatically casted to py::dict using pybind11_json.
+        return state.ToStruct()->to_json_base();
+      });
 
   py::classh<Game, PyGame> game(m, "Game");
   game.def(py::init<GameType, GameInfo, GameParameters>())
@@ -422,6 +429,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("new_initial_state",
            (std::unique_ptr<State>(open_spiel::Game::*)(
                                    const std::string&) const)
+           &Game::NewInitialState)
+      .def("new_initial_state",
+           (std::unique_ptr<State>(open_spiel::Game::*)(
+                                   const nlohmann::json&) const)
            &Game::NewInitialState)
       .def("new_initial_state_for_population",
            &Game::NewInitialStateForPopulation)

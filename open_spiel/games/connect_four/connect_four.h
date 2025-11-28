@@ -35,11 +35,18 @@
 // https://archive.ics.uci.edu/ml/datasets/Connect-4
 //
 // Parameters: none
+//
+//   "egocentric_obs_tensor"   bool  Enable the egocentric observation tensors
+//                                   (default: false)
+//   "rows"                    int   Number of rows (default: 6)
+//   "columns"                 int   Number of columns (default: 7)
+//   "x_in_row"                int   Number of cells in a row (default: 4)
 
 namespace open_spiel {
 namespace connect_four {
 
 // Constants.
+inline constexpr bool kDefaultEgocentricObsTensor = false;
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultNumRows = 6;
 inline constexpr int kDefaultNumCols = 7;
@@ -144,11 +151,13 @@ class ConnectFourGame : public Game {
   }
   int MaxGameLength() const override { return rows_ * cols_; }
 
+  bool egocentric_obs_tensor() const { return egocentric_obs_tensor_; }
   int rows() const { return rows_; }
   int cols() const { return cols_; }
   int x_in_row() const { return x_in_row_; }
 
  private:
+  const int egocentric_obs_tensor_;
   const int rows_;
   const int cols_;
   const int x_in_row_;

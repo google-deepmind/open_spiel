@@ -106,16 +106,18 @@ class Policy:
       interval [0..game.num_players()-1].
   """
 
-  def __init__(self, game, player_ids):
+  def __init__(self, game, player_ids, random_state=None):
     """Initializes a policy.
 
     Args:
       game: the game for which this policy applies
       player_ids: list of player ids for which this policy applies; each should
         be in the range 0..game.num_players()-1.
+      random_state: a numpy random state to use for sampling from the policy.
     """
     self.game = game
     self.player_ids = player_ids
+    self._random_state = random_state or np.random.RandomState()
 
   def action_probabilities(self, state, player_id=None):
     """Returns a dictionary {action: prob} for all legal actions.
@@ -154,6 +156,24 @@ class Policy:
       Dictionary of action: probability.
     """
     return self.action_probabilities(state, player_id)
+
+  def sample_action(self, state, player_id=None):
+    """Sample an action from the policy.
+
+    Args:
+      state: The current state of the game.
+      player_id: Optional, the player id for whom we want an action. Optional
+        unless this is a simultaneous state at which multiple players can act.
+
+    Returns:
+      A sample from the policy.
+    """
+    actions = []
+    probs = []
+    for action, prob in self.action_probabilities(state, player_id).items():
+      actions.append(action)
+      probs.append(prob)
+    return self._random_state.choice(actions, p=probs)
 
   def to_tabular(self, states=None):
     """Returns a new `TabularPolicy` equivalent to this policy.

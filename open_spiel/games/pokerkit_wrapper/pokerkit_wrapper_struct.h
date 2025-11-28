@@ -52,7 +52,7 @@ struct PokerkitStateStruct : StateStruct {
   // For more details on PHH see the following docs:
   // https://phh.readthedocs.io/en/stable/required.html
   // https://pokerkit.readthedocs.io/en/stable/notation.html#writing-hands
-  std::vector<std::vector<std::string>> poker_hand_histories = {};
+  std::vector<std::vector<std::string>> per_player_phh_actions = {};
 
   // Holds each per-player ACPC log returned by
   // pokerkit.HandHistory.to_acpc_protocol(...). Each index in the outer vector
@@ -67,14 +67,19 @@ struct PokerkitStateStruct : StateStruct {
   //
   // NOTE: Only supported for games like Texas Hold'em; not supported for games
   // like 7 Card Stud that have a bring-in.
-  std::vector<std::vector<std::vector<std::string>>> full_acpc_logs = {};
+  std::vector<std::vector<std::vector<std::string>>> per_player_acpc_logs = {};
 
   // -- The following fields are used for compatibility with code that is using
   // UniversalPokerStateStruct. --
   std::vector<int> blinds = {};
-  // NOTE: Only supported for games like Texas Hold'em; not supported for games
-  // like 7 Card Stud that have a bring-in.
-  std::string acpc_betting_history = "";
+  // Mimics the relevant section of ACPC protocol, except:
+  // - raise sizes may be in non-acpc-style "contribution on this round" format,
+  //   depending on the specific PokerkitWrapperState class being used
+  // - always lists the raise even in limit games
+  // - supports non-TexasHoldem games like 7 card stud
+  // - in games with a bring-in like 7 card stud, supports a 'b{value}' action
+  //   to record posting a bring-in.
+  std::string betting_history = "";
   std::vector<int> player_contributions = {};
   int pot_size = 0;
   std::vector<int> starting_stacks = {};
@@ -93,9 +98,9 @@ struct PokerkitStateStruct : StateStruct {
                                  legal_actions, current_player, is_terminal,
                                  stacks, bets, board_cards, hole_cards, pots,
                                  burn_cards, mucked_cards,
-                                 poker_hand_histories,
-                                 full_acpc_logs, blinds,
-                                 acpc_betting_history, player_contributions,
+                                 per_player_phh_actions,
+                                 per_player_acpc_logs, blinds, betting_history,
+                                 player_contributions,
                                  pot_size, starting_stacks);
 };
 

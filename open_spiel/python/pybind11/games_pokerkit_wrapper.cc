@@ -39,12 +39,12 @@ void open_spiel::bind_pokerkit_state_struct(py::module& m) {
       .def_readwrite("pots", &PokerkitStateStruct::pots)
       .def_readwrite("burn_cards", &PokerkitStateStruct::burn_cards)
       .def_readwrite("mucked_cards", &PokerkitStateStruct::mucked_cards)
-      .def_readwrite("poker_hand_histories",
-                     &PokerkitStateStruct::poker_hand_histories)
-      .def_readwrite("full_acpc_logs", &PokerkitStateStruct::full_acpc_logs)
+      .def_readwrite("per_player_phh_actions",
+                     &PokerkitStateStruct::per_player_phh_actions)
+      .def_readwrite("per_player_acpc_logs",
+                     &PokerkitStateStruct::per_player_acpc_logs)
       .def_readwrite("blinds", &PokerkitStateStruct::blinds)
-      .def_readwrite("acpc_betting_history",
-                     &PokerkitStateStruct::acpc_betting_history)
+      .def_readwrite("betting_history", &PokerkitStateStruct::betting_history)
       .def_readwrite("player_contributions",
                      &PokerkitStateStruct::player_contributions)
       .def_readwrite("pot_size", &PokerkitStateStruct::pot_size)

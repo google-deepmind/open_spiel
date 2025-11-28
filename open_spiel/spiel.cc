@@ -15,6 +15,7 @@
 #include "open_spiel/spiel.h"
 
 #include <algorithm>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -49,6 +50,7 @@ constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
 constexpr const char* kSerializeGameSectionHeader = "[Game]";
 constexpr const char* kSerializeGameRNGStateSectionHeader = "[GameRNGState]";
 constexpr const char* kSerializeStateSectionHeader = "[State]";
+constexpr const char* kSerializeStartingState = "starting_state=";
 
 // Returns the available parameter keys, to be used as a utility function.
 std::string ListValidParameters(
@@ -290,7 +292,8 @@ State::State(std::shared_ptr<const Game> game)
     : game_(game),
       num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
-      move_number_(0) {}
+      move_number_(0),
+      starting_state_str_() {}
 
 void NormalizePolicy(ActionsAndProbs* policy) {
   const double sum = absl::c_accumulate(
@@ -354,7 +357,12 @@ std::string State::Serialize() const {
   SPIEL_CHECK_NE(game_->GetType().chance_mode,
                  GameType::ChanceMode::kSampledStochastic);
   SPIEL_CHECK_NE(game_->GetType().dynamics, GameType::Dynamics::kMeanField);
-  return absl::StrCat(absl::StrJoin(History(), "\n"), "\n");
+  std::string starting_state_str;
+  if (!starting_state_str_.empty()) {
+    starting_state_str = absl::StrCat(
+        kSerializeStartingState, starting_state_str_, "\n");
+  }
+  return absl::StrCat(starting_state_str, absl::StrJoin(History(), "\n"), "\n");
 }
 
 Action State::StringToAction(Player player,
@@ -452,12 +460,19 @@ std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   SPIEL_CHECK_NE(game_type_.dynamics,
                  GameType::Dynamics::kMeanField);
 
-  std::unique_ptr<State> state = NewInitialState();
-  if (str.empty()) {
-    return state;
-  }
+  int serialize_starting_state_str_len = std::strlen(kSerializeStartingState);
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
-  for (int i = 0; i < lines.size(); ++i) {
+  std::unique_ptr<State> state;
+  bool skip_first_line = false;
+  if (!lines.empty() && lines[0].find(kSerializeStartingState) == 0) {
+    std::string starting_state_str =
+        lines[0].substr(serialize_starting_state_str_len);
+    state = NewInitialState(starting_state_str);
+    skip_first_line = true;
+  } else {
+    state = NewInitialState();
+  }
+  for (int i = skip_first_line ? 1 : 0; i < lines.size(); ++i) {
     if (lines[i].empty()) continue;
     if (state->IsSimultaneousNode()) {
       std::vector<Action> actions;

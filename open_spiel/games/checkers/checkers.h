@@ -29,16 +29,32 @@
 //     Dimensions of the board can be customised by calling the
 //     CheckersState(rows, columns) constructer with the desired
 //     number of rows and columns
+//
+// Parameters:
+//     rows           int    Number of rows in the board (default: 8)
+//     columns        int    Number of columns in the board (default: 8)
+//     egocentric    bool    If true, the order of planes in observation tensor
+//                           is player-relative, starting with the observing
+//                           player's plane (default: false)
+
 
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
+
 
 namespace open_spiel {
 namespace checkers {
 
+constexpr bool kDefaultEgocentric = false;
 constexpr int kNumPlayers = 2;
 constexpr int kDefaultRows = 8;
 constexpr int kDefaultColumns = 8;
@@ -117,7 +133,7 @@ class CheckersState : public State {
   }
   void UndoAction(Player player, Action action) override;
   bool InBounds(int row, int column) const;
-  void SetCustomBoard(const std::string board_string);
+  void SetCustomBoard(const std::string& board_string);
   CellState CrownStateIfLastRowReached(int row, CellState state);
   CheckersAction SpielActionToCheckersAction(Action action) const;
   Action CheckersActionToSpielAction(CheckersAction move) const;
@@ -128,7 +144,7 @@ class CheckersState : public State {
     return board_[row * columns_ + column];
   }
   std::vector<Action> LegalActions() const override;
-  int ObservationPlane(CellState state, Player player) const;
+  int ObservationPlane(CellState state, Player player, bool egocentric) const;
   int GetRow() const { return rows_; }
   int GetCollumn() const { return columns_; }
   int GetCellState() const { return kCellStates; }
@@ -168,9 +184,14 @@ class CheckersGame : public Game {
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
 
+  bool egocentric() const { return egocentric_; }
+  int rows() const { return rows_; }
+  int columns() const { return columns_; }
+
  private:
-  int rows_;
-  int columns_;
+  const bool egocentric_;
+  const int rows_;
+  const int columns_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const CellState& state);

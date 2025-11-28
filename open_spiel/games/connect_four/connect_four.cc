@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
@@ -46,7 +47,8 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"rows", GameParameter(kDefaultNumRows)},
+    {{"egocentric_obs_tensor", GameParameter(kDefaultEgocentricObsTensor)},
+     {"rows", GameParameter(kDefaultNumRows)},
      {"columns", GameParameter(kDefaultNumCols)},
      {"x_in_row", GameParameter(kDefaultXInRow)}}};
 
@@ -281,7 +283,11 @@ void ConnectFourState::ObservationTensor(Player player,
   TensorView<3> view(values, {kCellStates, game.rows(), game.cols()}, true);
   for (int r = 0; r < game.rows(); ++r) {
     for (int c = 0; c < game.cols(); ++c) {
-      view[{PlayerRelative(CellAt(r, c), player), r, c}] = 1.0;
+      if (game.egocentric_obs_tensor()) {
+        view[{PlayerRelative(CellAt(r, c), player), r, c}] = 1.0;
+      } else {
+        view[{player, r, c}] = 1.0;
+      }
     }
   }
 }
@@ -292,6 +298,8 @@ std::unique_ptr<State> ConnectFourState::Clone() const {
 
 ConnectFourGame::ConnectFourGame(const GameParameters& params)
     : Game(kGameType, params),
+      egocentric_obs_tensor_(
+          ParameterValue<bool>("egocentric_obs_tensor")),
       rows_(ParameterValue<int>("rows")),
       cols_(ParameterValue<int>("columns")),
       x_in_row_(ParameterValue<int>("x_in_row")) {}
