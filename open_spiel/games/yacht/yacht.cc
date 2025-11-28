@@ -63,8 +63,6 @@ const GameType kGameType{
     GameType::Information::kPerfectInformation,
     GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
-    /*max_num_players=*/10,
-    /*min_num_players=*/2,
     /*provides_information_state_string=*/false,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
@@ -277,6 +275,12 @@ std::vector<double> YachtState::Returns() const {
   
   int max_score = *std::max_element(scores.begin(), scores.end());
   int num_winners = std::count(scores.begin(), scores.end(), max_score);
+
+  // In solo mode score is the normalized player score
+  const double MAX_POSSIBLE_SCORE = 50 + 4 * 36 + 25 + 20 + 15 + 10 + 5;
+  if (num_players_ == 1){
+	  return std::vector<double>(1, max_score / kMaxPossibleScore);
+  }
   
   // For zero-sum: winners get positive, losers get negative
   std::vector<double> returns(num_players_);
@@ -328,50 +332,53 @@ std::string YachtState::ToString() const {
 }
 
 std::vector<int> YachtGame::ObservationTensorShape() const {
-  // Dice values (one-hot): num_dice * dice_sides
-  // Roll count (one-hot): rolls_per_turn + 1 (0, 1, 2, 3)
-  // Current player (one-hot): num_players
-  // For each player:
-  //   - Category used flags: num_categories
-  //   - Category scores: num_categories
-  int size = num_dice_ * dice_sides_ +  // dice (one-hot)
-             (rolls_per_turn_ + 1) +     // roll count (one-hot)
-             num_players_ +               // current player (one-hot)
-             num_players_ * num_categories_ * 2;  // used flags + scores
+  int size = dice_sides_ +                    // dice counts (6 values)
+             (rolls_per_turn_ + 1) +          // roll count (4 values one-hot)
+             (num_players_ > 1 ? num_players_ : 0) +  // current player
+             num_players_ * num_categories_ + // category used flags
+             num_players_;                    // total scores (normalized)
   return {size};
 }
 
 void YachtState::ObservationTensor(Player player,
                                    absl::Span<float> values) const {
+  if (IsChanceNode()) {
+    SpielFatalError("ObservationTensor called on chance node!");
+  }
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  
   std::fill(values.begin(), values.end(), 0.0f);
-  
   int offset = 0;
   
-  // Encode dice (one-hot)
-  for (int i = 0; i < num_dice_; i++) {
-    if (dice_[i] > 0) {  // 0 means not yet rolled
-      values[offset + (i * dice_sides_) + (dice_[i] - 1)] = 1.0f;
-    }
-    offset += dice_sides_;
+  // Encode dice as RAW counts (0, 1, 2, 3, 4, or 5)
+  std::vector<int> counts(dice_sides_ + 1, 0);
+  for (int die : dice_) {
+    if (die > 0) counts[die]++;
+  }
+  for (int i = 1; i <= dice_sides_; i++) {
+    values[offset++] = static_cast<float>(counts[i]);
   }
   
   // Encode roll count (one-hot)
   values[offset + roll_count_] = 1.0f;
   offset += rolls_per_turn_ + 1;
   
-  // Encode current player (one-hot)
-  values[offset + turn_player_] = 1.0f;
-  offset += num_players_;
+  // Encode current player (one-hot) - only if multiplayer
+  if (num_players_ > 1) {
+    values[offset + turn_player_] = 1.0f;
+    offset += num_players_;
+  }
   
-  // Encode category usage and scores for all players
+  // Encode category usage for all players
   for (int p = 0; p < num_players_; p++) {
     for (int c = 0; c < num_categories_; c++) {
       values[offset++] = category_used_[p][c] ? 1.0f : 0.0f;
-      values[offset++] = static_cast<float>(category_scores_[p][c]);
     }
+  }
+  
+  // Encode normalized total scores for all players
+  for (int p = 0; p < num_players_; p++) {
+    values[offset++] = static_cast<float>(total_score(p)) / kMaxPossibleScore;
   }
 }
 

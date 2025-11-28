@@ -25,15 +25,10 @@
 // can only be used once per player. The game ends after all players have
 // filled all categories.
 //
-// Note: This is Yacht, not Yahtzee. Yacht has 12 categories and different
-// scoring rules (no bonus rules, no "Yahtzee bonus" for multiple Yahtzees).
 //
 // See Reiner Knizia's "Dice Games Properly Explained" for details on Yacht
 // and other category dice games.
 //
-// This implementation is designed to be extensible to other category dice
-// games (e.g., Generala, Yatzy) by making the scoring categories and game
-// rules configurable.
 //
 // Parameters:
 //     "players"       int    number of players               (default = 2)
@@ -130,6 +125,9 @@ class YachtState : public State {
   static constexpr int kLastRerollAction = 31;  // 2^5 - 1
   static constexpr int kFirstCategoryAction = 32;
   // kLastCategoryAction = kFirstCategoryAction + num_categories_ - 1
+
+  // Score getting max possible in all categories
+  static constexpr double kMaxPossibleScore = 50 + 4 * 36 + 25 + 20 + 15 + 10 + 5;
 };
 
 class YachtGame : public Game {
