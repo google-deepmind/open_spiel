@@ -1,3 +1,4 @@
+// Copyright 2025 George Weinberg
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_YACHT_H_
-#define OPEN_SPIEL_GAMES_YACHT_H_
+#ifndef OPEN_SPIEL_GAMES_YACHT_YACHT_H_
+#define OPEN_SPIEL_GAMES_YACHT_YACHT_H_
 
 #include <memory>
 #include <string>
@@ -98,28 +99,28 @@ class YachtState : public State {
   // Current turn state
   std::vector<int> dice_;  // Current dice values (1-indexed, e.g., 1-6)
   int roll_count_ = 0;     // Number of rolls taken this turn (0-3)
-  Player turn_player_ = 0; // Whose turn it is for making decisions
-  
+  Player turn_player_ = 0;  // Whose turn it is for making decisions
+
   // Game state
   Player cur_player_ = 0;  // Current player (may be chance player)
   int total_moves_ = 0;    // Total actions taken
-  
+
   // Persistent scoring state
   // category_scores_[player][category] = score for that category
   // -1 means not yet filled
   std::vector<std::vector<int>> category_scores_;
   std::vector<std::vector<bool>> category_used_;  // Track which categories used
-  
+
   // For chance nodes - remembers which dice to reroll
   int pending_reroll_mask_ = 0;
-  
+
   // Phase tracking
   bool IsRollingPhase() const { return roll_count_ < rolls_per_turn_; }
   bool IsScoringPhase() const { return roll_count_ >= rolls_per_turn_; }
-  
+
   // Scoring helpers
   int ComputeCategoryScore(int category, const std::vector<int>& dice) const;
-  
+
   // Action space helpers
   static constexpr int kFirstRerollAction = 0;
   static constexpr int kLastRerollAction = 31;  // 2^5 - 1
@@ -127,7 +128,8 @@ class YachtState : public State {
   // kLastCategoryAction = kFirstCategoryAction + num_categories_ - 1
 
   // Score getting max possible in all categories
-  static constexpr double kMaxPossibleScore = 50 + 4 * 36 + 25 + 20 + 15 + 10 + 5;
+  static constexpr double kMaxPossibleScore = 50 + 4 * 36 + 25 + 20 + 1
+    5 + 10 + 5;
 };
 
 class YachtGame : public Game {
@@ -136,16 +138,16 @@ class YachtGame : public Game {
 
   // Actions 0-31 are reroll patterns (5-bit masks)
   // Actions 32+ are category selections
-  int NumDistinctActions() const override { 
+  int NumDistinctActions() const override {
     return 32 + num_categories_;  // 44 for standard Yacht
   }
-  
+
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new YachtState(
         shared_from_this(), num_players_, num_dice_, dice_sides_,
         rolls_per_turn_, num_categories_, sort_dice_));
   }
-  
+
   // Maximum number of distinct outcomes from a single chance event
   // In Yacht, this is rolling all dice at once
   int MaxChanceOutcomes() const override {
@@ -182,7 +184,7 @@ class YachtGame : public Game {
   int rolls_per_turn_;
   int num_categories_;
   bool sort_dice_;
-  
+
   // Category definitions (can be extended for variants)
   std::vector<Category> categories_;
   void InitializeCategories();
@@ -191,4 +193,4 @@ class YachtGame : public Game {
 }  // namespace yacht
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_YACHT_H_
+#endif  // OPEN_SPIEL_GAMES_YACHT_YACHT_H_
