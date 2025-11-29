@@ -127,9 +127,11 @@ class YachtState : public State {
   static constexpr int kFirstCategoryAction = 32;
   // kLastCategoryAction = kFirstCategoryAction + num_categories_ - 1
 
-  // Score getting max possible in all categories
-  static constexpr double kMaxPossibleScore = 50 + 4 * 36 + 25 + 20 + 1
-    5 + 10 + 5;
+  // Score getting max possible in all categories:
+  // Ones(5) + Twos(10) + Threes(15) + Fours(20) + Fives(25) +
+  // Sixes(30) + Chance(30) + 4Kind(30) + FullHouse(30) +
+  // SmStr(30) + LgStr(30) + Yacht(50)
+  static constexpr double kMaxPossibleScore = 305.0;
 };
 
 class YachtGame : public Game {
