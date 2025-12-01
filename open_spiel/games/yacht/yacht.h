@@ -33,14 +33,13 @@
 //
 // Parameters:
 //     "players"       int    number of players               (default = 2)
-//     "num_dice"      int    number of dice to roll          (default = 5)
 //     "dice_sides"    int    number of sides on each die     (default = 6)
 //     "rolls_per_turn" int   number of rolls per turn        (default = 3)
-//     "num_categories" int   number of scoring categories    (default = 12)
 //     "sort_dice"     bool   sort dice after rolling         (default = false)
 
 namespace open_spiel {
 namespace yacht {
+constexpr int kNumCategories = 12;
 
 class YachtGame;
 
@@ -56,7 +55,7 @@ class YachtState : public State {
  public:
   YachtState(const YachtState&) = default;
   YachtState(std::shared_ptr<const Game> game, int num_players, int num_dice,
-             int dice_sides, int rolls_per_turn, int num_categories,
+             int dice_sides, int rolls_per_turn,
              bool sort_dice);
 
   Player CurrentPlayer() const override;
@@ -93,8 +92,12 @@ class YachtState : public State {
   int num_dice_ = 5;
   int dice_sides_ = 6;
   int rolls_per_turn_ = 3;
-  int num_categories_ = 12;
   bool sort_dice_ = false;
+
+  // These values are for 5 six sided dice, if we play a weird variant they will change
+  double max_possible_score = 305;
+  int last_reroll_action_ = 31;
+  int first_category_action_ = 32;
 
   // Current turn state
   std::vector<int> dice_;  // Current dice values (1-indexed, e.g., 1-6)
@@ -123,31 +126,21 @@ class YachtState : public State {
 
   // Action space helpers
   static constexpr int kFirstRerollAction = 0;
-  static constexpr int kLastRerollAction = 31;  // 2^5 - 1
-  static constexpr int kFirstCategoryAction = 32;
-  // kLastCategoryAction = kFirstCategoryAction + num_categories_ - 1
 
-  // Score getting max possible in all categories:
-  // Ones(5) + Twos(10) + Threes(15) + Fours(20) + Fives(25) +
-  // Sixes(30) + Chance(30) + 4Kind(30) + FullHouse(30) +
-  // SmStr(30) + LgStr(30) + Yacht(50)
-  static constexpr double kMaxPossibleScore = 305.0;
 };
 
 class YachtGame : public Game {
  public:
-  explicit YachtGame(const GameParameters& params);
+  explicit YachtGame(const GameParameters& params),
+  num_dice_(ParameterValue<int>("num_dice"));
 
-  // Actions 0-31 are reroll patterns (5-bit masks)
-  // Actions 32+ are category selections
-  int NumDistinctActions() const override {
-    return 32 + num_categories_;  // 44 for standard Yacht
-  }
+  // Lower Actions arereroll patterns (n-bit masks)
+  int NumDistinctActions() const override;
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new YachtState(
         shared_from_this(), num_players_, num_dice_, dice_sides_,
-        rolls_per_turn_, num_categories_, sort_dice_));
+        rolls_per_turn_, sort_dice_));
   }
 
   // Maximum number of distinct outcomes from a single chance event
@@ -162,15 +155,15 @@ class YachtGame : public Game {
     return max_outcomes;
   }
 
-  // Each turn has up to 3 rolls (3 chance nodes) + 1 category choice
-  // Total turns = num_players * num_categories
+  // Each turn usually has 3 rolls (3 chance nodes) + 1 category choice
+  // Total turns = num_players * kNumCatgeories
   int MaxGameLength() const override {
-    return num_players_ * num_categories_ * (rolls_per_turn_ + 1);
+    return num_players_ * kNumCategories * (rolls_per_turn_ + 1);
   }
 
   // Each turn has up to rolls_per_turn_ chance nodes
   int MaxChanceNodesInHistory() const override {
-    return num_players_ * num_categories_ * rolls_per_turn_;
+    return num_players_ * kNumCategories * rolls_per_turn_;
   }
 
   int NumPlayers() const override { return num_players_; }
@@ -184,7 +177,6 @@ class YachtGame : public Game {
   int num_dice_;
   int dice_sides_;
   int rolls_per_turn_;
-  int num_categories_;
   bool sort_dice_;
 
   // Category definitions (can be extended for variants)
