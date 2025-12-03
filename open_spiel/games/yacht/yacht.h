@@ -40,6 +40,21 @@
 namespace open_spiel {
 namespace yacht {
 constexpr int kNumCategories = 12;
+// Yacht category indices
+enum YachtCategory {
+  kOnes = 0,
+  kTwos = 1,
+  kThrees = 2,
+  kFours = 3,
+  kFives = 4,
+  kSixes = 5,
+  kChance = 6,
+  kFourOfAKind = 7,
+  kFullHouse = 8,
+  kSmallStraight = 9,
+  kLargeStraight = 10,
+  kYacht = 11
+};
 
 class YachtGame;
 
@@ -54,10 +69,7 @@ struct Category {
 class YachtState : public State {
  public:
   YachtState(const YachtState&) = default;
-  YachtState(std::shared_ptr<const Game> game, int num_players, int num_dice,
-             int dice_sides, int rolls_per_turn,
-             bool sort_dice);
-
+  explicit YachtState(std::shared_ptr<const Game> game);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -82,6 +94,15 @@ class YachtState : public State {
     return category_scores_[player][category];
   }
   int total_score(Player player) const;
+  void SetState(int turn_player, int roll_count,
+    const std::vector<int>& dice,
+    const std::vector<std::vector<int>>& category_scores,
+    const std::vector<std::vector<bool>>& category_used);
+
+  // Scoring helpers
+  int ComputeCategoryScore(int category, const std::vector<int>& dice) const;
+  bool IsStraight(const std::vector<int>& dice, int bottom, int top) const;
+  std::vector<int> CountDice(const std::vector<int>& dice) const;
 
  protected:
   void DoApplyAction(Action move_id) override;
@@ -94,8 +115,9 @@ class YachtState : public State {
   int rolls_per_turn_ = 3;
   bool sort_dice_ = false;
 
-  // These values are for 5 six sided dice, if we play a weird variant they will change
-  double max_possible_score = 305;
+  // These values are for 5 six sided dice.
+  // If we play a weird variant they will change
+  double max_possible_score;
   int last_reroll_action_ = 31;
   int first_category_action_ = 32;
 
@@ -121,26 +143,26 @@ class YachtState : public State {
   bool IsRollingPhase() const { return roll_count_ < rolls_per_turn_; }
   bool IsScoringPhase() const { return roll_count_ >= rolls_per_turn_; }
 
-  // Scoring helpers
-  int ComputeCategoryScore(int category, const std::vector<int>& dice) const;
-
   // Action space helpers
   static constexpr int kFirstRerollAction = 0;
-
 };
 
 class YachtGame : public Game {
  public:
-  explicit YachtGame(const GameParameters& params),
-  num_dice_(ParameterValue<int>("num_dice"));
-
-  // Lower Actions arereroll patterns (n-bit masks)
+  explicit YachtGame(const GameParameters& params);
   int NumDistinctActions() const override;
 
+
+  // Getters
+  int NumPlayers() const override { return num_players_; }
+  int NumDice() const { return num_dice_; }
+  int DiceSides() const { return dice_sides_; }
+  int RollsPerTurn() const { return rolls_per_turn_; }
+  bool SortDice() const { return sort_dice_; }
+  double MaxPossibleScore() const {return max_possible_score; }
+
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new YachtState(
-        shared_from_this(), num_players_, num_dice_, dice_sides_,
-        rolls_per_turn_, sort_dice_));
+    return std::unique_ptr<State>(new YachtState(shared_from_this()));
   }
 
   // Maximum number of distinct outcomes from a single chance event
@@ -166,7 +188,6 @@ class YachtGame : public Game {
     return num_players_ * kNumCategories * rolls_per_turn_;
   }
 
-  int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -1; }
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
@@ -178,12 +199,11 @@ class YachtGame : public Game {
   int dice_sides_;
   int rolls_per_turn_;
   bool sort_dice_;
+  double max_possible_score;
 
   // Category definitions (can be extended for variants)
   std::vector<Category> categories_;
-  void InitializeCategories();
-};
-
+};  // YachtGame
 }  // namespace yacht
 }  // namespace open_spiel
 

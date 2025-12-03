@@ -39,24 +39,7 @@ constexpr bool kDefaultSortDice = false;
 
 // Action encoding
 constexpr int kFirstRerollAction = 0;
-constexpr int last_reroll_action = 31;  // 2^5 - 1
-constexpr int first_category_action = 32;
 
-// Yacht category indices (per Knizia's rules)
-enum YachtCategory {
-  kOnes = 0,
-  kTwos = 1,
-  kThrees = 2,
-  kFours = 3,
-  kFives = 4,
-  kSixes = 5,
-  kChance = 6,
-  kFourOfAKind = 7,
-  kFullHouse = 8,
-  kSmallStraight = 9,
-  kLargeStraight = 10,
-  kYacht = 11
-};
 
 // Facts about the game
 const GameType kGameType{
@@ -90,30 +73,6 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
-// Helper function to count occurrences of each die value
-std::vector<int> CountDice(const std::vector<int>& dice) {
-  std::vector<int> counts(dice_sides_ + 1, 0);  // indices 1-6 used
-  for (int die : dice) {
-    counts[die]++;
-  }
-  return counts;
-}
-
-// Helper to check if dice form a straight
-bool IsStraight(const std::vector<int>& dice, int bottom, int top) {
-  std::vector<bool> present(dice_sides_, false);
-  for (int die : dice) {
-    present[die] = true;
-  }
-
-  // Check all required numbers are present
-  for (int i = bottom; i <= top; i++) {
-    if (!present[i]) {
-      return false;
-    }
-  }
-  return true;
-}
 
 }  // namespace
 
@@ -127,7 +86,7 @@ int YachtState::ComputeCategoryScore(int category,
     case kOnes:
       return counts[1] * 1;
     case kTwos:
-      return (dice_sides_ >= 3 ? counts[2] * 2: 0);
+      return (dice_sides_ >= 2 ? counts[2] * 2: 0);
     case kThrees:
       return (dice_sides_ >= 3 ? counts[3] * 3: 0);
     case kFours:
@@ -143,17 +102,24 @@ int YachtState::ComputeCategoryScore(int category,
 
     case kFourOfAKind:
       // Sum of all dice if at least 4 of a kind
-      for (int i = 1; i <= 6; i++) {
-        if (counts[i] >= 4) return total;
+      for (int i = 1; i <= dice_sides_; i++) {
+        if (dice_sides_ >=3 && counts[i] >= 4) return total;
       }
       return 0;
 
     case kFullHouse:
-      // Sum of all dice if 3 of one kind and 2 of another (or 5 the same)
+      // Sum of all dice if 3 (or more) of one kind
+      // and 2 or more of another
+      // or 5 or more all the same
       {
         bool has_three = false, has_two = false;
-        for (int i = 1; i <= 6; i++) {
-          if (counts[i] == 3) has_three = true;
+        for (int i = 1; i <= dice_sides_; i++) {
+          if (counts[i] >=3) {
+            if (has_three) {  // second number of spots with at least 3
+              has_two = true;
+             }
+             has_three = true;
+          }
           if (counts[i] == 2) has_two = true;
           if (counts[i] >= 5) {
               has_three = true;
@@ -173,7 +139,7 @@ int YachtState::ComputeCategoryScore(int category,
 
     case kYacht:
       // 50 points if at least 5 dice are the same
-      for (int i = 1; i <= dice_sides; i++) {
+      for (int i = 1; i <= dice_sides_; i++) {
         if (counts[i] >= 5) return 50;
       }
       return 0;
@@ -184,28 +150,23 @@ int YachtState::ComputeCategoryScore(int category,
   }
 }
 
-YachtState::YachtState(std::shared_ptr<const Game> game, int num_players,
-                       int num_dice, int dice_sides, int rolls_per_turn,
-                       bool sort_dice)
-    : State(game),
-      num_players_(num_players),
-      num_dice_(num_dice),
-      dice_sides_(dice_sides),
-      rolls_per_turn_(rolls_per_turn),
-      sort_dice_(sort_dice) {
-  // set max_possible_score
-  max_possible_score = num_dice_ +  // Ones
-    (dice_sides_ >= 2 ? 2 * num_dice_ : 0) +
-    (dice_sides_ >= 3 ? 3 * num_dice_ : 0) +
-    (dice_sides_ >= 4 ? 4 * num_dice_ : 0) +
-    (dice_sides_ >= 5 ? 5 * num_dice_ : 0) +
-    (dice_sides_ >= 6 ? 6 * num_dice_ : 0) +  // Sixes
-    dice_sides_ * num_dice_ +  // Chance
-    (num_dice_ >= 4  ? num_dice_ * dice_sides_ : 0) +  // 4 of kind
-    (num_dice_ >= 5 ?  num_dice_ * dice_sides_ : 0) +  // Full House
-    ((dice_sides_ >= 5 && num_dice_ >= 5) ? 30 : 0) +  // Small Straight
-    ((dice_sides_ >= 6 && num_dice_ >= 5) ? 30 : 0) +  // Large Straight
-    50;  // yacht
+std::vector<int> YachtState::CountDice(const std::vector<int>& dice) const {
+  std::vector<int> counts(dice_sides_ + 1, 0);  // usually 1-6
+  for (int die : dice) {
+    counts[die]++;
+  }
+  return counts;
+}
+
+YachtState::YachtState(std::shared_ptr<const Game> game)
+    : State(game) {
+  const YachtGame* yacht_game = static_cast<const YachtGame*>(game.get());
+  num_players_ = yacht_game->NumPlayers();
+  num_dice_ = yacht_game->NumDice();
+  dice_sides_ = yacht_game->DiceSides();
+  rolls_per_turn_ = yacht_game->RollsPerTurn();
+  sort_dice_ = yacht_game->SortDice();
+  max_possible_score = yacht_game->MaxPossibleScore();
   last_reroll_action_ = (1 << num_dice_) - 1;
   first_category_action_ = (1 << num_dice_);
 
@@ -226,6 +187,22 @@ YachtState::YachtState(std::shared_ptr<const Game> game, int num_players,
   }
 }
 
+
+void YachtState::SetState(int turn_player, int roll_count,
+  const std::vector<int>& dice,
+  const std::vector<std::vector<int>>& category_scores,
+  const std::vector<std::vector<bool>>& category_used) {
+    // Sanity checks
+    SPIEL_CHECK_EQ(dice.size(), num_dice_);
+    SPIEL_CHECK_EQ(category_scores.size(), num_players_);
+    SPIEL_CHECK_EQ(category_used.size(), num_players_);
+    turn_player_ = turn_player;
+    roll_count_ = roll_count;
+    dice_ = dice;
+    category_scores_ = category_scores;
+    category_used_ = category_used;
+}
+
 int YachtState::total_score(Player player) const {
   return std::accumulate(category_scores_[player].begin(),
                         category_scores_[player].end(), 0);
@@ -233,6 +210,23 @@ int YachtState::total_score(Player player) const {
 
 Player YachtState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : cur_player_;
+}
+
+// Helper to check if dice form a straight
+bool YachtState::IsStraight(const std::vector<int>& dice,
+  int bottom, int top) const {
+  std::vector<bool> present(dice_sides_, false);
+  for (int die : dice) {
+    present[die] = true;
+  }
+
+  // Check all required numbers are present
+  for (int i = bottom; i <= top; i++) {
+    if (!present[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 std::string YachtState::ActionToString(Player player, Action move_id) const {
@@ -247,9 +241,9 @@ std::string YachtState::ActionToString(Player player, Action move_id) const {
       }
     }
     return absl::StrCat("Roll: ", absl::StrJoin(rolled_dice, ","));
-  } else if (move_id >= first_category_action) {
+  } else if (move_id >= first_category_action_) {
     // Category selection
-    int category = move_id - first_category_action;
+    int category = move_id - first_category_action_;
     const std::vector<std::string> category_names = {
       "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes",
       "Chance", "Four of a Kind", "Full House",
@@ -352,8 +346,8 @@ std::string YachtState::ToString() const {
 }
 
 std::vector<int> YachtGame::ObservationTensorShape() const {
-  int size = dice_sides_ +                    // dice counts (6 values)
-             (rolls_per_turn_ + 1) +          // roll count (4 values one-hot)
+  int size = dice_sides_ +                    // dice counts
+             (rolls_per_turn_ + 1) +          // roll count (one-hot)
              (num_players_ > 1 ? num_players_ : 0) +  // current player
              num_players_ * kNumCategories +  // category used flags
              num_players_;                    // total scores (normalized)
@@ -423,9 +417,9 @@ void YachtState::DoApplyAction(Action move_id) {
     cur_player_ = turn_player_;
     pending_reroll_mask_ = 0;
 
-  } else if (move_id >= first_category_action) {
+  } else if (move_id >= first_category_action_) {
     // Score in a category
-    int category = move_id - first_category_action;
+    int category = move_id - first_category_action_;
     SPIEL_CHECK_FALSE(category_used_[turn_player_][category]);
 
     category_scores_[turn_player_][category] =
@@ -436,7 +430,7 @@ void YachtState::DoApplyAction(Action move_id) {
     turn_player_ = (turn_player_ + 1) % num_players_;
     roll_count_ = 0;
     cur_player_ = kChancePlayerId;
-    pending_reroll_mask_ = (1 << num_dice) - 1;  // All dice
+    pending_reroll_mask_ = (1 << num_dice_) - 1;  // All dice
     std::fill(dice_.begin(), dice_.end(), 0);
     total_moves_++;
 
@@ -464,7 +458,7 @@ std::vector<Action> YachtState::LegalActions() const {
     std::vector<Action> actions;
     for (int c = 0; c < kNumCategories; c++) {
       if (!category_used_[turn_player_][c]) {
-        actions.push_back(first_category_action + c);
+        actions.push_back(first_category_action_ + c);
       }
     }
     return actions;
@@ -472,7 +466,7 @@ std::vector<Action> YachtState::LegalActions() const {
     // Rolling phase - choose which dice to reroll
     std::vector<Action> actions;
     // All possible reroll patterns (0 = keep all)
-    for (int mask = 0; mask <= last_reroll_action; mask++) {
+    for (int mask = 0; mask <= last_reroll_action_; mask++) {
       actions.push_back(mask);
     }
     return actions;
@@ -510,7 +504,6 @@ std::vector<std::pair<Action, double>> YachtState::ChanceOutcomes() const {
 std::unique_ptr<State> YachtState::Clone() const {
   return std::unique_ptr<State>(new YachtState(*this));
 }
-
 YachtGame::YachtGame(const GameParameters& params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),
@@ -518,6 +511,22 @@ YachtGame::YachtGame(const GameParameters& params)
       dice_sides_(ParameterValue<int>("dice_sides")),
       rolls_per_turn_(ParameterValue<int>("rolls_per_turn")),
       sort_dice_(ParameterValue<bool>("sort_dice")) {
+  // set max_possible_score
+  max_possible_score = num_dice_ +  // Ones
+    (dice_sides_ >= 2 ? 2 * num_dice_ : 0) +
+    (dice_sides_ >= 3 ? 3 * num_dice_ : 0) +
+    (dice_sides_ >= 4 ? 4 * num_dice_ : 0) +
+    (dice_sides_ >= 5 ? 5 * num_dice_ : 0) +
+    (dice_sides_ >= 6 ? 6 * num_dice_ : 0) +  // Sixes
+    dice_sides_ * num_dice_ +  // Chance
+    (num_dice_ >= 4  ? num_dice_ * dice_sides_ : 0) +  // 4 of kind
+    (num_dice_ >= 5 ?  num_dice_ * dice_sides_ : 0) +  // Full House
+    ((dice_sides_ >= 5 && num_dice_ >= 5) ? 30 : 0) +  // Small Straight
+    ((dice_sides_ >= 6 && num_dice_ >= 5) ? 30 : 0) +  // Large Straight
+    50;  // yacht
+}
+int YachtGame::NumDistinctActions() const {
+  return (1 << num_dice_) + kNumCategories;
 }
 
 }  // namespace yacht
