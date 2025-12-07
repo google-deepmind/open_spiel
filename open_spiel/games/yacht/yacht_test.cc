@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <memory>
+#include <string>
 #include <vector>
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
@@ -32,6 +33,50 @@ void BasicYachtTests() {
     testing::RandomSimTest(
         *LoadGame("yacht", {{"players", GameParameter(players)}}), 100);
   }
+}
+
+// Make sure scoring works ok for standard yacht
+void CheckScores() {
+  std::vector<std::vector<int>> category_scores = {
+    std::vector<int>(12, 0),  // vector of 12 zeros
+    std::vector<int>(12, 0)  // 1 for each player
+  };
+  std::vector<std::vector<bool>> category_used = {
+    std::vector<bool>(12, false),  // vector of 12 falses
+    std::vector<bool>(12, false)  // 1 for each player
+  };
+  GameParameters params = GameParameters();
+  std::shared_ptr<const Game> game = std::make_shared<yacht::YachtGame>(params);
+  std::unique_ptr<State> state = game->NewInitialState();
+  yacht::YachtState* yacht_state = static_cast<yacht::YachtState*>(state.get());
+  std::vector<int> dice = {5, 3, 2, 4, 1};
+  yacht_state->SetState(0, 0, dice, category_scores, category_used);
+  // small straight in knizia is 1-5 and scores 30
+  int score = yacht_state->ComputeCategoryScore(kSmallStraight, dice);
+  SPIEL_CHECK_EQ(score, 30);
+  // large is 2-6
+  SPIEL_CHECK_EQ(yacht_state->ComputeCategoryScore(kLargeStraight, dice), 0);
+  dice = {5, 3, 5, 3, 5};
+  // Full house scores sum of dice
+  SPIEL_CHECK_EQ(yacht_state->ComputeCategoryScore(kFullHouse, dice), 21);
+  dice = {5, 5, 5, 3, 5};
+  SPIEL_CHECK_EQ(yacht_state->ComputeCategoryScore(kFullHouse, dice), 0);
+  SPIEL_CHECK_EQ(yacht_state->ComputeCategoryScore(kFourOfAKind, dice), 23);
+  dice = {1, 1, 1, 1, 1};
+  SPIEL_CHECK_EQ(yacht_state->ComputeCategoryScore(kOnes, dice), 5);
+  SPIEL_CHECK_EQ(yacht_state->ComputeCategoryScore(kYacht, dice), 50);
+}
+
+// Have the nature player make a specific move
+void NatureMove() {
+  std::shared_ptr<const Game> game = LoadGame("yacht(sort_dice=true)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  auto* yacht_state = static_cast<YachtState*>(state.get());
+  // Nature should be on the move
+  yacht_state->ApplyAction(4472);  // 4, 3, 5, 2, 3 before sorting
+  std::string info = yacht_state->InformationStateString();
+  // 2, 3, 4, 4, 5 after sorting
+  SPIEL_CHECK_NE(info.find("Dice: 2 3 3 4 5"), std::string::npos);
 }
 
 void WackyDiceTest() {
@@ -72,6 +117,8 @@ void WackyDiceTest() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::yacht::NatureMove();
   open_spiel::yacht::BasicYachtTests();
+  open_spiel::yacht::CheckScores();
   open_spiel::yacht::WackyDiceTest();
 }

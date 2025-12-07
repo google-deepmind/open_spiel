@@ -504,6 +504,15 @@ std::vector<std::pair<Action, double>> YachtState::ChanceOutcomes() const {
 std::unique_ptr<State> YachtState::Clone() const {
   return std::unique_ptr<State>(new YachtState(*this));
 }
+
+std::string YachtState::InformationStateString() const {
+  return InformationStateString(CurrentPlayer());
+}
+
+std::string YachtState::InformationStateString(Player player) const {
+  return ToString();
+}
+
 YachtGame::YachtGame(const GameParameters& params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),

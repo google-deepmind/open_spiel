@@ -71,6 +71,8 @@ class YachtState : public State {
   YachtState(const YachtState&) = default;
   explicit YachtState(std::shared_ptr<const Game> game);
   Player CurrentPlayer() const override;
+  std::string InformationStateString() const;
+  std::string InformationStateString(Player player) const override;
   std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string ToString() const override;
