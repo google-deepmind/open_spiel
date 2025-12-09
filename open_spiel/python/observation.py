@@ -96,7 +96,17 @@ def make_observation(
     imperfect_information_observation_type=None,
     params=None,
 ):
-  """Returns an _Observation instance if the imperfect_information_observation_type is supported, otherwise None."""
+  """Make an observation.
+
+  Args:
+    game: a pyspiel.Game object.
+    imperfect_information_observation_type: an IIGObservationType object.
+    params: game-specific parameters for observations.
+
+  Returns:
+    An _Observation instance if the
+    imperfect_information_observation_type is supported, otherwise None.
+  """
   params = params or {}
   if hasattr(game, 'make_py_observer'):
     return game.make_py_observer(imperfect_information_observation_type, params)
@@ -113,7 +123,7 @@ def make_observation(
 
 
 class IIGObserverForPublicInfoGame:
-  """Observer for imperfect information obvservations of public-info games."""
+  """Observer for imperfect information observations of public-info games."""
 
   def __init__(self, iig_obs_type, params):
     if params:
