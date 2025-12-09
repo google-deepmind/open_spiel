@@ -39,7 +39,7 @@ jobs:
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
         - os: macos-15-intel
-          NAME: "MacOS14_Python_lte_3.11"
+          NAME: "MacOS15_Intel_Python_lte_3.11"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.11
           OS_PYTHON_VERSION: "3.11"
@@ -48,7 +48,7 @@ jobs:
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-macosx_x86_64 cp311-macosx_x86_64
         - os: macos-15-intel
-          NAME: "MacOS14_Python_gte_3.12"
+          NAME: "MacOS15_Intel_Python_gte_3.12"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.13
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
