@@ -100,6 +100,7 @@ jobs:
         run: |
           pwd
           uname -a
+          ./open_spiel/scripts/ci_python_prechecks.sh
           [[ "${OS_TYPE}" = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
           [[ "${OS_TYPE}" = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
           which g++
