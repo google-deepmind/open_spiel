@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
@@ -81,191 +80,63 @@ std::string StateToString(CellState state) {
   }
 }
 
-/* Move generation functions */
-std::vector<Action> AmazonsState::GetHorizontalMoves(Action cell) const {
-  std::vector<Action> horizontalMoves;
-
-  unsigned char col = cell % kNumRows;  // The column the cell is in
-  unsigned char left =
-      col;  // The maximum amount of spaces to check left of given cell
-  unsigned char right =
-      kNumCols - col -
-      1;  // The maximal amount of spaces to check right of given cell
-  Action focus;
-
-  // <-----X
-  // Walk until we encounter a blocking piece or end of row
-  int count = 1;
-  while (count <= left) {
-    focus = cell - count;
-    if (board_[focus] == CellState::kEmpty) {
-      horizontalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  // X---->
-  // Walk until we encounter a blocking piece or end of row
-  count = 1;
-  while (count <= right) {
-    focus = cell + count;
-    if (board_[focus] == CellState::kEmpty) {
-      horizontalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  return horizontalMoves;
-}
-
-std::vector<Action> AmazonsState::GetVerticalMoves(Action cell) const {
-  std::vector<Action> verticalMoves;
-
-  unsigned char row = cell / kNumRows;  // The row the cell is in
-  unsigned char up =
-      row;  // The maximum amount of spaces to check up of given cell
-  unsigned char down =
-      kNumRows - row -
-      1;  // The maximal amount of spaces to check down of given cell
-  Action focus;
-
-  // ^
-  // |
-  // |
-  // X
-  // Walk until we encounter a blocking piece or end of column
-  int count = 1;
-  focus = cell;
-  while (count <= up) {
-    focus -= kNumRows;
-    if (board_[focus] == CellState::kEmpty) {
-      verticalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  // X
-  // |
-  // |
-  // V
-  // Walk until we encounter a blocking piece or end of column
-  count = 1;
-  focus = cell;
-  while (count <= down) {
-    focus += kNumRows;
-    if (board_[focus] == CellState::kEmpty) {
-      verticalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  return verticalMoves;
-}
-
-std::vector<Action> AmazonsState::GetDiagonalMoves(Action cell) const {
-  std::vector<Action> diagonalMoves;
-  unsigned char col = cell % kNumCols;  // The column the cell is in
-  unsigned char row = cell / kNumRows;  // The row the cell is in
-  unsigned char upLeft = std::min(
-      row,
-      col);  // The maximum amount of spaces to check up and left of given cell
-  unsigned char upRight = std::min(
-      row,
-      (unsigned char)(kNumCols - col - 1));  // The maximum amount of spaces to
-                                             // check up and right of given cell
-  // The maximum amount of spaces to check
-  // down and left of given cell
-  unsigned char downLeft =
-      std::min(static_cast<unsigned char>(kNumRows - row - 1), col);
-  // The maximum amount of spaces to check down
-  // and right of given cell
-  unsigned char downRight =
-      std::min(static_cast<unsigned char>(kNumRows - row - 1),
-               static_cast<unsigned char>(kNumCols - col - 1));
-  Action focus;
-
-  // Up and left
-  int count = 1;
-  focus = cell;
-  while (count <= upLeft) {
-    focus -= (kNumRows + 1);
-    if (board_[focus] == CellState::kEmpty) {
-      diagonalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  // Up and right
-  count = 1;
-  focus = cell;
-  while (count <= upRight) {
-    focus -= (kNumRows - 1);
-    if (board_[focus] == CellState::kEmpty) {
-      diagonalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  // Down and left
-  count = 1;
-  focus = cell;
-  while (count <= downLeft) {
-    focus += (kNumRows - 1);
-    if (board_[focus] == CellState::kEmpty) {
-      diagonalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  // Down and right
-  count = 1;
-  focus = cell;
-  while (count <= downRight) {
-    focus += (kNumRows + 1);
-    if (board_[focus] == CellState::kEmpty) {
-      diagonalMoves.push_back(focus);
-      count++;
-    } else {
-      // We have encountered a blocking piece
-      break;
-    }
-  }
-
-  return diagonalMoves;
-}
-
 std::vector<Action> AmazonsState::GetAllMoves(Action cell) const {
-  std::vector<Action> horizontals = GetHorizontalMoves(cell);
-  std::vector<Action> verticals = GetVerticalMoves(cell);
-  std::vector<Action> diagonals = GetDiagonalMoves(cell);
+  std::vector<Action> moves;
 
-  std::vector<Action> acc = horizontals;
+  const int row = static_cast<int>(cell) / kNumCols;
+  const int col = static_cast<int>(cell) % kNumCols;
 
-  acc.insert(acc.end(), verticals.begin(), verticals.end());
-  acc.insert(acc.end(), diagonals.begin(), diagonals.end());
+  // Directions: left, right, up, down, and the four diagonals.
+  static constexpr int kDirRow[8] = {0,  0, -1, 1, -1, -1,  1,  1};
+  static constexpr int kDirCol[8] = {-1, 1,  0, 0, -1,  1, -1,  1};
 
-  return acc;
+  for (int d = 0; d < 8; ++d) {
+    int r = row + kDirRow[d];
+    int c = col + kDirCol[d];
+
+    // Walk along this ray until we leave the board or hit a non-empty cell.
+    while (r >= 0 && r < kNumRows && c >= 0 && c < kNumCols) {
+      const Action focus = r * kNumCols + c;
+      if (board_[focus] != CellState::kEmpty) {
+        break;  // blocked by amazon or arrow
+      }
+      moves.push_back(focus);
+      r += kDirRow[d];
+      c += kDirCol[d];
+    }
+  }
+
+  return moves;
+}
+
+bool AmazonsState::HasAnyMoveFromCell(Action cell) const {
+  const int row = static_cast<int>(cell) / kNumCols;
+  const int col = static_cast<int>(cell) % kNumCols;
+
+  static constexpr int kDirRow[8] = {0,  0, -1, 1, -1, -1,  1,  1};
+  static constexpr int kDirCol[8] = {-1, 1,  0, 0, -1,  1, -1,  1};
+
+  for (int d = 0; d < 8; ++d) {
+    int r = row + kDirRow[d];
+    int c = col + kDirCol[d];
+
+    while (r >= 0 && r < kNumRows && c >= 0 && c < kNumCols) {
+      const Action focus = r * kNumCols + c;
+      if (board_[focus] != CellState::kEmpty) break;  // ray blocked
+      return true;  // found at least one legal destination
+    r += kDirRow[d];
+    c += kDirCol[d];
+    }
+  }
+  return false;
+}
+
+bool AmazonsState::PlayerHasAnyMove(Player p) const {
+  const CellState mine = PlayerToState(p);
+  for (int i = 0; i < static_cast<int>(kNumCells); ++i) {
+    if (board_[i] == mine && HasAnyMoveFromCell(i)) return true;
+  }
+  return false;
 }
 
 void AmazonsState::DoApplyAction(Action action) {
@@ -275,8 +146,8 @@ void AmazonsState::DoApplyAction(Action action) {
       from_ = action;
       board_[from_] = CellState::kEmpty;
       state_ = destination_select;
+      break;
     }
-    break;
 
     case destination_select: {
       SPIEL_CHECK_EQ(board_[action], CellState::kEmpty);
@@ -293,12 +164,14 @@ void AmazonsState::DoApplyAction(Action action) {
       current_player_ = 1 - current_player_;
       state_ = amazon_select;
       // Check if game is over
-      if (LegalActions().empty()) {
-        // outcome  = winner
+      if (!PlayerHasAnyMove(current_player_)) {
         outcome_ = 1 - current_player_;
       }
+      break;
     }
-    break;
+
+    default:
+      SpielFatalError("Invalid move state in DoApplyAction");
   }
   ++num_moves_;
 }
@@ -311,22 +184,25 @@ void AmazonsState::UndoAction(Player player, Action move) {
       current_player_ = player;
       outcome_ = kInvalidPlayer;
       state_ = shot_select;
+      break;
     }
-    break;
 
     case destination_select: {
       from_ = move;
       board_[from_] = PlayerToState(player);
       state_ = amazon_select;
+      break;
     }
-    break;
 
     case shot_select: {
       to_ = move;
       board_[to_] = CellState::kEmpty;
       state_ = destination_select;
+      break;
     }
-    break;
+
+    default:
+      SpielFatalError("Invalid move state in UndoAction");
   }
 
   --num_moves_;
@@ -344,8 +220,7 @@ std::vector<Action> AmazonsState::LegalActions() const {
       for (int i = 0; i < board_.size(); i++) {
         if (board_[i] == PlayerToState(CurrentPlayer())) {
           // check if the selected amazon has a possible move
-          if (GetAllMoves(i).empty()) continue;
-
+          if (!HasAnyMoveFromCell(i)) continue;
           actions.push_back(i);
         }
       }
@@ -361,46 +236,55 @@ std::vector<Action> AmazonsState::LegalActions() const {
       break;
   }
 
-  sort(actions.begin(), actions.end());
+  std::sort(actions.begin(), actions.end());
 
   return actions;
 }
 
-std::string AmazonsState::ActionToString(Player player, Action action) const {
-  std::string str = absl::StrCat("(", (action / kNumRows) + 1, ", ",
-                                 (action % kNumRows) + 1, ")");
+std::string AmazonsState::ActionToString(Player player,
+                                         Action action) const {
+  const int row = static_cast<int>(action) / kNumCols;
+  const int col = static_cast<int>(action) % kNumCols;
+
+  std::string coord = absl::StrCat("(", row + 1, ", ", col + 1, ")");
 
   switch (state_) {
     case amazon_select:
-      return absl::StrCat(StateToString(PlayerToState(player)), " From ", str);
+      return absl::StrCat(StateToString(PlayerToState(player)),
+                          " From ", coord);
 
     case destination_select:
-      return absl::StrCat(StateToString(PlayerToState(player)), " To ", str);
+      return absl::StrCat(StateToString(PlayerToState(player)),
+                          " To ", coord);
 
     case shot_select:
       return absl::StrCat(StateToString(PlayerToState(player)),
-                          " Shoot:  ", str);
+                          " Shoot: ", coord);
   }
 
-  std::cerr << "Unhandled case in AmazonState::ActionToString, "
-            << "returning empty string." << std::endl;
-  return "";
+  // This should be unreachable.
+  SpielFatalError("Unhandled state in AmazonsState::ActionToString");
 }
 
-// Looks okay
-AmazonsState::AmazonsState(std::shared_ptr<const Game> game) : State(game) {
+AmazonsState::AmazonsState(std::shared_ptr<const Game> game)
+    : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
-  switch (kNumRows) {
-    case 6:
-      board_[1] = board_[4] = board_[6] = board_[11] = CellState::kCross;
-      board_[24] = board_[29] = board_[31] = board_[34] = CellState::kNought;
-      break;
 
-    case 8:
-      board_[2] = board_[5] = board_[16] = board_[23] = CellState::kCross;
-      board_[40] = board_[47] = board_[58] = board_[61] = CellState::kNought;
-      break;
-  }
+  // Standard Amazons is defined for a 10x10 board
+  SPIEL_CHECK_EQ(kNumRows, 10);
+  SPIEL_CHECK_EQ(kNumCols, 10);
+
+  // Player 1 (Nought, 'O') – black: a7, d10, g10, j7
+  board_[3]  = CellState::kNought;  // d10
+  board_[6]  = CellState::kNought;  // g10
+  board_[30] = CellState::kNought;  // a7
+  board_[39] = CellState::kNought;  // j7
+
+  // Player 0 (Cross, 'X') – white: a4, d1, g1, j4
+  board_[60] = CellState::kCross;   // a4
+  board_[69] = CellState::kCross;   // j4
+  board_[93] = CellState::kCross;   // d1
+  board_[96] = CellState::kCross;   // g1
 }
 
 void AmazonsState::SetState(int cur_player, MoveState move_state,
@@ -451,11 +335,15 @@ void AmazonsState::ObservationTensor(Player player,
                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
+  SPIEL_CHECK_EQ(values.size(), kCellStates * kNumCells);
 
-  // Treat `values` as a 2-d tensor.
+  // Clear tensor first.
+  std::fill(values.begin(), values.end(), 0.0f);
+
   TensorView<2> view(values, {kCellStates, kNumCells}, true);
   for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
+    const int channel = static_cast<int>(board_[cell]);
+    view[{channel, cell}] = 1.0f;
   }
 }
 
