@@ -326,7 +326,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   if [[ "$CI" ]]; then
     # Set brew to use the specific python version
     ci_check_install_python
-    brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
   python3 --version
