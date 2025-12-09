@@ -58,6 +58,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "coop_to_1p",
     "coordinated_mp",
     "crazy_eights",
+    "crazyhouse",
     "cribbage",
     "cursor_go",
     "dark_chess",

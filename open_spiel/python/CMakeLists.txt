@@ -49,6 +49,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_bridge.h
   pybind11/games_chess.cc
   pybind11/games_chess.h
+  pybind11/games_crazyhouse.cc
+  pybind11/games_crazyhouse.h
   pybind11/games_crazy_eights.cc
   pybind11/games_crazy_eights.h
   pybind11/games_colored_trails.cc
