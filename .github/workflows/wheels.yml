@@ -38,18 +38,17 @@ jobs:
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
-        # These must use the old abseil
-        - os: macOS-13
+        - os: macOS-14
           NAME: "MacOS13_Python_lte_3.11"
           OS_TYPE: "Darwin"
           CI_PYBIN: "python3.10"
           OS_PYTHON_VERSION: "3.10"
-          OPEN_SPIEL_ABSL_VERSION: "20230125.0"
+          OPEN_SPIEL_ABSL_VERSION: "20250127.0"
           CIBW_VERSION: 2.23.3
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp310-macosx_x86_64 cp311-macosx_x86_64
         # These use the new abseil
-        - os: macOS-13
+        - os: macOS-14
           NAME: "MacOS13_Python_gte_3.12"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.12
