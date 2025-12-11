@@ -26,7 +26,7 @@ from open_spiel.python.pytorch import deep_cfr
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_iterations", 400, "Number of iterations")
-flags.DEFINE_integer("num_traversals", 40, "Number of traversals/games")
+flags.DEFINE_integer("num_traversals", 160, "Number of traversals/games")
 flags.DEFINE_string("game_name", "kuhn_poker", "Name of the game")
 
 
@@ -41,9 +41,12 @@ def main(unused_argv):
       num_iterations=FLAGS.num_iterations,
       num_traversals=FLAGS.num_traversals,
       learning_rate=1e-3,
-      batch_size_advantage=None,
+      batch_size_advantage=512,
       batch_size_strategy=None,
-      memory_capacity=int(1e7))
+      memory_capacity=int(1e7),
+      reinitialize_advantage_networks=False,
+      policy_network_train_steps=100
+      )
 
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()
   for player, losses in advantage_losses.items():
