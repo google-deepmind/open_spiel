@@ -1,4 +1,3 @@
-import functools
 import os
 from typing import Sequence, Optional, Callable
 import warnings
@@ -149,10 +148,10 @@ class PolicyHead(nn.Module):
       self.torso = nn.Sequential(
         ConvBlock(in_features, 2, (1, 1), activation, seed),
         Flatten(),
-        nn.Linear(np.prod(space_features) * 2, nn_width, rngs=nn.Rngs(seed))
+        MLPBlock(np.prod(space_features) * 2, nn_width, activation, seed)
       )
     
-    self.policy_head = nn.Linear(nn_width, out_features, rngs=nn.Rngs(seed))
+    self.policy_head = MLPBlock(nn_width, out_features, None, seed)
   
   def __call__(self, x: chex.Array) -> chex.Array:
     y = self.torso(x)
@@ -177,15 +176,14 @@ class ValueHead(nn.Module):
       self.torso = MLPBlock(in_features, nn_width, activation, seed)
     else:
       self.torso = nn.Sequential(
-        ConvBlock(in_features, 1, kernel_size = (1, 1), activation=activation),
+        ConvBlock(in_features, 1, (1, 1), activation),
         Flatten(),
-        nn.Linear(np.prod(space_features) * 1, nn_width, rngs=nn.Rngs(seed))
+        MLPBlock(np.prod(space_features) * 1, nn_width, activation, seed)
       )
 
     self.value_head = MLPBlock(nn_width, 1, "tanh", seed=seed)
     
     
-  
   def __call__(self, x: chex.Array) -> chex.Array:
     y = self.torso(x)
     values = self.value_head(y)
@@ -263,13 +261,13 @@ class AlphaZeroModel(nn.Module):
      self.torso = nn.Sequential( 
         lambda x: x.reshape(input_shape),
         ConvBlock(input_shape[-1], nn_width, (3, 3), activation, seed=seed), *[
-        ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(1, nn_depth)
+        ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(nn_depth)
       ])
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
     
-    self.policy_head = PolicyHead((*input_shape[:-1], nn_width), nn_width, output_size, model_type, activation, seed=seed)
-    self.value_head = ValueHead((*input_shape[:-1], nn_width), nn_width, model_type, activation, seed=seed)
+    self.policy_head = PolicyHead((*input_shape[:-1], nn_width), nn_width, output_size, model_type, activation, seed)
+    self.value_head = ValueHead((*input_shape[:-1], nn_width), nn_width, model_type, activation, seed)
 
   def __call__(self, observations: chex.Array) -> tuple[chex.Array, chex.Array]:
 
@@ -349,7 +347,7 @@ class Model:
       nn_depth = nn_depth
     )
     
-    optimizer = optax.adam(learning_rate=learning_rate)
+    optimizer = optax.adamw(learning_rate=learning_rate, weight_decay=weight_decay)
     state = cls._create_train_state(model, optimizer)    
 
     @jax.jit
@@ -360,19 +358,21 @@ class Model:
         model.train()
 
         policy_logits, value_preds = forward(model, observations)
-        policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
-        policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
+        policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
+        
+        policy_loss =  jax.vmap(optax.safe_softmax_cross_entropy)(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
 
         l2_reg_loss = jax.tree.reduce(
           operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0) * weight_decay
         
-        total_loss = policy_loss + value_loss + l2_reg_loss
+        total_loss = policy_loss + value_loss
 
         batch_stats = get_batch_stats(model)   
         return total_loss, (policy_loss, value_loss, l2_reg_loss, batch_stats)
 
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
+
       (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
         state.params, observations, legals_mask, policy_targets, value_targets)
       
@@ -416,7 +416,7 @@ class Model:
 
     policy_logits, value = forward(model, observation)
     
-    policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
+    policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
     policy = nn.softmax(policy_logits, axis=-1)
 
     return value, policy

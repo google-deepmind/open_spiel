@@ -22,8 +22,8 @@ import numpy as np
 import jax.numpy as jnp
 import flax.linen as linen
 import flax.nnx as nnx
+import jax
 
-#TODO: add parametrised tests for the selection of the API
 from open_spiel.python.algorithms.alpha_zero.utils import (
   AVIALABLE_APIS, TrainInput, api_selector, linen_to_nnx, nnx_to_linen)
 
@@ -51,10 +51,10 @@ def solve_game(state):
   policy = np.zeros_like(act_mask)
   policy[best_actions[0][0]] = 1  # Choose the first for a deterministic policy.
   solved[state_str] = TrainInput(
-    observation=jnp.array(obs), 
-    legals_mask=jnp.array(act_mask), 
-    policy=jnp.array(policy), 
-    value=jnp.array(value)
+    observation=jnp.array(obs, dtype=jnp.float32), 
+    legals_mask=jnp.array(act_mask, dtype=jnp.bool), 
+    policy=jnp.array(policy, dtype=jnp.float32), 
+    value=jnp.array(value, dtype=jnp.float32)
   )
   return value
 

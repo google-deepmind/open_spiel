@@ -129,7 +129,7 @@ def extend(
  )
 
 
-def sample(
+def sample_seq(
   state: BufferState,
   rng_key: chex.PRNGKey,
   count: int
@@ -154,6 +154,15 @@ def sample(
   batch_trajectory = jax.tree.map(lambda x: x[traj_indices], state.experience)
 
   return state, BufferSample(experience=batch_trajectory), traj_indices
+
+def sample_random(
+  state: BufferState,
+  rng_key: chex.PRNGKey,
+  count: int
+) -> BufferSample:
+  traj_indices = jax.random.choice(rng_key, jnp.arange(get_tree_shape_prefix(state.experience)[0]), shape=(count,))
+  batch_trajectory = jax.tree.map(lambda x: x[traj_indices], state.experience)
+  return state, batch_trajectory, traj_indices
 
 
 def can_sample(
@@ -241,7 +250,7 @@ def make_flat_buffer(max_size: int) -> FlatBuffer:
    return FlatBuffer(
       init=partial(init, max_size=max_size),
       extend=extend,
-      sample=sample,
+      sample=sample_random,
       can_sample=can_sample,
       can_add=can_add
    )
@@ -280,22 +289,23 @@ class Buffer:
     
     max_size = get_tree_shape_prefix(self.buffer_state.experience)[0]
     # Queue length: add unless it's full, but keep unchanged further
-    return jnp.where(self.buffer_state.is_full, max_size, self.buffer_state.write_index).item()
+    return jnp.where(self.buffer_state.is_full, max_size, self.buffer_state.write_index).item() 
 
   def __bool__(self) -> bool:
     if self.buffer_state is None:
         return False
     
-    return bool(self.buffer.can_sample(self.buffer_state, 1))
+    return True #bool(self.buffer.can_sample(self.buffer_state, 1))
 
   def append(self, val: Any) -> None:
     
     if self.buffer_state is None:
-       self.buffer_state = self.buffer.init(val)
+      self.buffer_state = self.buffer.init(val)
 
-    batched_val = jax.tree.map(lambda x: jnp.array(x)[None, ...], val)
+    batched_val = jax.tree.map(lambda x: jnp.array(x)[jnp.newaxis, ...], val)
 
     self.buffer_state = self.buffer.extend(self.buffer_state, batched_val)
+    self.total_seen = self.buffer_state.total_seen
 
   def extend(self, val: Any) -> None:
     if self.buffer_state is None:
@@ -310,20 +320,10 @@ class Buffer:
     self.total_seen = self.buffer_state.total_seen
 
   def sample(self, count: int) -> Any:
-    if True: #self.buffer.can_sample(self.buffer_state, count):
-      self._rng, rng = jax.random.split(self._rng)
+    self._rng, rng = jax.random.split(self._rng) 
 
-      buffer_state = self.buffer_state.replace(experience=jax.lax.cond(
-          self.sequential,
-          lambda x, rng: x,
-          lambda x, rng: jax.tree.map(lambda y: jax.random.permutation(rng, y, axis=0), x),
-          self.buffer_state.experience, rng
-        )
-      )
-
-      # indices are returned for debug purposes only
-      self.buffer_state, batch, indices = self.buffer.sample( # pylint: disable=possibly-unused-variable
-        buffer_state, self._rng, count) 
-
-      # To keep experiences at random, let them be shuffled
-      return batch.experience
+    # indices are returned for debug purposes only
+    self.buffer_state, batch, indices = self.buffer.sample( # pylint: disable=possibly-unused-variable
+      self.buffer_state, rng, count) 
+    
+    return batch

@@ -199,7 +199,7 @@ def _init_bot(config, game, evaluator_, evaluation):
 
 def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
   """Play one game, return the trajectory."""
-  trajectory = []
+  trajectory_states = []
   actions = []
   state = game.new_initial_state()
   random_state = np.random.RandomState()
@@ -227,26 +227,26 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       else:
         action = np.random.choice(len(policy), p=policy)
 
-      trajectory.append(
-          TrajectoryState(
-            observation=jnp.array(state.observation_tensor()), 
-            current_player=jnp.array(state.current_player(), dtype=int),
-            legals_mask=jnp.array(state.legal_actions_mask(), dtype=jnp.bool), 
-            action=jnp.array(action, dtype=int), 
-            policy=jnp.array(policy, dtype=jnp.float32),
-            value=jnp.array(root.total_reward / root.explore_count, dtype=jnp.float32)
-          )
+      trajectory_states.append(
+        TrajectoryState(
+          observation=jnp.array(state.observation_tensor(), dtype=jnp.float32), 
+          current_player=jnp.array(state.current_player(), dtype=int),
+          legals_mask=jnp.array(state.legal_actions_mask(), dtype=jnp.bool), 
+          action=jnp.array(action, dtype=float), 
+          policy=jnp.array(policy, dtype=jnp.float32),
+          value=jnp.array(root.total_reward / root.explore_count, dtype=jnp.float32)
         )
+      )
       
       action_str = state.action_to_string(state.current_player(), action)
       actions.append(action_str)
-      logger.opt_print("Player {} sampled action: {}".format(
-          state.current_player(), action_str))
+      logger.opt_print(f"Player {state.current_player()} sampled action: {action_str}")
       state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
   #it's not good to do like that but it's python.
+
   trajectory = Trajectory(
-    states=trajectory,
+    states=trajectory_states,
     returns=jnp.array(state.returns())
   )
   logger.print("Game {}: Returns: {}; Actions: {}".format(
@@ -337,13 +337,14 @@ def evaluator(*, game, config, logger, queue):
 def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
   logger.also_to_stdout = True
+
   replay_buffer = buffer_lib.Buffer(config.replay_buffer_size, sequential=False) #only this
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
-  logger.print("Model type: %s(%s, %s)" % (config.nn_model, config.nn_width,
-                                           config.nn_depth))
+  logger.print(f"Model type: {config.nn_model}({config.nn_width}, {config.nn_depth})")
   logger.print("Model size:", model.num_trainable_variables, "variables")
+  
   save_path = model.save_checkpoint(0)
   logger.print("Initial checkpoint:", save_path)
   broadcast_fn(str(save_path))
@@ -493,7 +494,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         "value_accuracy": [v.as_dict for v in value_accuracies],
         "value_prediction": [v.as_dict for v in value_predictions],
         "eval": {
-            "count": evals[0].total_seen,
+            "count": evals[0].total_seen.item(),
             "results": [tree_sum(e.data, 0).item() / len(e) if e else 0 for e in evals],
         },
         "batch_size": batch_size_stats.as_dict,

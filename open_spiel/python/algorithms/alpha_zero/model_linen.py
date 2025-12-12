@@ -13,6 +13,7 @@ import optax
 import chex
 import orbax
 from flax.training import train_state, orbax_utils
+from flax.traverse_util import flatten_dict
 import orbax.checkpoint
 
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
@@ -62,6 +63,7 @@ class MLPBlock(nn.Module):
 
   @nn.compact
   def __call__(self, x: chex.Array) -> chex.Array:
+    # kernel_init=nn.initializers.glorot_normal()
     y = nn.Dense(features=self.features)(x)
     y = Activation(self.activation)(y)
     return y
@@ -73,6 +75,7 @@ class ConvBlock(nn.Module):
 
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
+    # kernel_init=nn.initializers.glorot_uniform()
     y = nn.Conv(features=self.features, kernel_size=self.kernel_size, padding='SAME')(x)
     y = nn.BatchNorm(use_running_average=not training, axis_name="batch")(y)
     y = Activation(self.activation)(y)
@@ -101,13 +104,12 @@ class PolicyHead(nn.Module):
   
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
-    if self.model_type == "mlp":
-      x = MLPBlock(self.nn_width, activation=self.activation)(x)
-    else:
-      x = ConvBlock(features = 2, kernel_size = (1, 1))(x, training)
+    if self.model_type != "mlp":
+      x = ConvBlock(features = 2, kernel_size = (1, 1), activation=self.activation)(x, training)
       x = flatten(x)
 
-    policy_logits = nn.Dense(features=self.output_size)(x)
+    x = MLPBlock(self.nn_width, activation=self.activation)(x)
+    policy_logits = MLPBlock(self.output_size, None)(x)
     return policy_logits
 
 
@@ -118,11 +120,10 @@ class ValueHead(nn.Module):
   
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
-
     if self.model_type != "mlp":
       x = ConvBlock(features = 1, kernel_size = (1, 1), activation=self.activation)(x, training)
       x = flatten(x)
-    
+
     x = MLPBlock(self.nn_width, self.activation)(x)
     values = MLPBlock(1, "tanh")(x)
     return values
@@ -134,7 +135,7 @@ class ValueHead(nn.Module):
   in_axes=(0, None),
   out_axes=0,
   variable_axes={'params': None, 'batch_stats': None}, # `None` means these collections are shared
-  split_rngs={'params': False,}, # Rngs for params are shared, but for dropout, they are split
+  split_rngs={'params': False, }, # Rngs for params are shared, but for dropout, they are split
   axis_name="batch"
 )
 class AlphaZeroModel(nn.Module):
@@ -181,7 +182,6 @@ class AlphaZeroModel(nn.Module):
   def __call__(self, observations: chex.Array, training: bool = False) -> tuple[chex.Array, chex.Array]:
 
     # torso:
-    # TODO: may also in the future replace the for-loop iteration with nn.scan
     x = observations
     if self.model_type == "mlp":
       x = flatten(observations)
@@ -194,9 +194,8 @@ class AlphaZeroModel(nn.Module):
     elif self.model_type == "resnet":
       x = observations.reshape(self.input_shape)
       x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
-      for _ in range(1, self.nn_depth):
+      for _ in range(self.nn_depth):
         x = ResidualBlock(filters=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
-
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
     
@@ -208,7 +207,6 @@ class AlphaZeroModel(nn.Module):
 
 class TrainState(train_state.TrainState):
   batch_stats: Any
-
 
 class Model:
   valid_model_types = ['mlp', 'conv2d', 'resnet']
@@ -267,7 +265,7 @@ class Model:
       nn_depth = nn_depth
     )
     
-    optimizer = optax.adam(learning_rate=learning_rate)
+    optimizer = optax.adamw(learning_rate=learning_rate, weight_decay=weight_decay)
     rng = jax.random.PRNGKey(seed)
     variables = model.init(rng, jnp.ones((1, *input_shape)), False)
 
@@ -276,25 +274,39 @@ class Model:
     @jax.jit
     def update_step_fn(state, observations, legals_mask, policy_targets, value_targets):
       
+      def calculate_kernel_l2_loss(params, weight_decay):
+        flat_params_with_keys = flatten_dict(params).items()
+        kernel_weights = [
+            value for key_path, value in flat_params_with_keys
+            if 'bias' not in key_path
+        ]
+        
+        # Sum the squared L2 norms of all kernel parameters
+        l2_term = sum(jnp.sum(w**2) for w in kernel_weights)
+        return weight_decay * l2_term
+      
       def loss_fn(params, batch_stats, observations, legals_mask, policy_targets, value_targets):
         variables = {'params': params, 'batch_stats': batch_stats}
+        
         (policy_logits, value_preds), new_model_state = state.apply_fn(variables, observations, True, mutable=['batch_stats'])
-        policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
-        policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
-        value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
+        policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
+        
+        policy_loss =  jax.vmap(optax.safe_softmax_cross_entropy)(policy_logits, policy_targets).mean()
+        value_loss = jax.vmap(optax.l2_loss)(value_preds, value_targets).mean()
         
         l2_reg_loss = jax.tree.reduce(
-          operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0) * weight_decay
+          operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0.) * weight_decay
+
+        # l2_reg_loss = calculate_kernel_l2_loss(params, weight_decay)
         
-        total_loss = policy_loss + value_loss + l2_reg_loss      
+        total_loss = policy_loss + value_loss      
         return total_loss, (policy_loss, value_loss, l2_reg_loss, new_model_state['batch_stats'])
     
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
       (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
         state.params, state.batch_stats, observations, legals_mask, policy_targets, value_targets)
-      
-      new_state = state.apply_gradients(grads=grads)
-      new_state = new_state.replace(batch_stats=new_batch_stats)
+    
+      new_state = state.apply_gradients(grads=grads, batch_stats=new_batch_stats)
       return new_state, (policy_loss, value_loss, l2_reg_loss)
     
     return cls(model, state, path, update_step_fn)
@@ -330,17 +342,21 @@ class Model:
     policy_logits, value = self._state.apply_fn(
         {'params': self._state.params, 'batch_stats': self._state.batch_stats}, observation, False, mutable=False)
     
-    policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
+    policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
     policy = nn.softmax(policy_logits, axis=-1)
 
     return value, policy
   
   def update(self, batch: Sequence[TrainInput]) -> Losses:
-    self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
+
+    self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
+      self._state, batch.observation, batch.legals_mask, batch.policy, batch.value
+    )
     
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
   def save_checkpoint(self, step: int) -> int:
+    jax.block_until_ready(self._state)
     path = os.path.join(self._path, f"checkpoint-{step}")
     self._checkpointer.save(path, self._state, save_args=orbax_utils.save_args_from_target(self._state), force=True)
     return step
@@ -349,4 +365,5 @@ class Model:
     target = self._state
     path = os.path.join(self._path, f"checkpoint-{step}")
     self._state = self._checkpointer.restore(path, item=target)
+    jax.block_until_ready(self._state)
     return self._state
