@@ -40,7 +40,54 @@ namespace crazyhouse {
 namespace {
 constexpr const char* kShredderWhiteCastlingFiles = "ABCDEFGH";
 constexpr const char* kShredderBlackCastlingFiles = "abcdefgh";
+inline int PocketIndexForPieceType(PieceType type) {
+  switch (type) {
+    case PieceType::kPawn:   return 0;
+    case PieceType::kKnight: return 1;
+    case PieceType::kBishop: return 2;
+    case PieceType::kRook:   return 3;
+    case PieceType::kQueen:  return 4;
+    case PieceType::kKnightP: return 1;
+    case PieceType::kBishopP: return 2;
+    case PieceType::kRookP: return 3;
+    case PieceType::kQueenP: return 4;
+    default:      return -1;  // King not pocketable
+  }
 }
+
+inline PieceType DropPieceTypeFromIndex(int index) {
+	switch(index) {
+		case 0:
+			return PieceType::kPawn;
+		case 1:
+			return PieceType::kKnight;
+		case 2:
+			return PieceType::kBishop;
+		case 3:
+			return PieceType::kRook;
+		case 4:
+			return PieceType::kQueen;
+		default:
+			 return PieceType::kEmpty;
+	}
+}
+
+
+inline PieceType PromotedType(PieceType type) {
+	  switch (type) {
+		  case PieceType::kKnight: return PieceType::kKnightP;
+		  case PieceType::kBishop: return PieceType::kBishopP;
+		  case PieceType::kRook: return PieceType::kRookP;
+		  case PieceType::kQueen: return PieceType::kQueenP;
+	  }
+}
+
+
+PieceType DropPieceType(const Move& m) {
+    return DropPieceTypeFromIndex(m.from.y);
+}
+
+}  // namespace
 
 bool IsMoveCharacter(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
@@ -106,6 +153,14 @@ std::string PieceTypeToString(PieceType p, bool uppercase) {
       return uppercase ? "Q" : "q";
     case PieceType::kKing:
       return uppercase ? "K" : "k";
+    case PieceType::kQueenP:
+      return uppercase ? "Q+" : "q+";
+    case PieceType::kRookP:
+      return uppercase ? "R+" : "r+";
+    case PieceType::kBishopP:
+      return uppercase ? "B+" : "b+";
+    case PieceType::kKnightP:
+      return uppercase ? "N+" : "n+";
     default:
       SpielFatalError("Unknown piece.");
       return "This will never return.";
@@ -364,7 +419,8 @@ std::string Move::ToSAN(const CrazyhouseBoard &board) const {
 }
 
 CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
-                       bool allow_pass_move)
+                       bool allow_pass_move, 
+					   int insanity, bool sticky_promotions, bool tsume)
     : board_size_(board_size),
       king_in_check_allowed_(king_in_check_allowed),
       allow_pass_move_(allow_pass_move),
@@ -372,8 +428,15 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
       ep_square_(kInvalidSquare),
       irreversible_move_counter_(0),
       move_number_(1),
-      zobrist_hash_(0) {
+      zobrist_hash_(0),
+	  insanity_(insanity),
+	  sticky_promotions_(sticky_promotions),
+	  tsume_(tsume)
+{
+  
   board_.fill(kEmptyPiece);
+  white_pocket_.fill(0);
+  black_pocket_.fill(0);
 }
 
 /*static*/ absl::optional<CrazyhouseBoard> CrazyhouseBoard::BoardFromFEN(
@@ -586,6 +649,8 @@ void CrazyhouseBoard::GeneratePseudoLegalMoves(
 
   if (allow_pass_move_) YIELD(kPassMove);
 
+  GenerateDropDestinations_(color, settings, yield);
+
   for (int8_t y = 0; y < board_size_ && generating; ++y) {
     for (int8_t x = 0; x < board_size_ && generating; ++x) {
       Square sq{x, y};
@@ -737,6 +802,46 @@ void CrazyhouseBoard::GeneratePseudoLegalPawnCaptures(
   }
 
 #undef YIELD
+}
+
+template <typename YieldFn>
+void CrazyhouseBoard::GenerateDropDestinations_(
+    Color player,
+    const PseudoLegalMoveSettings& settings,
+    const YieldFn& yield) const 
+{
+  // Get the pocket for the player
+  const std::array<int, 5>& pocket =
+      (player == Color::kWhite ? white_pocket_ : black_pocket_);
+
+  // Loop over drop-capable piece types
+  for (int pindex = 0; pindex < 5; ++pindex) {
+    if (pocket[pindex] <= 0) continue;
+
+    PieceType ptype = DropPieceTypeFromIndex(pindex);
+
+    for (int y = 0; y < board_size_; ++y) {
+      for (int x = 0; x < board_size_; ++x) {
+        Square sq{x, y};
+
+        // Only drop on empty squares
+        if (at(sq) != kEmptyPiece) continue;
+
+        // Pawn drop restriction
+        if (ptype == PieceType::kPawn && (y == 0 || y == board_size_ - 1))
+          continue;
+
+        // Build the Move
+        Move m;
+        m.from = Square{static_cast<int8_t>(board_size_),  // sentinel X
+                        static_cast<int8_t>(pindex)};      // piece index in Y
+        m.to = sq;
+
+        // Output the move
+        yield(m);
+      }
+    }
+  }
 }
 
 bool CrazyhouseBoard::IsBreachingMove(Move tested_move) const {
@@ -1143,14 +1248,34 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   // There are a few exceptions - castling, en passant, promotions, double pawn
   // pushes. They require special adjustments in addition to those things. We
   // do them after the basic apply move.
-
-  Piece moving_piece = at(move.from);
+  Piece moving_piece;
   Piece destination_piece = at(move.to);
 
-  // We have to do it in this order because in Chess960 the king can castle
+  if (IsDropMove(move)){
+	  PieceType from_type = DropPieceType(move);
+	  moving_piece =  Piece{to_play_, from_type};
+	  if (to_play_ == Color::kBlack) {
+		  black_pocket_[move.from.y] -= 1;
+	  } else {
+		  white_pocket_[move.from.y] -= 1;
+	  }
+
+  } else {
+	   moving_piece = at(move.from);
+	   set_square(move.from, kEmptyPiece);
+  }
+
+  // Must change move.from before move.to because in Chess960 the king can castle
   // in-place! That's the only possibility for move.from == move.to.
-  set_square(move.from, kEmptyPiece);
   set_square(move.to, moving_piece);
+  // Increment pockets for capture
+  if (destination_piece !=  kEmptyPiece) {
+	  if (to_play_ == Color::kBlack) {
+		  black_pocket_[PocketIndexForPieceType(destination_piece.type)] += insanity_;
+      } else {
+		  black_pocket_[PocketIndexForPieceType(destination_piece.type)] += insanity_;
+	  }
+  }
 
   // Whether the move is irreversible for the purpose of the 50-moves rule. Note
   // that although castling (and losing castling rights) should be irreversible,
@@ -1258,7 +1383,13 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
 
   // 3. Promotions
   if (moving_piece.type == PieceType::kPawn && IsPawnPromotionRank(move.to)) {
-    set_square(move.to, Piece{at(move.to).color, move.promotion_type});
+	PieceType promoted_type;
+	if (sticky_promotions_) {
+		promoted_type = move.promotion_type;
+	} else {
+		promoted_type = PromotedType(move.promotion_type);
+	}
+    set_square(move.to, Piece{at(move.to).color, promoted_type});
   }
 
   // 4. Double push

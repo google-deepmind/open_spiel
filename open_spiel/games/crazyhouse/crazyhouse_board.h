@@ -63,7 +63,11 @@ enum class PieceType : int8_t {
   kRook = 3,
   kBishop = 4,
   kKnight = 5,
-  kPawn = 6
+  kPawn = 6,
+  kQueenP = 7,
+  kRookP = 8,
+  kBishopP = 9,
+  kKnightP = 10
 };
 
 static inline constexpr std::array<PieceType, 6> kPieceTypes = {
@@ -258,7 +262,11 @@ class CrazyhouseBoard {
  public:
   CrazyhouseBoard(int board_size = kDefaultBoardSize,
              bool king_in_check_allowed = false,
-             bool allow_pass_move = false);
+             bool allow_pass_move = false,
+			 int insanity = 1,
+			 bool sticky_promotions = false,
+			 bool tsume = false
+	  );
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
@@ -321,6 +329,11 @@ class CrazyhouseBoard {
       const MoveYieldFn& yield, Color color,
       PseudoLegalMoveSettings settings =
           PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
+
+  // counts of pocket pieces by type
+  // Pawn, Knight, Bishop, Rook, Queen 
+  std::array<int, 5> white_pocket_;  // counts of pocket pieces by type
+  std::array<int, 5> black_pocket_;
 
   bool HasLegalMoves() const {
     bool found = false;
@@ -423,6 +436,10 @@ class CrazyhouseBoard {
 
   bool InCheck() const {
     return UnderAttack(find(Piece{to_play_, PieceType::kKing}), to_play_);
+  }
+
+  bool IsDropMove(const Move& m) const {
+    return m.from.x >= board_size_;
   }
 
   int BoardSize() const { return board_size_; }
@@ -538,6 +555,11 @@ class CrazyhouseBoard {
                                 PseudoLegalMoveSettings settings,
                                 Offset offset_step, const YieldFn& yield) const;
 
+  template <typename YieldFn>
+  void GenerateDropDestinations_(Color player,
+                               const PseudoLegalMoveSettings& settings,
+                               const YieldFn& yield) const;
+
   void SetIrreversibleMoveCounter(int c);
   void SetMovenumber(int move_number);
   bool EpSquareThreatened(Square ep_square) const;
@@ -563,6 +585,10 @@ class CrazyhouseBoard {
   } castling_rights_[2];
 
   uint64_t zobrist_hash_;
+  int insanity_;
+  bool sticky_promotions_;
+  bool tsume_ = false;
+
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const CrazyhouseBoard& board) {

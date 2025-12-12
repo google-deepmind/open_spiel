@@ -47,11 +47,11 @@ inline constexpr double LossUtility() { return -1; }
 inline constexpr double DrawUtility() { return 0; }
 inline constexpr double WinUtility() { return 1; }
 
-inline constexpr int NumDistinctActions() { return 4674; }
+inline constexpr int NumDistinctActions() { return 4978; }
 inline constexpr int kLeftCastlingAction = 4672;
 inline constexpr int kRightCastlingAction = 4673;
 
-// https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
+// Keep the same value as for chess, nobody cares
 inline constexpr int MaxGameLength() { return 17695; }
 
 inline const std::vector<int>& ObservationTensorShape() {
@@ -64,6 +64,9 @@ inline const std::vector<int>& ObservationTensorShape() {
 }
 
 constexpr bool kDefaultChess960 = false;
+constexpr bool kDefaultStickyPromotions = false;
+constexpr bool kDefaultTsume = false;
+constexpr int kDefaultInsanity = 1;
 
 // Returns a list of all possible starting positions in chess960.
 std::vector<std::string> Chess960StartingPositions();
@@ -276,9 +279,16 @@ class CrazyhouseGame : public Game {
     SPIEL_CHECK_LT(index, initial_fens_.size());
     return initial_fens_[index];
   }
+  int Insanity() const { return insanity_; }
+  bool StickyPromotions() const { return sticky_promotions_; }
+  bool Tsume() const { return tsume_; }
+
 
  private:
   bool chess960_;
+  bool sticky_promotions_;
+  bool tsume_;
+  int insanity_;
   std::vector<std::string> initial_fens_;  // Used for chess960.
 };
 

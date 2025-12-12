@@ -59,7 +59,10 @@ const GameType kGameType{/*short_name=*/"crazyhouse",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"chess960", GameParameter(kDefaultChess960)}}};
+                         {{"chess960", GameParameter(kDefaultChess960)},
+							 {"insanity", GameParameter(kDefaultInsanity)},
+							 {"sticky_promotions", GameParameter(kDefaultStickyPromotions)},
+							 {"tsume", GameParameter(kDefaultTsume)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new CrazyhouseGame(params));
@@ -550,11 +553,15 @@ std::string CrazyhouseState::StartFEN() const {
 
 
 CrazyhouseGame::CrazyhouseGame(const GameParameters& params)
-    : Game(kGameType, params), chess960_(ParameterValue<bool>("chess960")) {
+    : Game(kGameType, params), chess960_(ParameterValue<bool>("chess960")
+) {
   if (chess960_) {
     initial_fens_ = Chess960StartingPositions();
     SPIEL_CHECK_EQ(initial_fens_.size(), 960);
   }
+  insanity_ = ParameterValue<int>("insanity");
+  sticky_promotions_ = ParameterValue<bool>("sticky_promotions");
+  tsume_ =  ParameterValue<bool>("tsume");
 }
 
 std::unique_ptr<State> CrazyhouseGame::DeserializeState(
