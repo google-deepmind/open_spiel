@@ -22,7 +22,7 @@ import torch
 
 from open_spiel.python import policy
 import pyspiel
-from open_spiel.python.pytorch import deep_cfr
+from open_spiel.python.pytorch import deep_cfr_refactor as deep_cfr
 
 SEED = 24984617
 
@@ -41,7 +41,9 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
         learning_rate=1e-3,
         batch_size_advantage=None,
         batch_size_strategy=None,
-        memory_capacity=1e7)
+        memory_capacity=1e7,
+        seed=SEED
+      )
     deep_cfr_solver.solve()
 
   def test_matching_pennies_3p(self):

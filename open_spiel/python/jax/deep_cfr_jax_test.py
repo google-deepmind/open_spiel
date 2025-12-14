@@ -19,7 +19,7 @@ from absl.testing import parameterized
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.jax import deep_cfr
+from open_spiel.python.jax import deep_cfr_refactored as deep_cfr
 import pyspiel
 
 

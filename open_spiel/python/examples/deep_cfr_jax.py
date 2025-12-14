@@ -21,14 +21,14 @@ from absl import logging
 from open_spiel.python import policy
 from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.jax import deep_cfr
+from open_spiel.python.jax import deep_cfr_refactored as deep_cfr
 import pyspiel
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("num_iterations", 100, "Number of iterations")
-flags.DEFINE_integer("num_traversals", 1500, "Number of traversals/games")
-flags.DEFINE_string("game_name", "leduc_poker", "Name of the game")
+flags.DEFINE_integer("num_iterations", 400, "Number of iterations")
+flags.DEFINE_integer("num_traversals", 40, "Number of traversals/games")
+flags.DEFINE_string("game_name", "kuhn_poker", "Name of the game")
 
 
 def main(unused_argv):
@@ -36,17 +36,15 @@ def main(unused_argv):
   game = pyspiel.load_game(FLAGS.game_name)
   deep_cfr_solver = deep_cfr.DeepCFRSolver(
       game,
-      policy_network_layers=(64, 64, 64),
-      advantage_network_layers=(64, 64, 64),
+      policy_network_layers=(32, 32),
+      advantage_network_layers=(16, 16),
       num_iterations=FLAGS.num_iterations,
       num_traversals=FLAGS.num_traversals,
       learning_rate=1e-3,
-      batch_size_advantage=2048,
-      batch_size_strategy=2048,
-      memory_capacity=1e7,
-      policy_network_train_steps=5000,
-      advantage_network_train_steps=750,
-      reinitialize_advantage_networks=True)
+      batch_size_advantage=None,
+      batch_size_strategy=None,
+      memory_capacity=int(1e7))
+  
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()
   for player, losses in advantage_losses.items():
     logging.info("Advantage for player %d: %s", player,

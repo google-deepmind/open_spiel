@@ -21,12 +21,12 @@ from absl import logging
 from open_spiel.python import policy
 from open_spiel.python.algorithms import expected_game_score
 import pyspiel
-from open_spiel.python.pytorch import deep_cfr
+from open_spiel.python.pytorch import deep_cfr_refactor as deep_cfr
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("num_iterations", 400, "Number of iterations")
-flags.DEFINE_integer("num_traversals", 40, "Number of traversals/games")
+flags.DEFINE_integer("num_iterations", 600, "Number of iterations")
+flags.DEFINE_integer("num_traversals", 100, "Number of traversals/games")
 flags.DEFINE_string("game_name", "kuhn_poker", "Name of the game")
 
 
@@ -43,7 +43,9 @@ def main(unused_argv):
       learning_rate=1e-3,
       batch_size_advantage=None,
       batch_size_strategy=None,
-      memory_capacity=int(1e7))
+      memory_capacity=int(1e7),
+      reinitialize_advantage_networks=False
+    )
 
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()
   for player, losses in advantage_losses.items():
