@@ -28,8 +28,7 @@ import random
 import numpy as np
 import torch
 from torch import nn
-import torch.nn.functional as F
-from typing import Iterable, NamedTuple, Callable
+from typing import Iterable, NamedTuple
 
 from open_spiel.python import policy
 import pyspiel
@@ -39,7 +38,7 @@ def set_seed(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
-      torch.cuda.manual_seed_all(seed) # set for all GPUs
+      torch.cuda.manual_seed_all(seed)
       torch.backends.cudnn.deterministic = True
       torch.backends.cudnn.benchmark = False
 
@@ -76,7 +75,7 @@ class MLP(nn.Module):
 
     super().__init__()
     
-    self._layers = []
+    _layers = []
 
     def _create_linear_block(in_features, out_features):
       return nn.Sequential(
@@ -86,14 +85,14 @@ class MLP(nn.Module):
 
     # Input and Hidden layers
     for size in hidden_sizes:
-      self._layers.append(_create_linear_block(input_size, size))
+      _layers.append(_create_linear_block(input_size, size))
       input_size = size
     # Output layer
-    self._layers.append(nn.LayerNorm(input_size))
-    self._layers.append(_create_linear_block(input_size, output_size))
+    _layers.append(nn.LayerNorm(input_size))
+    _layers.append(_create_linear_block(input_size, output_size))
     if final_activation:
-      self._layers.append(final_activation)
-    self.model = nn.Sequential(*self._layers)
+      _layers.append(final_activation)
+    self.model = nn.Sequential(*_layers)
 
   def forward(self, x: torch.Tensor) -> torch.Tensor:
     return self.model(x)
@@ -245,11 +244,11 @@ class DeepCFRSolver(policy.Policy):
         ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
     ]
     self._advantage_networks = [
-        MLP(
-          self._embedding_size, 
-          list(advantage_network_layers),
-          self._num_actions
-        ) for _ in range(self._num_players)
+      MLP(
+        self._embedding_size, 
+        list(advantage_network_layers),
+        self._num_actions
+      ) for _ in range(self._num_players)
     ]
 
     # Define strategy network, loss & memory.
@@ -260,6 +259,7 @@ class DeepCFRSolver(policy.Policy):
       self._num_actions,
       nn.Softmax(-1)
     )
+
     # Illegal actions are handled in the traversal code where expected payoff
     # and sampled regret is computed from the advantage networks.
     
@@ -270,8 +270,8 @@ class DeepCFRSolver(policy.Policy):
 
     self._loss_advantages = nn.MSELoss(reduction="mean")
     self._optimizer_advantages = [
-        self._reinitialize_advantage_network(p)
-        for p in range(self._num_players)
+      self._reinitialize_advantage_network(p)
+      for p in range(self._num_players)
     ]
 
 
@@ -370,8 +370,9 @@ class DeepCFRSolver(policy.Policy):
       sampled_action = np.random.choice(range(self._num_actions), p=probs)
       self._strategy_memories.add(
           StrategyMemory(
-              state.information_state_tensor(other_player), self._iteration,
-              strategy))
+            state.information_state_tensor(other_player), self._iteration,
+            strategy)
+          )
       return self._traverse_game_tree(state.child(sampled_action), player)
 
   def _sample_action_from_advantage(self, state, player):
@@ -493,4 +494,4 @@ class DeepCFRSolver(policy.Policy):
       loss_strategy.backward()
       self._optimizer_policy.step()
 
-    return loss_strategy.detach().numpy()
+    return loss_strategy.detach().cpu().numpy()
