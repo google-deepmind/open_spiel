@@ -246,7 +246,7 @@ class DeepCFRSolver(policy.Policy):
       ) for p in range(self._num_players)
     ]
     self._empty_advantage_states = [
-      nn.state(self._advantage_networks[p], nn.Param)
+      nn.state(self._advantage_networks[p])
       for p in range(self._num_players)
     ]
 
@@ -258,7 +258,7 @@ class DeepCFRSolver(policy.Policy):
       lambda x: x,
       seed
     )
-    self._empty_police_state = nn.state(self._policy_network, nn.Param)
+    self._empty_police_state = nn.state(self._policy_network)
 
     # initialise losses
     self._advantage_loss = self._policy_loss = jax.vmap(optax.l2_loss)
@@ -278,21 +278,6 @@ class DeepCFRSolver(policy.Policy):
   def _get_jitted_adv_update(self) -> Callable:
     """get jitted advantage update function."""
 
-    def _loss_adv(
-        advantage_model: nn.Module, 
-        info_states: chex.Array, 
-        samp_regrets: chex.Array, 
-        masks: chex.Array,
-        iterations: chex.Array, 
-        total_iterations: chex.Array
-      ) -> chex.Array:
-      """Loss function for our advantage network."""
-      preds = forward(advantage_model, info_states, masks)
-      loss_values = self._advantage_loss(preds, samp_regrets) * jnp.sqrt(iterations)
-      return loss_values.mean()
-    
-    self._adv_grads = nn.value_and_grad(_loss_adv)
-
     @nn.jit
     def update(
       advantage_model: nn.Module,
@@ -303,6 +288,21 @@ class DeepCFRSolver(policy.Policy):
       iterations: chex.Array,
       total_iterations: chex.Array
     ) -> chex.Array:
+      
+      def _loss_adv(
+        advantage_model: nn.Module, 
+        info_states: chex.Array, 
+        samp_regrets: chex.Array, 
+        masks: chex.Array,
+        iterations: chex.Array, 
+        total_iterations: chex.Array
+      ) -> chex.Array:
+        """Loss function for our advantage network."""
+        preds = forward(advantage_model, info_states, masks)
+        loss_values = self._advantage_loss(preds, samp_regrets) * iterations
+        return loss_values.mean()
+    
+      self._adv_grads = nn.value_and_grad(_loss_adv)
       main_loss, grads = self._adv_grads(
         advantage_model, info_states, samp_regrets, masks, iterations, total_iterations)
       optimiser.update(advantage_model, grads)
@@ -312,25 +312,6 @@ class DeepCFRSolver(policy.Policy):
 
   def _get_jitted_policy_update(self) -> Callable:
     """get jitted policy update function."""
-
-    def _loss_policy(
-      policy_model: nn.Module, 
-      info_states: chex.Array, 
-      action_probs: chex.Array, 
-      masks: chex.Array,
-      iterations: chex.Array, 
-      total_iterations: chex.Array
-    ) -> chex.Array:
-      """Loss function for our policy network."""
-      preds = forward(policy_model, info_states, None)
-      # # masking illegal actions and normalising
-      preds = jnp.where(masks, preds, -1e-21)
-      preds = nn.softmax(preds)
-
-      loss_values =  self._policy_loss(preds, action_probs) * jnp.sqrt(iterations)
-      return loss_values.mean()
-
-    _policy_grad_fn = nn.value_and_grad(_loss_policy)
 
     @nn.jit
     def update(
@@ -342,6 +323,26 @@ class DeepCFRSolver(policy.Policy):
       iterations: chex.Array, 
       total_iterations: chex.Array
     ) -> chex.Array:
+      
+      def _loss_policy(
+        policy_model: nn.Module, 
+        info_states: chex.Array, 
+        action_probs: chex.Array, 
+        masks: chex.Array,
+        iterations: chex.Array, 
+        total_iterations: chex.Array
+      ) -> chex.Array:
+        """Loss function for our policy network."""
+        preds = forward(policy_model, info_states, None)
+        # # masking illegal actions and normalising
+        preds = jnp.where(masks, preds, -1e-21)
+        preds = nn.softmax(preds)
+
+        loss_values = self._policy_loss(preds, action_probs) * iterations
+        return loss_values.mean()
+
+      _policy_grad_fn = nn.value_and_grad(_loss_policy)
+      
       main_loss, grads = _policy_grad_fn(
         policy_model, info_states, action_probs, masks, iterations, total_iterations)
       optimiser.update(policy_model, grads)
@@ -532,8 +533,11 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       The average loss over the advantage network of the last batch.
     """
-    self._advantage_networks[player].train()
-    cached_update = nn.cached_partial(self._jitted_adv_update, self._advantage_networks[player], self._advantage_opt[player])
+    
+    net = self._advantage_networks[player]
+    opt = self._advantage_opt[player]
+    net.train()
+    cached_update = nn.cached_partial(self._jitted_adv_update, net, opt)
     
     for _ in range(self._advantage_network_train_steps):
 
@@ -569,6 +573,9 @@ class DeepCFRSolver(policy.Policy):
         jnp.array(self._iteration)
       )
 
+    self._advantage_networks[player] = net
+    self._advantage_opt[player] = opt
+
     return main_loss
 
   def _learn_strategy_network(self) -> chex.Numeric:
@@ -578,8 +585,11 @@ class DeepCFRSolver(policy.Policy):
       The average loss obtained on the last training batch of transitions
       or `None`.
     """
-    self._policy_network.train()
-    cached_update = nn.cached_partial(self._jitted_policy_update, self._policy_network, self._policy_opt)
+    net = self._policy_network
+    opt = self._policy_opt
+    net.train()
+
+    cached_update = nn.cached_partial(self._jitted_policy_update, net, opt)
 
     for _ in range(self._policy_network_train_steps):
       if self._batch_size_strategy:
@@ -608,5 +618,8 @@ class DeepCFRSolver(policy.Policy):
         *data, 
         jnp.array(self._iteration)
       )
+
+    self._policy_network = net
+    self._policy_opt = opt
 
     return main_loss

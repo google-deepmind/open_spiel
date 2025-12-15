@@ -63,7 +63,7 @@ class MLP(nn.Module):
       hidden_sizes: Iterable[int],
       output_size: int,
       final_activation: nn.Module = None,
-
+      seed: int = 42
     ) -> None:
     """Create the MLP.
 
@@ -75,6 +75,7 @@ class MLP(nn.Module):
     """
 
     super().__init__()
+    set_seed(seed)
     
     _layers = []
 
@@ -109,8 +110,8 @@ class MLP(nn.Module):
               for child in layer.children():
                   reset_model_weights(child)
       
-      self.apply(reset_model_weights)
-      return self
+    self.apply(reset_model_weights)
+    return self
 
 class ReservoirBuffer(object):
   """Allows uniform sampling over a stream of data.
@@ -239,7 +240,6 @@ class DeepCFRSolver(policy.Policy):
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
     self._learning_rate = learning_rate
-    set_seed(seed)
     self._print_nash_convs = print_nash_convs
 
     # Define advantage network, loss & memory. (One per player)
@@ -250,8 +250,10 @@ class DeepCFRSolver(policy.Policy):
       MLP(
         self._embedding_size, 
         list(advantage_network_layers),
-        self._num_actions
-      ) for _ in range(self._num_players)
+        self._num_actions,
+        None, 
+        seed + p
+      ) for p in range(self._num_players)
     ]
 
     # Define strategy network, loss & memory.
@@ -260,7 +262,8 @@ class DeepCFRSolver(policy.Policy):
       self._embedding_size,
       list(policy_network_layers),
       self._num_actions,
-      nn.Softmax(-1)
+      nn.Softmax(-1),
+      seed
     )
 
     # Illegal actions are handled in the traversal code where expected payoff
@@ -327,7 +330,7 @@ class DeepCFRSolver(policy.Policy):
         # Re-initialize advantage networks and train from scratch.
         advantage_losses[p].append(self._learn_advantage_network(p))
       self._iteration += 1
-      # Train policy network.
+    # Train policy network.
     policy_loss = self._learn_strategy_network()
     return self._policy_network, advantage_losses, policy_loss
 

@@ -40,18 +40,18 @@ def main(unused_argv):
   game = pyspiel.load_game(FLAGS.game_name)
   deep_cfr_solver = deep_cfr.DeepCFRSolver(
     game,
-    policy_network_layers=(64, 64),
-    advantage_network_layers=(64, 64),
-    num_iterations=100,
+    policy_network_layers=(64,),
+    advantage_network_layers=(64,),
+    num_iterations=101,
     num_traversals=375,
     reinitialize_advantage_networks=True,
     learning_rate=1e-3,
-    batch_size_advantage=512,
-    batch_size_strategy=512,
-    memory_capacity=int(1e6),
+    batch_size_advantage=256,
+    batch_size_strategy=256,
+    memory_capacity=1000000,
     policy_network_train_steps=2500,
     advantage_network_train_steps=375,
-    print_nash_convs=True # for debug purposes
+    print_nash_convs=False # for debug purposes
   )
   
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()

@@ -23,6 +23,10 @@ from open_spiel.python.algorithms import expected_game_score
 import pyspiel
 from open_spiel.python.pytorch import deep_cfr_refactor as deep_cfr
 
+"""Recommended parameters:
+  For more, see https://github.com/aicenter/openspiel_reproductions/
+"""
+
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_iterations", 600, "Number of iterations")
@@ -36,15 +40,15 @@ def main(unused_argv):
 
   deep_cfr_solver = deep_cfr.DeepCFRSolver(
     game,
-    policy_network_layers=(64, 64),
-    advantage_network_layers=(64, 64),
-    num_iterations=100,
+    policy_network_layers=(64,),
+    advantage_network_layers=(64,),
+    num_iterations=101,
     num_traversals=375,
     reinitialize_advantage_networks=True,
     learning_rate=1e-3,
-    batch_size_advantage=512,
-    batch_size_strategy=512,
-    memory_capacity=int(1e6),
+    batch_size_advantage=256,
+    batch_size_strategy=256,
+    memory_capacity=1000000,
     policy_network_train_steps=2500,
     advantage_network_train_steps=375,
     print_nash_convs=True # for debug purposes
