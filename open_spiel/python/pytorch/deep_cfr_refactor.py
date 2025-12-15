@@ -292,7 +292,7 @@ class DeepCFRSolver(policy.Policy):
     self._optimizer_advantages[player] = torch.optim.Adam(
         self._advantage_networks[player].parameters(), lr=self._learning_rate)
     
-  def _reinitialize_policy_network(self, player):
+  def _reinitialize_policy_network(self):
     self._policy_network.reset()
     self._optimizer_policy = torch.optim.Adam(
         self._policy_network.parameters(), lr=self._learning_rate)
