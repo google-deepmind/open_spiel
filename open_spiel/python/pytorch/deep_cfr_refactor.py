@@ -31,6 +31,7 @@ from torch import nn
 from typing import Iterable, NamedTuple
 
 from open_spiel.python import policy
+from open_spiel.python.algorithms import exploitability
 import pyspiel
 
 def set_seed(seed):
@@ -193,7 +194,8 @@ class DeepCFRSolver(policy.Policy):
     policy_network_train_steps: int = 1,
     advantage_network_train_steps: int = 1,
     reinitialize_advantage_networks: bool = True,
-    seed: int = 42
+    seed: int = 42,
+    print_nash_convs: bool = False
   ) -> None:
     """Initialize the Deep CFR algorithm.
 
@@ -238,6 +240,7 @@ class DeepCFRSolver(policy.Policy):
     self._iteration = 1
     self._learning_rate = learning_rate
     set_seed(seed)
+    self._print_nash_convs = print_nash_convs
 
     # Define advantage network, loss & memory. (One per player)
     self._advantage_memories = [
@@ -267,13 +270,10 @@ class DeepCFRSolver(policy.Policy):
     self._optimizer_policy = torch.optim.Adam(
         self._policy_network.parameters(), lr=learning_rate)
 
-
     self._loss_advantages = nn.MSELoss(reduction="mean")
-    self._optimizer_advantages = [
+    self._optimizer_advantages = [None] * self._num_players
+    for p in range(self._num_players):
       self._reinitialize_advantage_network(p)
-      for p in range(self._num_players)
-    ]
-
 
   @property
   def advantage_buffers(self):
@@ -289,8 +289,13 @@ class DeepCFRSolver(policy.Policy):
 
   def _reinitialize_advantage_network(self, player):
     self._advantage_networks[player].reset()
-    return torch.optim.Adam(
+    self._optimizer_advantages[player] = torch.optim.Adam(
         self._advantage_networks[player].parameters(), lr=self._learning_rate)
+    
+  def _reinitialize_policy_network(self, player):
+    self._policy_network.reset()
+    self._optimizer_policy = torch.optim.Adam(
+        self._policy_network.parameters(), lr=self._learning_rate)
 
   def solve(self):
     """Solution logic for Deep CFR.
@@ -306,12 +311,19 @@ class DeepCFRSolver(policy.Policy):
     """
     advantage_losses = collections.defaultdict(list)
     for _ in range(self._num_iterations):
+      if self._print_nash_convs:
+        policy_loss = self._learn_strategy_network()
+        average_policy = policy.tabular_policy_from_callable(self._game, self.action_probabilities)
+        conv = exploitability.nash_conv(self._game, average_policy)
+        print(f"NashConv @ {self._iteration} = {conv}")
+        self._reinitialize_policy_network()
+
       for p in range(self._num_players):
         for _ in range(self._num_traversals):
           self._traverse_game_tree(self._root_node, p)
         if self._reinitialize_advantage_networks:
           # Re-initialize advantage network for player and train from scratch.
-          self._optimizer_advantages[p] = self._reinitialize_advantage_network(p)
+          self._reinitialize_advantage_network(p)
         # Re-initialize advantage networks and train from scratch.
         advantage_losses[p].append(self._learn_advantage_network(p))
       self._iteration += 1
@@ -374,7 +386,8 @@ class DeepCFRSolver(policy.Policy):
             strategy)
           )
       return self._traverse_game_tree(state.child(sampled_action), player)
-
+  
+  @torch.inference_mode()
   def _sample_action_from_advantage(self, state, player):
     """Returns an info state policy by applying regret-matching.
 
@@ -401,6 +414,7 @@ class DeepCFRSolver(policy.Policy):
       matched_regrets[max(legal_actions, key=lambda a: raw_advantages[a])] = 1
     return advantages, matched_regrets
 
+  @torch.inference_mode()
   def action_probabilities(self, state, player_id=None):
     """Computes action probabilities for the current player in state.
 
@@ -418,7 +432,7 @@ class DeepCFRSolver(policy.Policy):
     if len(info_state_vector.shape) == 1:
       info_state_vector = np.expand_dims(info_state_vector, axis=0)
     with torch.no_grad():
-      probs = self._policy_network(torch.FloatTensor(info_state_vector)).cpu().numpy()
+      probs = self._policy_network(torch.from_numpy(info_state_vector).float()).cpu().numpy()
     return {action: probs[0][action] for action in legal_actions}
 
   def _learn_advantage_network(self, player):
