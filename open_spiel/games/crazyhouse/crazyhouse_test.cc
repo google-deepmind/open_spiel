@@ -26,12 +26,17 @@ namespace {
 namespace testing = open_spiel::testing;
 
 void BasicTests() {
+  testing::LoadGameTest("crazyhouse");
+  auto game = open_spiel::LoadGame("crazyhouse");
+  auto state = game->NewInitialState();
+
+  std::cout << state->ToString() << std::endl;
   // whoo hoo all pass! 
 }
 
 
 }  // namespace
-}  // namespace tic_tac_toe
+}  // namespace crazyhouse
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {

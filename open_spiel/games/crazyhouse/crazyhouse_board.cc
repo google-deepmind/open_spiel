@@ -40,38 +40,6 @@ namespace crazyhouse {
 namespace {
 constexpr const char* kShredderWhiteCastlingFiles = "ABCDEFGH";
 constexpr const char* kShredderBlackCastlingFiles = "abcdefgh";
-inline int PocketIndexForPieceType(PieceType type) {
-  switch (type) {
-    case PieceType::kPawn:   return 0;
-    case PieceType::kKnight: return 1;
-    case PieceType::kBishop: return 2;
-    case PieceType::kRook:   return 3;
-    case PieceType::kQueen:  return 4;
-    case PieceType::kKnightP: return 1;
-    case PieceType::kBishopP: return 2;
-    case PieceType::kRookP: return 3;
-    case PieceType::kQueenP: return 4;
-    default:      return -1;  // King not pocketable
-  }
-}
-
-inline PieceType DropPieceTypeFromIndex(int index) {
-	switch(index) {
-		case 0:
-			return PieceType::kPawn;
-		case 1:
-			return PieceType::kKnight;
-		case 2:
-			return PieceType::kBishop;
-		case 3:
-			return PieceType::kRook;
-		case 4:
-			return PieceType::kQueen;
-		default:
-			 return PieceType::kEmpty;
-	}
-}
-
 
 inline PieceType PromotedType(PieceType type) {
 	  switch (type) {
@@ -80,11 +48,6 @@ inline PieceType PromotedType(PieceType type) {
 		  case PieceType::kRook: return PieceType::kRookP;
 		  case PieceType::kQueen: return PieceType::kQueenP;
 	  }
-}
-
-
-PieceType DropPieceType(const Move& m) {
-    return DropPieceTypeFromIndex(m.from.y);
 }
 
 }  // namespace
@@ -131,6 +94,14 @@ absl::optional<PieceType> PieceTypeFromChar(char c) {
       return PieceType::kQueen;
     case 'K':
       return PieceType::kKing;
+    case 'H':
+        return PieceType::kKnightP;
+    case 'A':
+        return PieceType::kBishopP;
+    case 'C':
+		return PieceType::kRookP;
+    case 'E':
+        return PieceType::kQueenP;
     default:
       std::cerr << "Invalid piece type: " << c << std::endl;
       return absl::nullopt;
@@ -154,13 +125,13 @@ std::string PieceTypeToString(PieceType p, bool uppercase) {
     case PieceType::kKing:
       return uppercase ? "K" : "k";
     case PieceType::kQueenP:
-      return uppercase ? "Q+" : "q+";
+      return uppercase ? "E" : "e";
     case PieceType::kRookP:
-      return uppercase ? "R+" : "r+";
+      return uppercase ? "C" : "c";
     case PieceType::kBishopP:
-      return uppercase ? "B+" : "b+";
+      return uppercase ? "A" : "a";
     case PieceType::kKnightP:
-      return uppercase ? "N+" : "n+";
+      return uppercase ? "H" : "h";
     default:
       SpielFatalError("Unknown piece.");
       return "This will never return.";
@@ -168,6 +139,7 @@ std::string PieceTypeToString(PieceType p, bool uppercase) {
 }
 
 std::string Piece::ToUnicode() const {
+  SpielFatalError("ToUnicode doesnt work");
   switch (color) {
     case Color::kBlack:
       switch (type) {
@@ -435,13 +407,28 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
 {
   
   board_.fill(kEmptyPiece);
-  white_pocket_.fill(0);
-  black_pocket_.fill(0);
 }
 
 /*static*/ absl::optional<CrazyhouseBoard> CrazyhouseBoard::BoardFromFEN(
     const std::string &fen, int board_size,
-    bool king_in_check_allowed, bool allow_pass_move) {
+    bool king_in_check_allowed, bool allow_pass_move,
+	int insanity, bool sticky_promotions, bool tsume) {
+
+  // Extract pocket section if present: looks like "[PNBRQpnbrq]"
+  std::string fen_copy = fen;
+  std::string pocket_section;
+
+  auto lb = fen_copy.find('[');
+  if (lb != std::string::npos) {
+    auto rb = fen_copy.find(']', lb);
+    if (rb == std::string::npos) {
+        std::cerr << "Malformed pocket section in FEN: " << fen << std::endl;
+        return absl::nullopt;
+    }
+    pocket_section = fen_copy.substr(lb + 1, rb - lb - 1);
+    fen_copy = absl::StripAsciiWhitespace(fen_copy.substr(0, lb)); // strip trailing space
+  }
+
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
    *
@@ -453,9 +440,10 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
    *
    * Many FEN strings don't have the last two fields.
    */
-  CrazyhouseBoard board(board_size, king_in_check_allowed, allow_pass_move);
+  CrazyhouseBoard board(board_size, king_in_check_allowed, allow_pass_move,
+		  insanity,  sticky_promotions, tsume);
 
-  std::vector<std::string> fen_parts = absl::StrSplit(fen, ' ');
+  std::vector<std::string> fen_parts = absl::StrSplit(fen_copy, ' ');
 
   if (fen_parts.size() != 6 && fen_parts.size() != 4) {
     std::cerr << "Invalid FEN: " << fen << std::endl;
@@ -590,6 +578,26 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
 
   board.SetIrreversibleMoveCounter(std::stoi(fifty_clock));
   board.SetMovenumber(std::stoi(move_number));
+  // ----- Parse pockets -----
+  if (!pocket_section.empty()) {
+    for (char pc : pocket_section) {
+        bool white = std::isupper(pc);
+        char uc = std::toupper(pc);
+		absl::optional<PieceType> opt = PieceTypeFromChar(uc);
+		PieceType pptype = *opt;
+		if (!opt) {
+            std::cerr << "Invalid pocket char in FEN: " << pc << std::endl;
+            return absl::nullopt;
+        }
+
+        if (white) {
+			board.white_pocket_.Increment(pptype, 1);
+		}  else {
+	 		board.black_pocket_.Increment(pptype, 1);
+		}
+    }
+  }
+
 
   return board;
 }
@@ -811,14 +819,12 @@ void CrazyhouseBoard::GenerateDropDestinations_(
     const YieldFn& yield) const 
 {
   // Get the pocket for the player
-  const std::array<int, 5>& pocket =
+  Pocket pocket =
       (player == Color::kWhite ? white_pocket_ : black_pocket_);
 
   // Loop over drop-capable piece types
-  for (int pindex = 0; pindex < 5; ++pindex) {
-    if (pocket[pindex] <= 0) continue;
-
-    PieceType ptype = DropPieceTypeFromIndex(pindex);
+  for (PieceType ptype : Pocket::PieceTypes()) {
+    if (pocket.Count(ptype) == 0) continue;
 
     for (int y = 0; y < board_size_; ++y) {
       for (int x = 0; x < board_size_; ++x) {
@@ -834,7 +840,7 @@ void CrazyhouseBoard::GenerateDropDestinations_(
         // Build the Move
         Move m;
         m.from = Square{static_cast<int8_t>(board_size_),  // sentinel X
-                        static_cast<int8_t>(pindex)};      // piece index in Y
+                        pocket.Index(ptype)};      // piece index in Y
         m.to = sq;
 
         // Output the move
@@ -1233,6 +1239,7 @@ absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string &move,
 }
 
 void CrazyhouseBoard::ApplyMove(const Move &move) {
+  // to_play switches up here at the top, careful.
   // Skip applying a move if it's a pass.
   if (move == kPassMove) {
     if (to_play_ == Color::kBlack) ++move_number_;
@@ -1252,12 +1259,12 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   Piece destination_piece = at(move.to);
 
   if (IsDropMove(move)){
-	  PieceType from_type = DropPieceType(move);
+	  PieceType from_type = Pocket::DropPieceType(move.from.y);
 	  moving_piece =  Piece{to_play_, from_type};
 	  if (to_play_ == Color::kBlack) {
-		  black_pocket_[move.from.y] -= 1;
+		  white_pocket_.Decrement(from_type);
 	  } else {
-		  white_pocket_[move.from.y] -= 1;
+		  black_pocket_.Decrement(from_type);
 	  }
 
   } else {
@@ -1270,10 +1277,11 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   set_square(move.to, moving_piece);
   // Increment pockets for capture
   if (destination_piece !=  kEmptyPiece) {
+	  PieceType dpt = destination_piece.type;
 	  if (to_play_ == Color::kBlack) {
-		  black_pocket_[PocketIndexForPieceType(destination_piece.type)] += insanity_;
+		  white_pocket_.Increment(dpt, insanity_);
       } else {
-		  black_pocket_[PocketIndexForPieceType(destination_piece.type)] += insanity_;
+		  black_pocket_.Increment(dpt, insanity_);
 	  }
   }
 
@@ -1858,14 +1866,15 @@ char CrazyhouseBoard::ShredderCastlingRightChar(Color color,
 }
 
 std::string CrazyhouseBoard::ToFEN(bool shredder) const {
-  // Example FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
   std::string fen;
 
-  // 1. encode the board.
+  // ----- 1. Board -----
   for (int8_t rank = board_size_ - 1; rank >= 0; --rank) {
     int num_empty = 0;
+
     for (int8_t file = 0; file < board_size_; ++file) {
-      auto piece = at(Square{file, rank});
+	  auto piece = at(Square{file, rank});
+
       if (piece == kEmptyPiece) {
         ++num_empty;
       } else {
@@ -1876,54 +1885,70 @@ std::string CrazyhouseBoard::ToFEN(bool shredder) const {
         absl::StrAppend(&fen, piece.ToString());
       }
     }
-    if (num_empty > 0) {
-      absl::StrAppend(&fen, num_empty);
-    }
-    if (rank > 0) {
-      fen.push_back('/');
-    }
+
+    if (num_empty > 0) absl::StrAppend(&fen, num_empty);
+    if (rank > 0) fen.push_back('/');
   }
 
-  // 2. color to play.
+  // ----- 2. Side to move -----
   absl::StrAppend(&fen, " ", to_play_ == Color::kWhite ? "w" : "b");
 
-  // 3. by castling rights.
-  //    Note: Shredder FEN uses different characters (the files of the rooks):
-  //    https://www.chessprogramming.org/Forsyth-Edwards_Notation#Shredder-FEN.
+  // ----- 3. Castling -----
   absl::StrAppend(&fen, " ");
   std::string castling_rights;
+
   if (CastlingRight(Color::kWhite, CastlingDirection::kRight)) {
     castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kWhite,
-                                             CastlingDirection::kRight) : 'K');
+        shredder ? ShredderCastlingRightChar(Color::kWhite, CastlingDirection::kRight)
+                 : 'K');
   }
   if (CastlingRight(Color::kWhite, CastlingDirection::kLeft)) {
     castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kWhite,
-                                             CastlingDirection::kLeft) : 'Q');
+        shredder ? ShredderCastlingRightChar(Color::kWhite, CastlingDirection::kLeft)
+                 : 'Q');
   }
   if (CastlingRight(Color::kBlack, CastlingDirection::kRight)) {
     castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kBlack,
-                                             CastlingDirection::kRight) : 'k');
+        shredder ? ShredderCastlingRightChar(Color::kBlack, CastlingDirection::kRight)
+                 : 'k');
   }
   if (CastlingRight(Color::kBlack, CastlingDirection::kLeft)) {
     castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kBlack,
-                                             CastlingDirection::kLeft) : 'q');
+        shredder ? ShredderCastlingRightChar(Color::kBlack, CastlingDirection::kLeft)
+                 : 'q');
   }
+
   absl::StrAppend(&fen, castling_rights.empty() ? "-" : castling_rights);
 
-  // 4. en passant square
+  // ----- 4. En passant -----
   absl::StrAppend(&fen, " ");
-  absl::StrAppend(
-      &fen, EpSquare() == kInvalidSquare ? "-" : SquareToString(EpSquare()));
+  absl::StrAppend(&fen,
+      EpSquare() == kInvalidSquare ? "-" : SquareToString(EpSquare()));
 
-  // 5. half-move clock for 50-move rule
+  // ----- 5. Halfmove clock -----
   absl::StrAppend(&fen, " ", irreversible_move_counter_);
 
-  // 6. full-move clock
+  // ----- 6. Move number -----
   absl::StrAppend(&fen, " ", move_number_);
+
+  // ----- 7. Crazyhouse pockets -----
+  std::string pockets;
+
+  // white pockets: Pawn, Knight, Bishop, Rook, Queen indices 0..4
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+	  const Pocket& pocket = (color == Color::kWhite) ? white_pocket_ : black_pocket_;
+      for (PieceType ptype : Pocket::PieceTypes()) {
+		  Piece pocket_piece{color, ptype};
+		  char c = pocket_piece.ToString()[0];
+		  pockets.append(pocket.Count(ptype), c);
+	  }
+  }
+
+
+
+  if (!pockets.empty()) {
+    absl::StrAppend(&fen, " [", pockets, "]");
+  }
 
   return fen;
 }
@@ -2191,11 +2216,6 @@ void CrazyhouseBoard::SetEpSquare(Square sq) {
   ep_square_ = sq;
 }
 
-CrazyhouseBoard MakeDefaultBoard() {
-  auto maybe_board = CrazyhouseBoard::BoardFromFEN(kDefaultStandardFEN);
-  SPIEL_CHECK_TRUE(maybe_board);
-  return *maybe_board;
-}
 
 std::string DefaultFen(int board_size) {
   if (board_size == 8)
@@ -2207,6 +2227,64 @@ std::string DefaultFen(int board_size) {
         "Only board sizes 4 and 8 have their default chessboards. "
         "For other sizes, you have to pass your own FEN.");
 }
+
+Pocket::Pocket() : counts_{} {}
+
+void Pocket::Increment(PieceType piece, int count) {
+  const std::size_t i = Index(piece);
+  counts_[i] += count;
+}
+
+void Pocket::Decrement(PieceType piece) {
+  const std::size_t i = Index(piece);
+  assert(counts_[i] > 0);
+  --counts_[i];
+}
+
+int Pocket::Count(PieceType piece) const {
+  return counts_[Index(piece)];
+}
+
+constexpr std::array<PieceType, 5> Pocket::PieceTypes() {
+  return {
+      PieceType::kPawn,
+      PieceType::kKnight,
+      PieceType::kBishop,
+      PieceType::kRook,
+      PieceType::kQueen
+  };
+}
+
+std::size_t Pocket::Index(PieceType ptype) {
+  switch (ptype) {
+    case PieceType::kPawn:   return 0;
+    case PieceType::kKnight: return 1;
+    case PieceType::kBishop: return 2;
+    case PieceType::kRook:   return 3;
+    case PieceType::kQueen:  return 4;
+    default:
+      assert(false && "Invalid PieceType for Pocket");
+      return 0;
+  }
+}
+
+PieceType Pocket::DropPieceType(int y) {
+	switch(y) {
+		case 0:
+			return PieceType::kPawn;
+		case 1:
+			return PieceType::kKnight;
+		case 2:
+			return PieceType::kBishop;
+		case 3:
+			return PieceType::kRook;
+		case 4:
+			return PieceType::kQueen;
+		default:
+			 return PieceType::kEmpty;
+	}
+}
+
 
 }  // namespace crazyhouse
 }  // namespace open_spiel

@@ -54,6 +54,10 @@ void open_spiel::init_pyspiel_games_crazyhouse(py::module& m) {
     .value("BISHOP", PieceType::kBishop)
     .value("KNIGHT", PieceType::kKnight)
     .value("PAWN", PieceType::kPawn)
+    .value("QUEENP", PieceType::kQueenP)
+    .value("ROOKP", PieceType::kRookP)
+    .value("BISHOPP", PieceType::kBishopP)
+    .value("KNIGHTP", PieceType::kKnightP)
     .export_values();
 
   py::class_<Piece>(crazyhouse, "Piece")

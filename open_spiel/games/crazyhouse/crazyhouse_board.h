@@ -258,6 +258,32 @@ inline const crazyhouse::Move kPassMove =
     Move(Square{-1, -1}, Square{-1, -1},
          Piece{Color::kEmpty, PieceType::kEmpty});
 
+class Pocket {
+ public:
+  Pocket();
+
+  // Modifiers
+  void Increment(PieceType piece, int count);
+  void Decrement(PieceType piece);
+
+  // Accessor
+  int Count(PieceType piece) const;
+
+  // Move encoding
+  static std::size_t Index(PieceType piece);
+  static PieceType DropPieceType(int y);
+
+  // Iteration support
+  static constexpr std::array<PieceType, 5> PieceTypes();
+
+ private:
+  static constexpr std::size_t kNumPocketPieces = 5;
+
+  // Internal storage: Pawn, Knight, Bishop, Rook, Queen
+  std::array<int, kNumPocketPieces> counts_;
+
+};
+
 class CrazyhouseBoard {
  public:
   CrazyhouseBoard(int board_size = kDefaultBoardSize,
@@ -273,7 +299,10 @@ class CrazyhouseBoard {
   static absl::optional<CrazyhouseBoard> BoardFromFEN(
       const std::string& fen, int board_size = 8,
       bool king_in_check_allowed = false,
-      bool allow_pass_move = false);
+      bool allow_pass_move = false,
+	  int insanity = 1,
+	  bool sticky_promotions = false,
+	  bool tsume = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
@@ -332,8 +361,8 @@ class CrazyhouseBoard {
 
   // counts of pocket pieces by type
   // Pawn, Knight, Bishop, Rook, Queen 
-  std::array<int, 5> white_pocket_;  // counts of pocket pieces by type
-  std::array<int, 5> black_pocket_;
+  Pocket white_pocket_;  // counts of pocket pieces by type
+  Pocket black_pocket_;
 
   bool HasLegalMoves() const {
     bool found = false;
@@ -456,6 +485,7 @@ class CrazyhouseBoard {
 
   // Constructs a string describing the chess board position in Forsyth-Edwards
   // Notation. https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+  // Modified to support promoted and pocket pieces.
   std::string ToFEN(bool shredder = false) const;
 
   /* Constructs a string describing the dark chess board position in a notation
@@ -599,8 +629,9 @@ inline std::ostream& operator<<(std::ostream& stream, const PieceType& pt) {
   return stream << PieceTypeToString(pt);
 }
 
-CrazyhouseBoard MakeDefaultBoard();
 std::string DefaultFen(int board_size);
+
+
 
 }  // namespace crazyhouse
 }  // namespace open_spiel

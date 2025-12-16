@@ -103,16 +103,31 @@ void AddBinaryPlane(bool val, absl::Span<float>::iterator& value_it) {
 }  // namespace
 
 CrazyhouseState::CrazyhouseState(std::shared_ptr<const Game> game)
-    : State(game),
-      start_board_(MakeDefaultBoard()),
-      current_board_(start_board_) {
+    : State(game) {
+  const auto* g = ParentGame();
+  auto maybe_board = CrazyhouseBoard::BoardFromFEN(
+      kDefaultStandardFEN, // fen
+      8,  // size
+      false,  // king in check allowed
+      false,  // allow pass move
+      g->Insanity(),
+      g->StickyPromotions(),
+      g->Tsume());
+  start_board_ = *maybe_board;
+  current_board_ = start_board_;
   repetitions_[current_board_.HashValue()] = 1;
 }
 
 CrazyhouseState::CrazyhouseState(std::shared_ptr<const Game> game, const std::string& fen)
     : State(game) {
+  auto* g = static_cast<const CrazyhouseGame*>(game.get());
   specific_initial_fen_ = fen;
-  auto maybe_board = CrazyhouseBoard::BoardFromFEN(fen);
+  int insanity = g->Insanity();
+  bool sticky_promotions = g->StickyPromotions();
+  bool tsume = g->Tsume();
+  auto maybe_board = CrazyhouseBoard::BoardFromFEN(fen,
+		  8, false, false,
+		  insanity, sticky_promotions, tsume);
   SPIEL_CHECK_TRUE(maybe_board);
   start_board_ = *maybe_board;
   current_board_ = start_board_;
@@ -210,6 +225,18 @@ Color PlayerToColor(Player p) {
 }
 
 Action MoveToAction(const Move& move, int board_size) {
+
+  // handle drop moves first
+  if (move.from.x == board_size) {
+    // piece_index is stored in m.from.y (0=Pawn ... 4=Queen)
+    int piece_index = move.from.y;
+    int to_index = move.to.y * board_size + move.to.x;  // flatten 2D → 1D
+    int num_squares = board_size * board_size;
+    int action_int = kFirstDropAction  + piece_index * num_squares + to_index;
+    return static_cast<Action>(action_int);
+  }
+
+
   // Special-case for pass move.
   if (move == kPassMove) return kPassAction;
 
@@ -303,6 +330,31 @@ std::pair<Square, int> ActionToDestination(int action, int board_size,
 Move ActionToMove(const Action& action, const CrazyhouseBoard& board) {
   SPIEL_CHECK_GE(action, 0);
   SPIEL_CHECK_LT(action, NumDistinctActions());
+
+  // Check for drop actions first
+
+  if (action >= kFirstDropAction) {
+	int bs = board.BoardSize();
+    int num_squares = bs * bs;
+    int idx = static_cast<int>(action) - kFirstDropAction;
+
+    int piece_index = idx / num_squares;
+    int to_index    = idx % num_squares;
+
+    Move m;
+    m.from = Square{
+        static_cast<int8_t>(bs),               // x = board_size → indicates drop
+        static_cast<int8_t>(piece_index)      // y = pieceIndex
+    };
+
+    m.to = Square{
+        static_cast<int8_t>(to_index % bs),
+        static_cast<int8_t>(to_index / bs)
+    };
+
+    // m.promotion = kNoPiece;
+        return m;
+  }
 
   // Some chess variants (e.g. RBC) allow pass moves.
   if (board.AllowPassMove() && action == kPassAction) {

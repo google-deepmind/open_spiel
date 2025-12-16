@@ -47,7 +47,9 @@ inline constexpr double LossUtility() { return -1; }
 inline constexpr double DrawUtility() { return 0; }
 inline constexpr double WinUtility() { return 1; }
 
-inline constexpr int NumDistinctActions() { return 4978; }
+inline constexpr int kFirstDropAction = 4674;
+// because of our encoding NumDistinctActions includes impossible pawn drops
+inline constexpr int NumDistinctActions() { return kFirstDropAction + 5 * 64; }
 inline constexpr int kLeftCastlingAction = 4672;
 inline constexpr int kRightCastlingAction = 4673;
 
