@@ -22,7 +22,6 @@ import numpy as np
 import jax.numpy as jnp
 import flax.linen as linen
 import flax.nnx as nnx
-import jax
 
 from open_spiel.python.algorithms.alpha_zero.utils import (
   AVIALABLE_APIS, TrainInput, api_selector, linen_to_nnx, nnx_to_linen)

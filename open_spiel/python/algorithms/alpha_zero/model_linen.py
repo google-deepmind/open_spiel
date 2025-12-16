@@ -361,9 +361,24 @@ class Model:
     self._checkpointer.save(path, self._state, save_args=orbax_utils.save_args_from_target(self._state), force=True)
     return step
    
-  def load_checkpoint(self, step: int | str) -> TrainState:
+  def load_checkpoint(self, step: int | str, device: str = None) -> TrainState:
     target = self._state
     path = os.path.join(self._path, f"checkpoint-{step}")
+
+    if device is None:
+      device = jax.local_devices()[0]
+
+    restore_args_tree = jax.tree_util.tree_map(
+        lambda x: 
+        orbax.checkpoint.type_handlers.ArrayRestoreArgs(sharding=jax.sharding.SingleDeviceSharding(device)),
+        target
+    )
+
+    self._state = self._checkpointer.restore(
+        path, 
+        item=orbax.checkpoint.args.PyTreeRestore(item=restore_args_tree) 
+    )
+
     self._state = self._checkpointer.restore(path, item=target)
     jax.block_until_ready(self._state)
     return self._state
