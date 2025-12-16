@@ -51,7 +51,7 @@ def main(unused_argv):
     memory_capacity=1000000,
     policy_network_train_steps=2500,
     advantage_network_train_steps=375,
-    print_nash_convs=False # for debug purposes
+    # print_nash_convs=True # for debug purposes
   )
   
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()

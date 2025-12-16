@@ -43,6 +43,10 @@ def set_seed(seed):
       torch.backends.cudnn.deterministic = True
       torch.backends.cudnn.benchmark = False
 
+def lp_norm(mdl: nn.Module, p: int = 2) -> torch.Tensor:
+    lp_norms = [w.norm(p) for name, w in mdl.named_parameters()]
+    return sum(lp_norms)
+
 class AdvantageMemory(NamedTuple):
   info_state: torch.Tensor
   iteration: torch.Tensor
@@ -91,27 +95,25 @@ class MLP(nn.Module):
       input_size = size
     # Output layer
     _layers.append(nn.LayerNorm(input_size))
-    _layers.append(_create_linear_block(input_size, output_size))
+    _layers.append(nn.Linear(input_size, output_size))
     if final_activation:
       _layers.append(final_activation)
     self.model = nn.Sequential(*_layers)
 
   def forward(self, x: torch.Tensor) -> torch.Tensor:
     return self.model(x)
-
+  
   def reset(self):
 
     @torch.no_grad()
-    def reset_model_weights(layer):
-      if hasattr(layer, 'reset_parameters'):
-          layer.reset_parameters()
-      else:
-          if hasattr(layer, 'children'):
-              for child in layer.children():
-                  reset_model_weights(child)
-      
-    self.apply(reset_model_weights)
-    return self
+    def weight_reset(m: nn.Module):
+        reset_parameters = getattr(m, "reset_parameters", None)
+        if callable(reset_parameters):
+            m.reset_parameters()
+
+    self.apply(fn=weight_reset)
+
+
 
 class ReservoirBuffer(object):
   """Allows uniform sampling over a stream of data.
@@ -270,8 +272,8 @@ class DeepCFRSolver(policy.Policy):
     # and sampled regret is computed from the advantage networks.
     
     self._loss_policy = nn.MSELoss()
-    self._optimizer_policy = torch.optim.Adam(
-        self._policy_network.parameters(), lr=learning_rate)
+    self._optimizer_policy = None
+    self._reinitialize_policy_network()
 
     self._loss_advantages = nn.MSELoss(reduction="mean")
     self._optimizer_advantages = [None] * self._num_players
@@ -294,7 +296,7 @@ class DeepCFRSolver(policy.Policy):
     self._advantage_networks[player].reset()
     self._optimizer_advantages[player] = torch.optim.Adam(
         self._advantage_networks[player].parameters(), lr=self._learning_rate)
-    
+  
   def _reinitialize_policy_network(self):
     self._policy_network.reset()
     self._optimizer_policy = torch.optim.Adam(
@@ -318,7 +320,7 @@ class DeepCFRSolver(policy.Policy):
         policy_loss = self._learn_strategy_network()
         average_policy = policy.tabular_policy_from_callable(self._game, self.action_probabilities)
         conv = exploitability.nash_conv(self._game, average_policy)
-        print(f"NashConv @ {self._iteration} = {conv}")
+        print(f"NashConv @ {self._iteration} = {conv} | policy loss = {policy_loss}")
         self._reinitialize_policy_network()
 
       for p in range(self._num_players):
@@ -435,7 +437,7 @@ class DeepCFRSolver(policy.Policy):
     if len(info_state_vector.shape) == 1:
       info_state_vector = np.expand_dims(info_state_vector, axis=0)
     with torch.no_grad():
-      probs = self._policy_network(torch.from_numpy(info_state_vector).float()).cpu().numpy()
+      probs = self._policy_network(torch.FloatTensor(info_state_vector)).cpu().numpy()
     return {action: probs[0][action] for action in legal_actions}
 
   def _learn_advantage_network(self, player):
@@ -471,9 +473,9 @@ class DeepCFRSolver(policy.Policy):
       if not info_states:
         return None
       self._optimizer_advantages[player].zero_grad()
-      advantages = torch.tensor(advantages).float()
-      iters = torch.tensor(iterations).sqrt().float()
-      outputs = self._advantage_networks[player](torch.tensor(info_states).float())
+      advantages = torch.FloatTensor(advantages)
+      iters = torch.FloatTensor(np.sqrt(iterations))
+      outputs = self._advantage_networks[player](torch.FloatTensor(info_states))
       loss_advantages = self._loss_advantages(iters * outputs,
                                               iters * advantages)
       loss_advantages.backward()
@@ -504,9 +506,9 @@ class DeepCFRSolver(policy.Policy):
         iterations.append([s.iteration])
 
       self._optimizer_policy.zero_grad()
-      iters = torch.tensor(iterations).sqrt().float()
-      ac_probs = torch.tensor(action_probs).squeeze().float()
-      outputs = self._policy_network(torch.tensor(info_states).float())
+      iters = torch.FloatTensor(np.sqrt(iterations))
+      ac_probs = torch.FloatTensor(np.array(action_probs)).squeeze()
+      outputs = self._policy_network(torch.FloatTensor(np.array(info_states)))
       loss_strategy = self._loss_policy(iters * outputs, iters * ac_probs)
       loss_strategy.backward()
       self._optimizer_policy.step()

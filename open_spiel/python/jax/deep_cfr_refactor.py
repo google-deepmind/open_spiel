@@ -42,6 +42,7 @@ import optax
 import chex
 from typing import Iterable, NamedTuple, Callable
 from tqdm.auto import tqdm
+from copy import deepcopy
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
@@ -89,6 +90,10 @@ class ReservoirBuffer(object):
         self._data[idx] = element
     self._add_calls += 1
 
+  @property
+  def data(self):
+    return self._data
+
   def sample(self, num_samples):
     """Returns `num_samples` uniformly sampled from the buffer.
 
@@ -133,18 +138,20 @@ class MLP(nn.Module):
   ) -> None:
     
     _layers = []
-    def _create_linear_block(in_features, out_features):
+    def _create_linear_block(in_features, out_features, act=nn.relu):
       return nn.Sequential(
-        nn.Linear(in_features, out_features, rngs=nn.Rngs(seed)),
-        nn.relu
+        nn.Linear(in_features, out_features,
+          kernel_init=nn.initializers.glorot_uniform(),
+          rngs=nn.Rngs(seed)),
+        act,
       )
     # Input and Hidden layers
     for size in hidden_sizes:
-      _layers.append(_create_linear_block(input_size, size))
+      _layers.append(_create_linear_block(input_size, size, act=nn.relu))
       input_size = size
     # Output layer
     _layers.append(nn.LayerNorm(input_size, rngs=nn.Rngs(seed)))
-    _layers.append(_create_linear_block(input_size, output_size))
+    _layers.append(_create_linear_block(input_size, output_size, act=lambda x: x))
     if final_activation:
       _layers.append(final_activation)
     self.model = nn.Sequential(*_layers)
@@ -534,8 +541,8 @@ class DeepCFRSolver(policy.Policy):
       The average loss over the advantage network of the last batch.
     """
     
-    net = self._advantage_networks[player]
-    opt = self._advantage_opt[player]
+    net = deepcopy(self._advantage_networks[player])
+    opt = deepcopy(self._advantage_opt[player])
     net.train()
     cached_update = nn.cached_partial(self._jitted_adv_update, net, opt)
     
@@ -585,23 +592,26 @@ class DeepCFRSolver(policy.Policy):
       The average loss obtained on the last training batch of transitions
       or `None`.
     """
-    net = self._policy_network
-    opt = self._policy_opt
+
+    net = deepcopy(self._policy_network)
+    opt = deepcopy(self._policy_opt)
     net.train()
 
     cached_update = nn.cached_partial(self._jitted_policy_update, net, opt)
-
+    if self._batch_size_strategy > len(self._strategy_memories):
+      ## Skip if there aren't enough samples
+      return None
+    
     for _ in range(self._policy_network_train_steps):
+      
       if self._batch_size_strategy:
-        if self._batch_size_strategy > len(self._strategy_memories):
-          ## Skip if there aren't enough samples
-          return None
-        
-        samples = self._strategy_memories.sample(self._batch_size_strategy)
+        samples = self._strategy_memories.sample(
+            self._batch_size_strategy)
       else:
         samples = self._strategy_memories
+      
       data = []
-     
+      
       for s in samples:
         data.append(
           (
@@ -611,7 +621,12 @@ class DeepCFRSolver(policy.Policy):
             jnp.array([s.iteration])
           )  
         )
-     
+
+      # Ensure some samples have been gathered.
+      if not data[0]:
+        print("Not enough samples gathered")
+        return None
+      
       data = jax.tree.map(lambda *x: jnp.stack(x), *data)
 
       main_loss = cached_update(
