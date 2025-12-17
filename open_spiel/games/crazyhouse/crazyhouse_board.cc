@@ -139,7 +139,6 @@ std::string PieceTypeToString(PieceType p, bool uppercase) {
 }
 
 std::string Piece::ToUnicode() const {
-  SpielFatalError("ToUnicode doesnt work");
   switch (color) {
     case Color::kBlack:
       switch (type) {
@@ -148,12 +147,16 @@ std::string Piece::ToUnicode() const {
         case PieceType::kPawn:
           return "♟";
         case PieceType::kKnight:
+        case PieceType::kKnightP:
           return "♞";
         case PieceType::kBishop:
+        case PieceType::kBishopP:
           return "♝";
         case PieceType::kRook:
+        case PieceType::kRookP:
           return "♜";
         case PieceType::kQueen:
+        case PieceType::kQueenP:
           return "♛";
         case PieceType::kKing:
           return "♚";
@@ -168,12 +171,16 @@ std::string Piece::ToUnicode() const {
         case PieceType::kPawn:
           return "♙";
         case PieceType::kKnight:
+        case PieceType::kKnightP:
           return "♘";
         case PieceType::kBishop:
+        case PieceType::kBishopP:
           return "♗";
         case PieceType::kRook:
+        case PieceType::kRookP:
           return "♖";
         case PieceType::kQueen:
+        case PieceType::kQueenP:
           return "♕";
         case PieceType::kKing:
           return "♔";
@@ -1142,6 +1149,42 @@ absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string &move,
                                               bool chess960) const {
   if (move.empty()) { return absl::nullopt; }
 
+  // Check for drop moves first
+  // Crazyhouse drop move: P@e4
+  if (move.size() == 4 && move[1] == '@') {
+    char pc = move[0];
+    char file = move[2];
+    char rank = move[3];
+
+	  // Validate square
+	  if (file < 'a' || file >= ('a' + board_size_) ||
+		  rank < '1' || rank >= ('1' + board_size_)) {
+		return absl::nullopt;
+	  }
+
+	  // Parse piece type
+	  absl::optional<PieceType> opt = PieceTypeFromChar(pc);
+	  if (!opt) return absl::nullopt;
+
+	  PieceType ptype = *opt;
+
+	  // Disallow illegal drops
+	  if (ptype == PieceType::kKing) return absl::nullopt;
+
+	  auto to = SquareFromString(move.substr(2, 2));
+	  if (!to) return absl::nullopt;
+
+	  // Construct drop move
+	  Move drop;
+	  drop.from = Square{board_size_,
+						 static_cast<int>(Pocket::Index(ptype))};
+	  drop.to = *to;
+	  drop.piece = Piece{to_play_, ptype};
+
+	  return drop;
+  }
+
+
   // Long algebraic notation moves (of the variant we care about) are in one of
   // two forms -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
@@ -1239,7 +1282,6 @@ absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string &move,
 }
 
 void CrazyhouseBoard::ApplyMove(const Move &move) {
-  // to_play switches up here at the top, careful.
   // Skip applying a move if it's a pass.
   if (move == kPassMove) {
     if (to_play_ == Color::kBlack) ++move_number_;
@@ -1262,9 +1304,9 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
 	  PieceType from_type = Pocket::DropPieceType(move.from.y);
 	  moving_piece =  Piece{to_play_, from_type};
 	  if (to_play_ == Color::kBlack) {
-		  white_pocket_.Decrement(from_type);
-	  } else {
 		  black_pocket_.Decrement(from_type);
+	  } else {
+		  white_pocket_.Decrement(from_type);
 	  }
 
   } else {
@@ -1279,9 +1321,9 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   if (destination_piece !=  kEmptyPiece) {
 	  PieceType dpt = destination_piece.type;
 	  if (to_play_ == Color::kBlack) {
-		  white_pocket_.Increment(dpt, insanity_);
-      } else {
 		  black_pocket_.Increment(dpt, insanity_);
+      } else {
+		  white_pocket_.Increment(dpt, insanity_);
 	  }
   }
 
@@ -1370,7 +1412,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
 
   // 2. En-passant
   if (moving_piece.type == PieceType::kPawn && move.from.x != move.to.x &&
-      destination_piece.type == PieceType::kEmpty) {
+      destination_piece.type == PieceType::kEmpty && !IsDropMove(move)) {
     if (move.to != EpSquare()) {
       std::cerr << "We are trying to capture an empty square "
                 << "with a pawn, but the square is not the en passant square:\n"
@@ -1403,7 +1445,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   // 4. Double push
   SetEpSquare(kInvalidSquare);
   if (moving_piece.type == PieceType::kPawn &&
-      abs(move.from.y - move.to.y) == 2) {
+      abs(move.from.y - move.to.y) == 2 && !IsDropMove(move)) {
     Square ep_square{move.from.x,
                      static_cast<int8_t>((move.from.y + move.to.y) / 2)};
     // Only set the en-passant square if it's being threatened. This is to
@@ -1890,6 +1932,22 @@ std::string CrazyhouseBoard::ToFEN(bool shredder) const {
     if (rank > 0) fen.push_back('/');
   }
 
+  // ----- 1.5 🙂 Crazyhouse pockets -----
+  std::string pockets;
+
+  // white pockets: Pawn, Knight, Bishop, Rook, Queen indices 0..4
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+	  const Pocket& pocket = (color == Color::kWhite) ? white_pocket_ : black_pocket_;
+      for (PieceType ptype : Pocket::PieceTypes()) {
+		  Piece pocket_piece{color, ptype};
+		  char c = pocket_piece.ToString()[0];
+		  pockets.append(pocket.Count(ptype), c);
+	  }
+  }
+  if (!pockets.empty()) {
+    absl::StrAppend(&fen, "[", pockets, "]");
+  }
+
   // ----- 2. Side to move -----
   absl::StrAppend(&fen, " ", to_play_ == Color::kWhite ? "w" : "b");
 
@@ -1930,25 +1988,6 @@ std::string CrazyhouseBoard::ToFEN(bool shredder) const {
 
   // ----- 6. Move number -----
   absl::StrAppend(&fen, " ", move_number_);
-
-  // ----- 7. Crazyhouse pockets -----
-  std::string pockets;
-
-  // white pockets: Pawn, Knight, Bishop, Rook, Queen indices 0..4
-  for (Color color : {Color::kWhite, Color::kBlack}) {
-	  const Pocket& pocket = (color == Color::kWhite) ? white_pocket_ : black_pocket_;
-      for (PieceType ptype : Pocket::PieceTypes()) {
-		  Piece pocket_piece{color, ptype};
-		  char c = pocket_piece.ToString()[0];
-		  pockets.append(pocket.Count(ptype), c);
-	  }
-  }
-
-
-
-  if (!pockets.empty()) {
-    absl::StrAppend(&fen, " [", pockets, "]");
-  }
 
   return fen;
 }

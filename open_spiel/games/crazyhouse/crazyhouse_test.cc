@@ -25,6 +25,7 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
+
 void BasicTests() {
   testing::LoadGameTest("crazyhouse");
   auto game = open_spiel::LoadGame("crazyhouse");
@@ -34,11 +35,82 @@ void BasicTests() {
   // whoo hoo all pass! 
 }
 
+void FoolsMateTest() {
+  auto game = open_spiel::LoadGame("crazyhouse");
+  auto state = game->NewInitialState();
+  CrazyhouseState* ch_state = dynamic_cast<CrazyhouseState*>(state.get());
+  SPIEL_CHECK_TRUE(ch_state != nullptr);
+  auto apply = [&](const std::string& lan) {
+    const CrazyhouseBoard& board = ch_state->Board();
+
+    absl::optional<Move> maybe_move = board.ParseLANMove(lan);
+    SPIEL_CHECK_TRUE(maybe_move);
+
+    Action action = MoveToAction(*maybe_move, board.BoardSize());
+    state->ApplyAction(action);
+	std::cout << board.ToFEN() << std::endl;
+  };
+  apply("f2f4");
+  apply("e7e5");
+  apply("g2g4");
+  apply("d8h4");
+  // Checkmate assertions
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  // Black wins
+  SPIEL_CHECK_EQ(state->Returns()[crazyhouse::ColorToPlayer(Color::kWhite)], -1);
+  SPIEL_CHECK_EQ(state->Returns()[crazyhouse::ColorToPlayer(Color::kBlack)], 1);
+}
+
+  
+  void CrazyhouseDropMateTest() {
+  auto game = open_spiel::LoadGame("crazyhouse");
+  auto state = game->NewInitialState();
+  CrazyhouseState* ch_state;
+
+  auto apply = [&](const std::string& lan) {
+    ch_state = dynamic_cast<CrazyhouseState*>(state.get());
+    SPIEL_CHECK_TRUE(ch_state != nullptr);
+
+    const CrazyhouseBoard& board = ch_state->Board();
+
+    absl::optional<Move> maybe_move = board.ParseLANMove(lan);
+    SPIEL_CHECK_TRUE(maybe_move);
+
+    Action action = MoveToAction(*maybe_move, board.BoardSize());
+    state->ApplyAction(action);
+	std::cout << board.ToFEN() << std::endl;
+  };
+
+  // 1. f2f4
+  apply("f2f4");
+  // ... Ng8f6
+  apply("g8f6");
+
+  // 2. g2g4
+  apply("g2g4");
+  // ... Nxg4
+  apply("f6g4");  // see note below
+
+  // 3. Nb1a3
+  apply("b1a3");
+  // ... P@f2#
+  apply("P@f2");
+
+
+  // Checkmate assertions
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  // Black wins
+  SPIEL_CHECK_EQ(state->Returns()[crazyhouse::ColorToPlayer(Color::kWhite)], -1);
+  SPIEL_CHECK_EQ(state->Returns()[crazyhouse::ColorToPlayer(Color::kBlack)], 1);
+}
+
 
 }  // namespace
 }  // namespace crazyhouse
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::crazyhouse::FoolsMateTest();
   open_spiel::crazyhouse::BasicTests();
+  open_spiel::crazyhouse::CrazyhouseDropMateTest();
 }
