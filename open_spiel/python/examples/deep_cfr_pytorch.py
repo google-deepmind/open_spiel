@@ -61,7 +61,7 @@ def main(unused_argv):
     learning_rate=1e-3,
     batch_size_advantage=256,
     batch_size_strategy=256,
-    memory_capacity=1000000,
+    memory_capacity=100000,
     policy_network_train_steps=2500,
     advantage_network_train_steps=375,
     print_nash_convs=False # for debugging purposes

@@ -32,7 +32,6 @@ longer supported yet still required in this file.
 """
 
 import collections
-import random
 
 import jax
 import flax.nnx as nn
@@ -62,51 +61,69 @@ class StrategyMemory(NamedTuple):
   strategy_action_probs: chex.Array
   legal_mask: chex.Array
 
-# TODO(author3) Refactor into data structures lib.
-class ReservoirBuffer(object):
+
+class ReservoirBufferState(NamedTuple):
   """Allows uniform sampling over a stream of data.
-
-  This class supports the storage of arbitrary elements, such as observation
-  tensors, integer actions, etc.
-
   See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
   """
+  experience: chex.ArrayTree
+  capacity: chex.Numeric
+  add_calls: chex.Array
 
-  def __init__(self, reservoir_buffer_capacity):
-    self._reservoir_buffer_capacity = reservoir_buffer_capacity
-    self._data = []
-    self._add_calls = 0
+  def __len__(self) -> int:
+    return min(self.add_calls, self.capacity)
 
-  def add(self, element):
-    """Potentially adds `element` to the reservoir buffer.
+@jax.jit(static_argnames=("capacity",))
+def init_reservoir(capacity: chex.Numeric, experience: chex.ArrayTree) -> ReservoirBufferState:
+  # Set experience value to be empty.
+  experience = jax.tree.map(jnp.empty_like, experience)
+  # Broadcast to [add_batch_size, ...]
+  experience = jax.tree.map(
+    lambda x: jnp.broadcast_to(
+        x[jnp.newaxis, ...], (capacity, *x.shape)
+    ),
+    experience,
+  )
+  return ReservoirBufferState(
+    capacity=capacity, experience=experience, add_calls=jnp.array(0))
 
-    Args:
-      element: data to be added to the reservoir buffer.
-    """
-    if len(self._data) < self._reservoir_buffer_capacity:
-      self._data.append(element)
-    else:
-      idx = np.random.randint(0, self._add_calls + 1)
-      if idx < self._reservoir_buffer_capacity:
-        self._data[idx] = element
-    self._add_calls += 1
+@partial(jax.jit, donate_argnums=(0,))
+def append_to_reservoir(
+  state: ReservoirBufferState, 
+  experience: chex.ArrayTree, 
+  rng: chex.PRNGKey
+) -> ReservoirBufferState:
+  """Potentially adds `experience` to the reservoir buffer.
 
-  @property
-  def data(self):
-    return self._data
+  Args:
+    state: `ReservoirBufferState`, current state of the buffer
+    experience: data to be added to the reservoir buffer.
+    rng: `chex.PRNGKey`, a random seed
 
-  def clear(self):
-    self._data = []
-    self._add_calls = 0
+  Returns:
+    An updated `ReservoirBufferState` 
 
-  def __len__(self):
-    return len(self._data)
+    BE CAREFUL!: https://github.com/jax-ml/jax/issues/16587
+  """
+  
+  # Note: count + 1 because the current item is the (count+1)-th item
+  idx = jax.random.randint(rng, (), 0, state.add_calls + 1)
+  
+  # 2. Logic: 
+  # If buffer is not full, we always add at 'count'.
+  # If buffer is full, we replace at 'idx' ONLY IF idx < capacity.
+  is_full = state.add_calls >= state.capacity
+  write_idx = jnp.where(is_full, idx, state.add_calls)
+  should_update = write_idx < state.capacity
 
-  def __iter__(self):
-    return iter(self._data)
+  def update_leaf(buffer_leaf, exp_leaf):
+    new_val = jnp.where(should_update, exp_leaf, buffer_leaf[write_idx])
+    return buffer_leaf.at[write_idx].set(new_val)
 
-  def shuffle_data(self):
-    random.shuffle(self._data)
+  new_experience = jax.tree.map(update_leaf, state.experience, experience)
+
+  return ReservoirBufferState(
+    capacity=state.capacity, experience=new_experience, add_calls=state.add_calls+1)
 
 def get_tree_shape_prefix(tree: chex.ArrayTree, n_axes: int = 1) -> chex.Shape:
   """Get the shape of the leading axes (up to n_axes) of a pytree. This assumes all
@@ -117,13 +134,13 @@ def get_tree_shape_prefix(tree: chex.ArrayTree, n_axes: int = 1) -> chex.Shape:
   chex.assert_tree_shape_prefix(tree, leading_axis_shape)
   return leading_axis_shape
 
-@partial(jax.jit, static_argnames=("num_samples",))
-def sample(rng: chex.PRNGKey, data: chex.ArrayTree, num_samples: int):
+@partial(jax.jit, static_argnames=("num_samples", "max_size"))
+def sample(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int, max_size: int):
   """Returns `num_samples` uniformly sampled from the buffer.
 
   Args:
     rng: `chex.PRNGKey`, a random state
-    data: `chex.ArrayTree`, a dataset
+    state: `ReservoirBufferState`, a buffer state
     num_samples: `int`, number of samples to draw.
 
   Returns:
@@ -132,20 +149,33 @@ def sample(rng: chex.PRNGKey, data: chex.ArrayTree, num_samples: int):
   Raises:
     AssertionError: If there are less than `num_samples` elements in the buffer
   """
-  # if len(data) < num_samples:
-  #   raise ValueError('{} elements could not be sampled from size {}'.format(
-  #       num_samples, len(data)))
-  data_size = get_tree_shape_prefix(data)[0]
+  capacity = get_tree_shape_prefix(state.experience)[0]
+  chex.assert_equal(num_samples < capacity, True)
 
-  chex.assert_equal(num_samples < data_size, True)
-  indices = jax.random.choice(rng, jnp.arange(data_size), shape=(num_samples,), replace=False)
-  return jax.tree.map(lambda x: x[indices], data)
+  indices = jax.random.choice(
+    rng, jnp.arange(max_size), shape=(num_samples,), replace=False)
+  return jax.tree.map(lambda x: x[indices], state.experience)
+
+@partial(jax.jit, static_argnames=("num_samples", "max_size"))
+def shuffle_data(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int, max_size: int):
+  """Returns shuffled buffer along the batch axis.
+
+  Args:
+    rng: `chex.PRNGKey`, a random state
+    state: `ReservoirBufferState`, a buffer state
+    num_samples: `int`, number of samples to draw (UNUSED). 
+
+  Returns:
+    The iterable buffer.
+  """
+  return jax.tree.map(
+    lambda arr: jax.random.permutation(rng, arr[:max_size], axis=0), state.experience
+  )
 
 def get_batch_sampler(batch_size) -> Callable:
   if batch_size is not None:
       return sample
-  return jax.jit(
-    lambda rng, arr, u: jax.random.permutation(rng, arr, axis=0), static_argnums=(2,))
+  return shuffle_data
 
 class MLP(nn.Module):
   def __init__(self,
@@ -257,11 +287,10 @@ class DeepCFRSolver(policy.Policy):
     self._learning_rate = learning_rate
     self._rngkey = jax.random.key(seed)
     self._print_nash_convs = print_nash_convs
+    self._memory_capacity = memory_capacity
 
     # Initialize networks and memory buffers
-    self._advantage_memories = [
-        ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
-    ]
+    self._advantage_memories = [None] * self._num_players
     self._advantage_networks = [
       MLP(
         self._embedding_size, 
@@ -276,7 +305,7 @@ class DeepCFRSolver(policy.Policy):
       for p in range(self._num_players)
     ]
 
-    self._strategy_memories = ReservoirBuffer(memory_capacity)
+    self._strategy_memories = None
     self._policy_network = MLP(
       self._embedding_size,
       list(policy_network_layers),
@@ -308,10 +337,7 @@ class DeepCFRSolver(policy.Policy):
     def update(
       advantage_model: nn.Module,
       optimiser: nn.Optimizer, 
-      info_states: chex.Array, 
-      samp_regrets: chex.Array,
-      masks: chex.Array, 
-      iterations: chex.Array,
+      batch: AdvantageMemory,
       total_iterations: chex.Array
     ) -> chex.Array:
       
@@ -330,7 +356,13 @@ class DeepCFRSolver(policy.Policy):
     
       self._adv_grads = nn.value_and_grad(_loss_adv)
       main_loss, grads = self._adv_grads(
-        advantage_model, info_states, samp_regrets, masks, iterations, total_iterations)
+        advantage_model, 
+        batch.info_state, 
+        batch.advantage, 
+        batch.legal_mask, 
+        batch.iteration, 
+        total_iterations
+      )
       optimiser.update(advantage_model, grads)
       return main_loss
 
@@ -343,10 +375,7 @@ class DeepCFRSolver(policy.Policy):
     def update(
       policy_model: nn.Module, 
       optimiser: nn.Optimizer, 
-      info_states: chex.Array, 
-      action_probs: chex.Array, 
-      masks: chex.Array, 
-      iterations: chex.Array, 
+      batch: StrategyMemory,
       total_iterations: chex.Array
     ) -> chex.Array:
       
@@ -370,7 +399,13 @@ class DeepCFRSolver(policy.Policy):
       _policy_grad_fn = nn.value_and_grad(_loss_policy)
       
       main_loss, grads = _policy_grad_fn(
-        policy_model, info_states, action_probs, masks, iterations, total_iterations)
+        policy_model, 
+        batch.info_state, 
+        batch.strategy_action_probs, 
+        batch.legal_mask, 
+        batch.iteration, 
+        total_iterations
+      )
       optimiser.update(policy_model, grads)
       return main_loss
 
@@ -416,16 +451,22 @@ class DeepCFRSolver(policy.Policy):
     self._advantage_opt[player] = nn.Optimizer(self._advantage_networks[player], optax.adam(self._learning_rate), wrt=nn.Param)
 
   @property
-  def advantage_buffers(self) -> list[ReservoirBuffer]:
+  def advantage_buffers(self) -> ReservoirBufferState:
     return self._advantage_memories
 
   @property
-  def strategy_buffer(self) -> ReservoirBuffer:
+  def strategy_buffer(self) -> ReservoirBufferState:
     return self._strategy_memories
+  
+  def _append_to_advantage_buffer(self, player: int, data: AdvantageMemory):
+    if self._advantage_memories[player] is None:
+      self._advantage_memories[player] = init_reservoir(self._memory_capacity, data)
+    self._advantage_memories[player] = append_to_reservoir(self._advantage_memories[player], data, self._next_rng_key())
 
-  def clear_advantage_buffers(self):
-    for p in range(self._num_players):
-      self._advantage_memories[p].clear()
+  def _append_to_stategy_buffer(self, data: StrategyMemory):
+    if self._strategy_memories is None:
+      self._strategy_memories = init_reservoir(self._memory_capacity, data)
+    self._strategy_memories = append_to_reservoir(self._strategy_memories, data, self._next_rng_key())
 
   def solve(self) -> tuple[nn.Module, dict, chex.Numeric]:
     """Solution logic for Deep CFR."""
@@ -484,15 +525,14 @@ class DeepCFRSolver(policy.Policy):
             state.child(action), player)
       cfv = np.sum(exp_payoff * strategy)
       samp_regret = (exp_payoff - cfv) * state.legal_actions_mask(player)
-      self._advantage_memories[player].add(
-        AdvantageMemory(
-          jnp.array(state.information_state_tensor()), 
-          jnp.array(self._iteration, dtype=int),
-          jnp.array(samp_regret), 
-          jnp.array(action),
-          jnp.array(state.legal_actions_mask(player))
-        )
+      data = AdvantageMemory(
+        jnp.array(state.information_state_tensor()), 
+        jnp.array(self._iteration, dtype=int).reshape(1,),
+        jnp.array(samp_regret), 
+        jnp.array(action),
+        jnp.array(state.legal_actions_mask(player))
       )
+      self._append_to_advantage_buffer(player, data)
       return cfv
     else:
       other_player = state.current_player()
@@ -501,14 +541,13 @@ class DeepCFRSolver(policy.Policy):
       probs = jnp.array(strategy)
       probs /= probs.sum()
       sampled_action = jax.random.choice(self._next_rng_key(), jnp.arange(self._num_actions), p=probs)
-      self._strategy_memories.add(
-          StrategyMemory(
-          jnp.array(state.information_state_tensor(other_player)), 
-          jnp.array(self._iteration),
-          jnp.array(strategy),
-          jnp.array(state.legal_actions_mask(other_player))
-        )
+      data = StrategyMemory(
+        jnp.array(state.information_state_tensor(other_player)), 
+        jnp.array(self._iteration, dtype=int).reshape(1,),
+        jnp.array(strategy),
+        jnp.array(state.legal_actions_mask(other_player))
       )
+      self._append_to_stategy_buffer(data)
       return self._traverse_game_tree(state.child(sampled_action), player)
 
   def _sample_action_from_advantage(self, state, player):
@@ -560,43 +599,28 @@ class DeepCFRSolver(policy.Policy):
       The average loss over the advantage network of the last batch.
     """
 
-    net = deepcopy(self._advantage_networks[player])
-    opt = deepcopy(self._advantage_opt[player])
-    net.train()
-    
-
-    data = []
-    for s in self._advantage_memories[player]:
-        data.append(
-          (
-            jnp.array(s.info_state), jnp.array(s.advantage), 
-            jnp.array(s.legal_mask), jnp.array([s.iteration])
-          )  
-        )
-
-    dataset = jax.tree.map(lambda *x: jnp.stack(x), *data)
+    self._advantage_networks[player].train()
 
     batch_size = self._batch_size_advantage
     sampler_fn = get_batch_sampler(batch_size)
+    max_size = min(self._advantage_memories[player].add_calls.item(), self._advantage_memories[player].capacity.astype(int).item())
 
     def _step(carry, unused):
-      net, opt, rng, ds, iteration, _ = carry
-
-      batch = sampler_fn(rng, ds, batch_size)
+      net, opt, rng, buffer_state, iteration, _ = carry
+      batch = sampler_fn(rng, buffer_state, batch_size, max_size)
 
       main_loss = self._jitted_adv_update(
         net, 
         opt,
-        *batch, 
+        batch, 
         jnp.array(iteration)
       )
       _, rng = jax.random.split(rng)
-      return (net, opt, rng, ds, iteration, main_loss), None
-    
+      return (net, opt, rng, buffer_state, iteration, main_loss), None
     
     (self._advantage_networks[player], self._advantage_opt[player], _, _, _, main_loss), _ = jax.lax.scan(
       _step, 
-      (net, opt, self._next_rng_key(), dataset, self._iteration, jnp.array(0)),
+      (self._advantage_networks[player], self._advantage_opt[player], self._next_rng_key(), self._advantage_memories[player], self._iteration, jnp.array(0)),
       None,
       self._advantage_network_train_steps
     )    
@@ -610,47 +634,34 @@ class DeepCFRSolver(policy.Policy):
       The average loss obtained on the last training batch of transitions
       or `None`.
     """
-
-    net = deepcopy(self._policy_network)
-    opt = deepcopy(self._policy_opt)
-    net.train()
+    self._policy_network.train()
 
     if self._batch_size_strategy > len(self._strategy_memories):
       ## Skip if there aren't enough samples
       return None
-    
-    data = []
-    for s in self._strategy_memories:
-        data.append(
-          (
-            jnp.array(s.info_state), jnp.array(s.strategy_action_probs), 
-            jnp.array(s.legal_mask), jnp.array([s.iteration])
-          )  
-        )
-
-    dataset = jax.tree.map(lambda *x: jnp.stack(x), *data)
-
+  
     batch_size = self._batch_size_strategy
     sampler_fn = get_batch_sampler(batch_size)
+    max_size = min(self._strategy_memories.add_calls.item(), self._strategy_memories.capacity.item())
 
     def _step(carry, unused):
-      net, opt, rng, ds, iteration, _ = carry
+      net, opt, rng, buffer_state, iteration, _ = carry
 
-      batch =  sampler_fn(rng, ds, batch_size)
+      batch = sampler_fn(rng, buffer_state, batch_size, max_size)
         
       main_loss = self._jitted_policy_update(
         net, 
         opt,
-        *batch, 
+        batch, 
         jnp.array(iteration)
       )
       _, rng = jax.random.split(rng)
-      return (net, opt, rng, ds, iteration, main_loss), None
+      return (net, opt, rng, buffer_state, iteration, main_loss), None
     
     
     (self._policy_network, self._policy_opt,  _, _, _, main_loss), _ = jax.lax.scan(
       _step, 
-      (net, opt, self._next_rng_key(), dataset, self._iteration, jnp.array(0)),
+      (self._policy_network, self._policy_opt, self._next_rng_key(), self._strategy_memories, self._iteration, jnp.array(0)),
       None,
       self._policy_network_train_steps
     )  
