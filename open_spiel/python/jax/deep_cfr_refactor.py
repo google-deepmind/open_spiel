@@ -43,6 +43,7 @@ import chex
 from typing import Iterable, NamedTuple, Callable
 from tqdm.auto import tqdm
 from copy import deepcopy
+from functools import partial
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
@@ -94,23 +95,6 @@ class ReservoirBuffer(object):
   def data(self):
     return self._data
 
-  def sample(self, num_samples):
-    """Returns `num_samples` uniformly sampled from the buffer.
-
-    Args:
-      num_samples: `int`, number of samples to draw.
-
-    Returns:
-      An iterable over `num_samples` random elements of the buffer.
-
-    Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
-    """
-    if len(self._data) < num_samples:
-      raise ValueError('{} elements could not be sampled from size {}'.format(
-          num_samples, len(self._data)))
-    return random.sample(self._data, num_samples)
-
   def clear(self):
     self._data = []
     self._add_calls = 0
@@ -121,12 +105,47 @@ class ReservoirBuffer(object):
   def __iter__(self):
     return iter(self._data)
 
-  @property
-  def data(self):
-    return self._data
-
   def shuffle_data(self):
     random.shuffle(self._data)
+
+def get_tree_shape_prefix(tree: chex.ArrayTree, n_axes: int = 1) -> chex.Shape:
+  """Get the shape of the leading axes (up to n_axes) of a pytree. This assumes all
+  leaves have a common leading axes size (e.g. a common batch size)."""
+  flat_tree, tree_def = jax.tree_util.tree_flatten(tree)
+  leaf = flat_tree[0]
+  leading_axis_shape = leaf.shape[0:n_axes]
+  chex.assert_tree_shape_prefix(tree, leading_axis_shape)
+  return leading_axis_shape
+
+@partial(jax.jit, static_argnames=("num_samples",))
+def sample(rng: chex.PRNGKey, data: chex.ArrayTree, num_samples: int):
+  """Returns `num_samples` uniformly sampled from the buffer.
+
+  Args:
+    rng: `chex.PRNGKey`, a random state
+    data: `chex.ArrayTree`, a dataset
+    num_samples: `int`, number of samples to draw.
+
+  Returns:
+    An iterable over `num_samples` random elements of the buffer.
+
+  Raises:
+    AssertionError: If there are less than `num_samples` elements in the buffer
+  """
+  # if len(data) < num_samples:
+  #   raise ValueError('{} elements could not be sampled from size {}'.format(
+  #       num_samples, len(data)))
+  data_size = get_tree_shape_prefix(data)[0]
+
+  chex.assert_equal(num_samples < data_size, True)
+  indices = jax.random.choice(rng, jnp.arange(data_size), shape=(num_samples,), replace=False)
+  return jax.tree.map(lambda x: x[indices], data)
+
+def get_batch_sampler(batch_size) -> Callable:
+  if batch_size is not None:
+      return sample
+  return jax.jit(
+    lambda rng, arr, u: jax.random.permutation(rng, arr, axis=0), static_argnums=(2,))
 
 class MLP(nn.Module):
   def __init__(self,
@@ -417,7 +436,7 @@ class DeepCFRSolver(policy.Policy):
         policy_loss = self._learn_strategy_network()
         average_policy = policy.tabular_policy_from_callable(self._game, self.action_probabilities)
         conv = exploitability.nash_conv(self._game, average_policy)
-        print(f"NashConv @ {self._iteration} = {conv}")
+        print(f"NashConv @ {self._iteration} = {conv} | Policy loss = {policy_loss}")
         self._reinitialize_policy_network()
 
       for p in range(self._num_players):
@@ -540,48 +559,47 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       The average loss over the advantage network of the last batch.
     """
-    
+
     net = deepcopy(self._advantage_networks[player])
     opt = deepcopy(self._advantage_opt[player])
     net.train()
-    cached_update = nn.cached_partial(self._jitted_adv_update, net, opt)
     
-    for _ in range(self._advantage_network_train_steps):
 
-      if self._batch_size_advantage:
-        if self._batch_size_advantage > len(self._advantage_memories[player]):
-          ## Skip if there aren't enough samples
-          return None
-        samples = self._advantage_memories[player].sample(
-            self._batch_size_advantage)
-      else:
-        samples = self._advantage_memories[player]
-      data = []
-      
-      for s in samples:
+    data = []
+    for s in self._advantage_memories[player]:
         data.append(
           (
-            jnp.array(s.info_state),
-            jnp.array(s.advantage), 
-            jnp.array(s.legal_mask), 
-            jnp.array([s.iteration])
+            jnp.array(s.info_state), jnp.array(s.advantage), 
+            jnp.array(s.legal_mask), jnp.array([s.iteration])
           )  
         )
 
-      # Ensure some samples have been gathered.
-      if not data[0]:
-        print("Not enough samples gathered")
-        return None
-      
-      data = jax.tree.map(lambda *x: jnp.stack(x), *data)
+    dataset = jax.tree.map(lambda *x: jnp.stack(x), *data)
 
-      main_loss = cached_update(
-        *data, 
-        jnp.array(self._iteration)
+    batch_size = self._batch_size_advantage
+    sampler_fn = get_batch_sampler(batch_size)
+
+    def _step(carry, unused):
+      net, opt, rng, ds, iteration, _ = carry
+
+      batch = sampler_fn(rng, ds, batch_size)
+
+      main_loss = self._jitted_adv_update(
+        net, 
+        opt,
+        *batch, 
+        jnp.array(iteration)
       )
-
-    self._advantage_networks[player] = net
-    self._advantage_opt[player] = opt
+      _, rng = jax.random.split(rng)
+      return (net, opt, rng, ds, iteration, main_loss), None
+    
+    
+    (self._advantage_networks[player], self._advantage_opt[player], _, _, _, main_loss), _ = jax.lax.scan(
+      _step, 
+      (net, opt, self._next_rng_key(), dataset, self._iteration, jnp.array(0)),
+      None,
+      self._advantage_network_train_steps
+    )    
 
     return main_loss
 
@@ -597,44 +615,44 @@ class DeepCFRSolver(policy.Policy):
     opt = deepcopy(self._policy_opt)
     net.train()
 
-    cached_update = nn.cached_partial(self._jitted_policy_update, net, opt)
     if self._batch_size_strategy > len(self._strategy_memories):
       ## Skip if there aren't enough samples
       return None
     
-    for _ in range(self._policy_network_train_steps):
-      
-      if self._batch_size_strategy:
-        samples = self._strategy_memories.sample(
-            self._batch_size_strategy)
-      else:
-        samples = self._strategy_memories
-      
-      data = []
-      
-      for s in samples:
+    data = []
+    for s in self._strategy_memories:
         data.append(
           (
-            jnp.array(s.info_state),
-            jnp.array(s.strategy_action_probs), 
-            jnp.array(s.legal_mask), 
-            jnp.array([s.iteration])
+            jnp.array(s.info_state), jnp.array(s.strategy_action_probs), 
+            jnp.array(s.legal_mask), jnp.array([s.iteration])
           )  
         )
 
-      # Ensure some samples have been gathered.
-      if not data[0]:
-        print("Not enough samples gathered")
-        return None
-      
-      data = jax.tree.map(lambda *x: jnp.stack(x), *data)
+    dataset = jax.tree.map(lambda *x: jnp.stack(x), *data)
 
-      main_loss = cached_update(
-        *data, 
-        jnp.array(self._iteration)
+    batch_size = self._batch_size_strategy
+    sampler_fn = get_batch_sampler(batch_size)
+
+    def _step(carry, unused):
+      net, opt, rng, ds, iteration, _ = carry
+
+      batch =  sampler_fn(rng, ds, batch_size)
+        
+      main_loss = self._jitted_policy_update(
+        net, 
+        opt,
+        *batch, 
+        jnp.array(iteration)
       )
-
-    self._policy_network = net
-    self._policy_opt = opt
-
+      _, rng = jax.random.split(rng)
+      return (net, opt, rng, ds, iteration, main_loss), None
+    
+    
+    (self._policy_network, self._policy_opt,  _, _, _, main_loss), _ = jax.lax.scan(
+      _step, 
+      (net, opt, self._next_rng_key(), dataset, self._iteration, jnp.array(0)),
+      None,
+      self._policy_network_train_steps
+    )  
+    
     return main_loss

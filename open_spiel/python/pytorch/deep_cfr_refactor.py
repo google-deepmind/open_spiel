@@ -29,6 +29,7 @@ import numpy as np
 import torch
 from torch import nn
 from typing import Iterable, NamedTuple
+from tqdm.auto import tqdm
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
@@ -315,12 +316,12 @@ class DeepCFRSolver(policy.Policy):
       3. (float) Policy loss.
     """
     advantage_losses = collections.defaultdict(list)
-    for _ in range(self._num_iterations):
+    for _ in tqdm(range(self._num_iterations), total=self._num_iterations):
       if self._print_nash_convs:
         policy_loss = self._learn_strategy_network()
         average_policy = policy.tabular_policy_from_callable(self._game, self.action_probabilities)
         conv = exploitability.nash_conv(self._game, average_policy)
-        print(f"NashConv @ {self._iteration} = {conv} | policy loss = {policy_loss}")
+        print(f"NashConv @ {self._iteration} = {conv} | Policy loss = {policy_loss}")
         self._reinitialize_policy_network()
 
       for p in range(self._num_players):
