@@ -691,6 +691,7 @@ void CrazyhouseBoard::GeneratePseudoLegalMoves(
                 });
             break;
           case PieceType::kQueen:
+          case PieceType::kQueenP:
             GenerateQueenDestinations_(
                 sq, color, settings,
                 [&yield, &sq, &piece, &generating](const Square &to) {
@@ -698,6 +699,7 @@ void CrazyhouseBoard::GeneratePseudoLegalMoves(
                 });
             break;
           case PieceType::kRook:
+          case PieceType::kRookP:
             GenerateRookDestinations_(
                 sq, color, settings,
                 [&yield, &sq, &piece, &generating](const Square &to) {
@@ -705,6 +707,7 @@ void CrazyhouseBoard::GeneratePseudoLegalMoves(
                 });
             break;
           case PieceType::kBishop:
+          case PieceType::kBishopP:
             GenerateBishopDestinations_(
                 sq, color, settings,
                 [&yield, &sq, &piece, &generating](const Square &to) {
@@ -712,6 +715,7 @@ void CrazyhouseBoard::GeneratePseudoLegalMoves(
                 });
             break;
           case PieceType::kKnight:
+          case PieceType::kKnightP:
             GenerateKnightDestinations_(
                 sq, color,
                 [&yield, &sq, &piece, &generating](const Square &to) {
@@ -1497,7 +1501,9 @@ bool CrazyhouseBoard::UnderAttack(const Square &sq, Color our_color) const {
       sq, our_color, PseudoLegalMoveSettings::kAcknowledgeEnemyPieces,
       [this, &under_attack, &opponent_color](const Square &to) {
         if ((at(to) == Piece{opponent_color, PieceType::kRook}) ||
-            (at(to) == Piece{opponent_color, PieceType::kQueen})) {
+            (at(to) == Piece{opponent_color, PieceType::kQueen}) ||
+            (at(to) == Piece{opponent_color, PieceType::kRookP}) ||
+            (at(to) == Piece{opponent_color, PieceType::kQueenP})) {
           under_attack = true;
         }
       });
@@ -1510,6 +1516,8 @@ bool CrazyhouseBoard::UnderAttack(const Square &sq, Color our_color) const {
       sq, our_color, PseudoLegalMoveSettings::kAcknowledgeEnemyPieces,
       [this, &under_attack, &opponent_color](const Square &to) {
         if ((at(to) == Piece{opponent_color, PieceType::kBishop}) ||
+		    (at(to) == Piece{opponent_color, PieceType::kBishopP}) ||
+		    (at(to) == Piece{opponent_color, PieceType::kQueenP}) ||
             (at(to) == Piece{opponent_color, PieceType::kQueen})) {
           under_attack = true;
         }
@@ -1521,7 +1529,8 @@ bool CrazyhouseBoard::UnderAttack(const Square &sq, Color our_color) const {
   // Knight moves
   GenerateKnightDestinations_(
       sq, our_color, [this, &under_attack, &opponent_color](const Square &to) {
-        if (at(to) == Piece{opponent_color, PieceType::kKnight}) {
+        if ((at(to) == Piece{opponent_color, PieceType::kKnight}) ||
+			(at(to) == Piece{opponent_color, PieceType::kKnightP})) {
           under_attack = true;
         }
       });
@@ -2294,16 +2303,29 @@ constexpr std::array<PieceType, 5> Pocket::PieceTypes() {
   };
 }
 
+// A captured promoted piece reverts to being a pawn
 std::size_t Pocket::Index(PieceType ptype) {
   switch (ptype) {
-    case PieceType::kPawn:   return 0;
-    case PieceType::kKnight: return 1;
-    case PieceType::kBishop: return 2;
-    case PieceType::kRook:   return 3;
-    case PieceType::kQueen:  return 4;
-    default:
-      assert(false && "Invalid PieceType for Pocket");
+    case PieceType::kPawn:
+	case PieceType::kKnightP:
+    case PieceType::kBishopP:
+    case PieceType::kRookP:
+    case PieceType::kQueenP:
       return 0;
+    case PieceType::kKnight:
+       return 1;
+    case PieceType::kBishop:
+       return 2;
+    case PieceType::kRook:
+       return 3;
+    case PieceType::kQueen:
+      return 4;
+    default: {
+       SpielFatalError(
+          absl::StrCat("Invalid PieceType for Pocket: ",
+                   static_cast<int>(ptype)));
+    }
+    return 0;  // never happens
   }
 }
 
