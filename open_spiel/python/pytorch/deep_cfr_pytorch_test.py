@@ -22,7 +22,7 @@ import torch
 
 from open_spiel.python import policy
 import pyspiel
-from open_spiel.python.pytorch import deep_cfr_refactor as deep_cfr
+from open_spiel.python.pytorch import deep_cfr
 
 SEED = 24984617
 

@@ -24,118 +24,96 @@ train the networks.
 """
 
 import collections
-import math
+from typing import Iterable, NamedTuple
+
 import random
 import numpy as np
-from scipy import stats
 import torch
 from torch import nn
-import torch.nn.functional as F
 
 from open_spiel.python import policy
+from open_spiel.python.algorithms import exploitability
 import pyspiel
 
-AdvantageMemory = collections.namedtuple(
-    "AdvantageMemory", "info_state iteration advantage action")
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+      torch.cuda.manual_seed_all(seed)
+      torch.backends.cudnn.deterministic = True
+      torch.backends.cudnn.benchmark = False
 
-StrategyMemory = collections.namedtuple(
-    "StrategyMemory", "info_state iteration strategy_action_probs")
-
-
-class SonnetLinear(nn.Module):
-  """A Sonnet linear module.
-
-  Always includes biases and only supports ReLU activations.
+class AdvantageMemory(NamedTuple):
+  """Advantage network memory buffer
   """
+  info_state: list
+  iteration: int
+  advantage: np.ndarray
 
-  def __init__(self, in_size, out_size, activate_relu=True):
-    """Creates a Sonnet linear layer.
-
-    Args:
-      in_size: (int) number of inputs
-      out_size: (int) number of outputs
-      activate_relu: (bool) whether to include a ReLU activation layer
-    """
-    super(SonnetLinear, self).__init__()
-    self._activate_relu = activate_relu
-    self._in_size = in_size
-    self._out_size = out_size
-    # stddev = 1.0 / math.sqrt(self._in_size)
-    # mean = 0
-    # lower = (-2 * stddev - mean) / stddev
-    # upper = (2 * stddev - mean) / stddev
-    # # Weight initialization inspired by Sonnet's Linear layer,
-    # # which cites https://arxiv.org/abs/1502.03167v3
-    # # pytorch default: initialized from
-    # # uniform(-sqrt(1/in_features), sqrt(1/in_features))
-    self._weight = None
-    self._bias = None
-    self.reset()
-
-  def forward(self, tensor):
-    y = F.linear(tensor, self._weight, self._bias)
-    return F.relu(y) if self._activate_relu else y
-
-  def reset(self):
-    stddev = 1.0 / math.sqrt(self._in_size)
-    mean = 0
-    lower = (-2 * stddev - mean) / stddev
-    upper = (2 * stddev - mean) / stddev
-    # Weight initialization inspired by Sonnet's Linear layer,
-    # which cites https://arxiv.org/abs/1502.03167v3
-    # pytorch default: initialized from
-    # uniform(-sqrt(1/in_features), sqrt(1/in_features))
-    self._weight = nn.Parameter(
-        torch.Tensor(
-            stats.truncnorm.rvs(
-                lower,
-                upper,
-                loc=mean,
-                scale=stddev,
-                size=[self._out_size, self._in_size])))
-    self._bias = nn.Parameter(torch.zeros([self._out_size]))
-
+class StrategyMemory(NamedTuple):
+  """Stratefy network memory buffer
+  """
+  info_state: list
+  iteration: int
+  strategy_action_probs: np.ndarray
 
 class MLP(nn.Module):
   """A simple network built from nn.linear layers."""
 
-  def __init__(self,
-               input_size,
-               hidden_sizes,
-               output_size,
-               activate_final=False):
+  def __init__(
+      self,
+      input_size: int,
+      hidden_sizes: Iterable[int],
+      output_size: int,
+      final_activation: nn.Module = None,
+      seed: int = 42
+    ) -> None:
     """Create the MLP.
 
     Args:
       input_size: (int) number of inputs
       hidden_sizes: (list) sizes (number of units) of each hidden layer
       output_size: (int) number of outputs
-      activate_final: (bool) should final layer should include a ReLU
+      final_activation: (nn.Module) an activation for the final later, defaults to None
+      seed: (int) a random seed
     """
 
-    super(MLP, self).__init__()
-    self._layers = []
-    # Hidden layers
+    super().__init__()
+    set_seed(seed)
+    
+    _layers = []
+
+    def _create_linear_block(in_features, out_features):
+      return nn.Sequential(
+        nn.Linear(in_features, out_features),
+        nn.ReLU()
+      )
+
+    # Input and Hidden layers
     for size in hidden_sizes:
-      self._layers.append(SonnetLinear(in_size=input_size, out_size=size))
+      _layers.append(_create_linear_block(input_size, size))
       input_size = size
     # Output layer
-    self._layers.append(
-        SonnetLinear(
-            in_size=input_size,
-            out_size=output_size,
-            activate_relu=activate_final))
+    _layers.append(nn.LayerNorm(input_size))
+    _layers.append(nn.Linear(input_size, output_size))
+    if final_activation:
+      _layers.append(final_activation)
+    self.model = nn.Sequential(*_layers)
 
-    self.model = nn.ModuleList(self._layers)
-
-  def forward(self, x):
-    for layer in self.model:
-      x = layer(x)
-    return x
-
+  def forward(self, x: torch.Tensor) -> torch.Tensor:
+    return self.model(x)
+  
   def reset(self):
-    for layer in self._layers:
-      layer.reset()
+
+    @torch.no_grad()
+    def weight_reset(m: nn.Module):
+        reset_parameters = getattr(m, "reset_parameters", None)
+        if callable(reset_parameters):
+            m.reset_parameters()
+
+    self.apply(fn=weight_reset)
+
 
 
 class ReservoirBuffer(object):
@@ -146,12 +124,12 @@ class ReservoirBuffer(object):
   See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
   """
 
-  def __init__(self, reservoir_buffer_capacity):
+  def __init__(self, reservoir_buffer_capacity: int) -> None:
     self._reservoir_buffer_capacity = reservoir_buffer_capacity
     self._data = []
     self._add_calls = 0
 
-  def add(self, element):
+  def add(self, element) -> None:
     """Potentially adds `element` to the reservoir buffer.
 
     Args:
@@ -181,11 +159,11 @@ class ReservoirBuffer(object):
           num_samples, len(self._data)))
     return random.sample(self._data, num_samples)
 
-  def clear(self):
+  def clear(self) -> None:
     self._data = []
     self._add_calls = 0
 
-  def __len__(self):
+  def __len__(self) -> int:
     return len(self._data)
 
   def __iter__(self):
@@ -206,19 +184,24 @@ class DeepCFRSolver(policy.Policy):
         memory.
   """
 
-  def __init__(self,
-               game,
-               policy_network_layers=(256, 256),
-               advantage_network_layers=(128, 128),
-               num_iterations: int = 100,
-               num_traversals: int = 20,
-               learning_rate: float = 1e-4,
-               batch_size_advantage=None,
-               batch_size_strategy=None,
-               memory_capacity: int = int(1e6),
-               policy_network_train_steps: int = 1,
-               advantage_network_train_steps: int = 1,
-               reinitialize_advantage_networks: bool = True):
+  def __init__(
+    self,
+    game,
+    policy_network_layers=(256, 256),
+    advantage_network_layers=(128, 128),
+    num_iterations: int = 100,
+    num_traversals: int = 20,
+    learning_rate: float = 1e-4,
+    batch_size_advantage=None,
+    batch_size_strategy=None,
+    memory_capacity: int = int(1e6),
+    policy_network_train_steps: int = 1,
+    advantage_network_train_steps: int = 1,
+    reinitialize_advantage_networks: bool = True,
+    device: str = "cpu",
+    seed: int = 42,
+    print_nash_convs: bool = False
+  ) -> None:
     """Initialize the Deep CFR algorithm.
 
     Args:
@@ -239,9 +222,13 @@ class DeepCFRSolver(policy.Policy):
         (per iteration).
       reinitialize_advantage_networks: Whether to re-initialize the advantage
         network before training on each iteration.
+      seed: (int) A random seed
+      device: (str) A pytorch device, defaults to cpu
+      print_nash_convs: (bool) print explotability for each iteration, defaults to False
     """
     all_players = list(range(game.num_players()))
     super(DeepCFRSolver, self).__init__(game, all_players)
+    
     self._game = game
     if game.get_type().dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS:
       # `_traverse_game_tree` does not take into account this option.
@@ -258,34 +245,45 @@ class DeepCFRSolver(policy.Policy):
     self._reinitialize_advantage_networks = reinitialize_advantage_networks
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
-
-    # Define strategy network, loss & memory.
-    self._strategy_memories = ReservoirBuffer(memory_capacity)
-    self._policy_network = MLP(self._embedding_size,
-                               list(policy_network_layers),
-                               self._num_actions)
-    # Illegal actions are handled in the traversal code where expected payoff
-    # and sampled regret is computed from the advantage networks.
-    self._policy_sm = nn.Softmax(dim=-1)
-    self._loss_policy = nn.MSELoss()
-    self._optimizer_policy = torch.optim.Adam(
-        self._policy_network.parameters(), lr=learning_rate)
+    self._learning_rate = learning_rate
+    self._print_nash_convs = print_nash_convs
+    self._device = torch.device(device)
 
     # Define advantage network, loss & memory. (One per player)
     self._advantage_memories = [
         ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
     ]
     self._advantage_networks = [
-        MLP(self._embedding_size, list(advantage_network_layers),
-            self._num_actions) for _ in range(self._num_players)
+      MLP(
+        self._embedding_size, 
+        list(advantage_network_layers),
+        self._num_actions,
+        None, 
+        seed + p
+      ).to(self._device) for p in range(self._num_players)
     ]
+
+    # Define strategy network, loss & memory.
+    self._strategy_memories = ReservoirBuffer(memory_capacity)
+    self._policy_network = MLP(
+      self._embedding_size,
+      list(policy_network_layers),
+      self._num_actions,
+      nn.Softmax(-1),
+      seed
+    ).to(self._device)
+
+    # Illegal actions are handled in the traversal code where expected payoff
+    # and sampled regret is computed from the advantage networks.
+    
+    self._loss_policy = nn.MSELoss()
+    self._optimizer_policy = None
+    self._reinitialize_policy_network()
+
     self._loss_advantages = nn.MSELoss(reduction="mean")
-    self._optimizer_advantages = []
+    self._optimizer_advantages = [None] * self._num_players
     for p in range(self._num_players):
-      self._optimizer_advantages.append(
-          torch.optim.Adam(
-              self._advantage_networks[p].parameters(), lr=learning_rate))
-    self._learning_rate = learning_rate
+      self._reinitialize_advantage_network(p)
 
   @property
   def advantage_buffers(self):
@@ -295,20 +293,17 @@ class DeepCFRSolver(policy.Policy):
   def strategy_buffer(self):
     return self._strategy_memories
 
-  def clear_advantage_buffers(self):
-    for p in range(self._num_players):
-      self._advantage_memories[p].clear()
-
-  def reinitialize_advantage_network(self, player):
+  def _reinitialize_advantage_network(self, player):
     self._advantage_networks[player].reset()
     self._optimizer_advantages[player] = torch.optim.Adam(
         self._advantage_networks[player].parameters(), lr=self._learning_rate)
+  
+  def _reinitialize_policy_network(self):
+    self._policy_network.reset()
+    self._optimizer_policy = torch.optim.Adam(
+        self._policy_network.parameters(), lr=self._learning_rate)
 
-  def reinitialize_advantage_networks(self):
-    for p in range(self._num_players):
-      self.reinitialize_advantage_network(p)
-
-  def solve(self):
+  def solve(self) -> tuple[nn.Module, list[float], float]:
     """Solution logic for Deep CFR.
 
     Traverses the game tree, while storing the transitions for training
@@ -322,16 +317,23 @@ class DeepCFRSolver(policy.Policy):
     """
     advantage_losses = collections.defaultdict(list)
     for _ in range(self._num_iterations):
+      if self._print_nash_convs:
+        policy_loss = self._learn_strategy_network()
+        average_policy = policy.tabular_policy_from_callable(self._game, self.action_probabilities)
+        conv = exploitability.nash_conv(self._game, average_policy)
+        print(f"NashConv @ {self._iteration} = {conv} | Policy loss = {policy_loss}")
+        self._reinitialize_policy_network()
+
       for p in range(self._num_players):
         for _ in range(self._num_traversals):
           self._traverse_game_tree(self._root_node, p)
         if self._reinitialize_advantage_networks:
           # Re-initialize advantage network for player and train from scratch.
-          self.reinitialize_advantage_network(p)
+          self._reinitialize_advantage_network(p)
         # Re-initialize advantage networks and train from scratch.
         advantage_losses[p].append(self._learn_advantage_network(p))
       self._iteration += 1
-      # Train policy network.
+    # Train policy network.
     policy_loss = self._learn_strategy_network()
     return self._policy_network, advantage_losses, policy_loss
 
@@ -374,8 +376,12 @@ class DeepCFRSolver(policy.Policy):
       for action in sampled_regret:
         sampled_regret_arr[action] = sampled_regret[action]
       self._advantage_memories[player].add(
-          AdvantageMemory(state.information_state_tensor(), self._iteration,
-                          sampled_regret_arr, action))
+        AdvantageMemory(
+          state.information_state_tensor(), 
+          self._iteration,
+          sampled_regret_arr
+        )
+      )
       return cfv
     else:
       other_player = state.current_player()
@@ -385,11 +391,15 @@ class DeepCFRSolver(policy.Policy):
       probs /= probs.sum()
       sampled_action = np.random.choice(range(self._num_actions), p=probs)
       self._strategy_memories.add(
-          StrategyMemory(
-              state.information_state_tensor(other_player), self._iteration,
-              strategy))
+        StrategyMemory(
+          state.information_state_tensor(other_player), 
+          self._iteration,
+          strategy
+        )
+      )
       return self._traverse_game_tree(state.child(sampled_action), player)
-
+  
+  @torch.inference_mode()
   def _sample_action_from_advantage(self, state, player):
     """Returns an info state policy by applying regret-matching.
 
@@ -404,8 +414,8 @@ class DeepCFRSolver(policy.Policy):
     info_state = state.information_state_tensor(player)
     legal_actions = state.legal_actions(player)
     with torch.no_grad():
-      state_tensor = torch.FloatTensor(np.expand_dims(info_state, axis=0))
-      raw_advantages = self._advantage_networks[player](state_tensor)[0].numpy()
+      state_tensor = torch.FloatTensor(np.expand_dims(info_state, axis=0), device=self._device)
+      raw_advantages = self._advantage_networks[player](state_tensor)[0].cpu().numpy()
     advantages = [max(0., advantage) for advantage in raw_advantages]
     cumulative_regret = np.sum([advantages[action] for action in legal_actions])
     matched_regrets = np.array([0.] * self._num_actions)
@@ -416,6 +426,7 @@ class DeepCFRSolver(policy.Policy):
       matched_regrets[max(legal_actions, key=lambda a: raw_advantages[a])] = 1
     return advantages, matched_regrets
 
+  @torch.inference_mode()
   def action_probabilities(self, state, player_id=None):
     """Computes action probabilities for the current player in state.
 
@@ -432,9 +443,7 @@ class DeepCFRSolver(policy.Policy):
     info_state_vector = np.array(state.information_state_tensor())
     if len(info_state_vector.shape) == 1:
       info_state_vector = np.expand_dims(info_state_vector, axis=0)
-    with torch.no_grad():
-      logits = self._policy_network(torch.FloatTensor(info_state_vector))
-      probs = self._policy_sm(logits).numpy()
+    probs = self._policy_network(torch.FloatTensor(info_state_vector, device=self._device)).cpu().numpy()
     return {action: probs[0][action] for action in legal_actions}
 
   def _learn_advantage_network(self, player):
@@ -470,16 +479,14 @@ class DeepCFRSolver(policy.Policy):
       if not info_states:
         return None
       self._optimizer_advantages[player].zero_grad()
-      advantages = torch.FloatTensor(np.array(advantages))
-      iters = torch.FloatTensor(np.sqrt(np.array(iterations)))
-      outputs = self._advantage_networks[player](
-          torch.FloatTensor(np.array(info_states)))
-      loss_advantages = self._loss_advantages(iters * outputs,
-                                              iters * advantages)
+      iters = torch.FloatTensor(np.array(iterations), device=self._device).sqrt()
+      outputs = self._advantage_networks[player](torch.FloatTensor(np.array(info_states), device=self._device))
+      advantages = torch.FloatTensor(np.array(advantages), device=self._device)
+      loss_advantages = self._loss_advantages(iters * outputs, iters * advantages)
       loss_advantages.backward()
       self._optimizer_advantages[player].step()
 
-    return loss_advantages.detach().numpy()
+    return loss_advantages.detach().cpu().item()
 
   def _learn_strategy_network(self):
     """Compute the loss over the strategy network.
@@ -504,12 +511,13 @@ class DeepCFRSolver(policy.Policy):
         iterations.append([s.iteration])
 
       self._optimizer_policy.zero_grad()
-      iters = torch.FloatTensor(np.sqrt(np.array(iterations)))
-      ac_probs = torch.FloatTensor(np.array(np.squeeze(action_probs)))
-      logits = self._policy_network(torch.FloatTensor(np.array(info_states)))
-      outputs = self._policy_sm(logits)
+
+      iters = torch.FloatTensor(np.array(iterations), device=self._device).sqrt()
+      ac_probs = torch.FloatTensor(np.array(action_probs), device=self._device).squeeze()
+      outputs = self._policy_network(torch.FloatTensor(np.array(info_states), device=self._device))
+
       loss_strategy = self._loss_policy(iters * outputs, iters * ac_probs)
       loss_strategy.backward()
       self._optimizer_policy.step()
 
-    return loss_strategy.detach().numpy()
+    return loss_strategy.detach().cpu().item()

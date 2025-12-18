@@ -21,24 +21,24 @@ from absl import logging
 from open_spiel.python import policy
 from open_spiel.python.algorithms import expected_game_score
 import pyspiel
-from open_spiel.python.pytorch import deep_cfr_refactor as deep_cfr
+from open_spiel.python.pytorch import deep_cfr
 
-"""Recommended parameters:
-  For more, see https://github.com/aicenter/openspiel_reproductions/
+# Recommended parameters:
+#   For more, see https://github.com/aicenter/openspiel_reproductions/
   
-  Parameter                        Value
-  ---------------------------------------
-  num_traversals                   1500
-  batch_size_advantage             2048
-  batch_size_strategy              2048
-  num_hidden                       64
-  num_layers                       3
-  reinitialize_advantage_networks  True
-  learning_rate                    1e-3
-  memory_capacity                  1e6
-  policy_network_train_steps       5000
-  advantage_network_train_steps    750
-"""
+#   Parameter                        Value
+#   ---------------------------------------
+#   num_traversals                   1500
+#   batch_size_advantage             2048
+#   batch_size_strategy              2048
+#   num_hidden                       64
+#   num_layers                       3
+#   reinitialize_advantage_networks  True
+#   learning_rate                    1e-3
+#   memory_capacity                  1e6
+#   policy_network_train_steps       5000
+#   advantage_network_train_steps    750
+
 
 FLAGS = flags.FLAGS
 

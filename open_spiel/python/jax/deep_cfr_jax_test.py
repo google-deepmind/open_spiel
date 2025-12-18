@@ -19,7 +19,7 @@ from absl.testing import parameterized
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.jax import deep_cfr_refactor as deep_cfr
+from open_spiel.python.jax import deep_cfr
 import pyspiel
 
 
@@ -37,7 +37,9 @@ class DeepCFRTest(parameterized.TestCase):
         learning_rate=1e-3,
         batch_size_advantage=8,
         batch_size_strategy=8,
-        memory_capacity=1e7)
+        memory_capacity=1e5,
+        seed=42
+      )
     deep_cfr_solver.solve()
 
   def test_matching_pennies_3p(self):
@@ -53,7 +55,9 @@ class DeepCFRTest(parameterized.TestCase):
         learning_rate=1e-3,
         batch_size_advantage=8,
         batch_size_strategy=8,
-        memory_capacity=1e7)
+        memory_capacity=1e5,
+        seed=42
+      )
     deep_cfr_solver.solve()
     conv = exploitability.nash_conv(
         game,
