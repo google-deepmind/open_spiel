@@ -355,10 +355,24 @@ class Model:
     
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
-  def save_checkpoint(self, step: int) -> int:
+  def save_checkpoint(self, step: int, device = None) -> int:
     jax.block_until_ready(self._state)
     path = os.path.join(self._path, f"checkpoint-{step}")
-    self._checkpointer.save(path, self._state, save_args=orbax_utils.save_args_from_target(self._state), force=True)
+
+    if device is None:
+      device = jax.local_devices()[0]
+
+    sharded_state = jax.tree_util.tree_map(
+      lambda x: jax.device_put(x, jax.sharding.SingleDeviceSharding(device)), self._state
+    ) 
+    if self._checkpointer:
+      self._checkpointer.save(
+        path, 
+        args=orbax.checkpoint.args.PyTreeSave(item=sharded_state),
+        force=True
+      )
+
+    # self._checkpointer.save(path, self._state, save_args=orbax_utils.save_args_from_target(self._state),)
     return step
    
   def load_checkpoint(self, step: int | str, device: str = None) -> TrainState:
@@ -374,11 +388,10 @@ class Model:
         target
     )
 
-    self._state = self._checkpointer.restore(
+    if self._checkpointer:
+      self._state = self._checkpointer.restore(
         path, 
         item=orbax.checkpoint.args.PyTreeRestore(item=restore_args_tree) 
-    )
-
-    self._state = self._checkpointer.restore(path, item=target)
-    jax.block_until_ready(self._state)
+      )
+      jax.block_until_ready(self._state)
     return self._state
