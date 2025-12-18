@@ -41,8 +41,6 @@ def main(unused_argv):
       num_iterations=FLAGS.num_iterations,
       num_traversals=FLAGS.num_traversals,
       learning_rate=1e-3,
-      batch_size_advantage=None,
-      batch_size_strategy=None,
       memory_capacity=int(1e7))
 
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()

@@ -211,13 +211,13 @@ class DeepCFRSolver(policy.Policy):
                policy_network_layers=(256, 256),
                advantage_network_layers=(128, 128),
                num_iterations: int = 100,
-               num_traversals: int = 20,
-               learning_rate: float = 1e-4,
-               batch_size_advantage=None,
-               batch_size_strategy=None,
+               num_traversals: int = 100,
+               learning_rate: float = 1e-3,
+               batch_size_advantage: int = 2048,
+               batch_size_strategy: int = 2048,
                memory_capacity: int = int(1e6),
-               policy_network_train_steps: int = 1,
-               advantage_network_train_steps: int = 1,
+               policy_network_train_steps: int = 5000,
+               advantage_network_train_steps: int = 750,
                reinitialize_advantage_networks: bool = True):
     """Initialize the Deep CFR algorithm.
 
