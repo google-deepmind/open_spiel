@@ -76,7 +76,7 @@ class ReservoirBufferState(NamedTuple):
   def __len__(self) -> int:
     return min(self.add_calls, self.capacity)
 
-@jax.jit(static_argnames=("capacity",))
+@partial(jax.jit, static_argnames=("num_samples",))
 def init_reservoir(capacity: chex.Numeric, experience: chex.ArrayTree) -> ReservoirBufferState:
   # Set experience value to be empty.
   experience = jax.tree.map(jnp.empty_like, experience)
@@ -555,7 +555,7 @@ class DeepCFRSolver(policy.Policy):
       self._append_to_stategy_buffer(data)
       return self._traverse_game_tree(state.child(sampled_action), player)
 
-  def _sample_action_from_advantage(self, state, player):
+  def _sample_action_from_advantage(self, state, player: int) -> tuple[chex.Array, chex.Array]:
     """Returns an info state policy by applying regret-matching.
 
     Args:
@@ -575,7 +575,7 @@ class DeepCFRSolver(policy.Policy):
       self._advantage_networks[player], info_state, legal_actions_mask)
     return advantages, matched_regrets
 
-  def action_probabilities(self, state, player_id: int=None):
+  def action_probabilities(self, state, player_id: int=None) -> dict[chex.Numeric, chex.Array]:
     """Returns action probabilities dict for a single batch."""
     del player_id  # unused
     self._policy_network.eval()
