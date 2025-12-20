@@ -40,7 +40,6 @@ import flax.nnx as nn
 import jax.numpy as jnp
 import numpy as np
 import tree as np_tree # Use dm-tree for easy pytree handling in NumPy
-from tqdm.auto import tqdm
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
@@ -585,7 +584,7 @@ class DeepCFRSolver(policy.Policy):
   def solve(self) -> tuple[nn.Module, dict, chex.Numeric]:
     """Solution logic for Deep CFR."""
     advantage_losses = collections.defaultdict(list)
-    for _ in tqdm(range(self._num_iterations), total=self._num_iterations):
+    for _ in range(self._num_iterations):
       
       if self._print_nash_convs:
         policy_loss = self._learn_strategy_network()
