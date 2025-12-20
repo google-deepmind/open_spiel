@@ -37,7 +37,8 @@ _EMPTY_INFOSET_ACTION_KEYS = [
 
 
 def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
-                   chance_reach, lps, parent_is_keys, parent_isa_keys):
+                   chance_reach, lps, parent_is_keys, parent_isa_keys,
+                   infostate_parent_sequences):
   """Build the linear programs recursively from this state.
 
   Args:
@@ -58,6 +59,8 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
       constraints and variables.
     parent_is_keys: a list of parent information state keys for this state
     parent_isa_keys: a list of parent (infostate, action) keys
+    infostate_parent_sequences: a list of dicts, one per player, that maps
+      infostate to the parent sequence key of the opponent.
   """
   if state.is_terminal():
     returns = state.returns()
@@ -79,7 +82,8 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
     for action, prob in state.chance_outcomes():
       new_state = state.child(action)
       _construct_lps(new_state, infosets, infoset_actions, infoset_action_maps,
-                     prob * chance_reach, lps, parent_is_keys, parent_isa_keys)
+                     prob * chance_reach, lps, parent_is_keys, parent_isa_keys,
+                     infostate_parent_sequences)
     return
 
   player = state.current_player()
@@ -111,6 +115,7 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
   # Add to the infostate maps
   if info_state not in infosets[player]:
     infosets[player][info_state] = len(infosets[player])
+    infostate_parent_sequences[player][info_state] = parent_isa_keys[1 - player]
   if info_state not in infoset_action_maps[player]:
     infoset_action_maps[player][info_state] = []
 
@@ -137,7 +142,8 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
 
     new_state = state.child(action)
     _construct_lps(new_state, infosets, infoset_actions, infoset_action_maps,
-                   chance_reach, lps, new_parent_is_keys, new_parent_isa_keys)
+                   chance_reach, lps, new_parent_is_keys, new_parent_isa_keys,
+                   infostate_parent_sequences)
 
 
 def solve_zero_sum_game(game, solver=None):
@@ -228,30 +234,114 @@ def solve_zero_sum_game(game, solver=None):
   lps[1].set_cons_coeff(_EMPTY_INFOSET_KEYS[0], _EMPTY_INFOSET_ACTION_KEYS[0],
                         1.0)
   lps[1].set_cons_rhs(_EMPTY_INFOSET_KEYS[0], 1.0)
+  # Mapping from infostate to its parent sequence id (opponent's sequence)
+  # This tells us which opponent sequence leads to this infostate.
+  infostate_parent_sequences = [{}, {}]
+
   _construct_lps(game.new_initial_state(), infosets, infoset_actions,
                  infoset_action_maps, 1.0, lps, _EMPTY_INFOSET_KEYS[:],
-                 _EMPTY_INFOSET_ACTION_KEYS[:])
+                 _EMPTY_INFOSET_ACTION_KEYS[:], infostate_parent_sequences)
   # Solve the programs.
-  solutions = [lps[0].solve(solver=solver), lps[1].solve(solver=solver)]
+  primal_solutions = []
+  dual_eq_solutions = []
+  dual_ineq_solutions = []
+  for i in range(2):
+    x, y, z = lps[i].solve(solver=solver)
+    primal_solutions.append(x)
+    dual_eq_solutions.append(y)
+    dual_ineq_solutions.append(z)
+
   # Extract the policies (convert from realization plan to behavioral form).
   policies = [policy.TabularPolicy(game), policy.TabularPolicy(game)]
+
+  # To correctly identify reachable states for player i, we need to know the reach
+  # probability of infostates under the current equilibrium strategies.
+  # An infostate is reachable for player i if ALL its player-i ancestors have
+  # non-zero probability and ALL its player-(1-i) ancestors (sequences) have
+  # non-zero realization probability.
+  
+  reach_probs = [{}, {}] # Key: infostate, Value: reach probability
+  reach_probs[0][_EMPTY_INFOSET_KEYS[0]] = 1.0
+  reach_probs[1][_EMPTY_INFOSET_KEYS[1]] = 1.0
+
+  # We need to traverse the game tree (or use the infoset maps) to propagate reach probs.
+  # Since we have infoset_action_maps, we can propagate top-down.
+  # However, the order in infoset_action_maps might not be topological.
+  # Let's use a simple topological-like propagation by iterating and repeating if needed, 
+  # or better, use the structure if possible. Kuhn is small, we can just use the known structure.
+  # Realization plan for Player 0 (x) is in primal_solutions[1]
+  # Realization plan for Player 1 (y) is in primal_solutions[0]
+  def get_realization_prob(player, isa_key):
+    if isa_key in _EMPTY_INFOSET_ACTION_KEYS:
+      return 1.0
+    if player == 0:
+      vid = lps[1].get_var_id(isa_key)
+      return primal_solutions[1][vid]
+    else:
+      vid = lps[0].get_var_id(isa_key)
+      return primal_solutions[0][vid]
+
   for i in range(2):
     for info_state in infoset_action_maps[i]:
-      total_weight = 0
-      num_actions = 0
+      # Reach probability of this infostate for player i is x(parent_isa_of_i).
+      # But we also need the reach probability of the OPPONENT'S sequence leading here.
+      opponent_isa_key = infostate_parent_sequences[i][info_state]
+      
+      # Joint reach prob = own_reach * opponent_reach * chance_reach.
+      # However, total_weight across actions already includes opponent reach and chance reach 
+      # from the objective/constraints!
+      # Actually, the sequence-form realization plan x(s,a) for Player 0 ALREADY incorporates
+      # player 0's own reach. It does NOT incorporate Player 1's decisions.
+      
+      # So an infostate is reachable for player i if:
+      # 1. Player i's own parent sequence has non-zero realization probability.
+      # 2. Player 1-i's parent sequence leading here has non-zero realization probability.
+      
+      # We just need to check if total_weight > 0 where total_weight is calculated 
+      # from the OPPONENT'S realization plans for these sequences.
+      # Wait, no. The behavioral policy is x(s,a) / x(s).
+      # If x(s) == 0, the state is unreachable by player i's own strategy.
+      # If the state is unreachable by player 1-i's strategy, x(s) might still be > 0!
+      
+      # Total realization probability of this infostate s for player i:
+      # x(s) = sum_a x(s,a). This x(s) is in primal_solutions[1] (for P0) or [0] (for P1).
+      
+      own_weight = 0
       for isa_key in infoset_action_maps[i][info_state]:
-        total_weight += solutions[1 - i][lps[1 - i].get_var_id(isa_key)]
-        num_actions += 1
-      unif_pr = 1.0 / num_actions
+        own_weight += get_realization_prob(i, isa_key)
+        
+      # Opponent realization probability leading to this infostate:
+      opponent_weight = get_realization_prob(1 - i, opponent_isa_key)
+      
+      total_reach = own_weight * opponent_weight
+      
       state_policy = policies[i].policy_for_key(info_state)
-      for isa_key in infoset_action_maps[i][info_state]:
-        # The 1 - i here is due to Eq (8) yielding a solution for player 1 and
-        # Eq (9) a solution for player 0.
-        rel_weight = solutions[1 - i][lps[1 - i].get_var_id(isa_key)]
-        _, action_str = isa_key.split(_DELIMITER)
-        action = int(action_str)
-        pr_action = rel_weight / total_weight if total_weight > 0 else unif_pr
-        state_policy[action] = pr_action
-  return (solutions[0][lps[0].get_var_id(_EMPTY_INFOSET_KEYS[0])],
-          solutions[1][lps[1].get_var_id(_EMPTY_INFOSET_KEYS[1])], policies[0],
-          policies[1])
+      if total_reach > 1e-8:
+        for isa_key in infoset_action_maps[i][info_state]:
+          rel_weight = get_realization_prob(i, isa_key)
+          _, action_str = isa_key.split(_DELIMITER)
+          action = int(action_str)
+          state_policy[action] = rel_weight / own_weight if own_weight > 0 else 1.0/len(infoset_action_maps[i][info_state])
+      else:
+        # State is unreachable in equilibrium. Use subgame-perfect optimal actions.
+        optimal_actions = []
+        for isa_key in infoset_action_maps[i][info_state]:
+          slack = lps[i].get_slack(isa_key, primal_solutions[i])
+          if abs(slack) < 1e-7:
+            _, action_str = isa_key.split(_DELIMITER)
+            optimal_actions.append(int(action_str))
+
+        state_policy.fill(0.0)
+        if not optimal_actions:
+          prob = 1.0 / len(infoset_action_maps[i][info_state])
+          for isa_key in infoset_action_maps[i][info_state]:
+            _, action_str = isa_key.split(_DELIMITER)
+            state_policy[int(action_str)] = prob
+        else:
+          prob = 1.0 / len(optimal_actions)
+          for action in optimal_actions:
+            state_policy[action] = prob
+
+  return (primal_solutions[0][lps[0].get_var_id(_EMPTY_INFOSET_KEYS[0])],
+          primal_solutions[1][lps[1].get_var_id(_EMPTY_INFOSET_KEYS[1])],
+          policies[0], policies[1])
