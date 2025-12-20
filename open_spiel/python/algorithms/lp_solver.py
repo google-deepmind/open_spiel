@@ -242,7 +242,36 @@ class LinearProgram(object):
       sol = cvxopt.solvers.lp(c, g_mat, h, a_mat, b, solver=solver)
     else:
       sol = cvxopt.solvers.lp(c, g_mat, h, solver=solver)
-    return sol["x"]
+    return sol["x"], sol["y"], sol["z"]
+
+  def get_slack(self, cons_label, solution):
+    """Returns the slack of a constraint given a solution.
+
+    Args:
+      cons_label: the label of the constraint
+      solution: the solution vector (output of solve)
+
+    Returns:
+      The slack of the constraint. For LEQ (Gx <= h), slack = h - Gx.
+      For GEQ (Gx >= h), slack = Gx - h.
+      For EQ (Ax = b), slack = |Ax - b|.
+    """
+    cons = self._cons.get(cons_label)
+    assert cons is not None
+    lhs = 0
+    for var_label, coeff in cons.coeffs.items():
+      vid = self._vars[var_label].vid
+      lhs += coeff * solution[vid]
+
+    rhs = cons.rhs if cons.rhs is not None else 0.0
+    if cons.ctype == CONS_TYPE_LEQ:
+      return rhs - lhs
+    elif cons.ctype == CONS_TYPE_GEQ:
+      return lhs - rhs
+    elif cons.ctype == CONS_TYPE_EQ:
+      return abs(lhs - rhs)
+    else:
+      assert False, "Unknown constraint type"
 
 
 def solve_zero_sum_matrix_game(game):
