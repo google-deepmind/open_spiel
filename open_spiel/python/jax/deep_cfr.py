@@ -104,6 +104,7 @@ class ReservoirBuffer:
     @classmethod
     def init_reservoir(cls, capacity: chex.Numeric, experience: chex.ArrayTree) -> "ReservoirBuffer":
       # Initialize buffer by replicating the structure of the experience
+
       _experience = np_tree.map_structure(
         lambda x: np.empty((capacity, *x.shape), dtype=x.dtype),
         experience
@@ -216,18 +217,20 @@ class ReservoirBuffer:
       )
 
     @staticmethod
-    def get_batch_sampler(batch_size: int | None) -> Callable:
+    def get_batch_sampler(batch_size: int | None, max_size: int) -> Callable:
       """Choose if we batch or just shuffle the data
+      Args:
+        num_samples: `int`, number of samples to draw, could be None if the whole buffer is used
+        max_size: `int`, current size of the buffer, could be less than its capacity
       """
-      @partial(jax.jit, static_argnames=("num_samples", "max_size"))
-      def sample(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int, max_size: int):
+      @partial(jax.jit, static_argnames=("num_samples"))
+      def sample(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int):
         """Returns `num_samples` uniformly sampled from the buffer.
 
         Args:
           rng: `chex.PRNGKey`, a random state
           state: `ReservoirBufferState`, a buffer state
           num_samples: `int`, number of samples to draw.
-          max_size: `int`, current size of the buffer, could be less than its capacity
 
         Returns:
           An iterable over `num_samples` random elements of the buffer.
@@ -242,8 +245,8 @@ class ReservoirBuffer:
           rng, jnp.arange(capacity), shape=(num_samples,), replace=False)
         return jax.tree.map(lambda x: x[indices], state.experience)
 
-      @partial(jax.jit, static_argnames=("num_samples", "max_size"))
-      def shuffle_data(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int, max_size: int):
+      @partial(jax.jit, static_argnames=("num_samples"))
+      def shuffle_data(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int):
         """Returns shuffled buffer along the batch axis.
 
         Args:
@@ -260,7 +263,8 @@ class ReservoirBuffer:
         )
       
       if batch_size is not None:
-        return sample
+        if batch_size < max_size:
+          return sample
       return shuffle_data
 
 class MLP(nn.Module):
@@ -374,7 +378,7 @@ class DeepCFRSolver(policy.Policy):
     self._learning_rate = learning_rate
     self._rngkey = jax.random.key(seed)
     self._print_nash_convs = print_nash_convs
-    self._memory_capacity = memory_capacity
+    self._memory_capacity = int(memory_capacity)
 
     self._backend = jax.default_backend()
 
@@ -426,7 +430,7 @@ class DeepCFRSolver(policy.Policy):
       data: AdvantageMemory | StrategyMemory
     ) -> ReservoirBuffer | ReservoirBufferState:
       if self._backend == "cpu":
-         return ReservoirBuffer.init_reservoir(capacity, data)
+        return ReservoirBuffer.init_reservoir(capacity, data)
       data = jax.tree.map(jnp.array, data)
       return ReservoirBuffer.init_reservoir_jitted(capacity, data)
 
@@ -656,7 +660,7 @@ class DeepCFRSolver(policy.Policy):
       
       data = StrategyMemory(
         np.array(state.information_state_tensor(other_player), dtype=np.float32), 
-        np.array(self._iteration, dtype=int).reshape(1,),
+        np.array(self._iteration, dtype=int).reshape(-1,),
         np.array(strategy, dtype=np.float32),
         np.array(state.legal_actions_mask(other_player), dtype=np.bool)
       )
@@ -715,16 +719,21 @@ class DeepCFRSolver(policy.Policy):
     self._advantage_networks[player].train()
 
     batch_size = self._batch_size_advantage
-    sampler_fn = ReservoirBuffer.get_batch_sampler(batch_size)
-    # We shouldn't sample futher that we've added
     max_size = min(
       self._advantage_memories[player].add_calls.item(), 
       self._advantage_memories[player].capacity.astype(int).item()
     )
 
+    sampler_fn = ReservoirBuffer.get_batch_sampler(batch_size, max_size)
+
+    if batch_size is not None:
+      if batch_size > max_size:
+        # Not enough samples to train on
+        return None
+
     def _step(it, carry):
       net, opt, rng, buffer_state, iteration, _ = carry
-      batch = sampler_fn(rng, buffer_state, batch_size, max_size)
+      batch = sampler_fn(rng, buffer_state, batch_size)
 
       main_loss = self._jitted_adv_update(
         net, 
@@ -767,18 +776,17 @@ class DeepCFRSolver(policy.Policy):
       ## Skip if there aren't enough samples
       return None
   
-    batch_size = self._batch_size_strategy
-    sampler_fn = ReservoirBuffer.get_batch_sampler(batch_size)
-    # We shouldn't sample futher that we've added
+    batch_size = self._batch_size_advantage
     max_size = min(
       self._strategy_memories.add_calls.item(), 
-      self._strategy_memories.capacity.item()
+      self._strategy_memories.capacity.astype(int).item()
     )
+    sampler_fn = ReservoirBuffer.get_batch_sampler(batch_size, max_size)
 
     def _step(it, carry):
       net, opt, rng, buffer_state, iteration, _ = carry
 
-      batch = sampler_fn(rng, buffer_state, batch_size, max_size)
+      batch = sampler_fn(rng, buffer_state, batch_size)
         
       main_loss = self._jitted_policy_update(
         net, 
