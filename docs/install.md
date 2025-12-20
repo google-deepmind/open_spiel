@@ -62,6 +62,21 @@ On MacOS, you can install the dependencies via `brew install cmake python3`. For
 clang, you need to install or upgrade XCode and install the command-line
 developer tools.
 
+### Python-only installation via uv
+
+[uv](https://github.com/astral-sh/uv) is an extremely fast Python package manager
+and a drop-in replacement for pip. It can be used to install OpenSpiel:
+
+```bash
+uv pip install open_spiel
+```
+
+Or from source:
+
+```bash
+uv pip install --no-binary=:open_spiel: open_spiel
+```
+
 ## Installation from Source
 
 The instructions here are for Linux and MacOS. For installation on Windows, see
@@ -262,6 +277,11 @@ Install required dependencies (Python 3):
 python3 -m venv ./venv
 source venv/bin/activate
 python3 -m pip install -r requirements.txt
+# Alternatively, using uv:
+# uv venv
+# source .venv/bin/activate
+# uv pip install -r requirements.txt
+
 # Older than Ubuntu 22.04:
 virtualenv -p python3 venv
 source venv/bin/activate
@@ -273,6 +293,8 @@ system-wide with:
 
 ```bash
 python3 -m pip install --upgrade -r requirements.txt
+# Or using uv:
+# uv pip install --upgrade -r requirements.txt
 ```
 
 ##### Optional dependencies
