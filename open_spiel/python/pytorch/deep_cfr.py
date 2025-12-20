@@ -26,17 +26,16 @@ train the networks.
 import collections
 from typing import Iterable, NamedTuple
 
-import random
-import numpy as np
 import torch
 from torch import nn
+import numpy as np
+import tree as np_tree
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
 import pyspiel
 
 def set_seed(seed):
-    random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
@@ -47,15 +46,15 @@ def set_seed(seed):
 class AdvantageMemory(NamedTuple):
   """Advantage network memory buffer
   """
-  info_state: list
-  iteration: int
+  info_state: np.ndarray
+  iteration: np.ndarray
   advantage: np.ndarray
 
 class StrategyMemory(NamedTuple):
   """Stratefy network memory buffer
   """
-  info_state: list
-  iteration: int
+  info_state: np.ndarray
+  iteration: np.ndarray
   strategy_action_probs: np.ndarray
 
 class MLP(nn.Module):
@@ -115,60 +114,81 @@ class MLP(nn.Module):
     self.apply(fn=weight_reset)
 
 
+class ReservoirBuffer:
+    """Allows uniform sampling over a stream of data.
+      See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
+    """   
+    def __init__(self, capacity: np.ndarray, experience: AdvantageMemory | StrategyMemory) -> None:
+      self.capacity = capacity
+      self.experience = experience
+      self.add_calls = np.array(0)
 
-class ReservoirBuffer(object):
-  """Allows uniform sampling over a stream of data.
+    def __len__(self) -> int:
+      return min(self.add_calls.item(), self.capacity.item())
+    
+    @classmethod
+    def init_reservoir(cls, capacity: int, experience: AdvantageMemory | StrategyMemory) -> "ReservoirBuffer":
+      # Initialize buffer by replicating the structure of the experience
+      _experience = np_tree.map_structure(
+        lambda x: np.empty((capacity, *x.shape), dtype=x.dtype),
+        experience
+      )
+      return cls(np.array(capacity), _experience)
+    
+    def append_to_reservoir(
+      self, 
+      experience: AdvantageMemory | StrategyMemory, 
+    ) -> None:
+      """Potentially adds `experience` to the reservoir buffer.
+      Args:
+        experience: data to be added to the reservoir buffer.
+        
+      Returns:
+        None as the method updated the buffer in-place
+      """
+      # Determine the insertion index
+      # Note: count + 1 because the current item is the (count+1)-th item
+      idx = np.random.randint(0, self.add_calls + 1)
+      
+      # 2. Logic: 
+      # If buffer is not full, we always add at 'count'.
+      # If buffer is full, we replace at 'idx' ONLY IF idx < capacity.
+      is_full = self.add_calls >= self.capacity
+      write_idx = np.where(is_full, idx, self.add_calls)
+      should_update = write_idx < self.capacity
 
-  This class supports the storage of arbitrary elements, such as observation
-  tensors, integer actions, etc.
-  See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
-  """
+      def _inplace(arr, idx, val):
+        arr[idx] = val
 
-  def __init__(self, reservoir_buffer_capacity: int) -> None:
-    self._reservoir_buffer_capacity = reservoir_buffer_capacity
-    self._data = []
-    self._add_calls = 0
+      if should_update:
+        np_tree.map_structure(
+          lambda buf_leaf, exp_leaf: _inplace(buf_leaf, write_idx, exp_leaf),
+          self.experience, 
+          experience,
+        )
+      self.add_calls += 1
 
-  def add(self, element) -> None:
-    """Potentially adds `element` to the reservoir buffer.
+    def sample(self, num_samples: int) ->  AdvantageMemory | StrategyMemory:
+      """Returns `num_samples` uniformly sampled from the buffer.
+      
+      Args:
+        num_samples: `int`, number of samples to draw.
 
-    Args:
-      element: data to be added to the reservoir buffer.
-    """
-    if len(self._data) < self._reservoir_buffer_capacity:
-      self._data.append(element)
-    else:
-      idx = np.random.randint(0, self._add_calls + 1)
-      if idx < self._reservoir_buffer_capacity:
-        self._data[idx] = element
-    self._add_calls += 1
-
-  def sample(self, num_samples):
-    """Returns `num_samples` uniformly sampled from the buffer.
-
-    Args:
-      num_samples: `int`, number of samples to draw.
-
-    Returns:
-      An iterable over `num_samples` random elements of the buffer.
-    Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
-    """
-    if len(self._data) < num_samples:
-      raise ValueError("{} elements could not be sampled from size {}".format(
-          num_samples, len(self._data)))
-    return random.sample(self._data, num_samples)
-
-  def clear(self) -> None:
-    self._data = []
-    self._add_calls = 0
-
-  def __len__(self) -> int:
-    return len(self._data)
-
-  def __iter__(self):
-    return iter(self._data)
-
+      Returns:
+        An iterable over `num_samples` random elements of the buffer.
+      Raises:
+        ValueError: If there are less than `num_samples` elements in the buffer
+      """
+      max_size = self.__len__()
+      if max_size < num_samples:
+        raise ValueError("{} elements could not be sampled from size {}".format(num_samples, max_size))
+      
+      indices = np.random.choice(max_size, size=(num_samples,), replace=False)
+      
+      return np_tree.map_structure(
+        lambda data: data[indices],
+        self.experience
+      )  
 
 class DeepCFRSolver(policy.Policy):
   """Implements a solver for the Deep CFR Algorithm with PyTorch.
@@ -242,6 +262,7 @@ class DeepCFRSolver(policy.Policy):
     self._embedding_size = len(self._root_node.information_state_tensor(0))
     self._num_iterations = num_iterations
     self._num_traversals = num_traversals
+    self._memory_capacity = memory_capacity
     self._reinitialize_advantage_networks = reinitialize_advantage_networks
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
@@ -250,9 +271,7 @@ class DeepCFRSolver(policy.Policy):
     self._device = torch.device(device)
 
     # Define advantage network, loss & memory. (One per player)
-    self._advantage_memories = [
-        ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
-    ]
+    self._advantage_memories = [None] * self._num_players
     self._advantage_networks = [
       MLP(
         self._embedding_size, 
@@ -264,7 +283,7 @@ class DeepCFRSolver(policy.Policy):
     ]
 
     # Define strategy network, loss & memory.
-    self._strategy_memories = ReservoirBuffer(memory_capacity)
+    self._strategy_memories = None
     self._policy_network = MLP(
       self._embedding_size,
       list(policy_network_layers),
@@ -284,6 +303,13 @@ class DeepCFRSolver(policy.Policy):
     self._optimizer_advantages = [None] * self._num_players
     for p in range(self._num_players):
       self._reinitialize_advantage_network(p)
+
+  def _get_buffer_init(
+      self, 
+      capacity: int, 
+      data: AdvantageMemory | StrategyMemory
+    ) -> ReservoirBuffer:
+      return ReservoirBuffer.init_reservoir(capacity, data)
 
   @property
   def advantage_buffers(self):
@@ -337,6 +363,18 @@ class DeepCFRSolver(policy.Policy):
     policy_loss = self._learn_strategy_network()
     return self._policy_network, advantage_losses, policy_loss
 
+  def _append_to_stategy_buffer(self, data: StrategyMemory) -> None:
+    if self._strategy_memories is None:
+      self._strategy_memories = self._get_buffer_init(self._memory_capacity, data)
+
+    self._strategy_memories.append_to_reservoir(data)
+
+  def _append_to_advantage_buffer(self, player: int, data: AdvantageMemory) -> None:
+    if self._advantage_memories[player] is None:
+      self._advantage_memories[player] = self._get_buffer_init(self._memory_capacity, data)
+
+    self._advantage_memories[player].append_to_reservoir(data)
+
   def _traverse_game_tree(self, state, player):
     """Performs a traversal of the game tree.
 
@@ -375,13 +413,14 @@ class DeepCFRSolver(policy.Policy):
       sampled_regret_arr = [0] * self._num_actions
       for action in sampled_regret:
         sampled_regret_arr[action] = sampled_regret[action]
-      self._advantage_memories[player].add(
-        AdvantageMemory(
-          state.information_state_tensor(), 
-          self._iteration,
-          sampled_regret_arr
-        )
+
+      data = AdvantageMemory(
+        np.array(state.information_state_tensor(), dtype=np.float32), 
+        np.array(self._iteration, dtype=int).reshape(1,),
+        np.array(sampled_regret_arr,  dtype=np.float32)
       )
+
+      self._append_to_advantage_buffer(player, data)
       return cfv
     else:
       other_player = state.current_player()
@@ -390,13 +429,14 @@ class DeepCFRSolver(policy.Policy):
       probs = np.array(strategy)
       probs /= probs.sum()
       sampled_action = np.random.choice(range(self._num_actions), p=probs)
-      self._strategy_memories.add(
-        StrategyMemory(
-          state.information_state_tensor(other_player), 
-          self._iteration,
-          strategy
-        )
+      
+      data = StrategyMemory(
+        np.array(state.information_state_tensor(other_player), dtype=np.float32),
+        np.array(self._iteration, dtype=int).reshape(1,),
+        np.array(strategy, dtype=np.float32)
       )
+      self._append_to_stategy_buffer(data)
+
       return self._traverse_game_tree(state.child(sampled_action), player)
   
   @torch.inference_mode()
@@ -467,21 +507,16 @@ class DeepCFRSolver(policy.Policy):
         samples = self._advantage_memories[player].sample(
             self._batch_size_advantage)
       else:
+        np_tree.map_structure(lambda x: np.random.shuffle(x[:len(self._advantage_memories[player])]), self._advantage_memories[player])
         samples = self._advantage_memories[player]
-      info_states = []
-      advantages = []
-      iterations = []
-      for s in samples:
-        info_states.append(s.info_state)
-        advantages.append(s.advantage)
-        iterations.append([s.iteration])
+
       # Ensure some samples have been gathered.
-      if not info_states:
+      if len(samples.info_state) == 0:
         return None
       self._optimizer_advantages[player].zero_grad()
-      iters = torch.FloatTensor(np.array(iterations), device=self._device).sqrt()
-      outputs = self._advantage_networks[player](torch.FloatTensor(np.array(info_states), device=self._device))
-      advantages = torch.FloatTensor(np.array(advantages), device=self._device)
+      iters = torch.FloatTensor(samples.iteration, device=self._device).sqrt()
+      outputs = self._advantage_networks[player](torch.FloatTensor(samples.info_state, device=self._device))
+      advantages = torch.FloatTensor(samples.advantage, device=self._device)
       loss_advantages = self._loss_advantages(iters * outputs, iters * advantages)
       loss_advantages.backward()
       self._optimizer_advantages[player].step()
@@ -501,21 +536,18 @@ class DeepCFRSolver(policy.Policy):
           return None
         samples = self._strategy_memories.sample(self._batch_size_strategy)
       else:
+        np_tree.map_structure(lambda x: np.random.shuffle(x[:len(self._strategy_memories)]), self._strategy_memories)
         samples = self._strategy_memories
-      info_states = []
-      action_probs = []
-      iterations = []
-      for s in samples:
-        info_states.append(s.info_state)
-        action_probs.append(s.strategy_action_probs)
-        iterations.append([s.iteration])
 
+      # Ensure some samples have been gathered.
+
+      if len(samples.info_state) == 0:
+        return None
+      
       self._optimizer_policy.zero_grad()
-
-      iters = torch.FloatTensor(np.array(iterations), device=self._device).sqrt()
-      ac_probs = torch.FloatTensor(np.array(action_probs), device=self._device).squeeze()
-      outputs = self._policy_network(torch.FloatTensor(np.array(info_states), device=self._device))
-
+      iters = torch.FloatTensor(samples.iteration, device=self._device).sqrt()
+      outputs = self._policy_network(torch.FloatTensor(samples.info_state, device=self._device))
+      ac_probs = torch.FloatTensor(samples.strategy_action_probs, device=self._device).squeeze()
       loss_strategy = self._loss_policy(iters * outputs, iters * ac_probs)
       loss_strategy.backward()
       self._optimizer_policy.step()
