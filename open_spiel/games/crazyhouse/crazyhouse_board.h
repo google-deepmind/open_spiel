@@ -70,9 +70,11 @@ enum class PieceType : int8_t {
   kKnightP = 10
 };
 
-static inline constexpr std::array<PieceType, 6> kPieceTypes = {
+static inline constexpr std::array<PieceType, 10> kPieceTypes = {
     {PieceType::kKing, PieceType::kQueen, PieceType::kRook, PieceType::kBishop,
-     PieceType::kKnight, PieceType::kPawn}};
+     PieceType::kKnight, PieceType::kPawn, PieceType::kQueenP, PieceType::kRookP,
+	 PieceType::kKnightP}};
+
 
 // In case all the pieces are represented in the same plane, these values are
 // used to represent each piece type.
@@ -260,7 +262,17 @@ inline const crazyhouse::Move kPassMove =
 
 class Pocket {
  public:
-  Pocket();
+
+  // Iteration support
+  static constexpr std::array<PieceType, 5> PieceTypes() {
+    return {
+        PieceType::kPawn,
+        PieceType::kKnight,
+        PieceType::kBishop,
+        PieceType::kRook,
+        PieceType::kQueen
+    };
+  }
 
   // Modifiers
   void Increment(PieceType piece, int count);
@@ -273,14 +285,10 @@ class Pocket {
   static std::size_t Index(PieceType piece);
   static PieceType DropPieceType(int y);
 
-  // Iteration support
-  static constexpr std::array<PieceType, 5> PieceTypes();
-
  private:
   static constexpr std::size_t kNumPocketPieces = 5;
-
   // Internal storage: Pawn, Knight, Bishop, Rook, Queen
-  std::array<int, kNumPocketPieces> counts_;
+  std::array<int, kNumPocketPieces> counts_{};
 
 };
 

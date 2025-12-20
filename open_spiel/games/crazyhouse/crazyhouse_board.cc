@@ -277,6 +277,10 @@ std::string Move::ToSAN(const CrazyhouseBoard &board) const {
       case PieceType::kRook:
       case PieceType::kBishop:
       case PieceType::kKnight:
+      case PieceType::kQueenP:
+      case PieceType::kRookP:
+      case PieceType::kBishopP:
+      case PieceType::kKnightP:
         move_text += PieceTypeToString(piece_type);
         break;
       case PieceType::kPawn:
@@ -639,9 +643,10 @@ void CrazyhouseBoard::GenerateLegalMoves(const MoveYieldFn &yield,
           auto board_copy = *this;
           board_copy.ApplyMove(move);
 
-          auto ks =
-              at(move.from).type == PieceType::kKing ? move.to : king_square;
-
+          auto ks = king_square;
+		  if (!(IsDropMove(move)) && at(move.from).type == PieceType::kKing) {
+		     ks =  move.to;
+		  }
           if (board_copy.UnderAttack(ks, color)) {
             return true;
           } else {
@@ -776,8 +781,10 @@ void CrazyhouseBoard::GenerateLegalPawnCaptures(const MoveYieldFn &yield,
           auto board_copy = *this;
           board_copy.ApplyMove(move);
 
-          auto ks =
-              at(move.from).type == PieceType::kKing ? move.to : king_square;
+          auto ks = king_square;
+		  if (!(IsDropMove(move)) && at(move.from).type == PieceType::kKing) {
+		      ks == move.to;
+		  }
 
           if (board_copy.UnderAttack(ks, color)) {
             return true;
@@ -861,6 +868,7 @@ void CrazyhouseBoard::GenerateDropDestinations_(
   }
 }
 
+// WARNING Crazyhouse does not yet support kriegspiel, this function has not been tested.
 bool CrazyhouseBoard::IsBreachingMove(Move tested_move) const {
   if (tested_move == kPassMove) return false;
 
@@ -874,7 +882,10 @@ bool CrazyhouseBoard::IsBreachingMove(Move tested_move) const {
 
   SPIEL_DCHECK_TRUE(piece.type == PieceType::kQueen ||
                     piece.type == PieceType::kRook ||
-                    piece.type == PieceType::kBishop);
+                    piece.type == PieceType::kBishop ||
+                    piece.type == PieceType::kQueenP ||
+                    piece.type == PieceType::kRookP ||
+                    piece.type == PieceType::kBishopP);
 
   // The move is not breaching, if it is generated with
   // PseudoLegalMoveSettings::kAcknowledgeEnemyPieces
@@ -885,11 +896,13 @@ bool CrazyhouseBoard::IsBreachingMove(Move tested_move) const {
   };
 
   // Queen moves are a combination of rook and bishop moves.
-  if (piece.type == PieceType::kRook || piece.type == PieceType::kQueen) {
+  if (piece.type == PieceType::kRook || piece.type == PieceType::kQueen ||
+		  piece.type == PieceType::kRookP || piece.type == PieceType::kQueenP) {
     GenerateRookDestinations_(tested_move.from, piece.color,
                               kAcknowledgeEnemyPieces, check_breaching);
   }
-  if (piece.type == PieceType::kBishop || piece.type == PieceType::kQueen) {
+  if (piece.type == PieceType::kBishop || piece.type == PieceType::kQueen ||
+		   piece.type == PieceType::kBishopP || piece.type == PieceType::kQueenP) {
     GenerateBishopDestinations_(tested_move.from, piece.color,
                                 kAcknowledgeEnemyPieces, check_breaching);
   }
@@ -931,6 +944,10 @@ bool CrazyhouseBoard::HasSufficientMaterial() const {
   // that means the game had already ended.
   if (king_in_check_allowed_) {
     return true;
+  }
+
+  if (insanity_ > 0) {
+	  return true;
   }
 
   // Indexed by colour.
@@ -1324,6 +1341,9 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   // Increment pockets for capture
   if (destination_piece !=  kEmptyPiece) {
 	  PieceType dpt = destination_piece.type;
+	  if (dpt == PieceType::kKing) {
+          SpielFatalError("King capture detected.");
+	  }
 	  if (to_play_ == Color::kBlack) {
 		  black_pocket_.Increment(dpt, insanity_);
       } else {
@@ -1343,6 +1363,9 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
       (moving_piece.type == PieceType::kPawn) ||        // pawn move
       (destination_piece.type != PieceType::kEmpty &&
        destination_piece.color != moving_piece.color);  // capture
+  if (insanity_ > 0) {
+	  irreversible = false;
+  }
 
   if (irreversible) {
     SetIrreversibleMoveCounter(0);
@@ -1427,8 +1450,10 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
     Square captured_pawn_square = move.to;
     if (to_play_ == Color::kWhite) {
       --captured_pawn_square.y;
+	   white_pocket_.Increment(PieceType::kPawn, insanity_);
     } else {
       ++captured_pawn_square.y;
+	   black_pocket_.Increment(PieceType::kPawn, insanity_);
     }
     SPIEL_CHECK_EQ(at(captured_pawn_square),
                    (Piece{OppColor(to_play_), PieceType::kPawn}));
@@ -2276,8 +2301,6 @@ std::string DefaultFen(int board_size) {
         "For other sizes, you have to pass your own FEN.");
 }
 
-Pocket::Pocket() : counts_{} {}
-
 void Pocket::Increment(PieceType piece, int count) {
   const std::size_t i = Index(piece);
   counts_[i] += count;
@@ -2293,15 +2316,6 @@ int Pocket::Count(PieceType piece) const {
   return counts_[Index(piece)];
 }
 
-constexpr std::array<PieceType, 5> Pocket::PieceTypes() {
-  return {
-      PieceType::kPawn,
-      PieceType::kKnight,
-      PieceType::kBishop,
-      PieceType::kRook,
-      PieceType::kQueen
-  };
-}
 
 // A captured promoted piece reverts to being a pawn
 std::size_t Pocket::Index(PieceType ptype) {
@@ -2321,6 +2335,7 @@ std::size_t Pocket::Index(PieceType ptype) {
     case PieceType::kQueen:
       return 4;
     default: {
+	   // std::cout << ToFEN() << std::endl;
        SpielFatalError(
           absl::StrCat("Invalid PieceType for Pocket: ",
                    static_cast<int>(ptype)));

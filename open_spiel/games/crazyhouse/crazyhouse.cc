@@ -501,6 +501,23 @@ void CrazyhouseState::ObservationTensor(Player player,
       Board().CastlingRight(Color::kBlack, CastlingDirection::kRight),
       value_it);
 
+   // Pocket pieces.
+   // Order: Pawn, Knight, Bishop, Rook, Queen.
+   // Maximum pocket count encoded in observation tensor.
+   // Counts above this are saturated.
+   // This does not affect gameplay.
+  constexpr int kMaxPocketCount = 16;  // safe upper bound
+
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    const Pocket& pocket =
+      (color == Color::kWhite) ? Board().white_pocket_
+                               : Board().black_pocket_;
+	for (PieceType ptype : Pocket::PieceTypes()) {
+      int count = pocket.Count(ptype);
+      count = std::min(count, kMaxPocketCount);
+      AddScalarPlane(count, 0, kMaxPocketCount, value_it);
+    }
+  }
   SPIEL_CHECK_EQ(value_it, values.end());
 }
 
