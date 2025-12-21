@@ -1,4 +1,3 @@
-P
 if (OPEN_SPIEL_BUILDING_WHEEL)
   # When building a wheel, need to use this. See:
   # https://github.com/joerick/cibuildwheel/issues/639#issuecomment-817872369
@@ -341,7 +340,7 @@ set(WHEEL_EXCLUDED_PYTHON_TESTS
   games/tic_tac_toe_test.py
   ../integration_tests/playthrough_test.py)
 
-
+# Prefer to use PYBIN as the executable if it's defined (e.g. on GitHub CI)
 if(NOT DEFINED ENV{PYBIN})
   set(PYBIN ${Python3_EXECUTABLE})
 else()
