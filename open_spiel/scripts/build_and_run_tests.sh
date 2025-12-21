@@ -81,6 +81,7 @@ fi
 
 echo -e "\e[33mRunning ${0} from $PWD\e[0m"
 PYBIN=${PYBIN:-"python3"}
+PYBIN=${PYBIN:-"python"}
 PYBIN=`which ${PYBIN}`
 if [ ! -x $PYBIN ]
 then
@@ -93,9 +94,9 @@ if [[ "$VIRTUAL_ENV" != "" ]]
 then
   echo -e "\e[1m\e[93mVirtualenv already detected. We do not create a new one.\e[0m"
   ArgsLibSet virtualenv false
-  # When you're in a virtual environment, the python binary should be just python3.
+  # When you're in a virtual environment, the python binary should be just python.
   # Otherwise, it uses the environment's python.
-  PYBIN="python3"
+  PYBIN="python"
 fi
 
 VENV_DIR="./venv"
@@ -118,9 +119,9 @@ if [[ $ARG_virtualenv == "true" ]]; then
   fi
   PYBIN=python
   source $VENV_DIR/bin/activate
-  # When you're in a virtual environment, the python binary should be just python3.
+  # When you're in a virtual environment, the python binary should be just python.
   # Otherwise, it uses the environment's python.
-  PYBIN="python3"
+  PYBIN="python"
 fi
 
 # We only exit the virtualenv if we were asked to create one.
