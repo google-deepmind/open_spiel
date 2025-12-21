@@ -25,19 +25,18 @@ jobs:
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: ubuntu-22.04
+        - os: ubuntu-24.04
           OS_PYTHON_VERSION: "3.11"
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_ABSL_VERSION: "20230125.0"
+          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Standard (most current) platforms and versions.
-        - os: ubuntu-22.04
+        - os: ubuntu-24.04
           OS_PYTHON_VERSION: "3.10"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_ABSL_VERSION: "20230125.0"
+          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: macos-14
