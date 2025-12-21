@@ -81,12 +81,16 @@ fi
 
 echo -e "\e[33mRunning ${0} from $PWD\e[0m"
 PYBIN=${PYBIN:-"python"}
-PYBIN=${PYBIN:-"python3"}
 PYBIN=`which ${PYBIN}`
 if [ ! -x $PYBIN ]
 then
-  echo -e "\e[1m\e[93m$PYBIN not found! Skip build and test.\e[0m"
-  continue
+  PYBIN=${PYBIN:-"python3"}
+  PYBIN=`which ${PYBIN}`
+  if [ ! -x $PYBIN ]
+  then
+    echo -e "\e[1m\e[93m$PYBIN not found! Skip build and test.\e[0m"
+    continue
+  fi
 fi
 
 # if we are in a virtual_env, we will not create a new one inside.
