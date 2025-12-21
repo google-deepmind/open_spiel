@@ -21,7 +21,7 @@ import torch
 
 from open_spiel.python import rl_environment
 import pyspiel
-from open_spiel.python.pytorch import dqn
+from open_spiel.python.pytorch import dqn_refactor as dqn
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.
@@ -92,6 +92,22 @@ class DQNTest(absltest.TestCase):
     for agent in agents:
       agent.step(time_step)
 
+    total_eval_reward = [0] * 2
+
+    for _ in range(1000):
+      time_step = env.reset()
+      while not time_step.last():
+        current_player = time_step.observations["current_player"]
+        current_agent = agents[current_player]
+        agent_output = current_agent.step(time_step, is_evaluation=True)
+        time_step = env.step([agent_output.action])
+        total_eval_reward = [
+          t + r for t, r in zip(total_eval_reward, time_step.rewards)
+        ] 
+
+    self.assertGreaterEqual(abs(total_eval_reward[0]), 1000)
+
+
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
     game = "hanabi"
@@ -113,15 +129,17 @@ class DQNTest(absltest.TestCase):
     num_actions = env.action_spec()["num_actions"]
 
     agents = [
-        dqn.DQN(  # pylint: disable=g-complex-comprehension
-            player_id,
-            state_representation_size=state_size,
-            num_actions=num_actions,
-            hidden_layers_sizes=[16],
-            replay_buffer_capacity=10,
-            batch_size=5) for player_id in range(num_players)
+      dqn.DQN(  # pylint: disable=g-complex-comprehension
+        player_id,
+        state_representation_size=state_size,
+        num_actions=num_actions,
+        hidden_layers_sizes=[16],
+        replay_buffer_capacity=10,
+        batch_size=5
+      ) for player_id in range(num_players)
     ]
     time_step = env.reset()
+
     while not time_step.last():
       current_player = time_step.observations["current_player"]
       agent_output = [agent.step(time_step) for agent in agents]
@@ -129,7 +147,6 @@ class DQNTest(absltest.TestCase):
 
     for agent in agents:
       agent.step(time_step)
-
 
 if __name__ == "__main__":
   random.seed(SEED)
