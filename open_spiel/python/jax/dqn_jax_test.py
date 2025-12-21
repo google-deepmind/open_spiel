@@ -17,7 +17,7 @@
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
-from open_spiel.python.jax import dqn
+from open_spiel.python.jax import dqn_refactor as dqn
 import pyspiel
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
@@ -79,6 +79,21 @@ class DQNTest(absltest.TestCase):
 
     for agent in agents:
       agent.step(time_step)
+
+    total_eval_reward = [0] * 2
+
+    for _ in range(1000):
+      time_step = env.reset()
+      while not time_step.last():
+        current_player = time_step.observations["current_player"]
+        current_agent = agents[current_player]
+        agent_output = current_agent.step(time_step, is_evaluation=True)
+        time_step = env.step([agent_output.action])
+        total_eval_reward = [
+          t + r for t, r in zip(total_eval_reward, time_step.rewards)
+        ] 
+
+    self.assertGreaterEqual(abs(total_eval_reward[0]), 1000)
 
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
