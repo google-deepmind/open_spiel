@@ -35,6 +35,7 @@
 # Load argslib for parsing of command-line arguments.
 source $(dirname "$0")/argslib.sh
 
+ArgsLibAddArg github_ci bool false "Whether running from github CI."
 ArgsLibAddArg virtualenv bool true "Whether to use virtualenv. We enter a virtualenv (stored in venv/) only if this flag is true and we are not already in one."
 # We define a string and not a boolean, because we can to know whether this flag
 # has been explicitly set or not.
@@ -52,8 +53,11 @@ function die() {
   exit -1
 }
 
-set -e  # exit when any command fails
-# set -x  # Prints all executed command
+if [[ $ARG_github_ci == "true" ]]; then
+  echo "GitHub CI detected. Setting -e and -x"
+  set -e
+  set -x
+fi
 
 MYDIR="$(dirname "$(realpath "$0")")"
 source "${MYDIR}/global_variables.sh"
@@ -80,18 +84,19 @@ else
 fi
 
 echo -e "\e[33mRunning ${0} from $PWD\e[0m"
-PYBIN=${PYBIN:-"python"}
-PYBIN=`which ${PYBIN}`
-if [ ! -x $PYBIN ]
+echo -e "Trying to find 'python'"
+PYBIN=`which python`
+if [[ ! -x $PYBIN ]]
 then
-  PYBIN=${PYBIN:-"python3"}
-  PYBIN=`which ${PYBIN}`
-  if [ ! -x $PYBIN ]
+  echo -e "python not found, trying to find python3..."
+  PYBIN=`which python3`
+  if [[ ! -x $PYBIN ]]
   then
     echo -e "\e[1m\e[93m$PYBIN not found! Skip build and test.\e[0m"
-    continue
+    exit 1
   fi
 fi
+echo "PYBIN is $PYBIN"
 
 # if we are in a virtual_env, we will not create a new one inside.
 if [[ "$VIRTUAL_ENV" != "" ]]

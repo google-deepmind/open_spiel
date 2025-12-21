@@ -41,6 +41,6 @@ pip install --upgrade -r requirements.txt
 
 # We need PYBIN to be python on its own so that the build and run script
 # finds the one from the virtual environment.
-PYBIN="python" ./open_spiel/scripts/build_and_run_tests.sh
+PYBIN="python" ./open_spiel/scripts/build_and_run_tests.sh --github_ci=true
 
 deactivate
