@@ -66,6 +66,9 @@ jobs:
     - uses: julia-actions/setup-julia@v2
       with:
         version: 1.8
+    - uses: actions/setup-python@v6
+      with:
+        python-version: $OS_PYTHON_VERSION
     - name: Ad-hoc fix
       if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
       run: |
