@@ -529,6 +529,9 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       (float) The average loss obtained on this batch of transitions or `None`.
     """
+    if self._strategy_memories is None:
+      return None
+    
     for _ in range(self._policy_network_train_steps):
       if self._batch_size_strategy:
         if self._batch_size_strategy > len(self._strategy_memories):
