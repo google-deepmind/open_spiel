@@ -434,7 +434,6 @@ class DeepCFRSolver(policy.Policy):
       advantage_model: nn.Module,
       optimiser: nn.Optimizer, 
       batch: AdvantageMemory,
-      total_iterations: chex.Array
     ) -> chex.Array:
       
       def _loss_adv(
@@ -443,7 +442,6 @@ class DeepCFRSolver(policy.Policy):
         samp_regrets: chex.Array, 
         masks: chex.Array,
         iterations: chex.Array, 
-        total_iterations: chex.Array
       ) -> chex.Array:
         """Loss function for our advantage network."""
         preds = forward(advantage_model, info_states, masks)
@@ -457,7 +455,6 @@ class DeepCFRSolver(policy.Policy):
         batch.advantage, 
         batch.legal_mask, 
         batch.iteration, 
-        total_iterations
       )
       optimiser.update(advantage_model, grads)
       return main_loss
@@ -471,7 +468,6 @@ class DeepCFRSolver(policy.Policy):
       policy_model: nn.Module, 
       optimiser: nn.Optimizer, 
       batch: StrategyMemory,
-      total_iterations: chex.Array
     ) -> chex.Array:
       
       def _loss_policy(
@@ -480,7 +476,6 @@ class DeepCFRSolver(policy.Policy):
         action_probs: chex.Array, 
         masks: chex.Array,
         iterations: chex.Array, 
-        total_iterations: chex.Array
       ) -> chex.Array:
         """Loss function for our policy network."""
         preds = forward(policy_model, info_states, None)
@@ -499,7 +494,6 @@ class DeepCFRSolver(policy.Policy):
         batch.strategy_action_probs, 
         batch.legal_mask, 
         batch.iteration, 
-        total_iterations
       )
       optimiser.update(policy_model, grads)
       return main_loss
@@ -708,7 +702,7 @@ class DeepCFRSolver(policy.Policy):
       """Utility method to avoid boilerplate"""
       
       def _train_step(it: chex.Array, carry: nn.Carry) -> nn.Carry:
-        graphdef, state, buffer_state, rng, iteration, _ = carry
+        graphdef, state, buffer_state, rng, _ = carry
 
         # merge at the beginning of the function
         model, optimiser = nn.merge(graphdef, state)
@@ -719,12 +713,11 @@ class DeepCFRSolver(policy.Policy):
         loss = update_fn(
           model, 
           optimiser,
-          batch, 
-          jnp.array(iteration)
+          batch
         )
         
         state = nn.state((model, optimiser))
-        return (graphdef, state, buffer_state, _rng, iteration, loss)  
+        return (graphdef, state, buffer_state, _rng, loss)  
       
       return _train_step
 
@@ -743,28 +736,21 @@ class DeepCFRSolver(policy.Policy):
 
     self._advantage_networks[player].train()
 
-    batch_size = self._batch_size_advantage
-    max_size = min(
-      self._advantage_memories[player].add_calls.item(), 
-      self._advantage_memories[player].capacity.astype(int).item()
-    )
-
-    sampler_fn = ReservoirBuffer.get_batch_sampler(batch_size, max_size)
-
-    if batch_size is not None:
-      if batch_size > max_size:
-        # Not enough samples to train on
-        return None
-      
     # Training loops are inspired by https://flax.readthedocs.io/en/stable/guides/performance.html#functional-training-loop
     graphdef, state = nn.split((self._advantage_networks[player], self._advantage_opt[player]))
     buffer_state = self._advantage_memories[player].to_jax() if self._backend == "cpu" else self._advantage_memories[player]
-    update_fn = self._make_train_step(self._jittable_adv_update, sampler_fn, batch_size)
+    sampler_fn = ReservoirBuffer.get_batch_sampler(self._batch_size_strategy, len(buffer_state))
+    update_fn = self._make_train_step(self._jittable_adv_update, sampler_fn, self._batch_size_advantage)
+
+    if self._batch_size_advantage is not None:
+      if self._batch_size_advantage > len(buffer_state):
+        # Not enough samples to train on
+        return None
     
-    (_, state, _, _, _, main_loss) = jax.lax.fori_loop(
+    (_, state, _, _, main_loss) = jax.lax.fori_loop(
       0, self._advantage_network_train_steps,
       update_fn,
-      (graphdef, state, buffer_state, self._next_rng_key(), self._iteration, jnp.array(0))
+      (graphdef, state, buffer_state, self._next_rng_key(), jnp.array(0))
     )
         
     nn.update((self._advantage_networks[player], self._advantage_opt[player]), state)
@@ -783,26 +769,21 @@ class DeepCFRSolver(policy.Policy):
     if self._strategy_memories is None:
       return None
     
-    if self._batch_size_strategy > len(self._strategy_memories):
-      ## Skip if there aren't enough samples
-      return None
-  
-    batch_size = self._batch_size_advantage
-    max_size = min(
-      self._strategy_memories.add_calls.item(), 
-      self._strategy_memories.capacity.astype(int).item()
-    )
-    sampler_fn = ReservoirBuffer.get_batch_sampler(batch_size, max_size)
-
+    if self._batch_size_strategy:
+      if self._batch_size_strategy > len(self._strategy_memories):
+        ## Skip if there aren't enough samples
+        return None
+    
     # Training loops are inspired by https://flax.readthedocs.io/en/stable/guides/performance.html#functional-training-loop
     graphdef, state = nn.split((self._policy_network, self._policy_opt))
     buffer_state = self._strategy_memories.to_jax() if self._backend == "cpu" else self._strategy_memories
-    update_fn = self._make_train_step(self._jittable_policy_update, sampler_fn, batch_size)
+    sampler_fn = ReservoirBuffer.get_batch_sampler(self._batch_size_strategy, len(buffer_state))
+    update_fn = self._make_train_step(self._jittable_policy_update, sampler_fn, self._batch_size_strategy)
     
-    (_, state, _, _, _, main_loss) = jax.lax.fori_loop(
+    (_, state, _, _, main_loss) = jax.lax.fori_loop(
       0, self._advantage_network_train_steps,
       update_fn,
-      (graphdef, state, buffer_state, self._next_rng_key(), self._iteration, jnp.array(0))
+      (graphdef, state, buffer_state, self._next_rng_key(), jnp.array(0))
     )
     
     nn.update((self._policy_network, self._policy_opt), state)
