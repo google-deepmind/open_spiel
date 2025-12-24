@@ -12,6 +12,7 @@ import optax
 import chex
 import orbax
 from flax.training import train_state
+from flax.traverse_util import flatten_dict, unflatten_dict
 import orbax.checkpoint
 
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
@@ -158,7 +159,7 @@ class AlphaZeroModel(nn.Module):
   """
   
   model_type: str
-  input_shape: Tuple[int, ...]
+  input_shape: chex.Shape
   output_size: int
   nn_width: int
   nn_depth: int
@@ -269,19 +270,32 @@ class Model:
     
     # This mask function identifies parameters that are not 1-dimensional, 
     # which often corresponds to weights/kernels in simple models, excluding biases.  
-    mask_biases = lambda p: jax.tree.map(lambda x: x.ndim != 1, p)  # noqa: E731
+    mask_biases_and_bn = lambda p: jax.tree.map(lambda x: x.ndim != 1, p)  # noqa: E731
+
+    def mask_only_biases(params):
+      # Flatten the nested dictionary: {('layers_0', 'bias'): array(...)}
+      flat_params = flatten_dict(params)
+      
+      # Create a mask: True for bias, False otherwise
+      flat_mask = {
+          path: (path[-1] == 'bias' and 'BatchNorm' not in path) 
+          for path, value in flat_params.items()
+      }
+      
+      # Return as a PyTree matching the original structure
+      return unflatten_dict(flat_mask)
+    
     if not decouple_weight_decay:
       optimiser = optax.adam(learning_rate=learning_rate)
     else:    
       optimiser = optax.chain(
         optax.scale_by_adam(),
-        optax.add_decayed_weights(weight_decay, mask_biases),
+        optax.add_decayed_weights(weight_decay, mask_only_biases),
         optax.scale_by_learning_rate(learning_rate),
     )
 
     rng = jax.random.PRNGKey(seed)
     variables = model.init(rng, jnp.ones(input_shape), False)
-
     state = cls._create_train_state(model.apply, variables, optimiser)
 
     @jax.jit
@@ -301,7 +315,7 @@ class Model:
         policy_loss =  jax.vmap(optax.safe_softmax_cross_entropy)(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds, value_targets).mean()
         
-        l2_reg_loss = optax.tree_utils.tree_l2_norm(mask_biases(params), ord=2, squared=True) * weight_decay
+        l2_reg_loss = optax.tree_utils.tree_l2_norm(mask_only_biases(params), ord=2, squared=True) * weight_decay
 
         total_loss = policy_loss + value_loss + jax.lax.select(
           decouple_weight_decay, jnp.array(0.0), l2_reg_loss

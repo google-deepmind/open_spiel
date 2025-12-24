@@ -100,15 +100,12 @@ def extend(
 def sample_seq(
   state: BufferState,
   rng_key: chex.PRNGKey,
-  count: int
-) -> BufferSample:
-    
+  count: int,
+  max_size: int
+) -> tuple[BufferState, Any, chex.Array]:
+
   """Sampling count examples from the buffer
   """
-
-  # Get add_batch_size and the full size of the time axis.
-  max_size = get_tree_shape_prefix(state.experience)[0]
- 
   # The queue is circular, so we can loop back to the start
   traj_indices = (jnp.arange(count) + state.read_index) % max_size
 
@@ -116,20 +113,20 @@ def sample_seq(
   new_read_index = (state.read_index + count) % max_size
   state = state.replace(  # type: ignore
     read_index=new_read_index,
-    is_full=jnp.array(False),
+    # is_full=jnp.array(False),
   )
   # Sample
   batch_trajectory = jax.tree.map(lambda x: x[traj_indices], state.experience)
 
-  return state, BufferSample(experience=batch_trajectory), traj_indices
+  return state, batch_trajectory, traj_indices
 
 def sample_random(
   state: BufferState,
   rng_key: chex.PRNGKey,
   count: int,
   max_size: int
-) -> BufferSample:
-  traj_indices = jax.random.choice(rng_key, jnp.arange(max_size), shape=(count,))
+) -> tuple[BufferState, Any, chex.Array]:
+  traj_indices = jax.random.choice(rng_key, jnp.arange(max_size), shape=(count,), replace=False)
   batch_trajectory = jax.tree.map(lambda x: x[traj_indices], state.experience)
   return state, batch_trajectory, traj_indices
 
@@ -211,6 +208,13 @@ class Buffer:
 
     self.buffer_state = self.buffer.extend(self.buffer_state, val)
     self.total_seen = self.buffer_state.total_seen
+
+  def shuffle(self) -> None:
+    self._rng, rng = jax.random.split(self._rng) 
+    self.buffer_state = self.buffer_state.replace(
+      experience=jax.tree.map(lambda x: jax.random.permutation(rng, x, axis=0), self.buffer_state.experience)
+    )
+
 
   def sample(self, count: int) -> Any:
     self._rng, rng = jax.random.split(self._rng) 

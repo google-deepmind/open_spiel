@@ -313,7 +313,8 @@ def evaluator(*, game, config, logger, queue):
             random_evaluator,
             solve=True,
             verbose=False,
-            dont_return_chance_node=True)
+            dont_return_chance_node=True
+          )
     ]
     if az_player == 1:
       bots = list(reversed(bots))
@@ -407,7 +408,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         index = (len(trajectory.states) - 1) * stage // (stage_count - 1)
         n = trajectory.states[index]
         accurate = (n.value >= 0) == (trajectory.returns[n.current_player] >= 0)
-        value_accuracies[stage].add(1 if accurate else 0)
+        value_accuracies[stage].add(int(accurate))
         value_predictions[stage].add(abs(n.value))
 
       if num_states >= learn_rate:
@@ -471,7 +472,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
           evals[difficulty].append(outcome)
         except spawn.Empty:
           break
-        
+
     batch_size_stats = stats.BasicStats()  # Only makes sense in C++.
     batch_size_stats.add(1)
     data_log.write({
