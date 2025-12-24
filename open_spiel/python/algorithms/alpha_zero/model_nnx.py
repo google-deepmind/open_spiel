@@ -10,38 +10,33 @@ import flax.nnx as nn
 import optax
 import chex
 from flax.training import train_state
-from flax.traverse_util import flatten_dict, unflatten_dict
 import orbax.checkpoint as orbax
 
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
 
 warnings.warn("Pay attention that you've been using the `nnx` api")
-state_axes = nn.StateAxes({nn.RngState: 0, (nn.Param, nn.BatchStat): None})
 
 activations_dict = {
-    "celu": nn.celu,
-    "elu": nn.elu,
-    "gelu": nn.gelu,
-    "glu": nn.glu,
-    "hard_sigmoid": nn.hard_sigmoid,
-    "hard_silu": nn.hard_silu, # Alias for hard_swish
-    "hard_swish": nn.hard_swish, # Alias for hard_silu
-    "hard_tanh": nn.hard_tanh,
-    "leaky_relu": nn.leaky_relu,
-    "log_sigmoid": nn.log_sigmoid,
-    "log_softmax": nn.log_softmax,
-    "logsumexp": nn.logsumexp,
-    "one_hot": nn.one_hot,
-    "relu": nn.relu,
-    "selu": nn.selu,
-    "sigmoid": nn.sigmoid,
-    "silu": nn.silu,
-    "soft_sign": nn.soft_sign,
-    "softmax": nn.softmax,
-    "softplus": nn.softplus,
-    "standardize": nn.standardize,
-    "swish": nn.swish,
-    "tanh": nn.tanh,
+  "celu": nn.celu,
+  "elu": nn.elu,
+  "gelu": nn.gelu,
+  "glu": nn.glu,
+  "hard_sigmoid": nn.hard_sigmoid,
+  "hard_silu": nn.hard_silu, # Alias for hard_swish
+  "hard_swish": nn.hard_swish, # Alias for hard_silu
+  "hard_tanh": nn.hard_tanh,
+  "leaky_relu": nn.leaky_relu,
+  "log_sigmoid": nn.log_sigmoid,
+  "log_softmax": nn.log_softmax,
+  "relu": nn.relu,
+  "selu": nn.selu,
+  "sigmoid": nn.sigmoid,
+  "silu": nn.silu,
+  "soft_sign": nn.soft_sign,
+  "softmax": nn.softmax,
+  "softplus": nn.softplus,
+  "swish": nn.swish,
+  "tanh": nn.tanh,
 }
 
 def get_batch_stats(layer: nn.Module):
@@ -365,18 +360,9 @@ class Model:
       lambda x: x.ndim > 1, p, is_leaf=lambda leaf: isinstance(leaf, nn.Param)
     ) 
 
-    def mask_only_biases(params):
-      # Flatten the nested dictionary: {('layers_0', 'bias'): array(...)}
-      flat_params = flatten_dict(params)
-      
-      # Create a mask: True for bias, False otherwise
-      flat_mask = {
-          path: (path[-1] == 'bias' and 'BatchNorm' not in path) 
-          for path, value in flat_params.items()
-      }
-      
-      # Return as a PyTree matching the original structure
-      return unflatten_dict(flat_mask)
+    def mask_only_biases(params: nn.Param) -> nn.State:
+      flat_mask = {path: ("bias" not in path) for path in params.keys()}
+      return nn.State.from_flat_path(flat_mask)
 
     if not decouple_weight_decay:
       optimiser = optax.adam(learning_rate=learning_rate)
@@ -416,12 +402,12 @@ class Model:
         policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
         
         policy_loss =  jax.vmap(optax.safe_softmax_cross_entropy)(policy_logits, policy_targets).mean()
-        value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
+        value_loss = jax.vmap(optax.l2_loss)(value_preds, value_targets).mean()
 
-        l2_reg_loss = optax.tree_utils.tree_l2_norm(mask_only_biases(params), ord=2, squared=True) * weight_decay
+        l2_reg_loss = optax.tree_utils.tree_l2_norm(mask_only_biases, params, ord=2, squared=True) * weight_decay
         
         total_loss = policy_loss + value_loss + jax.lax.select(
-          decouple_weight_decay, jnp.array(0.0), l2_reg_loss
+          decouple_weight_decay, jnp.array(0.0), l2_reg_loss 
         )    
 
         batch_stats = get_batch_stats(model)   

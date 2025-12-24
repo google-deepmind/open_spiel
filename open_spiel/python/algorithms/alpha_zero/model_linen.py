@@ -21,29 +21,26 @@ flax.config.update('flax_use_orbax_checkpointing', True)
 warnings.warn("Pay attention that you've been using the `linen` api")
 
 activations_dict = {
-    "celu": nn.celu,
-    "elu": nn.elu,
-    "gelu": nn.gelu,
-    "glu": nn.glu,
-    "hard_sigmoid": nn.hard_sigmoid,
-    "hard_silu": nn.hard_silu, # Alias for hard_swish
-    "hard_swish": nn.hard_swish, # Alias for hard_silu
-    "hard_tanh": nn.hard_tanh,
-    "leaky_relu": nn.leaky_relu,
-    "log_sigmoid": nn.log_sigmoid,
-    "log_softmax": nn.log_softmax,
-    "logsumexp": nn.logsumexp,
-    "one_hot": nn.one_hot,
-    "relu": nn.relu,
-    "selu": nn.selu,
-    "sigmoid": nn.sigmoid,
-    "silu": nn.silu,
-    "soft_sign": nn.soft_sign,
-    "softmax": nn.softmax,
-    "softplus": nn.softplus,
-    "standardize": nn.standardize,
-    "swish": nn.swish,
-    "tanh": nn.tanh,
+  "celu": nn.celu,
+  "elu": nn.elu,
+  "gelu": nn.gelu,
+  "glu": nn.glu,
+  "hard_sigmoid": nn.hard_sigmoid,
+  "hard_silu": nn.hard_silu, # Alias for hard_swish
+  "hard_swish": nn.hard_swish, # Alias for hard_silu
+  "hard_tanh": nn.hard_tanh,
+  "leaky_relu": nn.leaky_relu,
+  "log_sigmoid": nn.log_sigmoid,
+  "log_softmax": nn.log_softmax,
+  "relu": nn.relu,
+  "selu": nn.selu,
+  "sigmoid": nn.sigmoid,
+  "silu": nn.silu,
+  "soft_sign": nn.soft_sign,
+  "softmax": nn.softmax,
+  "softplus": nn.softplus,
+  "swish": nn.swish,
+  "tanh": nn.tanh,
 }
 
 class Activation(nn.Module):
@@ -245,7 +242,7 @@ class Model:
     learning_rate: float, 
     path: str, 
     seed: int = 0,
-    decouple_weight_decay: bool = True
+    decouple_weight_decay: bool = False
   ) -> "Model":
     
     if model_type not in cls.valid_model_types:
@@ -278,10 +275,10 @@ class Model:
       
       # Create a mask: True for bias, False otherwise
       flat_mask = {
-          path: (path[-1] == 'bias' and 'BatchNorm' not in path) 
-          for path, value in flat_params.items()
+        path: (path[-1] == 'bias' and 'BatchNorm_0' not in path) 
+        for path in flat_params.keys()
       }
-      
+
       # Return as a PyTree matching the original structure
       return unflatten_dict(flat_mask)
     
