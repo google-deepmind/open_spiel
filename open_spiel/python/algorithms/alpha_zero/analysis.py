@@ -32,9 +32,9 @@ import pandas as pd
 from open_spiel.python.utils import gfile
 
 X_AXIS = {
-    "step": "step",
-    "time": "time_rel_h",
-    "states": "total_states",
+  "step": "step",
+  "time": "time_rel_h",
+  "states": "total_states",
 }
 
 flags.DEFINE_string("path", None,
@@ -71,7 +71,7 @@ def print_columns(strings, max_width=MAX_WIDTH):
 
 def load_jsonl_data(filename):
   with gfile.Open(filename) as f:
-    return [json.loads(l) for l in f.readlines()]
+    return [json.loads(ljson) for ljson in f.readlines()]
 
 
 def sub_sample(data, count):
@@ -255,16 +255,17 @@ def main(argv):
   data = load_jsonl_data(os.path.join(FLAGS.path, "learner.jsonl"))
 
   print("config:")
-  print_columns(sorted("{}: {}".format(k, v) for k, v in config.items()))
-  print()
+  print_columns(sorted("{}: {}\n".format(k, v) for k, v in config.items()))
   print("data keys:")
-  print_columns(sorted(data[0].keys()))
-  print()
-  print("training time:", datetime.timedelta(seconds=int(data[-1]["time_rel"])))
+  try:
+    print_columns(sorted(data[0].keys()))
+  except IndexError:
+    print("The data is not ready")
+    return
+  print("\ntraining time:", datetime.timedelta(seconds=int(data[-1]["time_rel"])))
   print("training steps: %d" % (data[-1]["step"]))
   print("total states: %d" % (data[-1]["total_states"]))
-  print("total trajectories: %d" % (data[-1]["total_trajectories"]))
-  print()
+  print("total trajectories: %d\n" % (data[-1]["total_trajectories"]))
 
   try:
     plot_data(config, data)
