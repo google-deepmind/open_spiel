@@ -129,16 +129,13 @@ class Config:
   nn_model: str
   nn_width: int
   nn_depth: int
-  observation_shape: tuple[int, ...]
+  observation_shape: chex.Shape
   output_size: int
 
   quiet: bool
 
   nn_api_version: str = "nnx" 
-  # device can be 'cpu', 'gpu', or 'mps'
-  # NOTE: the corresponding `jax` version has to be installed. See
-  # https://docs.jax.dev/en/latest/installation.html#supported-platforms
-  device: str = "cpu"
+
 
 def _init_model_from_config(config: Config):
   return api_selector(config.nn_api_version).Model.build_model(
@@ -243,7 +240,6 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       logger.opt_print(f"Player {state.current_player()} sampled action: {action_str}")
       state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
-  #it's not good to do like that but it's python.
 
   trajectory = Trajectory(
     states=trajectory_states,
@@ -338,7 +334,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
   logger.also_to_stdout = True
 
-  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size, sequential=False) #only this
+  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size) #only this
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
@@ -421,8 +417,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   def learn(step):
     """Sample from the replay buffer, update weights and save a checkpoint."""
     losses = [] 
-    #TODO: why not to replace replace with `jax.lax.scan`, 
-    # but the model state is not explicit
+
     for _ in range(len(replay_buffer) // config.train_batch_size):
       data = replay_buffer.sample(config.train_batch_size)
       losses.append(model.update(data))
@@ -476,10 +471,9 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
           evals[difficulty].append(outcome)
         except spawn.Empty:
           break
-
+        
     batch_size_stats = stats.BasicStats()  # Only makes sense in C++.
     batch_size_stats.add(1)
-
     data_log.write({
         "step": step,
         "total_states": replay_buffer.total_seen.item(),
@@ -494,27 +488,27 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         "value_accuracy": [v.as_dict for v in value_accuracies],
         "value_prediction": [v.as_dict for v in value_predictions],
         "eval": {
-            "count": evals[0].total_seen.item(),
-            "results": [tree_sum(e.data, 0).item() / len(e) if e else 0 for e in evals],
+          "count": evals[0].total_seen.item(),
+          "results": [np.mean(e.data).item() if e is not None else 0 for e in evals],
         },
         "batch_size": batch_size_stats.as_dict,
         "batch_size_hist": [0, 1],
         "loss": {
-            "policy": float(losses.policy),
-            "value": float(losses.value),
-            "l2reg": float(losses.l2),
-            "sum": float(losses.total),
+          "policy": float(losses.policy),
+          "value": float(losses.value),
+          "l2reg": float(losses.l2),
+          "sum": float(losses.total),
         },
         "cache": {  # Null stats because it's hard to report between processes.
-            "size": 0,
-            "max_size": 0,
-            "usage": 0,
-            "requests": 0,
-            "requests_per_s": 0,
-            "hits": 0,
-            "misses": 0,
-            "misses_per_s": 0,
-            "hit_rate": 0,
+          "size": 0,
+          "max_size": 0,
+          "usage": 0,
+          "requests": 0,
+          "requests_per_s": 0,
+          "hits": 0,
+          "misses": 0,
+          "misses_per_s": 0,
+          "hit_rate": 0,
         },
     })
     logger.print()
@@ -527,7 +521,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 
 def alpha_zero(config: Config):
   # NOTE: a single device accelearation is currently supported
-  with jax.default_device(jax.devices(config.device)[0]):
+  with jax.default_device(jax.default_backend()):
 
     """Start all the worker processes for a full alphazero setup."""
     game = pyspiel.load_game(config.game)

@@ -11,7 +11,6 @@ import optax
 import chex
 from flax.training import train_state
 import orbax.checkpoint as orbax
-import operator
 
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
 
@@ -277,10 +276,6 @@ class AlphaZeroModel(nn.Module):
 
     return policy_logits, value_out
 
-@nn.vmap(in_axes=(None, 0), axis_name="batch")
-def forward(model, x):
-  return model(x)
-
 #modified train state
 class TrainState(train_state.TrainState):
   batch_stats: nn.State
@@ -312,20 +307,35 @@ class Model:
 
 
   @classmethod
-  def _create_train_state(cls, model, optimizer) -> TrainState:
+  def _create_train_state(
+    cls, 
+    model: AlphaZeroModel, 
+    optimiser: optax.GradientTransformation
+  ) -> TrainState:
     graphdef, variables, batch_stats = nn.split(model, nn.Param, nn.BatchStat)
 
     return TrainState.create(
       apply_fn=model, 
       params=variables, 
-      tx=optimizer, 
+      tx=optimiser, 
       batch_stats=batch_stats,
       graphdef=graphdef
     )
     
   @classmethod
-  def build_model(cls, model_type, input_shape, output_size, nn_width, nn_depth,
-                  weight_decay, learning_rate, path, seed=0):
+  def build_model(
+    cls, 
+    model_type: str, 
+    input_shape: chex.Shape, 
+    output_size: chex.Numeric, 
+    nn_width: int, 
+    nn_depth: int,
+    weight_decay: float, 
+    learning_rate: float, 
+    path: str, 
+    seed: int = 0,
+    decouple_weight_decay: bool = True
+  ) -> "Model":
     
     if model_type not in cls.valid_model_types:
       raise ValueError(f"Invalid model type: {model_type}, "
@@ -344,17 +354,48 @@ class Model:
       input_shape = input_shape, 
       output_size = output_size, 
       nn_width = nn_width, 
-      nn_depth = nn_depth
+      nn_depth = nn_depth,
+      seed=seed
     )
+
+    # This mask function identifies parameters that are not 1-dimensional, 
+    # which often corresponds to weights/kernels in simple models, excluding biases.  
+    mask_biases = lambda p: jax.tree.map(  # noqa: E731
+      lambda x: x.ndim > 1, p, is_leaf=lambda leaf: isinstance(leaf, nn.Param)
+    ) 
+
+    if not decouple_weight_decay:
+      optimiser = optax.adam(learning_rate=learning_rate)
+    else:    
+      optimiser = optax.chain(
+        optax.scale_by_adam(),
+        optax.add_decayed_weights(weight_decay, mask_biases),
+        optax.scale_by_learning_rate(learning_rate),
+    )
+    state = cls._create_train_state(model, optimiser)    
     
-    optimizer = optax.adamw(learning_rate=learning_rate, weight_decay=weight_decay)
-    state = cls._create_train_state(model, optimizer)    
+    @nn.vmap(in_axes=(None, 0), axis_name="batch")
+    def forward(model: AlphaZeroModel, x: chex.Array) -> chex.Array:
+      return model(x)
 
     @jax.jit
-    def update_step_fn(state, observations, legals_mask, policy_targets, value_targets):
+    def update_step_fn(
+      state: TrainState, 
+      observations: chex.Array,
+      legals_mask: chex.Array,
+      policy_targets: chex.Array,
+      value_targets: chex.Array
+    ) -> Callable:
       
-      def loss_fn(params, observations, legals_mask, policy_targets, value_targets):
-        model = nn.merge(state.graphdef, params, state.batch_stats, copy=True)
+      def loss_fn(
+        params: nn.Param, 
+        batch_stats: nn.BatchStat, 
+        observations: chex.Array,
+        legals_mask: chex.Array,
+        policy_targets: chex.Array,
+        value_targets: chex.Array
+      ):
+        model = nn.merge(state.graphdef, params, batch_stats, copy=True)
         model.train()
 
         policy_logits, value_preds = forward(model, observations)
@@ -363,10 +404,11 @@ class Model:
         policy_loss =  jax.vmap(optax.safe_softmax_cross_entropy)(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
 
-        l2_reg_loss = jax.tree.reduce(
-          operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0) * weight_decay
+        l2_reg_loss = optax.tree_utils.tree_l2_norm(mask_biases(params), ord=2, squared=True) * weight_decay
         
-        total_loss = policy_loss + value_loss
+        total_loss = policy_loss + value_loss + jax.lax.select(
+          decouple_weight_decay, jnp.array(0.0), l2_reg_loss
+        )    
 
         batch_stats = get_batch_stats(model)   
         return total_loss, (policy_loss, value_loss, l2_reg_loss, batch_stats)
@@ -374,7 +416,7 @@ class Model:
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
 
       (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
-        state.params, observations, legals_mask, policy_targets, value_targets)
+        state.params, state.batch_stats, observations, legals_mask, policy_targets, value_targets)
       
       new_state = state.apply_gradients(grads=grads, batch_stats=new_batch_stats)
   
@@ -393,35 +435,35 @@ class Model:
     return model
   
   @property
-  def num_trainable_variables(self):
+  def num_trainable_variables(self) -> int:
     return sum(np.prod(p.shape) for p in jax.tree.leaves(self._state.params))
   
   @property
-  def parameters_per_layer(self):
+  def parameters_per_layer(self) -> chex.ArrayTree:
     flat_params = flax.traverse_util.flatten_dict(self._state.params, sep='/')
     return jax.tree.map(jnp.shape, flat_params)
   
-  def print_trainable_variables(self):
+  def print_trainable_variables(self) -> None:
     # nn.display(self._model)
     flat_params, _ = jax.tree.flatten(self._state.params)
     for i, p in enumerate(flat_params):
       print(f"Param {i}: {p.shape}")
   
-  def inference(self, observation, legals_mask):
+  def inference(self, observation: chex.Array, legals_mask: chex.Array) -> tuple[chex.Array, chex.Array]:
     model = nn.merge(self._state.graphdef, self._state.params, self._state.batch_stats)
     model.eval()
 
     observation = jnp.array(observation, dtype=jnp.float32)
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
-    policy_logits, value = forward(model, observation)
+    policy_logits, value = model(observation)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
     policy = nn.softmax(policy_logits, axis=-1)
 
     return value, policy
   
-  def update(self, batch: Sequence[TrainInput] | chex.ArrayTree):
+  def update(self, batch: Sequence[TrainInput] | chex.ArrayTree) -> Losses:
 
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
       self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)

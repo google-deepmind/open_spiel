@@ -42,8 +42,8 @@ class BufferSample(Generic[Experience]):
 
 
 def init(
-    experience: Experience,
-    max_size: int,
+  experience: Experience,
+  max_size: int,
 ) -> BufferState:
   """Instanting a buffer state from the mock transition
   """
@@ -66,38 +66,6 @@ def init(
     write_index=jnp.array(0),
   )
 
-
-def can_add(
-    state: BufferState[Experience],
-    add_batch_size: int,
-) -> chex.Array:
-  """Check if the queue state can be written to.
-  Fully taken from 
-  https://github.com/instadeepai/flashbax/blob/main/flashbax/buffers/trajectory_queue.py
-  """
-
-  max_size = get_tree_shape_prefix(state.experience)[0]
-
-  new_write_index = state.write_index + add_batch_size
-  read_index_lt_eq_to_write = state.read_index <= state.write_index
-  read_index_greater_than_write = state.read_index > state.write_index
-  max_length_reached = new_write_index >= max_size
-
-  write_index_circular_overtake = (
-      read_index_lt_eq_to_write
-      & max_length_reached
-      & ((new_write_index % max_size) > state.read_index)
-  )
-
-  read_index_overtaken = read_index_greater_than_write & (
-      new_write_index > state.read_index
-  )
-
-  will_overwrite = write_index_circular_overtake | read_index_overtaken
-
-  do_not_write = state.is_full | will_overwrite
-
-  return ~do_not_write
 
 def extend(
   state: BufferState,
@@ -158,70 +126,12 @@ def sample_seq(
 def sample_random(
   state: BufferState,
   rng_key: chex.PRNGKey,
-  count: int
+  count: int,
+  max_size: int
 ) -> BufferSample:
-  traj_indices = jax.random.choice(rng_key, jnp.arange(get_tree_shape_prefix(state.experience)[0]), shape=(count,))
+  traj_indices = jax.random.choice(rng_key, jnp.arange(max_size), shape=(count,))
   batch_trajectory = jax.tree.map(lambda x: x[traj_indices], state.experience)
   return state, batch_trajectory, traj_indices
-
-
-def can_sample(
-  state: BufferState,
-  batch_size: int,
-) -> chex.Array:
-  """Indicates whether the buffer has been filled above the minimum length, such that it
-  may be sampled from.
-  Fully taken from:
-  https://github.com/instadeepai/flashbax/blob/main/flashbax/buffers/trajectory_queue.py
-  """
-
-  # Get the buffer's size
-  max_size = get_tree_shape_prefix(state.experience)[0]
-
-  # Calculate all the conditional expressions
-  new_read_index = state.read_index + batch_size
-  read_index_less_than_write = state.read_index < state.write_index
-  read_index_greater_than_write = state.read_index > state.write_index
-  max_length_reached = new_read_index >= max_size
-
-  # If the read index is less than the write index and the new read index is still less than the
-  # write index, then we can sample.
-  can_sample_read_less = read_index_less_than_write & (
-      new_read_index <= state.write_index
-  )
-  # If the read index is greater than the write index and the new read index has
-  # wrapped around thus when taking modulo the length of the buffer, it is less
-  # than the write index, then we can sample.
-  can_sample_read_greater = (
-      read_index_greater_than_write
-      & max_length_reached
-      & ((new_read_index % max_size) <= state.write_index)
-  )
-
-  # if the queue is full
-  can_sample_if_full = (
-      state.is_full & ~max_length_reached & (new_read_index > state.write_index)
-  )
-  can_sample_if_full_circular = (
-      state.is_full
-      & max_length_reached
-      & ((new_read_index % max_size) <= state.write_index)
-  )
-
-  # We combine the previous conditions to get the final condition. Note that we
-  # apply can_sample_read_greater only if the max length has been reached.
-  # Otherwise, if the read index is greater than the write index and the
-  # new read index is still greater than the write index without wrapping
-  # around the buffer, then we can sample.
-  can_sample = (
-      can_sample_read_less
-      | can_sample_read_greater
-      | (read_index_greater_than_write & ~max_length_reached)
-      | can_sample_if_full
-      | can_sample_if_full_circular
-  )
-
-  return can_sample
 
 
 TBufferState = TypeVar("TBufferState", bound=BufferState)
@@ -241,40 +151,30 @@ class FlatBuffer(Generic[Experience, TBufferState, TBufferSample]):
     [BufferState, chex.PRNGKey],
     tuple[BufferState, BufferSample, chex.Array],
   ]
-  # Checkers
-  can_sample: Callable[[BufferState, int], chex.Array]
-  can_add: Callable[[BufferState, int], chex.Array]
-
 
 def make_flat_buffer(max_size: int) -> FlatBuffer:
    return FlatBuffer(
       init=partial(init, max_size=max_size),
       extend=extend,
       sample=sample_random,
-      can_sample=can_sample,
-      can_add=can_add
    )
 
 
 class Buffer:
   """A fixed size buffer that keeps the newest values."""
 
-  def __init__(self, max_size: int, force_cpu: bool = False, seed: int = 0, sequential: bool = True) -> None:
+  def __init__(self, max_size: int, force_cpu: bool = False, seed: int = 0) -> None:
     self.max_size = max_size
     self.buffer = make_flat_buffer(max_size=max_size)
     self.total_seen = 0
-    self.sequential = sequential
 
-    #TODO: debug `can_*` checks.
-    
     self._rng = jax.random.PRNGKey(seed)
     # jit-compling all the methods for cpu if forced otherwise automatically
-    backend = "cpu" if force_cpu else None
+    backend = "cpu" if force_cpu else jax.default_backend()
     self.buffer = self.buffer.replace(
-        init=jax.jit(self.buffer.init, backend=backend),
-        extend=jax.jit(self.buffer.extend, backend=backend),
-        sample=jax.jit(self.buffer.sample, backend=backend, static_argnames="count"),
-        can_sample=jax.jit(self.buffer.can_sample, backend=backend),
+      init=jax.jit(self.buffer.init, backend=backend),
+      extend=jax.jit(self.buffer.extend, backend=backend, donate_argnums=(0,)),
+      sample=jax.jit(self.buffer.sample, backend=backend, static_argnames=("count", "max_size")),
     )
     self.buffer_state = None
 
@@ -287,15 +187,11 @@ class Buffer:
     if self.buffer_state is None:
        return 0
     
-    max_size = get_tree_shape_prefix(self.buffer_state.experience)[0]
     # Queue length: add unless it's full, but keep unchanged further
-    return jnp.where(self.buffer_state.is_full, max_size, self.buffer_state.write_index).item() 
+    return jnp.where(self.buffer_state.is_full, self.max_size, self.total_seen).item() 
 
   def __bool__(self) -> bool:
-    if self.buffer_state is None:
-        return False
-    
-    return True #bool(self.buffer.can_sample(self.buffer_state, 1))
+    return self.buffer_state is None
 
   def append(self, val: Any) -> None:
     
@@ -313,9 +209,6 @@ class Buffer:
        unbatched_val = jax.tree.map(lambda x: x[0], val)
        self.buffer_state = self.buffer.init(unbatched_val)
 
-    #TODO: add `can_add` check
-    batch_size = get_tree_shape_prefix(val)[0] # pylint: disable=possibly-unused-variable  # noqa: F841
-    # if self.buffer.can_add(self.buffer_state, batch_size):
     self.buffer_state = self.buffer.extend(self.buffer_state, val)
     self.total_seen = self.buffer_state.total_seen
 
@@ -324,6 +217,6 @@ class Buffer:
 
     # indices are returned for debug purposes only
     self.buffer_state, batch, indices = self.buffer.sample( # pylint: disable=possibly-unused-variable
-      self.buffer_state, rng, count) 
+      self.buffer_state, rng, count, len(self)) 
     
     return batch

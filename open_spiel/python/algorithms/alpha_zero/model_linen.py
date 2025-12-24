@@ -5,15 +5,13 @@ import warnings
 
 import numpy as np
 import flax
-import operator
 import jax
 import jax.numpy as jnp
 import flax.linen as nn
 import optax
 import chex
 import orbax
-from flax.training import train_state, orbax_utils
-from flax.traverse_util import flatten_dict
+from flax.training import train_state
 import orbax.checkpoint
 
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
@@ -63,7 +61,6 @@ class MLPBlock(nn.Module):
 
   @nn.compact
   def __call__(self, x: chex.Array) -> chex.Array:
-    # kernel_init=nn.initializers.glorot_normal()
     y = nn.Dense(features=self.features)(x)
     y = Activation(self.activation)(y)
     return y
@@ -75,7 +72,6 @@ class ConvBlock(nn.Module):
 
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
-    # kernel_init=nn.initializers.glorot_uniform()
     y = nn.Conv(features=self.features, kernel_size=self.kernel_size, padding='SAME')(x)
     y = nn.BatchNorm(use_running_average=not training, axis_name="batch")(y)
     y = Activation(self.activation)(y)
@@ -128,16 +124,6 @@ class ValueHead(nn.Module):
     values = MLPBlock(1, "tanh")(x)
     return values
 
-# https://github.com/google/flax/discussions/1675
-# Define a vmapped MLP class
-@functools.partial(
-  nn.vmap,
-  in_axes=(0, None),
-  out_axes=0,
-  variable_axes={'params': None, 'batch_stats': None}, # `None` means these collections are shared
-  split_rngs={'params': False, }, # Rngs for params are shared, but for dropout, they are split
-  axis_name="batch"
-)
 class AlphaZeroModel(nn.Module):
   """An AlphaZero style model with a policy and value head.
 
@@ -232,18 +218,34 @@ class Model:
       self._checkpointer = orbax.checkpoint.PyTreeCheckpointer()
 
   @classmethod
-  def _create_train_state(cls, apply_fn, variables, optimizer) -> TrainState:
+  def _create_train_state(
+    cls, 
+    apply_fn: Callable, 
+    variables: flax.core.FrozenDict, 
+    optimiser: optax.GradientTransformation
+  ) -> TrainState:
     return TrainState.create(
       apply_fn=apply_fn,
       params=variables['params'], 
-      tx=optimizer, 
+      tx=optimiser, 
       batch_stats=variables.get('batch_stats', {})
     )
     
 
   @classmethod
-  def build_model(cls, model_type, input_shape, output_size, nn_width, nn_depth,
-                  weight_decay, learning_rate, path, seed=0):
+  def build_model(
+    cls, 
+    model_type: str, 
+    input_shape: chex.Shape, 
+    output_size: chex.Numeric, 
+    nn_width: int, 
+    nn_depth: int,
+    weight_decay: float, 
+    learning_rate: float, 
+    path: str, 
+    seed: int = 0,
+    decouple_weight_decay: bool = True
+  ) -> "Model":
     
     if model_type not in cls.valid_model_types:
       raise ValueError(f"Invalid model type: {model_type}, "
@@ -265,41 +267,46 @@ class Model:
       nn_depth = nn_depth
     )
     
-    optimizer = optax.adamw(learning_rate=learning_rate, weight_decay=weight_decay)
-    rng = jax.random.PRNGKey(seed)
-    variables = model.init(rng, jnp.ones((1, *input_shape)), False)
+    # This mask function identifies parameters that are not 1-dimensional, 
+    # which often corresponds to weights/kernels in simple models, excluding biases.  
+    mask_biases = lambda p: jax.tree.map(lambda x: x.ndim != 1, p)  # noqa: E731
+    if not decouple_weight_decay:
+      optimiser = optax.adam(learning_rate=learning_rate)
+    else:    
+      optimiser = optax.chain(
+        optax.scale_by_adam(),
+        optax.add_decayed_weights(weight_decay, mask_biases),
+        optax.scale_by_learning_rate(learning_rate),
+    )
 
-    state = cls._create_train_state(model.apply, variables, optimizer)
+    rng = jax.random.PRNGKey(seed)
+    variables = model.init(rng, jnp.ones(input_shape), False)
+
+    state = cls._create_train_state(model.apply, variables, optimiser)
 
     @jax.jit
     def update_step_fn(state, observations, legals_mask, policy_targets, value_targets):
       
-      def calculate_kernel_l2_loss(params, weight_decay):
-        flat_params_with_keys = flatten_dict(params).items()
-        kernel_weights = [
-            value for key_path, value in flat_params_with_keys
-            if 'bias' not in key_path
-        ]
-        
-        # Sum the squared L2 norms of all kernel parameters
-        l2_term = sum(jnp.sum(w**2) for w in kernel_weights)
-        return weight_decay * l2_term
-      
+      @functools.partial(jax.vmap, in_axes=(None, 0), out_axes=(0, None), axis_name="batch")
+      def apply_model(variables, observations):
+        return state.apply_fn(variables, observations, training=True, mutable=['batch_stats'])
+
       def loss_fn(params, batch_stats, observations, legals_mask, policy_targets, value_targets):
         variables = {'params': params, 'batch_stats': batch_stats}
         
-        (policy_logits, value_preds), new_model_state = state.apply_fn(variables, observations, True, mutable=['batch_stats'])
+        (policy_logits, value_preds), new_model_state = apply_model(variables, observations)
+
         policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
         
         policy_loss =  jax.vmap(optax.safe_softmax_cross_entropy)(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds, value_targets).mean()
         
-        l2_reg_loss = jax.tree.reduce(
-          operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0.) * weight_decay
+        l2_reg_loss = optax.tree_utils.tree_l2_norm(mask_biases(params), ord=2, squared=True) * weight_decay
 
-        # l2_reg_loss = calculate_kernel_l2_loss(params, weight_decay)
+        total_loss = policy_loss + value_loss + jax.lax.select(
+          decouple_weight_decay, jnp.array(0.0), l2_reg_loss
+        )    
         
-        total_loss = policy_loss + value_loss      
         return total_loss, (policy_loss, value_loss, l2_reg_loss, new_model_state['batch_stats'])
     
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
@@ -339,8 +346,16 @@ class Model:
     observation = jnp.array(observation, dtype=jnp.float32)
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
-    policy_logits, value = self._state.apply_fn(
-        {'params': self._state.params, 'batch_stats': self._state.batch_stats}, observation, False, mutable=False)
+    # @jax.jit  # --- with it the model is much slower than without...
+    def _predict(state: TrainState, observation: chex.Array):
+      return state.apply_fn(
+        {'params': state.params, 'batch_stats': state.batch_stats}, 
+        observation,
+        training=False, 
+        mutable=False
+      ) 
+    
+    policy_logits, value =_predict(self._state, observation)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -jnp.inf))
     policy = nn.softmax(policy_logits, axis=-1)
@@ -371,8 +386,7 @@ class Model:
         args=orbax.checkpoint.args.PyTreeSave(item=sharded_state),
         force=True
       )
-
-    # self._checkpointer.save(path, self._state, save_args=orbax_utils.save_args_from_target(self._state),)
+    
     return step
    
   def load_checkpoint(self, step: int | str, device: str = None) -> TrainState:
