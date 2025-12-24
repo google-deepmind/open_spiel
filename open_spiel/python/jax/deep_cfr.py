@@ -27,95 +27,278 @@ consecutive layers of the advantage or policy network have the same number
 of units, except for the last connection. Before the last hidden layer
 a layer normalization is applied.
 
-NOTE: the deep_cfr_jax_test.py is no longer run on github CI as TF1 is no
-longer supported yet still required in this file.
 """
 
 import collections
-import random
+from typing import Iterable, NamedTuple, Callable
+from functools import partial
 
-import haiku as hk
 import jax
+import optax
+import chex
+import flax.nnx as nn
 import jax.numpy as jnp
 import numpy as np
-import optax
-
-# tensorflow is only used for data processing
-import tensorflow as tf
-import tensorflow_datasets as tfds
-
+import tree as np_tree # Use dm-tree for easy pytree handling in NumPy
 from open_spiel.python import policy
+from open_spiel.python.algorithms import exploitability
 import pyspiel
 
-# The size of the shuffle buffer used to reshuffle part of the data each
-# epoch within one training iteration
-ADVANTAGE_TRAIN_SHUFFLE_SIZE = 100000
-STRATEGY_TRAIN_SHUFFLE_SIZE = 1000000
+ILLEGAL_ACTION_LOGITS_PENALTY = -1e21
 
-
-# TODO(author3) Refactor into data structures lib.
-class ReservoirBuffer(object):
-  """Allows uniform sampling over a stream of data.
-
-  This class supports the storage of arbitrary elements, such as observation
-  tensors, integer actions, etc.
-
-  See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
+class AdvantageMemory(NamedTuple):
+  """Advantage network memory buffer
   """
+  info_state: chex.Array
+  iteration: chex.Array
+  advantage: chex.Array
+  legal_mask: chex.Array
 
-  def __init__(self, reservoir_buffer_capacity):
-    self._reservoir_buffer_capacity = reservoir_buffer_capacity
-    self._data = []
-    self._add_calls = 0
+class StrategyMemory(NamedTuple):
+  """Strategy network memory buffer
+  """
+  info_state: chex.Array
+  iteration: chex.Array
+  strategy_action_probs: chex.Array
+  legal_mask: chex.Array
 
-  def add(self, element):
-    """Potentially adds `element` to the reservoir buffer.
+class ReservoirBufferState(NamedTuple):
 
-    Args:
-      element: data to be added to the reservoir buffer.
-    """
-    if len(self._data) < self._reservoir_buffer_capacity:
-      self._data.append(element)
-    else:
-      idx = np.random.randint(0, self._add_calls + 1)
-      if idx < self._reservoir_buffer_capacity:
-        self._data[idx] = element
-    self._add_calls += 1
+  experience: chex.ArrayTree
+  capacity: chex.Numeric
+  add_calls: chex.Array
 
-  def sample(self, num_samples):
-    """Returns `num_samples` uniformly sampled from the buffer.
+  def __len__(self) -> int:
+    return min(self.add_calls, self.capacity)
+  
 
-    Args:
-      num_samples: `int`, number of samples to draw.
+def get_tree_shape_prefix(tree: chex.ArrayTree, n_axes: int = 1) -> chex.Shape:
+  """Get the shape of the leading axes (up to n_axes) of a pytree. This assumes all
+    leaves have a common leading axes size (e.g. a common batch size).
+  """
+  flat_tree, tree_def = jax.tree_util.tree_flatten(tree)
+  leaf = flat_tree[0]
+  leading_axis_shape = leaf.shape[0:n_axes]
+  chex.assert_tree_shape_prefix(tree, leading_axis_shape)
+  return leading_axis_shape
 
-    Returns:
-      An iterable over `num_samples` random elements of the buffer.
+class ReservoirBuffer:
+    """Allows uniform sampling over a stream of data.
+      See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
+    """   
+    def __init__(self, capacity: chex.Numeric, experience: chex.ArrayTree) -> None:
+      self.capacity = capacity
+      self.experience = experience
+      self.add_calls = np.array(0)
 
-    Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
-    """
-    if len(self._data) < num_samples:
-      raise ValueError('{} elements could not be sampled from size {}'.format(
-          num_samples, len(self._data)))
-    return random.sample(self._data, num_samples)
+    def __len__(self) -> int:
+      return min(self.add_calls.item(), self.capacity.item())
+    
+    @classmethod
+    def init_reservoir(cls, capacity: chex.Numeric, experience: chex.ArrayTree) -> "ReservoirBuffer":
+      # Initialize buffer by replicating the structure of the experience
 
-  def clear(self):
-    self._data = []
-    self._add_calls = 0
+      _experience = np_tree.map_structure(
+        lambda x: np.empty((capacity, *x.shape), dtype=x.dtype),
+        experience
+      )
+      return cls(np.array(capacity), _experience)
+    
+    def to_state(self) -> ReservoirBufferState:
+      return ReservoirBufferState(
+        capacity=self.capacity, experience=self.experience, add_calls=self.add_calls+1
+      )
+    
+    @staticmethod
+    @partial(jax.jit, static_argnames=("capacity",))
+    def init_reservoir_jitted(capacity: chex.Numeric, experience: chex.ArrayTree) -> ReservoirBufferState:
+      # Set experience value to be empty.
+      experience = jax.tree.map(jnp.empty_like, experience)
+      # Broadcast to [add_batch_size, ...]
+      experience = jax.tree.map(
+        lambda x: jnp.broadcast_to(
+            x[jnp.newaxis, ...], (capacity, *x.shape)
+        ),
+        experience,
+      )
+      return ReservoirBufferState(
+        capacity=capacity, experience=experience, add_calls=jnp.array(0))
 
-  def __len__(self):
-    return len(self._data)
+    def append_to_reservoir(
+      self, 
+      experience: chex.ArrayTree, 
+      rng: chex.PRNGKey
+    ) -> None:
+      """Potentially adds `experience` to the reservoir buffer.
+      Args:
+        experience: data to be added to the reservoir buffer.
+        rng: `chex.PRNGKey`, a random seed
 
-  def __iter__(self):
-    return iter(self._data)
+      Returns:
+        None as the method updated the buffer in-place
+      """
+    
+      # Determine the insertion index
+      # Note: count + 1 because the current item is the (count+1)-th item
+      idx = jax.random.randint(rng, (), 0, self.add_calls + 1)
+      
+      # 2. Logic: 
+      # If buffer is not full, we always add at 'count'.
+      # If buffer is full, we replace at 'idx' ONLY IF idx < capacity.
+      is_full = self.add_calls >= self.capacity
+      write_idx = jnp.where(is_full, idx, self.add_calls)
+      should_update = write_idx < self.capacity
+      
+      def _inplace(arr, idx, val):
+        arr[idx] = val
 
-  @property
-  def data(self):
-    return self._data
+      if should_update:
+        np_tree.map_structure(
+          lambda buf_leaf, exp_leaf: _inplace(buf_leaf, write_idx, exp_leaf),
+          # lambda buf_leaf, exp_leaf: np.copyto(buf_leaf[write_idx], exp_leaf),
+          self.experience, 
+          experience
+        )
+          
+      self.add_calls += 1
 
-  def shuffle_data(self):
-    random.shuffle(self._data)
+    @staticmethod    
+    @partial(jax.jit, donate_argnums=(0,))
+    def append_to_reservoir_jittable(
+      state: ReservoirBufferState, 
+      experience: chex.ArrayTree, 
+      rng: chex.PRNGKey
+    ) -> ReservoirBufferState:
+      """Potentially adds `experience` to the reservoir buffer.
 
+      Args:
+        state: `ReservoirBufferState`, current state of the buffer
+        experience: data to be added to the reservoir buffer.
+        rng: `chex.PRNGKey`, a random seed
+
+      Returns:
+        An updated `ReservoirBufferState` 
+      """
+      
+      # Note: count + 1 because the current item is the (count+1)-th item
+      idx = jax.random.randint(rng, (), 0, state.add_calls + 1)
+      
+      # 2. Logic: 
+      # If buffer is not full, we always add at 'count'.
+      # If buffer is full, we replace at 'idx' ONLY IF idx < capacity.
+      is_full = state.add_calls >= state.capacity
+      write_idx = jnp.where(is_full, idx, state.add_calls)
+      should_update = write_idx < state.capacity
+
+      def update_leaf(buffer_leaf, exp_leaf):
+        new_val = jnp.where(should_update, exp_leaf, buffer_leaf[write_idx])
+        return buffer_leaf.at[write_idx].set(new_val)
+
+      new_experience = jax.tree.map(update_leaf, state.experience, experience)
+
+      return ReservoirBufferState(
+        capacity=state.capacity, experience=new_experience, add_calls=state.add_calls+1)
+
+    def to_jax(self) -> ReservoirBufferState:
+      """Converts numpy buffer to jax.
+      """
+
+      return ReservoirBufferState(
+        capacity=self.capacity, 
+        experience=jax.tree.map(lambda x: jnp.array(x), self.experience), 
+        add_calls=self.add_calls
+      )
+
+    @staticmethod
+    def get_batch_sampler(batch_size: int | None, max_size: int) -> Callable:
+      """Choose if we batch or just shuffle the data
+      Args:
+        num_samples: `int`, number of samples to draw, could be None if the whole buffer is used
+        max_size: `int`, current size of the buffer, could be less than its capacity
+      """
+      @partial(jax.jit, static_argnames=("num_samples"))
+      def sample(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int):
+        """Returns `num_samples` uniformly sampled from the buffer.
+
+        Args:
+          rng: `chex.PRNGKey`, a random state
+          state: `ReservoirBufferState`, a buffer state
+          num_samples: `int`, number of samples to draw.
+
+        Returns:
+          An iterable over `num_samples` random elements of the buffer.
+
+        Raises:
+          AssertionError: If there are less than `num_samples` elements in the buffer
+        """
+        # capacity = get_tree_shape_prefix(state.experience)[0]
+        # chex.assert_equal(num_samples < capacity, True)
+
+        indices = jax.random.choice(
+          rng, jnp.arange(max_size), shape=(num_samples,), replace=False)
+        return jax.tree.map(lambda x: x[indices], state.experience)
+
+      @partial(jax.jit, static_argnames=("num_samples"))
+      def shuffle_data(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int):
+        """Returns shuffled buffer along the batch axis.
+
+        Args:
+          rng: `chex.PRNGKey`, a random state
+          state: `ReservoirBufferState`, a buffer state
+          num_samples: `int`, number of samples to draw (UNUSED). 
+          max_size: `int`, current size of the buffer, could be less than its capacity
+
+        Returns:
+          The iterable buffer.
+        """
+        return jax.tree.map(
+          lambda arr: jax.random.permutation(rng, arr[:max_size], axis=0), state.experience
+        )
+      
+      if batch_size is not None:
+        if batch_size < max_size:
+          return sample
+      return shuffle_data
+
+class MLP(nn.Module):
+  def __init__(self,
+    input_size: int,
+    hidden_sizes: Iterable[int],
+    output_size: int,
+    final_activation: Callable = lambda x: x,
+    seed: int = 0
+  ) -> None:
+    
+    _layers = []
+    def _create_linear_block(in_features, out_features, act=nn.relu):
+      return nn.Sequential(
+        nn.Linear(in_features, out_features,
+          kernel_init=nn.initializers.glorot_uniform(),
+          rngs=nn.Rngs(seed)),
+        act,
+      )
+    # Input and Hidden layers
+    for size in hidden_sizes:
+      _layers.append(_create_linear_block(input_size, size, act=nn.relu))
+      input_size = size
+    # Output layer
+    _layers.append(nn.LayerNorm(input_size, rngs=nn.Rngs(seed)))
+    _layers.append(_create_linear_block(input_size, output_size, act=lambda x: x))
+    if final_activation:
+      _layers.append(final_activation)
+    self.model = nn.Sequential(*_layers)
+
+  def __call__(self, x: chex.Array, mask: chex.Array = None) -> chex.Array:
+    outputs = self.model(x)
+    if mask is not None:
+      outputs *= mask
+    return outputs
+  
+  # NOTE: reset is done a bit differently
+
+@nn.vmap(in_axes=(None, 0, 0), out_axes=0)
+def forward(model, x, mask):
+  return model(x, mask)
 
 class DeepCFRSolver(policy.Policy):
   """Implements a solver for the Deep CFR Algorithm.
@@ -126,19 +309,23 @@ class DeepCFRSolver(policy.Policy):
   steps. Initialize the game state and algorithmic variables.
   """
 
-  def __init__(self,
-               game,
-               policy_network_layers=(256, 256),
-               advantage_network_layers=(128, 128),
-               num_iterations: int = 100,
-               num_traversals: int = 100,
-               learning_rate: float = 1e-3,
-               batch_size_advantage: int = 2048,
-               batch_size_strategy: int = 2048,
-               memory_capacity: int = int(1e6),
-               policy_network_train_steps: int = 5000,
-               advantage_network_train_steps: int = 750,
-               reinitialize_advantage_networks: bool = True):
+  def __init__(
+    self,
+    game,
+    policy_network_layers=(256, 256),
+    advantage_network_layers=(128, 128),
+    num_iterations: int = 100,
+    num_traversals: int = 20,
+    learning_rate: float = 1e-4,
+    batch_size_advantage: int = None,
+    batch_size_strategy: int = None,
+    memory_capacity: int = int(1e6),
+    policy_network_train_steps: int = 5000,
+    advantage_network_train_steps: int = 750,
+    reinitialize_advantage_networks: bool = True,
+    seed: int = 42, 
+    print_nash_convs: bool = False
+  ) -> None:
     """Initialize the Deep CFR algorithm.
 
     Args:
@@ -156,10 +343,13 @@ class DeepCFRSolver(policy.Policy):
       advantage_network_train_steps: Number of advantage network training steps
         (per iteration).
       reinitialize_advantage_networks: Whether to re-initialize the advantage
-        network before training on each iteration.
+      network before training on each iteration.
+            seed: (int) A random seed
+      print_nash_convs: (bool) print explotability for each iteration, defaults to False
     """
     all_players = list(range(game.num_players()))
-    super(DeepCFRSolver, self).__init__(game, all_players)
+    super().__init__(game, all_players)
+    
     self._game = game
     if game.get_type().dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS:
       # `_traverse_game_tree` does not take into account this option.
@@ -179,165 +369,221 @@ class DeepCFRSolver(policy.Policy):
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
     self._learning_rate = learning_rate
-    self._rngkey = jax.random.PRNGKey(42)
+    self._rngkey = jax.random.key(seed)
+    self._print_nash_convs = print_nash_convs
+    self._memory_capacity = int(memory_capacity)
 
-    # Initialize networks
-    def base_network(x, layers):
-      x = hk.nets.MLP(layers[:-1], activate_final=True)(x)
-      x = hk.LayerNorm(axis=-1, create_scale=True, create_offset=True)(x)
-      x = hk.Linear(layers[-1])(x)
-      x = jax.nn.relu(x)
-      x = hk.Linear(self._num_actions)(x)
-      return x
+    self._backend = jax.default_backend()
 
-    def adv_network(x, mask):
-      x = base_network(x, advantage_network_layers)
-      x = mask * x
-      return x
-
-    def policy_network(x, mask):
-      x = base_network(x, policy_network_layers)
-      x = jnp.where(mask == 1, x, -10e20)
-      x = jax.nn.softmax(x)
-      return x
-
-    x, mask = (jnp.ones([1, self._embedding_size]),
-               jnp.ones([1, self._num_actions]))
-    self._hk_adv_network = hk.without_apply_rng(hk.transform(adv_network))
-    self._params_adv_network = [
-        self._hk_adv_network.init(self._next_rng_key(), x, mask)
-        for _ in range(self._num_players)
+    # Initialize networks and memory buffers
+    self._advantage_memories = [None] * self._num_players
+    self._advantage_networks = [
+      MLP(
+        self._embedding_size, 
+        list(advantage_network_layers),
+        self._num_actions, 
+        lambda x: x, 
+        seed + p
+      ) for p in range(self._num_players)
     ]
-    self._hk_policy_network = hk.without_apply_rng(hk.transform(policy_network))
-    self._params_policy_network = self._hk_policy_network.init(
-        self._next_rng_key(), x, mask)
-
-    # initialize losses and grads
-    self._adv_loss = optax.l2_loss
-    self._policy_loss = optax.l2_loss
-    self._adv_grads = jax.value_and_grad(self._loss_adv)
-    self._policy_grads = jax.value_and_grad(self._loss_policy)
-
-    # initialize optimizers
-    self._opt_adv_init, self._opt_adv_update = optax.adam(learning_rate)
-    self._opt_adv_state = [
-        self._opt_adv_init(params) for params in self._params_adv_network
+    self._empty_advantage_states = [
+      nn.state(self._advantage_networks[p])
+      for p in range(self._num_players)
     ]
-    self._opt_policy_init, self._opt_policy_update = optax.adam(learning_rate)
-    self._opt_policy_state = self._opt_policy_init(self._params_policy_network)
 
-    # initialize memories
-    self._create_memories(memory_capacity)
+    self._strategy_memories = None
+    self._policy_network = MLP(
+      self._embedding_size,
+      list(policy_network_layers),
+      self._num_actions,
+      lambda x: x,
+      seed
+    )
+    self._empty_police_state = nn.state(self._policy_network)
+
+    # initialise losses
+    self._advantage_loss = self._policy_loss = jax.vmap(optax.l2_loss)
+
+    # initialise optimizers
+    self._reinitialize_policy_network()
+
+    self._advantage_opt = [None] * self._num_players
+    for p in range(self._num_players):
+      self._reinitialize_advantage_network(p)
 
     # jit param updates and matched regrets calculations
-    self._jitted_matched_regrets = self._get_jitted_matched_regrets()
-    self._jitted_adv_update = self._get_jitted_adv_update()
-    self._jitted_policy_update = self._get_jitted_policy_update()
+    self._jittable_matched_regrets = self._get_jittable_matched_regrets()
+    self._jittable_adv_update = self._get_jittable_adv_update()
+    self._jittable_policy_update = self._get_jittable_policy_update()
 
-  def _get_jitted_adv_update(self):
-    """get jitted advantage update function."""
+  
+  def _get_buffer_init(
+      self, 
+      capacity: int, 
+      data: AdvantageMemory | StrategyMemory
+    ) -> ReservoirBuffer | ReservoirBufferState:
+      if self._backend == "cpu":
+        return ReservoirBuffer.init_reservoir(capacity, data)
+      data = jax.tree.map(jnp.array, data)
+      return ReservoirBuffer.init_reservoir_jitted(capacity, data)
 
-    @jax.jit
-    def update(params_adv, opt_state, info_states, samp_regrets, iterations,
-               masks, total_iterations):
-      main_loss, grads = self._adv_grads(params_adv, info_states, samp_regrets,
-                                         iterations, masks, total_iterations)
-      updates, new_opt_state = self._opt_adv_update(grads, opt_state)
-      new_params = optax.apply_updates(params_adv, updates)
-      return new_params, new_opt_state, main_loss
+  def _get_jittable_adv_update(self) -> Callable:
+    """get jittable advantage update function."""
+
+    def update(
+      advantage_model: nn.Module,
+      optimiser: nn.Optimizer, 
+      batch: AdvantageMemory,
+    ) -> chex.Array:
+      
+      def _loss_adv(
+        advantage_model: nn.Module, 
+        info_states: chex.Array, 
+        samp_regrets: chex.Array, 
+        masks: chex.Array,
+        iterations: chex.Array, 
+      ) -> chex.Array:
+        """Loss function for our advantage network."""
+        preds = forward(advantage_model, info_states, masks)
+        loss_values = self._advantage_loss(preds, samp_regrets) * iterations
+        return loss_values.mean()
+    
+      self._adv_grads = nn.value_and_grad(_loss_adv)
+      main_loss, grads = self._adv_grads(
+        advantage_model, 
+        batch.info_state, 
+        batch.advantage, 
+        batch.legal_mask, 
+        batch.iteration, 
+      )
+      optimiser.update(advantage_model, grads)
+      return main_loss
 
     return update
 
-  def _get_jitted_policy_update(self):
-    """get jitted policy update function."""
+  def _get_jittable_policy_update(self) -> Callable:
+    """get jittable policy update function."""
 
-    @jax.jit
-    def update(params_policy, opt_state, info_states, action_probs, iterations,
-               masks, total_iterations):
-      main_loss, grads = self._policy_grads(params_policy, info_states,
-                                            action_probs, iterations, masks,
-                                            total_iterations)
-      updates, new_opt_state = self._opt_policy_update(grads, opt_state)
-      new_params = optax.apply_updates(params_policy, updates)
-      return new_params, new_opt_state, main_loss
+    def update(
+      policy_model: nn.Module, 
+      optimiser: nn.Optimizer, 
+      batch: StrategyMemory,
+    ) -> chex.Array:
+      
+      def _loss_policy(
+        policy_model: nn.Module, 
+        info_states: chex.Array, 
+        action_probs: chex.Array, 
+        masks: chex.Array,
+        iterations: chex.Array, 
+      ) -> chex.Array:
+        """Loss function for our policy network."""
+        preds = forward(policy_model, info_states, None)
+        # masking illegal actions and normalising
+        preds = jnp.where(masks, preds, -1e-21)
+        preds = nn.softmax(preds)
+
+        loss_values = self._policy_loss(preds, action_probs) * iterations
+        return loss_values.mean()
+
+      _policy_grad_fn = nn.value_and_grad(_loss_policy)
+      
+      main_loss, grads = _policy_grad_fn(
+        policy_model, 
+        batch.info_state, 
+        batch.strategy_action_probs, 
+        batch.legal_mask, 
+        batch.iteration, 
+      )
+      optimiser.update(policy_model, grads)
+      return main_loss
 
     return update
 
-  def _get_jitted_matched_regrets(self):
-    """get jitted regret matching function."""
+  def _get_jittable_matched_regrets(self) -> Callable:
+    """get jittable regret matching function."""
 
     @jax.jit
-    def get_matched_regrets(info_state, legal_actions_mask, params_adv):
-      advs = self._hk_adv_network.apply(params_adv, info_state,
-                                        legal_actions_mask)
-      advantages = jnp.maximum(advs, 0)
+    def get_matched_regrets(
+      graphdef: nn.GraphDef, 
+      state: nn.State, 
+      info_state: chex.Array, 
+      legal_actions_mask: chex.Array
+    ) -> tuple[chex.Array, chex.Array]:
+      advantage_model = nn.merge(graphdef, state)
+      advs = advantage_model(info_state, legal_actions_mask)
+      advantages = nn.relu(advs)
       summed_regret = jnp.sum(advantages)
-      matched_regrets = jax.lax.cond(
-          summed_regret > 0, lambda _: advantages / summed_regret,
-          lambda _: jax.nn.one_hot(  # pylint: disable=g-long-lambda
-              jnp.argmax(jnp.where(legal_actions_mask == 1, advs, -10e20)), self
-              ._num_actions), None)
+      matched_regrets = jnp.where(
+        summed_regret > 0, 
+        advantages / summed_regret,
+        jax.nn.one_hot(  # pylint: disable=g-long-lambda
+          jnp.argmax(jnp.where(legal_actions_mask, advs, ILLEGAL_ACTION_LOGITS_PENALTY)), 
+          self._num_actions
+        )
+      )
       return advantages, matched_regrets
 
     return get_matched_regrets
 
-  def _next_rng_key(self):
+  def _next_rng_key(self) -> chex.PRNGKey:
     """Get the next rng subkey from class rngkey."""
     self._rngkey, subkey = jax.random.split(self._rngkey)
     return subkey
 
-  def _reinitialize_policy_network(self):
+  def _reinitialize_policy_network(self) -> None:
     """Reinitalize policy network and optimizer for training."""
-    x, mask = (jnp.ones([1, self._embedding_size]),
-               jnp.ones([1, self._num_actions]))
-    self._params_policy_network = self._hk_policy_network.init(
-        self._next_rng_key(), x, mask)
-    self._opt_policy_state = self._opt_policy_init(self._params_policy_network)
-
-  def _reinitialize_advantage_network(self, player):
+    nn.update(self._policy_network, self._empty_police_state)
+    self._policy_opt = nn.Optimizer(self._policy_network, optax.adam(self._learning_rate), wrt=nn.Param)
+  
+  def _reinitialize_advantage_network(self, player: int) -> None:
     """Reinitalize player's advantage network and optimizer for training."""
-    x, mask = (jnp.ones([1, self._embedding_size]),
-               jnp.ones([1, self._num_actions]))
-    self._params_adv_network[player] = self._hk_adv_network.init(
-        self._next_rng_key(), x, mask)
-    self._opt_adv_state[player] = self._opt_adv_init(
-        self._params_adv_network[player])
+    nn.update(self._advantage_networks[player], self._empty_advantage_states[player])
+    self._advantage_opt[player] = nn.Optimizer(self._advantage_networks[player], optax.adam(self._learning_rate), wrt=nn.Param)
 
   @property
-  def advantage_buffers(self):
+  def advantage_buffers(self) -> ReservoirBufferState:
     return self._advantage_memories
 
   @property
-  def strategy_buffer(self):
+  def strategy_buffer(self) -> ReservoirBufferState:
     return self._strategy_memories
+  
+  def _append_to_advantage_buffer(self, player: int, data: AdvantageMemory) -> None:
+    if self._advantage_memories[player] is None:
+      self._advantage_memories[player] = self._get_buffer_init(self._memory_capacity, data)
 
-  def clear_advantage_buffers(self):
-    for p in range(self._num_players):
-      self._advantage_memories[p].clear()
+    if self._backend == "cpu":
+      self._advantage_memories[player].append_to_reservoir(data, self._next_rng_key())
+    else:
+      data = jax.tree.map(jnp.array, data)
+      self._advantage_memories[player] = ReservoirBuffer.append_to_reservoir_jitted(
+        self._advantage_memories[player], data, self._next_rng_key())
 
-  def _create_memories(self, memory_capacity):
-    """Create memory buffers and associated feature descriptions."""
-    self._strategy_memories = ReservoirBuffer(memory_capacity)
-    self._advantage_memories = [
-        ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
-    ]
-    self._strategy_feature_description = {
-        'info_state': tf.io.FixedLenFeature([self._embedding_size], tf.float32),
-        'action_probs': tf.io.FixedLenFeature([self._num_actions], tf.float32),
-        'iteration': tf.io.FixedLenFeature([1], tf.float32),
-        'legal_actions': tf.io.FixedLenFeature([self._num_actions], tf.float32)
-    }
-    self._advantage_feature_description = {
-        'info_state': tf.io.FixedLenFeature([self._embedding_size], tf.float32),
-        'iteration': tf.io.FixedLenFeature([1], tf.float32),
-        'samp_regret': tf.io.FixedLenFeature([self._num_actions], tf.float32),
-        'legal_actions': tf.io.FixedLenFeature([self._num_actions], tf.float32)
-    }
 
-  def solve(self):
+  def _append_to_stategy_buffer(self, data: StrategyMemory) -> None:
+    if self._strategy_memories is None:
+      self._strategy_memories = self._get_buffer_init(self._memory_capacity, data)
+    
+    if self._backend == "cpu":
+      self._strategy_memories.append_to_reservoir(data, self._next_rng_key())
+    else:
+      data = jax.tree.map(jnp.array, data)
+      self._strategy_memories = ReservoirBuffer.append_to_reservoir_jitted(
+        self._strategy_memories, data, self._next_rng_key())
+
+  def solve(self) -> tuple[nn.Module, dict, chex.Numeric]:
     """Solution logic for Deep CFR."""
     advantage_losses = collections.defaultdict(list)
     for _ in range(self._num_iterations):
+      
+      if self._print_nash_convs:
+        policy_loss = self._learn_strategy_network()
+        average_policy = policy.tabular_policy_from_callable(self._game, self.action_probabilities)
+        conv = exploitability.nash_conv(self._game, average_policy)
+        print(f"NashConv @ {self._iteration} = {conv} | Policy loss = {policy_loss}")
+        self._reinitialize_policy_network()
+
       for p in range(self._num_players):
         for _ in range(self._num_traversals):
           self._traverse_game_tree(self._root_node, p)
@@ -345,78 +591,14 @@ class DeepCFRSolver(policy.Policy):
           # Re-initialize advantage network for p and train from scratch.
           self._reinitialize_advantage_network(p)
         advantage_losses[p].append(self._learn_advantage_network(p))
+      
       self._iteration += 1
+
     # Train policy network.
     policy_loss = self._learn_strategy_network()
-    return None, advantage_losses, policy_loss
+    return self._policy_network, advantage_losses, policy_loss
 
-  def _serialize_advantage_memory(self, info_state, iteration, samp_regret,
-                                  legal_actions_mask):
-    """Create serialized example to store an advantage entry."""
-    example = tf.train.Example(
-        features=tf.train.Features(
-            feature={
-                'info_state':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(value=info_state)),
-                'iteration':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(value=[iteration])),
-                'samp_regret':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(value=samp_regret)),
-                'legal_actions':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(value=legal_actions_mask))
-            }))
-    return example.SerializeToString()
-
-  def _deserialize_advantage_memory(self, serialized):
-    """Deserializes a batch of advantage examples for the train step."""
-    tups = tf.io.parse_example(serialized, self._advantage_feature_description)
-    return (tups['info_state'], tups['samp_regret'], tups['iteration'],
-            tups['legal_actions'])
-
-  def _serialize_strategy_memory(self, info_state, iteration,
-                                 strategy_action_probs, legal_actions_mask):
-    """Create serialized example to store a strategy entry."""
-    example = tf.train.Example(
-        features=tf.train.Features(
-            feature={
-                'info_state':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(value=info_state)),
-                'action_probs':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(
-                            value=strategy_action_probs)),
-                'iteration':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(value=[iteration])),
-                'legal_actions':
-                    tf.train.Feature(
-                        float_list=tf.train.FloatList(value=legal_actions_mask))
-            }))
-    return example.SerializeToString()
-
-  def _deserialize_strategy_memory(self, serialized):
-    """Deserializes a batch of strategy examples for the train step."""
-    tups = tf.io.parse_example(serialized, self._strategy_feature_description)
-    return (tups['info_state'], tups['action_probs'], tups['iteration'],
-            tups['legal_actions'])
-
-  def _add_to_strategy_memory(self, info_state, iteration,
-                              strategy_action_probs, legal_actions_mask):
-    # pylint: disable=g-doc-args
-    """Adds the given strategy data to the memory.
-
-    Uses either a tfrecordsfile on disk if provided, or a reservoir buffer.
-    """
-    serialized_example = self._serialize_strategy_memory(
-        info_state, iteration, strategy_action_probs, legal_actions_mask)
-    self._strategy_memories.add(serialized_example)
-
-  def _traverse_game_tree(self, state, player):
+  def _traverse_game_tree(self, state, player: int) -> chex.Array:
     """Performs a traversal of the game tree using external sampling.
 
     Over a traversal the advantage and strategy memories are populated with
@@ -435,7 +617,7 @@ class DeepCFRSolver(policy.Policy):
     elif state.is_chance_node():
       # If this is a chance node, sample an action
       chance_outcome, chance_proba = zip(*state.chance_outcomes())
-      action = np.random.choice(chance_outcome, p=chance_proba)
+      action = jax.random.choice(self._next_rng_key(), jnp.array(chance_outcome), p=jnp.asarray(chance_proba))
       return self._traverse_game_tree(state.child(action), player)
     elif state.current_player() == player:
       # Update the policy over the info set & actions via regret matching.
@@ -445,26 +627,34 @@ class DeepCFRSolver(policy.Policy):
       for action in state.legal_actions():
         exp_payoff[action] = self._traverse_game_tree(
             state.child(action), player)
-      ev = np.sum(exp_payoff * strategy)
-      samp_regret = (exp_payoff - ev) * state.legal_actions_mask(player)
-      self._advantage_memories[player].add(
-          self._serialize_advantage_memory(state.information_state_tensor(),
-                                           self._iteration, samp_regret,
-                                           state.legal_actions_mask(player)))
-      return ev
+      cfv = np.sum(exp_payoff * strategy)
+      samp_regret = (exp_payoff - cfv) * state.legal_actions_mask(player)
+      data = AdvantageMemory(
+        np.array(state.information_state_tensor(), dtype=np.float32), 
+        np.array(self._iteration, dtype=int).reshape(1,),
+        np.array(samp_regret, dtype=np.float32), 
+        np.array(state.legal_actions_mask(player), dtype=np.bool)
+      )
+      self._append_to_advantage_buffer(player, data)
+      return cfv
     else:
       other_player = state.current_player()
       _, strategy = self._sample_action_from_advantage(state, other_player)
       # Recompute distribution for numerical errors.
-      probs = np.array(strategy)
+      probs = jnp.array(strategy)
       probs /= probs.sum()
-      sampled_action = np.random.choice(range(self._num_actions), p=probs)
-      self._add_to_strategy_memory(
-          state.information_state_tensor(other_player), self._iteration, probs,
-          state.legal_actions_mask(other_player))
+      sampled_action = jax.random.choice(self._next_rng_key(), jnp.arange(self._num_actions), p=probs)
+      
+      data = StrategyMemory(
+        np.array(state.information_state_tensor(other_player), dtype=np.float32), 
+        np.array(self._iteration, dtype=int).reshape(-1,),
+        np.array(strategy, dtype=np.float32),
+        np.array(state.legal_actions_mask(other_player), dtype=np.bool)
+      )
+      self._append_to_stategy_buffer(data)
       return self._traverse_game_tree(state.child(sampled_action), player)
 
-  def _sample_action_from_advantage(self, state, player):
+  def _sample_action_from_advantage(self, state, player: int) -> tuple[chex.Array, chex.Array]:
     """Returns an info state policy by applying regret-matching.
 
     Args:
@@ -472,64 +662,66 @@ class DeepCFRSolver(policy.Policy):
       player: (int) Player index over which to compute regrets.
 
     Returns:
-      1. (np-array) Advantage values for info state actions indexed by action.
-      2. (np-array) Matched regrets, prob for actions indexed by action.
+      1. (jnp-array) Advantage values for info state actions indexed by action.
+      2. (jnp-array) Matched regrets, prob for actions indexed by action.
     """
+    self._advantage_networks[player].eval()
     info_state = jnp.array(
         state.information_state_tensor(player), dtype=jnp.float32)
     legal_actions_mask = jnp.array(
-        state.legal_actions_mask(player), dtype=jnp.float32)
-    advantages, matched_regrets = self._jitted_matched_regrets(
-        info_state, legal_actions_mask, self._params_adv_network[player])
+        state.legal_actions_mask(player), dtype=jnp.bool)
+    
+    graphdef, state = nn.split(self._advantage_networks[player])
+    advantages, matched_regrets = self._jittable_matched_regrets(
+      graphdef, state, info_state, legal_actions_mask)
+    
     return advantages, matched_regrets
 
-  def action_probabilities(self, state, player_id=None):
+  def action_probabilities(self, state, player_id: int=None) -> dict[chex.Numeric, chex.Array]:
     """Returns action probabilities dict for a single batch."""
     del player_id  # unused
+    self._policy_network.eval()
     cur_player = state.current_player()
     legal_actions = state.legal_actions(cur_player)
     info_state_vector = jnp.array(
         state.information_state_tensor(), dtype=jnp.float32)
-    legal_actions_mask = jnp.array(
-        state.legal_actions_mask(cur_player), dtype=jnp.float32)
-    probs = self._hk_policy_network.apply(self._params_policy_network,
-                                          info_state_vector, legal_actions_mask)
+    
+    probs = self._policy_network(info_state_vector)
+    legal_actions_mask = jnp.array(state.legal_actions_mask(cur_player), dtype=jnp.bool)
+    probs = jnp.where(legal_actions_mask, probs, ILLEGAL_ACTION_LOGITS_PENALTY)
+    probs = nn.softmax(probs)
+
     return {action: probs[action] for action in legal_actions}
+  
+  def _make_train_step(
+      self, 
+      update_fn: Callable, 
+      batch_sampler: Callable, 
+      batch_size: int
+    ) -> Callable:
+      """Utility method to avoid boilerplate"""
+      
+      def _train_step(it: chex.Array, carry: nn.Carry) -> nn.Carry:
+        graphdef, state, buffer_state, rng, _ = carry
 
-  def _get_advantage_dataset(self, player, nr_steps=1):
-    """Returns the collected regrets for the given player as a dataset."""
-    self._advantage_memories[player].shuffle_data()
-    data = tf.data.Dataset.from_tensor_slices(
-        self._advantage_memories[player].data)
-    data = data.repeat()
-    data = data.shuffle(ADVANTAGE_TRAIN_SHUFFLE_SIZE)
-    data = data.batch(self._batch_size_advantage)
-    data = data.map(self._deserialize_advantage_memory)
-    data = data.prefetch(tf.data.experimental.AUTOTUNE)
-    data = data.take(nr_steps)
-    return iter(tfds.as_numpy(data))
+        # merge at the beginning of the function
+        model, optimiser = nn.merge(graphdef, state)
+        rng, _rng = jax.random.split(rng)
 
-  def _get_strategy_dataset(self, nr_steps=1):
-    """Returns the collected strategy memories as a dataset."""
-    self._strategy_memories.shuffle_data()
-    data = tf.data.Dataset.from_tensor_slices(self._strategy_memories.data)
-    data = data.repeat()
-    data = data.shuffle(STRATEGY_TRAIN_SHUFFLE_SIZE)
-    data = data.batch(self._batch_size_strategy)
-    data = data.map(self._deserialize_strategy_memory)
-    data = data.prefetch(tf.data.experimental.AUTOTUNE)
-    data = data.take(nr_steps)
-    return iter(tfds.as_numpy(data))
+        batch = batch_sampler(rng, buffer_state, batch_size)
 
-  def _loss_adv(self, params_adv, info_states, samp_regrets, iterations, masks,
-                total_iterations):
-    """Loss function for our advantage network."""
-    preds = self._hk_adv_network.apply(params_adv, info_states, masks)
-    loss_values = jnp.mean(self._adv_loss(preds, samp_regrets), axis=-1)
-    loss_values = loss_values * iterations * 2 / total_iterations
-    return jnp.mean(loss_values)
+        loss = update_fn(
+          model, 
+          optimiser,
+          batch
+        )
+        
+        state = nn.state((model, optimiser))
+        return (graphdef, state, buffer_state, _rng, loss)  
+      
+      return _train_step
 
-  def _learn_advantage_network(self, player):
+  def _learn_advantage_network(self, player: int) -> chex.Numeric:
     """Compute the loss on sampled transitions and perform a Q-network update.
 
     If there are not enough elements in the buffer, no loss is computed and
@@ -541,34 +733,59 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       The average loss over the advantage network of the last batch.
     """
-    for data in self._get_advantage_dataset(
-        player, self._advantage_network_train_steps):
-      (self._params_adv_network[player], self._opt_adv_state[player],
-       main_loss) = self._jitted_adv_update(self._params_adv_network[player],
-                                            self._opt_adv_state[player],
-                                            *data, jnp.array(self._iteration))
+
+    self._advantage_networks[player].train()
+
+    # Training loops are inspired by https://flax.readthedocs.io/en/stable/guides/performance.html#functional-training-loop
+    graphdef, state = nn.split((self._advantage_networks[player], self._advantage_opt[player]))
+    buffer_state = self._advantage_memories[player].to_jax() if self._backend == "cpu" else self._advantage_memories[player]
+    sampler_fn = ReservoirBuffer.get_batch_sampler(self._batch_size_advantage, len(buffer_state))
+    update_fn = self._make_train_step(self._jittable_adv_update, sampler_fn, self._batch_size_advantage)
+
+    if self._batch_size_advantage is not None:
+      if self._batch_size_advantage > len(buffer_state):
+        # Not enough samples to train on
+        return None
+    
+    (_, state, _, _, main_loss) = jax.lax.fori_loop(
+      0, self._advantage_network_train_steps,
+      update_fn,
+      (graphdef, state, buffer_state, self._next_rng_key(), jnp.array(0))
+    )
+        
+    nn.update((self._advantage_networks[player], self._advantage_opt[player]), state)
 
     return main_loss
 
-  def _loss_policy(self, params_policy, info_states, action_probs, iterations,
-                   masks, total_iterations):
-    """Loss function for our policy network."""
-    preds = self._hk_policy_network.apply(params_policy, info_states, masks)
-    loss_values = jnp.mean(self._policy_loss(preds, action_probs), axis=-1)
-    loss_values = loss_values * iterations * 2 / total_iterations
-    return jnp.mean(loss_values)
-
-  def _learn_strategy_network(self):
+  def _learn_strategy_network(self) -> chex.Numeric:
     """Compute the loss over the strategy network.
 
     Returns:
       The average loss obtained on the last training batch of transitions
       or `None`.
     """
-    for data in self._get_strategy_dataset(self._policy_network_train_steps):
-      (self._params_policy_network, self._opt_policy_state,
-       main_loss) = self._jitted_policy_update(self._params_policy_network,
-                                               self._opt_policy_state,
-                                               *data, self._iteration)
+    self._policy_network.train()
+
+    if self._strategy_memories is None:
+      return None
+    
+    if self._batch_size_strategy:
+      if self._batch_size_strategy > len(self._strategy_memories):
+        ## Skip if there aren't enough samples
+        return None
+    
+    # Training loops are inspired by https://flax.readthedocs.io/en/stable/guides/performance.html#functional-training-loop
+    graphdef, state = nn.split((self._policy_network, self._policy_opt))
+    buffer_state = self._strategy_memories.to_jax() if self._backend == "cpu" else self._strategy_memories
+    sampler_fn = ReservoirBuffer.get_batch_sampler(self._batch_size_strategy, len(buffer_state))
+    update_fn = self._make_train_step(self._jittable_policy_update, sampler_fn, self._batch_size_strategy)
+    
+    (_, state, _, _, main_loss) = jax.lax.fori_loop(
+      0, self._advantage_network_train_steps,
+      update_fn,
+      (graphdef, state, buffer_state, self._next_rng_key(), jnp.array(0))
+    )
+    
+    nn.update((self._policy_network, self._policy_opt), state)
 
     return main_loss
