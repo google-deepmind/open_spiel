@@ -739,7 +739,7 @@ class DeepCFRSolver(policy.Policy):
     # Training loops are inspired by https://flax.readthedocs.io/en/stable/guides/performance.html#functional-training-loop
     graphdef, state = nn.split((self._advantage_networks[player], self._advantage_opt[player]))
     buffer_state = self._advantage_memories[player].to_jax() if self._backend == "cpu" else self._advantage_memories[player]
-    sampler_fn = ReservoirBuffer.get_batch_sampler(self._batch_size_strategy, len(buffer_state))
+    sampler_fn = ReservoirBuffer.get_batch_sampler(self._batch_size_advantage, len(buffer_state))
     update_fn = self._make_train_step(self._jittable_adv_update, sampler_fn, self._batch_size_advantage)
 
     if self._batch_size_advantage is not None:

@@ -179,7 +179,7 @@ class ReservoirBuffer:
       Raises:
         ValueError: If there are less than `num_samples` elements in the buffer
       """
-      max_size = self.__len__()
+      max_size = len(self)
       if max_size < num_samples:
         raise ValueError("{} elements could not be sampled from size {}".format(num_samples, max_size))
       
@@ -188,7 +188,12 @@ class ReservoirBuffer:
       return np_tree.map_structure(
         lambda data: data[indices],
         self.experience
-      )  
+      )
+
+    def shuffle(self) -> None:
+      """Shuffling the reservoir buffer along the batch axis
+      """
+      np_tree.map_structure(lambda x: np.random.shuffle(x[:len(self)]), self.experience)   
 
 class DeepCFRSolver(policy.Policy):
   """Implements a solver for the Deep CFR Algorithm with PyTorch.
@@ -212,8 +217,8 @@ class DeepCFRSolver(policy.Policy):
     num_iterations: int = 100,
     num_traversals: int = 20,
     learning_rate: float = 1e-4,
-    batch_size_advantage=None,
-    batch_size_strategy=None,
+    batch_size_advantage: int = None,
+    batch_size_strategy: int = None,
     memory_capacity: int = int(1e6),
     policy_network_train_steps: int = 1,
     advantage_network_train_steps: int = 1,
@@ -262,7 +267,7 @@ class DeepCFRSolver(policy.Policy):
     self._embedding_size = len(self._root_node.information_state_tensor(0))
     self._num_iterations = num_iterations
     self._num_traversals = num_traversals
-    self._memory_capacity = memory_capacity
+    self._memory_capacity = int(memory_capacity)
     self._reinitialize_advantage_networks = reinitialize_advantage_networks
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
@@ -507,12 +512,13 @@ class DeepCFRSolver(policy.Policy):
         samples = self._advantage_memories[player].sample(
             self._batch_size_advantage)
       else:
-        np_tree.map_structure(lambda x: np.random.shuffle(x[:len(self._advantage_memories[player])]), self._advantage_memories[player])
-        samples = self._advantage_memories[player]
+        self._advantage_memories[player].shuffle()
+        samples = self._advantage_memories[player].experience
 
       # Ensure some samples have been gathered.
       if len(samples.info_state) == 0:
         return None
+      
       self._optimizer_advantages[player].zero_grad()
       iters = torch.FloatTensor(samples.iteration, device=self._device).sqrt()
       outputs = self._advantage_networks[player](torch.FloatTensor(samples.info_state, device=self._device))
@@ -539,8 +545,8 @@ class DeepCFRSolver(policy.Policy):
           return None
         samples = self._strategy_memories.sample(self._batch_size_strategy)
       else:
-        np_tree.map_structure(lambda x: np.random.shuffle(x[:len(self._strategy_memories)]), self._strategy_memories)
-        samples = self._strategy_memories
+        self._strategy_memories.shuffle()
+        samples = self._strategy_memories.experience
 
       # Ensure some samples have been gathered.
 

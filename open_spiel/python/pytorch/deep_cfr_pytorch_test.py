@@ -57,7 +57,7 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
         learning_rate=1e-3,
         batch_size_advantage=None,
         batch_size_strategy=None,
-        memory_capacity=1e7)
+        memory_capacity=int(1e7))
     deep_cfr_solver.solve()
     conv = pyspiel.nash_conv(
         game,
