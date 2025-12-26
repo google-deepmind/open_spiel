@@ -103,9 +103,9 @@ jobs:
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
 
       - name: Install
         run: |
@@ -157,7 +157,7 @@ jobs:
           source ./venv/bin/activate
           ./open_spiel/scripts/test_wheel.sh full `pwd` python
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.NAME }}
           path: |
