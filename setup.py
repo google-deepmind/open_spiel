@@ -49,55 +49,62 @@ class BuildExt(build_ext):
       self.build_extension(ext)
 
   def _check_build_environment(self):
-    """Check for required build tools: CMake, C++ compiler, and python dev."""
+    """Check for required build tools: CMake and C++ compiler."""
     try:
-      subprocess.check_call(["cmake", "--version"])
-    except OSError as e:
-      ext_names = ", ".join(e.name for e in self.extensions)
-      raise RuntimeError(
-          "CMake must be installed to build" +
-          f"the following extensions: {ext_names}") from e
-    print("Found CMake")
-
-    cxx = "clang++"
-    if os.environ.get("CXX") is not None:
-      cxx = os.environ.get("CXX")
-    try:
-      subprocess.check_call([cxx, "--version"])
-    except OSError as e:
-      ext_names = ", ".join(e.name for e in self.extensions)
-      raise RuntimeError(
-          "A C++ compiler that supports c++17 must be installed to build the "
-          + "following extensions: {}".format(ext_names)
-          + ". We recommend: Clang version >= 7.0.0."
-      ) from e
-    print("Found C++ compiler: {}".format(cxx))
+      subprocess.check_call(["cmake", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except (OSError, subprocess.CalledProcessError):
+      raise RuntimeError("CMake is required to build OpenSpiel extensions.")
+    
+    if not sys.platform.startswith("win"):
+      cxx = os.environ.get("CXX", "clang++")
+      try:
+        subprocess.check_call([cxx, "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+      except (OSError, subprocess.CalledProcessError):
+        raise RuntimeError(f"C++ compiler {cxx} is required to build OpenSpiel extensions.")
 
   def build_extension(self, ext):
     extension_dir = os.path.abspath(
         os.path.dirname(self.get_ext_fullpath(ext.name)))
-    cxx = "clang++"
-    if os.environ.get("CXX") is not None:
-      cxx = os.environ.get("CXX")
+    
     env = os.environ.copy()
     cmake_args = [
         f"-DPython3_EXECUTABLE={sys.executable}",
-        f"-DCMAKE_CXX_COMPILER={cxx}",
         f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extension_dir}",
+        "-DCMAKE_BUILD_TYPE=Release",
     ]
+    
+    # Platform-specific configuration
+    if sys.platform.startswith("win"):
+      # Windows-specific CMake arguments
+      cmake_args += [
+          "-DCMAKE_CXX_FLAGS=/std:c++17 /utf-8 /bigobj /DWIN32 /D_WINDOWS /GR /EHsc",
+          f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={extension_dir}",
+          "-A", "x64"
+      ]
+      build_args = ["--config", "Release", "--", "/m"]
+    else:
+      # Unix-like systems
+      cxx = "clang++"
+      if os.environ.get("CXX") is not None:
+        cxx = os.environ.get("CXX")
+      cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
+      build_args = [f"-j{os.cpu_count()}"]
+    
     if not os.path.exists(self.build_temp):
       os.makedirs(self.build_temp)
+    
+    # Configure
     subprocess.check_call(
         ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp,
         env=env)
 
-    # Build only pyspiel (for pip package)
-    detected_jobs = os.cpu_count()
-    jobs = max(detected_jobs or 1, 1)
-    print(f"Building pyspiel with {jobs} parallel job(s)")
-    subprocess.check_call(["make", "pyspiel", f"-j{jobs}"],
-                          cwd=self.build_temp,
-                          env=env)
+    # Build
+    if sys.platform.startswith("win"):
+      subprocess.check_call(["cmake", "--build", ".", "--target", "pyspiel"] + build_args,
+                            cwd=self.build_temp, env=env)
+    else:
+      subprocess.check_call(["make", "pyspiel"] + build_args,
+                            cwd=self.build_temp, env=env)
 
 
 def _get_requirements(requirements_file):  # pylint: disable=g-doc-args
