@@ -54,16 +54,7 @@ jobs:
     - name: Test wheel installation
       run: |
         python -m pip install dist/*.whl
-        python - <<'PY'
-import sys, site, os
-import pyspiel
-user_site = site.getusersitepackages()
-release_path = os.path.join(user_site, 'Release')
-if os.path.exists(release_path):
-    sys.path.insert(0, release_path)
-game = pyspiel.load_game('tic_tac_toe')
-print('✅ OpenSpiel works! Game:', game.get_type().short_name)
-PY
+        python -c "import sys, site, os; import pyspiel; user_site = site.getusersitepackages(); release_path = os.path.join(user_site, 'Release'); sys.path.insert(0, release_path) if os.path.exists(release_path) else None; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
