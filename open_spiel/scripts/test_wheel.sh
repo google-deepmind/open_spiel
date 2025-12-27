@@ -53,6 +53,12 @@ if [[ "$MODE" = "full" ]]; then
 fi
 
 if [[ "$MODE" = "full" ]]; then
+  # Special case: Skip full tests on macOS Python 3.13 (only cp314 wheel built)
+  if [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.13" ]]; then
+    echo "Skipping full tests on macOS Python 3.13 (only Python 3.14 wheel available)"
+    exit 0
+  fi
+  
   # Dynamically detect Python version and install matching wheel
   PYTHON_VERSION=$(${PYBIN} --version 2>&1 | awk '{print $2}' | cut -d. -f1,2 | tr -d '.')
   echo "Detected Python version: ${PYTHON_VERSION}, installing matching wheel for ${OS}"
