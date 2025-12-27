@@ -1,0 +1,6 @@
+[submodule "open_spiel/json"]
+	path = open_spiel/json
+	url = https://github.com/nlohmann/json
+[submodule "open_spiel/pybind11_json"]
+	path = open_spiel/pybind11_json
+	url = https://github.com/pybind/pybind11_json
