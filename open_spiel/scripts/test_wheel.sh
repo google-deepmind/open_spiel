@@ -61,30 +61,28 @@ if [[ "$MODE" = "full" ]]; then
 fi
 
 if [[ "$MODE" = "full" ]]; then
+  # Dynamically detect Python version and install matching wheel
+  PYTHON_VERSION=$(${PYBIN} --version 2>&1 | awk '{print $2}' | cut -d. -f1,2 | tr -d '.')
+  echo "Detected Python version: ${PYTHON_VERSION}, installing matching wheel for ${OS}"
+  
   if [[ "$OS" = "Linux" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux*.whl`
-    ${PYBIN} -m pip install $file
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp310-cp310-*.whl`
-    ${PYBIN} -m pip install $file
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.11" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp311-cp311-*.whl`
-    ${PYBIN} -m pip install $file
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-*.whl`
-    ${PYBIN} -m pip install $file
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.13" && "$MODE" = "full" ]]; then
-    # file=`ls wheelhouse/open_spiel-*-cp312-cp312-*.whl`
-    # ${PYBIN} -m pip install $file
-    echo "Skipping full tests on MacOS Python 3.14 not yet available in brew / pypa."
-    exit 0
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.14" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp314-cp314-*.whl`
-    ${PYBIN} -m pip install $file
+    WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl 2>/dev/null | head -1)
+  elif [[ "$OS" = "Darwin" ]]; then
+    WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-*.whl 2>/dev/null | head -1)
   else
-    echo "Config not found for full tests"
-    exit -1
+    echo "ERROR: Unsupported OS: ${OS}"
+    exit 1
   fi
+  
+  if [[ -z "$WHEEL_FILE" ]]; then
+    echo "ERROR: No wheel found for Python ${PYTHON_VERSION} on ${OS}"
+    echo "Available wheels:"
+    ls wheelhouse/*.whl 2>/dev/null || echo "No wheels found in wheelhouse/"
+    exit 1
+  fi
+  
+  echo "Installing wheel: $WHEEL_FILE"
+  ${PYBIN} -m pip install "$WHEEL_FILE"
 fi
 
 export OPEN_SPIEL_BUILDING_WHEEL="ON"
