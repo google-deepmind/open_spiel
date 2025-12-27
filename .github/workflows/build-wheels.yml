@@ -51,12 +51,18 @@ jobs:
         git clone -b develop --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel/games/bridge/double_dummy_solver
 
     - name: Build wheel
-      run: python -m build --wheel --outdir dist/
+      run: |
+        python -m build --wheel --outdir dist/
+        if (!(Test-Path dist/*.whl)) { Write-Error "No wheel file generated"; exit 1 }
+        Get-ChildItem dist/*.whl
+      shell: pwsh
 
     - name: Test wheel installation
       run: |
-        python -m pip install dist/*.whl
-        python -c "import sys, site, os; import pyspiel; user_site = site.getusersitepackages(); release_path = os.path.join(user_site, 'Release'); sys.path.insert(0, release_path) if os.path.exists(release_path) else None; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
+        $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
+        python -m pip install $wheel.FullName
+        python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
+      shell: pwsh
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
