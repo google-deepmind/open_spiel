@@ -12,6 +12,7 @@ jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
     strategy:
       matrix:
         os: [windows-latest]
