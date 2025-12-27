@@ -64,7 +64,8 @@ if [[ "$MODE" = "full" ]]; then
   echo "Detected Python version: ${PYTHON_VERSION}, installing matching wheel for ${OS}"
   
   if [[ "$OS" = "Linux" ]]; then
-    WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl 2>/dev/null | head -1)
+    # Match both x86_64 and aarch64 wheels
+    WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-manylinux*.whl 2>/dev/null | head -1)
   elif [[ "$OS" = "Darwin" ]]; then
     WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-*.whl 2>/dev/null | head -1)
   else
