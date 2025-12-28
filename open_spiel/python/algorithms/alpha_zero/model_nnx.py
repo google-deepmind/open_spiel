@@ -1,10 +1,8 @@
-import functools
 import os
 from typing import Sequence, Optional, Callable
 import warnings
 
 import numpy as np
-import flax
 import jax
 import jax.numpy as jnp
 import flax.nnx as nn
@@ -12,37 +10,32 @@ import optax
 import chex
 from flax.training import train_state
 import orbax.checkpoint as orbax
-import operator
 
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
 
 warnings.warn("Pay attention that you've been using the `nnx` api")
-state_axes = nn.StateAxes({nn.RngState: 0, (nn.Param, nn.BatchStat): None})
 
 activations_dict = {
-    "celu": nn.celu,
-    "elu": nn.elu,
-    "gelu": nn.gelu,
-    "glu": nn.glu,
-    "hard_sigmoid": nn.hard_sigmoid,
-    "hard_silu": nn.hard_silu, # Alias for hard_swish
-    "hard_swish": nn.hard_swish, # Alias for hard_silu
-    "hard_tanh": nn.hard_tanh,
-    "leaky_relu": nn.leaky_relu,
-    "log_sigmoid": nn.log_sigmoid,
-    "log_softmax": nn.log_softmax,
-    "logsumexp": nn.logsumexp,
-    "one_hot": nn.one_hot,
-    "relu": nn.relu,
-    "selu": nn.selu,
-    "sigmoid": nn.sigmoid,
-    "silu": nn.silu,
-    "soft_sign": nn.soft_sign,
-    "softmax": nn.softmax,
-    "softplus": nn.softplus,
-    "standardize": nn.standardize,
-    "swish": nn.swish,
-    "tanh": nn.tanh,
+  "celu": nn.celu,
+  "elu": nn.elu,
+  "gelu": nn.gelu,
+  "glu": nn.glu,
+  "hard_sigmoid": nn.hard_sigmoid,
+  "hard_silu": nn.hard_silu, # Alias for hard_swish
+  "hard_swish": nn.hard_swish, # Alias for hard_silu
+  "hard_tanh": nn.hard_tanh,
+  "leaky_relu": nn.leaky_relu,
+  "log_sigmoid": nn.log_sigmoid,
+  "log_softmax": nn.log_softmax,
+  "relu": nn.relu,
+  "selu": nn.selu,
+  "sigmoid": nn.sigmoid,
+  "silu": nn.silu,
+  "soft_sign": nn.soft_sign,
+  "softmax": nn.softmax,
+  "softplus": nn.softplus,
+  "swish": nn.swish,
+  "tanh": nn.tanh,
 }
 
 def get_batch_stats(layer: nn.Module):
@@ -78,7 +71,7 @@ class Activation(nn.Module):
     
 class MLPBlock(nn.Module):
 
-  def __init__(self, in_features: int, out_features: int, activation: str, seed: int = 0):
+  def __init__(self, in_features: int, out_features: int, activation: str, seed: int = 0) -> None:
 
     self.activation = Activation(activation)
     self.dense_layer = nn.Linear(in_features, out_features, rngs=nn.Rngs(seed))
@@ -90,7 +83,7 @@ class MLPBlock(nn.Module):
   
 class ConvBlock(nn.Module):
   
-  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0):
+  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0) -> None:
 
     self.conv = nn.Conv(in_features, out_features, kernel_size=kernel_size, padding="SAME", rngs=nn.Rngs(seed))
     self.activation = Activation(activation) 
@@ -110,7 +103,7 @@ class ConvBlock(nn.Module):
     return y
 
 class ResidualBlock(nn.Module):
-  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0):
+  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0) -> None:
 
     self.conv1 = ConvBlock(in_features, out_features, kernel_size, activation, seed) 
     self.conv2 = ConvBlock(out_features, out_features, kernel_size, None, seed) #activation's applied separately
@@ -124,8 +117,7 @@ class ResidualBlock(nn.Module):
     residual = x
     y = self.conv1(x)
     y = self.conv2(y)
-    y = y + residual
-    y = self.activation(y)
+    y = self.activation(y + residual)
     return y
 
 
@@ -143,17 +135,16 @@ class PolicyHead(nn.Module):
     ) -> None:
     *space_features, in_features = input_shape
 
-    self.torso = None
     if model_type == "mlp":
       self.torso = MLPBlock(in_features, nn_width, activation, seed)
     else:
       self.torso = nn.Sequential(
         ConvBlock(in_features, 2, (1, 1), activation, seed),
         Flatten(),
-        nn.Linear(np.prod(space_features) * 2, nn_width, rngs=nn.Rngs(seed))
+        MLPBlock(np.prod(space_features) * 2, nn_width, activation, seed)
       )
     
-    self.policy_head = nn.Linear(nn_width, out_features, rngs=nn.Rngs(seed))
+    self.policy_head = MLPBlock(nn_width, out_features, None, seed)
   
   def __call__(self, x: chex.Array) -> chex.Array:
     y = self.torso(x)
@@ -173,26 +164,23 @@ class ValueHead(nn.Module):
     ) -> None:
     
     *space_features, in_features = input_shape
-    self.torso = None
+
     if model_type == "mlp":
       self.torso = MLPBlock(in_features, nn_width, activation, seed)
     else:
       self.torso = nn.Sequential(
-        ConvBlock(in_features, 1, kernel_size = (1, 1), activation=activation),
+        ConvBlock(in_features, 1, (1, 1), activation),
         Flatten(),
-        nn.Linear(np.prod(space_features) * 1, nn_width, rngs=nn.Rngs(seed))
+        MLPBlock(np.prod(space_features) * 1, nn_width, activation, seed)
       )
 
-    self.value_head = MLPBlock(nn_width, 1, "tanh", seed=seed)
+    self.value_head = MLPBlock(nn_width, 1, "tanh", seed)
     
     
-  
   def __call__(self, x: chex.Array) -> chex.Array:
     y = self.torso(x)
     values = self.value_head(y)
     return values
-
-
 
 class AlphaZeroModel(nn.Module):
   """An AlphaZero style model with a policy and value head.
@@ -251,38 +239,34 @@ class AlphaZeroModel(nn.Module):
       self.torso = nn.Sequential(
         Flatten(),
         MLPBlock(np.prod(input_shape), nn_width, activation=activation, seed=seed), *[
-        MLPBlock(nn_width, nn_width, activation=activation, seed=seed) for _ in range(1, nn_depth)
+        MLPBlock(nn_width, nn_width, activation=activation, seed=seed+_seed) for _seed in range(1, nn_depth)
       ])
     elif model_type == "conv2d":
       self.torso = nn.Sequential( 
-        #by default any observation may be flat
+        #by default an observation may be flat
         lambda x: x.reshape(input_shape),
         ConvBlock(input_shape[-1], nn_width, (3, 3), activation, seed=seed), *[
-        ConvBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(nn_depth)
+        ConvBlock(nn_width, nn_width, (3, 3), activation, seed=seed+_seed) for _seed in range(nn_depth)
       ])
     elif model_type == "resnet":
      self.torso = nn.Sequential( 
         lambda x: x.reshape(input_shape),
         ConvBlock(input_shape[-1], nn_width, (3, 3), activation, seed=seed), *[
-        ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(1, nn_depth)
+        ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed+_seed) for _seed in range(nn_depth)
       ])
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
     
-    self.policy_head = PolicyHead((*input_shape[:-1], nn_width), nn_width, output_size, model_type, activation, seed=seed)
-    self.value_head = ValueHead((*input_shape[:-1], nn_width), nn_width, model_type, activation, seed=seed)
+    self.policy_head = PolicyHead((*input_shape[:-1], nn_width), nn_width, output_size, model_type, activation, seed)
+    self.value_head = ValueHead((*input_shape[:-1], nn_width), nn_width, model_type, activation, seed)
 
-  @functools.partial(
-    nn.vmap, in_axes=(None, 0), axis_name='batch', out_axes=(0, 0)
-  )
   def __call__(self, observations: chex.Array) -> tuple[chex.Array, chex.Array]:
 
     x = self.torso(observations)
     policy_logits = self.policy_head(x)
     value_out = self.value_head(x)
 
-    return policy_logits, value_out
-
+    return policy_logits, value_out.squeeze(-1)
 
 #modified train state
 class TrainState(train_state.TrainState):
@@ -295,13 +279,11 @@ class Model:
 
   def __init__(
     self, 
-    model: nn.Module, 
     state: TrainState, 
     path: str, 
     update_step_fn: Callable
   ) -> None: 
     
-    self._model = model
     self._state = state
     self._path = path
     self._update_step_fn = update_step_fn
@@ -315,20 +297,35 @@ class Model:
 
 
   @classmethod
-  def _create_train_state(cls, model, optimizer) -> TrainState:
+  def _create_train_state(
+    cls, 
+    model: AlphaZeroModel, 
+    optimiser: optax.GradientTransformation
+  ) -> TrainState:
     graphdef, variables, batch_stats = nn.split(model, nn.Param, nn.BatchStat)
 
     return TrainState.create(
       apply_fn=model, 
       params=variables, 
-      tx=optimizer, 
+      tx=optimiser, 
       batch_stats=batch_stats,
       graphdef=graphdef
     )
     
   @classmethod
-  def build_model(cls, model_type, input_shape, output_size, nn_width, nn_depth,
-                  weight_decay, learning_rate, path, seed=0):
+  def build_model(
+    cls, 
+    model_type: str, 
+    input_shape: chex.Shape, 
+    output_size: chex.Numeric, 
+    nn_width: int, 
+    nn_depth: int,
+    weight_decay: float, 
+    learning_rate: float, 
+    path: str, 
+    seed: int = 0,
+    decouple_weight_decay: bool = True
+  ) -> "Model":
     
     if model_type not in cls.valid_model_types:
       raise ValueError(f"Invalid model type: {model_type}, "
@@ -347,41 +344,85 @@ class Model:
       input_shape = input_shape, 
       output_size = output_size, 
       nn_width = nn_width, 
-      nn_depth = nn_depth
+      nn_depth = nn_depth,
+      seed=seed
     )
+
+    def mask_fn(path, _):
+      # path is a tuple of segments, e.g., ('linear1', 'bias')
+      names = [str(p.key) if isinstance(p, jax.tree_util.DictKey) else str(p) for p in path]
+      # Return True to APPLY decay, False to MASK it
+      return ("bias" not in names) and ("bn" not in names)
     
-    optimizer = optax.adam(learning_rate=learning_rate)
-    state = cls._create_train_state(model, optimizer)    
+    params = nn.state(model, nn.Param)
+    mask = jax.tree.map_with_path(mask_fn, params)
+
+    weights_no_bias_filter = nn.All(
+      nn.Param,
+      mask_fn
+    )
+
+    if not decouple_weight_decay:
+      optimiser = optax.adam(learning_rate=learning_rate)
+    else:    
+      optimiser = optax.adamw(learning_rate=learning_rate, weight_decay=weight_decay, mask=mask)
+    
+    state = cls._create_train_state(model, optimiser)   
+
+    @nn.vmap(in_axes=(None, 0), axis_name="batch")
+    def forward(model: AlphaZeroModel, x: chex.Array) -> chex.Array:
+      return model(x)
 
     @jax.jit
-    def update_step_fn(state, observations, legals_mask, policy_targets, value_targets):
+    def update_step_fn(
+      state: TrainState, 
+      observations: chex.Array,
+      legals_mask: chex.Array,
+      policy_targets: chex.Array,
+      value_targets: chex.Array
+    ) -> Callable:
       
-      def loss_fn(params, observations, legals_mask, policy_targets, value_targets):
-        model = nn.merge(state.graphdef, params, state.batch_stats)
-        model.train()
+      def loss_fn(
+        params,
+        batch_stats,
+        observations: chex.Array,
+        legals_mask: chex.Array,
+        policy_targets: chex.Array,
+        value_targets: chex.Array
+      ):
+        model = nn.merge(state.graphdef, params, batch_stats)
 
-        policy_logits, value_preds = model(observations)
-        policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
-        policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
-        value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
-
-        l2_reg_loss = jax.tree.reduce(
-          operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0) * weight_decay
+        policy_logits, value_preds = forward(model, observations)
+        policy_logits = jnp.where(
+          legals_mask, 
+          policy_logits, 
+          jnp.full_like(policy_logits, jnp.finfo(jnp.float32).min)
+        )
         
-        total_loss = policy_loss + value_loss + l2_reg_loss
+        policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
+        value_loss = optax.l2_loss(value_preds, value_targets).mean()
 
-        batch_stats = get_batch_stats(model)   
-        return total_loss, (policy_loss, value_loss, l2_reg_loss, batch_stats)
+        l2_reg_loss = optax.tree_utils.tree_l2_norm(
+          nn.state(model, weights_no_bias_filter), squared=True
+        ) * weight_decay
+        
+        total_loss = policy_loss + value_loss 
+
+        if not decouple_weight_decay:
+          total_loss = total_loss + l2_reg_loss
+
+        return total_loss, (policy_loss, value_loss, l2_reg_loss, get_batch_stats(model))
 
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
+
       (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
-        state.params, observations, legals_mask, policy_targets, value_targets)
+        state.params, state.batch_stats, observations, legals_mask, policy_targets, value_targets)
       
       new_state = state.apply_gradients(grads=grads, batch_stats=new_batch_stats)
   
       return new_state, (policy_loss, value_loss, l2_reg_loss)
     
-    return cls(model, state, path, update_step_fn)
+    return cls(state, path, update_step_fn)
   
   @classmethod
   def from_checkpoint(cls, checkpoint_path, model_args=None):
@@ -394,36 +435,33 @@ class Model:
     return model
   
   @property
-  def num_trainable_variables(self):
+  def num_trainable_variables(self) -> int:
     return sum(np.prod(p.shape) for p in jax.tree.leaves(self._state.params))
   
-  @property
-  def parameters_per_layer(self):
-    flat_params = flax.traverse_util.flatten_dict(self._state.params, sep='/')
-    return jax.tree.map(jnp.shape, flat_params)
-  
-  def print_trainable_variables(self):
-    nn.display(self._model)
+  def print_trainable_variables(self) -> None:
+    # nn.display(self._model)
     flat_params, _ = jax.tree.flatten(self._state.params)
     for i, p in enumerate(flat_params):
       print(f"Param {i}: {p.shape}")
   
-  def inference(self, observation, legals_mask):
+  def inference(self, observation: chex.Array, legals_mask: chex.Array) -> tuple[chex.Array, chex.Array]:
     model = nn.merge(self._state.graphdef, self._state.params, self._state.batch_stats)
     model.eval()
 
-    observation = jnp.array(observation, dtype=jnp.float32)
-    legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
+    observation = jnp.asarray(observation, dtype=jnp.float32)
+    legals_mask = jnp.asarray(legals_mask, dtype=jnp.bool)
 
     policy_logits, value = model(observation)
-    
-    policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
-    policy = nn.softmax(policy_logits, axis=-1)
+    policy_logits = jnp.where(
+      legals_mask, 
+      policy_logits, 
+      jnp.full_like(policy_logits, jnp.finfo(jnp.float32).min)
+    )
 
+    policy = nn.softmax(policy_logits)
     return value, policy
   
-  def update(self, batch: Sequence[TrainInput] | chex.ArrayTree):
-
+  def update(self, batch: Sequence[TrainInput] | chex.ArrayTree) -> Losses:
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
       self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
@@ -434,11 +472,10 @@ class Model:
     if self._checkpointer:
       self._checkpointer.save(path, self._state, force=True)
     else:
-      print("No checkpoint path provided. Skipping.")
+      print("No checkpoint path is provided. Skipping.")
     return step
    
-  def load_checkpoint(self, step: int) -> TrainState:
+  def load_checkpoint(self, step: int) -> None:
     # model = nn.eval_shape(lambda: self._model)
     if self._checkpointer:
-      self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), self._state)
-    return self._state
+      self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), self._state)    

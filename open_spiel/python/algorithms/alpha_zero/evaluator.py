@@ -35,7 +35,7 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
       raise ValueError("Game must have sequential turns.")
 
-    self._model = model
+    self._model = model # nn.cached_partial?
     self._cache = lru_cache.LRUCache(cache_size)
 
   def cache_info(self):
@@ -48,18 +48,19 @@ class AlphaZeroEvaluator(mcts.Evaluator):
 
   def _inference(self, state):
     # Make a singleton batch
-    obs = np.expand_dims(state.observation_tensor(), 0)
-    mask = np.expand_dims(state.legal_actions_mask(), 0)
+    obs = np.asarray(state.observation_tensor())
+    mask = np.asarray(state.legal_actions_mask())
 
     # np.ndarray isn't hashable
     cache_key = obs.tobytes() + mask.tobytes()
 
     value, policy = self._cache.make(
-      cache_key, lambda: self._model.inference(obs, mask))
+      cache_key, lambda: self._model.inference(obs, mask)
+    )
+    
+    return value, policy 
 
-    return value[0, 0], policy[0]  # Unpack batch
-
-  def evaluate(self, state):
+  def evaluate(self, state) -> np.ndarray:
     """Returns a value for the given state."""
     value, _ = self._inference(state)
     return np.array([value, -value])

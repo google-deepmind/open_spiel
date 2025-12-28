@@ -50,11 +50,6 @@ def nnx_to_linen(
 def flatten(x):
   return x.reshape(-1)
 
-def tree_sum(tree: Any, initialiser: Any):
-  """Sum of all elements in a tree. Re-used from `optax`."""
-  sums = jax.tree.map(jnp.sum, tree)
-  return jax.tree.reduce(lambda x, y: x+y, sums, initializer=initialiser)
-
 @chex.dataclass(frozen=True)
 class TrainInput: 
   """Inputs of the model: o_t, mask_t, π(a_t|o_t), v_t
@@ -66,11 +61,7 @@ class TrainInput:
 
   @staticmethod
   def stack(train_inputs):
-
-    stacked_states = jax.tree.map(lambda *x: jnp.stack(x), *train_inputs)
-    stacked_states = stacked_states.replace(value=jnp.expand_dims(stacked_states.value, 1))
-
-    return stacked_states
+    return jax.tree.map(lambda *x: jnp.stack(x), *train_inputs)
 
 @chex.dataclass(frozen=True)
 class Losses:

@@ -42,12 +42,13 @@ import time
 import traceback
 
 import numpy as np
+import jax
 
 import multiprocessing
 from open_spiel.python.algorithms import mcts
 
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
-from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, Losses, tree_sum
+from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, Losses
 from open_spiel.python.algorithms.alpha_zero import replay_buffer as buffer_lib
 
 import pyspiel
@@ -58,11 +59,6 @@ from open_spiel.python.utils import stats
 
 import chex
 import jax.numpy as jnp
-import jax
-
-# Set TF environment variables for GPU memory management and device visibility.
-# This must be done BEFORE TensorFlow is imported.
-os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
 
 # Set the start method to 'spawn' for CUDA compatibility and monkey-patch
 # to prevent OpenSpiel from overriding it.
@@ -129,28 +125,25 @@ class Config:
   nn_model: str
   nn_width: int
   nn_depth: int
-  observation_shape: tuple[int, ...]
+  observation_shape: chex.Shape
   output_size: int
-
+  verbose: bool
   quiet: bool
 
   nn_api_version: str = "nnx" 
-  # device can be 'cpu', 'gpu', or 'mps'
-  # NOTE: the corresponding `jax` version has to be installed. See
-  # https://docs.jax.dev/en/latest/installation.html#supported-platforms
-  device: str = "cpu"
+
 
 def _init_model_from_config(config: Config):
   return api_selector(config.nn_api_version).Model.build_model(
-      config.nn_model,
-      config.observation_shape,
-      config.output_size,
-      config.nn_width,
-      config.nn_depth,
-      config.weight_decay,
-      config.learning_rate,
-      config.path
-    )
+    config.nn_model,
+    config.observation_shape,
+    config.output_size,
+    config.nn_width,
+    config.nn_depth,
+    config.weight_decay,
+    config.learning_rate,
+    config.path
+  )
 
 
 def watcher(fn):
@@ -192,14 +185,14 @@ def _init_bot(config, game, evaluator_, evaluation):
       solve=False,
       dirichlet_noise=noise,
       child_selection_fn=mcts.SearchNode.puct_value,
-      verbose=False,
+      verbose=config.verbose,
       dont_return_chance_node=True
     )
 
 
 def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
   """Play one game, return the trajectory."""
-  trajectory = []
+  trajectory_states = []
   actions = []
   state = game.new_initial_state()
   random_state = np.random.RandomState()
@@ -227,28 +220,27 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       else:
         action = np.random.choice(len(policy), p=policy)
 
-      trajectory.append(
-          TrajectoryState(
-            observation=jnp.array(state.observation_tensor()), 
-            current_player=jnp.array(state.current_player(), dtype=int),
-            legals_mask=jnp.array(state.legal_actions_mask(), dtype=jnp.bool), 
-            action=jnp.array(action, dtype=int), 
-            policy=jnp.array(policy, dtype=jnp.float32),
-            value=jnp.array(root.total_reward / root.explore_count, dtype=jnp.float32)
-          )
+      trajectory_states.append(
+        TrajectoryState(
+          observation=state.observation_tensor(), 
+          current_player=state.current_player(),
+          legals_mask=state.legal_actions_mask(), 
+          action=action, 
+          policy=policy,
+          value=root.total_reward / root.explore_count
         )
-      
+      )
       action_str = state.action_to_string(state.current_player(), action)
       actions.append(action_str)
-      logger.opt_print("Player {} sampled action: {}".format(
-          state.current_player(), action_str))
+      logger.opt_print(f"Player {state.current_player()} sampled action: {action_str}")
       state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
-  #it's not good to do like that but it's python.
+
   trajectory = Trajectory(
-    states=trajectory,
-    returns=jnp.array(state.returns())
+    states=trajectory_states,
+    returns=state.returns()
   )
+
   logger.print("Game {}: Returns: {}; Actions: {}".format(
       game_num, " ".join(map(str, trajectory.returns)), " ".join(actions)))
   return trajectory
@@ -280,8 +272,8 @@ def actor(*, config: Config, game, logger, queue):
   logger.print("Initializing bots")
   az_evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
   bots = [
-      _init_bot(config, game, az_evaluator, False),
-      _init_bot(config, game, az_evaluator, False),
+    _init_bot(config, game, az_evaluator, False),
+    _init_bot(config, game, az_evaluator, False),
   ]
   for game_num in itertools.count():
     if not update_checkpoint(logger, queue, model, az_evaluator):
@@ -311,21 +303,22 @@ def evaluator(*, game, config, logger, queue):
     bots = [
         _init_bot(config, game, az_evaluator, True),
         mcts.MCTSBot(
-            game,
-            config.uct_c,
-            max_simulations,
-            random_evaluator,
-            solve=True,
-            verbose=False,
-            dont_return_chance_node=True)
+          game,
+          config.uct_c,
+          max_simulations,
+          random_evaluator,
+          solve=True,
+          verbose=config.verbose,
+          dont_return_chance_node=True
+        )
     ]
     if az_player == 1:
       bots = list(reversed(bots))
 
     trajectory = _play_game(logger, game_num, game, bots, temperature=1,
                             temperature_drop=0)
-    results.append(trajectory.returns[az_player])
-    queue.put((difficulty, trajectory.returns[az_player]))
+    results.append(jnp.asarray(trajectory.returns[az_player]))
+    queue.put((difficulty, jnp.asarray(trajectory.returns[az_player])))
 
     logger.print(f"AZ: {trajectory.returns[az_player]},\
       MCTS: {trajectory.returns[1 - az_player]},\
@@ -337,13 +330,14 @@ def evaluator(*, game, config, logger, queue):
 def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
   logger.also_to_stdout = True
-  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size, sequential=True) #only this
+
+  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size)
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
-  logger.print("Model type: %s(%s, %s)" % (config.nn_model, config.nn_width,
-                                           config.nn_depth))
+  logger.print(f"Model type: {config.nn_model}({config.nn_width}, {config.nn_depth})")
   logger.print("Model size:", model.num_trainable_variables, "variables")
+  
   save_path = model.save_checkpoint(0)
   logger.print("Initial checkpoint:", save_path)
   broadcast_fn(str(save_path))
@@ -375,8 +369,9 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         time.sleep(0.01)  # 10ms
 
   def collect_trajectories():
-    logger.print("Collecting trajectories")
     """Collects the trajectories from actors into the replay buffer."""
+
+    logger.print("Collecting trajectories")
     num_trajectories = 0
     num_states = 0
     for trajectory in trajectory_generator():
@@ -386,31 +381,32 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
       game_lengths.add(len(trajectory.states))
       game_lengths_hist.add(len(trajectory.states))
 
-      p1_outcome = trajectory.returns[0]
-      if p1_outcome > 0:
+      game_outcome = trajectory.returns[0]
+      if game_outcome > 0:
         outcomes.add(0)
-      elif p1_outcome < 0:
+      elif game_outcome < 0:
         outcomes.add(1)
       else:
         outcomes.add(2)
 
-      buffer_inputs = [
-        TrainInput(
-          observation=s.observation, 
-          legals_mask=s.legals_mask, 
-          policy=s.policy, 
-          value=jnp.array(p1_outcome, dtype=jnp.float32)
-        ) for s in trajectory.states
-      ]
-
-      replay_buffer.extend(TrainInput.stack(buffer_inputs))
+      for s in trajectory.states:
+        replay_buffer.append(TrainInput(
+            observation=jnp.asarray(s.observation, dtype=jnp.float32), 
+            legals_mask=jnp.asarray(s.legals_mask,dtype=jnp.bool),
+            policy=jnp.asarray(s.policy, dtype=jnp.float32),
+            value=game_outcome
+          ) 
+        )
             
       for stage in range(stage_count):
         # Scale for the length of the game
         index = (len(trajectory.states) - 1) * stage // (stage_count - 1)
         n = trajectory.states[index]
-        accurate = (n.value >= 0) == (trajectory.returns[n.current_player] >= 0)
-        value_accuracies[stage].add(1 if accurate else 0)
+        # Let's leave it out while we're testing
+        # value_accuracies[stage].add(int(
+        #   (n.value >= 0) == (trajectory.returns[n.current_player] >= 0)
+        # ))
+        value_accuracies[stage].add((n.value-trajectory.returns[n.current_player])**2)
         value_predictions[stage].add(abs(n.value))
 
       if num_states >= learn_rate:
@@ -420,17 +416,14 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   def learn(step):
     """Sample from the replay buffer, update weights and save a checkpoint."""
     losses = [] 
-    #TODO: why not to replace replace with `jax.lax.scan`, 
-    # but the model state is not explicit
+
     for _ in range(len(replay_buffer) // config.train_batch_size):
       data = replay_buffer.sample(config.train_batch_size)
-      if data:
-        losses.append(model.update(data))
+      losses.append(model.update(data))
 
     # Always save a checkpoint, either for keeping or for loading the weights to
     # the actors. We only allow numbers, so use -1 as "latest".
-    save_path = model.save_checkpoint(
-        step if step % config.checkpoint_freq == 0 else -1)
+    save_path = model.save_checkpoint(step if step % config.checkpoint_freq == 0 else -1)
     
     # for an unlucky case when the agent didn't collect enough transitions
     if len(losses):
@@ -479,112 +472,110 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 
     batch_size_stats = stats.BasicStats()  # Only makes sense in C++.
     batch_size_stats.add(1)
-
     data_log.write({
-        "step": step,
-        "total_states": replay_buffer.total_seen.item(),
-        "states_per_s": num_states / seconds,
-        "states_per_s_actor": num_states / (config.actors * seconds),
-        "total_trajectories": total_trajectories,
-        "trajectories_per_s": num_trajectories / seconds,
-        "queue_size": 0,  # Only available in C++.
-        "game_length": game_lengths.as_dict,
-        "game_length_hist": game_lengths_hist.data,
-        "outcomes": outcomes.data,
-        "value_accuracy": [v.as_dict for v in value_accuracies],
-        "value_prediction": [v.as_dict for v in value_predictions],
-        "eval": {
-            "count": evals[0].total_seen,
-            "results": [tree_sum(e.data, 0).item() / len(e) if e else 0 for e in evals],
-        },
-        "batch_size": batch_size_stats.as_dict,
-        "batch_size_hist": [0, 1],
-        "loss": {
-            "policy": float(losses.policy),
-            "value": float(losses.value),
-            "l2reg": float(losses.l2),
-            "sum": float(losses.total),
-        },
-        "cache": {  # Null stats because it's hard to report between processes.
-            "size": 0,
-            "max_size": 0,
-            "usage": 0,
-            "requests": 0,
-            "requests_per_s": 0,
-            "hits": 0,
-            "misses": 0,
-            "misses_per_s": 0,
-            "hit_rate": 0,
-        },
+      "step": step,
+      "total_states": replay_buffer.total_seen.item(),
+      "states_per_s": num_states / seconds,
+      "states_per_s_actor": num_states / (config.actors * seconds),
+      "total_trajectories": total_trajectories,
+      "trajectories_per_s": num_trajectories / seconds,
+      "queue_size": 0,  # Only available in C++.
+      "game_length": game_lengths.as_dict,
+      "game_length_hist": game_lengths_hist.data,
+      "outcomes": outcomes.data,
+      "value_accuracy": [v.as_dict for v in value_accuracies],
+      "value_prediction": [v.as_dict for v in value_predictions],
+      "eval": {
+        "count": evals[0].total_seen.item(),
+        "results": [np.mean(e.data).item() if e else 0 for e in evals],
+      },
+      "batch_size": batch_size_stats.as_dict,
+      "batch_size_hist": [0, 1],
+      "loss": {
+        "policy": float(losses.policy),
+        "value": float(losses.value),
+        "l2reg": float(losses.l2),
+        "sum": float(losses.total),
+      },
+      "cache": {  # Null stats because it's hard to report between processes.
+        "size": 0,
+        "max_size": 0,
+        "usage": 0,
+        "requests": 0,
+        "requests_per_s": 0,
+        "hits": 0,
+        "misses": 0,
+        "misses_per_s": 0,
+        "hit_rate": 0,
+      },
     })
     logger.print()
 
     if config.max_steps > 0 and step >= config.max_steps:
       break
 
-    broadcast_fn(save_path)
+    broadcast_fn(str(save_path))
 
 
 def alpha_zero(config: Config):
   # NOTE: a single device accelearation is currently supported
-  with jax.default_device(jax.devices(config.device)[0]):
 
-    """Start all the worker processes for a full alphazero setup."""
-    game = pyspiel.load_game(config.game)
-    config = config.replace(
-        observation_shape=game.observation_tensor_shape(),
-        output_size=game.num_distinct_actions())
+  """Start all the worker processes for a full alphazero setup."""
+  game = pyspiel.load_game(config.game)
+  config = config.replace(
+      observation_shape=game.observation_tensor_shape(),
+      output_size=game.num_distinct_actions())
 
-    print("Starting game", config.game)
-    if game.num_players() != 2:
-      sys.exit("AlphaZero can only handle 2-player games.")
-    game_type = game.get_type()
-    if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
-      raise ValueError("Game must have terminal rewards.")
-    if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
-      raise ValueError("Game must have sequential turns.")
+  print("Starting game", config.game)
+  if game.num_players() != 2:
+    sys.exit("AlphaZero can only handle 2-player games.")
+  game_type = game.get_type()
+  if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
+    raise ValueError("Game must have terminal rewards.")
+  if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
+    raise ValueError("Game must have sequential turns.")
 
-    path = config.path
-    if not path:
-      path = tempfile.mkdtemp(prefix="az-{}-{}-".format(
-          datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"), config.game))
-      config = config.replace(path=path)
+  path = config.path
+  if not path:
+    path = tempfile.mkdtemp(prefix="az-{}-{}-".format(
+        datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"), config.game))
+    config = config.replace(path=path)
 
-    if not os.path.exists(path):
-      os.makedirs(path)
-    if not os.path.isdir(path):
-      sys.exit(f"{path} isn't a directory")
-    print(f"Writing logs and checkpoints to: {path}")
-    print(f"Model type: {config.nn_model}(width={config.nn_width}, depth={config.nn_depth})")
+  if not os.path.exists(path):
+    os.makedirs(path)
+  if not os.path.isdir(path):
+    sys.exit(f"{path} isn't a directory")
+  print(f"Writing logs and checkpoints to: {path}")
+  print(f"Model type: {config.nn_model}(width={config.nn_width}, depth={config.nn_depth})")
 
-    with open(os.path.join(config.path, "config.json"), "w") as fp:
-      fp.write(json.dumps(config.__dict__, indent=2, sort_keys=True) + "\n")
+  with open(os.path.join(config.path, "config.json"), "w") as fp:
+    fp.write(json.dumps(config.__dict__, indent=2, sort_keys=True) + "\n")
 
-    actors = [spawn.Process(actor, kwargs={"game": game, "config": config,
-                                          "num": i})
-              for i in range(config.actors)]
-    
-    evaluators = [spawn.Process(evaluator, kwargs={"game": game, "config": config,
-                                                  "num": i})
-                  for i in range(config.evaluators)]
+  actors = [spawn.Process(actor, kwargs={"game": game, "config": config,
+                                        "num": i})
+            for i in range(config.actors)]
+  
+  evaluators = [spawn.Process(evaluator, kwargs={"game": game, "config": config,
+                                                "num": i})
+                for i in range(config.evaluators)]
 
-    def broadcast(msg):
-      for proc in actors+evaluators:
-        proc.queue.put(msg)
+  def broadcast(msg):
+    for proc in actors+evaluators:
+      proc.queue.put(msg)
 
-    try:
-      learner(game=game, config=config, actors=actors,  # pylint: disable=missing-kwoa
-              evaluators=evaluators, broadcast_fn=broadcast)
-    except (KeyboardInterrupt, EOFError):
-      print("Caught a KeyboardInterrupt, stopping early.")
-    finally:
-      broadcast("")
-      # for actor processes to join we have to make sure that their q_in is empty,
-      # including backed up items
-      for proc in actors:
-        while proc.exitcode is None:
-          while not proc.queue.empty():
-            proc.queue.get_nowait()
-          proc.join(JOIN_WAIT_DELAY)
-      for proc in evaluators:
-        proc.join()
+  try:
+    learner(game=game, config=config, actors=actors,  # pylint: disable=missing-kwoa
+            evaluators=evaluators, broadcast_fn=broadcast)
+  except (KeyboardInterrupt, EOFError):
+    print("Caught a KeyboardInterrupt, stopping early.")
+  finally:
+    broadcast("")
+    # for actor processes to join we have to make sure that their q_in is empty,
+    # including backed up items
+    for proc in actors:
+      while proc.exitcode is None:
+        while not proc.queue.empty():
+          proc.queue.get_nowait()
+        proc.join(JOIN_WAIT_DELAY)
+    for proc in evaluators:
+      proc.join()

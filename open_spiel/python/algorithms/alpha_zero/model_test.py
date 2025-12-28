@@ -23,7 +23,6 @@ import jax.numpy as jnp
 import flax.linen as linen
 import flax.nnx as nnx
 
-#TODO: add parametrised tests for the selection of the API
 from open_spiel.python.algorithms.alpha_zero.utils import (
   AVIALABLE_APIS, TrainInput, api_selector, linen_to_nnx, nnx_to_linen)
 
@@ -51,10 +50,10 @@ def solve_game(state):
   policy = np.zeros_like(act_mask)
   policy[best_actions[0][0]] = 1  # Choose the first for a deterministic policy.
   solved[state_str] = TrainInput(
-    observation=jnp.array(obs), 
-    legals_mask=jnp.array(act_mask), 
-    policy=jnp.array(policy), 
-    value=jnp.array(value)
+    observation=jnp.array(obs, dtype=jnp.float32), 
+    legals_mask=jnp.array(act_mask, dtype=jnp.bool), 
+    policy=jnp.array(policy, dtype=jnp.float32), 
+    value=jnp.array(value, dtype=jnp.float32)
   )
   return value
 
@@ -91,15 +90,14 @@ class ModelTest(parameterized.TestCase):
         value=jnp.array(1))
       )
       state.apply_action(action)
-      value, policy = model.inference([obs], [act_mask])
-      self.assertLen(policy, 1)
+      value, policy = model.inference(obs, act_mask)
+      self.assertLen(policy, game.num_distinct_actions())
       self.assertLen(value, 1)
-      self.assertLen(policy[0], game.num_distinct_actions())
-      self.assertLen(value[0], 1)
 
     losses = []
     policy_loss_goal = 0.05
     value_loss_goal = 0.05
+
     for i in range(200):
       loss = model.update(TrainInput.stack(train_inputs))
       print(i, loss)
@@ -117,7 +115,6 @@ class ModelTest(parameterized.TestCase):
     AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types)
   )
   def test_model_learns_optimal(self, api_version: str, model_type: str):
-    print(api_version, model_type)
     game = pyspiel.load_game("tic_tac_toe")
     solve_game(game.new_initial_state())
 
@@ -177,11 +174,9 @@ class ModelTest(parameterized.TestCase):
       policy = np.zeros(len(act_mask), dtype=float)
       policy[action] = 1
       state.apply_action(action)
-      value, policy = model.inference([obs], [act_mask])
-      self.assertLen(policy, 1)
+      value, policy = model.inference(obs, act_mask)
+      self.assertLen(policy, game.num_distinct_actions())
       self.assertLen(value, 1)
-      self.assertLen(policy[0], game.num_distinct_actions())
-      self.assertLen(value[0], 1)
 
 
 
