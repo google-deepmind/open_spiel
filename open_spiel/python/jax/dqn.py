@@ -20,7 +20,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
-import rlax
+# import rlax
 
 from open_spiel.python import rl_agent
 from open_spiel.python.utils.replay_buffer import ReplayBuffer
@@ -109,8 +109,8 @@ class DQN(rl_agent.AbstractAgent):
       self.loss_func = lambda x: jnp.mean(x**2)
     elif loss_str == "huber":
       # pylint: disable=g-long-lambda
-      self.loss_func = lambda x: jnp.mean(
-          rlax.huber_loss(x, self.huber_loss_parameter))
+      self.loss_func = lambda x, y: jnp.mean(
+          optax.huber_loss(x, delta=self.huber_loss_parameter))
     else:
       raise ValueError("Not implemented, choose from 'mse', 'huber'.")
 

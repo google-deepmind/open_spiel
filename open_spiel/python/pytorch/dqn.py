@@ -336,7 +336,6 @@ class DQN(rl_agent.AbstractAgent):
     ],
                                  dim=0)
     predictions = self._q_values[list(action_indices)]
-
     loss = self.loss_class(predictions, target)
 
     self._optimizer.zero_grad()

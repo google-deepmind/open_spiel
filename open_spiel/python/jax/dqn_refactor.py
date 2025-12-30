@@ -13,37 +13,43 @@
 # limitations under the License.
 """DQN agent implemented in JAX."""
 
-from typing import Iterable, NamedTuple, Callable
-import flax.nnx as nn
-import jax
+from typing import Iterable, NamedTuple, Callable, Any
+from functools import partial
 from enum import StrEnum
+
+import flax.nnx as nn
 import jax.numpy as jnp
 import numpy as np
+
+import jax
 import optax
 import chex
-from functools import partial
+
+import etils.epath as epath
+import orbax.checkpoint as ocp
 
 from open_spiel.python import rl_agent
 
 ILLEGAL_ACTION_LOGITS_PENALTY = jnp.finfo(jnp.float32).min
 
 class Transition(NamedTuple):
-    """Data structure for the Replay buffer"""
-    info_state: chex.Array
-    action: chex.Array
-    reward: chex.Array
-    next_info_state: chex.Array
-    is_final_step: chex.Array
-    legal_actions_mask: chex.Array
+  """Data structure for the Replay buffer"""
+  info_state: chex.Array
+  action: chex.Array
+  reward: chex.Array
+  next_info_state: chex.Array
+  is_final_step: chex.Array
+  legal_actions_mask: chex.Array
 
 class ReplayBufferState(NamedTuple):
 
   experience: chex.ArrayTree
   capacity: chex.Numeric
   entry_index: chex.Array
+  is_full: bool
 
   def __len__(self) -> int:
-    return min(self.entry_index, self.capacity)
+    return min(self.entry_index, self.capacity).astype(int)
 
 class ReplayBuffer:
   """ReplayBuffer of fixed size with a FIFO replacement policy.
@@ -53,11 +59,20 @@ class ReplayBuffer:
   The underlying datastructure is a ring buffer, allowing 0(1) adding and
   sampling.
   """
+  def __init__(self, capacity: np.ndarray, experience: Transition) -> None:
+    self.capacity = capacity
+    self.experience = experience
+    self.entry_index = np.array(0)
+    self.is_full = jnp.array(False, dtype=jnp.bool)
+
+  def __len__(self) -> int:
+    return jnp.where(self.is_full, self.capacity, self.entry_index).item()
 
   @staticmethod
   @partial(jax.jit, static_argnames=("capacity",))
-  def init_buffer(capacity: chex.Numeric, experience: chex.ArrayTree) -> ReplayBufferState:
+  def init(capacity: chex.Numeric, experience: chex.ArrayTree) -> ReplayBufferState:
     # Set experience value to be empty.
+
     experience = jax.tree.map(jnp.empty_like, experience)
     # Broadcast to [add_batch_size, ...]
     experience = jax.tree.map(
@@ -67,11 +82,11 @@ class ReplayBuffer:
       experience,
     )
     return ReplayBufferState(
-      capacity=capacity, experience=experience, entry_index=jnp.array(0))
+      capacity=capacity, experience=experience, entry_index=jnp.array(0), is_full=jnp.array(False, dtype=jnp.bool))
   
   @staticmethod    
   @partial(jax.jit, donate_argnums=(0,))
-  def append_to_buffer(
+  def append(
     state: ReplayBufferState, 
     experience: chex.ArrayTree, 
   ) -> ReplayBufferState:
@@ -83,23 +98,33 @@ class ReplayBuffer:
       An updated `ReplayBufferState` 
     """
 
-    index = state.entry_index
+    chex.assert_trees_all_equal_dtypes(experience, state.experience)
+
+    index = state.entry_index % state.capacity
+
     def update_leaf(buffer_leaf, exp_leaf):
       return buffer_leaf.at[index].set(exp_leaf)
 
     new_experience = jax.tree.map(update_leaf, state.experience, experience)
-    new_index = (state.entry_index + 1) % state.capacity
+
+    new_entry_index = state.entry_index + 1
+    new_is_full = state.is_full | (new_entry_index >= state.capacity)
+    new_entry_index = new_entry_index % state.capacity
 
     return ReplayBufferState(
-      capacity=state.capacity, experience=new_experience, entry_index=new_index)
+      capacity=state.capacity, 
+      experience=new_experience, 
+      entry_index=new_entry_index, 
+      is_full=new_is_full
+    )
   
   @staticmethod    
-  @partial(jax.jit, static_argnames=("num_samples", "max_size"))
-  def sample(rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int, max_size: int) -> Transition:
+  @partial(jax.jit, static_argnames=("num_samples",))
+  def sample(rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int) -> Transition:
     """Returns `num_samples` uniformly sampled from the buffer.
     Args:
       rng: `chex.PRNGKey`, a random state
-      state: `ReservoirBufferState`, a buffer state
+      state: `ReplayBufferState`, a buffer state
       num_samples: `int`, number of samples to draw.
     Returns:
       An iterable over `num_samples` random elements of the buffer.
@@ -107,8 +132,11 @@ class ReplayBuffer:
       AssertionError: If there are less than `num_samples` elements in the buffer
     """
 
-    indices = jax.random.choice(
-      rng, jnp.arange(max_size), shape=(num_samples,), replace=False)
+    # When full, the max time index is max_length_time_axis otherwise it is current index.
+    max_size = jnp.where(state.is_full, state.capacity, state.entry_index)
+
+    indices = jax.random.randint(
+      rng, shape=(num_samples,), minval=0, maxval=max_size)
     
     return jax.tree.map(lambda x: x[indices], state.experience)
 
@@ -142,8 +170,9 @@ class MLP(nn.Module):
   def __call__(self, x: chex.Array) -> chex.Array:
     return self.model(x)
 
+@nn.jit
 @nn.vmap(in_axes=(None, 0), out_axes=0)
-def forward(model, x):
+def forward(model, x: chex.Array) -> chex.Array:
   return model(x)
 
 class Loss(StrEnum):
@@ -179,13 +208,12 @@ class DQN(rl_agent.AbstractAgent):
   def __init__(
     self,
     player_id: int,
-    state_representation_size: tuple[int, ...],
+    state_representation_size: chex.Shape,
     num_actions: int,
     hidden_layers_sizes: Iterable[int]= (128,),
     batch_size: int=128,
-    replay_buffer_class: Callable=ReplayBuffer,
+    replay_buffer_class: object=ReplayBuffer,
     replay_buffer_capacity: int=10000,
-    replay_buffer_kwargs: dict={},
     learning_rate: float=0.01,
     update_target_network_every: int=1000,
     weight_update_coeff: float = .005,
@@ -201,7 +229,6 @@ class DQN(rl_agent.AbstractAgent):
     huber_loss_parameter: float=1.0,
     seed: int = 42,
     gradient_clipping: float | None=None,
-    device: str = "cpu"
   ) -> None:
     """Initialize the DQN agent."""
 
@@ -219,10 +246,12 @@ class DQN(rl_agent.AbstractAgent):
     self._learn_every = learn_every
     self._min_buffer_size_to_learn = min_buffer_size_to_learn
     self._discount_factor = discount_factor
-    self.huber_loss_parameter = huber_loss_parameter
 
     self._replay_buffer_class = replay_buffer_class
-    self._replay_buffer_capacity = replay_buffer_capacity
+    assert hasattr(replay_buffer_class, "init")
+    assert hasattr(replay_buffer_class, "append")
+    assert hasattr(replay_buffer_class, "sample")
+    self._replay_buffer_capacity = int(replay_buffer_capacity)
     self._replay_buffer = None
     
     self._tau = weight_update_coeff
@@ -256,8 +285,7 @@ class DQN(rl_agent.AbstractAgent):
     if loss_str == Loss.MSE:
       self.loss_func = jax.vmap(optax.l2_loss)
     elif loss_str == Loss.HUBER:
-      # pylint: disable=g-long-lambda
-      self.loss_func = jax.vmap(optax.huber_loss)
+      self.loss_func = jax.vmap(partial(optax.huber_loss, delta=huber_loss_parameter))
     else:
       raise ValueError("Not implemented, choose from 'mse', 'huber'.")
     
@@ -280,28 +308,37 @@ class DQN(rl_agent.AbstractAgent):
       optimizer = optax.rmsprop(learning_rate)
     else:
       raise ValueError("Not implemented, choose from 'adam', 'rmsprop', and 'sgd'.")
+    
+    self._checkpointer = ocp.StandardCheckpointer()
 
     # Clipping the gradients prevent divergence and allow more stable training.
     if gradient_clipping:
-      optimizer = optax.chain(optimizer,
-                              optax.clip_by_global_norm(gradient_clipping))
-    
+      optimizer = optax.chain(
+        optimizer,
+        optax.clip_by_global_norm(gradient_clipping)
+      )
+  
     self._optimizer = nn.Optimizer(self._q_network, optimizer, wrt=nn.Param)
     self._jit_update = self._get_jitted_update()
+    self._jit_inference = self._get_jitted_inference()
+   
+  def _get_jitted_inference(self) -> Callable:
+    """Get jitted Q-network inference function."""
 
+    graphdef = nn.graphdef(self._q_network)
+    
+    @jax.jit
+    def infer(state: nn.State, info_state: chex.Array) -> tuple[chex.Array, nn.State]:
+      model = nn.merge(graphdef, state)
+      q_values = model(info_state)
+      return q_values
+    
+    return infer
 
   def _get_jitted_update(self) -> Callable:
-    """get jitted advantage update function."""
+    """Get jitted Q-network update function."""
 
-    @nn.jit
-    def update(
-      q_network: nn.Module,
-      target_q_network: nn.Module, 
-      optimiser: nn.Optimizer, 
-      batch: Transition
-    ) -> chex.Array:
-
-      def _loss_fn(
+    def _loss_fn(
         q_network: nn.Module, 
         target_q_network: nn.Module, 
         info_states: chex.Array,
@@ -313,7 +350,6 @@ class DQN(rl_agent.AbstractAgent):
       ) -> chex.Array:
         """Loss function for the Q-network."""
         q_values = forward(q_network, info_states)
-        
         next_q_values = forward(target_q_network, next_info_states)
         next_q_values = jnp.where(
           legal_actions_mask,
@@ -321,17 +357,29 @@ class DQN(rl_agent.AbstractAgent):
           ILLEGAL_ACTION_LOGITS_PENALTY
         ).max(-1)
 
-        targets = (
+        targets = jax.lax.stop_gradient(
           rewards + jnp.logical_not(are_final_steps) * self._discount_factor * next_q_values)
         predictions = q_values[jnp.arange(q_values.shape[0]), actions.squeeze()]
 
-        loss_values = self.loss_func(predictions, jax.lax.stop_gradient(targets))
+        loss_values = self.loss_func(predictions, targets)
 
         return loss_values.mean()
 
-      self._grad_fn = nn.value_and_grad(_loss_fn)
+    grad_fn = nn.value_and_grad(_loss_fn)
+    graphdef_q_network = nn.graphdef((self._q_network, self._optimizer))
+    graphdef_target_q_network = nn.graphdef(self._target_q_network)
 
-      main_loss, grads = self._grad_fn(
+    @jax.jit
+    def update(
+      q_network_optimiser_state: nn.State,
+      target_q_network_state: nn.State, 
+      batch: Transition
+    ) -> tuple[chex.Numeric, nn.State]:
+      
+      q_network, optimiser = nn.merge(graphdef_q_network, q_network_optimiser_state)
+      target_q_network = nn.merge(graphdef_target_q_network, target_q_network_state)
+      
+      main_loss, grads = grad_fn(
         q_network,
         target_q_network, 
         batch.info_state, 
@@ -342,11 +390,12 @@ class DQN(rl_agent.AbstractAgent):
         batch.legal_actions_mask 
       )
       optimiser.update(q_network, grads)
-      return main_loss
 
+      return main_loss, nn.state((q_network, optimiser))
+  
     return update
   
-  def select_action(self, time_step, greedy: bool = True) -> rl_agent.StepOutput:
+  def select_action(self, time_step: chex.ArrayTree, rng: chex.PRNGKey, greedy: bool = True) -> rl_agent.StepOutput:
     """Returns the action to be taken and updates the Q-network if needed.
 
     Args:
@@ -363,12 +412,18 @@ class DQN(rl_agent.AbstractAgent):
       ):
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
-      epsilon = self.epsilon_schedule(self._iteration) if not greedy else 0.0
-      action, probs = self._act_epsilon_greedy(info_state, legal_actions, epsilon)
+      epsilon = jnp.where(greedy, jnp.asarray(0.0), self.epsilon_schedule(self._iteration))
+      action, probs = self._act(
+        nn.state(self._q_network), 
+        jnp.asarray(info_state), 
+        jax.nn.one_hot(legal_actions, self._num_actions).sum(0), 
+        rng, 
+        epsilon
+      )
   
     return rl_agent.StepOutput(action=action, probs=probs)
 
-  def step(self, time_step, is_evaluation=False):
+  def step(self, time_step, is_evaluation=False) -> rl_agent.StepOutput:
     """Returns the action to be taken and updates the Q-network if needed.
 
     Args:
@@ -378,12 +433,14 @@ class DQN(rl_agent.AbstractAgent):
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-
+    rng, train_rng = jax.random.split(self._next_rng_key())
     if is_evaluation:
-      return self.select_action(time_step, True)
+      self._q_network.eval()
+      return self.select_action(time_step, rng, True)
     
+    self._q_network.train()
     # Act step: don't act at terminal info states or if its not our turn.
-    action, probs = self.select_action(time_step, False)
+    action, probs = self.select_action(time_step, train_rng, False)
 
     self._iteration += 1
 
@@ -391,12 +448,13 @@ class DQN(rl_agent.AbstractAgent):
       self._last_loss_value = self.learn()
 
     if self._iteration % self._update_target_network_every == 0:
-      target_params = optax.incremental_update(
-        nn.state(self._target_q_network, nn.Param), 
-        nn.state(self._q_network, nn.Param), 
-        self._tau
+
+      updated_state = jax.jit(optax.incremental_update)(
+        nn.state(self._q_network, nn.Param),    
+        nn.state(self._target_q_network, nn.Param),   
+        1-self._tau        
       )
-      nn.update(self._target_q_network, target_params)
+      nn.update(self._target_q_network, updated_state)
 
     if self._prev_timestep is not None and self._prev_action is not None:
       # We may omit record adding here if it's done elsewhere.
@@ -412,7 +470,12 @@ class DQN(rl_agent.AbstractAgent):
 
     return rl_agent.StepOutput(action=action, probs=probs)
   
-  def _add_transition(self, prev_time_step, prev_action, time_step):
+  def _add_transition(
+    self, 
+    prev_time_step: chex.ArrayTree | None, 
+    prev_action: chex.Array | None, 
+    time_step: chex.ArrayTree
+  ) -> None:
     """Adds the new transition using `time_step` to the replay buffer.
 
     Adds the transition from `self._prev_timestep` to `time_step` by
@@ -424,30 +487,38 @@ class DQN(rl_agent.AbstractAgent):
       time_step: current ts, an instance of rl_environment.TimeStep.
     """
     assert prev_time_step is not None
-    legal_actions = (time_step.observations["legal_actions"][self.player_id])
-    legal_actions_mask = np.zeros(self._num_actions)
-    legal_actions_mask[legal_actions] = 1.0
+    legal_actions = time_step.observations["legal_actions"][self.player_id]
     transition = Transition(
-        info_state=jnp.array(prev_time_step.observations["info_state"][self.player_id], dtype=jnp.float32),
-        action=jnp.array(prev_action, dtype=int),
-        reward=jnp.array(time_step.rewards[self.player_id], dtype=jnp.float32),
-        next_info_state=jnp.array(time_step.observations["info_state"][self.player_id], dtype=jnp.float32),
-        is_final_step=jnp.array(time_step.last(), dtype=jnp.bool),
-        legal_actions_mask=jnp.array(legal_actions_mask, dtype=jnp.bool)
-      )
+      info_state=jnp.asarray(prev_time_step.observations["info_state"][self.player_id], dtype=jnp.float32),
+      action=jnp.asarray(prev_action, dtype=int),
+      reward=jnp.asarray(time_step.rewards[self.player_id], dtype=jnp.float32),
+      next_info_state=jnp.asarray(time_step.observations["info_state"][self.player_id], dtype=jnp.float32),
+      is_final_step=jnp.asarray(time_step.last(), dtype=jnp.bool),
+      legal_actions_mask=jax.nn.one_hot(legal_actions, self._num_actions, dtype=jnp.bool).sum(0).astype(jnp.bool)
+    )
+    
     if self._replay_buffer is None:
-      self._replay_buffer = self._replay_buffer_class.init_buffer(
-        self._replay_buffer_capacity, transition)
+      self._replay_buffer = self._replay_buffer_class.init(
+        self._replay_buffer_capacity, transition
+      )
       
-    self._replay_buffer = self._replay_buffer_class.append_to_buffer(self._replay_buffer, transition)
-
+    self._replay_buffer = self._replay_buffer_class.append(
+      self._replay_buffer, transition)
 
   def _next_rng_key(self) -> chex.PRNGKey:
     """Get the next rng subkey from class rngkey."""
     self._rngkey, subkey = jax.random.split(self._rngkey)
     return subkey
 
-  def _act_epsilon_greedy(self, info_state, legal_actions, epsilon):
+  @partial(jax.jit, static_argnums=(0,))
+  def _act(
+    self, 
+    network_state: nn.State,
+    info_state: chex.Array, 
+    legal_actions: chex.Array, 
+    rng: chex.PRNGKey,
+    epsilon: float
+  ) -> tuple[chex.Array, chex.Array]:
     """Returns a valid epsilon-greedy action and valid action probs.
 
     Action probabilities are given by a softmax over legal q-values.
@@ -460,25 +531,36 @@ class DQN(rl_agent.AbstractAgent):
     Returns:
       A valid epsilon-greedy action and valid action probabilities.
     """
-    probs = np.zeros(self._num_actions)
-    legal_one_hot = np.zeros(self._num_actions)
-    legal_one_hot[legal_actions] = 1
-    if jax.random.uniform(self._next_rng_key()) < epsilon:
-      action = jax.random.choice(self._next_rng_key(), jnp.array(legal_actions))
-      probs[legal_actions] = 1.0 / len(legal_actions)
-    else:
-      info_state = jnp.array(info_state).reshape(1, -1)
-      q_values = nn.jit(self._q_network)(info_state)
-      legal_actions_mask = np.zeros(self._num_actions)
-      legal_actions_mask[legal_actions] = 1.0
-      legal_q_values = np.where(legal_actions_mask, q_values, ILLEGAL_ACTION_LOGITS_PENALTY)
-      action = np.argmax(legal_q_values)
-      probs[action] = 1.0
 
-    probs /= probs.sum()
-    return action, probs
+    choose_rng, act_rng = jax.random.split(rng)
+    def _act_randomly(network_state, info_state, rng, legal_actions):
+      probs = legal_actions/legal_actions.sum()
+      action = jax.random.choice(
+        rng,
+        jnp.arange(self._num_actions), 
+        p=probs
+      )
+      return action, probs
 
-  def learn(self):
+    def _act_greedy(network_state, info_state, rng, legal_actions):
+      q_values = self._jit_inference(network_state, info_state)
+      
+      legal_q_values = jnp.where(
+        legal_actions, 
+        q_values, 
+        jnp.full_like(q_values, ILLEGAL_ACTION_LOGITS_PENALTY)
+      )
+      action = legal_q_values.argmax()
+      probs = jax.nn.one_hot(action, self._num_actions)
+      return action, probs
+    
+    return jax.lax.cond(
+      jax.random.uniform(choose_rng) < epsilon,
+      _act_randomly, _act_greedy,
+      network_state, info_state, act_rng, legal_actions
+    )
+  
+  def learn(self) -> float:
     """Compute the loss on sampled transitions and perform a Q-network update.
 
     If there are not enough elements in the buffer, no loss is computed and
@@ -487,40 +569,73 @@ class DQN(rl_agent.AbstractAgent):
     Returns:
       The average loss obtained on this batch of transitions or `None`.
     """
-
-    if (len(self._replay_buffer) < self._batch_size or
-        len(self._replay_buffer) < self._min_buffer_size_to_learn):
+    if (
+      len(self._replay_buffer) < self._batch_size
+      or len(self._replay_buffer) < self._min_buffer_size_to_learn
+    ):
       return None
     
-    chex.assert_equal(self._batch_size < len(self._replay_buffer), True)
     transitions = self._replay_buffer_class.sample(
-      self._next_rng_key(), self._replay_buffer, self._batch_size, len(self._replay_buffer))
+    self._next_rng_key(), self._replay_buffer, self._batch_size)
 
-    loss_val = self._jit_update(
-        self._q_network, self._target_q_network, self._optimizer, transitions)
+    q_network_state = nn.state((self._q_network, self._optimizer))
+    target_q_network_state = nn.state(self._target_q_network)
+
+    loss_val, new_state = self._jit_update(q_network_state, target_q_network_state, transitions)
+    nn.update((self._q_network, self._optimizer), new_state)
 
     return loss_val
 
   @property
-  def q_values(self):
+  def q_values(self) -> chex.Array | None:
     return self._q_values
 
   @property
-  def replay_buffer(self):
+  def replay_buffer(self) -> Any:
     return self._replay_buffer
 
   @property
-  def loss(self):
+  def loss(self) -> float | None:
     return self._last_loss_value
 
   @property
-  def prev_timestep(self):
+  def prev_timestep(self) -> chex.Array | None:
     return self._prev_timestep
 
   @property
-  def prev_action(self):
+  def prev_action(self) -> int | None:
     return self._prev_action
 
   @property
-  def step_counter(self):
+  def step_counter(self) -> int:
     return self._iteration
+  
+  def save(self, checkpoint_dir: epath.Path, save_optimiser: bool=True) -> None:
+    """Saves the RL agent's q-network.
+
+    Args:
+      checkpoint_dir (epath.Path): directory from which checkpoints will be restored.
+      save_optimiser (bool, optional): whether save only the optimiser (if it's been saved) 
+        or just the network's weights. Defaults to True.
+    """
+    if save_optimiser:
+      self._checkpointer.save(checkpoint_dir / 'optimiser', nn.state((self._q_network, self._optimizer)))
+    else:
+      self._checkpointer.save(checkpoint_dir / 'state', nn.state(self._q_network))
+
+  def load(self, checkpoint_dir, load_optimiser: bool=True) -> None:
+    """Restores the RL agent's q-network.
+
+    Args:
+      checkpoint_dir (epath.Path): directory from which checkpoints will be restored.
+      load_optimiser (bool, optional): whether load only the optimiser (if it's been saved) 
+        or just the network's weights. Defaults to True.
+    """
+    if load_optimiser:
+      state_restored = self._checkpointer.restore(checkpoint_dir / 'optimiser', nn.state((self._q_network, self._optimizer)))
+      nn.update((self._q_network, self._optimizer), state_restored)
+    
+    else:
+      state_restored = self._checkpointer.restore(checkpoint_dir / 'state', nn.state(self._q_network))
+      nn.update(self._q_network, state_restored)
+

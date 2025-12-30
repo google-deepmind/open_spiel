@@ -21,7 +21,7 @@ from absl import logging
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.jax import nfsp
+from open_spiel.python.jax import nfsp_refactor as nfsp
 
 FLAGS = flags.FLAGS
 

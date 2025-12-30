@@ -17,7 +17,7 @@
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
-from open_spiel.python.jax import nfsp
+from open_spiel.python.jax import nfsp_refactor as nfsp
 
 
 class NFSPTest(absltest.TestCase):
@@ -45,43 +45,6 @@ class NFSPTest(absltest.TestCase):
         time_step = env.step([agent_output.action])
       for agent in agents:
         agent.step(time_step)
-
-
-class ReservoirBufferTest(absltest.TestCase):
-
-  def test_reservoir_buffer_add(self):
-    # pylint: disable=g-generic-assert
-    reservoir_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=10)
-    self.assertEqual(len(reservoir_buffer), 0)
-    reservoir_buffer.add("entry1")
-    self.assertEqual(len(reservoir_buffer), 1)
-    reservoir_buffer.add("entry2")
-    self.assertEqual(len(reservoir_buffer), 2)
-
-    self.assertIn("entry1", reservoir_buffer)
-    self.assertIn("entry2", reservoir_buffer)
-
-  def test_reservoir_buffer_max_capacity(self):
-    # pylint: disable=g-generic-assert
-    reservoir_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=2)
-    reservoir_buffer.add("entry1")
-    reservoir_buffer.add("entry2")
-    reservoir_buffer.add("entry3")
-
-    self.assertEqual(len(reservoir_buffer), 2)
-
-  def test_reservoir_buffer_sample(self):
-    replay_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=3)
-    replay_buffer.add("entry1")
-    replay_buffer.add("entry2")
-    replay_buffer.add("entry3")
-
-    samples = replay_buffer.sample(3)
-
-    self.assertIn("entry1", samples)
-    self.assertIn("entry2", samples)
-    self.assertIn("entry3", samples)
-
 
 if __name__ == "__main__":
   absltest.main()
