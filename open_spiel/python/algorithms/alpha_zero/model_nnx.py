@@ -82,8 +82,16 @@ class MLPBlock(nn.Module):
     return y
   
 class ConvBlock(nn.Module):
-  
-  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0) -> None:
+  """Convolutional block with SAME padding + BatchNorm + Activation
+  """
+  def __init__(
+    self, 
+    in_features: int, 
+    out_features: int, 
+    kernel_size: tuple[int, int], 
+    activation: str, 
+    seed: int = 0
+  ) -> None:
 
     self.conv = nn.Conv(in_features, out_features, kernel_size=kernel_size, padding="SAME", rngs=nn.Rngs(seed))
     self.activation = Activation(activation) 
@@ -103,10 +111,18 @@ class ConvBlock(nn.Module):
     return y
 
 class ResidualBlock(nn.Module):
-  def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0) -> None:
+  def __init__(
+    self, 
+    in_features: int, 
+    out_features: int, 
+    kernel_size: tuple[int, int], 
+    activation: str, 
+    seed: int = 0
+  ) -> None:
 
     self.conv1 = ConvBlock(in_features, out_features, kernel_size, activation, seed) 
-    self.conv2 = ConvBlock(out_features, out_features, kernel_size, None, seed) #activation's applied separately
+    # activation's applied separately
+    self.conv2 = ConvBlock(out_features, out_features, kernel_size, None, seed) 
     self.activation = Activation(activation)
 
   def output_shape(self, x: chex.Array) -> tuple[int, int, int]:
@@ -126,7 +142,7 @@ class PolicyHead(nn.Module):
 
   def __init__(
       self, 
-      input_shape: tuple[int, ...], 
+      input_shape: chex.Shape, 
       nn_width: int,
       out_features: int, 
       model_type: str, 
@@ -156,7 +172,7 @@ class ValueHead(nn.Module):
   """Value network"""
   def __init__(
       self, 
-      input_shape: tuple[int, ...], 
+      input_shape: chex.Shape, 
       nn_width: str, 
       model_type: str, 
       activation: str, 
@@ -218,7 +234,7 @@ class AlphaZeroModel(nn.Module):
   def __init__(
     self,
     model_type: str,
-    input_shape: tuple[int, ...],
+    input_shape: chex.Shape,
     output_size: int,
     nn_width: int,
     nn_depth: int,
@@ -228,7 +244,7 @@ class AlphaZeroModel(nn.Module):
     """
     Args:
         model_type (str): underlying model type: conv2d, mlp, or resnet
-        input_shape (tuple[int, ...]): input spec
+        input_shape (chex.Shape): input spec
         output_size (int): action space spec
         nn_width (int): hidden layers dimensionality
         nn_depth (int): number of hidden layers
@@ -324,12 +340,14 @@ class Model:
     learning_rate: float, 
     path: str, 
     seed: int = 0,
-    decouple_weight_decay: bool = True
+    decouple_weight_decay: bool = False
   ) -> "Model":
     
     if model_type not in cls.valid_model_types:
-      raise ValueError(f"Invalid model type: {model_type}, "
-                       f"expected one of: {cls.valid_model_types}")
+      raise ValueError(
+        f"Invalid model type: {model_type}, "
+        f"expected one of: {cls.valid_model_types}"
+      )
     
     if isinstance(input_shape, int):
       input_shape = (input_shape,)
@@ -357,10 +375,7 @@ class Model:
     params = nn.state(model, nn.Param)
     mask = jax.tree.map_with_path(mask_fn, params)
 
-    weights_no_bias_filter = nn.All(
-      nn.Param,
-      mask_fn
-    )
+    weights_no_bias_filter = nn.All(nn.Param, mask_fn)
 
     if not decouple_weight_decay:
       optimiser = optax.adam(learning_rate=learning_rate)
@@ -463,7 +478,8 @@ class Model:
   
   def update(self, batch: Sequence[TrainInput] | chex.ArrayTree) -> Losses:
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
-      self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
+      self._state, batch.observation, batch.legals_mask, batch.policy, batch.value
+    )
     
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
@@ -478,4 +494,6 @@ class Model:
   def load_checkpoint(self, step: int) -> None:
     # model = nn.eval_shape(lambda: self._model)
     if self._checkpointer:
-      self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), self._state)    
+      self._state = self._checkpointer.restore(
+        os.path.join(self._path, f"checkpoint-{step}"), self._state
+      )    

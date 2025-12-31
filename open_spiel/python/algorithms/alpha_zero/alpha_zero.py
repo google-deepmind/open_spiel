@@ -42,7 +42,6 @@ import time
 import traceback
 
 import numpy as np
-import jax
 
 import multiprocessing
 from open_spiel.python.algorithms import mcts
@@ -104,6 +103,7 @@ class Config:
   path: str
   learning_rate: float
   weight_decay: float
+  decouple_weight_decay: bool
   train_batch_size: int
   replay_buffer_size: int
   replay_buffer_reuse: bool
@@ -142,7 +142,8 @@ def _init_model_from_config(config: Config):
     config.nn_depth,
     config.weight_decay,
     config.learning_rate,
-    config.path
+    config.path,
+    decouple_weight_decay=config.decouple_weight_decay
   )
 
 
@@ -275,7 +276,7 @@ def actor(*, config: Config, game, logger, queue):
     _init_bot(config, game, az_evaluator, False),
     _init_bot(config, game, az_evaluator, False),
   ]
-  for game_num in itertools.count():
+  for game_num in itertools.count(1):
     if not update_checkpoint(logger, queue, model, az_evaluator):
       return
     queue.put(_play_game(logger, game_num, game, bots, config.temperature,
@@ -381,7 +382,9 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
       game_lengths.add(len(trajectory.states))
       game_lengths_hist.add(len(trajectory.states))
 
-      game_outcome = trajectory.returns[0]
+      # we learn from perspective of only the first player,
+      # rather than rotating 
+      game_outcome = trajectory.returns[0] 
       if game_outcome > 0:
         outcomes.add(0)
       elif game_outcome < 0:

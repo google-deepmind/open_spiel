@@ -22,7 +22,6 @@ ml_dtypes==0.5.3
 msgpack==1.1.2
 nest-asyncio==1.6.0
 numpy==2.3.3
--e git+ssh://git@github.com/harmanagrawal/open_spiel.git@b058354c7e5528806093f731de9883eab99ad763#egg=open_spiel
 opt_einsum==3.4.0
 optax==0.2.6
 orbax-checkpoint==0.11.25

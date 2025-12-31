@@ -85,8 +85,7 @@ class ResidualBlock(nn.Module):
     residual = x
     y = ConvBlock(self.filters, self.kernel_size, self.activation)(x, training)
     y = ConvBlock(self.filters, self.kernel_size, None)(y, training)
-    y = y + residual
-    y = Activation(self.activation)(y)
+    y = Activation(self.activation)(y + residual)
     return y
 
 
@@ -169,22 +168,28 @@ class AlphaZeroModel(nn.Module):
     x = observations
     if self.model_type == "mlp":
       x = flatten(observations)
-      for layer in range(self.nn_depth):
-        x = MLPBlock(features=self.nn_width, activation=self.activation, name=f"MLPTorso_{layer}")(x)
+      for _ in range(self.nn_depth):
+        x = MLPBlock(
+          features=self.nn_width, activation=self.activation)(x)
     elif self.model_type == "conv2d":
       x = observations.reshape(self.input_shape)
-      for layer in range(self.nn_depth):
-        x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation, name=f"ConvTorso_{layer}")(x, training)
+      for _ in range(self.nn_depth):
+        x = ConvBlock(
+          features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
     elif self.model_type == "resnet":
       x = observations.reshape(self.input_shape)
-      x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation, name="ResnetConv")(x, training)
-      for layer in range(self.nn_depth):
-        x = ResidualBlock(filters=self.nn_width, kernel_size=(3, 3), activation=self.activation, name=f"ResnetTorso_{layer}")(x, training)
+      x = ConvBlock(
+        features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
+      for _ in range(self.nn_depth):
+        x = ResidualBlock(
+          filters=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
     
-    policy_logits = PolicyHead(model_type=self.model_type, nn_width=self.nn_width, output_size=self.output_size)(x, training)
-    value_out = ValueHead(model_type=self.model_type, nn_width=self.nn_width)(x, training)
+    policy_logits = PolicyHead(
+      model_type=self.model_type, nn_width=self.nn_width, output_size=self.output_size)(x, training)
+    value_out = ValueHead(
+      model_type=self.model_type, nn_width=self.nn_width)(x, training)
     
     return policy_logits, value_out.squeeze(-1)
 
@@ -244,8 +249,10 @@ class Model:
   ) -> "Model":
     
     if model_type not in cls.valid_model_types:
-      raise ValueError(f"Invalid model type: {model_type}, "
-                       f"expected one of: {cls.valid_model_types}")
+      raise ValueError(
+        f"Invalid model type: {model_type}, "
+        f"expected one of: {cls.valid_model_types}"
+      )
     
     if isinstance(input_shape, int):
       input_shape = (input_shape,)
@@ -264,14 +271,11 @@ class Model:
     )
     
     def mask_only_biases(params):
-
       flat_params = flatten_dict(params)
-      
       flat_mask = {
         path: not ((path[-1] == 'bias') or ('BatchNorm_0' in path)) 
         for path in flat_params.keys()
       }
-
       return unflatten_dict(flat_mask)
 
     rng = jax.random.PRNGKey(seed)
@@ -301,8 +305,8 @@ class Model:
             jnp.full_like(policy_logits, jnp.finfo(jnp.float32).min)
           )
           policy_loss =  optax.softmax_cross_entropy(policy_logits, policy_targets)
-
           value_loss = optax.l2_loss(value_preds, value_targets)
+
           return (policy_loss, value_loss), new_model_state["batch_stats"]
 
         (policy_loss, value_loss), new_model_state = _per_example_loss(
@@ -312,8 +316,8 @@ class Model:
         value_loss = value_loss.mean()
 
         l2_reg_loss = optax.tree_utils.tree_l2_norm(
-          jax.tree.map(lambda p, m: p * m, params, mask_only_biases(params)), squared=True
-        ) * weight_decay
+          jax.tree.map(lambda p, m: p * m, params, mask_only_biases(params)), 
+          squared=True) * weight_decay
         
         total_loss = policy_loss + value_loss
         if not decouple_weight_decay:

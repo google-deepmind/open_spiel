@@ -26,9 +26,42 @@ flags.DEFINE_enum("nn_api", "linen", ["linen", "nnx"],
                   "What type of flax api should be used for training?.\
                   Currently, linen and nnx are supported")
 
-# flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
-# flags.DEFINE_float("uct_c", 1., "UCT's exploration constant.")
-# flags.DEFINE_integer("max_simulations", 20, "How many simulations to run.")
+## TIC-TAC-TOE CONFIG
+
+flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
+flags.DEFINE_float("uct_c", 1.41, "UCT's exploration constant.")
+flags.DEFINE_integer("max_simulations", 40, "How many simulations to run.")
+flags.DEFINE_integer("train_batch_size", 2 ** 7, "Batch size for learning.")
+flags.DEFINE_integer("replay_buffer_size", 2 ** 13,
+                     "How many states to store in the replay buffer.")
+flags.DEFINE_integer("replay_buffer_reuse", 4,
+                     "How many times to learn from each state.")
+flags.DEFINE_float("learning_rate", 1e-3, "Learning rate.")
+flags.DEFINE_float("weight_decay", 1e-4, "L2 regularization strength.")
+flags.DEFINE_bool("decouple_weight_decay", False,
+                  "Whether to use explicit regulariser or decouple the weights when update")
+flags.DEFINE_float("policy_epsilon", 0.25, "What noise epsilon to use.")
+flags.DEFINE_float("policy_alpha", 1.0, "What dirichlet noise alpha to use.")
+flags.DEFINE_float("temperature", 1,
+                   "Temperature for final move selection.")
+flags.DEFINE_integer("temperature_drop", 2,  # Less than AZ due to short games.
+                     "Drop the temperature to 0 after this many moves.")
+flags.DEFINE_enum("nn_model", "resnet", api_selector(AVIALABLE_APIS[0]).Model.valid_model_types,
+                  "What type of model should be used?.")
+flags.DEFINE_integer("nn_width", 2 ** 8, "How wide should the network be.")
+flags.DEFINE_integer("nn_depth", 2, "How deep should the network be.")
+flags.DEFINE_string("path", None, "Where to save checkpoints.")
+flags.DEFINE_integer("checkpoint_freq", 25, "Save a checkpoint every N steps.")
+flags.DEFINE_integer("actors", 2, "How many actors to run.")
+flags.DEFINE_integer("evaluators", 2, "How many evaluators to run.")
+flags.DEFINE_integer("evaluation_window", 50,
+                     "How many games to average results over.")
+
+## CONNECT FOUR CONFIG
+
+# flags.DEFINE_string("game", "connect_four", "Name of the game.")
+# flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
+# flags.DEFINE_integer("max_simulations", 100, "How many simulations to run.")
 # flags.DEFINE_integer("train_batch_size", 2 ** 7, "Batch size for learning.")
 # flags.DEFINE_integer("replay_buffer_size", 2 ** 14,
 #                      "How many states to store in the replay buffer.")
@@ -37,55 +70,28 @@ flags.DEFINE_enum("nn_api", "linen", ["linen", "nnx"],
 # flags.DEFINE_float("learning_rate", 1e-3, "Learning rate.")
 # flags.DEFINE_float("weight_decay", 1e-4, "L2 regularization strength.")
 # flags.DEFINE_float("policy_epsilon", 0.25, "What noise epsilon to use.")
-# flags.DEFINE_float("policy_alpha", 1.0, "What dirichlet noise alpha to use.")
+# flags.DEFINE_float("policy_alpha", 1, "What dirichlet noise alpha to use.")
 # flags.DEFINE_float("temperature", 1,
 #                    "Temperature for final move selection.")
-# flags.DEFINE_integer("temperature_drop", 3,  # Less than AZ due to short games.
+# flags.DEFINE_integer("temperature_drop", 10,  # Less than AZ due to short games.
 #                      "Drop the temperature to 0 after this many moves.")
 # flags.DEFINE_enum("nn_model", "resnet", api_selector(AVIALABLE_APIS[0]).Model.valid_model_types,
 #                   "What type of model should be used?.")
 # flags.DEFINE_integer("nn_width", 2 ** 7, "How wide should the network be.")
-# flags.DEFINE_integer("nn_depth", 2, "How deep should the network be.")
+# flags.DEFINE_integer("nn_depth", 5, "How deep should the network be.")
 # flags.DEFINE_string("path", None, "Where to save checkpoints.")
 # flags.DEFINE_integer("checkpoint_freq", 25, "Save a checkpoint every N steps.")
 # flags.DEFINE_integer("actors", 2, "How many actors to run.")
-# flags.DEFINE_integer("evaluators", 2, "How many evaluators to run.")
-# flags.DEFINE_integer("evaluation_window", 50,
+# flags.DEFINE_integer("evaluators", 1, "How many evaluators to run.")
+# flags.DEFINE_integer("evaluation_window", 100,
 #                      "How many games to average results over.")
-
-flags.DEFINE_string("game", "connect_four", "Name of the game.")
-flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
-flags.DEFINE_integer("max_simulations", 100, "How many simulations to run.")
-flags.DEFINE_integer("train_batch_size", 2 ** 7, "Batch size for learning.")
-flags.DEFINE_integer("replay_buffer_size", 2 ** 14,
-                     "How many states to store in the replay buffer.")
-flags.DEFINE_integer("replay_buffer_reuse", 4,
-                     "How many times to learn from each state.")
-flags.DEFINE_float("learning_rate", 1e-3, "Learning rate.")
-flags.DEFINE_float("weight_decay", 1e-4, "L2 regularization strength.")
-flags.DEFINE_float("policy_epsilon", 0.25, "What noise epsilon to use.")
-flags.DEFINE_float("policy_alpha", 1, "What dirichlet noise alpha to use.")
-flags.DEFINE_float("temperature", 1,
-                   "Temperature for final move selection.")
-flags.DEFINE_integer("temperature_drop", 10,  # Less than AZ due to short games.
-                     "Drop the temperature to 0 after this many moves.")
-flags.DEFINE_enum("nn_model", "resnet", api_selector(AVIALABLE_APIS[0]).Model.valid_model_types,
-                  "What type of model should be used?.")
-flags.DEFINE_integer("nn_width", 2 ** 7, "How wide should the network be.")
-flags.DEFINE_integer("nn_depth", 5, "How deep should the network be.")
-flags.DEFINE_string("path", None, "Where to save checkpoints.")
-flags.DEFINE_integer("checkpoint_freq", 25, "Save a checkpoint every N steps.")
-flags.DEFINE_integer("actors", 2, "How many actors to run.")
-flags.DEFINE_integer("evaluators", 1, "How many evaluators to run.")
-flags.DEFINE_integer("evaluation_window", 100,
-                     "How many games to average results over.")
 
 flags.DEFINE_integer(
     "eval_levels", 7,
     ("Play evaluation games vs MCTS+Solver, with max_simulations*10^(n/2)"
      " simulations for n in range(eval_levels). Default of 7 means "
      "running mcts with up to 1000 times more simulations."))
-flags.DEFINE_integer("max_steps", 50, "How many learn steps before exiting.")
+flags.DEFINE_integer("max_steps", 26, "How many learn steps before exiting.")
 flags.DEFINE_bool("quiet", True, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
 
@@ -97,6 +103,7 @@ def main(unused_argv):
     path=FLAGS.path,
     learning_rate=FLAGS.learning_rate,
     weight_decay=FLAGS.weight_decay,
+    decouple_weight_decay=FLAGS.decouple_weight_decay,
     train_batch_size=FLAGS.train_batch_size,
     replay_buffer_size=FLAGS.replay_buffer_size,
     replay_buffer_reuse=FLAGS.replay_buffer_reuse,

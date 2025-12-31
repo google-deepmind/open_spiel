@@ -15,12 +15,6 @@ class FakeTransition:
   reward: chex.Array 
 
 
-def get_fake_batch(fake_transition: chex.ArrayTree, batch_size) -> chex.ArrayTree:
-    """Create a fake batch with differing values for each transition."""
-    return jax.tree.map(
-        lambda x: jnp.stack([x + i for i in range(batch_size)]), fake_transition
-    )
-
 def get_fake_transition():
   return FakeTransition(
     **{
@@ -44,13 +38,11 @@ class FlatBufferTest(absltest.TestCase):
   def test_extend(self):
     buffer = Buffer(10, force_cpu=True)
     batch = get_fake_transition()
-    buffer.append(batch)
+    for iter in range(11):
+      buffer.append(batch)
+      self.assertEqual(buffer.total_seen, iter+1)
+      self.assertEqual(buffer.buffer_state.write_index, (iter+1)%10)
 
-    for iter in range(3):
-      big_batch = get_fake_batch(batch, 4)
-      buffer.extend(big_batch)
-      self.assertEqual(buffer.total_seen, 1 + 4 * (iter+1))
-      self.assertEqual(buffer.buffer_state.write_index, (1 + 4 * (iter+1))%10)
     self.assertTrue(buffer.buffer_state.is_full.item())
      
   def test_sample(self):

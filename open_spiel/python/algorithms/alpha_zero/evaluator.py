@@ -14,12 +14,12 @@
 
 """An MCTS Evaluator for an AlphaZero model."""
 
+import jax
 import numpy as np
 
 from open_spiel.python.algorithms import mcts
 import pyspiel
 from open_spiel.python.utils import lru_cache
-import jax
 
 
 class AlphaZeroEvaluator(mcts.Evaluator):
