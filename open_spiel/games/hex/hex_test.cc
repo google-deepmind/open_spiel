@@ -14,6 +14,8 @@
 
 #include <iostream>
 #include <memory>
+#include <algorithm>
+#include <vector>
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
@@ -44,6 +46,27 @@ void TestBoardOrientation() {
   SPIEL_CHECK_EQ(state->PlayerReturn(1), -1.0);
 }
 
+void TestSwapRule() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "hex", {{"board_size", GameParameter(3)}, {"swap", GameParameter(true)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(1);  // P0 plays 1=(0,1)
+  state->ApplyAction(3 * 3);  // P1 swaps.
+
+  // After swap, P0's piece at (0,1) should be gone, and P1 should have a piece
+  // at (1,0) (action 3), and it is P0's turn.
+  // We check this by checking legal actions.
+  // Action 1 should be legal, action 3 should not.
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_TRUE(
+      std::find(legal_actions.begin(), legal_actions.end(), 1) !=
+      legal_actions.end());
+  SPIEL_CHECK_TRUE(
+      std::find(legal_actions.begin(), legal_actions.end(), 3) ==
+      legal_actions.end());
+}
+
+
 void BasicHexTests() {
   testing::LoadGameTest("hex(num_cols=5,num_rows=5)");
   testing::NoChanceOutcomesTest(*LoadGame("hex(num_cols=5,num_rows=5)"));
@@ -51,6 +74,7 @@ void BasicHexTests() {
   testing::RandomSimTest(*LoadGame("hex"), 5);
   testing::RandomSimTest(*LoadGame("hex(num_cols=2,num_rows=3)"), 10);
   testing::RandomSimTest(*LoadGame("hex(num_cols=2,num_rows=2)"), 10);
+  testing::RandomSimTest(*LoadGame("hex(swap=true)"), 10);
 }
 
 }  // namespace
@@ -60,4 +84,5 @@ void BasicHexTests() {
 int main(int argc, char** argv) {
   open_spiel::hex::BasicHexTests();
   open_spiel::hex::TestBoardOrientation();
+  open_spiel::hex::TestSwapRule();
 }

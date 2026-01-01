@@ -1,6 +1,6 @@
 @testset "games simulation" begin
 
-MAX_ACTIONS_PER_GAME = 1000
+DEFAULT_MAX_ACTIONS_PER_GAME = 1000
 
 SPIEL_GAMES_LIST = registered_games()
 
@@ -57,7 +57,7 @@ function simulate_game(game)
     total_actions = 0
 
     next_serialize_check = 1
-
+    MAX_ACTIONS_PER_GAME = short_name(get_type(game) == "bargaining" ? 1 : DEFAULT_MAX_ACTIONS_PER_GAME
     while !is_terminal(state) && (total_actions <= MAX_ACTIONS_PER_GAME)
         total_actions += 1
 

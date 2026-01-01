@@ -92,7 +92,10 @@ class BuildExt(build_ext):
         env=env)
 
     # Build only pyspiel (for pip package)
-    subprocess.check_call(["make", "pyspiel", f"-j{os.cpu_count()}"],
+    detected_jobs = os.cpu_count()
+    jobs = max(detected_jobs or 1, 1)
+    print(f"Building pyspiel with {jobs} parallel job(s)")
+    subprocess.check_call(["make", "pyspiel", f"-j{jobs}"],
                           cwd=self.build_temp,
                           env=env)
 
@@ -124,7 +127,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="1.6.9",
+    version="1.6.10",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",

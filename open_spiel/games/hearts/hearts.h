@@ -37,13 +37,23 @@
 // reward, returns are calculated by subtracting the in-game points from an
 // upper bound.
 
+#include <algorithm>
+#include <array>
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace hearts {
@@ -102,10 +112,56 @@ inline std::string CardString(int card) {
 inline std::map<int, std::string> pass_dir_str = {
     {0, "No Pass"}, {1, "Left"}, {2, "Across"}, {3, "Right"}};
 
+struct HeartsStructContents {
+  std::string phase;
+  std::string current_player;
+  std::string pass_direction;
+  std::vector<std::vector<std::string>> hands;
+  std::vector<std::vector<std::string>> passed_cards;
+  std::vector<std::vector<std::string>> received_cards;
+  std::vector<std::vector<std::pair<std::string, std::string>>> tricks;
+  std::vector<double> points;
+  bool hearts_broken;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(HeartsStructContents, phase, current_player,
+                                 pass_direction, hands, passed_cards,
+                                 received_cards, tricks, points,
+                                 hearts_broken);
+};
+
+struct HeartsStateStruct : StateStruct, HeartsStructContents {
+  HeartsStateStruct() = default;
+  explicit HeartsStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override { return *this; }
+};
+
+struct HeartsObservationStruct : ObservationStruct, HeartsStructContents {
+  HeartsObservationStruct() = default;
+  explicit HeartsObservationStruct(const std::string& json_str) {
+    nlohmann::json data = nlohmann::json::parse(json_str);
+    data.get_to(static_cast<HeartsStructContents&>(*this));
+    observing_player = data.value("observing_player", -1);
+  }
+  nlohmann::json to_json_base() const override {
+    nlohmann::json j = static_cast<const HeartsStructContents&>(*this);
+    j["observing_player"] = observing_player;
+    return j;
+  }
+  int observing_player = -1;
+};
+
 // State of a single trick.
 class Trick {
  public:
-  Trick() : Trick{kInvalidPlayer, 0, false} {}
+  Trick()
+      : jd_bonus_(false),
+        winning_rank_(-1),
+        points_(0),
+        led_suit_(Suit::kClubs),
+        leader_(kInvalidPlayer),
+        winning_player_(kInvalidPlayer) {}
   Trick(Player leader, int card, bool jd_bonus);
   void Play(Player player, int card);
   Suit LedSuit() const { return led_suit_; }
@@ -145,14 +201,20 @@ class HeartsState : public State {
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
+  std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const override;
 
   int Points(Player player) const { return points_[player]; }
+  bool HeartsBroken() const { return hearts_broken_; }
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
   enum class Phase { kPassDir, kDeal, kPass, kPlay, kGameOver };
+  inline static constexpr std::array<absl::string_view, 5> kPhaseString = {
+      "PassDir", "Deal", "Pass", "Play", "GameOver"};
 
   std::vector<Action> PassDirLegalActions() const;
   std::vector<Action> DealLegalActions() const;

@@ -15,14 +15,22 @@
 #include "open_spiel/games/hearts/hearts.h"
 
 #include <algorithm>
+#include <array>
 #include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -747,6 +755,76 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
   SPIEL_CHECK_EQ(InformationStateString(player_id),
                  clone->InformationStateString(player_id));
   return clone;
+}
+
+std::unique_ptr<StateStruct> HeartsState::ToStruct() const {
+  auto rv = std::make_unique<HeartsStateStruct>();
+  rv->phase = std::string(kPhaseString[static_cast<int>(phase_)]);
+  rv->current_player = DefaultPlayerString(CurrentPlayer());
+  rv->pass_direction = pass_dir_str.at(static_cast<int>(pass_dir_));
+  rv->points = points_;
+  rv->hearts_broken = hearts_broken_;
+
+  rv->hands.resize(kNumPlayers);
+  rv->passed_cards.resize(kNumPlayers);
+  rv->received_cards.resize(kNumPlayers);
+
+  for (int p = 0; p < kNumPlayers; ++p) {
+    for (int card = 0; card < kNumCards; ++card) {
+      if (holder_[card] == p) {
+        rv->hands[p].push_back(CardString(card));
+      }
+    }
+    absl::c_sort(rv->hands[p]);
+
+    for (int card : passed_cards_[p]) {
+      rv->passed_cards[p].push_back(CardString(card));
+    }
+    absl::c_sort(rv->passed_cards[p]);
+
+    if (pass_dir_ != PassDir::kNoPass) {
+      int passer =
+          (p + kNumPlayers - static_cast<int>(pass_dir_)) % kNumPlayers;
+      for (int card : passed_cards_[passer]) {
+        rv->received_cards[p].push_back(CardString(card));
+      }
+      absl::c_sort(rv->received_cards[p]);
+    }
+  }
+
+  for (int i = 0; i < kNumTricks; ++i) {
+    const auto& trick = tricks_[i];
+    if (trick.Leader() == kInvalidPlayer && trick.Cards().empty()) break;
+    std::vector<std::pair<std::string, std::string>> trick_vec;
+    Player player = trick.Leader();
+    for (int card : trick.Cards()) {
+      trick_vec.push_back({DirString(player), CardString(card)});
+      player = (player + 1) % kNumPlayers;
+    }
+    rv->tricks.push_back(trick_vec);
+  }
+
+  return rv;
+}
+
+std::unique_ptr<ObservationStruct> HeartsState::ToObservationStruct(
+    Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  auto obs_struct =
+      std::make_unique<HeartsObservationStruct>(this->ToJson());
+  obs_struct->observing_player = player;
+
+  for (int p = 0; p < kNumPlayers; ++p) {
+    if (p != player) {
+      std::fill(obs_struct->hands[p].begin(), obs_struct->hands[p].end(), "XX");
+      std::fill(obs_struct->passed_cards[p].begin(),
+                obs_struct->passed_cards[p].end(), "XX");
+      std::fill(obs_struct->received_cards[p].begin(),
+                obs_struct->received_cards[p].end(), "XX");
+    }
+  }
+  return obs_struct;
 }
 
 Trick::Trick(Player leader, int card, bool jd_bonus)

@@ -36,6 +36,33 @@ class EloTest(parameterized.TestCase):
     self.assertAlmostEqual(ratings_map["C"], ratings_map["A"])
     self.assertLess(ratings_map["B"], ratings_map["C"])
 
+    # Now run it as a voting method using the same profile, and ensure that the
+    # ratings are the same.
+    method = elo.EloVoting()
+    outcome = method.run_election(profile)
+    self.assertAlmostEqual(outcome.get_score("A"), ratings_map["A"])
+    self.assertAlmostEqual(outcome.get_score("B"), ratings_map["B"])
+    self.assertAlmostEqual(outcome.get_score("C"), ratings_map["C"])
+
+  def test_meeple_pentathlon_with_integer_alternatives(self):
+    alternatives = [0, 1, 2]
+    votes = [
+        base.WeightedVote(1, [0, 1, 2]),
+        base.WeightedVote(1, [0, 2, 1]),
+        base.WeightedVote(2, [2, 0, 1]),
+        base.WeightedVote(1, [1, 2, 0]),
+    ]
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    ratings_map = elo.compute_ratings_from_preference_profile(profile)
+    # Make sure alteratives with integer keys are in the ratings map.
+    for alt in alternatives:
+      self.assertIn(alt, ratings_map)
+    # Make sure alteratives with string keys are NOT in the ratings map.
+    for string_alt in [str(alt) for alt in alternatives]:
+      self.assertNotIn(string_alt, ratings_map)
+    self.assertAlmostEqual(ratings_map[2], ratings_map[0])
+    self.assertLess(ratings_map[1], ratings_map[2])
+
 
 if __name__ == "__main__":
   absltest.main()

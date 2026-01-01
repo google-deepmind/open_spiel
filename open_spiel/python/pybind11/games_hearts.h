@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_GO_H_
-#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_GO_H_
+#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_HEARTS_H_
+#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_HEARTS_H_
 
 #include "open_spiel/python/pybind11/pybind11.h"
 
 namespace open_spiel {
 
-void init_pyspiel_games_go(::pybind11::module &m);
+void init_pyspiel_games_hearts(::pybind11::module &m);
 
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_GO_H_
+#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_HEARTS_H_

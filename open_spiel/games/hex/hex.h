@@ -36,6 +36,7 @@
 //       "string_rep"    string  representation of the action and board strings
 //                               ("standard" (default) | "explicit"). See below
 //                               for details.
+//       "swap"          bool    whether to enable swap rule (default = false)
 
 namespace open_spiel {
 namespace hex {
@@ -48,6 +49,7 @@ inline constexpr int kMaxNeighbours =
 inline constexpr int kCellStates = 1 + 4 * kNumPlayers;
 inline constexpr int kMinValueCellState = -4;
 inline constexpr const char* kDefaultStringRep = "standard";
+inline constexpr bool kDefaultSwap = false;
 
 // State of a cell.
 // Describes if a cell is
@@ -82,7 +84,7 @@ enum class StringRep {
 class HexState : public State {
  public:
   HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows,
-           StringRep string_rep);
+           StringRep string_rep, bool swap);
 
   HexState(const HexState&) = default;
 
@@ -118,16 +120,19 @@ class HexState : public State {
   const int num_cols_;  // x
   const int num_rows_;  // y
   const enum StringRep string_rep_;
+  const bool swap_;
 };
 
 // Game object.
 class HexGame : public Game {
  public:
   explicit HexGame(const GameParameters& params);
-  int NumDistinctActions() const override { return num_cols_ * num_rows_; }
+  int NumDistinctActions() const override {
+    return num_cols_ * num_rows_ + (swap_ ? 1 : 0);
+  }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new HexState(shared_from_this(), num_cols_, num_rows_, string_rep_));
+    return std::unique_ptr<State>(new HexState(
+        shared_from_this(), num_cols_, num_rows_, string_rep_, swap_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -143,6 +148,7 @@ class HexGame : public Game {
   const int num_cols_;
   const int num_rows_;
   const enum StringRep string_rep_;
+  const bool swap_;
 };
 
 CellState PlayerToState(Player player);

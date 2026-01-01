@@ -820,78 +820,14 @@ class PokerkitWrapperState(pyspiel.State):
     return sorted(actions)
 
   def chance_outcomes(self):
-    """Returns the possible chance outcomes and their probabilities.
-
-    NOTE: Pokerkit has a known-issue of returning certain mucked cards in N>2
-    player games. As such, we additionally ourselves 'double check' to ensure
-    that there are no cards being incorrectly returned by pokerkit itself. And
-    in such cases either A. remove such offending cards, or B. raise an error
-    (respectively depending on whether it's this exact 'mucked card' known issue
-    vs something else).)
-
-    Raises:
-      RuntimeError: If `pokerkit.State.get_dealable_cards()` returns cards that
-        are determined to be non-dealable, even after resolving a known issue
-        with mucked cards.
-    """
+    """Returns the possible chance outcomes and their probabilities."""
     assert self.is_chance_node()
-    wrapped_state: pokerkit.State = self._wrapped_state
-    # pokerkit has a bug in get_dealable_cards() where it sometimes returns
-    # cards in N>2 player games that were already dealt to a different player if
-    # that player mucked. We want to filter those out here to avoid bugs
-    # in our code later when applying the action (at which point pokerkit will
-    # correctly raise an error sayign that the card is not recommened to be
-    # dealt).
-    # Flattened list of hole cards
-    flattened_hole_cards = []
-    for sublist in wrapped_state.hole_cards:
-      flattened_hole_cards.extend(sublist)
-    flattened_board_cards = []
-    for sublist in wrapped_state.board_cards:
-      flattened_board_cards.extend(sublist)
-    double_checked_used_cards = set(wrapped_state.deck) - set(
-        flattened_hole_cards
-        + flattened_board_cards
-        + wrapped_state.burn_cards
-        + wrapped_state.mucked_cards
-    )
-    pokerkit_computed_dealable_cards = set(wrapped_state.get_dealable_cards())
-    if pokerkit_computed_dealable_cards != double_checked_used_cards:
-      logging.warning(
-          "pokerkit.State.get_dealable_cards() did not return the same set of"
-          " cards as the set of used cards. %s != %s",
-          pokerkit_computed_dealable_cards,
-          double_checked_used_cards,
-      )
-    # Make sure that there's no bugs where *our* logic forgets to filter out
-    # cards vs pokerkit's logic
-    assert double_checked_used_cards.issubset(pokerkit_computed_dealable_cards)
-
-    for card in pokerkit_computed_dealable_cards - double_checked_used_cards:
-      if card in wrapped_state.mucked_cards:
-        logging.warning(
-            "Confirmed incorrectly-dealable card is an instance of known issue"
-            " in pokerkit (card %s is one of the mucked_card). ***REMOVING "
-            "CARD %s FROM THE RETURNED CARDS AS A WORKAROUD.****",
-            card,
-            card,
-        )
-        pokerkit_computed_dealable_cards.remove(card)
-    if pokerkit_computed_dealable_cards != double_checked_used_cards:
-      raise RuntimeError(
-          "pokerkit.State.get_dealable_cards() still contains cards that we "
-          " have determined should not be dealable - even after removing some "
-          " cards that were included due to known issues with pokerkit. This"
-          " means there are likely MORE problems in pokerkit that we have no"
-          " identified yet! Post-'surgery' get_dealable_cards() was"
-          f" {pokerkit_computed_dealable_cards}, but when double-checking"
-          " ourselves we determined the list should instead be"
-          f" {double_checked_used_cards}"
-      )
-
-    outcomes = sorted([
-        self.get_game().card_to_int[c] for c in pokerkit_computed_dealable_cards
-    ])
+    # WARNING: Calling the no-arg get_dealable_cards() can return mucked cards
+    # since it assumes the caller may be dealing an arbitrary number of cards!
+    # To get "safe" cards here we must actually pass in a `deal_count` integer.
+    deal_count = 1
+    dealable_cards = set(self._wrapped_state.get_dealable_cards(deal_count))
+    outcomes = sorted([self.get_game().card_to_int[c] for c in dealable_cards])
     p = 1.0 / len(outcomes)
     return [(o, p) for o in outcomes]
 
