@@ -287,7 +287,7 @@ std::string Move::ToSAN(const CrazyhouseBoard &board) const {
         // No piece type required.
         break;
       case PieceType::kEmpty:
-        std::cerr << "Move doesn't have a piece type" << std::endl;
+        std::cerr << "Move doesn't have a piece type" << move_text << std::endl;
     }
 
     // Now we generate all moves from this position, and see if our file and
@@ -1364,7 +1364,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
       (destination_piece.type != PieceType::kEmpty &&
        destination_piece.color != moving_piece.color);  // capture
   if (insanity_ > 0) {
-	  irreversible = false;
+	  irreversible = true;
   }
 
   if (irreversible) {
