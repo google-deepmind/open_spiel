@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_IMPL_COMMON_CRAZYHOUSE_COMMON_H_
-#define OPEN_SPIEL_GAMES_IMPL_COMMON_CRAZYHOUSE_COMMON_H_
+#ifndef OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_COMMON_H_
+#define OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_COMMON_H_
 
 #include <array>
 #include <cstdint>
 #include <random>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 
@@ -132,7 +134,7 @@ class ZobristTable {
   using Generator = std::mt19937_64;
   using NestedTable = ZobristTable<T, OtherDims...>;
 
-  ZobristTable(Generator::result_type seed) {
+  explicit ZobristTable(Generator::result_type seed) {
     Generator generator(seed);
     absl::uniform_int_distribution<Generator::result_type> dist;
     data_.reserve(InnerDim);
@@ -155,7 +157,7 @@ class ZobristTable<T, InnerDim> {
  public:
   using Generator = std::mt19937_64;
 
-  ZobristTable(Generator::result_type seed) : data_(InnerDim) {
+  explicit ZobristTable(Generator::result_type seed) : data_(InnerDim) {
     Generator generator(seed);
     absl::uniform_int_distribution<T> dist;
     for (auto& field : data_) {
@@ -176,4 +178,4 @@ inline std::ostream& operator<<(std::ostream& stream, const Square& sq) {
 }  // namespace crazyhouse_common
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_IMPL_COMMON_CRAZYHOUSE_COMMON_H_
+#endif  // OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_COMMON_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_IMPL_CRAZYHOUSE_CRAZYHOUSE_BOARD_H_
-#define OPEN_SPIEL_GAMES_IMPL_CRAZYHOUSE_CRAZYHOUSE_BOARD_H_
+#ifndef OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_BOARD_H_
+#define OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_BOARD_H_
 
 #include <array>
 #include <cstddef>
@@ -71,15 +71,15 @@ enum class PieceType : int8_t {
 };
 
 static inline constexpr std::array<PieceType, 10> kPieceTypes = {
-    {PieceType::kKing, PieceType::kQueen, PieceType::kRook, PieceType::kBishop,
-     PieceType::kKnight, PieceType::kPawn, PieceType::kQueenP, PieceType::kRookP,
-	 PieceType::kKnightP}};
+{PieceType::kKing, PieceType::kQueen, PieceType::kRook, PieceType::kBishop,
+PieceType::kKnight, PieceType::kPawn, PieceType::kQueenP, PieceType::kRookP,
+PieceType::kKnightP}};
 
 
 // In case all the pieces are represented in the same plane, these values are
 // used to represent each piece type.
 static inline constexpr std::array<float, 6> kPieceRepresentation = {
-    {1, 0.8, 0.6, 0.4, 0.2, 0.1}};
+{1, 0.8, 0.6, 0.4, 0.2, 0.1}};
 
 // Tries to parse piece type from char ('K', 'Q', 'R', 'B', 'N', 'P').
 // Case-insensitive.
@@ -104,7 +104,7 @@ struct Piece {
 };
 
 static inline constexpr Piece kEmptyPiece =
-    Piece{Color::kEmpty, PieceType::kEmpty};
+Piece{Color::kEmpty, PieceType::kEmpty};
 
 inline std::ostream& operator<<(std::ostream& stream, const Piece& p) {
   return stream << p.ToString();
@@ -132,12 +132,12 @@ inline std::string FileToString(int8_t file) {
 
 // Offsets for all possible knight moves.
 inline constexpr std::array<Offset, 8> kKnightOffsets = {
-    {{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {2, -1}, {2, 1}, {1, -2}, {1, 2}}};
+{{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {2, -1}, {2, 1}, {1, -2}, {1, 2}}};
 
 absl::optional<Square> SquareFromString(const std::string& s);
 
-bool IsLongDiagonal(const crazyhouse::Square& from_sq, const crazyhouse::Square& to_sq,
-                    int board_size);
+bool IsLongDiagonal(const crazyhouse::Square& from_sq,
+    const crazyhouse::Square& to_sq, int board_size);
 
 // Forward declare CrazyhouseBoard here because it's needed in Move::ToSAN.
 class CrazyhouseBoard;
@@ -236,7 +236,7 @@ inline constexpr int kMaxBoardSize = 8;
 inline constexpr int kDefaultBoardSize = 8;
 inline constexpr int k2dMaxBoardSize = kMaxBoardSize * kMaxBoardSize;
 inline const std::string kDefaultStandardFEN =
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 using ObservationTable = std::array<bool, k2dMaxBoardSize>;
@@ -256,13 +256,13 @@ enum PseudoLegalMoveSettings {
 
 // Some chess variants (RBC) allow a "pass" action/move
 inline constexpr open_spiel::Action kPassAction = 0;
+// The linter won't let me have a line-continuation indent
 inline const crazyhouse::Move kPassMove =
-    Move(Square{-1, -1}, Square{-1, -1},
-         Piece{Color::kEmpty, PieceType::kEmpty});
+Move(Square{-1, -1}, Square{-1, -1},
+Piece{Color::kEmpty, PieceType::kEmpty});
 
 class Pocket {
  public:
-
   // Iteration support
   static constexpr std::array<PieceType, 5> PieceTypes() {
     return {
@@ -289,7 +289,6 @@ class Pocket {
   static constexpr std::size_t kNumPocketPieces = 5;
   // Internal storage: Pawn, Knight, Bishop, Rook, Queen
   std::array<int, kNumPocketPieces> counts_{};
-
 };
 
 class CrazyhouseBoard {
@@ -297,10 +296,9 @@ class CrazyhouseBoard {
   CrazyhouseBoard(int board_size = kDefaultBoardSize,
              bool king_in_check_allowed = false,
              bool allow_pass_move = false,
-			 int insanity = 1,
-			 bool sticky_promotions = false,
-			 bool tsume = false
-	  );
+             int insanity = 1,
+             bool sticky_promotions = false,
+             bool king_of_hill = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
@@ -308,9 +306,9 @@ class CrazyhouseBoard {
       const std::string& fen, int board_size = 8,
       bool king_in_check_allowed = false,
       bool allow_pass_move = false,
-	  int insanity = 1,
-	  bool sticky_promotions = false,
-	  bool tsume = false);
+      int insanity = 1,
+      bool sticky_promotions = false,
+      bool king_of_hill = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
@@ -368,7 +366,7 @@ class CrazyhouseBoard {
           PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
 
   // counts of pocket pieces by type
-  // Pawn, Knight, Bishop, Rook, Queen 
+  // Pawn, Knight, Bishop, Rook, Queen
   Pocket white_pocket_;  // counts of pocket pieces by type
   Pocket black_pocket_;
 
@@ -625,11 +623,11 @@ class CrazyhouseBoard {
   uint64_t zobrist_hash_;
   int insanity_;
   bool sticky_promotions_;
-  bool tsume_ = false;
-
+  bool king_of_hill_ = false;
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const CrazyhouseBoard& board) {
+inline std::ostream& operator<<(std::ostream& stream,
+    const CrazyhouseBoard& board) {
   return stream << board.DebugString();
 }
 
@@ -644,4 +642,4 @@ std::string DefaultFen(int board_size);
 }  // namespace crazyhouse
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_IMPL_CRAZYHOUSE_CRAZYHOUSE_BOARD_H_
+#endif  // OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_BOARD_H_

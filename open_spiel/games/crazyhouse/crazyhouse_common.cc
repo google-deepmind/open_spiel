@@ -15,7 +15,7 @@
 #include "open_spiel/games/crazyhouse/crazyhouse_common.h"
 
 #include <algorithm>
-
+#include <utility>
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

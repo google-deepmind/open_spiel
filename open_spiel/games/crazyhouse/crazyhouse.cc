@@ -15,6 +15,7 @@
 #include "open_spiel/games/crazyhouse/crazyhouse.h"
 #include <sys/types.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <iterator>
 #include <memory>
@@ -60,9 +61,11 @@ const GameType kGameType{/*short_name=*/"crazyhouse",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {{"chess960", GameParameter(kDefaultChess960)},
-							 {"insanity", GameParameter(kDefaultInsanity)},
-							 {"sticky_promotions", GameParameter(kDefaultStickyPromotions)},
-							 {"tsume", GameParameter(kDefaultTsume)}}};
+                          {"insanity", GameParameter(kDefaultInsanity)},
+                          {"sticky_promotions",
+                            GameParameter(kDefaultStickyPromotions)},
+                          {"king_of_hill",
+GameParameter(kDefaultKingOfHill)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new CrazyhouseGame(params));
@@ -106,28 +109,28 @@ CrazyhouseState::CrazyhouseState(std::shared_ptr<const Game> game)
     : State(game) {
   const auto* g = ParentGame();
   auto maybe_board = CrazyhouseBoard::BoardFromFEN(
-      kDefaultStandardFEN, // fen
+      kDefaultStandardFEN,  // fen
       8,  // size
       false,  // king in check allowed
       false,  // allow pass move
       g->Insanity(),
       g->StickyPromotions(),
-      g->Tsume());
+      g->KingOfHill());
   start_board_ = *maybe_board;
   current_board_ = start_board_;
   repetitions_[current_board_.HashValue()] = 1;
 }
 
-CrazyhouseState::CrazyhouseState(std::shared_ptr<const Game> game, const std::string& fen)
-    : State(game) {
+CrazyhouseState::CrazyhouseState(std::shared_ptr<const Game> game,
+    const std::string& fen): State(game) {
   auto* g = static_cast<const CrazyhouseGame*>(game.get());
   specific_initial_fen_ = fen;
   int insanity = g->Insanity();
   bool sticky_promotions = g->StickyPromotions();
-  bool tsume = g->Tsume();
+  bool king_of_hill = g->KingOfHill();
   auto maybe_board = CrazyhouseBoard::BoardFromFEN(fen,
-		  8, false, false,
-		  insanity, sticky_promotions, tsume);
+    8, false, false,
+    insanity, sticky_promotions, king_of_hill);
   SPIEL_CHECK_TRUE(maybe_board);
   start_board_ = *maybe_board;
   current_board_ = start_board_;
@@ -225,7 +228,6 @@ Color PlayerToColor(Player p) {
 }
 
 Action MoveToAction(const Move& move, int board_size) {
-
   // handle drop moves first
   if (move.from.x == board_size) {
     // piece_index is stored in m.from.y (0=Pawn ... 4=Queen)
@@ -334,7 +336,7 @@ Move ActionToMove(const Action& action, const CrazyhouseBoard& board) {
   // Check for drop actions first
 
   if (action >= kFirstDropAction) {
-	int bs = board.BoardSize();
+    int bs = board.BoardSize();
     int num_squares = bs * bs;
     int idx = static_cast<int>(action) - kFirstDropAction;
 
@@ -342,9 +344,11 @@ Move ActionToMove(const Action& action, const CrazyhouseBoard& board) {
     int to_index    = idx % num_squares;
 
     Move m;
-    m.from = Square{
-        static_cast<int8_t>(bs),               // x = board_size → indicates drop
-        static_cast<int8_t>(piece_index)      // y = pieceIndex
+    m.from = Square {
+        // x = board_size → indicates drop
+        // y = pieceIndex
+        static_cast<int8_t>(bs),
+        static_cast<int8_t>(piece_index)
     };
 
     m.to = Square{
@@ -418,7 +422,8 @@ Move ActionToMove(const Action& action, const CrazyhouseBoard& board) {
   return move;
 }
 
-std::string CrazyhouseState::ActionToString(Player player, Action action) const {
+std::string CrazyhouseState::ActionToString(Player player,
+     Action action) const {
   if (player == kChancePlayerId) {
     // Chess960 has an initial chance node.
     SPIEL_CHECK_GE(action, 0);
@@ -501,18 +506,18 @@ void CrazyhouseState::ObservationTensor(Player player,
       Board().CastlingRight(Color::kBlack, CastlingDirection::kRight),
       value_it);
 
-   // Pocket pieces.
-   // Order: Pawn, Knight, Bishop, Rook, Queen.
-   // Maximum pocket count encoded in observation tensor.
-   // Counts above this are saturated.
-   // This does not affect gameplay.
+  // Pocket pieces.
+  // Order: Pawn, Knight, Bishop, Rook, Queen.
+  // Maximum pocket count encoded in observation tensor.
+  // Counts above this are saturated.
+  // This does not affect gameplay.
   constexpr int kMaxPocketCount = 16;  // safe upper bound
 
   for (Color color : {Color::kWhite, Color::kBlack}) {
     const Pocket& pocket =
       (color == Color::kWhite) ? Board().white_pocket_
                                : Board().black_pocket_;
-	for (PieceType ptype : Pocket::PieceTypes()) {
+    for (PieceType ptype : Pocket::PieceTypes()) {
       int count = pocket.Count(ptype);
       count = std::min(count, kMaxPocketCount);
       AddScalarPlane(count, 0, kMaxPocketCount, value_it);
@@ -526,7 +531,6 @@ std::unique_ptr<State> CrazyhouseState::Clone() const {
 }
 
 void CrazyhouseState::UndoAction(Player player, Action action) {
-  // TODO: Make this fast by storing undo info in another stack.
   // Note: only supported after the chance node in Chess960.
   SPIEL_CHECK_GE(moves_history_.size(), 1);
   --repetitions_[current_board_.HashValue()];
@@ -630,7 +634,7 @@ CrazyhouseGame::CrazyhouseGame(const GameParameters& params)
   }
   insanity_ = ParameterValue<int>("insanity");
   sticky_promotions_ = ParameterValue<bool>("sticky_promotions");
-  tsume_ =  ParameterValue<bool>("tsume");
+  king_of_hill_ =  ParameterValue<bool>("king_of_hill");
 }
 
 std::unique_ptr<State> CrazyhouseGame::DeserializeState(

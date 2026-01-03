@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_CRAZYHOUSE_H_
-#define OPEN_SPIEL_GAMES_CRAZYHOUSE_H_
+#ifndef OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_H_
+#define OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_H_
 
 #include <array>
 #include <cstdint>
@@ -61,14 +61,14 @@ inline const std::vector<int>& ObservationTensorShape() {
       21 /* piece types * colours + empty */ + 1 /* repetition count */ +
           1 /* side to move */ + 1 /* irreversible move counter */ +
           4 /* castling rights */ +
-		  10 /* pockets */ ,
+          10 /* pockets */ ,
       kMaxBoardSize, kMaxBoardSize};
   return shape;
 }
 
 constexpr bool kDefaultChess960 = false;
 constexpr bool kDefaultStickyPromotions = false;
-constexpr bool kDefaultTsume = false;
+constexpr bool kDefaultKingOfHill = false;
 constexpr int kDefaultInsanity = 1;
 
 // Returns a list of all possible starting positions in chess960.
@@ -86,14 +86,16 @@ inline int ColorToPlayer(Color c) {
   }
 }
 
-inline int OtherPlayer(Player player) { return player == Player{0} ? 1 : 0; }
+inline int OtherPlayer(Player player) {
+  return player == Player {0} ? 1 : 0;
+}
 
 inline constexpr std::array<PieceType, 3> kUnderPromotionIndexToType = {
-    PieceType::kRook, PieceType::kBishop, PieceType::kKnight};
+PieceType::kRook, PieceType::kBishop, PieceType::kKnight};
 inline constexpr std::array<Offset, 3> kUnderPromotionDirectionToOffset = {
-    {{0, 1}, {1, 1}, {-1, 1}}};
+{{0, 1}, {1, 1}, {-1, 1}}};
 inline constexpr int kNumUnderPromotions =
-    kUnderPromotionIndexToType.size() * kUnderPromotionDirectionToOffset.size();
+kUnderPromotionIndexToType.size() * kUnderPromotionDirectionToOffset.size();
 
 // Reads a bitfield within action, with LSB at offset, and length bits long (up
 // to 8).
@@ -142,7 +144,7 @@ Move ActionToMove(const Action& action, const CrazyhouseBoard& board);
 class CrazyhouseState : public State {
  public:
   // Constructs a chess state at the standard start position.
-  CrazyhouseState(std::shared_ptr<const Game> game);
+  explicit CrazyhouseState(std::shared_ptr<const Game> game);
 
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
@@ -284,13 +286,13 @@ class CrazyhouseGame : public Game {
   }
   int Insanity() const { return insanity_; }
   bool StickyPromotions() const { return sticky_promotions_; }
-  bool Tsume() const { return tsume_; }
+  bool KingOfHill() const { return king_of_hill_; }
 
 
  private:
   bool chess960_;
   bool sticky_promotions_;
-  bool tsume_;
+  bool king_of_hill_;
   int insanity_;
   std::vector<std::string> initial_fens_;  // Used for chess960.
 };
@@ -298,4 +300,4 @@ class CrazyhouseGame : public Game {
 }  // namespace crazyhouse
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_CRAZYHOUSE_H_
+#endif  // OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_H_
