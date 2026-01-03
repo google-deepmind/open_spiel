@@ -85,7 +85,7 @@ std::shared_ptr<const Game> GamutGenerator::GenerateGame(
   // Lock here to prevent concurrently writing / removal.
   std::shared_ptr<const Game> game;
   {
-    absl::MutexLock lock(&generation_mutex_);
+    absl::MutexLock lock(generation_mutex_);
     // Get a temporary file and add it to the arguments.
     std::string tmp_filename = TmpFile();
     arguments.push_back("-f");
