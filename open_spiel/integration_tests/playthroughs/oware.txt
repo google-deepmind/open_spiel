@@ -1,0 +1,828 @@
+game: oware
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Oware"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["num_houses_per_player", "num_seeds_per_house"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "oware"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 6
+PolicyTensorShape() = [6]
+MaxChanceOutcomes() = 0
+GetParameters() = {num_houses_per_player=6,num_seeds_per_house=4}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [14]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 14
+MaxGameLength() = 1000
+ToString() = "oware()"
+
+# State 0
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   4  4  4  4  4  4
+#   4  4  4  4  4  4
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 0 0 | 4 4 4 4 4 4 4 4 4 4 4 4"
+ObservationString(1) = "0 | 0 0 | 4 4 4 4 4 4 4 4 4 4 4 4"
+ObservationTensor(0) = [0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+ObservationTensor(1) = [0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 1
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   4  4  4  4  4  5
+#   4  4  0  5  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0
+IsTerminal() = False
+History() = [2]
+HistoryString() = "2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 0 0 | 4 4 0 5 5 5 5 4 4 4 4 4"
+ObservationString(1) = "1 | 0 0 | 4 4 0 5 5 5 5 4 4 4 4 4"
+ObservationTensor(0) = [0.08333, 0.08333, 0.0, 0.10417, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+ObservationTensor(1) = [0.08333, 0.08333, 0.0, 0.10417, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 2
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   0  4  4  4  4  5
+#   5  5  1  6  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
+IsTerminal() = False
+History() = [2, 5]
+HistoryString() = "2, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 0 0 | 5 5 1 6 5 5 5 4 4 4 4 0"
+ObservationString(1) = "0 | 0 0 | 5 5 1 6 5 5 5 4 4 4 4 0"
+ObservationTensor(0) = [0.10417, 0.10417, 0.02083, 0.125, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.10417, 0.10417, 0.02083, 0.125, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 3
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   0  4  4  4  4  5
+#   5  5  0  7  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0
+IsTerminal() = False
+History() = [2, 5, 2]
+HistoryString() = "2, 5, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 0 0 | 5 5 0 7 5 5 5 4 4 4 4 0"
+ObservationString(1) = "1 | 0 0 | 5 5 0 7 5 5 5 4 4 4 4 0"
+ObservationTensor(0) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["a", "b", "c", "d", "e"]
+
+# Apply action "b"
+action: 1
+
+# State 4
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   1  5  5  5  0  5
+#   5  5  0  7  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
+IsTerminal() = False
+History() = [2, 5, 2, 1]
+HistoryString() = "2, 5, 2, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 0 0 | 5 5 0 7 5 5 5 0 5 5 5 1"
+ObservationString(1) = "0 | 0 0 | 5 5 0 7 5 5 5 0 5 5 5 1"
+ObservationTensor(0) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+ObservationTensor(1) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["A", "B", "D", "E", "F"]
+
+# Apply action "B"
+action: 1
+
+# State 5
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   1  5  5  5  0  6
+#   5  0  1  8  6  6
+#   A  B  C  D  E  F
+# Player 0 score = 0
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1]
+HistoryString() = "2, 5, 2, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 0 0 | 5 0 1 8 6 6 6 0 5 5 5 1"
+ObservationString(1) = "1 | 0 0 | 5 0 1 8 6 6 6 0 5 5 5 1"
+ObservationTensor(0) = [0.10417, 0.0, 0.02083, 0.16667, 0.125, 0.125, 0.125, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+ObservationTensor(1) = [0.10417, 0.0, 0.02083, 0.16667, 0.125, 0.125, 0.125, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 2, 3, 4, 5]
+StringLegalActions() = ["a", "c", "d", "e", "f"]
+
+# Apply action "c"
+action: 2
+
+# State 6
+# Apply action "C"
+action: 2
+
+# State 7
+# Apply action "d"
+action: 3
+
+# State 8
+# Apply action "F"
+action: 5
+
+# State 9
+# Apply action "e"
+action: 4
+
+# State 10
+# Apply action "C"
+action: 2
+
+# State 11
+# Apply action "d"
+action: 3
+
+# State 12
+# Apply action "D"
+action: 3
+
+# State 13
+# Apply action "e"
+action: 4
+
+# State 14
+# Apply action "A"
+action: 0
+
+# State 15
+# Apply action "b"
+action: 1
+
+# State 16
+# Apply action "D"
+action: 3
+
+# State 17
+# Apply action "a"
+action: 0
+
+# State 18
+# Apply action "C"
+action: 2
+
+# State 19
+# Apply action "c"
+action: 2
+
+# State 20
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   9  4  5  0  1  0
+#   2  7  0  2 14  4
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 0 0 | 2 7 0 2 14 4 0 1 0 5 4 9"
+ObservationString(1) = "0 | 0 0 | 2 7 0 2 14 4 0 1 0 5 4 9"
+ObservationTensor(0) = [0.04167, 0.14583, 0.0, 0.04167, 0.29167, 0.08333, 0.0, 0.02083, 0.0, 0.10417, 0.08333, 0.1875, 0.0, 0.0]
+ObservationTensor(1) = [0.04167, 0.14583, 0.0, 0.04167, 0.29167, 0.08333, 0.0, 0.02083, 0.0, 0.10417, 0.08333, 0.1875, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["A", "B", "D", "E", "F"]
+
+# Apply action "E"
+action: 4
+
+# State 21
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#  10  5  6  1  0  0
+#   3  8  1  3  0  6
+#   A  B  C  D  E  F
+# Player 0 score = 5
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 5 0 | 3 8 1 3 0 6 0 0 1 6 5 10"
+ObservationString(1) = "1 | 5 0 | 3 8 1 3 0 6 0 0 1 6 5 10"
+ObservationTensor(0) = [0.0625, 0.16667, 0.02083, 0.0625, 0.0, 0.125, 0.0, 0.0, 0.02083, 0.125, 0.10417, 0.20833, 0.10417, 0.0]
+ObservationTensor(1) = [0.0625, 0.16667, 0.02083, 0.0625, 0.0, 0.125, 0.0, 0.0, 0.02083, 0.125, 0.10417, 0.20833, 0.10417, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [2, 3, 4, 5]
+StringLegalActions() = ["c", "d", "e", "f"]
+
+# Apply action "c"
+action: 2
+
+# State 22
+# Apply action "C"
+action: 2
+
+# State 23
+# Apply action "e"
+action: 4
+
+# State 24
+# Apply action "D"
+action: 3
+
+# State 25
+# Apply action "d"
+action: 3
+
+# State 26
+# Apply action "A"
+action: 0
+
+# State 27
+# Apply action "e"
+action: 4
+
+# State 28
+# Apply action "F"
+action: 5
+
+# State 29
+# Apply action "b"
+action: 1
+
+# State 30
+# Apply action "A"
+action: 0
+
+# State 31
+# Apply action "e"
+action: 4
+
+# State 32
+# Apply action "E"
+action: 4
+
+# State 33
+# Apply action "a"
+action: 0
+
+# State 34
+# Apply action "F"
+action: 5
+
+# State 35
+# Apply action "b"
+action: 1
+
+# State 36
+# Apply action "B"
+action: 1
+
+# State 37
+# Apply action "e"
+action: 4
+
+# State 38
+# Apply action "A"
+action: 0
+
+# State 39
+# Apply action "d"
+action: 3
+
+# State 40
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  18  1  0  6  1  2
+#   1  1  5  4  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 5 2 | 1 1 5 4 1 1 2 1 6 0 1 18"
+ObservationString(1) = "0 | 5 2 | 1 1 5 4 1 1 2 1 6 0 1 18"
+ObservationTensor(0) = [0.02083, 0.02083, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0, 0.02083, 0.375, 0.10417, 0.04167]
+ObservationTensor(1) = [0.02083, 0.02083, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0, 0.02083, 0.375, 0.10417, 0.04167]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 41
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  18  1  0  6  0  0
+#   1  1  5  0  2  2
+#   A  B  C  D  E  F
+# Player 0 score = 10
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 10 2 | 1 1 5 0 2 2 0 0 6 0 1 18"
+ObservationString(1) = "1 | 10 2 | 1 1 5 0 2 2 0 0 6 0 1 18"
+ObservationTensor(0) = [0.02083, 0.02083, 0.10417, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.02083, 0.375, 0.20833, 0.04167]
+ObservationTensor(1) = [0.02083, 0.02083, 0.10417, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.02083, 0.375, 0.20833, 0.04167]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [2, 4, 5]
+StringLegalActions() = ["c", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 42
+# Apply action "B"
+action: 1
+
+# State 43
+# Apply action "f"
+action: 5
+
+# State 44
+# Apply action "D"
+action: 3
+
+# State 45
+# Apply action "c"
+action: 2
+
+# State 46
+# Apply action "A"
+action: 0
+
+# State 47
+# Apply action "d"
+action: 3
+
+# State 48
+# Apply action "F"
+action: 5
+
+# State 49
+# Apply action "f"
+action: 5
+
+# State 50
+# Apply action "B"
+action: 1
+
+# State 51
+# Apply action "b"
+action: 1
+
+# State 52
+# Apply action "D"
+action: 3
+
+# State 53
+# Apply action "c"
+action: 2
+
+# State 54
+# Apply action "C"
+action: 2
+
+# State 55
+# Apply action "d"
+action: 3
+
+# State 56
+# Apply action "F"
+action: 5
+
+# State 57
+# Apply action "f"
+action: 5
+
+# State 58
+# Apply action "E"
+action: 4
+
+# State 59
+# Apply action "f"
+action: 5
+
+# State 60
+# Player 1 score = 10
+#   f  e  d  c  b  a
+#   0  9  1  1  1  8
+#   0  2  0  1  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 14 10 | 0 2 0 1 0 1 8 1 1 1 9 0"
+ObservationString(1) = "0 | 14 10 | 0 2 0 1 0 1 8 1 1 1 9 0"
+ObservationTensor(0) = [0.0, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+ObservationTensor(1) = [0.0, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 5]
+StringLegalActions() = ["B", "D", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 61
+# Player 1 score = 10 [PLAYING]
+#   f  e  d  c  b  a
+#   0  9  1  1  1  8
+#   0  2  0  0  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 14 10 | 0 2 0 0 1 1 8 1 1 1 9 0"
+ObservationString(1) = "1 | 14 10 | 0 2 0 0 1 1 8 1 1 1 9 0"
+ObservationTensor(0) = [0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+ObservationTensor(1) = [0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["a", "b", "c", "d", "e"]
+
+# Apply action "d"
+action: 3
+
+# State 62
+# Apply action "B"
+action: 1
+
+# State 63
+# Apply action "e"
+action: 4
+
+# State 64
+# Apply action "D"
+action: 3
+
+# State 65
+# Apply action "b"
+action: 1
+
+# State 66
+# Apply action "F"
+action: 5
+
+# State 67
+# Apply action "b"
+action: 1
+
+# State 68
+# Apply action "E"
+action: 4
+
+# State 69
+# Apply action "d"
+action: 3
+
+# State 70
+# Apply action "B"
+action: 1
+
+# State 71
+# Apply action "f"
+action: 5
+
+# State 72
+# Apply action "C"
+action: 2
+
+# State 73
+# Apply action "b"
+action: 1
+
+# State 74
+# Apply action "F"
+action: 5
+
+# State 75
+# Apply action "b"
+action: 1
+
+# State 76
+# Apply action "D"
+action: 3
+
+# State 77
+# Apply action "c"
+action: 2
+
+# State 78
+# Apply action "C"
+action: 2
+
+# State 79
+# Apply action "f"
+action: 5
+
+# State 80
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   0  2  1  0  0 12
+#   0  1  0  2  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 14 14 | 0 1 0 2 2 0 12 0 0 1 2 0"
+ObservationString(1) = "0 | 14 14 | 0 1 0 2 2 0 12 0 0 1 2 0"
+ObservationTensor(0) = [0.0, 0.02083, 0.0, 0.04167, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+ObservationTensor(1) = [0.0, 0.02083, 0.0, 0.04167, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 4]
+StringLegalActions() = ["B", "D", "E"]
+
+# Apply action "E"
+action: 4
+
+# State 81
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   0  2  1  0  0 13
+#   0  1  0  2  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 14 14 | 0 1 0 2 0 1 13 0 0 1 2 0"
+ObservationString(1) = "1 | 14 14 | 0 1 0 2 0 1 13 0 0 1 2 0"
+ObservationTensor(0) = [0.0, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.27083, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+ObservationTensor(1) = [0.0, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.27083, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 3, 4]
+StringLegalActions() = ["a", "d", "e"]
+
+# Apply action "e"
+action: 4
+
+# State 82
+# Apply action "D"
+action: 3
+
+# State 83
+# Apply action "d"
+action: 3
+
+# State 84
+# Apply action "B"
+action: 1
+
+# State 85
+# Apply action "a"
+action: 0
+
+# State 86
+# Apply action "E"
+action: 4
+
+# State 87
+# Apply action "a"
+action: 0
+
+# State 88
+# Apply action "C"
+action: 2
+
+# State 89
+# Apply action "b"
+action: 1
+
+# State 90
+# Apply action "F"
+action: 5
+
+# State 91
+# Apply action "a"
+action: 0
+
+# State 92
+# Apply action "D"
+action: 3
+
+# State 93
+# Apply action "e"
+action: 4
+
+# State 94
+# Apply action "F"
+action: 5
+
+# State 95
+# Apply action "f"
+action: 5
+
+# State 96
+# Apply action "B"
+action: 1
+
+# State 97
+# Apply action "b"
+action: 1
+
+# State 98
+# Apply action "A"
+action: 0
+
+# State 99
+# Apply action "a"
+action: 0
+
+# State 100
+# Player 1 score = 19
+#   f  e  d  c  b  a
+#   0  0  1  5  1  0
+#   0  1  2  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "0 | 17 19 | 0 1 2 0 2 0 0 1 5 1 0 0"
+ObservationString(1) = "0 | 17 19 | 0 1 2 0 2 0 0 1 5 1 0 0"
+ObservationTensor(0) = [0.0, 0.02083, 0.04167, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+ObservationTensor(1) = [0.0, 0.02083, 0.04167, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2, 4]
+StringLegalActions() = ["B", "C", "E"]
+
+# Apply action "E"
+action: 4
+
+# State 101
+# Player 1 score = 19 [PLAYING]
+#   f  e  d  c  b  a
+#   0  0  1  5  1  1
+#   0  1  2  0  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 17
+IsTerminal() = False
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "1 | 17 19 | 0 1 2 0 0 1 1 1 5 1 0 0"
+ObservationString(1) = "1 | 17 19 | 0 1 2 0 0 1 1 1 5 1 0 0"
+ObservationTensor(0) = [0.0, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+ObservationTensor(1) = [0.0, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["a", "b", "c", "d"]
+
+# Apply action "c"
+action: 2
+
+# State 102
+# Apply action "C"
+action: 2
+
+# State 103
+# Apply action "e"
+action: 4
+
+# State 104
+# Apply action "A"
+action: 0
+
+# State 105
+# Apply action "f"
+action: 5
+
+# State 106
+# Apply action "D"
+action: 3
+
+# State 107
+# Apply action "d"
+action: 3
+
+# State 108
+# Apply action "F"
+action: 5
+
+# State 109
+# Apply action "f"
+action: 5
+
+# State 110
+# [FINISHED]
+# Player 1 score = 27
+#   f  e  d  c  b  a
+#   0  0  0  0  0  0
+#   0  0  0  0  0  0
+#   A  B  C  D  E  F
+# Player 0 score = 21
+IsTerminal() = True
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5, 5]
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+ObservationString(0) = "0 | 21 27 | 0 0 0 0 0 0 0 0 0 0 0 0"
+ObservationString(1) = "0 | 21 27 | 0 0 0 0 0 0 0 0 0 0 0 0"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4375, 0.5625]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4375, 0.5625]
+Rewards() = [-1, 1]
+Returns() = [-1, 1]

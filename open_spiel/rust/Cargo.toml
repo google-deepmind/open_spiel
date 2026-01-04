@@ -1,0 +1,26 @@
+[package]
+name = "libopen_spiel-sys"
+version = "1.0.2"
+links = "rust_spiel"
+build = "build.rs"
+edition = "2018"
+crate_type = "lib"
+
+[dependencies]
+libc = "0.2"
+
+[lib]
+name = "rust_open_spiel"
+path = "src/rust_open_spiel.rs"
+test = false
+bench = false
+
+[[example]]
+name = "example"
+path = "src/example.rs"
+test = false
+bench = false
+
+[build-dependencies]
+cc = { version = "1.0", features = ["parallel"] }
+pkg-config = "0.3"

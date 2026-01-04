@@ -1,0 +1,1481 @@
+game: nine_mens_morris
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Nine men's morris"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "nine_mens_morris"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 600
+PolicyTensorShape() = [600]
+MaxChanceOutcomes() = 0
+GetParameters() = {}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [5, 7, 7]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 245
+MaxGameLength() = 214
+ToString() = "nine_mens_morris()"
+
+# State 0
+# .------.------.
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--.--. | |
+# | | |     | | |
+# .-.-.     .-.-.
+# | | |     | | |
+# | | .--.--. | |
+# | |    |    | |
+# | .----.----. |
+# |      |      |
+# .------.------.
+#
+# Current player: W
+# Turn number: 0
+# Men to deploy: 9 9
+# Num men: 9 9
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = ".------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\n.------.------.\n\nCurrent player: W\nTurn number: 0\nMen to deploy: 9 9\nNum men: 9 9\n"
+ObservationString(1) = ".------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\n.------.------.\n\nCurrent player: W\nTurn number: 0\nMen to deploy: 9 9\nNum men: 9 9\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+StringLegalActions() = ["Point 0", "Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7", "Point 8", "Point 9", "Point 10", "Point 11", "Point 12", "Point 13", "Point 14", "Point 15", "Point 16", "Point 17", "Point 18", "Point 19", "Point 20", "Point 21", "Point 22", "Point 23"]
+
+# Apply action "Point 21"
+action: 21
+
+# State 1
+# .------.------.
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--.--. | |
+# | | |     | | |
+# .-.-.     .-.-.
+# | | |     | | |
+# | | .--.--. | |
+# | |    |    | |
+# | .----.----. |
+# |      |      |
+# W------.------.
+#
+# Current player: B
+# Turn number: 1
+# Men to deploy: 8 9
+# Num men: 9 9
+IsTerminal() = False
+History() = [21]
+HistoryString() = "21"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21"
+InformationStateString(1) = "21"
+ObservationString(0) = ".------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 1\nMen to deploy: 8 9\nNum men: 9 9\n"
+ObservationString(1) = ".------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 1\nMen to deploy: 8 9\nNum men: 9 9\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23]
+StringLegalActions() = ["Point 0", "Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7", "Point 8", "Point 9", "Point 10", "Point 11", "Point 12", "Point 13", "Point 14", "Point 15", "Point 16", "Point 17", "Point 18", "Point 19", "Point 20", "Point 22", "Point 23"]
+
+# Apply action "Point 0"
+action: 0
+
+# State 2
+# B------.------.
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--.--. | |
+# | | |     | | |
+# .-.-.     .-.-.
+# | | |     | | |
+# | | .--.--. | |
+# | |    |    | |
+# | .----.----. |
+# |      |      |
+# W------.------.
+#
+# Current player: W
+# Turn number: 2
+# Men to deploy: 8 8
+# Num men: 9 9
+IsTerminal() = False
+History() = [21, 0]
+HistoryString() = "21, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0"
+InformationStateString(1) = "21, 0"
+ObservationString(0) = "B------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: W\nTurn number: 2\nMen to deploy: 8 8\nNum men: 9 9\n"
+ObservationString(1) = "B------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: W\nTurn number: 2\nMen to deploy: 8 8\nNum men: 9 9\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23]
+StringLegalActions() = ["Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7", "Point 8", "Point 9", "Point 10", "Point 11", "Point 12", "Point 13", "Point 14", "Point 15", "Point 16", "Point 17", "Point 18", "Point 19", "Point 20", "Point 22", "Point 23"]
+
+# Apply action "Point 2"
+action: 2
+
+# State 3
+# B------.------W
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--.--. | |
+# | | |     | | |
+# .-.-.     .-.-.
+# | | |     | | |
+# | | .--.--. | |
+# | |    |    | |
+# | .----.----. |
+# |      |      |
+# W------.------.
+#
+# Current player: B
+# Turn number: 3
+# Men to deploy: 7 8
+# Num men: 9 9
+IsTerminal() = False
+History() = [21, 0, 2]
+HistoryString() = "21, 0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2"
+InformationStateString(1) = "21, 0, 2"
+ObservationString(0) = "B------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 3\nMen to deploy: 7 8\nNum men: 9 9\n"
+ObservationString(1) = "B------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 3\nMen to deploy: 7 8\nNum men: 9 9\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23]
+StringLegalActions() = ["Point 1", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7", "Point 8", "Point 9", "Point 10", "Point 11", "Point 12", "Point 13", "Point 14", "Point 15", "Point 16", "Point 17", "Point 18", "Point 19", "Point 20", "Point 22", "Point 23"]
+
+# Apply action "Point 15"
+action: 15
+
+# State 4
+# B------.------W
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--.--. | |
+# | | |     | | |
+# .-.-.     .-.-.
+# | | |     | | |
+# | | B--.--. | |
+# | |    |    | |
+# | .----.----. |
+# |      |      |
+# W------.------.
+#
+# Current player: W
+# Turn number: 4
+# Men to deploy: 7 7
+# Num men: 9 9
+IsTerminal() = False
+History() = [21, 0, 2, 15]
+HistoryString() = "21, 0, 2, 15"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0, 2, 15"
+InformationStateString(1) = "21, 0, 2, 15"
+ObservationString(0) = "B------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | B--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: W\nTurn number: 4\nMen to deploy: 7 7\nNum men: 9 9\n"
+ObservationString(1) = "B------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-.     .-.-.\n| | |     | | |\n| | B--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: W\nTurn number: 4\nMen to deploy: 7 7\nNum men: 9 9\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 22, 23]
+StringLegalActions() = ["Point 1", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7", "Point 8", "Point 9", "Point 10", "Point 11", "Point 12", "Point 13", "Point 14", "Point 16", "Point 17", "Point 18", "Point 19", "Point 20", "Point 22", "Point 23"]
+
+# Apply action "Point 11"
+action: 11
+
+# State 5
+# B------.------W
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--.--. | |
+# | | |     | | |
+# .-.-W     .-.-.
+# | | |     | | |
+# | | B--.--. | |
+# | |    |    | |
+# | .----.----. |
+# |      |      |
+# W------.------.
+#
+# Current player: B
+# Turn number: 5
+# Men to deploy: 6 7
+# Num men: 9 9
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11]
+HistoryString() = "21, 0, 2, 15, 11"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2, 15, 11"
+InformationStateString(1) = "21, 0, 2, 15, 11"
+ObservationString(0) = "B------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-W     .-.-.\n| | |     | | |\n| | B--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 5\nMen to deploy: 6 7\nNum men: 9 9\n"
+ObservationString(1) = "B------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-.-W     .-.-.\n| | |     | | |\n| | B--.--. | |\n| |    |    | |\n| .----.----. |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 5\nMen to deploy: 6 7\nNum men: 9 9\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 22, 23]
+StringLegalActions() = ["Point 1", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7", "Point 8", "Point 9", "Point 10", "Point 12", "Point 13", "Point 14", "Point 16", "Point 17", "Point 18", "Point 19", "Point 20", "Point 22", "Point 23"]
+
+# Apply action "Point 5"
+action: 5
+
+# State 6
+# Apply action "Point 7"
+action: 7
+
+# State 7
+# Apply action "Point 1"
+action: 1
+
+# State 8
+# Apply action "Point 10"
+action: 10
+
+# State 9
+# Apply action "Point 23"
+action: 23
+
+# State 10
+# Apply action "Point 4"
+action: 4
+
+# State 11
+# Apply action "Point 13"
+action: 13
+
+# State 12
+# Apply action "Point 20"
+action: 20
+
+# State 13
+# Apply action "Point 22"
+action: 22
+
+# State 14
+# Apply action "Point 14"
+action: 14
+
+# State 15
+# Apply action "Point 8"
+action: 8
+
+# State 16
+# Apply action "Point 9"
+action: 9
+
+# State 17
+# Apply action "Point 5"
+action: 5
+
+# State 18
+# Apply action "Point 5"
+action: 5
+
+# State 19
+# B------B------W
+# |      |      |
+# | .----W----B |
+# | |    |    | |
+# | | .--W--B | |
+# | | |     | | |
+# W-W-W     .-B-W
+# | | |     | | |
+# | | B--.--. | |
+# | |    |    | |
+# | .----.----W |
+# |      |      |
+# W------B------B
+#
+# Current player: W
+# Turn number: 18
+# Men to deploy: 0 0
+# Num men: 9 8
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5"
+ObservationString(0) = "B------B------W\n|      |      |\n| .----W----B |\n| |    |    | |\n| | .--W--B | |\n| | |     | | |\nW-W-W     .-B-W\n| | |     | | |\n| | B--.--. | |\n| |    |    | |\n| .----.----W |\n|      |      |\nW------B------B\n\nCurrent player: W\nTurn number: 18\nMen to deploy: 0 0\nNum men: 9 8\n"
+ObservationString(1) = "B------B------W\n|      |      |\n| .----W----B |\n| |    |    | |\n| | .--W--B | |\n| | |     | | |\nW-W-W     .-B-W\n| | |     | | |\n| | B--.--. | |\n| |    |    | |\n| .----.----W |\n|      |      |\nW------B------B\n\nCurrent player: W\nTurn number: 18\nMen to deploy: 0 0\nNum men: 9 8\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [123, 198, 267, 282, 294, 523]
+StringLegalActions() = ["Move 4 -> 3", "Move 7 -> 6", "Move 10 -> 3", "Move 10 -> 18", "Move 11 -> 6", "Move 20 -> 19"]
+
+# Apply action "Move 10 -> 3"
+action: 267
+
+# State 20
+# Apply action "Move 22 -> 19"
+action: 571
+
+# State 21
+# Apply action "Move 3 -> 10"
+action: 106
+
+# State 22
+# Apply action "Point 15"
+action: 15
+
+# State 23
+# B------B------W
+# |      |      |
+# | .----W----B |
+# | |    |    | |
+# | | .--W--B | |
+# | | |     | | |
+# W-W-W     .-B-W
+# | | |     | | |
+# | | .--.--. | |
+# | |    |    | |
+# | .----B----W |
+# |      |      |
+# W------.------B
+#
+# Current player: B
+# Turn number: 21
+# Men to deploy: 0 0
+# Num men: 9 7
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15"
+ObservationString(0) = "B------B------W\n|      |      |\n| .----W----B |\n| |    |    | |\n| | .--W--B | |\n| | |     | | |\nW-W-W     .-B-W\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----B----W |\n|      |      |\nW------.------B\n\nCurrent player: B\nTurn number: 21\nMen to deploy: 0 0\nNum men: 9 7\n"
+ObservationString(1) = "B------B------W\n|      |      |\n| .----W----B |\n| |    |    | |\n| | .--W--B | |\n| | |     | | |\nW-W-W     .-B-W\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----B----W |\n|      |      |\nW------.------B\n\nCurrent player: B\nTurn number: 21\nMen to deploy: 0 0\nNum men: 9 7\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◉◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◉◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [228, 348, 496, 498, 502, 598]
+StringLegalActions() = ["Move 8 -> 12", "Move 13 -> 12", "Move 19 -> 16", "Move 19 -> 18", "Move 19 -> 22", "Move 23 -> 22"]
+
+# Apply action "Move 19 -> 18"
+action: 498
+
+# State 24
+# Apply action "Move 7 -> 6"
+action: 198
+
+# State 25
+# Apply action "Move 8 -> 7"
+action: 223
+
+# State 26
+# Apply action "Move 21 -> 22"
+action: 550
+
+# State 27
+# Apply action "Move 7 -> 8"
+action: 200
+
+# State 28
+# Apply action "Move 11 -> 15"
+action: 303
+
+# State 29
+# Apply action "Move 13 -> 12"
+action: 348
+
+# State 30
+# Apply action "Move 15 -> 11"
+action: 395
+
+# State 31
+# Apply action "Point 8"
+action: 8
+
+# State 32
+# Apply action "Move 12 -> 13"
+action: 325
+
+# State 33
+# Apply action "Move 22 -> 21"
+action: 573
+
+# State 34
+# Apply action "Move 18 -> 19"
+action: 475
+
+# State 35
+# Apply action "Move 4 -> 7"
+action: 127
+
+# State 36
+# Apply action "Move 5 -> 4"
+action: 148
+
+# State 37
+# B------B------W
+# |      |      |
+# | .----B----. |
+# | |    |    | |
+# | | W--W--. | |
+# | | |     | | |
+# W-W-W     .-B-W
+# | | |     | | |
+# | | .--.--. | |
+# | |    |    | |
+# | .----B----W |
+# |      |      |
+# W------.------B
+#
+# Current player: W
+# Turn number: 34
+# Men to deploy: 0 0
+# Num men: 9 6
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148"
+ObservationString(0) = "B------B------W\n|      |      |\n| .----B----. |\n| |    |    | |\n| | W--W--. | |\n| | |     | | |\nW-W-W     .-B-W\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----B----W |\n|      |      |\nW------.------B\n\nCurrent player: W\nTurn number: 34\nMen to deploy: 0 0\nNum men: 9 6\n"
+ObservationString(1) = "B------B------W\n|      |      |\n| .----B----. |\n| |    |    | |\n| | W--W--. | |\n| | |     | | |\nW-W-W     .-B-W\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| .----B----W |\n|      |      |\nW------.------B\n\nCurrent player: W\nTurn number: 34\nMen to deploy: 0 0\nNum men: 9 6\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◉◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◉◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [200, 267, 282, 303, 550]
+StringLegalActions() = ["Move 7 -> 8", "Move 10 -> 3", "Move 10 -> 18", "Move 11 -> 15", "Move 21 -> 22"]
+
+# Apply action "Move 7 -> 8"
+action: 200
+
+# State 38
+# Apply action "Move 19 -> 18"
+action: 498
+
+# State 39
+# Apply action "Move 21 -> 22"
+action: 550
+
+# State 40
+# Apply action "Move 4 -> 7"
+action: 127
+
+# State 41
+# Apply action "Move 20 -> 19"
+action: 523
+
+# State 42
+# Apply action "Move 13 -> 20"
+action: 356
+
+# State 43
+# Apply action "Move 8 -> 12"
+action: 228
+
+# State 44
+# B------B------W
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | W--B--. | |
+# | | |     | | |
+# W-W-W     W-.-W
+# | | |     | | |
+# | | .--.--. | |
+# | |    |    | |
+# | B----W----B |
+# |      |      |
+# .------W------B
+#
+# Current player: B
+# Turn number: 41
+# Men to deploy: 0 0
+# Num men: 9 6
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228"
+ObservationString(0) = "B------B------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | W--B--. | |\n| | |     | | |\nW-W-W     W-.-W\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| B----W----B |\n|      |      |\n.------W------B\n\nCurrent player: B\nTurn number: 41\nMen to deploy: 0 0\nNum men: 9 6\n"
+ObservationString(1) = "B------B------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | W--B--. | |\n| | |     | | |\nW-W-W     W-.-W\n| | |     | | |\n| | .--.--. | |\n| |    |    | |\n| B----W----B |\n|      |      |\n.------W------B\n\nCurrent player: B\nTurn number: 41\nMen to deploy: 0 0\nNum men: 9 6\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◉◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◉◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◉◉◯◉◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [52, 196, 200, 517]
+StringLegalActions() = ["Move 1 -> 4", "Move 7 -> 4", "Move 7 -> 8", "Move 20 -> 13"]
+
+# Apply action "Move 20 -> 13"
+action: 517
+
+# State 45
+# Apply action "Move 9 -> 21"
+action: 261
+
+# State 46
+# Apply action "Move 0 -> 9"
+action: 33
+
+# State 47
+# Apply action "Move 10 -> 3"
+action: 267
+
+# State 48
+# Apply action "Move 13 -> 20"
+action: 356
+
+# State 49
+# Apply action "Move 12 -> 17"
+action: 329
+
+# State 50
+# Apply action "Move 7 -> 8"
+action: 200
+
+# State 51
+# Apply action "Move 19 -> 16"
+action: 496
+
+# State 52
+# Apply action "Move 9 -> 10"
+action: 250
+
+# State 53
+# Apply action "Move 17 -> 12"
+action: 444
+
+# State 54
+# Apply action "Move 20 -> 13"
+action: 517
+
+# State 55
+# Apply action "Move 21 -> 9"
+action: 537
+
+# State 56
+# Apply action "Move 1 -> 4"
+action: 52
+
+# State 57
+# .------.------W
+# |      |      |
+# | W----B----. |
+# | |    |    | |
+# | | W--.--B | |
+# | | |     | | |
+# W-B-W     W-B-W
+# | | |     | | |
+# | | .--W--. | |
+# | |    |    | |
+# | B----.----. |
+# |      |      |
+# .------W------B
+#
+# Current player: W
+# Turn number: 54
+# Men to deploy: 0 0
+# Num men: 9 6
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52"
+ObservationString(0) = ".------.------W\n|      |      |\n| W----B----. |\n| |    |    | |\n| | W--.--B | |\n| | |     | | |\nW-B-W     W-B-W\n| | |     | | |\n| | .--W--. | |\n| |    |    | |\n| B----.----. |\n|      |      |\n.------W------B\n\nCurrent player: W\nTurn number: 54\nMen to deploy: 0 0\nNum men: 9 6\n"
+ObservationString(1) = ".------.------W\n|      |      |\n| W----B----. |\n| |    |    | |\n| | W--.--B | |\n| | |     | | |\nW-B-W     W-B-W\n| | |     | | |\n| | .--W--. | |\n| |    |    | |\n| B----.----. |\n|      |      |\n.------W------B\n\nCurrent player: W\nTurn number: 54\nMen to deploy: 0 0\nNum men: 9 6\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◉◯◉◯◉  ◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◉◯◉◯◉  ◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [73, 175, 261, 303, 329, 423, 425, 427, 571, 573]
+StringLegalActions() = ["Move 2 -> 1", "Move 6 -> 7", "Move 9 -> 21", "Move 11 -> 15", "Move 12 -> 17", "Move 16 -> 15", "Move 16 -> 17", "Move 16 -> 19", "Move 22 -> 19", "Move 22 -> 21"]
+
+# Apply action "Move 2 -> 1"
+action: 73
+
+# State 58
+# Apply action "Move 4 -> 7"
+action: 127
+
+# State 59
+# Apply action "Move 16 -> 15"
+action: 423
+
+# State 60
+# Apply action "Point 23"
+action: 23
+
+# State 61
+# Apply action "Move 7 -> 4"
+action: 196
+
+# State 62
+# Apply action "Move 15 -> 16"
+action: 400
+
+# State 63
+# Apply action "Move 4 -> 5"
+action: 125
+
+# State 64
+# Apply action "Move 14 -> 23"
+action: 383
+
+# State 65
+# .------W------.
+# |      |      |
+# | W----.----B |
+# | |    |    | |
+# | | W--.--B | |
+# | | |     | | |
+# W-B-W     W-B-.
+# | | |     | | |
+# | | .--W--. | |
+# | |    |    | |
+# | B----.----. |
+# |      |      |
+# .------W------W
+#
+# Current player: B
+# Turn number: 61
+# Men to deploy: 0 0
+# Num men: 9 5
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383"
+ObservationString(0) = ".------W------.\n|      |      |\n| W----.----B |\n| |    |    | |\n| | W--.--B | |\n| | |     | | |\nW-B-W     W-B-.\n| | |     | | |\n| | .--W--. | |\n| |    |    | |\n| B----.----. |\n|      |      |\n.------W------W\n\nCurrent player: B\nTurn number: 61\nMen to deploy: 0 0\nNum men: 9 5\n"
+ObservationString(1) = ".------W------.\n|      |      |\n| W----.----B |\n| |    |    | |\n| | W--.--B | |\n| | |     | | |\nW-B-W     W-B-.\n| | |     | | |\n| | .--W--. | |\n| |    |    | |\n| B----.----. |\n|      |      |\n.------W------W\n\nCurrent player: B\nTurn number: 61\nMen to deploy: 0 0\nNum men: 9 5\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◉◯◉◯◯  ◯◉◯◯◯◉◯  ◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◉◯◉◯◯  ◯◉◯◯◯◉◯  ◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [148, 223, 350, 356, 475]
+StringLegalActions() = ["Move 5 -> 4", "Move 8 -> 7", "Move 13 -> 14", "Move 13 -> 20", "Move 18 -> 19"]
+
+# Apply action "Move 5 -> 4"
+action: 148
+
+# State 66
+# Apply action "Move 16 -> 17"
+action: 425
+
+# State 67
+# Apply action "Move 4 -> 7"
+action: 127
+
+# State 68
+# Apply action "Move 11 -> 15"
+action: 303
+
+# State 69
+# Apply action "Move 13 -> 20"
+action: 356
+
+# State 70
+# Apply action "Move 23 -> 14"
+action: 590
+
+# State 71
+# Apply action "Move 18 -> 19"
+action: 475
+
+# State 72
+# Apply action "Move 14 -> 23"
+action: 383
+
+# State 73
+# Apply action "Move 20 -> 13"
+action: 517
+
+# State 74
+# Apply action "Move 15 -> 16"
+action: 400
+
+# State 75
+# Apply action "Move 13 -> 14"
+action: 350
+
+# State 76
+# .------W------.
+# |      |      |
+# | W----.----. |
+# | |    |    | |
+# | | W--B--B | |
+# | | |     | | |
+# W-B-.     W-.-B
+# | | |     | | |
+# | | .--W--W | |
+# | |    |    | |
+# | .----B----. |
+# |      |      |
+# .------W------W
+#
+# Current player: W
+# Turn number: 72
+# Men to deploy: 0 0
+# Num men: 9 5
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350"
+ObservationString(0) = ".------W------.\n|      |      |\n| W----.----. |\n| |    |    | |\n| | W--B--B | |\n| | |     | | |\nW-B-.     W-.-B\n| | |     | | |\n| | .--W--W | |\n| |    |    | |\n| .----B----. |\n|      |      |\n.------W------W\n\nCurrent player: W\nTurn number: 72\nMen to deploy: 0 0\nNum men: 9 5\n"
+ObservationString(1) = ".------W------.\n|      |      |\n| W----.----. |\n| |    |    | |\n| | W--B--B | |\n| | |     | | |\nW-B-.     W-.-B\n| | |     | | |\n| | .--W--W | |\n| |    |    | |\n| .----B----. |\n|      |      |\n.------W------W\n\nCurrent player: W\nTurn number: 72\nMen to deploy: 0 0\nNum men: 9 5\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◯◯◉◯◯  ◯◉◯◯◯◯◉  ◯◯◉◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◯◯◉◯◯  ◯◉◯◯◯◯◉  ◯◯◉◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [50, 52, 100, 179, 261, 325, 423, 573]
+StringLegalActions() = ["Move 1 -> 2", "Move 1 -> 4", "Move 3 -> 4", "Move 6 -> 11", "Move 9 -> 21", "Move 12 -> 13", "Move 16 -> 15", "Move 22 -> 21"]
+
+# Apply action "Move 6 -> 11"
+action: 179
+
+# State 77
+# Apply action "Move 14 -> 2"
+action: 362
+
+# State 78
+# Apply action "Move 11 -> 15"
+action: 303
+
+# State 79
+# Apply action "Point 2"
+action: 2
+
+# State 80
+# Apply action "Move 19 -> 18"
+action: 498
+
+# State 81
+# Apply action "Move 1 -> 2"
+action: 50
+
+# State 82
+# Apply action "Move 7 -> 4"
+action: 196
+
+# State 83
+# Apply action "Move 2 -> 1"
+action: 73
+
+# State 84
+# Apply action "Move 10 -> 11"
+action: 275
+
+# State 85
+# Apply action "Move 22 -> 19"
+action: 571
+
+# State 86
+# .------W------.
+# |      |      |
+# | W----B----. |
+# | |    |    | |
+# | | .--.--B | |
+# | | |     | | |
+# W-.-B     W-.-.
+# | | |     | | |
+# | | W--W--W | |
+# | |    |    | |
+# | B----W----. |
+# |      |      |
+# .------.------W
+#
+# Current player: B
+# Turn number: 81
+# Men to deploy: 0 0
+# Num men: 9 4
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571"
+ObservationString(0) = ".------W------.\n|      |      |\n| W----B----. |\n| |    |    | |\n| | .--.--B | |\n| | |     | | |\nW-.-B     W-.-.\n| | |     | | |\n| | W--W--W | |\n| |    |    | |\n| B----W----. |\n|      |      |\n.------.------W\n\nCurrent player: B\nTurn number: 81\nMen to deploy: 0 0\nNum men: 9 4\n"
+ObservationString(1) = ".------W------.\n|      |      |\n| W----B----. |\n| |    |    | |\n| | .--.--B | |\n| | |     | | |\nW-.-B     W-.-.\n| | |     | | |\n| | W--W--W | |\n| |    |    | |\n| B----W----. |\n|      |      |\n.------.------W\n\nCurrent player: B\nTurn number: 81\nMen to deploy: 0 0\nNum men: 9 4\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◯◯◉◯◯  ◯◯◉◯◯◯◯  ◯◉◯◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◉◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◯◯◉◯◯  ◯◯◉◯◯◯◯  ◯◉◯◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [125, 127, 223, 294, 298, 466]
+StringLegalActions() = ["Move 4 -> 5", "Move 4 -> 7", "Move 8 -> 7", "Move 11 -> 6", "Move 11 -> 10", "Move 18 -> 10"]
+
+# Apply action "Move 18 -> 10"
+action: 466
+
+# State 87
+# Apply action "Move 9 -> 21"
+action: 261
+
+# State 88
+# Apply action "Move 10 -> 18"
+action: 282
+
+# State 89
+# Apply action "Move 3 -> 10"
+action: 106
+
+# State 90
+# Apply action "Move 4 -> 5"
+action: 125
+
+# State 91
+# Apply action "Move 19 -> 20"
+action: 500
+
+# State 92
+# Apply action "Move 5 -> 4"
+action: 148
+
+# State 93
+# Apply action "Move 16 -> 19"
+action: 427
+
+# State 94
+# Apply action "Move 4 -> 7"
+action: 127
+
+# State 95
+# .------W------.
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--B--B | |
+# | | |     | | |
+# .-W-B     W-.-.
+# | | |     | | |
+# | | W--.--W | |
+# | |    |    | |
+# | B----W----W |
+# |      |      |
+# W------.------W
+#
+# Current player: W
+# Turn number: 90
+# Men to deploy: 0 0
+# Num men: 9 4
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127"
+ObservationString(0) = ".------W------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--B--B | |\n| | |     | | |\n.-W-B     W-.-.\n| | |     | | |\n| | W--.--W | |\n| |    |    | |\n| B----W----W |\n|      |      |\nW------.------W\n\nCurrent player: W\nTurn number: 90\nMen to deploy: 0 0\nNum men: 9 4\n"
+ObservationString(1) = ".------W------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--B--B | |\n| | |     | | |\n.-W-B     W-.-.\n| | |     | | |\n| | W--.--W | |\n| |    |    | |\n| B----W----W |\n|      |      |\nW------.------W\n\nCurrent player: W\nTurn number: 90\nMen to deploy: 0 0\nNum men: 9 4\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◉◯◯  ◯◯◉◯◯◯◯  ◉◯◯◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◉◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◉◯  ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◉◉◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◉◯◯  ◯◯◉◯◯◯◯  ◉◯◯◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◉◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◉◯  ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [50, 52, 267, 273, 325, 400, 448, 496, 502, 517, 537, 550, 590, 598]
+StringLegalActions() = ["Move 1 -> 2", "Move 1 -> 4", "Move 10 -> 3", "Move 10 -> 9", "Move 12 -> 13", "Move 15 -> 16", "Move 17 -> 16", "Move 19 -> 16", "Move 19 -> 22", "Move 20 -> 13", "Move 21 -> 9", "Move 21 -> 22", "Move 23 -> 14", "Move 23 -> 22"]
+
+# Apply action "Move 15 -> 16"
+action: 400
+
+# State 96
+# Apply action "Move 11 -> 6"
+action: 294
+
+# State 97
+# Apply action "Point 21"
+action: 21
+
+# State 98
+# Apply action "Move 1 -> 2"
+action: 50
+
+# State 99
+# Apply action "Move 7 -> 4"
+action: 196
+
+# State 100
+# Apply action "Move 23 -> 22"
+action: 598
+
+# State 101
+# Apply action "Point 8"
+action: 8
+
+# State 102
+# Apply action "Move 18 -> 8"
+action: 464
+
+# State 103
+# Apply action "Move 2 -> 14"
+action: 86
+
+# State 104
+# Apply action "Move 4 -> 18"
+action: 138
+
+# State 105
+# Apply action "Move 14 -> 2"
+action: 362
+
+# State 106
+# .------.------W
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | B--.--B | |
+# | | |     | | |
+# .-W-.     W-.-.
+# | | |     | | |
+# | | .--W--W | |
+# | |    |    | |
+# | B----W----W |
+# |      |      |
+# .------W------.
+#
+# Current player: B
+# Turn number: 99
+# Men to deploy: 0 0
+# Num men: 8 3
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362"
+ObservationString(0) = ".------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | B--.--B | |\n| | |     | | |\n.-W-.     W-.-.\n| | |     | | |\n| | .--W--W | |\n| |    |    | |\n| B----W----W |\n|      |      |\n.------W------.\n\nCurrent player: B\nTurn number: 99\nMen to deploy: 0 0\nNum men: 8 3\n"
+ObservationString(1) = ".------.------W\n|      |      |\n| .----.----. |\n| |    |    | |\n| | B--.--B | |\n| | |     | | |\n.-W-.     W-.-.\n| | |     | | |\n| | .--W--W | |\n| |    |    | |\n| B----W----W |\n|      |      |\n.------W------.\n\nCurrent player: B\nTurn number: 99\nMen to deploy: 0 0\nNum men: 8 3\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◯◉◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◉◯  ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◯◉◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◉◉◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◯◉◯◉◯  ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [168, 169, 171, 172, 173, 175, 177, 179, 181, 182, 183, 189, 191, 216, 217, 219, 220, 221, 223, 225, 227, 229, 230, 231, 237, 239, 456, 457, 459, 460, 461, 463, 465, 467, 469, 470, 471, 477, 479]
+StringLegalActions() = ["Move 6 -> 0", "Move 6 -> 1", "Move 6 -> 3", "Move 6 -> 4", "Move 6 -> 5", "Move 6 -> 7", "Move 6 -> 9", "Move 6 -> 11", "Move 6 -> 13", "Move 6 -> 14", "Move 6 -> 15", "Move 6 -> 21", "Move 6 -> 23", "Move 8 -> 0", "Move 8 -> 1", "Move 8 -> 3", "Move 8 -> 4", "Move 8 -> 5", "Move 8 -> 7", "Move 8 -> 9", "Move 8 -> 11", "Move 8 -> 13", "Move 8 -> 14", "Move 8 -> 15", "Move 8 -> 21", "Move 8 -> 23", "Move 18 -> 0", "Move 18 -> 1", "Move 18 -> 3", "Move 18 -> 4", "Move 18 -> 5", "Move 18 -> 7", "Move 18 -> 9", "Move 18 -> 11", "Move 18 -> 13", "Move 18 -> 14", "Move 18 -> 15", "Move 18 -> 21", "Move 18 -> 23"]
+
+# Apply action "Move 18 -> 7"
+action: 463
+
+# State 107
+# Apply action "Point 2"
+action: 2
+
+# State 108
+# Apply action "Move 16 -> 15"
+action: 423
+
+# State 109
+# Apply action "Move 7 -> 2"
+action: 194
+
+# State 110
+# Apply action "Move 19 -> 18"
+action: 498
+
+# State 111
+# Apply action "Move 8 -> 4"
+action: 220
+
+# State 112
+# Apply action "Move 15 -> 11"
+action: 395
+
+# State 113
+# Apply action "Move 6 -> 3"
+action: 171
+
+# State 114
+# Apply action "Move 22 -> 21"
+action: 573
+
+# State 115
+# Apply action "Move 2 -> 16"
+action: 88
+
+# State 116
+# .------.------.
+# |      |      |
+# | B----B----. |
+# | |    |    | |
+# | | .--.--. | |
+# | | |     | | |
+# .-W-W     W-.-.
+# | | |     | | |
+# | | .--B--W | |
+# | |    |    | |
+# | W----.----W |
+# |      |      |
+# W------.------.
+#
+# Current player: W
+# Turn number: 108
+# Men to deploy: 0 0
+# Num men: 7 3
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88"
+ObservationString(0) = ".------.------.\n|      |      |\n| B----B----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-W-W     W-.-.\n| | |     | | |\n| | .--B--W | |\n| |    |    | |\n| W----.----W |\n|      |      |\nW------.------.\n\nCurrent player: W\nTurn number: 108\nMen to deploy: 0 0\nNum men: 7 3\n"
+ObservationString(1) = ".------.------.\n|      |      |\n| B----B----. |\n| |    |    | |\n| | .--.--. | |\n| | |     | | |\n.-W-W     W-.-.\n| | |     | | |\n| | .--B--W | |\n| |    |    | |\n| W----.----W |\n|      |      |\nW------.------.\n\nCurrent player: W\nTurn number: 108\nMen to deploy: 0 0\nNum men: 7 3\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◉◯◉◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯  ◯◯◯◯◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◉◯◉◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [273, 294, 303, 320, 325, 475, 517, 523, 537, 550]
+StringLegalActions() = ["Move 10 -> 9", "Move 11 -> 6", "Move 11 -> 15", "Move 12 -> 8", "Move 12 -> 13", "Move 18 -> 19", "Move 20 -> 13", "Move 20 -> 19", "Move 21 -> 9", "Move 21 -> 22"]
+
+# Apply action "Move 12 -> 8"
+action: 320
+
+# State 117
+# Apply action "Move 3 -> 2"
+action: 98
+
+# State 118
+# Apply action "Move 21 -> 22"
+action: 550
+
+# State 119
+# Apply action "Move 2 -> 5"
+action: 77
+
+# State 120
+# Apply action "Move 8 -> 12"
+action: 228
+
+# State 121
+# Apply action "Move 5 -> 8"
+action: 152
+
+# State 122
+# Apply action "Move 10 -> 9"
+action: 273
+
+# State 123
+# Apply action "Move 4 -> 0"
+action: 120
+
+# State 124
+# Apply action "Move 12 -> 13"
+action: 325
+
+# State 125
+# B------.------.
+# |      |      |
+# | .----.----. |
+# | |    |    | |
+# | | .--.--B | |
+# | | |     | | |
+# W-.-W     .-W-.
+# | | |     | | |
+# | | .--B--W | |
+# | |    |    | |
+# | W----.----W |
+# |      |      |
+# .------W------.
+#
+# Current player: B
+# Turn number: 117
+# Men to deploy: 0 0
+# Num men: 7 3
+IsTerminal() = False
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325"
+ObservationString(0) = "B------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--B | |\n| | |     | | |\nW-.-W     .-W-.\n| | |     | | |\n| | .--B--W | |\n| |    |    | |\n| W----.----W |\n|      |      |\n.------W------.\n\nCurrent player: B\nTurn number: 117\nMen to deploy: 0 0\nNum men: 7 3\n"
+ObservationString(1) = "B------.------.\n|      |      |\n| .----.----. |\n| |    |    | |\n| | .--.--B | |\n| | |     | | |\nW-.-W     .-W-.\n| | |     | | |\n| | .--B--W | |\n| |    |    | |\n| W----.----W |\n|      |      |\n.------W------.\n\nCurrent player: B\nTurn number: 117\nMen to deploy: 0 0\nNum men: 7 3\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◉◯◯◉◯  ◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◉◯◉◯◯◉◯  ◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [25, 26, 27, 28, 29, 30, 31, 34, 36, 38, 39, 43, 45, 47, 217, 218, 219, 220, 221, 222, 223, 226, 228, 230, 231, 235, 237, 239, 409, 410, 411, 412, 413, 414, 415, 418, 420, 422, 423, 427, 429, 431]
+StringLegalActions() = ["Move 0 -> 1", "Move 0 -> 2", "Move 0 -> 3", "Move 0 -> 4", "Move 0 -> 5", "Move 0 -> 6", "Move 0 -> 7", "Move 0 -> 10", "Move 0 -> 12", "Move 0 -> 14", "Move 0 -> 15", "Move 0 -> 19", "Move 0 -> 21", "Move 0 -> 23", "Move 8 -> 1", "Move 8 -> 2", "Move 8 -> 3", "Move 8 -> 4", "Move 8 -> 5", "Move 8 -> 6", "Move 8 -> 7", "Move 8 -> 10", "Move 8 -> 12", "Move 8 -> 14", "Move 8 -> 15", "Move 8 -> 19", "Move 8 -> 21", "Move 8 -> 23", "Move 16 -> 1", "Move 16 -> 2", "Move 16 -> 3", "Move 16 -> 4", "Move 16 -> 5", "Move 16 -> 6", "Move 16 -> 7", "Move 16 -> 10", "Move 16 -> 12", "Move 16 -> 14", "Move 16 -> 15", "Move 16 -> 19", "Move 16 -> 21", "Move 16 -> 23"]
+
+# Apply action "Move 0 -> 5"
+action: 29
+
+# State 126
+# Apply action "Move 9 -> 21"
+action: 261
+
+# State 127
+# Apply action "Move 5 -> 3"
+action: 147
+
+# State 128
+# Apply action "Move 22 -> 19"
+action: 571
+
+# State 129
+# Apply action "Point 16"
+action: 16
+
+# State 130
+# .------.------.
+# |      |      |
+# | B----.----. |
+# | |    |    | |
+# | | .--.--B | |
+# | | |     | | |
+# .-.-W     .-W-.
+# | | |     | | |
+# | | .--.--W | |
+# | |    |    | |
+# | W----W----W |
+# |      |      |
+# W------.------.
+#
+# Current player: B
+# Turn number: 121
+# Men to deploy: 0 0
+# Num men: 7 2
+IsTerminal() = True
+History() = [21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325, 29, 261, 147, 571, 16]
+HistoryString() = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325, 29, 261, 147, 571, 16"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325, 29, 261, 147, 571, 16"
+InformationStateString(1) = "21, 0, 2, 15, 11, 5, 7, 1, 10, 23, 4, 13, 20, 22, 14, 8, 9, 5, 5, 267, 571, 106, 15, 498, 198, 223, 550, 200, 303, 348, 395, 8, 325, 573, 475, 127, 148, 200, 498, 550, 127, 523, 356, 228, 517, 261, 33, 267, 356, 329, 200, 496, 250, 444, 517, 537, 52, 73, 127, 423, 23, 196, 400, 125, 383, 148, 425, 127, 303, 356, 590, 475, 383, 517, 400, 350, 179, 362, 303, 2, 498, 50, 196, 73, 275, 571, 466, 261, 282, 106, 125, 500, 148, 427, 127, 400, 294, 21, 50, 196, 598, 8, 464, 86, 138, 362, 463, 2, 423, 194, 498, 220, 395, 171, 573, 88, 320, 98, 550, 77, 228, 152, 273, 120, 325, 29, 261, 147, 571, 16"
+ObservationString(0) = ".------.------.\n|      |      |\n| B----.----. |\n| |    |    | |\n| | .--.--B | |\n| | |     | | |\n.-.-W     .-W-.\n| | |     | | |\n| | .--.--W | |\n| |    |    | |\n| W----W----W |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 121\nMen to deploy: 0 0\nNum men: 7 2\n"
+ObservationString(1) = ".------.------.\n|      |      |\n| B----.----. |\n| |    |    | |\n| | .--.--B | |\n| | |     | | |\n.-.-W     .-W-.\n| | |     | | |\n| | .--.--W | |\n| |    |    | |\n| W----W----W |\n|      |      |\nW------.------.\n\nCurrent player: B\nTurn number: 121\nMen to deploy: 0 0\nNum men: 7 2\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◉◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◯◉◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◉◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◯◯◯◉◯◉◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◯◉◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◯◉◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◯◯◉◉
+◯◉◯◉◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◯◯◯◯◯◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◉  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
+Rewards() = [1, -1]
+Returns() = [1, -1]

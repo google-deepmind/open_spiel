@@ -1,0 +1,128 @@
+game: oshi_zumo(coins=10)
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Oshi Zumo"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["alesia", "coins", "horizon", "min_bid", "size"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "oshi_zumo"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 11
+PolicyTensorShape() = [11]
+MaxChanceOutcomes() = 0
+GetParameters() = {alesia=False,coins=10,horizon=1000,min_bid=0,size=3}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [31]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 31
+MaxGameLength() = 1000
+ToString() = "oshi_zumo(coins=10)"
+
+# State 0
+# Coins: 10 10, Field: #...W...#
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = "Coins: 10 10, Field: #...W...#\n"
+ObservationString(1) = "Coins: 10 10, Field: #...W...#\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3", "[P0]Bid: 4", "[P0]Bid: 5", "[P0]Bid: 6", "[P0]Bid: 7", "[P0]Bid: 8", "[P0]Bid: 9", "[P0]Bid: 10"]
+StringLegalActions(1) = ["[P1]Bid: 0", "[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3", "[P1]Bid: 4", "[P1]Bid: 5", "[P1]Bid: 6", "[P1]Bid: 7", "[P1]Bid: 8", "[P1]Bid: 9", "[P1]Bid: 10"]
+
+# Apply joint action ["[P0]Bid: 6", "[P1]Bid: 10"]
+actions: [6, 10]
+
+# State 1
+# Coins: 4 0, Field: #..W....#
+IsTerminal() = False
+History() = [6, 10]
+HistoryString() = "6, 10"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+InformationStateString(0) = "6, 10"
+InformationStateString(1) = "6, 10"
+ObservationString(0) = "Coins: 4 0, Field: #..W....#\n"
+ObservationString(1) = "Coins: 4 0, Field: #..W....#\n"
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions(0) = [0, 1, 2, 3, 4]
+LegalActions(1) = [0]
+StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3", "[P0]Bid: 4"]
+StringLegalActions(1) = ["[P1]Bid: 0"]
+
+# Apply joint action ["[P0]Bid: 1", "[P1]Bid: 0"]
+actions: [1, 0]
+
+# State 2
+# Coins: 3 0, Field: #...W...#
+IsTerminal() = False
+History() = [6, 10, 1, 0]
+HistoryString() = "6, 10, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+InformationStateString(0) = "6, 10, 1, 0"
+InformationStateString(1) = "6, 10, 1, 0"
+ObservationString(0) = "Coins: 3 0, Field: #...W...#\n"
+ObservationString(1) = "Coins: 3 0, Field: #...W...#\n"
+ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions(0) = [0, 1, 2, 3]
+LegalActions(1) = [0]
+StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3"]
+StringLegalActions(1) = ["[P1]Bid: 0"]
+
+# Apply joint action ["[P0]Bid: 1", "[P1]Bid: 0"]
+actions: [1, 0]
+
+# State 3
+# Apply joint action ["[P0]Bid: 1", "[P1]Bid: 0"]
+actions: [1, 0]
+
+# State 4
+# Apply joint action ["[P0]Bid: 1", "[P1]Bid: 0"]
+actions: [1, 0]
+
+# State 5
+# Coins: 0 0, Field: #......W#
+IsTerminal() = True
+History() = [6, 10, 1, 0, 1, 0, 1, 0, 1, 0]
+HistoryString() = "6, 10, 1, 0, 1, 0, 1, 0, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "6, 10, 1, 0, 1, 0, 1, 0, 1, 0"
+InformationStateString(1) = "6, 10, 1, 0, 1, 0, 1, 0, 1, 0"
+ObservationString(0) = "Coins: 0 0, Field: #......W#\n"
+ObservationString(1) = "Coins: 0 0, Field: #......W#\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+Rewards() = [1, -1]
+Returns() = [1, -1]

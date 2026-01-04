@@ -1,0 +1,20 @@
+1. d1-b3 h3-e3
+2. b1-b4 a7-d4
+3. c8-c6 h6-e6
+4. c1xe3 h7-g6
+5. b8-d6 h4-f2
+6. e8-b5 h5-e5
+7. d8-d5 h2-e2
+8. g1-h2 e5-c3
+9. h2-h3 c3-c1
+10. f8-d8 c1xe3
+11. d8xd4 f2-c2
+12. g8xg6 a2-d2
+13. e1-f2 c2-c4
+14. c6xc4 e2-f3
+15. h3-f5 e6-e4
+16. f2xd2 f3xb3
+17. c4-c3 a6xd6
+18. f5-e6 e3xe6
+19. g6xe4 e6-c6
+20. f1-e1

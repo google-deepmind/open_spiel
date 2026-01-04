@@ -1,0 +1,16 @@
+# python package requirements
+include requirements.txt
+
+# pybind files
+recursive-include pybind11/include/pybind11 *.h
+recursive-include pybind11/pybind11 *.py
+include pybind11/CMakeLists.txt
+
+# open_spiel files, including source files for abseil and dds
+recursive-include open_spiel CMakeLists.txt *.cc *.cpp *.h *.hpp *.py evalHandTables
+
+# abseil CMake files
+recursive-include open_spiel/abseil-cpp/CMake **
+recursive-include open_spiel/abseil-cpp/ *.cmake *.inc
+
+

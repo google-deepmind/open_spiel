@@ -1,0 +1,88 @@
+// Copyright 2019 DeepMind Technologies Limited
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <iostream>
+#include <memory>
+#include <algorithm>
+#include <vector>
+
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
+#include "open_spiel/tests/basic_tests.h"
+
+namespace open_spiel {
+namespace hex {
+namespace {
+
+namespace testing = open_spiel::testing;
+
+void TestBoardOrientation() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "hex", {{"num_cols", GameParameter(3)}, {"num_rows", GameParameter(4)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(1);
+  state->ApplyAction(2);
+  state->ApplyAction(4);
+  state->ApplyAction(5);
+  state->ApplyAction(7);
+  state->ApplyAction(8);
+  state->ApplyAction(10);
+  // Black wins
+  std::cout << state << std::endl;
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), 1.0);
+  SPIEL_CHECK_EQ(state->PlayerReturn(1), -1.0);
+}
+
+void TestSwapRule() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "hex", {{"board_size", GameParameter(3)}, {"swap", GameParameter(true)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(1);  // P0 plays 1=(0,1)
+  state->ApplyAction(3 * 3);  // P1 swaps.
+
+  // After swap, P0's piece at (0,1) should be gone, and P1 should have a piece
+  // at (1,0) (action 3), and it is P0's turn.
+  // We check this by checking legal actions.
+  // Action 1 should be legal, action 3 should not.
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_TRUE(
+      std::find(legal_actions.begin(), legal_actions.end(), 1) !=
+      legal_actions.end());
+  SPIEL_CHECK_TRUE(
+      std::find(legal_actions.begin(), legal_actions.end(), 3) ==
+      legal_actions.end());
+}
+
+
+void BasicHexTests() {
+  testing::LoadGameTest("hex(num_cols=5,num_rows=5)");
+  testing::NoChanceOutcomesTest(*LoadGame("hex(num_cols=5,num_rows=5)"));
+  testing::RandomSimTest(*LoadGame("hex(num_cols=5,num_rows=5)"), 100);
+  testing::RandomSimTest(*LoadGame("hex"), 5);
+  testing::RandomSimTest(*LoadGame("hex(num_cols=2,num_rows=3)"), 10);
+  testing::RandomSimTest(*LoadGame("hex(num_cols=2,num_rows=2)"), 10);
+  testing::RandomSimTest(*LoadGame("hex(swap=true)"), 10);
+}
+
+}  // namespace
+}  // namespace hex
+}  // namespace open_spiel
+
+int main(int argc, char** argv) {
+  open_spiel::hex::BasicHexTests();
+  open_spiel::hex::TestBoardOrientation();
+  open_spiel::hex::TestSwapRule();
+}

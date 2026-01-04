@@ -1,0 +1,108 @@
+game: bridge_uncontested_bidding(subgame=2NT,relative_scoring=True,num_redeals=1,rng_seed=-1)
+
+GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Bridge: Uncontested Bidding"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["num_redeals", "relative_scoring", "rng_seed", "subgame"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = False
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "bridge_uncontested_bidding"
+GameType.utility = Utility.IDENTICAL
+
+NumDistinctActions() = 36
+PolicyTensorShape() = [36]
+MaxChanceOutcomes() = 1
+GetParameters() = {num_redeals=1,relative_scoring=True,rng_seed=-1,subgame=2NT}
+NumPlayers() = 2
+MinUtility() = -2170.0
+MaxUtility() = 0.0
+UtilitySum() = None
+InformationStateTensorShape() = [126]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 126
+MaxGameLength() = 36
+ToString() = "bridge_uncontested_bidding(num_redeals=1,relative_scoring=True,rng_seed=-1,subgame=2NT)"
+
+# State 0
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateTensor(0): ◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
+SerializeState() = ""
+ChanceOutcomes() = [(0,1)]
+LegalActions() = [0]
+StringLegalActions() = ["Deal"]
+
+# Apply action "Deal"
+action: 0
+
+# State 1
+# QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N
+IsTerminal() = False
+History() = [0]
+HistoryString() = "0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "QT85.JT7.AKQ.AKQ 2N"
+InformationStateString(1) = "643.86.97642.T94 2N"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◉◯◉◉◯◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◉◉◉◯◉◯◯◯◯◯◉◉◉◯◉◯◯◯◯◉◯◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
+SerializeState() = "QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+StringLegalActions() = ["Pass", "3C", "3D", "3H", "3S", "3N", "4C", "4D", "4H", "4S", "4N", "5C", "5D", "5H", "5S", "5N", "6C", "6D", "6H", "6S", "6N", "7C", "7D", "7H", "7S", "7N"]
+
+# Apply action "6D"
+action: 27
+
+# State 2
+# QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D
+IsTerminal() = False
+History() = [0, 27]
+HistoryString() = "0, 27"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "QT85.JT7.AKQ.AKQ 2N-6D"
+InformationStateString(1) = "643.86.97642.T94 2N-6D"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◉◯◉◉◯◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◉◉◉◯◉◯◯◯◯◯◉◉◉◯◉◯◯◯◯◉◯◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
+SerializeState() = "QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 28, 29, 30, 31, 32, 33, 34, 35]
+StringLegalActions() = ["Pass", "6H", "6S", "6N", "7C", "7D", "7H", "7S", "7N"]
+
+# Apply action "Pass"
+action: 0
+
+# State 3
+# QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D-Pass Score:-200 2N N:-100 3C E:-200 3D N:-50 3D E:-50 3H N:-200 3H E:-200 3S N:-150 3S E:-150 3N N:-150 4C N:-250 4H N:-250 4H E:-250 4S N:-200 4S E:-200 5C N:-300 5C E:-300 5D N:-150 5D E:-150 6C N:-350 6C E:-350 6D N:-200 6D E:-200 6H N:-350 6H E:-350 6S N:-300 6S E:-300 6N N:-300 7C N:-400 7C E:-400 7D N:-250 7D E:-250 7H N:-400 7H E:-400 7S N:-350 7S E:-350 7N N:-350
+IsTerminal() = True
+History() = [0, 27, 0]
+HistoryString() = "0, 27, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "QT85.JT7.AKQ.AKQ 2N-6D-Pass"
+InformationStateString(1) = "643.86.97642.T94 2N-6D-Pass"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◉◯◉◉◯◉◉◉◯◯◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◉◉◉◯◉◯◯◯◯◯◉◉◉◯◉◯◯◯◯◉◯◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
+SerializeState() = "QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D-Pass Score:-200 2N N:-100 3C E:-200 3D N:-50 3D E:-50 3H N:-200 3H E:-200 3S N:-150 3S E:-150 3N N:-150 4C N:-250 4H N:-250 4H E:-250 4S N:-200 4S E:-200 5C N:-300 5C E:-300 5D N:-150 5D E:-150 6C N:-350 6C E:-350 6D N:-200 6D E:-200 6H N:-350 6H E:-350 6S N:-300 6S E:-300 6N N:-300 7C N:-400 7C E:-400 7D N:-250 7D E:-250 7H N:-400 7H E:-400 7S N:-350 7S E:-350 7N N:-350"
+Rewards() = [-200, -150]
+Returns() = [-200, -150]

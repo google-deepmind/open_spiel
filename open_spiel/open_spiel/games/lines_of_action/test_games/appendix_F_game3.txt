@@ -1,0 +1,24 @@
+1. d1-b3 a5-c7
+2. b1-b4 a7-d7
+3. g1-g3 h3-e6
+4. g3xc7 h7-e7
+5. e1-e5 h6xf8
+6. c1-c4 f8xb4
+7. b8-f4 a3-d6
+8. f1-e1 a6xc4
+9. e1xe6 a4xf4
+10. e8-g6 b4-b6
+11. b3-a3 b6-c5
+12. g8xc4 h5xe5
+13. g6xd6 h4-e4
+14. a3-a5 e5-b5
+15. d8-b8 f4-e3
+16. b8-b6 a2-a4
+17. a5-a7 e3-d2
+18. c8-b7 h2-h1
+19. a7-b8 e7-d8
+20. e6xe4 d2xd6
+21. c4-d5 c5xc7
+22. e4-a8 d6xb6
+23. a8-a6 h1-e4
+24. d5xb5

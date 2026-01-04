@@ -1,0 +1,17 @@
+# The core OpenSpiel pip dependencies.
+#
+# Note that there are optional python packages used by some of the python
+# algorithms or tools in OpenSpiel that are purposely excluded (e.g.,
+# cvxopt, nashpy, matplotlib, etc.) This is because we want to keep only
+# the dependencies that are absolutely necessary to use the Python API.
+#
+# However, when testing using continuous integration like GitHub Actions,
+# we install several more packages to ensure the proper tests are
+# included. See open_spiel/scripts/python_extra_deps.sh for the extra
+# packages and their versions we use for testing purposes.
+pip >= 20.0.2
+attrs >= 19.3.0
+absl-py >= 0.10.0
+numpy >= 1.21.5
+scipy >= 1.10.1
+ml-collections >= 0.1.1

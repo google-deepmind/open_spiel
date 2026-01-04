@@ -1,0 +1,219 @@
+game: cliff_walking
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "CliffWalking"
+GameType.max_num_players = 1
+GameType.min_num_players = 1
+GameType.parameter_specification = ["height", "horizon", "width"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "cliff_walking"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 4
+PolicyTensorShape() = [4]
+MaxChanceOutcomes() = 0
+GetParameters() = {height=4,horizon=100,width=8}
+NumPlayers() = 1
+MinUtility() = -199.0
+MaxUtility() = -9.0
+UtilitySum() = None
+InformationStateTensorShape() = [400]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 400
+ObservationTensorShape() = [4, 8]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 32
+MaxGameLength() = 100
+ToString() = "cliff_walking()"
+
+# State 0
+# ........
+# ........
+# ........
+# PXXXXXXG
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateTensor(0): zeros(400)
+ObservationString(0) = "........\n........\n........\nPXXXXXXG\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯◯
+Rewards() = [0]
+Returns() = [-0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["RIGHT", "UP", "LEFT", "DOWN"]
+
+# Apply action "LEFT"
+action: 2
+
+# State 1
+# ........
+# ........
+# ........
+# PXXXXXXG
+IsTerminal() = False
+History() = [2]
+HistoryString() = "2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "2"
+InformationStateTensor(0): binvec(400, 0x2000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "........\n........\n........\nPXXXXXXG\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯◯
+Rewards() = [-1]
+Returns() = [-1]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["RIGHT", "UP", "LEFT", "DOWN"]
+
+# Apply action "DOWN"
+action: 3
+
+# State 2
+# ........
+# ........
+# ........
+# PXXXXXXG
+IsTerminal() = False
+History() = [2, 3]
+HistoryString() = "2, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "2, 3"
+InformationStateTensor(0): binvec(400, 0x2100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "........\n........\n........\nPXXXXXXG\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯◯
+Rewards() = [-1]
+Returns() = [-2]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["RIGHT", "UP", "LEFT", "DOWN"]
+
+# Apply action "LEFT"
+action: 2
+
+# State 3
+# Apply action "UP"
+action: 1
+
+# State 4
+# Apply action "LEFT"
+action: 2
+
+# State 5
+# Apply action "LEFT"
+action: 2
+
+# State 6
+# Apply action "RIGHT"
+action: 0
+
+# State 7
+# Apply action "LEFT"
+action: 2
+
+# State 8
+# Apply action "LEFT"
+action: 2
+
+# State 9
+# Apply action "LEFT"
+action: 2
+
+# State 10
+# ........
+# ........
+# P.......
+# .XXXXXXG
+IsTerminal() = False
+History() = [2, 3, 2, 1, 2, 2, 0, 2, 2, 2]
+HistoryString() = "2, 3, 2, 1, 2, 2, 0, 2, 2, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "2, 3, 2, 1, 2, 2, 0, 2, 2, 2"
+InformationStateTensor(0): binvec(400, 0x2124228222000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "........\n........\nP.......\n.XXXXXXG\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+Rewards() = [-1]
+Returns() = [-10]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["RIGHT", "UP", "LEFT", "DOWN"]
+
+# Apply action "LEFT"
+action: 2
+
+# State 11
+# Apply action "UP"
+action: 1
+
+# State 12
+# Apply action "UP"
+action: 1
+
+# State 13
+# Apply action "DOWN"
+action: 3
+
+# State 14
+# Apply action "DOWN"
+action: 3
+
+# State 15
+# Apply action "UP"
+action: 1
+
+# State 16
+# Apply action "DOWN"
+action: 3
+
+# State 17
+# Apply action "RIGHT"
+action: 0
+
+# State 18
+# Apply action "DOWN"
+action: 3
+
+# State 19
+# ........
+# ........
+# ........
+# .PXXXXXG
+IsTerminal() = True
+History() = [2, 3, 2, 1, 2, 2, 0, 2, 2, 2, 2, 1, 1, 3, 3, 1, 3, 0, 3]
+HistoryString() = "2, 3, 2, 1, 2, 2, 0, 2, 2, 2, 2, 1, 1, 3, 3, 1, 3, 0, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "2, 3, 2, 1, 2, 2, 0, 2, 2, 2, 2, 1, 1, 3, 3, 1, 3, 0, 3"
+InformationStateTensor(0): binvec(400, 0x2124228222244114181000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "........\n........\n........\n.PXXXXXG\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◯◯◯◯◯◯◯◯
+                      ◯◉◯◯◯◯◯◯
+Rewards() = [-100]
+Returns() = [-118]

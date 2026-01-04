@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+ # C extensions
+*.so
+
+ # Jupyter Notebook
+.ipynb_checkpoints
+
+ # virtualenv
+.venv
+venv/
+ENV/
+
+ # OSX specific
+.DS_Store
+
+ # Build products
+build/
+build*/
+cmake-build-*/
+dist/
+pyspiel.egg-info/
+open_spiel.egg-info/
+
+
+# Swift build directory
+.build
+
+ # External git modules
+open_spiel/abseil-cpp/
+open_spiel/eigen/libeigen/
+open_spiel/libnop/libnop/
+open_spiel/games/bridge/double_dummy_solver/
+open_spiel/games/universal_poker/double_dummy_solver/
+open_spiel/games/hanabi/hanabi-learning-environment/
+/open_spiel/pybind11_abseil/
+pybind11/
+
+# Install artifacts
+download_cache/
+get-pip.py
+open_spiel/scripts/shflags
+open_spiel/scripts/jill.sh
+
+# julia wrapper
+Manifest.toml
+
+
+# IDE
+.idea/
+.vscode/
+*~
+
+
+open_spiel/cmake-build-debug/
+
+# Swift generated build file
+Package.resolved
+# Visual Studio generated files
+open_spiel/.vs
+/.env

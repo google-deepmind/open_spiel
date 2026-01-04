@@ -1,0 +1,11 @@
+NFG 1 R "OpenSpiel export of matching_pennies_3p()"
+{ "Player 0" "Player 1" "Player 2" } { 2 2 2 }
+
+1 1 -1
+-1 1 1
+-1 -1 -1
+1 -1 1
+1 -1 1
+-1 -1 -1
+-1 1 1
+1 1 -1
