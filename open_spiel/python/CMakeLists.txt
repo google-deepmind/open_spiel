@@ -178,7 +178,7 @@ endif()
 set(PYTHON_TESTS ${PYTHON_TESTS}
   # Disabled until we can reduce the length. See #1371.
   # ../integration_tests/api_test.py
-  # ../integration_tests/playthrough_test.py
+  ../integration_tests/playthrough_test.py
   algorithms/action_value_test.py
   algorithms/action_value_vs_best_response_test.py
   algorithms/async_mcts_test.py
