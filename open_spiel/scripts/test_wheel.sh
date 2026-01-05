@@ -56,7 +56,7 @@ if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.11" ]]; then
     file=`ls wheelhouse/open_spiel-*-cp311-cp311-manylinux*.whl`
     ${PYBIN} -m pip install $file
-  if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
+  elif [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
     file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux*.whl`
     ${PYBIN} -m pip install $file
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
