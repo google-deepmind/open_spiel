@@ -41,8 +41,8 @@ jobs:
         - os: ubuntu-24.04-arm
           NAME: "Linux_arm64"
           OS_TYPE: "Linux"
-          CI_PYBIN: python3.11
-          OS_PYTHON_VERSION: 3.11
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
           OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           CIBW_VERSION: 3.2.1
           CIBW_ENABLE: all
