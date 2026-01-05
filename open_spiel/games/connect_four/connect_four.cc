@@ -71,6 +71,19 @@ CellState PlayerToState(Player player) {
   }
 }
 
+Player StateToPlayer(const CellState& state) {
+  switch (state) {
+    case CellState::kCross:
+      return 0;
+    case CellState::kNought:
+      return 1;
+    case CellState::kEmpty:
+      return 2;
+    default:
+      SpielFatalError("Invalid cell state in StateToPlayer");
+  }
+}
+
 std::string PlayerToString(Player player) {
   switch (player) {
     case 0:
@@ -286,7 +299,7 @@ void ConnectFourState::ObservationTensor(Player player,
       if (game.egocentric_obs_tensor()) {
         view[{PlayerRelative(CellAt(r, c), player), r, c}] = 1.0;
       } else {
-        view[{player, r, c}] = 1.0;
+        view[{StateToPlayer(CellAt(r, c)), r, c}] = 1.0;
       }
     }
   }
