@@ -55,7 +55,7 @@ if verlt $PY_VER 3.12; then
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.1.0"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.4.20 jaxlib==0.4.20 dm-haiku==0.0.10 optax==0.1.7 chex==0.1.84 rlax==0.1.6 distrax==0.1.4"
   export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.26.1 tensorflow==2.14.0 tensorflow-probability==0.22.1 tensorflow_datasets==4.9.7 keras==2.14.0"
-  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==3.2 matplotlib==3.10.7 mock==4.0.2 nashpy==0.0.19 scipy==1.11.3 testresources==2.0.1 cvxopt==1.3.1 cvxpy==1.4.1 ecos==2.0.10 osqp==1.0.4 flax==0.5.3 pokerkit==0.6.3"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==3.2 matplotlib==3.10.7 mock==4.0.2 nashpy==0.0.19 scipy==1.11.3 testresources==2.0.1 cvxopt==1.3.2 cvxpy==1.4.1 ecos==2.0.10 osqp==1.0.4 flax==0.5.3 pokerkit==0.6.3"
 elif verlt $PY_VER 3.13; then
   echo "Detected Python version 3.12"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.2.2"
