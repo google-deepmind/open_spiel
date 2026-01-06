@@ -283,8 +283,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
-    algorithms/alpha_zero/model_test.py
-    algorithms/alpha_zero/evaluator_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
     jax/opponent_shaping_jax_test.py
@@ -338,6 +336,8 @@ endif()
 # Tests that are excluded when running via the installed wheel.
 # Some bundle data not shipped with the wheel (e.g. playthroughs)
 set(WHEEL_EXCLUDED_PYTHON_TESTS
+  algorithms/alpha_zero/model_test.py
+  algorithms/alpha_zero/evaluator_test.py
   algorithms/response_graph_ucb_test.py
   games/tic_tac_toe_test.py
   ../integration_tests/playthrough_test.py)
