@@ -483,7 +483,7 @@ def is_symmetric_matrix_game(payoff_tables):
     if payoffs_are_hpt_format and np.array_equal(payoff_tables[0](),
                                                  payoff_tables[1]()):
       return True, [payoff_tables[0]]
-    elif ~payoffs_are_hpt_format and np.array_equal(payoff_tables[0],
+    elif not payoffs_are_hpt_format and np.array_equal(payoff_tables[0],
                                                     payoff_tables[1].T):
       return True, [payoff_tables[0]]
   return False, payoff_tables
