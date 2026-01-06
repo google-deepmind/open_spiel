@@ -6,7 +6,6 @@ import jax
 import flax.linen as linen
 import flax.nnx as nnx
 
-
 AVIALABLE_APIS = ["nnx", "linen"]
 
 def api_selector(api_version):
@@ -47,7 +46,7 @@ def nnx_to_linen(
   variables = new_model.init(jax.random.key(seed), (1, *sample_shape), train=False)
   return new_model.apply, variables
 
-def flatten(x):
+def flatten(x: chex.Array) -> chex.Array:
   return x.reshape(-1)
 
 @chex.dataclass(frozen=True)
@@ -60,7 +59,7 @@ class TrainInput:
   value: chex.Array
 
   @staticmethod
-  def stack(train_inputs):
+  def stack(train_inputs: list["TrainInput"]) -> "TrainInput":
     return jax.tree.map(lambda *x: jnp.stack(x), *train_inputs)
 
 @chex.dataclass(frozen=True)
@@ -72,19 +71,19 @@ class Losses:
   l2: chex.Array 
   
   @property
-  def total(self):
+  def total(self) -> float:
     return self.policy + self.value + self.l2
 
-  def __str__(self):
+  def __str__(self) -> str:
     return (f"Losses(total: {self.total:.3f}, policy: {self.policy:.3f}, value: {self.value:.3f}, "
             f"l2: {self.l2:.3f})")
 
-  def __add__(self, other):
+  def __add__(self, other) -> "Losses":
     return Losses(
       policy=self.policy + other.policy,
       value=self.value + other.value,
       l2=self.l2 + other.l2
     )
 
-  def __truediv__(self, n):
+  def __truediv__(self, n) -> "Losses":
     return Losses(policy=self.policy / n, value=self.value / n, l2=self.l2 / n)

@@ -14,27 +14,36 @@
 
 """Tests for open_spiel.python.algorithms.alpha_zero.evaluator."""
 
-from absl.testing import absltest
-from absl.testing import parameterized
-import numpy as np
 import jax.numpy as jnp
+import numpy as np
+import pyspiel
+from absl.testing import absltest, parameterized
 
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
-from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, AVIALABLE_APIS
-import pyspiel
+from open_spiel.python.algorithms.alpha_zero.utils import (
+  AVIALABLE_APIS,
+  TrainInput,
+  api_selector,
+)
 
 
 def build_model(api_version: str, game):
   return api_selector(api_version).Model.build_model(
-      "mlp", game.observation_tensor_shape(), game.num_distinct_actions(),
-      nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
+    "mlp",
+    game.observation_tensor_shape(),
+    game.num_distinct_actions(),
+    nn_width=64,
+    nn_depth=2,
+    weight_decay=1e-4,
+    learning_rate=0.01,
+    path=None,
+  )
 
 
 class EvaluatorTest(parameterized.TestCase):
-  
   @parameterized.parameters(AVIALABLE_APIS)
-  def test_evaluator_caching(self, api_version: str):
+  def test_evaluator_caching(self, api_version: str) -> None:
     game = pyspiel.load_game("tic_tac_toe")
     model = build_model(api_version, game)
     evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
@@ -47,11 +56,12 @@ class EvaluatorTest(parameterized.TestCase):
     policy[action] = 1
     train_inputs = [
       TrainInput(
-        observation=jnp.array(obs), 
-        legals_mask=jnp.array(act_mask), 
-        policy=jnp.array(policy), 
-        value=jnp.array(1)
-      )]
+        observation=jnp.asarray(obs),
+        legals_mask=jnp.asarray(act_mask),
+        policy=jnp.asarray(policy),
+        value=jnp.asarray(1),
+      )
+    ]
 
     value = evaluator.evaluate(state)
     self.assertEqual(value[0], -value[1])
@@ -104,12 +114,13 @@ class EvaluatorTest(parameterized.TestCase):
     self.assertEqual(info.hits, 2)
 
   @parameterized.parameters(AVIALABLE_APIS)
-  def test_works_with_mcts(self, api_version: str):
+  def test_works_with_mcts(self, api_version: str) -> None:
     game = pyspiel.load_game("tic_tac_toe")
     model = build_model(api_version, game)
     evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
     bot = mcts.MCTSBot(
-        game, 1., 20, evaluator, solve=False, dirichlet_noise=(0.25, 1.))
+      game, 1.0, 20, evaluator, solve=False, dirichlet_noise=(0.25, 1.0)
+    )
     root = bot.mcts_search(game.new_initial_state())
     self.assertEqual(root.explore_count, 20)
 

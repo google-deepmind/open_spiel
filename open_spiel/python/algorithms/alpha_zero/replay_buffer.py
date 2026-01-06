@@ -1,9 +1,8 @@
+from typing import Generic, TypeVar
+
 import chex
 import jax
 import jax.numpy as jnp
-from functools import partial
-
-from typing import Callable, TypeVar, Generic, Any
 
 Experience = TypeVar("Experience", bound=chex.ArrayTree)
 
@@ -11,121 +10,88 @@ Experience = TypeVar("Experience", bound=chex.ArrayTree)
 https://github.com/instadeepai/flashbax/blob/main/flashbax/buffers/flat_buffer.py
 """
 
-def get_tree_shape_prefix(tree: chex.ArrayTree, n_axes: int = 1) -> chex.Shape:
-  """Get the shape of the leading axes (up to n_axes) of a pytree. This assumes all
-  leaves have a common leading axes size (e.g. a common batch size)."""
-  flat_tree, tree_def = jax.tree_util.tree_flatten(tree)
-  leaf = flat_tree[0]
-  leading_axis_shape = leaf.shape[0:n_axes]
-  chex.assert_tree_shape_prefix(tree, leading_axis_shape)
-  return leading_axis_shape
-
 
 @chex.dataclass(frozen=True)
-class BufferState(Generic[Experience]):
-  """A state for the buffer
-
-    Important arguments: 
-      write_index: Index where the next batch of experience data will be added to.
-      read_index: Index where the next batch of experience data will be sampled from
-  """
+class ReplayBufferState(Generic[Experience]):
   experience: Experience
-  is_full: chex.Array
-  total_seen: chex.Array
-  read_index: chex.Array
-  write_index: chex.Array
+  capacity: chex.Numeric
+  entry_index: chex.Array
+  is_full: bool
 
 
+def init(capacity: chex.Numeric, experience: Experience) -> ReplayBufferState:
+  """Initialise a replay buffer.
 
-def init(
-  experience: Experience,
-  max_size: int,
-) -> BufferState:
-  """Instanting a buffer state from the mock transition
+  Args:
+    capacity (chex.Numeric, int): max size of the buffer
+    experience (Experience): initial value
+
+  Returns:
+    ReplayBufferState: state of the buffer
   """
-
   # Set experience value to be empty.
   experience = jax.tree.map(jnp.empty_like, experience)
   # Broadcast to [add_batch_size, ...]
   experience = jax.tree.map(
-    lambda x: jnp.broadcast_to(
-        x[None, ...], (max_size, *x.shape)
-    ),
+    lambda x: jnp.broadcast_to(x[jnp.newaxis, ...], (capacity, *x.shape)),
     experience,
   )
-
-  return BufferState(
+  return ReplayBufferState(
+    capacity=capacity,
     experience=experience,
-    is_full=jnp.array(False, dtype=bool),
-    total_seen=jnp.array(0),
-    read_index=jnp.array(0),
-    write_index=jnp.array(0),
+    entry_index=jnp.array(0),
+    is_full=jnp.array(False, dtype=jnp.bool),
   )
 
 
 def append(
-  state: BufferState,
-  batch: Experience,
-) -> BufferState:
-    
-  """Adding a batch of experience to the buffer state.
+  state: ReplayBufferState,
+  experience: Experience,
+) -> ReplayBufferState:
+  """Potentially adds `experience` to the replay buffer.
+  Args:
+    state: `ReplayBufferState`, current state of the buffer
+    experience: data to be added to the reservoir buffer.
+  Returns:
+    An updated `ReplayBufferState`
   """
 
-  max_size = get_tree_shape_prefix(state.experience)[0]
+  chex.assert_trees_all_equal_dtypes(experience, state.experience)
 
-  new_experience = jax.tree.map(
-    lambda exp_field, batch_field: exp_field.at[state.write_index].set(batch_field),
-    state.experience,
-    batch,
+  index = state.entry_index % state.capacity
+
+  def update_leaf(buffer_leaf: Experience, exp_leaf: Experience):
+    return buffer_leaf.at[index].set(exp_leaf)
+
+  new_experience = jax.tree.map(update_leaf, state.experience, experience)
+
+  new_entry_index = state.entry_index + 1
+  new_is_full = state.is_full | (new_entry_index >= state.capacity)
+
+  return ReplayBufferState(
+    capacity=state.capacity,
+    experience=new_experience,
+    entry_index=new_entry_index,
+    is_full=new_is_full,
   )
 
-  new_total_seen = state.total_seen + 1
-  
-  return state.replace(  # type: ignore
-    experience=new_experience,
-    total_seen=new_total_seen,
-    is_full=state.is_full | (new_total_seen >= max_size),
-    write_index=(new_total_seen % max_size)
- )
 
+def sample(rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int) -> Experience:
+  """Returns `num_samples` uniformly sampled from the buffer.
+  Args:
+    rng: `chex.PRNGKey`, a random state
+    state: `ReplayBufferState`, a buffer state
+    num_samples: `int`, number of samples to draw.
+  Returns:
+    An iterable over `num_samples` random elements of the buffer.
+  Raises:
+    AssertionError: If there are less than `num_samples` elements in the buffer
+  """
 
-def sample_random(
-  state: BufferState,
-  rng_key: chex.PRNGKey,
-  count: int,
-) -> tuple[BufferState, Any, chex.Array]:
-  max_size = get_tree_shape_prefix(state.experience)[0]
-  max_size = jnp.where(state.is_full, max_size, state.write_index)
-  
-  traj_indices = jax.random.randint(rng_key, shape=(count,), minval=0, maxval=max_size)
-  batch_trajectory = jax.tree.map(lambda x: x[traj_indices], state.experience)
-
-  return state, batch_trajectory, traj_indices
-
-
-TBufferState = TypeVar("TBufferState", bound=BufferState)
-
-@chex.dataclass(frozen=True)
-class FlatBuffer(Generic[Experience, TBufferState]):
-
-  init: Callable[[Experience], BufferState]
-  # Adding function
-  append: Callable[
-    [BufferState, Experience],
-    BufferState,
-  ]
-
-  sample: Callable[
-    [BufferState, chex.PRNGKey],
-    tuple[BufferState, Any, chex.Array],
-  ]
-
-def make_flat_buffer(max_size: int) -> FlatBuffer:
-   return FlatBuffer(
-      init=partial(init, max_size=max_size),
-      append=append,
-      sample=sample_random,
-   )
+  # When full, the max time index is max_length_time_axis otherwise it is current index.
+  max_size = jnp.where(state.is_full, state.capacity, state.entry_index)
+  indices = jax.random.randint(rng, shape=(num_samples,), minval=0, maxval=max_size)
+  return jax.tree.map(lambda x: x[indices], state.experience)
 
 
 class Buffer:
@@ -133,52 +99,45 @@ class Buffer:
 
   def __init__(self, max_size: int, force_cpu: bool = False, seed: int = 0) -> None:
     self.max_size = max_size
-    self.buffer = make_flat_buffer(max_size=max_size)
-    self.total_seen = jnp.array(0)
+    self._total_seen = jnp.array(0)
 
     self._rng = jax.random.PRNGKey(seed)
     # jit-compling all the methods for cpu if forced otherwise automatically
     backend = "cpu" if force_cpu else jax.default_backend()
-    self.buffer = self.buffer.replace(
-      init=jax.jit(self.buffer.init, backend=backend),
-      append=jax.jit(self.buffer.append, backend=backend, donate_argnums=(0,)),
-      sample=jax.jit(self.buffer.sample, backend=backend, static_argnames=("count",)),
-    )
+
+    self._init = jax.jit(init, backend=backend, static_argnames=("capacity",))
+    self._append = jax.jit(append, backend=backend, donate_argnums=(0,))
+    self._sample = jax.jit(sample, backend=backend, static_argnames=("num_samples",))
+
     self.buffer_state = None
 
   @property
   def data(self):
     if self.buffer_state is not None:
-        return self.buffer_state.experience
-  
+      return self.buffer_state.experience
+
+  @property
+  def total_seen(self) -> int:
+    return self._total_seen.item()
+
   def __len__(self) -> int:
     if self.buffer_state is None:
-       return 0
-    
-    # Queue length: add unless it's full, but keep unchanged further
-    return jnp.where(self.buffer_state.is_full, self.max_size, self.buffer_state.write_index).item()
+      return 0
+    return self.max_size if self.buffer_state.is_full else self._total_seen
 
   def __bool__(self) -> bool:
     return self.buffer_state is not None
 
-  def append(self, val: Any) -> None:
-    
+  def append(self, val: Experience) -> None:
     if self.buffer_state is None:
-      self.buffer_state = self.buffer.init(val)
-
-    # batched_val = jax.tree.map(lambda x: x[jnp.newaxis, ...], val)
-    self.buffer_state = self.buffer.append(self.buffer_state, val)
-    self.total_seen = self.buffer_state.total_seen
+      self.buffer_state = self._init(self.max_size, val)
+    self.buffer_state = self._append(self.buffer_state, val)
+    self._total_seen = self.buffer_state.entry_index
 
   def shuffle(self, key: int) -> chex.Array:
     return jax.random.permutation(jax.random.key(key), jnp.arange(len(self)))
 
-  def sample(self, count: int) -> Any:
-    self._rng, rng = jax.random.split(self._rng) 
-    indices = jax.random.choice(rng, jnp.arange(len(self)), replace=False, shape=(count,))
-    batch = jax.tree.map(lambda x: x[indices], self.buffer_state.experience)
-    # indices are returned for debug purposes only
-    # _, batch, indices = self.buffer.sample( # pylint: disable=possibly-unused-variable
-    #   self.buffer_state, rng, count) 
-    
+  def sample(self, num_samples: int) -> Experience:
+    self._rng, rng = jax.random.split(self._rng)
+    batch = self._sample(rng, self.buffer_state, num_samples)
     return batch

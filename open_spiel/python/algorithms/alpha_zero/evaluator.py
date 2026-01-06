@@ -16,9 +16,9 @@
 
 import jax
 import numpy as np
+import pyspiel
 
 from open_spiel.python.algorithms import mcts
-import pyspiel
 from open_spiel.python.utils import lru_cache
 
 
@@ -35,7 +35,7 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
       raise ValueError("Game must have sequential turns.")
 
-    self._model = model # nn.cached_partial?
+    self._model = model  # nn.cached_partial?
     self._cache = lru_cache.LRUCache(cache_size)
 
   def cache_info(self):
@@ -57,8 +57,7 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     value, policy = self._cache.make(
       cache_key, lambda: self._model.inference(obs, mask)
     )
-    
-    return value, policy 
+    return value, policy
 
   def evaluate(self, state) -> np.ndarray:
     """Returns a value for the given state."""
