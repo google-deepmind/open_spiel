@@ -16,7 +16,6 @@
 #define OPEN_SPIEL_GAMES_AMAZONS_H_
 
 #include <array>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -25,17 +24,14 @@
 
 // The "Game of Amazons":
 // https://en.wikipedia.org/wiki/Game_of_the_Amazons
-//
-// Parameters: TODO: let the user choose the dimension
 
 namespace open_spiel {
 namespace amazons {
 
 // Constants.
-
 inline constexpr int kNumPlayers = 2;
-inline constexpr int kNumRows = 6;
-inline constexpr int kNumCols = 6;
+inline constexpr int kNumRows = 10;
+inline constexpr int kNumCols = 10;
 inline constexpr int kNumCells = kNumRows * kNumCols;
 inline constexpr int kCellStates = 4;  // empty, 'X', 'O', '@'.
 
@@ -102,11 +98,8 @@ class AmazonsState : public State {
   int shoot_ = 0;
 
   std::vector<Action> GetAllMoves(Action) const;
-  std::vector<Action> GetDiagonalMoves(Action) const;
-  std::vector<Action> GetVerticalMoves(Action) const;
-  std::vector<Action> GetHorizontalMoves(Action) const;
-
-  bool IsGameOver() const;
+  bool HasAnyMoveFromCell(Action cell) const;
+  bool PlayerHasAnyMove(Player p) const;
 
   Player current_player_ = 0;        // Player zero goes first
   Player outcome_ = kInvalidPlayer;  // Outcome unclear at init

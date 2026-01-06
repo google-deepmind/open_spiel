@@ -19,6 +19,7 @@ https://ieeexplore.ieee.org/document/6203567
 
 import copy
 import enum
+from absl import logging
 import numpy as np
 import pyspiel
 
@@ -74,7 +75,7 @@ class ISMCTSBot(pyspiel.Bot):
                final_policy_type=ISMCTSFinalPolicyType.MAX_VISIT_COUNT,
                use_observation_string=False,
                allow_inconsistent_action_sets=False,
-               child_selection_policy=ChildSelectionPolicy.PUCT):
+               child_selection_policy=ChildSelectionPolicy.UCT):
 
     pyspiel.Bot.__init__(self)
     self._game = game
@@ -139,10 +140,16 @@ class ISMCTSBot(pyspiel.Bot):
       return self.get_final_policy(state, self._root_node)
 
   def step(self, state):
+    if state.is_chance_node():
+      logging.info('State is a chance node, returning invalid action policy.')
+      return pyspiel.INVALID_ACTION
     action_list, prob_list = zip(*self.run_search(state))
     return self._random_state.choice(action_list, p=prob_list)
 
   def get_policy(self, state):
+    if state.is_chance_node():
+      logging.info('State is a chance node, returning invalid action policy.')
+      return [(pyspiel.INVALID_ACTION, 1.0)]
     return self.run_search(state)
 
   def step_with_policy(self, state):

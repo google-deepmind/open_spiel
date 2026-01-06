@@ -15,11 +15,16 @@
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 
 #include <algorithm>
+#include <cstring>
 #include <set>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/spiel.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -390,7 +395,7 @@ VecInt GinRummyUtils::LegalMelds(const VecInt &hand, int knock_card) const {
 
 // Returns the legal discards when a player has knocked. Normally a player can
 // discard any card in their hand. When a player knocks, however, they must
-// discard a card that preseves the ability to arrange the hand so that the
+// discard a card that preserves the ability to arrange the hand so that the
 // total deadwood is less than the knock card.
 VecInt GinRummyUtils::LegalDiscards(const VecInt &hand, int knock_card) const {
   std::set<int> legal_discards;

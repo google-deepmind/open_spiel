@@ -18,13 +18,17 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/json/include/nlohmann/json_fwd.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/policy.h"
+#include "open_spiel/utils/nlohmann_json.h"  // IWYU pragma: keep
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -368,6 +372,64 @@ void PlayerIdToStringTest() {
   SPIEL_CHECK_EQ(DefaultPlayerString(kMeanFieldPlayerId), "MeanField");
 }
 
+void GetParametersFromStringTest() {
+  std::string params_str = "(betting=nolimit,bettingAbstraction=fullgame,"
+      "blind=100 50,boardCards=,firstPlayer=2 1 1 1,handReaches=,maxRaises=,"
+      "numBoardCards=0 3 1 1,numHoleCards=2,numPlayers=2,numRanks=13,"
+      "numRounds=4,numSuits=4,potSize=0,stack=20000 20000)";
+  auto params = GameParametersFromString(params_str);
+  SPIEL_CHECK_EQ(params.size(), 16);  // extra one for "name"
+}
+
+struct DummyStateStruct : StateStruct {
+  int x;
+  std::string y;
+  std::optional<std::string> z;
+
+  DummyStateStruct() = default;
+  explicit DummyStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  // Json serialization.
+  nlohmann::json to_json_base() const override {
+    nlohmann::json j = *this;
+    return j;
+  }
+
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(DummyStateStruct, x, y, z);
+};
+
+void GameStructTests() {
+  DummyStateStruct s;
+  s.x = 123;
+  s.y = "abc";
+
+  // Check serialization with value.
+  s.z = "def";
+  std::string json_str_with_val = s.ToJson();
+  SPIEL_CHECK_EQ(json_str_with_val, R"({"x":123,"y":"abc","z":"def"})");
+
+  // Check deserialization with value.
+  DummyStateStruct s2(json_str_with_val);
+  SPIEL_CHECK_EQ(s2.x, 123);
+  SPIEL_CHECK_EQ(s2.y, "abc");
+  SPIEL_CHECK_TRUE(s2.z.has_value());
+  SPIEL_CHECK_EQ(s2.z.value(), "def");
+
+  // Check serialization with nullopt.
+  s.z = std::nullopt;
+  std::string json_str_null = s.ToJson();
+  SPIEL_CHECK_EQ(json_str_null, R"({"x":123,"y":"abc","z":null})");
+
+  // Check deserialization with nullopt.
+  DummyStateStruct s3(json_str_null);
+  SPIEL_CHECK_EQ(s3.x, 123);
+  SPIEL_CHECK_EQ(s3.y, "abc");
+  SPIEL_CHECK_FALSE(s3.z.has_value());
+}
+
+
 }  // namespace
 }  // namespace testing
 }  // namespace open_spiel
@@ -384,4 +446,6 @@ int main(int argc, char** argv) {
   open_spiel::testing::PolicySerializationTest();
   open_spiel::testing::ConcreteGamesTest();
   open_spiel::testing::PlayerIdToStringTest();
+  open_spiel::testing::GetParametersFromStringTest();
+  open_spiel::testing::GameStructTests();
 }

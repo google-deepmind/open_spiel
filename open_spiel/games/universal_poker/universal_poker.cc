@@ -185,6 +185,10 @@ const GameType kGameType{
         // "fcpa" for fold, check/call, bet pot and all in (default).
         // Use "fullgame" for the unabstracted game.
         {"bettingAbstraction", GameParameter(std::string("fcpa"))},
+        // Number of simulations to run when calling CalculateOdds. Defaults to
+        // 0, which means that the odds of winning will not be calculated, to
+        // maintain performance by avoiding the overhead of the simulations.
+        {"calcOddsNumSims", GameParameter(0)},
 
         // ------------------------------------------------------------------------
         // Following parameters are used to specify specific subgame.
@@ -231,8 +235,12 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
             /*num_ranks=*/acpc_game_->NumRanksDeck()),
       cur_player_(kChancePlayerId),
       possibleActions_(ACTION_DEAL),
-      betting_abstraction_(static_cast<const UniversalPokerGame *>(game.get())
-                               ->betting_abstraction()) {
+      betting_abstraction_(
+          static_cast<const UniversalPokerGame *>(game.get())
+              ->betting_abstraction()),
+      calc_odds_num_sims_(
+          static_cast<const UniversalPokerGame *>(game.get())
+              ->calc_odds_num_sims()) {
   // -- Optionally apply subgame parameters. -----------------------------------
   // Pot size.
   const int pot_size = game->GetParameters().at("potSize").int_value();
@@ -525,7 +533,7 @@ void UniversalPokerState::ObservationTensor(Player player,
 
   // Adding the contribution of each players to the pot.
   for (auto p = Player{0}; p < NumPlayers(); p++) {
-    values[offset + p] = acpc_state_.Ante(p);
+    values[offset + p] = acpc_state_.CurrentSpent(p);
   }
   offset += NumPlayers();
   SPIEL_CHECK_EQ(offset, game_->ObservationTensorShape()[0]);
@@ -574,9 +582,9 @@ std::string UniversalPokerState::ObservationString(Player player) const {
     absl::StrAppend(&result, "[Private: ", HoleCards(player).ToString(), "]");
   }
   // Adding the contribution of each players to the pot
-  absl::StrAppend(&result, "[Ante:");
+  absl::StrAppend(&result, "[PlayerContribution:");
   for (auto p = Player{0}; p < num_players_; p++) {
-    absl::StrAppend(&result, " ", acpc_state_.Ante(p));
+    absl::StrAppend(&result, " ", acpc_state_.CurrentSpent(p));
   }
   absl::StrAppend(&result, "]");
 
@@ -1043,6 +1051,50 @@ double UniversalPokerState::GetTotalReward(Player player) const {
   return acpc_state_.ValueOfState(player);
 }
 
+std::unique_ptr<StateStruct> UniversalPokerState::ToStruct() const {
+  std::mt19937 rng;
+  auto rv = std::make_unique<UniversalPokerStateStruct>();
+  rv->acpc_state = acpc_state_.ToString();
+  rv->current_player = CurrentPlayer();
+  for (int blind : acpc_game_->blinds()) {
+    rv->blinds.push_back(blind);
+  }
+  std::string betting_history;
+  for (int r = 0; r <= acpc_state_.GetRound(); ++r) {
+    if (r > 0) absl::StrAppend(&betting_history, "/");
+    absl::StrAppend(&betting_history, acpc_state_.BettingSequence(r));
+  }
+  rv->betting_history = betting_history;
+  for (Player p = 0; p < num_players_; ++p) {
+    rv->player_contributions.push_back(acpc_state_.CurrentSpent(p));
+  }
+  rv->pot_size = acpc_state_.TotalSpent();
+  for (Player p = 0; p < num_players_; ++p) {
+    rv->starting_stacks.push_back(acpc_game_->StackSize(p));
+  }
+  logic::CardSet board_cards_set = BoardCards();
+  rv->board_cards = board_cards_set.ToString();
+  for (Player p = 0; p < num_players_; ++p) {
+    logic::CardSet hole_cards_set = HoleCards(p);
+    rv->player_hands.push_back(hole_cards_set.ToString());
+    logic::CardSet combined_cards = hole_cards_set;
+    for (uint8_t card : board_cards_set.ToCardArray()) {
+      combined_cards.AddCard(card);
+    }
+    logic::CardSet best_five_cards = combined_cards.GetBest5Cards();
+    rv->best_hand_rank_types.push_back(
+        logic::HandRankToString(best_five_cards.GetHandRank()));
+    rv->best_five_card_hands.push_back(best_five_cards.ToString());
+  }
+
+  if (calc_odds_num_sims_ > 0) {
+    // We use a default-constructed mt19937 here for determinism in tests.
+    std::mt19937 rng;
+    rv->odds = CalculateOdds(calc_odds_num_sims_, rng);
+  }
+  return rv;
+}
+
 std::unique_ptr<State> UniversalPokerState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
   std::unique_ptr<HistoryDistribution> potential_histories =
@@ -1095,6 +1147,109 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   return dist;
 }
 
+std::vector<double> UniversalPokerState::CalculateOdds(
+    int num_simulations, std::mt19937& rng) const {
+  std::vector<double> win_percentages(NumPlayers(), 0.0);
+  std::vector<double> draw_percentages(NumPlayers(), 0.0);
+  std::vector<Player> active_players;
+  for (Player p = 0; p < NumPlayers(); ++p) {
+    if (acpc_state_.raw_state().playerFolded[p] == 0) {
+      active_players.push_back(p);
+    }
+  }
+
+  if (active_players.size() == 1) {
+    win_percentages[active_players[0]] = 1.0;
+  } else if (active_players.size() > 1) {
+    std::vector<int> num_hole_cards_to_deal(NumPlayers());
+    std::vector<logic::CardSet> hole_cards(NumPlayers());
+    int num_board_cards_to_deal =
+        acpc_game_->GetTotalNbBoardCards() - board_cards_dealt_;
+    logic::CardSet board = BoardCards();
+    logic::CardSet known_cards = board;
+    for (Player p : active_players) {
+      hole_cards[p] = HoleCards(p);
+      for (uint8_t card : hole_cards[p].ToCardArray()) {
+        known_cards.AddCard(card);
+      }
+      num_hole_cards_to_deal[p] =
+          acpc_game_->GetNbHoleCardsRequired() - hole_cards[p].NumCards();
+    }
+
+    std::vector<double> win_counts(NumPlayers(), 0.0);
+    std::vector<double> draw_counts(NumPlayers(), 0.0);
+
+    for (int sim = 0; sim < num_simulations; ++sim) {
+      // Fresh deck.
+      logic::CardSet deck_to_sample(acpc_game_->NumSuitsDeck(),
+                                    acpc_game_->NumRanksDeck());
+      // Remove known cards from the deck.
+      for (uint8_t card : known_cards.ToCardArray()) {
+        deck_to_sample.RemoveCard(card);
+      }
+      std::vector<uint8_t> deck_cards = deck_to_sample.ToCardArray();
+      std::shuffle(deck_cards.begin(), deck_cards.end(), rng);
+      // Deal hole cards if needed.
+      std::vector<logic::CardSet> sim_hole_cards = hole_cards;
+      int deck_idx = 0;
+      for (Player p : active_players) {
+        for (int i = 0; i < num_hole_cards_to_deal[p]; ++i) {
+          sim_hole_cards[p].AddCard(deck_cards[deck_idx++]);
+          // The only time we should be simulating hole cards is before the
+          // initial deal has completed. Therefore, the board should be empty.
+          SPIEL_CHECK_EQ(board.NumCards(), 0);
+        }
+      }
+
+      logic::CardSet dealt_board_cards = board;
+      for (int i = 0; i < num_board_cards_to_deal; ++i) {
+        dealt_board_cards.AddCard(deck_cards[deck_idx++]);
+      }
+
+      std::vector<int> ranks;
+      ranks.reserve(active_players.size());
+      int max_rank = -1;
+      for (Player p : active_players) {
+        logic::CardSet hand_plus_board = sim_hole_cards[p];
+        for (uint8_t card : dealt_board_cards.ToCardArray())
+          hand_plus_board.AddCard(card);
+        int rank = hand_plus_board.RankCards();
+        ranks.push_back(rank);
+        if (rank > max_rank) {
+          max_rank = rank;
+        }
+      }
+
+      std::vector<Player> winners;
+      for (int i = 0; i < active_players.size(); ++i) {
+        if (ranks[i] == max_rank) {
+          winners.push_back(active_players[i]);
+        }
+      }
+
+      if (winners.size() == 1) {
+        win_counts[winners[0]] += 1.0;
+      } else {
+        for (Player p : winners) {
+          draw_counts[p] += 1.0;
+        }
+      }
+    }
+
+    for (Player p : active_players) {
+      win_percentages[p] = win_counts[p] / num_simulations;
+      draw_percentages[p] = draw_counts[p] / num_simulations;
+    }
+  }
+
+  std::vector<double> result(2 * NumPlayers());
+  for (Player p = 0; p < NumPlayers(); ++p) {
+    result[2*p] = win_percentages[p];
+    result[2*p+1] = draw_percentages[p];
+  }
+  return result;
+}
+
 /**
  * Universal Poker Game Constructor
  * @param params
@@ -1105,7 +1260,8 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
       acpc_game_(gameDesc_),
       potSize_(ParameterValue<int>("potSize")),
       boardCards_(ParameterValue<std::string>("boardCards")),
-      handReaches_(ParameterValue<std::string>("handReaches")) {
+      handReaches_(ParameterValue<std::string>("handReaches")),
+      calc_odds_num_sims_(ParameterValue<int>("calcOddsNumSims", 0)) {
   std::string betting_abstraction =
       ParameterValue<std::string>("bettingAbstraction");
   if (betting_abstraction == "fc") {

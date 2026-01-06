@@ -15,9 +15,23 @@
 #include "open_spiel/games/hearts/hearts.h"
 
 #include <algorithm>
+#include <array>
+#include <ctime>
 #include <map>
+#include <memory>
+#include <random>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/json/include/nlohmann/json_fwd.hpp"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -295,6 +309,88 @@ void InformationStateTensorTest(int num_games = 100) {
   }
 }
 
+void TestStructs() {
+  auto game = LoadGame("hearts");
+  auto state = game->NewInitialState();
+  // Apply some actions to get a non-initial state.
+  std::vector<Action> initial_actions = {
+      1,                                                   // Pass left
+      0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,  // Deal p0
+      13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,  // Deal p1
+      26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,  // Deal p2
+      39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,  // Deal p3
+  };
+  for (auto action : initial_actions) state->ApplyAction(action);
+
+  // p0 passes 3 cards: 0, 1, 2
+  state->ApplyAction(0);
+  state->ApplyAction(1);
+  state->ApplyAction(2);
+  // p1 passes 3 cards: 13, 14, 15
+  state->ApplyAction(13);
+  state->ApplyAction(14);
+  state->ApplyAction(15);
+  // p2 passes 3 cards: 26, 27, 28
+  state->ApplyAction(26);
+  state->ApplyAction(27);
+  state->ApplyAction(28);
+  // p3 passes 3 cards: 39, 40, 41
+  state->ApplyAction(39);
+  state->ApplyAction(40);
+  state->ApplyAction(41);
+
+  // p1 has 2C (card 0), so p1 leads.
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+
+  HeartsState* hearts_state = static_cast<HeartsState*>(state.get());
+  auto state_struct = hearts_state->ToStruct();
+
+  SPIEL_CHECK_EQ(state_struct->ToJson(), hearts_state->ToJson());
+
+  HeartsStateStruct* hearts_struct =
+      static_cast<HeartsStateStruct*>(state_struct.get());
+  SPIEL_CHECK_EQ(hearts_struct->phase, "Play");
+  SPIEL_CHECK_EQ(hearts_struct->current_player, "Player_1");
+  SPIEL_CHECK_EQ(hearts_struct->pass_direction, "Left");
+  SPIEL_CHECK_EQ(hearts_struct->points[0], 0);
+  SPIEL_CHECK_EQ(hearts_struct->hands[0].size(), 13);
+  SPIEL_CHECK_EQ(hearts_struct->passed_cards[0].size(), 3);
+  SPIEL_CHECK_EQ(hearts_struct->received_cards[0].size(), 3);
+  SPIEL_CHECK_EQ(hearts_struct->tricks.size(), 0);
+  SPIEL_CHECK_EQ(hearts_struct->hearts_broken, false);
+
+  std::string state_json = hearts_state->ToJson();
+  SPIEL_CHECK_EQ(nlohmann::json::parse(state_json).dump(),
+                 HeartsStateStruct(state_json).ToJson());
+
+  auto obs_struct = hearts_state->ToObservationStruct(0);
+
+  // Check fields in the observation struct for player 0.
+  HeartsObservationStruct* hearts_obs_struct =
+      static_cast<HeartsObservationStruct*>(obs_struct.get());
+  SPIEL_CHECK_EQ(hearts_obs_struct->phase, hearts_struct->phase);
+  SPIEL_CHECK_EQ(hearts_obs_struct->current_player,
+                 hearts_struct->current_player);
+  SPIEL_CHECK_EQ(hearts_obs_struct->hands[0], hearts_struct->hands[0]);
+  SPIEL_CHECK_EQ(hearts_obs_struct->passed_cards[0],
+                 hearts_struct->passed_cards[0]);
+  SPIEL_CHECK_EQ(hearts_obs_struct->received_cards[0],
+                 hearts_struct->received_cards[0]);
+  SPIEL_CHECK_EQ(hearts_obs_struct->points[0], hearts_struct->points[0]);
+  SPIEL_CHECK_EQ(hearts_obs_struct->hands[1].size(), 13);
+  SPIEL_CHECK_EQ(hearts_obs_struct->hands[1][0], "XX");
+  SPIEL_CHECK_EQ(hearts_obs_struct->passed_cards[1].size(), 3);
+  SPIEL_CHECK_EQ(hearts_obs_struct->passed_cards[1][0], "XX");
+  SPIEL_CHECK_EQ(hearts_obs_struct->received_cards[1].size(), 3);
+  SPIEL_CHECK_EQ(hearts_obs_struct->received_cards[1][0], "XX");
+  SPIEL_CHECK_EQ(hearts_obs_struct->observing_player, 0);
+
+  // Test json string -> obs_struct
+  std::string obs_json = obs_struct->ToJson();
+  SPIEL_CHECK_EQ(nlohmann::json::parse(obs_json).dump(),
+                 HeartsObservationStruct(obs_json).ToJson());
+}
+
 }  // namespace
 }  // namespace hearts
 }  // namespace open_spiel
@@ -303,4 +399,5 @@ int main(int argc, char** argv) {
   open_spiel::hearts::BasicGameTests();
   open_spiel::hearts::ShootTheMoonTest();
   open_spiel::hearts::InformationStateTensorTest();
+  open_spiel::hearts::TestStructs();
 }

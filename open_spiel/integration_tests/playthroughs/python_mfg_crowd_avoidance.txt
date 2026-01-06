@@ -37,7 +37,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "position_init_1"
@@ -88,7 +88,7 @@ History() = [32, 3]
 HistoryString() = "32, 3"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "32, 3"
 InformationStateString(1) = "32, 3"
 ObservationString(0) = "(pop=1, t=0_a_mu, pos=[4 3])"
@@ -107,21 +107,21 @@ StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
 action: 4
 
 # State 3
-# (pop=1, t=1_a, pos=[3 3])
+# (pop=1, t=1_a, pos=[4 3])
 IsTerminal() = False
 History() = [32, 3, 4]
 HistoryString() = "32, 3, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "32, 3, 4"
 InformationStateString(1) = "32, 3, 4"
-ObservationString(0) = "(pop=1, t=1_a, pos=[3 3])"
-ObservationString(1) = "(pop=1, t=1_a, pos=[3 3])"
-ObservationTensor(0).x: ◯◯◯◉◯◯◯
+ObservationString(0) = "(pop=1, t=1_a, pos=[4 3])"
+ObservationString(1) = "(pop=1, t=1_a, pos=[4 3])"
+ObservationTensor(0).x: ◯◯◯◯◉◯◯
 ObservationTensor(0).y: ◯◯◯◉◯◯◯
 ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).x: ◯◯◯◉◯◯◯
+ObservationTensor(1).x: ◯◯◯◯◉◯◯
 ObservationTensor(1).y: ◯◯◯◉◯◯◯
 ObservationTensor(1).t: ◯◉◯◯◯◯◯◯◯◯◯
 Rewards() = [0, 0]
@@ -132,7 +132,7 @@ DistributionSupport() = ['(pop=0, t=1_a, pos=[0 0])', '(pop=1, t=1_a, pos=[0 0])
 action: update_distribution
 
 # State 4
-# (pop=1, t=1, pos=[3 3])
+# (pop=1, t=1, pos=[4 3])
 IsTerminal() = False
 History() = [32, 3, 4]
 HistoryString() = "32, 3, 4"
@@ -141,12 +141,12 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "32, 3, 4"
 InformationStateString(1) = "32, 3, 4"
-ObservationString(0) = "(pop=1, t=1, pos=[3 3])"
-ObservationString(1) = "(pop=1, t=1, pos=[3 3])"
-ObservationTensor(0).x: ◯◯◯◉◯◯◯
+ObservationString(0) = "(pop=1, t=1, pos=[4 3])"
+ObservationString(1) = "(pop=1, t=1, pos=[4 3])"
+ObservationTensor(0).x: ◯◯◯◯◉◯◯
 ObservationTensor(0).y: ◯◯◯◉◯◯◯
 ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).x: ◯◯◯◉◯◯◯
+ObservationTensor(1).x: ◯◯◯◯◉◯◯
 ObservationTensor(1).y: ◯◯◯◉◯◯◯
 ObservationTensor(1).t: ◯◉◯◯◯◯◯◯◯◯◯
 Rewards() = [0, 0]
@@ -162,21 +162,21 @@ action: 2
 action: 2
 
 # State 6
-# (pop=1, t=2_a, pos=[3 5])
+# (pop=1, t=2_a, pos=[4 5])
 IsTerminal() = False
 History() = [32, 3, 4, 2, 2]
 HistoryString() = "32, 3, 4, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "32, 3, 4, 2, 2"
 InformationStateString(1) = "32, 3, 4, 2, 2"
-ObservationString(0) = "(pop=1, t=2_a, pos=[3 5])"
-ObservationString(1) = "(pop=1, t=2_a, pos=[3 5])"
-ObservationTensor(0).x: ◯◯◯◉◯◯◯
+ObservationString(0) = "(pop=1, t=2_a, pos=[4 5])"
+ObservationString(1) = "(pop=1, t=2_a, pos=[4 5])"
+ObservationTensor(0).x: ◯◯◯◯◉◯◯
 ObservationTensor(0).y: ◯◯◯◯◯◉◯
 ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
-ObservationTensor(1).x: ◯◯◯◉◯◯◯
+ObservationTensor(1).x: ◯◯◯◯◉◯◯
 ObservationTensor(1).y: ◯◯◯◯◯◉◯
 ObservationTensor(1).t: ◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [0, 0]
@@ -187,7 +187,7 @@ DistributionSupport() = ['(pop=0, t=2_a, pos=[0 0])', '(pop=1, t=2_a, pos=[0 0])
 action: update_distribution
 
 # State 7
-# (pop=1, t=2, pos=[3 5])
+# (pop=1, t=2, pos=[4 5])
 IsTerminal() = False
 History() = [32, 3, 4, 2, 2]
 HistoryString() = "32, 3, 4, 2, 2"
@@ -196,12 +196,12 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "32, 3, 4, 2, 2"
 InformationStateString(1) = "32, 3, 4, 2, 2"
-ObservationString(0) = "(pop=1, t=2, pos=[3 5])"
-ObservationString(1) = "(pop=1, t=2, pos=[3 5])"
-ObservationTensor(0).x: ◯◯◯◉◯◯◯
+ObservationString(0) = "(pop=1, t=2, pos=[4 5])"
+ObservationString(1) = "(pop=1, t=2, pos=[4 5])"
+ObservationTensor(0).x: ◯◯◯◯◉◯◯
 ObservationTensor(0).y: ◯◯◯◯◯◉◯
 ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
-ObservationTensor(1).x: ◯◯◯◉◯◯◯
+ObservationTensor(1).x: ◯◯◯◯◉◯◯
 ObservationTensor(1).y: ◯◯◯◯◯◉◯
 ObservationTensor(1).t: ◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [0, 0]
@@ -217,22 +217,22 @@ action: 2
 action: 3
 
 # State 9
-# (pop=1, t=3_a, pos=[3 5])
+# (pop=1, t=3_a, pos=[4 4])
 IsTerminal() = False
 History() = [32, 3, 4, 2, 2, 2, 3]
 HistoryString() = "32, 3, 4, 2, 2, 2, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.MEAN_FIELD
+CurrentPlayer() = -5
 InformationStateString(0) = "32, 3, 4, 2, 2, 2, 3"
 InformationStateString(1) = "32, 3, 4, 2, 2, 2, 3"
-ObservationString(0) = "(pop=1, t=3_a, pos=[3 5])"
-ObservationString(1) = "(pop=1, t=3_a, pos=[3 5])"
-ObservationTensor(0).x: ◯◯◯◉◯◯◯
-ObservationTensor(0).y: ◯◯◯◯◯◉◯
+ObservationString(0) = "(pop=1, t=3_a, pos=[4 4])"
+ObservationString(1) = "(pop=1, t=3_a, pos=[4 4])"
+ObservationTensor(0).x: ◯◯◯◯◉◯◯
+ObservationTensor(0).y: ◯◯◯◯◉◯◯
 ObservationTensor(0).t: ◯◯◯◉◯◯◯◯◯◯◯
-ObservationTensor(1).x: ◯◯◯◉◯◯◯
-ObservationTensor(1).y: ◯◯◯◯◯◉◯
+ObservationTensor(1).x: ◯◯◯◯◉◯◯
+ObservationTensor(1).y: ◯◯◯◯◉◯◯
 ObservationTensor(1).t: ◯◯◯◉◯◯◯◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
@@ -322,22 +322,22 @@ action: 4
 action: 0
 
 # State 30
-# (pop=1, t=10_a, pos=[1 5])
+# (pop=1, t=10_a, pos=[2 2])
 IsTerminal() = True
 History() = [32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0]
 HistoryString() = "32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0"
 InformationStateString(1) = "32, 3, 4, 2, 2, 2, 3, 3, 3, 0, 0, 4, 2, 0, 3, 0, 2, 2, 0, 4, 0"
-ObservationString(0) = "(pop=1, t=10_a, pos=[1 5])"
-ObservationString(1) = "(pop=1, t=10_a, pos=[1 5])"
-ObservationTensor(0).x: ◯◉◯◯◯◯◯
-ObservationTensor(0).y: ◯◯◯◯◯◉◯
+ObservationString(0) = "(pop=1, t=10_a, pos=[2 2])"
+ObservationString(1) = "(pop=1, t=10_a, pos=[2 2])"
+ObservationTensor(0).x: ◯◯◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◉◯◯◯◯
 ObservationTensor(0).t: ◯◯◯◯◯◯◯◯◯◯◉
-ObservationTensor(1).x: ◯◉◯◯◯◯◯
-ObservationTensor(1).y: ◯◯◯◯◯◉◯
+ObservationTensor(1).x: ◯◯◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◉◯◯◯◯
 ObservationTensor(1).t: ◯◯◯◯◯◯◯◯◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]

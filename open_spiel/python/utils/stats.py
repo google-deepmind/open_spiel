@@ -110,6 +110,8 @@ class SlidingWindowAccumulator(object):
         self._index = 0
 
   def mean(self):
+    if not self._values:
+      return 0
     return sum(self._values) / len(self._values)
 
 
@@ -168,7 +170,7 @@ class StatCounter:
 
   @property
   def n(self):
-    return self.n
+    return self._n
 
   def ci95(self):
     if self._n == 0: return 0

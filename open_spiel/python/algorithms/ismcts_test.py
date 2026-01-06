@@ -20,13 +20,6 @@ from open_spiel.python.algorithms import mcts
 import pyspiel
 
 
-NOLIMIT_GAME_STRING = (
-    "universal_poker(betting=nolimit,bettingAbstraction=fullgame,blind=50 100,"
-    "firstPlayer=1 1,numBoardCards=0 3 1 1,numHoleCards=2,numPlayers=2,"
-    "numRanks=13,numRounds=2,numSuits=4,stack=20000 20000)"
-)
-
-
 class IsmctsTest(parameterized.TestCase):
 
   def test_action_candidates_selection(self):
@@ -50,7 +43,8 @@ class IsmctsTest(parameterized.TestCase):
     }
     node.total_visits = 4
     self.assertAlmostEqual(
-        ismcts_bot._action_value(node, node.child_info[0]).item(), 8.0
+        ismcts_bot._action_value(node, node.child_info[0]).item(),
+        8.177410022515474,
     )
     candidates = ismcts_bot._select_candidate_actions(node)
     self.assertLen(candidates, 2)
@@ -84,10 +78,25 @@ class IsmctsTest(parameterized.TestCase):
     )
     self.play_game(game, ismcts_bot)
 
+  def test_invalid_action_at_chance_node(self):
+    game = pyspiel.load_game("kuhn_poker")
+    state = game.new_initial_state()
+    assert state.is_chance_node(), "Kuhn poker should start at a chance node."
+    ismcts_bot = ismcts.ISMCTSBot(
+        game=game,
+        uct_c=4.0,
+        evaluator=mcts.RandomRolloutEvaluator(),
+        max_simulations=10,
+    )
+    policy, action = ismcts_bot.step_with_policy(state)
+    self.assertLen(policy, 1)
+    self.assertEqual(policy[0][0], pyspiel.INVALID_ACTION)
+    self.assertEqual(action, pyspiel.INVALID_ACTION)
+
   @absltest.skip("Skipping. This one does not work.")
   def test_play_universal_poker(self):
     if "universal_poker" in pyspiel.registered_names():
-      game = pyspiel.load_game(NOLIMIT_GAME_STRING)
+      game = pyspiel.load_game(pyspiel.hunl_game_string("fullgame"))
       ismcts_bot = ismcts.ISMCTSBot(
           game=game,
           uct_c=4.0,

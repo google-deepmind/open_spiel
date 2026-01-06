@@ -25,7 +25,14 @@ import pyspiel
 
 _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
-_OPTIONAL_GAMES = frozenset(["hanabi", "universal_poker"])
+_OPTIONAL_GAMES = frozenset([
+    "hanabi",
+    "python_pokerkit_wrapper",
+    "python_pokerkit_wrapper_acpc_style",
+    "python_repeated_pokerkit",
+    "repeated_poker",
+    "universal_poker"
+])
 _AVAILABLE_GAMES = set(pyspiel.registered_names())
 
 # Games for which we do not have playthroughs. Please don't add new games

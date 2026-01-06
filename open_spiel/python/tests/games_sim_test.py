@@ -43,7 +43,18 @@ SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 # or while there are any known issues with the game causing test failures.
 SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = [
     "dou_dizhu",  # https://github.com/google-deepmind/open_spiel/issues/1358
-    "quoridor",   # https://github.com/google-deepmind/open_spiel/issues/1349
+    "quoridor",  # https://github.com/google-deepmind/open_spiel/issues/1349
+]
+
+# A list of games to exclude testing pickle serialization of the 'game type'
+# during general simulation tests (without entirely excluding them from the
+# simulation tests / pickling the game itself). This is necessary in cases where
+# OpenSpiel is improperly handling serialization of game types, e.g. python
+# games using a nested dict to store default params within their
+# parameter_specification).
+# TODO: b/445192003 - Investigate + resolve the serialization issue.
+SPIEL_EXCLUDE_CHECKING_GAME_TYPE_SERIALIZATION_GAMES_LIST = [
+    "python_repeated_pokerkit",
 ]
 
 # TODO(b/141950198): Stop hard-coding the number of loadable games.
@@ -51,11 +62,13 @@ assert len(SPIEL_LOADABLE_GAMES_LIST) >= 38, len(SPIEL_LOADABLE_GAMES_LIST)
 
 # All simultaneous games.
 SPIEL_SIMULTANEOUS_GAMES_LIST = [
-    g for g in SPIEL_LOADABLE_GAMES_LIST
+    g
+    for g in SPIEL_LOADABLE_GAMES_LIST
     if g.dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS
 ]
 assert len(SPIEL_SIMULTANEOUS_GAMES_LIST) >= 14, len(
-    SPIEL_SIMULTANEOUS_GAMES_LIST)
+    SPIEL_SIMULTANEOUS_GAMES_LIST
+)
 
 # All multiplayer games. This is a list of (game, num_players) pairs to test.
 # pylint: disable=g-complex-comprehension
@@ -63,13 +76,19 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     (g, p)
     for g in SPIEL_LOADABLE_GAMES_LIST
     for p in range(max(g.min_num_players, 2), 1 + min(g.max_num_players, 6))
-    if g.max_num_players > 2 and g.max_num_players > g.min_num_players and
-    g.short_name != "tiny_hanabi"  # default payoff only works for 2p
+    if g.max_num_players > 2
+    and g.max_num_players > g.min_num_players
+    and g.short_name != "tiny_hanabi"  # default payoff only works for 2p
     # cannot change the number of players without changing other parameters
-    and g.short_name != "universal_poker" and g.short_name != "scotland_yard"
+    and g.short_name != "universal_poker"
+    and g.short_name != "python_pokerkit_wrapper"
+    and g.short_name != "python_pokerkit_wrapper_acpc_style"
+    and g.short_name != "python_repeated_pokerkit"
+    and g.short_name != "scotland_yard"
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
-    SPIEL_MULTIPLAYER_GAMES_LIST)
+    SPIEL_MULTIPLAYER_GAMES_LIST
+)
 
 
 class GamesSimTest(parameterized.TestCase):
@@ -95,8 +114,9 @@ class GamesSimTest(parameterized.TestCase):
     self.assertEqual(str(state), str(state_clone))
     self.assertEqual(state.history(), state_clone.history())
 
-  def serialize_deserialize(self, game, state, check_pyspiel_serialization,
-                            check_pickle_serialization):
+  def serialize_deserialize(
+      self, game, state, check_pyspiel_serialization, check_pickle_serialization
+  ):
     # OpenSpiel native serialization
     if check_pyspiel_serialization:
       ser_str = pyspiel.serialize_game_and_state(game, state)
@@ -114,8 +134,13 @@ class GamesSimTest(parameterized.TestCase):
       game,
       check_pyspiel_serialization=True,
       check_pickle_serialization=True,
+      # Only considered at all if check_pickle_serialization is True. Structured
+      # this way to provide backwards compatibility with existing calls to this
+      # function before this flag was added.
+      check_game_type_serialization_when_checking_pickle_serialization=True,
       make_distribution_fn=(
-          lambda states: ([1 / len(states)] * len(states) if states else []))
+          lambda states: ([1 / len(states)] * len(states) if states else [])
+      ),
   ):
     min_utility = game.min_utility()
     max_utility = game.max_utility()
@@ -127,10 +152,23 @@ class GamesSimTest(parameterized.TestCase):
       unpickled_game = pickle.loads(pickled_game)
       self.assertEqual(str(game), str(unpickled_game))
 
-      # Pickle serialization + deserialization (of the game type).
-      pickled_game_type = pickle.dumps(game.get_type())
-      unpickled_game_type = pickle.loads(pickled_game_type)
-      self.assertEqual(game.get_type(), unpickled_game_type)
+      if check_game_type_serialization_when_checking_pickle_serialization:
+        # Pickle serialization + deserialization (of the game type).
+        #
+        # NOTE: python games with nested dict (i.e. nested kGame) params in
+        # their default params for their parameter_specification might fail
+        # these checks even when correctly implemented, and so may need to set
+        # check_game_type_serialization_when_checking_pickle_serialization False
+        # when calling this function.
+        pickled_game_type = pickle.dumps(game.get_type())
+        unpickled_game_type = pickle.loads(pickled_game_type)
+        self.assertEqual(game.get_type(), unpickled_game_type)
+      else:
+        print(
+            f"{game.get_type().short_name}'s GAME_TYPE is excluded from pickle"
+            " serialization check, so skipping. Now continuing on with the rest"
+            " of the sim_game function."
+        )
 
     # Get a new state
     for state in game.new_initial_states():
@@ -143,8 +181,12 @@ class GamesSimTest(parameterized.TestCase):
 
         # Serialize/Deserialize is costly. Only do it every power of 2 actions.
         if total_actions >= next_serialize_check:
-          self.serialize_deserialize(game, state, check_pyspiel_serialization,
-                                     check_pickle_serialization)
+          self.serialize_deserialize(
+              game,
+              state,
+              check_pyspiel_serialization,
+              check_pickle_serialization,
+          )
           next_serialize_check *= 2
 
         # The state can be four different types: chance node,
@@ -166,10 +208,12 @@ class GamesSimTest(parameterized.TestCase):
           # Apply the joint action and test cloning states.
           self.apply_action_test_clone(state, chosen_actions)
         elif state.is_mean_field_node():
-          self.assertEqual(game.get_type().dynamics,
-                           pyspiel.GameType.Dynamics.MEAN_FIELD)
+          self.assertEqual(
+              game.get_type().dynamics, pyspiel.GameType.Dynamics.MEAN_FIELD
+          )
           state.update_distribution(
-              make_distribution_fn(state.distribution_support()))
+              make_distribution_fn(state.distribution_support())
+          )
         else:
           self.assertTrue(state.is_player_node())
           # Decision node: sample action for the single current player
@@ -178,8 +222,9 @@ class GamesSimTest(parameterized.TestCase):
           self.apply_action_test_clone(state, action)
 
       # Max sure at least one action was made.
-      self.assertGreater(total_actions, 0,
-                         "No actions taken in sim of " + str(game))
+      self.assertGreater(
+          total_actions, 0, "No actions taken in sim of " + str(game)
+      )
 
       # Either the game is now done, or the maximum actions has been taken.
       if state.is_terminal():
@@ -196,14 +241,20 @@ class GamesSimTest(parameterized.TestCase):
         for utility in utilities:
           self.assertGreaterEqual(utility, game.min_utility())
           self.assertLessEqual(utility, game.max_utility())
-        print("Sim of game {} terminated with {} total actions. Utilities: {}"
-              .format(game, total_actions, utilities))
+        print(
+            "Sim of game {} terminated with {} total actions. Utilities: {}"
+            .format(game, total_actions, utilities)
+        )
       else:
-        print("Sim of game {} terminated after maximum number of actions {}"
-              .format(game, MAX_ACTIONS_PER_GAME))
+        print(
+            "Sim of game {} terminated after maximum number of actions {}"
+            .format(game, MAX_ACTIONS_PER_GAME)
+        )
 
-  @parameterized.named_parameters((game_info.short_name, game_info)
-                                  for game_info in SPIEL_LOADABLE_GAMES_LIST)
+  @parameterized.named_parameters(
+      (game_info.short_name, game_info)
+      for game_info in SPIEL_LOADABLE_GAMES_LIST
+  )
   def test_game_sim(self, game_info):
     if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
       print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
@@ -211,11 +262,19 @@ class GamesSimTest(parameterized.TestCase):
     game = pyspiel.load_game(game_info.short_name)
     self.assertLessEqual(game_info.min_num_players, game.num_players())
     self.assertLessEqual(game.num_players(), game_info.max_num_players)
-    self.sim_game(game)
+    check_game_type_pickles = (
+        game_info.short_name
+        not in SPIEL_EXCLUDE_CHECKING_GAME_TYPE_SERIALIZATION_GAMES_LIST
+    )
+    self.sim_game(
+        game,
+        check_game_type_serialization_when_checking_pickle_serialization=check_game_type_pickles,
+    )
 
   @parameterized.named_parameters(
       (game_info.short_name, game_info)
-      for game_info in SPIEL_SIMULTANEOUS_GAMES_LIST)
+      for game_info in SPIEL_SIMULTANEOUS_GAMES_LIST
+  )
   def test_simultaneous_game_as_turn_based(self, game_info):
     if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
       print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
@@ -223,8 +282,9 @@ class GamesSimTest(parameterized.TestCase):
     converted_game = pyspiel.load_game_as_turn_based(game_info.short_name)
     self.sim_game(converted_game)
 
-  @parameterized.named_parameters((f"{p}p_{g.short_name}", g, p)
-                                  for g, p in SPIEL_MULTIPLAYER_GAMES_LIST)
+  @parameterized.named_parameters(
+      (f"{p}p_{g.short_name}", g, p) for g, p in SPIEL_MULTIPLAYER_GAMES_LIST
+  )
   def test_multiplayer_game(self, game_info, num_players):
     if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
       print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
@@ -248,7 +308,7 @@ class GamesSimTest(parameterized.TestCase):
       pops = [pop_1, pop_2, pop_3, pop_4]
       init_distrib = []
       for p in range(num_players):
-        init_distrib += pops[p%4]
+        init_distrib += pops[p % 4]
       init_distrib = np.array(init_distrib)
       dict_args = {
           "players": num_players,
@@ -278,22 +338,26 @@ class GamesSimTest(parameterized.TestCase):
       self.sim_game(
           game,
           check_pyspiel_serialization=False,
-          check_pickle_serialization=False)
+          check_pickle_serialization=False,
+      )
     game = pyspiel.load_efg_game(pyspiel.get_kuhn_poker_efg_data())
     for _ in range(0, 100):
       self.sim_game(
           game,
           check_pyspiel_serialization=False,
-          check_pickle_serialization=False)
+          check_pickle_serialization=False,
+      )
     # EFG games loaded by file should serialize properly:
     filename = file_utils.find_file(
-        "third_party/open_spiel/games/efg/sample.efg", 2)
+        "third_party/open_spiel/games/efg/sample.efg", 2
+    )
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
         self.sim_game(game)
     filename = file_utils.find_file(
-        "third_party/open_spiel/games/efg/sample.efg", 2)
+        "third_party/open_spiel/games/efg/sample.efg", 2
+    )
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
@@ -308,9 +372,11 @@ class GamesSimTest(parameterized.TestCase):
     checker_moves = state.spiel_move_to_checker_moves(0, action)
     print("Checker moves:")
     for i in range(2):
-      print("pos {}, num {}, hit? {}".format(checker_moves[i].pos,
-                                             checker_moves[i].num,
-                                             checker_moves[i].hit))
+      print(
+          "pos {}, num {}, hit? {}".format(
+              checker_moves[i].pos, checker_moves[i].num, checker_moves[i].hit
+          )
+      )
     action2 = state.checker_moves_to_spiel_move(checker_moves)
     self.assertEqual(action, action2)
     action3 = state.translate_action(0, 0, True)  # 0->2, 0->1
@@ -330,9 +396,9 @@ class GamesSimTest(parameterized.TestCase):
         player = state.current_player()
         for action in legal_actions:
           action_str = state.action_to_string(player, action)
-          checker_moves = (
-              state.augment_with_hit_info(
-                  player, state.spiel_move_to_checker_moves(player, action)))
+          checker_moves = state.augment_with_hit_info(
+              player, state.spiel_move_to_checker_moves(player, action)
+          )
           if checker_moves[0].hit or checker_moves[1].hit:
             self.assertGreaterEqual(action_str.find("*"), 0)
           else:
@@ -340,16 +406,17 @@ class GamesSimTest(parameterized.TestCase):
           if action_str.find("*") > 0:
             self.assertTrue(checker_moves[0].hit or checker_moves[1].hit)
           else:
-            self.assertTrue(not checker_moves[0].hit and
-                            not checker_moves[1].hit)
+            self.assertTrue(
+                not checker_moves[0].hit and not checker_moves[1].hit
+            )
         action = np.random.choice(legal_actions)
         state.apply_action(action)
 
   def test_leduc_get_and_set_private_cards(self):
     game = pyspiel.load_game("leduc_poker")
     state = game.new_initial_state()
-    state.apply_action(0)   # give player 0 jack of first suit
-    state.apply_action(1)   # give player 1 jack of second suit
+    state.apply_action(0)  # give player 0 jack of first suit
+    state.apply_action(1)  # give player 1 jack of second suit
     # check that we can retrieve those cards
     print(state)
     private_cards = state.get_private_cards()
@@ -391,10 +458,14 @@ class GamesSimTest(parameterized.TestCase):
   )
   def test_restricted_nash_response_test(self, game_name):
     rnr_game = pyspiel.load_game(
-        f"restricted_nash_response(game={game_name}())")
+        f"restricted_nash_response(game={game_name}())"
+    )
     for _ in range(10):
-      self.sim_game(rnr_game, check_pyspiel_serialization=False,
-                    check_pickle_serialization=False)
+      self.sim_game(
+          rnr_game,
+          check_pyspiel_serialization=False,
+          check_pickle_serialization=False,
+      )
 
   # TODO(author18): find the list of games where it is reasonable to call
   # get_all_states
@@ -408,15 +479,17 @@ class GamesSimTest(parameterized.TestCase):
   def test_has_at_least_an_action(self, game_name):
     """Check that all population's state have at least one action."""
     game = pyspiel.load_game(game_name)
-    to_string = (
-        lambda s: s.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
+    to_string = lambda s: s.observation_string(
+        pyspiel.PlayerId.DEFAULT_PLAYER_ID
+    )
     states = get_all_states.get_all_states(
         game,
         depth_limit=-1,
         include_terminals=False,
         include_chance_states=False,
         include_mean_field_states=False,
-        to_string=to_string)
+        to_string=to_string,
+    )
     for state in states.values():
       self.assertNotEmpty(state.legal_actions())
 

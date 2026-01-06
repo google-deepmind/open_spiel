@@ -20,11 +20,14 @@
 
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::tic_tac_toe::CellState;
+using open_spiel::tic_tac_toe::TicTacToeObservationStruct;
 using open_spiel::tic_tac_toe::TicTacToeState;
 using open_spiel::tic_tac_toe::TicTacToeStateStruct;
 
@@ -40,10 +43,19 @@ void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
 
   py::class_<TicTacToeStateStruct, open_spiel::StateStruct>(
       tic_tac_toe, "TicTacToeStateStruct")
-      .def(py::init<>())
+      .def(py::init<>())  // TODO(author10): Can we move these to StateStruct?
       .def(py::init<std::string>())
+      .def(py::init<const nlohmann::json>())
       .def_readwrite("current_player", &TicTacToeStateStruct::current_player)
       .def_readwrite("board", &TicTacToeStateStruct::board);
+
+  py::class_<TicTacToeObservationStruct, open_spiel::ObservationStruct>(
+      tic_tac_toe, "TicTacToeObservationStruct")
+      .def(py::init<>())
+      .def(py::init<std::string>())
+      .def_readwrite("current_player",
+                     &TicTacToeObservationStruct::current_player)
+      .def_readwrite("board", &TicTacToeObservationStruct::board);
 
   py::enum_<CellState>(tic_tac_toe, "CellState")
       .value("EMPTY", CellState::kEmpty)

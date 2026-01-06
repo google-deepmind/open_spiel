@@ -36,8 +36,8 @@ class SCOTest(absltest.TestCase):
     self.assertGreater(ratings[0], ratings[1])
     self.assertGreater(ratings[1], ratings[2])
 
-  def test_meeple_pentathlon(self):
-    """Meeple pentathlon from the VasE paper."""
+  def test_meeple_pentathlon_sigmoid(self):
+    """Meeple pentathlon from the VasE paper using the sigmoid loss."""
     profile = base.PreferenceProfile(
         votes=[
             ["A", "B", "C"],
@@ -55,6 +55,32 @@ class SCOTest(absltest.TestCase):
     # Correct ranking is C > A > B.
     self.assertGreater(ratings[2], ratings[0])
     self.assertGreater(ratings[0], ratings[1])
+
+  def test_meeple_pentathlon_fenchel_young(self):
+    """Meeple pentathlon from the VasE paper using the Fenchel-Young loss."""
+    profile = base.PreferenceProfile(
+        votes=[
+            ["A", "B", "C"],
+            ["A", "C", "B"],
+            ["C", "A", "B"],
+            ["C", "A", "B"],
+            ["B", "C", "A"],
+        ]
+    )
+    solver = sco.FenchelYoungOptimizer(
+        profile=profile,
+        batch_size=4,
+        rating_lower_bound=0,
+        rating_upper_bound=1000,
+        sigma=20,
+    )
+    ratings, ranking = solver.run_solver(10000, learning_rate=0.1)
+    alt_idx = profile.alternatives_dict
+    for alt in ranking:
+      print(f"{alt}: {ratings[alt_idx[alt]]}")
+    # Like Elo, agent A will have a higher rating in Fenchel-Young.
+    self.assertGreater(ratings[0], ratings[1])
+    self.assertGreater(ratings[0], ratings[2])
 
   def test_cpp_meeple_pentathlon_sigmoid(self):
     # Tests the C++ implementation of the SCO with sigmoid solver.

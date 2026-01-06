@@ -21,6 +21,7 @@ if [[ "$OS" = "Darwin" ]]; then
   rm -f /usr/local/bin/2to3-${OS_PYTHON_VERSION}
   rm -f /usr/local/bin/idle${OS_PYTHON_VERSION}
   rm -f /usr/local/bin/pydoc${OS_PYTHON_VERSION}
+  rm -f /usr/local/bin/pip${OS_PYTHON_VERSION}
   rm -f /usr/local/bin/python${OS_PYTHON_VERSION}
   rm -f /usr/local/bin/python${OS_PYTHON_VERSION}*
 fi

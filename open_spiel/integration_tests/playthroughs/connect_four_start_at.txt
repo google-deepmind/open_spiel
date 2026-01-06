@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "StartAt history=4;3;3;2;0;4;4;4;4;0 game=Connect Four"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = []
+GameType.parameter_specification = ["columns", "egocentric_obs_tensor", "rows", "x_in_row"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -48,11 +48,11 @@ InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0"
 ObservationString(0) = ".......\n....x..\n....o..\n....x..\no..xo..\nx.oox..\n"
 ObservationString(1) = ".......\n....x..\n....o..\n....x..\no..xo..\nx.oox..\n"
 ObservationTensor(0):
-◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
-◉◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
+◯◯◯◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◉◯◯◉◉
 ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ObservationTensor(1):
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -87,11 +87,11 @@ InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2"
 ObservationString(0) = ".......\n....x..\n....o..\n....x..\no.xxo..\nx.oox..\n"
 ObservationString(1) = ".......\n....x..\n....o..\n....x..\no.xxo..\nx.oox..\n"
 ObservationTensor(0):
-◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ObservationTensor(1):
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -126,11 +126,11 @@ InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0"
 ObservationString(0) = ".......\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
 ObservationString(1) = ".......\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
 ObservationTensor(0):
-◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
-◉◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◉◉◉◯◉◉
-◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
+◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
+◯◯◯◯◉◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◯◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ObservationTensor(1):
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -165,12 +165,12 @@ InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4"
 ObservationString(0) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
 ObservationString(1) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
 ObservationTensor(0):
-◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
-◉◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◉◉◉◯◉◉
+◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
+◯◯◯◯◉◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ObservationTensor(1):
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
 ◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
@@ -204,12 +204,12 @@ InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1"
 ObservationString(0) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nxooox..\n"
 ObservationString(1) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nxooox..\n"
 ObservationTensor(0):
-◯◉◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◯◯◯◯◉◉
-◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
-◉◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◉◉◉◯◉◉
+◉◯◯◯◉◯◯  ◯◉◉◉◯◯◯  ◯◯◯◯◯◉◉
+◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
+◯◯◯◯◉◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ObservationTensor(1):
 ◉◯◯◯◉◯◯  ◯◉◉◉◯◯◯  ◯◯◯◯◯◉◉
 ◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
@@ -243,12 +243,12 @@ InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1, 2"
 ObservationString(0) = "....x..\n....x..\n....o..\no.x.x..\no.xxo..\nxooox..\n"
 ObservationString(1) = "....x..\n....x..\n....o..\no.x.x..\no.xxo..\nxooox..\n"
 ObservationTensor(0):
-◯◉◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◯◯◯◯◉◉
-◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
-◉◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◯◉◯◉◯◉◉
+◉◯◯◯◉◯◯  ◯◉◉◉◯◯◯  ◯◯◯◯◯◉◉
+◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
+◯◯◉◯◉◯◯  ◉◯◯◯◯◯◯  ◯◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
 ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ObservationTensor(1):
 ◉◯◯◯◉◯◯  ◯◉◉◉◯◯◯  ◯◯◯◯◯◉◉
 ◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
@@ -310,12 +310,12 @@ InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1, 2, 6, 3, 
 ObservationString(0) = "....x..\n..x.x..\n..xoo..\no.xxx.x\nooxxo.o\nxooox.o\n"
 ObservationString(1) = "....x..\n..x.x..\n..xoo..\no.xxx.x\nooxxo.o\nxooox.o\n"
 ObservationTensor(0):
-◯◉◉◉◯◯◉  ◉◯◯◯◉◯◯  ◯◯◯◯◯◉◯
-◉◉◯◯◉◯◉  ◯◯◉◉◯◯◯  ◯◯◯◯◯◉◯
-◉◯◯◯◯◯◯  ◯◯◉◉◉◯◉  ◯◉◯◯◯◉◯
-◯◯◯◉◉◯◯  ◯◯◉◯◯◯◯  ◉◉◯◯◯◉◉
-◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◉◯◉◯◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+◉◯◯◯◉◯◯  ◯◉◉◉◯◯◉  ◯◯◯◯◯◉◯
+◯◯◉◉◯◯◯  ◉◉◯◯◉◯◉  ◯◯◯◯◯◉◯
+◯◯◉◉◉◯◉  ◉◯◯◯◯◯◯  ◯◉◯◯◯◉◯
+◯◯◉◯◯◯◯  ◯◯◯◉◉◯◯  ◉◉◯◯◯◉◉
+◯◯◉◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◉◉
 ObservationTensor(1):
 ◉◯◯◯◉◯◯  ◯◉◉◉◯◯◉  ◯◯◯◯◯◉◯
 ◯◯◉◉◯◯◯  ◉◉◯◯◉◯◉  ◯◯◯◯◯◉◯

@@ -79,7 +79,7 @@ DOWNLOAD_CACHE_DIR=${DOWNLOAD_CACHE_DIR:-$DEFAULT_DOWNLOAD_CACHE_DIR}
 # Create the cache directory.
 [[ -d "${DOWNLOAD_CACHE_DIR}" ]] || mkdir "${DOWNLOAD_CACHE_DIR}"
 
-# 1. Clone the external dependencies before installing systen packages, to make
+# 1. Clone the external dependencies before installing system packages, to make
 # sure they are present even if later commands fail.
 #
 # We do not use submodules because the CL versions are stored within Git

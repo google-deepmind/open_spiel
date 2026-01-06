@@ -180,7 +180,7 @@ struct Move {
   // [x] is only included for captures
   // [to square] is always included
   // [=Promo] is only included for promotions ("=N", "=B", "=R", "=Q" depending
-  //     on type promoting to).
+  //     on type promoting to, possibly "=K" if king promotion is allowed).
   // [annotations] are a list of 0 or more characters added with different
   //     meanings. The ones we care about are '+' for check, and '#' for
   //     checkmate. All others are optional.
@@ -257,15 +257,15 @@ inline const chess::Move kPassMove =
 class ChessBoard {
  public:
   ChessBoard(int board_size = kDefaultBoardSize,
-             bool king_in_check_allowed = false,
-             bool allow_pass_move = false);
+             bool king_in_check_allowed = false, bool allow_pass_move = false,
+             bool allow_king_promotion = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   static absl::optional<ChessBoard> BoardFromFEN(
       const std::string& fen, int board_size = 8,
-      bool king_in_check_allowed = false,
-      bool allow_pass_move = false);
+      bool king_in_check_allowed = false, bool allow_pass_move = false,
+      bool allow_king_promotion = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
@@ -431,6 +431,9 @@ class ChessBoard {
 
   bool AllowPassMove() const { return allow_pass_move_; }
 
+  // Some variants allow promoting pawns to kings, like Antichess.
+  bool AllowKingPromotion() const { return allow_king_promotion_; }
+
   uint64_t HashValue() const { return zobrist_hash_; }
 
   std::string DebugString(bool shredder_fen = false) const;
@@ -545,6 +548,7 @@ class ChessBoard {
   int board_size_;
   bool king_in_check_allowed_;
   bool allow_pass_move_;
+  bool allow_king_promotion_;
 
   std::array<Piece, k2dMaxBoardSize> board_;
   Color to_play_;

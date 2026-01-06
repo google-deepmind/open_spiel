@@ -1,4 +1,3 @@
-
 if (OPEN_SPIEL_BUILDING_WHEEL)
   # When building a wheel, need to use this. See:
   # https://github.com/joerick/cibuildwheel/issues/639#issuecomment-817872369
@@ -61,12 +60,18 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_gin_rummy.h
   pybind11/games_go.cc
   pybind11/games_go.h
+  pybind11/games_hearts.cc
+  pybind11/games_hearts.h
   pybind11/games_kuhn_poker.cc
   pybind11/games_kuhn_poker.h
   pybind11/games_leduc_poker.cc
   pybind11/games_leduc_poker.h
   pybind11/games_negotiation.cc
   pybind11/games_negotiation.h
+  pybind11/games_pokerkit_wrapper.cc
+  pybind11/games_pokerkit_wrapper.h
+  pybind11/games_repeated_pokerkit.cc
+  pybind11/games_repeated_pokerkit.h
   pybind11/games_spades.cc
   pybind11/games_spades.h
   pybind11/games_tarok.cc
@@ -95,6 +100,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
 
 if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      pybind11/games_repeated_poker.cc
+      pybind11/games_repeated_poker.h
       pybind11/games_universal_poker.cc
       pybind11/games_universal_poker.h
   )
@@ -169,7 +176,8 @@ endif()
 # Python tests to run. Start with all the core tests here first, then
 # conditionally add other tests based on what has been enabled/detected.
 set(PYTHON_TESTS ${PYTHON_TESTS}
-  ../integration_tests/api_test.py
+  # Disabled until we can reduce the length. See #1371.
+  # ../integration_tests/api_test.py
   ../integration_tests/playthrough_test.py
   algorithms/action_value_test.py
   algorithms/action_value_vs_best_response_test.py
@@ -222,6 +230,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
   games/liars_poker_test.py
+  games/pokerkit_wrapper_test.py
   games/team_dominoes_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
@@ -245,8 +254,11 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
+  tests/games_hearts_test.py
+  tests/games_repeated_poker_test.py
   tests/games_sim_test.py
   tests/games_tic_tac_toe_test.py
+  tests/games_universal_poker_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
@@ -330,10 +342,17 @@ set(WHEEL_EXCLUDED_PYTHON_TESTS
   games/tic_tac_toe_test.py
   ../integration_tests/playthrough_test.py)
 
+# Prefer to use PYBIN as the executable if it's defined (e.g. on GitHub CI)
+if(NOT DEFINED ENV{PYBIN})
+  set(PYBIN ${Python3_EXECUTABLE})
+else()
+  set(PYBIN $ENV{PYBIN})
+endif()
+
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   if (NOT (OPEN_SPIEL_BUILDING_WHEEL AND ${py_test_file} IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS))
-    add_test(NAME python/${py_test_file} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+    add_test(NAME python/${py_test_file} COMMAND ${PYBIN} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
     # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
     # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
@@ -350,7 +369,7 @@ endforeach(py_test_file)
 # We don't generate these automatically because we may want custom parameters.
 if (OPEN_SPIEL_ENABLE_JAX AND NOT OPEN_SPIEL_BUILDING_WHEEL)
   add_test(NAME python_examples_bridge_supervised_learning
-           COMMAND ${Python3_EXECUTABLE}
+           COMMAND ${PYBIN}
            ${CMAKE_CURRENT_SOURCE_DIR}/examples/bridge_supervised_learning.py
            --iterations 10
            --eval_every 5

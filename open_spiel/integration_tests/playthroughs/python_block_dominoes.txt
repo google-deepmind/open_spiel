@@ -40,7 +40,7 @@ History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "p0 hand:[] history:[]"
 InformationStateString(1) = "p1 hand:[] history:[]"
 InformationStateTensor(0).player: ◉◯
@@ -126,7 +126,7 @@ History() = [5]
 HistoryString() = "5"
 IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
+CurrentPlayer() = -1
 InformationStateString(0) = "p0 hand:[(0.0, 5.0)] history:[]"
 InformationStateString(1) = "p1 hand:[] history:[]"
 InformationStateTensor(0).player: ◉◯
@@ -538,7 +538,7 @@ History() = [5, 10, 26, 19, 0, 16, 4, 20, 23, 1, 27, 6, 13, 25, 0, 95, 15, 148, 
 HistoryString() = "5, 10, 26, 19, 0, 16, 4, 20, 23, 1, 27, 6, 13, 25, 0, 95, 15, 148, 47, 115, 74, 143, 55, 134"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.TERMINAL
+CurrentPlayer() = -4
 InformationStateString(0) = "p0 hand:[(0.0, 4.0), (1.0, 4.0)] history:[p0 tile:(0.0, 0.0) pip:None, p1 tile:(0.0, 6.0) pip:0.0, p0 tile:(0.0, 5.0) pip:0.0, p1 tile:(5.0, 5.0) pip:5.0, p0 tile:(2.0, 5.0) pip:5.0, p1 tile:(2.0, 2.0) pip:2.0, p0 tile:(5.0, 6.0) pip:6.0, p1 tile:(4.0, 5.0) pip:5.0, p0 tile:(3.0, 4.0) pip:4.0, p1 tile:(3.0, 5.0) pip:3.0]"
 InformationStateString(1) = "p1 hand:[(0.0, 1.0), (6.0, 6.0)] history:[p0 tile:(0.0, 0.0) pip:None, p1 tile:(0.0, 6.0) pip:0.0, p0 tile:(0.0, 5.0) pip:0.0, p1 tile:(5.0, 5.0) pip:5.0, p0 tile:(2.0, 5.0) pip:5.0, p1 tile:(2.0, 2.0) pip:2.0, p0 tile:(5.0, 6.0) pip:6.0, p1 tile:(4.0, 5.0) pip:5.0, p0 tile:(3.0, 4.0) pip:4.0, p1 tile:(3.0, 5.0) pip:3.0]"
 InformationStateTensor(0).player: ◉◯

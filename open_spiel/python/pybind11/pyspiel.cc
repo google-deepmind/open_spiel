@@ -52,6 +52,7 @@
 #include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
 #include "open_spiel/python/pybind11/games_go.h"
+#include "open_spiel/python/pybind11/games_hearts.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_leduc_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
@@ -60,6 +61,8 @@
 #include "open_spiel/python/pybind11/games_tic_tac_toe.h"
 #include "open_spiel/python/pybind11/games_tiny_bridge.h"
 #include "open_spiel/python/pybind11/games_trade_comm.h"
+#include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
+#include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -70,6 +73,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 // Includes needed for absl::optional.
 #include "pybind11/include/pybind11/detail/common.h"
@@ -83,10 +87,11 @@
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
 #endif
 #if OPEN_SPIEL_BUILD_WITH_ACPC
+#include "open_spiel/python/pybind11/games_repeated_poker.h"
 #include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
-#define PYSPIEL_VERSION "1.6.1"
+#define PYSPIEL_VERSION "1.6.11"
 
 // Flags governing Open Spiel behaviour
 ABSL_FLAG(bool, log_exceptions_to_stderr, true,
@@ -120,10 +125,33 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
+static py::object CreatePlayerIdIntEnum(py::module_ m) {
+  py::object enum_mod = py::module_::import("enum");
+  py::object IntEnum  = enum_mod.attr("IntEnum");
+  std::string modname = py::str(m.attr("__name__"));
+
+  py::dict members;
+  members["DEFAULT_PLAYER_ID"] =
+      py::int_(open_spiel::kDefaultPlayerId);
+  members["INVALID"] = py::int_(open_spiel::kInvalidPlayer);
+  members["TERMINAL"] = py::int_(open_spiel::kTerminalPlayerId);
+  members["CHANCE"] = py::int_(open_spiel::kChancePlayerId);
+  members["MEAN_FIELD"] = py::int_(open_spiel::kMeanFieldPlayerId);
+  members["SIMULTANEOUS"] =
+      py::int_(open_spiel::kSimultaneousPlayerId);
+
+  py::object PlayerId = IntEnum("PlayerId", members,
+                                py::arg("module") = modname);
+  m.attr("PlayerId") = PlayerId;
+  return PlayerId;
+}
+
 // Definition of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
   m.attr("__version__") = PYSPIEL_VERSION;
+
+  m.attr("PlayerId") = CreatePlayerIdIntEnum(m);
 
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");
@@ -245,14 +273,6 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("REWARDS", GameType::RewardModel::kRewards)
       .value("TERMINAL", GameType::RewardModel::kTerminal);
 
-  py::enum_<open_spiel::PlayerId>(m, "PlayerId")
-      .value("DEFAULT_PLAYER_ID", open_spiel::kDefaultPlayerId)
-      .value("INVALID", open_spiel::kInvalidPlayer)
-      .value("TERMINAL", open_spiel::kTerminalPlayerId)
-      .value("CHANCE", open_spiel::kChancePlayerId)
-      .value("MEAN_FIELD", open_spiel::kMeanFieldPlayerId)
-      .value("SIMULTANEOUS", open_spiel::kSimultaneousPlayerId);
-
   py::class_<GameInfo> game_info(m, "GameInfo");
   game_info
       .def(py::init<int, int, int, double, double, absl::optional<double>,
@@ -270,9 +290,14 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("utility_sum", &GameInfo::utility_sum)
       .def_readonly("max_game_length", &GameInfo::max_game_length);
 
-  py::class_<StateStruct> state_struct(m, "StateStruct");
-  state_struct
-      .def("to_json", &StateStruct::ToJson);
+  py::class_<GameStruct> game_struct(m, "GameStruct");
+  game_struct.def("to_json", &GameStruct::ToJson);
+
+  py::class_<StateStruct, GameStruct>(m, "StateStruct");
+
+  py::class_<ObservationStruct, GameStruct>(m, "ObservationStruct");
+
+  py::class_<ActionStruct, GameStruct>(m, "ActionStruct");
 
   m.attr("INVALID_ACTION") = py::int_(open_spiel::kInvalidAction);
 
@@ -292,6 +317,11 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("apply_action_with_legality_check",
            py::overload_cast<Action>(
                &State::ApplyActionWithLegalityCheck))
+      .def("apply_actions", &State::ApplyActions)
+      .def("apply_actions_with_legality_checks",
+           &State::ApplyActionsWithLegalityChecks)
+      .def("apply_action_struct", &State::ApplyActionStruct)
+      .def("undo_action", &State::UndoAction)
       .def("legal_actions",
            (std::vector<open_spiel::Action>(State::*)(int) const) &
                State::LegalActions)
@@ -311,6 +341,13 @@ PYBIND11_MODULE(pyspiel, m) {
                State::StringToAction)
       .def("string_to_action",
            (Action(State::*)(const std::string&) const) & State::StringToAction)
+      .def("action_to_struct",
+           (std::unique_ptr<ActionStruct>(State::*)(Player, Action) const) &
+               State::ActionToStruct)
+      .def("action_to_struct",
+           (std::unique_ptr<ActionStruct>(State::*)(Action) const) &
+               State::ActionToStruct)
+      .def("struct_to_action", &State::StructToAction)
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
       .def("to_string", &State::ToString)
@@ -348,18 +385,23 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::vector<float>(State::*)(int) const) & State::ObservationTensor)
       .def("observation_tensor",
            (std::vector<float>(State::*)() const) & State::ObservationTensor)
+      .def("to_observation_struct",
+           (std::unique_ptr<ObservationStruct>(State::*)(Player) const) &
+               State::ToObservationStruct,
+           py::arg("player"))
+      .def("to_observation_struct",
+           (std::unique_ptr<ObservationStruct>(State::*)() const) &
+               State::ToObservationStruct)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
-      .def("undo_action", &State::UndoAction)
-      .def("apply_actions", &State::ApplyActions)
-      .def("apply_actions_with_legality_checks",
-           &State::ApplyActionsWithLegalityChecks)
       .def("num_distinct_actions", &State::NumDistinctActions)
       .def("num_players", &State::NumPlayers)
       .def("chance_outcomes", &State::ChanceOutcomes)
       .def("get_game", &State::GetGame)
       .def("get_type", &State::GetType)
       .def("serialize", &State::Serialize)
+      .def("starting_state", &State::StartingState)
+      .def("starting_state_str", &State::StartingStateStr)
       .def("resample_from_infostate", &State::ResampleFromInfostate)
       .def(py::pickle(              // Pickle support
           [](const State& state) {  // __getstate__
@@ -372,7 +414,11 @@ PYBIND11_MODULE(pyspiel, m) {
           }))
       .def("distribution_support", &State::DistributionSupport)
       .def("update_distribution", &State::UpdateDistribution)
-      .def("mean_field_population", &State::MeanFieldPopulation);
+      .def("mean_field_population", &State::MeanFieldPopulation)
+      .def("to_dict", [](const State& state) {
+        // Automatically casted to py::dict using pybind11_json.
+        return state.ToStruct()->to_json_base();
+      });
 
   py::classh<Game, PyGame> game(m, "Game");
   game.def(py::init<GameType, GameInfo, GameParameters>())
@@ -384,6 +430,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("new_initial_state",
            (std::unique_ptr<State>(open_spiel::Game::*)(
                                    const std::string&) const)
+           &Game::NewInitialState)
+      .def("new_initial_state",
+           (std::unique_ptr<State>(open_spiel::Game::*)(
+                                   const nlohmann::json&) const)
            &Game::NewInitialState)
       .def("new_initial_state_for_population",
            &Game::NewInitialStateForPopulation)
@@ -408,6 +458,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_chance_nodes_in_history", &Game::MaxChanceNodesInHistory)
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)
+      .def("serialize", &Game::Serialize)
+      .def("to_string", &Game::ToString)
       .def("make_observer",
            [](std::shared_ptr<const Game> game, IIGObservationType iig_obs_type,
               const GameParameters& params) {
@@ -657,6 +709,12 @@ PYBIND11_MODULE(pyspiel, m) {
       "A general implementation of deserialization of a game and state "
       "string serialized by serialize_game_and_state.");
 
+  m.def("deserialize_game",
+      [](const std::string& data) {
+        return open_spiel::DeserializeGame(data);
+      },
+      "A general implementation of deserialization of a game.");
+
   m.def("register_game", RegisterPyGame,
         "Register a Python game implementation");
 
@@ -705,6 +763,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_euchre(m);
   init_pyspiel_games_gin_rummy(m);
   init_pyspiel_games_go(m);
+  init_pyspiel_games_hearts(m);
   init_pyspiel_games_kuhn_poker(m);
   init_pyspiel_games_leduc_poker(m);
   init_pyspiel_games_negotiation(m);
@@ -713,6 +772,8 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_tic_tac_toe(m);
   init_pyspiel_games_tiny_bridge(m);
   init_pyspiel_games_trade_comm(m);
+  bind_pokerkit_state_struct(m);           // C++ struct for a Python game.
+  bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
 
@@ -725,6 +786,7 @@ PYBIND11_MODULE(pyspiel, m) {
 #endif
 #if OPEN_SPIEL_BUILD_WITH_ACPC
   init_pyspiel_games_universal_poker(m);  // Universal poker game.
+  init_pyspiel_games_repeated_poker(m);  // Repeated poker game.
 #endif
 }  // NOLINT
 

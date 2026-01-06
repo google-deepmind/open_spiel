@@ -49,6 +49,7 @@ const GameType kGameType{/*short_name=*/"hex",
                              {"num_cols", GameParameter(kDefaultBoardSize)},
                              {"num_rows", GameParameter(kDefaultBoardSize)},
                              {"string_rep", GameParameter(kDefaultStringRep)},
+                             {"swap", GameParameter(kDefaultSwap)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -205,6 +206,20 @@ std::string StateToString(CellState state, StringRep string_rep) {
 }
 
 void HexState::DoApplyAction(Action move) {
+  if (swap_ && move == num_cols_ * num_rows_) {
+    // Swap move.
+    SPIEL_CHECK_EQ(history_.size(), 1);
+    SPIEL_CHECK_EQ(current_player_, 1);
+    Action first_move = history_[0].action;
+    board_[first_move] = CellState::kEmpty;
+    int r = first_move / num_cols_;
+    int c = first_move % num_cols_;
+    Action mirrored_move = c * num_cols_ + r;
+    CellState move_cell_state = PlayerAndActionToState(1, mirrored_move);
+    board_[mirrored_move] = move_cell_state;
+    current_player_ = 0;  // After swap, it's player 0's turn.
+    return;
+  }
   SPIEL_CHECK_TRUE(board_[move] == CellState::kEmpty);
   CellState move_cell_state = PlayerAndActionToState(CurrentPlayer(), move);
   board_[move] = move_cell_state;
@@ -249,10 +264,16 @@ std::vector<Action> HexState::LegalActions() const {
       moves.push_back(cell);
     }
   }
+  if (swap_ && history_.size() == 1 && current_player_ == 1) {
+    moves.push_back(num_cols_ * num_rows_);
+  }
   return moves;
 }
 
 std::string HexState::ActionToString(Player player, Action action_id) const {
+  if (swap_ && action_id == num_cols_ * num_rows_) {
+    return "swap";
+  }
   int row = action_id % num_cols_;
   int col = action_id / num_cols_;
   if (StringRep() == StringRep::kStandard) {
@@ -286,11 +307,12 @@ std::vector<int> HexState::AdjacentCells(int cell) const {
 }
 
 HexState::HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows,
-                   enum StringRep string_rep)
+                   enum StringRep string_rep, bool swap)
     : State(game),
       num_cols_(num_cols),
       num_rows_(num_rows),
-      string_rep_(string_rep) {
+      string_rep_(string_rep),
+      swap_(swap) {
   // for all num_colss & num_rowss -> num_colss_ >= num_rowss_
   board_.resize(num_cols * num_rows, CellState::kEmpty);
 }
@@ -357,7 +379,8 @@ HexGame::HexGame(const GameParameters& params)
       num_rows_(
           ParameterValue<int>("num_rows", ParameterValue<int>("board_size"))),
       string_rep_(StringRepStrToEnum(
-          ParameterValue<std::string>("string_rep", kDefaultStringRep))) {}
+          ParameterValue<std::string>("string_rep", kDefaultStringRep))),
+      swap_(ParameterValue<bool>("swap")) {}
 
 }  // namespace hex
 }  // namespace open_spiel

@@ -15,13 +15,15 @@
 #ifndef OPEN_SPIEL_GAMES_BACKGAMMON_H_
 #define OPEN_SPIEL_GAMES_BACKGAMMON_H_
 
-#include <array>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // An implementation of the classic: https://en.wikipedia.org/wiki/Backgammon
 // using rule set from
@@ -35,6 +37,8 @@
 //   "hyper_backgammon"  bool    Use Hyper-backgammon variant [1] (def: false)
 //   "scoring_type"      string  Type of scoring for the game: "winloss_scoring"
 //                               (default), "enable_gammons", or "full_scoring"
+//   "max_player_turns"  int     Maximum number of player turns per game.
+//                               (default: 500)
 //
 // [1] https://bkgm.com/variants/HyperBackgammon.html. Hyper-backgammon is a
 // simplified backgammon start setup which is small enough to solve. Note that
@@ -44,14 +48,14 @@ namespace open_spiel {
 namespace backgammon {
 
 inline constexpr const int kNumPlayers = 2;
-inline constexpr const int kNumChanceOutcomes = 21;
+inline constexpr const int kNumChanceOutcomes = 36;
 inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
 inline constexpr const int kXPlayerId = 0;
 inline constexpr const int kOPlayerId = 1;
 inline constexpr const int kPassPos = -1;
 
-// Number of checkers per player in the standard game. For varaints, use
+// Number of checkers per player in the standard game. For variants, use
 // BackgammonGame::NumCheckersPerPlayer.
 inline constexpr const int kNumCheckersPerPlayer = 15;
 
@@ -74,6 +78,7 @@ inline constexpr const int kStateEncodingSize =
     3 * kNumPlayers + kBoardEncodingSize + 2;
 inline constexpr const char* kDefaultScoringType = "winloss_scoring";
 inline constexpr bool kDefaultHyperBackgammon = false;
+inline constexpr const int kDefaultMaxPlayerTurns = 500;
 
 // Game scoring type, whether to score gammons/backgammons specially.
 enum class ScoringType {
@@ -155,7 +160,7 @@ class BackgammonState : public State {
   bool IsOff(int player, int pos) const;
 
   // Returns whether pos2 is further (closer to scoring) than pos1 for the
-  // specifed player.
+  // specified player.
   bool IsFurther(int player, int pos1, int pos2) const;
 
   // Is this a legal from -> to checker move? Here, the to_pos can be a number
@@ -212,6 +217,7 @@ class BackgammonState : public State {
  private:
   void SetupInitialBoard();
   void RollDice(int outcome);
+  void SetDice(const std::vector<int>& dice);
   bool IsPosInHome(int player, int pos) const;
   bool AllInHome(int player) const;
   int CheckersInHome(int player) const;
@@ -271,11 +277,12 @@ class BackgammonGame : public Game {
   }
 
   // On the first turn there are 30 outcomes: 15 for each player (rolls without
-  // the doubles).
-  int MaxChanceOutcomes() const override { return 30; }
+  // the doubles). On subsequent turns, there are 36 outcomes.
+  int MaxChanceOutcomes() const override { return 36; }
 
-  // There is arbitrarily chosen number to ensure the game is finite.
-  int MaxGameLength() const override { return 1000; }
+  // For each player turn, there's a chance node, and every turn could be a
+  // a double.
+  int MaxGameLength() const override { return 3*max_player_turns_; }
 
   // Upper bound: chance node per move, with an initial chance node for
   // determining starting player.
@@ -310,10 +317,12 @@ class BackgammonGame : public Game {
   }
 
   int NumCheckersPerPlayer() const;
+  int MaxPlayerTurns() const { return max_player_turns_; }
 
  private:
   ScoringType scoring_type_;  // Which rules apply when scoring the game.
   bool hyper_backgammon_;     // Is hyper-backgammon variant enabled?
+  const int max_player_turns_;
 };
 
 }  // namespace backgammon

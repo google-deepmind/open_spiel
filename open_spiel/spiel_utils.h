@@ -399,7 +399,7 @@ inline To down_cast(From* f) {
 #if !defined(NDEBUG)
   if (f != nullptr && dynamic_cast<To>(f) == nullptr) {
     std::string from = typeid(From).name();
-    std::string to = typeid(From).name();
+    std::string to = typeid(To).name();
     SpielFatalError(
         absl::StrCat("Cast failure: could not cast a pointer from '", from,
                      "' to '", to, "'"));
@@ -415,7 +415,7 @@ inline To down_cast(From& f) {
 #if !defined(NDEBUG)
   if (dynamic_cast<ToAsPointer>(&f) == nullptr) {
     std::string from = typeid(From).name();
-    std::string to = typeid(From).name();
+    std::string to = typeid(To).name();
     SpielFatalError(
         absl::StrCat("Cast failure: could not cast a reference from '", from,
                      "' to '", to, "'"));

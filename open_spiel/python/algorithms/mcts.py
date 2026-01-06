@@ -17,6 +17,7 @@
 import math
 import time
 
+from absl import logging
 import numpy as np
 
 import pyspiel
@@ -47,8 +48,9 @@ class RandomRolloutEvaluator(Evaluator):
   outcomes to be considered.
   """
 
-  def __init__(self, n_rollouts=1, random_state=None):
+  def __init__(self, n_rollouts=1, random_state=None, max_length=None):
     self.n_rollouts = n_rollouts
+    self.max_length = max_length
     self._random_state = random_state or np.random.RandomState()
 
   def evaluate(self, state):
@@ -56,6 +58,7 @@ class RandomRolloutEvaluator(Evaluator):
     result = None
     for _ in range(self.n_rollouts):
       working_state = state.clone()
+      length = 0
       while not working_state.is_terminal():
         if working_state.is_chance_node():
           outcomes = working_state.chance_outcomes()
@@ -64,6 +67,9 @@ class RandomRolloutEvaluator(Evaluator):
         else:
           action = self._random_state.choice(working_state.legal_actions())
         working_state.apply_action(action)
+        length += 1
+        if self.max_length is not None and length >= self.max_length:
+          break
       returns = np.array(working_state.returns())
       result = returns if result is None else result + returns
 
@@ -259,7 +265,22 @@ class MCTSBot(pyspiel.Bot):
     pass
 
   def step_with_policy(self, state):
-    """Returns bot's policy and action at given state."""
+    """Returns bot's policy and action at given state.
+
+    Returns an invalid action policy and action if the state is a chance node.
+
+    Args:
+      state: pyspiel.State object, state to search from
+
+    Returns:
+      policy: A list of (action, probability) pairs.
+      action: The action the bot takes.
+    """
+    if state.is_chance_node():
+      logging.info("Chance node, returning invalid action policy.")
+      policy = [(pyspiel.INVALID_ACTION, 1.0)]
+      return policy, pyspiel.INVALID_ACTION
+
     t1 = time.time()
     root = self.mcts_search(state)
 

@@ -170,7 +170,10 @@ std::string GameParametersToString(const GameParameters& game_params) {
 }
 
 GameParameter GameParameterFromString(const std::string& str) {
-  if (str == "True" || str == "true") {
+  if (str.empty()) {
+    // Empty string value assumes a parameter of string type.
+    return GameParameter("");
+  } else if (str == "True" || str == "true") {
     return GameParameter(true);
   } else if (str == "False" || str == "false") {
     return GameParameter(false);

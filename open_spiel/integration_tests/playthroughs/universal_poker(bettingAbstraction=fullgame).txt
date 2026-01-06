@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Universal Poker"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["betting", "bettingAbstraction", "blind", "boardCards", "firstPlayer", "handReaches", "maxRaises", "numBoardCards", "numHoleCards", "numPlayers", "numRanks", "numRounds", "numSuits", "potSize", "raiseSize", "stack"]
+GameType.parameter_specification = ["betting", "bettingAbstraction", "blind", "boardCards", "calcOddsNumSims", "firstPlayer", "handReaches", "maxRaises", "numBoardCards", "numHoleCards", "numPlayers", "numRanks", "numRounds", "numSuits", "potSize", "raiseSize", "stack"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 1201
 PolicyTensorShape() = [1201]
 MaxChanceOutcomes() = 24
-GetParameters() = {betting=nolimit,bettingAbstraction=fullgame,blind=100 100,boardCards=,firstPlayer=1 1,handReaches=,maxRaises=,numBoardCards=0 1,numHoleCards=1,numPlayers=2,numRanks=6,numRounds=2,numSuits=4,potSize=0,stack=1200 1200}
+GetParameters() = {betting=nolimit,bettingAbstraction=fullgame,blind=100 100,boardCards=,calcOddsNumSims=0,firstPlayer=1 1,handReaches=,maxRaises=,numBoardCards=0 1,numHoleCards=1,numPlayers=2,numRanks=6,numRounds=2,numSuits=4,potSize=0,stack=1200 1200}
 NumPlayers() = 2
 MinUtility() = -1200.0
 MaxUtility() = 1200.0
@@ -56,8 +56,8 @@ InformationStateString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][P
 InformationStateString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Public: ][Sequences: ]"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Ante: 100 100]"
-ObservationString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Ante: 100 100]"
+ObservationString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][PlayerContribution: 100 100]"
+ObservationString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][PlayerContribution: 100 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
 ChanceOutcomes() = [(0,0.0416667), (1,0.0416667), (2,0.0416667), (3,0.0416667), (4,0.0416667), (5,0.0416667), (6,0.0416667), (7,0.0416667), (8,0.0416667), (9,0.0416667), (10,0.0416667), (11,0.0416667), (12,0.0416667), (13,0.0416667), (14,0.0416667), (15,0.0416667), (16,0.0416667), (17,0.0416667), (18,0.0416667), (19,0.0416667), (20,0.0416667), (21,0.0416667), (22,0.0416667), (23,0.0416667)]
@@ -90,8 +90,8 @@ InformationStateString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][P
 InformationStateString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Public: ][Sequences: ]"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: 5s][Ante: 100 100]"
-ObservationString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Ante: 100 100]"
+ObservationString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: 5s][PlayerContribution: 100 100]"
+ObservationString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][PlayerContribution: 100 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
 ChanceOutcomes() = [(0,0.0434783), (1,0.0434783), (2,0.0434783), (3,0.0434783), (4,0.0434783), (5,0.0434783), (6,0.0434783), (7,0.0434783), (8,0.0434783), (9,0.0434783), (10,0.0434783), (11,0.0434783), (12,0.0434783), (13,0.0434783), (14,0.0434783), (16,0.0434783), (17,0.0434783), (18,0.0434783), (19,0.0434783), (20,0.0434783), (21,0.0434783), (22,0.0434783), (23,0.0434783)]
@@ -123,8 +123,8 @@ InformationStateString(0) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Pr
 InformationStateString(1) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Private: 7d][Public: ][Sequences: ]"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Private: 5s][Ante: 100 100]"
-ObservationString(1) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Private: 7d][Ante: 100 100]"
+ObservationString(0) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Private: 5s][PlayerContribution: 100 100]"
+ObservationString(1) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Private: 7d][PlayerContribution: 100 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
 Rewards() = [0, 0]
@@ -157,8 +157,8 @@ InformationStateString(0) = "[Round 0][Player: 1][Pot: 1602][Money: 399 1100][Pr
 InformationStateString(1) = "[Round 0][Player: 1][Pot: 1602][Money: 399 1100][Private: 7d][Public: ][Sequences: r801]"
 InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationString(0) = "[Round 0][Player: 1][Pot: 1602][Money: 399 1100][Private: 5s][Ante: 801 100]"
-ObservationString(1) = "[Round 0][Player: 1][Pot: 1602][Money: 399 1100][Private: 7d][Ante: 801 100]"
+ObservationString(0) = "[Round 0][Player: 1][Pot: 1602][Money: 399 1100][Private: 5s][PlayerContribution: 801 100]"
+ObservationString(1) = "[Round 0][Player: 1][Pot: 1602][Money: 399 1100][Private: 7d][PlayerContribution: 801 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 100.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 100.0]
 Rewards() = [0, 0]
@@ -193,8 +193,8 @@ InformationStateString(0) = "[Round 0][Player: -4][Pot: 801][Money: 399 1100][Pr
 InformationStateString(1) = "[Round 0][Player: -4][Pot: 801][Money: 399 1100][Private: 7d][Public: ][Sequences: r801f]"
 InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationString(0) = "[Round 0][Player: -4][Pot: 801][Money: 399 1100][Private: 5s][Ante: 801 100]"
-ObservationString(1) = "[Round 0][Player: -4][Pot: 801][Money: 399 1100][Private: 7d][Ante: 801 100]"
+ObservationString(0) = "[Round 0][Player: -4][Pot: 801][Money: 399 1100][Private: 5s][PlayerContribution: 801 100]"
+ObservationString(1) = "[Round 0][Player: -4][Pot: 801][Money: 399 1100][Private: 7d][PlayerContribution: 801 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 100.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 801.0, 100.0]
 Rewards() = [100, -100]

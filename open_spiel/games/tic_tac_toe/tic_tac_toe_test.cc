@@ -48,6 +48,44 @@ void TestStateStruct() {
                  TicTacToeStateStruct(state_json).ToJson());
 }
 
+void TestObservationStruct() {
+  auto game = LoadGame("tic_tac_toe");
+  auto state = game->NewInitialState();
+  state->ApplyAction(4);  // Player 0 plays in the center.
+  TicTacToeState* ttt_state = static_cast<TicTacToeState*>(state.get());
+  auto obs_struct = ttt_state->ToObservationStruct(0);
+  std::string obs_json =
+      "{\"board\":[\".\",\".\",\".\",\".\",\"x\",\".\",\".\",\".\",\".\"],"
+      "\"current_player\":\"o\"}";
+  SPIEL_CHECK_EQ(obs_struct->ToJson(), obs_json);
+  SPIEL_CHECK_EQ(nlohmann::json::parse(obs_json).dump(),
+                 TicTacToeObservationStruct(obs_json).ToJson());
+}
+
+void TestActionStruct() {
+  auto game = LoadGame("tic_tac_toe");
+  auto state = game->NewInitialState();
+  auto* ttt_state = static_cast<TicTacToeState*>(state.get());
+
+  // Test ActionToStruct.
+  Action action_id = 4;  // Player 0 plays in the center.
+  auto action_struct = ttt_state->ActionToStruct(0, action_id);
+  std::string action_json = "{\"col\":1,\"row\":1}";
+  SPIEL_CHECK_EQ(action_struct->ToJson(), action_json);
+
+  // Test ApplyActionStruct.
+  auto state2 = game->NewInitialState();
+  state2->ApplyActionStruct(*action_struct);
+  SPIEL_CHECK_EQ(state2->ToString(), "...\n.x.\n...");
+
+  // Test JSON parsing.
+  SPIEL_CHECK_EQ(nlohmann::json::parse(action_json).dump(),
+                 TicTacToeActionStruct(action_json).ToJson());
+
+  // Test StructToAction.
+  SPIEL_CHECK_EQ(action_id, ttt_state->StructToAction(*action_struct));
+}
+
 }  // namespace
 }  // namespace tic_tac_toe
 }  // namespace open_spiel
@@ -55,4 +93,6 @@ void TestStateStruct() {
 int main(int argc, char** argv) {
   open_spiel::tic_tac_toe::BasicTicTacToeTests();
   open_spiel::tic_tac_toe::TestStateStruct();
+  open_spiel::tic_tac_toe::TestObservationStruct();
+  open_spiel::tic_tac_toe::TestActionStruct();
 }

@@ -1,6 +1,8 @@
 set(GAME_SOURCES
   amazons/amazons.cc
   amazons/amazons.h
+  antichess/antichess.cc
+  antichess/antichess.h
   backgammon/backgammon.cc
   backgammon/backgammon.h
   bargaining/bargaining.cc
@@ -106,8 +108,12 @@ set(GAME_SOURCES
   kuhn_poker/kuhn_poker.h
   laser_tag/laser_tag.cc
   laser_tag/laser_tag.h
+  latent_ttt/latent_ttt.cc
+  latent_ttt/latent_ttt.h
   leduc_poker/leduc_poker.cc
   leduc_poker/leduc_poker.h
+  leduc_poker/repeated_leduc_poker.cc
+  leduc_poker/repeated_leduc_poker.h
   lewis_signaling/lewis_signaling.cc
   lewis_signaling/lewis_signaling.h
   liars_dice/liars_dice.cc
@@ -165,6 +171,8 @@ set(GAME_SOURCES
   phantom_ttt/phantom_ttt.h
   pig/pig.cc
   pig/pig.h
+  pokerkit_wrapper/pokerkit_wrapper_struct.h
+  repeated_pokerkit/repeated_pokerkit_struct.h
   quoridor/quoridor.cc
   quoridor/quoridor.h
   rbc/rbc.cc
@@ -213,6 +221,7 @@ if (${OPEN_SPIEL_BUILD_WITH_HANABI})
 endif()
 if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   set(GAME_SOURCES ${GAME_SOURCES} universal_poker/universal_poker.cc universal_poker/universal_poker.h)
+  set(GAME_SOURCES ${GAME_SOURCES} universal_poker/repeated_poker.cc universal_poker/repeated_poker.h)
 endif()
 
 
@@ -303,6 +312,10 @@ add_executable(amazons_test amazons/amazons_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(amazons_test amazons_test)
 
+add_executable(antichess_test antichess/antichess_test.cc ${OPEN_SPIEL_OBJECTS}
+        $<TARGET_OBJECTS:tests>)
+add_test(antichess_test antichess_test)
+
 add_executable(backgammon_test backgammon/backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
@@ -329,9 +342,10 @@ add_executable(breakthrough_test breakthrough/breakthrough_test.cc ${OPEN_SPIEL_
                $<TARGET_OBJECTS:tests>)
 add_test(breakthrough_test breakthrough_test)
 
-add_executable(bridge_test bridge/bridge_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(bridge_test bridge_test)
+# Disabled until we reduce the length. See #1371.
+# add_executable(bridge_test bridge/bridge_test.cc ${OPEN_SPIEL_OBJECTS}
+#                $<TARGET_OBJECTS:tests>)
+# add_test(bridge_test bridge_test)
 
 add_executable(catch_test catch/catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -500,6 +514,10 @@ add_executable(kuhn_poker_test kuhn_poker/kuhn_poker_test.cc ${OPEN_SPIEL_OBJECT
                $<TARGET_OBJECTS:algorithms>)
 add_test(kuhn_poker_test kuhn_poker_test)
 
+add_executable(latent_ttt_test latent_ttt/latent_ttt_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(latent_ttt_test latent_ttt_test)
+
 add_executable(leduc_poker_test leduc_poker/leduc_poker_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
@@ -601,6 +619,14 @@ add_executable(pig_test pig/pig_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(pig_test pig_test)
 
+add_executable(pokerkit_wrapper_struct_test pokerkit_wrapper/pokerkit_wrapper_struct_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(pokerkit_wrapper_struct_test pokerkit_wrapper_struct_test)
+
+add_executable(repeated_pokerkit_struct_test repeated_pokerkit/repeated_pokerkit_struct_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(repeated_pokerkit_struct_test repeated_pokerkit_struct_test)
+
 add_executable(quoridor_test quoridor/quoridor_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(quoridor_test quoridor_test)
@@ -608,6 +634,10 @@ add_test(quoridor_test quoridor_test)
 add_executable(rbc_test rbc/rbc_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(rbc_test rbc_test)
+
+add_executable(repeated_leduc_poker_test leduc_poker/repeated_leduc_poker_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(repeated_leduc_poker_test repeated_leduc_poker_test)
 
 add_executable(sheriff_test sheriff/sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -670,6 +700,10 @@ if (${OPEN_SPIEL_BUILD_WITH_ACPC})
           $<TARGET_OBJECTS:algorithms>)
   add_test(universal_poker_test universal_poker_test
            --subgames_data_dir=${CMAKE_CURRENT_SOURCE_DIR}/universal_poker/endgames)
+  add_executable(repeated_poker_test universal_poker/repeated_poker_test.cc ${OPEN_SPIEL_OBJECTS}
+          $<TARGET_OBJECTS:tests>
+          $<TARGET_OBJECTS:algorithms>)
+  add_test(repeated_poker_test repeated_poker_test)
 endif()
 
 add_executable(y_test y/y_test.cc ${OPEN_SPIEL_OBJECTS}

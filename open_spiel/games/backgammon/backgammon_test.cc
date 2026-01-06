@@ -25,6 +25,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/init.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -68,6 +69,18 @@ void CheckHits(const State &state) {
       // any difference for what we're checking.
     }
   }
+}
+
+void CheckNumTurnsLt10(const State &state) {
+  const BackgammonState &bstate = down_cast<const BackgammonState &>(state);
+  SPIEL_CHECK_LE(bstate.player_turns(), 20);
+}
+
+
+void BasicBackgammonTestsMaxTurns() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "backgammon(max_player_turns=20)");
+  testing::RandomSimTest(*game, 10, true, true, &CheckNumTurnsLt10);
 }
 
 void BasicBackgammonTestsCheckHits() {
@@ -593,8 +606,10 @@ void BasicHyperBackgammonTest() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::Init(argv[0], &argc, &argv, true);
   open_spiel::testing::LoadGameTest("backgammon");
   open_spiel::backgammon::BasicBackgammonTestsCheckHits();
+  open_spiel::backgammon::BasicBackgammonTestsMaxTurns();
   open_spiel::backgammon::BasicBackgammonTestsDoNotStartWithDoubles();
   open_spiel::backgammon::BasicBackgammonTestsVaryScoring();
   open_spiel::backgammon::BasicHyperBackgammonTestsVaryScoring();

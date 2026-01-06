@@ -18,6 +18,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <random>
 #include <string>
 #include <utility>
@@ -25,9 +26,9 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
@@ -824,6 +825,86 @@ void GinRummyState::RemoveFromHand(Player player, Action card) {
 
 std::unique_ptr<State> GinRummyState::Clone() const {
   return std::unique_ptr<State>(new GinRummyState(*this));
+}
+
+std::unique_ptr<StateStruct> GinRummyState::ToStruct() const {
+  auto rv = std::make_unique<GinRummyStateStruct>();
+
+  rv->phase = std::string(kPhaseString[static_cast<int>(phase_)]);
+  rv->current_player = DefaultPlayerString(CurrentPlayer());
+  rv->knock_card = knock_card_;
+  if (upcard_.has_value()) {
+    rv->upcard = utils_.CardString(upcard_);
+  } else {
+    rv->upcard = std::nullopt;
+  }
+  if (prev_upcard_.has_value()) {
+    rv->prev_upcard = utils_.CardString(prev_upcard_);
+  } else {
+    rv->prev_upcard = std::nullopt;
+  }
+  rv->stock_size = stock_size_;
+
+  rv->hands.resize(kNumPlayers);
+  for (int p = 0; p < kNumPlayers; ++p) {
+    std::vector<int> sorted_hand = hands_[p];
+    absl::c_sort(sorted_hand);
+    for (int card : sorted_hand) {
+      rv->hands[p].push_back(utils_.CardString(card));
+    }
+  }
+
+  for (int card : discard_pile_) {
+    rv->discard_pile.push_back(utils_.CardString(card));
+  }
+
+  rv->deadwood = deadwood_;
+  rv->knocked = knocked_;
+  rv->pass_on_first_upcard = pass_on_first_upcard_;
+
+  rv->layed_melds.resize(kNumPlayers);
+  for (int p = 0; p < kNumPlayers; ++p) {
+    for (int meld_id : layed_melds_[p]) {
+      const std::vector<int>& meld = utils_.int_to_meld.at(meld_id);
+      std::vector<std::string> meld_str;
+      meld_str.reserve(meld.size());
+      for (int card : meld) {
+        meld_str.push_back(utils_.CardString(card));
+      }
+      rv->layed_melds[p].push_back(meld_str);
+    }
+  }
+
+  for (int card : layoffs_) {
+    rv->layoffs.push_back(utils_.CardString(card));
+  }
+
+  rv->finished_layoffs = finished_layoffs_;
+
+  return rv;
+}
+
+std::unique_ptr<ObservationStruct> GinRummyState::ToObservationStruct(
+    Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  auto obs_struct =
+      std::make_unique<GinRummyObservationStruct>(this->ToJson());
+  obs_struct->observing_player = player;
+
+  Player opponent = 1 - player;
+  bool hide_opponent_hand = !obs_struct->knocked[opponent] &&
+                            obs_struct->phase != "Layoff" &&
+                            obs_struct->phase != "GameOver";
+
+  if (hide_opponent_hand) {
+    for (std::string& card : obs_struct->hands[opponent]) {
+      card = "XX";
+    }
+    obs_struct->deadwood[opponent] = -1;
+  }
+
+  return obs_struct;
 }
 
 std::string GinRummyState::InformationStateString(Player player) const {

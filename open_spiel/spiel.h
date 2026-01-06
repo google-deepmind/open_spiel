@@ -29,6 +29,7 @@
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/utils/nlohmann_json.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
@@ -209,23 +210,31 @@ using HistoryDistribution =
 class Game;
 class Observer;
 
-// Structured information specifying the state of a game.
+// Structured information about a game.
 // Added to the API as part of Open Spiel 2.0:
 // https://github.com/google-deepmind/open_spiel/issues/1340.
-// The StateStruct makes explicit and provides an easy interface to the
-// information encoded in the state string. Accessible via the State::ToStruct
-// and State::ToJson methods.
-struct StateStruct {
-  virtual ~StateStruct() = default;
-  StateStruct() = default;
-  StateStruct(std::string json);
+// The GameStruct makes explicit and provides an easy interface to the
+// information encoded in the state, observation, and action strings.
+struct GameStruct {
+  virtual ~GameStruct() = default;
+  GameStruct() = default;
 
-  std::string ToJson() const {
-    return to_json_base().dump();
-  }
+  std::string ToJson() const { return to_json_base().dump(); }
 
   virtual nlohmann::json to_json_base() const = 0;
 };
+
+// Structured information specifying the state of a game.
+// Accessible via the State::ToStruct and State::ToJson methods.
+struct StateStruct : public GameStruct {};
+
+// Structured information specifying an observation of the game state for a
+// particular player in imperfect information games.
+// Accessible via the State::ToObservationStruct method.
+struct ObservationStruct : public GameStruct {};
+
+// Structured information specifying an action for a player in a game.
+struct ActionStruct : public GameStruct {};
 
 // An abstract class that represents a state of the game.
 class State {
@@ -262,6 +271,12 @@ class State {
 
   // Helper versions of ApplyAction that first does a legality check.
   virtual void ApplyActionWithLegalityCheck(Action action_id);
+
+  // Applies an action in its structured format.
+  // The default implementation will fatal error. Games that support this
+  // should override it, map the struct to an integer action id, and then call
+  // ApplyAction.
+  virtual void ApplyActionStruct(const ActionStruct& action_struct);
 
   // `LegalActions(Player player)` is valid for all nodes in all games,
   // returning an empty list for players who don't act at this state. The
@@ -324,6 +339,19 @@ class State {
                                 const std::string& action_str) const;
   Action StringToAction(const std::string& action_str) const {
     return StringToAction(CurrentPlayer(), action_str);
+  }
+
+  // Converts an action to a structured format.
+  virtual std::unique_ptr<ActionStruct> ActionToStruct(
+      Player player, Action action_id) const {
+    SpielFatalError("ActionToStruct not implemented.");
+  }
+  std::unique_ptr<ActionStruct> ActionToStruct(Action action_id) const {
+    return ActionToStruct(CurrentPlayer(), action_id);
+  }
+
+  virtual Action StructToAction(const ActionStruct& action_struct) const {
+    SpielFatalError("StructToAction not implemented.");
   }
 
   // Returns a string representation of the state. Also used as in the default
@@ -579,7 +607,12 @@ class State {
     return ObservationString(CurrentPlayer());
   }
 
-  // Returns the view of the game, preferably from `player`'s perspective.
+  // Returns player's of view of the game in a vector form.
+  //
+  // Note that while it is not strictly required, most perfect information
+  // games have player-independent observation tensors, and in some cases an
+  // "egocentric" flag can be passed to the game for observation tensors to be
+  // player-relative.
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
@@ -593,6 +626,19 @@ class State {
     return ObservationTensor(CurrentPlayer());
   }
   void ObservationTensor(Player player, std::vector<float>* values) const;
+
+  // Returns a structured representation of an observation for `player`.
+  //
+  // Implementations should start with (and it's tested in api_test.py):
+  //   SPIEL_CHECK_GE(player, 0);
+  //   SPIEL_CHECK_LT(player, num_players_);
+  virtual std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const {
+    SpielFatalError("ToObservationStruct not implemented!");
+  }
+  std::unique_ptr<ObservationStruct> ToObservationStruct() const {
+    return ToObservationStruct(CurrentPlayer());
+  }
 
   // Return a copy of this state.
   virtual std::unique_ptr<State> Clone() const = 0;
@@ -749,6 +795,9 @@ class State {
   // should override this function.
   virtual int MeanFieldPopulation() const;
 
+  std::unique_ptr<State> StartingState() const;
+  std::string StartingStateStr() const { return starting_state_str_; }
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
@@ -768,6 +817,9 @@ class State {
   // Information that changes over the course of the game.
   std::vector<PlayerAction> history_;
   int move_number_;
+
+  // Optional json-serialized starting state that the history originates from.
+  std::string starting_state_str_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const State& state);
@@ -800,10 +852,21 @@ class Game : public std::enable_shared_from_this<Game> {
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
 
-  // Return a new state from a string description. This is an unspecified and
-  // unrestricted function to construct a new state from a string.
+  // Return a new state from a string description. Defaults to interpreting the
+  // string as json.
   virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
-    SpielFatalError("NewInitialState from string is not implemented.");
+    return NewInitialState(nlohmann::json::parse(str));
+  }
+
+  // Overload for string literals to resolve ambiguity with nlohmann::json.
+  std::unique_ptr<State> NewInitialState(const char* str) const {
+    return NewInitialState(std::string(str));
+  }
+
+  // Return a new state from json.
+  virtual std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const {
+    SpielFatalError("NewInitialState from state json is not implemented.");
   }
 
   // Returns newly allocated initial states. In most cases, this will be a
@@ -915,11 +978,14 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // The maximum number of chance nodes occurring in any history of the game.
   // This is typically something like the number of times dice are rolled.
+  // For deterministic games, this is 0, otherwise it defaults to the max game
+  // length as a loose upper bound.
   virtual int MaxChanceNodesInHistory() const {
     if (GetType().chance_mode == GameType::ChanceMode::kDeterministic) {
       return 0;
+    } else {
+      return MaxGameLength();
     }
-    SpielFatalError("MaxChanceNodesInHistory() is not implemented");
   }
 
   // The maximum number of moves in the game. The value State::MoveNumber()
@@ -1076,6 +1142,13 @@ class Game : public std::enable_shared_from_this<Game> {
       ABSL_GUARDED_BY(mutex_defaulted_parameters_);
   mutable absl::Mutex mutex_defaulted_parameters_;
 };
+
+inline std::unique_ptr<State> State::StartingState() const {
+  if (!starting_state_str_.empty()) {
+    return game_->NewInitialState(nlohmann::json::parse(starting_state_str_));
+  }
+  return nullptr;
+}
 
 #define CONCAT_(x, y) x##y
 #define CONCAT(x, y) CONCAT_(x, y)

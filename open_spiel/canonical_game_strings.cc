@@ -23,6 +23,8 @@ namespace open_spiel {
 std::string HunlGameString(const std::string &betting_abstraction) {
   return absl::StrFormat(
       "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=100 50,"
+      // Heads-up standard turn order: D/SB->BB, then BB->D/SB
+      // https://en.wikipedia.org/wiki/Blind_(poker)#Overview
       "firstPlayer=2 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,"
       "numBoardCards=0 3 1 1,stack=20000 20000,bettingAbstraction=%s)",
       betting_abstraction);
@@ -32,7 +34,7 @@ std::string HunlGameString(const std::string &betting_abstraction) {
 std::string HulhGameString(const std::string &betting_abstraction) {
   return absl::StrFormat(
       "universal_poker(betting=limit,numPlayers=2,numRounds=4,blind=10 5,"
-      "firstPlayer=2 1,numSuits=4,numRanks=13,numHoleCards=2,"
+      "firstPlayer=2 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,"
       "numBoardCards=0 3 1 1,raiseSize=10 10 20 20,"
       "maxRaises=3 4 4 4,bettingAbstraction=%s)",
       betting_abstraction);

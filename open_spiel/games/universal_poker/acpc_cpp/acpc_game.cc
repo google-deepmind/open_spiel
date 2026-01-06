@@ -238,11 +238,6 @@ uint32_t ACPCState::Money(const uint8_t player) const {
   return game_->StackSize(player) - acpcState_.spent[player];
 }
 
-uint32_t ACPCState::Ante(const uint8_t player) const {
-  SPIEL_CHECK_LE(player, game_->GetNbPlayers());
-  return acpcState_.spent[player];
-}
-
 uint32_t ACPCState::TotalSpent() const {
   return static_cast<uint32_t>(absl::c_accumulate(acpcState_.spent, 0));
 }

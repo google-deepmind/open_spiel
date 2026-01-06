@@ -114,7 +114,7 @@ class MeanFieldRoutingGameState : public State {
   //  `waiting_time`: the representative player waiting time.
   //  `destination`: the destination of the representative player.
   std::string StateToString(std::string location, int time_step,
-                            Player player_id = PlayerId::kDefaultPlayerId,
+                            int player_id = kDefaultPlayerId,
                             int waiting_time = 0, std::string destination = "",
                             double ret = 0) const;
 
@@ -183,7 +183,7 @@ class MeanFieldRoutingGameState : public State {
       std::shared_ptr<const Game> game, double time_step_length,
       std::vector<OriginDestinationDemand>* od_demand, Network* network,
       bool perform_sanity_checks, int current_time_step,
-      open_spiel::PlayerId player_id, bool is_chance_init, bool is_terminal,
+      int player_id, bool is_chance_init, bool is_terminal,
       bool vehicle_at_destination, bool vehicle_without_legal_action,
       int waiting_time, double vehicle_final_travel_time,
       std::string vehicle_location, std::string vehicle_destination);
@@ -192,14 +192,14 @@ class MeanFieldRoutingGameState : public State {
       std::shared_ptr<const Game> game, double time_step_length,
       std::vector<OriginDestinationDemand>* od_demand, Network* network,
       bool perform_sanity_checks, int current_time_step,
-      open_spiel::PlayerId player_id, bool is_chance_init, bool is_terminal,
+      int player_id, bool is_chance_init, bool is_terminal,
       bool vehicle_at_destination, bool vehicle_without_legal_action,
       int waiting_time, double vehicle_final_travel_time,
       std::string vehicle_location, std::string vehicle_destination,
       double total_num_vehicle, const ActionsAndProbs& chance_outcomes);
 
   int current_time_step_;
-  open_spiel::PlayerId current_player_id_;
+  int current_player_id_;
   bool is_chance_init_;
   bool is_terminal_;
   // Boolean that encodes if the representative vehicle has reached its

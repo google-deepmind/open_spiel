@@ -14,14 +14,18 @@
 
 #include "open_spiel/games/checkers/checkers.h"
 
-#include <algorithm>
 #include <array>
 #include <memory>
+#include <ostream>
 #include <string>
-#include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
@@ -58,7 +62,8 @@ const GameType kGameType{/*short_name=*/"checkers",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"rows", GameParameter(kDefaultRows)},
+                         {{"egocentric", GameParameter(kDefaultEgocentric)},
+                          {"rows", GameParameter(kDefaultRows)},
                           {"columns", GameParameter(kDefaultColumns)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -220,7 +225,7 @@ CellState CheckersState::CrownStateIfLastRowReached(int row, CellState state) {
   return state;
 }
 
-void CheckersState::SetCustomBoard(const std::string board_string) {
+void CheckersState::SetCustomBoard(const std::string& board_string) {
   SPIEL_CHECK_EQ(rows_ * columns_, board_string.length() - 1);
   current_player_ = board_string[0] - '0';
   SPIEL_CHECK_GE(current_player_, 0);
@@ -448,30 +453,30 @@ std::string CheckersState::ToString() const {
   return result;
 }
 
-int CheckersState::ObservationPlane(CellState state, Player player) const {
-  int state_value;
+int CheckersState::ObservationPlane(CellState state, Player player,
+                                    bool egocentric) const {
+  int plane;
   switch (state) {
     case CellState::kWhite:
-      state_value = 0;
+      plane = 0;
       break;
     case CellState::kWhiteKing:
-      state_value = 1;
-      break;
-    case CellState::kBlackKing:
-      state_value = 2;
+      plane = 1;
       break;
     case CellState::kBlack:
-      state_value = 3;
+      plane = 2;
+      break;
+    case CellState::kBlackKing:
+      plane = 3;
       break;
     case CellState::kEmpty:
     default:
       return 4;
   }
-  if (player == Player{0}) {
-    return state_value;
-  } else {
-    return 3 - state_value;
+  if (egocentric && player == Player{1}) {
+    plane = (plane < 2) ? (plane + 2) : (plane - 2);
   }
+  return plane;
 }
 
 bool CheckersState::IsTerminal() const { return LegalActions().empty(); }
@@ -507,15 +512,22 @@ void CheckersState::ObservationTensor(Player player,
 
   TensorView<3> view(values, {kCellStates, rows_, columns_}, true);
 
+  const auto& game = down_cast<const CheckersGame&>(*game_);
+
   // Observation Tensor Representation:
-  //  Plane 0: 1's where the current player's pieces are, 0's elsewhere.
-  //  Plane 1: 1's where the oppponent's pieces are, 0's elsewhere.
-  //  Plane 2: 1's where the current player's crowned pieces are, 0's elsewhere.
-  //  Plane 3: 1's where the oppponent's crowned pieces are, 0's elsewhere.
+  //  Plane 0: 1's where player X's pieces are, 0's elsewhere.
+  //  Plane 1: 1's where player X's crowned pieces are, 0's elsewhere.
+  //  Plane 2: 1's where player Y's pieces are, 0's elsewhere.
+  //  Plane 3: 1's where player Y's crowned pieces are, 0's elsewhere.
   //  Plane 4: 1's where the empty cells are, 0's elsewhere.
+
+  // Which players corresponds to X and Y depends on whether egocentric is set
+  // in the game. If true: X is the observing player, Y is the opponent.
+  // If false: X is player 0, Y is the observing player.
   for (int row = 0; row < rows_; row++) {
     for (int column = 0; column < columns_; column++) {
-      int plane = ObservationPlane(BoardAt(row, column), player);
+      int plane = ObservationPlane(BoardAt(row, column), player,
+                                   game.egocentric());
       view[{plane, row, column}] = 1.0;
     }
   }
@@ -563,6 +575,7 @@ void CheckersState::UndoAction(Player player, Action action) {
 
 CheckersGame::CheckersGame(const GameParameters& params)
     : Game(kGameType, params),
+      egocentric_(ParameterValue<bool>("egocentric")),
       rows_(ParameterValue<int>("rows")),
       columns_(ParameterValue<int>("columns")) {}
 

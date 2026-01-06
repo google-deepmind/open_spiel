@@ -17,11 +17,15 @@
 
 #include <array>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/spiel.h"
 
@@ -51,25 +55,51 @@ enum class CellState {
 };
 
 
-struct TicTacToeStateStruct : StateStruct {
+struct TicTacToeStructContents {
   std::string current_player;
   std::vector<std::string> board;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(TicTacToeStructContents, current_player,
+                                 board);
+};
 
+struct TicTacToeStateStruct : public StateStruct,
+                               public TicTacToeStructContents {
   TicTacToeStateStruct() = default;
   explicit TicTacToeStateStruct(const std::string& json_str) {
     nlohmann::json::parse(json_str).get_to(*this);
   }
 
-  nlohmann::json to_json_base() const override {
-    return *this;
+  nlohmann::json to_json_base() const override { return *this; }
+};
+
+struct TicTacToeObservationStruct : public ObservationStruct,
+                                     public TicTacToeStructContents {
+  TicTacToeObservationStruct() = default;
+  explicit TicTacToeObservationStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
   }
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(TicTacToeStateStruct, current_player, board);
+
+  nlohmann::json to_json_base() const override { return *this; }
+};
+
+struct TicTacToeActionStruct : public ActionStruct {
+  int row;
+  int col;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(TicTacToeActionStruct, row, col);
+
+  TicTacToeActionStruct() = default;
+  explicit TicTacToeActionStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override { return *this; }
 };
 
 // State of an in-play game.
 class TicTacToeState : public State {
  public:
   TicTacToeState(std::shared_ptr<const Game> game);
+  TicTacToeState(std::shared_ptr<const Game> game, const nlohmann::json& json);
 
   TicTacToeState(const TicTacToeState&) = default;
   TicTacToeState& operator=(const TicTacToeState&) = default;
@@ -100,6 +130,11 @@ class TicTacToeState : public State {
   void SetCurrentPlayer(Player player) { current_player_ = player; }
 
   std::unique_ptr<StateStruct> ToStruct() const override;
+  std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const override;
+  std::unique_ptr<ActionStruct> ActionToStruct(
+      Player player, Action action_id) const override;
+  Action StructToAction(const ActionStruct& action_struct) const override;
 
  protected:
   std::array<CellState, kNumCells> board_;
@@ -120,6 +155,10 @@ class TicTacToeGame : public Game {
   int NumDistinctActions() const override { return kNumCells; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new TicTacToeState(shared_from_this()));
+  }
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const {
+    return std::unique_ptr<State>(new TicTacToeState(shared_from_this(), json));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }

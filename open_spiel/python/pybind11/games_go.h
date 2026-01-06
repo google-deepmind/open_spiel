@@ -17,7 +17,6 @@
 
 #include "open_spiel/python/pybind11/pybind11.h"
 
-// Initialize the Python interface for games/connect_four.
 namespace open_spiel {
 
 void init_pyspiel_games_go(::pybind11::module &m);

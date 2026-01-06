@@ -223,7 +223,7 @@ class BridgeGame : public Game {
   double MaxUtility() const override { return kMaxScore; }
   absl::optional<double> UtilitySum() const override { return 0; }
 
-  static int GetPlayTensorSize(int num_tricks_in_observation_) {
+  static int GetPlayTensorSize(int num_tricks_in_observation) {
     return kNumBidLevels          // What the contract is
            + kNumDenominations    // What trumps are
            + kNumOtherCalls       // Undoubled / doubled / redoubled
@@ -231,7 +231,7 @@ class BridgeGame : public Game {
            + kNumVulnerabilities  // Vulnerability of the declaring side
            + kNumCards            // Our remaining cards
            + kNumCards            // Dummy's remaining cards
-           + num_tricks_in_observation_ * kNumPlayers *
+           + num_tricks_in_observation * kNumPlayers *
                  kNumCards  // Number of played tricks to show
            + kNumTricks     // Number of tricks we have won
            + kNumTricks;    // Number of tricks they have won
@@ -268,6 +268,15 @@ class BridgeGame : public Game {
   int PrivateObservationTensorSize() const { return kNumCards; }
   int PublicObservationTensorSize() const { return kPublicInfoTensorSize; }
 
+  // Create an initial state for a given board number, as used in duplicate
+  // bridge: https://en.wikipedia.org/wiki/Duplicate_bridge
+  // This means the dealer and vulnerability are derived from the board number,
+  // and the deal is derived from the tournament seed and board number.
+  // The resultant state will have current player as the dealer, with no initial
+  // deal phase.
+  std::unique_ptr<State> NewDuplicateBridgeInitialState(int tournament_seed,
+                                                        int board_number) const;
+
  private:
   bool UseDoubleDummyResult() const {
     return ParameterValue<bool>("use_double_dummy_result", true);
@@ -280,7 +289,7 @@ class BridgeGame : public Game {
   }
   Player Dealer() const { return ParameterValue<Player>("dealer", 0); }
   int NumTricksInObservation() const {
-    return ParameterValue<int>("num_tricks_in_observation_", 2);
+    return ParameterValue<int>("num_tricks_in_observation", 2);
   }
 };
 
