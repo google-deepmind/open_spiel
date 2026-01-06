@@ -613,9 +613,7 @@ ABSL_CONST_INIT absl::Mutex dds_mutex(absl::kConstInit);
 void BridgeState::ComputeDoubleDummyTricks() const {
   if (!double_dummy_results_.has_value()) {
     // TODO(author11) Make DDS code thread-safe
-    // NOTE: Please leave the ampersand on the next line as we have to support
-    // older versions of abseil. See b/442608965 for details. TODO(author5)
-    absl::MutexLock lock(&dds_mutex);  // NOLINT
+    absl::MutexLock lock(dds_mutex);
     double_dummy_results_ = ddTableResults{};
     ddTableDeal dd_table_deal{};
     for (int suit = 0; suit < kNumSuits; ++suit) {
@@ -653,9 +651,7 @@ std::vector<int> BridgeState::ScoreForContracts(
     {
       // This performs some sort of global initialization; unclear
       // exactly what.
-      // NOTE: Please leave the ampersand on the next line as we have to support
-      // older versions of abseil. See b/442608965 for details. TODO(author5)
-      absl::MutexLock lock(&dds_mutex);  // NOLINT
+      absl::MutexLock lock(dds_mutex);
       DDS_EXTERNAL(SetMaxThreads)(0);
     }
 

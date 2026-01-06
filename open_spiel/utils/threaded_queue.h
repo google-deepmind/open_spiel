@@ -36,7 +36,7 @@ class ThreadedQueue {
     return Push(value, absl::Now() + wait);
   }
   bool Push(const T& value, absl::Time deadline) {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     if (block_new_values_) {
       return false;
     }
@@ -54,7 +54,7 @@ class ThreadedQueue {
   absl::optional<T> Pop() { return Pop(absl::InfiniteDuration()); }
   absl::optional<T> Pop(absl::Duration wait) { return Pop(absl::Now() + wait); }
   absl::optional<T> Pop(absl::Time deadline) {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     while (q_.empty()) {
       if (absl::Now() > deadline || block_new_values_) {
         return absl::nullopt;
@@ -68,25 +68,25 @@ class ThreadedQueue {
   }
 
   bool Empty() {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     return q_.empty();
   }
 
   void Clear() {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     while (!q_.empty()) {
       q_.pop();
     }
   }
 
   int Size() {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     return q_.size();
   }
 
   // Causes pushing new values to fail. Useful for shutting down the queue.
   void BlockNewValues() {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     block_new_values_ = true;
     cv_.SignalAll();
   }

@@ -123,7 +123,7 @@ void VPNetEvaluator::Runner() {
     {
       // Only one thread at a time should be listening to the queue to maximize
       // batch size and minimize latency.
-      absl::MutexLock lock(&inference_queue_m_);
+      absl::MutexLock lock(inference_queue_m_);
       absl::Time deadline = absl::InfiniteFuture();
       for (int i = 0; i < batch_size_; ++i) {
         absl::optional<QueueItem> item = queue_.Pop(deadline);
@@ -143,7 +143,7 @@ void VPNetEvaluator::Runner() {
     }
 
     {
-      absl::MutexLock lock(&stats_m_);
+      absl::MutexLock lock(stats_m_);
       batch_size_stats_.Add(inputs.size());
       batch_size_hist_.Add(inputs.size());
     }
@@ -159,18 +159,18 @@ void VPNetEvaluator::Runner() {
 }
 
 void VPNetEvaluator::ResetBatchSizeStats() {
-  absl::MutexLock lock(&stats_m_);
+  absl::MutexLock lock(stats_m_);
   batch_size_stats_.Reset();
   batch_size_hist_.Reset();
 }
 
 open_spiel::BasicStats VPNetEvaluator::BatchSizeStats() {
-  absl::MutexLock lock(&stats_m_);
+  absl::MutexLock lock(stats_m_);
   return batch_size_stats_;
 }
 
 open_spiel::HistogramNumbered VPNetEvaluator::BatchSizeHistogram() {
-  absl::MutexLock lock(&stats_m_);
+  absl::MutexLock lock(stats_m_);
   return batch_size_hist_;
 }
 
