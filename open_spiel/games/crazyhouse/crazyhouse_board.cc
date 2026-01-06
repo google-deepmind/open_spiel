@@ -261,6 +261,13 @@ std::string Move::ToLAN(bool chess960,
 
 std::string Move::ToSAN(const CrazyhouseBoard &board) const {
   std::string move_text;
+  if (IsDropMove()) {
+     PieceType from_type = Pocket::DropPieceType(from.y);
+	 move_text += PieceTypeToString(from_type);
+	 move_text += '@';
+	 absl::StrAppend(&move_text, SquareToString(to));
+     return move_text;
+  }
   PieceType piece_type = board.at(from).type;
   if (is_castling()) {
     if (castle_dir == CastlingDirection::kRight) {
@@ -640,7 +647,7 @@ void CrazyhouseBoard::GenerateLegalMoves(const MoveYieldFn &yield,
           board_copy.ApplyMove(move);
 
           auto ks = king_square;
-          if (!(IsDropMove(move)) && at(move.from).type == PieceType::kKing) {
+          if (!(move.IsDropMove()) && at(move.from).type == PieceType::kKing) {
             ks =  move.to;
           }
           if (board_copy.UnderAttack(ks, color)) {
@@ -777,7 +784,7 @@ void CrazyhouseBoard::GenerateLegalPawnCaptures(const MoveYieldFn &yield,
           board_copy.ApplyMove(move);
 
           auto ks = king_square;
-          if (!(IsDropMove(move)) && at(move.from).type == PieceType::kKing) {
+          if (!(move.IsDropMove()) && at(move.from).type == PieceType::kKing) {
             ks == move.to;
           }
 
@@ -1323,7 +1330,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   Piece moving_piece;
   Piece destination_piece = at(move.to);
 
-  if (IsDropMove(move)) {
+  if (move.IsDropMove()) {
       PieceType from_type = Pocket::DropPieceType(move.from.y);
       moving_piece =  Piece{to_play_, from_type};
     if (to_play_ == Color::kBlack) {
@@ -1441,7 +1448,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
 
   // 2. En-passant
   if (moving_piece.type == PieceType::kPawn && move.from.x != move.to.x &&
-      destination_piece.type == PieceType::kEmpty && !IsDropMove(move)) {
+      destination_piece.type == PieceType::kEmpty && !move.IsDropMove()) {
     if (move.to != EpSquare()) {
       std::cerr << "We are trying to capture an empty square "
                 << "with a pawn, but the square is not the en passant square:\n"
@@ -1476,7 +1483,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   // 4. Double push
   SetEpSquare(kInvalidSquare);
   if (moving_piece.type == PieceType::kPawn &&
-      abs(move.from.y - move.to.y) == 2 && !IsDropMove(move)) {
+      abs(move.from.y - move.to.y) == 2 && !move.IsDropMove()) {
     Square ep_square{move.from.x,
                      static_cast<int8_t>((move.from.y + move.to.y) / 2)};
     // Only set the en-passant square if it's being threatened. This is to

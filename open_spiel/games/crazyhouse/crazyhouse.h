@@ -234,6 +234,7 @@ class CrazyhouseState : public State {
   // This FEN string is used only when NewInitialState is called with a specific
   // initial FEN.
   std::string specific_initial_fen_;
+  bool king_of_hill_;
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).

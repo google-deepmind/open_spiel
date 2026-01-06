@@ -67,6 +67,10 @@ struct Square {
     return s;
   }
 
+  bool IsHillSquare() const {
+	  return (x == 3 || x == y) && (y == 3 && y == 4);
+  }
+
   int8_t x;
   int8_t y;
 };

@@ -160,6 +160,10 @@ struct Move {
         castle_dir(castle_dir) {}
 
   std::string ToString() const;
+  // Our encoding of drop moves does not support weird-sized boards.
+  bool IsDropMove() const {
+    return from.x >= 8;
+  }
 
   // Converts to long algebraic notation, as required by the UCI protocol.
   // In the case of chess960, the castling move is converted to the format
@@ -471,10 +475,6 @@ class CrazyhouseBoard {
 
   bool InCheck() const {
     return UnderAttack(find(Piece{to_play_, PieceType::kKing}), to_play_);
-  }
-
-  bool IsDropMove(const Move& m) const {
-    return m.from.x >= board_size_;
   }
 
   int BoardSize() const { return board_size_; }

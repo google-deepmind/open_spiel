@@ -116,6 +116,7 @@ CrazyhouseState::CrazyhouseState(std::shared_ptr<const Game> game)
       g->Insanity(),
       g->StickyPromotions(),
       g->KingOfHill());
+  king_of_hill_ = g->KingOfHill();
   start_board_ = *maybe_board;
   current_board_ = start_board_;
   repetitions_[current_board_.HashValue()] = 1;
@@ -127,10 +128,10 @@ CrazyhouseState::CrazyhouseState(std::shared_ptr<const Game> game,
   specific_initial_fen_ = fen;
   int insanity = g->Insanity();
   bool sticky_promotions = g->StickyPromotions();
-  bool king_of_hill = g->KingOfHill();
+  king_of_hill_ = g->KingOfHill();
   auto maybe_board = CrazyhouseBoard::BoardFromFEN(fen,
     8, false, false,
-    insanity, sticky_promotions, king_of_hill);
+    insanity, sticky_promotions, king_of_hill_);
   SPIEL_CHECK_TRUE(maybe_board);
   start_board_ = *maybe_board;
   current_board_ = start_board_;
@@ -574,6 +575,18 @@ CrazyhouseState::ExtractFenAndMaybeMoves() const {
 }
 
 absl::optional<std::vector<double>> CrazyhouseState::MaybeFinalReturns() const {
+  if (king_of_hill_){
+    auto next_to_play = ColorToPlayer(Board().ToPlay());
+	auto just_played = OtherPlayer(next_to_play);
+	Piece the_king = Piece{PlayerToColor(just_played), PieceType::kKing};
+    Square king_square = Board().find(the_king);
+    if (king_square.IsHillSquare()) {
+      std::vector<double> returns(NumPlayers());
+      returns[next_to_play] = LossUtility();
+      returns[just_played] = WinUtility();
+      return returns;
+   }
+  }
   if (!Board().HasSufficientMaterial()) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
