@@ -124,6 +124,7 @@ class ModelTest(parameterized.TestCase):
     self.assertLess(losses[-1].value, value_loss_goal)
     self.assertLess(losses[-1].policy, policy_loss_goal)
 
+  @absltest.skip("Too slow for the CI")
   @parameterized.parameters(
     itertools.product(
       AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types

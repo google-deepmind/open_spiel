@@ -343,16 +343,17 @@ class RootStateWrapper(object):
 
       reach_prob = reach_probabilities[player]
       for action_idx, action in enumerate(actions):
-        action_prob = policy[action_idx]
-        next_reach_prob = reach_prob * action_prob
-
+        action_prob = policy[action_idx].squeeze()
+        next_reach_prob = reach_prob * np.squeeze(action_prob)
+        
         if is_reach_weight_player_node:
           reach_weight_player_plays_down_this_line = next_reach_prob > 0
           if not reach_weight_player_plays_down_this_line:
             continue
           sequence_idx = sequence_idx_offset + action_idx
-          reach_weights[sequence_idx] += next_reach_prob
 
+          reach_weights[sequence_idx] += next_reach_prob
+    
         reach_probabilities[player] = next_reach_prob
 
         action_value = _walk_descendants(

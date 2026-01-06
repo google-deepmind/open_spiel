@@ -403,7 +403,6 @@ class Model:
 
     state = cls._create_train_state(model, optimiser)
 
-    @nn.jit
     @nn.vmap(in_axes=(None, 0), axis_name="batch")
     def forward(model: AlphaZeroModel, x: chex.Array) -> chex.Array:
       return model(x)
@@ -417,15 +416,12 @@ class Model:
       value_targets: chex.Array,
     ) -> Callable:
       def loss_fn(
-        params,
-        batch_stats,
+        model,
         observations: chex.Array,
         legals_mask: chex.Array,
         policy_targets: chex.Array,
         value_targets: chex.Array,
       ):
-        model = nn.merge(state.graphdef, params, batch_stats)
-
         policy_logits, value_preds = forward(model, observations)
         policy_logits = jnp.where(
           legals_mask,
@@ -455,11 +451,12 @@ class Model:
           get_batch_stats(model),
         )
 
-      grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
+      grad_fn = nn.value_and_grad(loss_fn, has_aux=True)
+      model = nn.merge(state.graphdef, state.params, state.batch_stats)
+      model.train()
 
       (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
-        state.params,
-        state.batch_stats,
+        model,
         observations,
         legals_mask,
         policy_targets,
