@@ -76,9 +76,7 @@ jobs:
           df -h
 
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: true
+        uses: actions/checkout@v6
 
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
@@ -86,9 +84,10 @@ jobs:
           version: '1.8'
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.OS_PYTHON_VERSION }}
+          
       - name: Ad-hoc fix
         if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
         run: |

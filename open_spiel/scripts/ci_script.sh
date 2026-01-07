@@ -36,7 +36,7 @@ python --version
 pip install --upgrade -r requirements.txt
 
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --extra-index-url https://download.pytorch.org/whl/cpu
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
 [[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
 # We need PYBIN to be python on its own so that the build and run script

@@ -76,8 +76,9 @@ jobs:
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
       CIBW_VERSION: ${{ matrix.CIBW_VERSION }}
       CIBW_ENABLE: ${{ matrix.CIBW_ENABLE }}
-      CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-      CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
+      CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+      CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
+      CIBW_BEFORE_BUILD: rm -rf {project}/build
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
