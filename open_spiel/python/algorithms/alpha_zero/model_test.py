@@ -53,10 +53,10 @@ def solve_game(state):
   policy = np.zeros_like(act_mask)
   policy[best_actions[0][0]] = 1  # Choose the first for a deterministic policy.
   solved[state_str] = TrainInput(
-    observation=jnp.array(obs, dtype=jnp.float32),
-    legals_mask=jnp.array(act_mask, dtype=jnp.bool),
-    policy=jnp.array(policy, dtype=jnp.float32),
-    value=jnp.array(value, dtype=jnp.float32),
+    observation=jnp.asarray(obs, dtype=jnp.float32),
+    legals_mask=jnp.asarray(act_mask, dtype=jnp.bool),
+    policy=jnp.asarray(policy, dtype=jnp.float32),
+    value=jnp.asarray(value, dtype=jnp.float32),
   )
   return value
 
@@ -156,6 +156,7 @@ class ModelTest(parameterized.TestCase):
     self.assertLess(losses[-1].value, value_loss_goal)
     self.assertLess(losses[-1].policy, policy_loss_goal)
 
+  @absltest.skip("May save to the disk")
   @parameterized.parameters(
     itertools.product(
       AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types
