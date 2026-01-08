@@ -41,6 +41,8 @@ _DEFAULT_PARAMS = {
 }
 
 # Default prisoner's dilemma payoff matrix for 2 players, 2 actions
+# Based on standard PD: T > R > P > S
+# T (Temptation) = 5, R (Reward) = 3, P (Punishment) = 1, S (Sucker's payoff) = 0
 _DEFAULT_PAYOFF_MATRIX = [
     [[3, 0], [5, 1]],  # Player 0's payoffs when Player 1 chooses action 0 or 1
     [[3, 5], [0, 1]]   # Player 1's payoffs when Player 0 chooses action 0 or 1

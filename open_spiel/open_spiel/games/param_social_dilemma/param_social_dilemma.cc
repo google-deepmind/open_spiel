@@ -32,6 +32,8 @@ namespace param_social_dilemma {
 namespace {
 
 // Default payoff matrix for 2-player prisoner's dilemma
+// Based on standard PD: T > R > P > S
+// T (Temptation) = 5, R (Reward) = 3, P (Punishment) = 1, S (Sucker's payoff) = 0
 constexpr std::array<double, 4> kDefault2PlayerPayoffs = {
     3, 0,  // Player 0: C-C, C-D
     5, 1   // Player 0: D-C, D-D

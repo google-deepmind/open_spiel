@@ -14,8 +14,11 @@
 
 """Axelrod-style bots for parameterized social dilemma games.
 
-This module implements classic strategies from Robert Axelrod's tournaments,
-adapted to work with N-player parameterized social dilemma games.
+This module implements classic strategies from Robert Axelrod's tournaments:
+- Axelrod, R. (1980). "Effective Choice in the Prisoner's Dilemma."
+- Axelrod, R. & Hamilton, W.D. (1981). "The Evolution of Cooperation."
+
+Adapted to work with N-player parameterized social dilemma games.
 """
 
 import abc
@@ -75,7 +78,10 @@ class SocialDilemmaBot(bot.Bot):
 
 
 class AlwaysCooperateBot(SocialDilemmaBot):
-    """Always cooperates (chooses action 0)."""
+    """Always cooperates (chooses action 0).
+    
+    From Axelrod (1980) - simplest cooperative strategy.
+    """
     
     def step(self, state):
         """Returns the selected action."""
@@ -85,7 +91,10 @@ class AlwaysCooperateBot(SocialDilemmaBot):
 
 
 class AlwaysDefectBot(SocialDilemmaBot):
-    """Always defects (chooses action 1 or last action)."""
+    """Always defects (chooses action 1 or last action).
+    
+    From Axelrod (1980) - simplest defective strategy.
+    """
     
     def step(self, state):
         """Returns the selected action."""
@@ -95,7 +104,10 @@ class AlwaysDefectBot(SocialDilemmaBot):
 
 
 class TitForTatBot(SocialDilemmaBot):
-    """Cooperates on first move, then copies opponent's last move."""
+    """Cooperates on first move, then copies opponent's last move.
+    
+    From Axelrod (1980) - one of the most successful strategies.
+    """
     
     def __init__(self, player_id: int, game: pyspiel.Game, **kwargs):
         """Initialize the Tit-for-Tat bot."""
@@ -126,7 +138,10 @@ class TitForTatBot(SocialDilemmaBot):
 
 
 class GrimTriggerBot(SocialDilemmaBot):
-    """Cooperates until an opponent defects, then defects forever."""
+    """Cooperates until an opponent defects, then defects forever.
+    
+    From Axelrod (1980) - unforgiving strategy.
+    """
     
     def __init__(self, player_id: int, game: pyspiel.Game, **kwargs):
         """Initialize the Grim Trigger bot."""
