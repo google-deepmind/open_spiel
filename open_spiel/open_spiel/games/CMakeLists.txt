@@ -98,6 +98,8 @@ set(GAME_SOURCES
   hearts/hearts.h
   hex/hex.cc
   hex/hex.h
+  param_social_dilemma/param_social_dilemma.cc
+  param_social_dilemma/param_social_dilemma.h
   hive/hive.cc
   hive/hive.h
   hive/hive_board.cc
