@@ -95,11 +95,15 @@ jobs:
           sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -e 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
       - name: Install
         run: |
+          export CMAKE_BUILD_PARALLEL_LEVEL=1 
+          export MAKEFLAGS="-j1"
           pwd
           ./open_spiel/scripts/ci_python_prechecks.sh
           chmod +x install.sh
           ./install.sh
       - name: Build and test
         run: |
+          export CMAKE_BUILD_PARALLEL_LEVEL=1 
+          export MAKEFLAGS="-j1"
           python3 --version
           ./open_spiel/scripts/ci_script.sh
