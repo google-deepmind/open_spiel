@@ -14,10 +14,11 @@
 
 """An MCTS Evaluator for an AlphaZero model."""
 
+import jax
 import numpy as np
+import pyspiel
 
 from open_spiel.python.algorithms import mcts
-import pyspiel
 from open_spiel.python.utils import lru_cache
 
 
@@ -34,29 +35,31 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
       raise ValueError("Game must have sequential turns.")
 
-    self._model = model
+    self._model = model  # nn.cached_partial?
     self._cache = lru_cache.LRUCache(cache_size)
 
   def cache_info(self):
     return self._cache.info()
 
   def clear_cache(self):
+    # Clear all compilation and staging caches.
+    jax.clear_caches()
     self._cache.clear()
 
   def _inference(self, state):
     # Make a singleton batch
-    obs = np.expand_dims(state.observation_tensor(), 0)
-    mask = np.expand_dims(state.legal_actions_mask(), 0)
+    obs = np.asarray(state.observation_tensor())
+    mask = np.asarray(state.legal_actions_mask())
 
-    # ndarray isn't hashable
+    # np.ndarray isn't hashable
     cache_key = obs.tobytes() + mask.tobytes()
 
     value, policy = self._cache.make(
-        cache_key, lambda: self._model.inference(obs, mask))
+      cache_key, lambda: self._model.inference(obs, mask)
+    )
+    return value, policy
 
-    return value[0, 0], policy[0]  # Unpack batch
-
-  def evaluate(self, state):
+  def evaluate(self, state) -> np.ndarray:
     """Returns a value for the given state."""
     value, _ = self._inference(state)
     return np.array([value, -value])
