@@ -62,19 +62,7 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:  ${{ matrix.OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL }}
 
     steps:
-      - name: Free Disk Space (Ubuntu)
-        if: runner.os == 'Linux'
-        run: |
-          echo "Disk space before cleanup:"
-          df -h
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo docker image prune --all --force
-          echo "Disk space after cleanup:"
-          df -h
-
+      
       - name: Checkout
         uses: actions/checkout@v6
 
@@ -95,15 +83,11 @@ jobs:
           sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -e 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
       - name: Install
         run: |
-          export CMAKE_BUILD_PARALLEL_LEVEL=1 
-          export MAKEFLAGS="-j1"
           pwd
           ./open_spiel/scripts/ci_python_prechecks.sh
           chmod +x install.sh
           ./install.sh
       - name: Build and test
         run: |
-          export CMAKE_BUILD_PARALLEL_LEVEL=1 
-          export MAKEFLAGS="-j1"
           python3 --version
           ./open_spiel/scripts/ci_script.sh
