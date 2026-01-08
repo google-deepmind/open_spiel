@@ -1,0 +1,697 @@
+game: python_repeated_pokerkit(max_num_hands=200,reset_stacks=False,rotate_dealer=True,pokerkit_game_params=python_pokerkit_wrapper(variant=PotLimitOmahaHoldem,num_players=4,blinds=5 10,stack_sizes=200 200 200 200))
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Python Repeated Pokerkit"
+GameType.max_num_players = 10
+GameType.min_num_players = 2
+GameType.parameter_specification = ["bet_size_schedule", "blind_schedule", "bring_in_schedule", "first_button_player", "max_num_hands", "pokerkit_game_params", "record_full_hand_histories", "reset_stacks", "rotate_dealer"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "python_repeated_pokerkit"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 800
+PolicyTensorShape() = [800]
+MaxChanceOutcomes() = 52
+GetParameters() = {bet_size_schedule=,blind_schedule=,bring_in_schedule=,first_button_player=-1,max_num_hands=200,pokerkit_game_params=python_pokerkit_wrapper(blinds=5 10,num_players=4,stack_sizes=200 200 200 200,variant=PotLimitOmahaHoldem),record_full_hand_histories=True,reset_stacks=False,rotate_dealer=True}
+NumPlayers() = 4
+MinUtility() = -200.0
+MaxUtility() = 800.0
+UtilitySum() = 0.0
+InformationStateTensorShape() = 
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 0
+ObservationTensorShape() = 
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 0
+MaxGameLength() = 25600
+ToString() = "python_repeated_pokerkit(bet_size_schedule=,blind_schedule=,bring_in_schedule=,first_button_player=-1,max_num_hands=200,pokerkit_game_params=python_pokerkit_wrapper(blinds=5 10,num_players=4,stack_sizes=200 200 200 200,variant=PotLimitOmahaHoldem),record_full_hand_histories=True,reset_stacks=False,rotate_dealer=True)"
+
+# State 0
+# Hand number: 0
+# Stacks: [195, 190, 200, 200] | Bets: [5, 10, 0, 0] | Board: [] | Hole Cards: [[], [], [], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10)]
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ChanceOutcomes() = [(0,0.0192308), (1,0.0192308), (2,0.0192308), (3,0.0192308), (4,0.0192308), (5,0.0192308), (6,0.0192308), (7,0.0192308), (8,0.0192308), (9,0.0192308), (10,0.0192308), (11,0.0192308), (12,0.0192308), (13,0.0192308), (14,0.0192308), (15,0.0192308), (16,0.0192308), (17,0.0192308), (18,0.0192308), (19,0.0192308), (20,0.0192308), (21,0.0192308), (22,0.0192308), (23,0.0192308), (24,0.0192308), (25,0.0192308), (26,0.0192308), (27,0.0192308), (28,0.0192308), (29,0.0192308), (30,0.0192308), (31,0.0192308), (32,0.0192308), (33,0.0192308), (34,0.0192308), (35,0.0192308), (36,0.0192308), (37,0.0192308), (38,0.0192308), (39,0.0192308), (40,0.0192308), (41,0.0192308), (42,0.0192308), (43,0.0192308), (44,0.0192308), (45,0.0192308), (46,0.0192308), (47,0.0192308), (48,0.0192308), (49,0.0192308), (50,0.0192308), (51,0.0192308)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["Deal Hole Card: DEUCE OF CLUBS (2c)", "Deal Hole Card: DEUCE OF DIAMONDS (2d)", "Deal Hole Card: DEUCE OF HEARTS (2h)", "Deal Hole Card: DEUCE OF SPADES (2s)", "Deal Hole Card: TREY OF CLUBS (3c)", "Deal Hole Card: TREY OF DIAMONDS (3d)", "Deal Hole Card: TREY OF HEARTS (3h)", "Deal Hole Card: TREY OF SPADES (3s)", "Deal Hole Card: FOUR OF CLUBS (4c)", "Deal Hole Card: FOUR OF DIAMONDS (4d)", "Deal Hole Card: FOUR OF HEARTS (4h)", "Deal Hole Card: FOUR OF SPADES (4s)", "Deal Hole Card: FIVE OF CLUBS (5c)", "Deal Hole Card: FIVE OF DIAMONDS (5d)", "Deal Hole Card: FIVE OF HEARTS (5h)", "Deal Hole Card: FIVE OF SPADES (5s)", "Deal Hole Card: SIX OF CLUBS (6c)", "Deal Hole Card: SIX OF DIAMONDS (6d)", "Deal Hole Card: SIX OF HEARTS (6h)", "Deal Hole Card: SIX OF SPADES (6s)", "Deal Hole Card: SEVEN OF CLUBS (7c)", "Deal Hole Card: SEVEN OF DIAMONDS (7d)", "Deal Hole Card: SEVEN OF HEARTS (7h)", "Deal Hole Card: SEVEN OF SPADES (7s)", "Deal Hole Card: EIGHT OF CLUBS (8c)", "Deal Hole Card: EIGHT OF DIAMONDS (8d)", "Deal Hole Card: EIGHT OF HEARTS (8h)", "Deal Hole Card: EIGHT OF SPADES (8s)", "Deal Hole Card: NINE OF CLUBS (9c)", "Deal Hole Card: NINE OF DIAMONDS (9d)", "Deal Hole Card: NINE OF HEARTS (9h)", "Deal Hole Card: NINE OF SPADES (9s)", "Deal Hole Card: TEN OF CLUBS (Tc)", "Deal Hole Card: TEN OF DIAMONDS (Td)", "Deal Hole Card: TEN OF HEARTS (Th)", "Deal Hole Card: TEN OF SPADES (Ts)", "Deal Hole Card: JACK OF CLUBS (Jc)", "Deal Hole Card: JACK OF DIAMONDS (Jd)", "Deal Hole Card: JACK OF HEARTS (Jh)", "Deal Hole Card: JACK OF SPADES (Js)", "Deal Hole Card: QUEEN OF CLUBS (Qc)", "Deal Hole Card: QUEEN OF DIAMONDS (Qd)", "Deal Hole Card: QUEEN OF HEARTS (Qh)", "Deal Hole Card: QUEEN OF SPADES (Qs)", "Deal Hole Card: KING OF CLUBS (Kc)", "Deal Hole Card: KING OF DIAMONDS (Kd)", "Deal Hole Card: KING OF HEARTS (Kh)", "Deal Hole Card: KING OF SPADES (Ks)", "Deal Hole Card: ACE OF CLUBS (Ac)", "Deal Hole Card: ACE OF DIAMONDS (Ad)", "Deal Hole Card: ACE OF HEARTS (Ah)", "Deal Hole Card: ACE OF SPADES (As)"]
+
+# Apply action "Deal Hole Card: TEN OF CLUBS (Tc)"
+action: 32
+
+# State 1
+# Hand number: 0
+# Stacks: [195, 190, 200, 200] | Bets: [5, 10, 0, 0] | Board: [] | Hole Cards: [[Tc], [], [], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,))]
+IsTerminal() = False
+History() = [32]
+HistoryString() = "32"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc]\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc]\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc]\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: None\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??], [], [], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ChanceOutcomes() = [(0,0.0196078), (1,0.0196078), (2,0.0196078), (3,0.0196078), (4,0.0196078), (5,0.0196078), (6,0.0196078), (7,0.0196078), (8,0.0196078), (9,0.0196078), (10,0.0196078), (11,0.0196078), (12,0.0196078), (13,0.0196078), (14,0.0196078), (15,0.0196078), (16,0.0196078), (17,0.0196078), (18,0.0196078), (19,0.0196078), (20,0.0196078), (21,0.0196078), (22,0.0196078), (23,0.0196078), (24,0.0196078), (25,0.0196078), (26,0.0196078), (27,0.0196078), (28,0.0196078), (29,0.0196078), (30,0.0196078), (31,0.0196078), (33,0.0196078), (34,0.0196078), (35,0.0196078), (36,0.0196078), (37,0.0196078), (38,0.0196078), (39,0.0196078), (40,0.0196078), (41,0.0196078), (42,0.0196078), (43,0.0196078), (44,0.0196078), (45,0.0196078), (46,0.0196078), (47,0.0196078), (48,0.0196078), (49,0.0196078), (50,0.0196078), (51,0.0196078)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["Deal Hole Card: DEUCE OF CLUBS (2c)", "Deal Hole Card: DEUCE OF DIAMONDS (2d)", "Deal Hole Card: DEUCE OF HEARTS (2h)", "Deal Hole Card: DEUCE OF SPADES (2s)", "Deal Hole Card: TREY OF CLUBS (3c)", "Deal Hole Card: TREY OF DIAMONDS (3d)", "Deal Hole Card: TREY OF HEARTS (3h)", "Deal Hole Card: TREY OF SPADES (3s)", "Deal Hole Card: FOUR OF CLUBS (4c)", "Deal Hole Card: FOUR OF DIAMONDS (4d)", "Deal Hole Card: FOUR OF HEARTS (4h)", "Deal Hole Card: FOUR OF SPADES (4s)", "Deal Hole Card: FIVE OF CLUBS (5c)", "Deal Hole Card: FIVE OF DIAMONDS (5d)", "Deal Hole Card: FIVE OF HEARTS (5h)", "Deal Hole Card: FIVE OF SPADES (5s)", "Deal Hole Card: SIX OF CLUBS (6c)", "Deal Hole Card: SIX OF DIAMONDS (6d)", "Deal Hole Card: SIX OF HEARTS (6h)", "Deal Hole Card: SIX OF SPADES (6s)", "Deal Hole Card: SEVEN OF CLUBS (7c)", "Deal Hole Card: SEVEN OF DIAMONDS (7d)", "Deal Hole Card: SEVEN OF HEARTS (7h)", "Deal Hole Card: SEVEN OF SPADES (7s)", "Deal Hole Card: EIGHT OF CLUBS (8c)", "Deal Hole Card: EIGHT OF DIAMONDS (8d)", "Deal Hole Card: EIGHT OF HEARTS (8h)", "Deal Hole Card: EIGHT OF SPADES (8s)", "Deal Hole Card: NINE OF CLUBS (9c)", "Deal Hole Card: NINE OF DIAMONDS (9d)", "Deal Hole Card: NINE OF HEARTS (9h)", "Deal Hole Card: NINE OF SPADES (9s)", "Deal Hole Card: TEN OF DIAMONDS (Td)", "Deal Hole Card: TEN OF HEARTS (Th)", "Deal Hole Card: TEN OF SPADES (Ts)", "Deal Hole Card: JACK OF CLUBS (Jc)", "Deal Hole Card: JACK OF DIAMONDS (Jd)", "Deal Hole Card: JACK OF HEARTS (Jh)", "Deal Hole Card: JACK OF SPADES (Js)", "Deal Hole Card: QUEEN OF CLUBS (Qc)", "Deal Hole Card: QUEEN OF DIAMONDS (Qd)", "Deal Hole Card: QUEEN OF HEARTS (Qh)", "Deal Hole Card: QUEEN OF SPADES (Qs)", "Deal Hole Card: KING OF CLUBS (Kc)", "Deal Hole Card: KING OF DIAMONDS (Kd)", "Deal Hole Card: KING OF HEARTS (Kh)", "Deal Hole Card: KING OF SPADES (Ks)", "Deal Hole Card: ACE OF CLUBS (Ac)", "Deal Hole Card: ACE OF DIAMONDS (Ad)", "Deal Hole Card: ACE OF HEARTS (Ah)", "Deal Hole Card: ACE OF SPADES (As)"]
+
+# Apply action "Deal Hole Card: EIGHT OF DIAMONDS (8d)"
+action: 25
+
+# State 2
+# Apply action "Deal Hole Card: EIGHT OF HEARTS (8h)"
+action: 26
+
+# State 3
+# Apply action "Deal Hole Card: DEUCE OF SPADES (2s)"
+action: 3
+
+# State 4
+# Apply action "Deal Hole Card: ACE OF SPADES (As)"
+action: 51
+
+# State 5
+# Apply action "Deal Hole Card: FOUR OF SPADES (4s)"
+action: 11
+
+# State 6
+# Apply action "Deal Hole Card: TREY OF HEARTS (3h)"
+action: 6
+
+# State 7
+# Apply action "Deal Hole Card: SEVEN OF DIAMONDS (7d)"
+action: 21
+
+# State 8
+# Apply action "Deal Hole Card: SEVEN OF HEARTS (7h)"
+action: 22
+
+# State 9
+# Apply action "Deal Hole Card: DEUCE OF DIAMONDS (2d)"
+action: 1
+
+# State 10
+# Apply action "Deal Hole Card: FIVE OF HEARTS (5h)"
+action: 14
+
+# State 11
+# Apply action "Deal Hole Card: SIX OF HEARTS (6h)"
+action: 18
+
+# State 12
+# Apply action "Deal Hole Card: KING OF HEARTS (Kh)"
+action: 46
+
+# State 13
+# Apply action "Deal Hole Card: DEUCE OF HEARTS (2h)"
+action: 2
+
+# State 14
+# Apply action "Deal Hole Card: FOUR OF DIAMONDS (4d)"
+action: 9
+
+# State 15
+# Apply action "Deal Hole Card: DEUCE OF CLUBS (2c)"
+action: 0
+
+# State 16
+# Hand number: 0
+# Stacks: [195, 190, 200, 200] | Bets: [5, 10, 0, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], [2s, 7d, 6h, 2c]] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,))]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [2s, 7d, 6h, 2c]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [5, 10, 0, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [2s, 7d, 6h, 2c]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 200, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+StringLegalActions() = ["Player 2: Fold", "Call(10)", "Player 2: Bet/Raise to 20", "Player 2: Bet/Raise to 21", "Player 2: Bet/Raise to 22", "Player 2: Bet/Raise to 23", "Player 2: Bet/Raise to 24", "Player 2: Bet/Raise to 25", "Player 2: Bet/Raise to 26", "Player 2: Bet/Raise to 27", "Player 2: Bet/Raise to 28", "Player 2: Bet/Raise to 29", "Player 2: Bet/Raise to 30", "Player 2: Bet/Raise to 31", "Player 2: Bet/Raise to 32", "Player 2: Bet/Raise to 33", "Player 2: Bet/Raise to 34", "Player 2: Bet/Raise to 35"]
+
+# Apply action "Player 2: Bet/Raise to 35"
+action: 35
+
+# State 17
+# Hand number: 0
+# Stacks: [195, 190, 165, 200] | Bets: [5, 10, 35, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], [2s, 7d, 6h, 2c]] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=2, amount=35)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [2s, 7d, 6h, 2c]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 3\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [2s, 7d, 6h, 2c]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120]
+StringLegalActions() = ["Player 3: Fold", "Call(35)", "Player 3: Bet/Raise to 60", "Player 3: Bet/Raise to 61", "Player 3: Bet/Raise to 62", "Player 3: Bet/Raise to 63", "Player 3: Bet/Raise to 64", "Player 3: Bet/Raise to 65", "Player 3: Bet/Raise to 66", "Player 3: Bet/Raise to 67", "Player 3: Bet/Raise to 68", "Player 3: Bet/Raise to 69", "Player 3: Bet/Raise to 70", "Player 3: Bet/Raise to 71", "Player 3: Bet/Raise to 72", "Player 3: Bet/Raise to 73", "Player 3: Bet/Raise to 74", "Player 3: Bet/Raise to 75", "Player 3: Bet/Raise to 76", "Player 3: Bet/Raise to 77", "Player 3: Bet/Raise to 78", "Player 3: Bet/Raise to 79", "Player 3: Bet/Raise to 80", "Player 3: Bet/Raise to 81", "Player 3: Bet/Raise to 82", "Player 3: Bet/Raise to 83", "Player 3: Bet/Raise to 84", "Player 3: Bet/Raise to 85", "Player 3: Bet/Raise to 86", "Player 3: Bet/Raise to 87", "Player 3: Bet/Raise to 88", "Player 3: Bet/Raise to 89", "Player 3: Bet/Raise to 90", "Player 3: Bet/Raise to 91", "Player 3: Bet/Raise to 92", "Player 3: Bet/Raise to 93", "Player 3: Bet/Raise to 94", "Player 3: Bet/Raise to 95", "Player 3: Bet/Raise to 96", "Player 3: Bet/Raise to 97", "Player 3: Bet/Raise to 98", "Player 3: Bet/Raise to 99", "Player 3: Bet/Raise to 100", "Player 3: Bet/Raise to 101", "Player 3: Bet/Raise to 102", "Player 3: Bet/Raise to 103", "Player 3: Bet/Raise to 104", "Player 3: Bet/Raise to 105", "Player 3: Bet/Raise to 106", "Player 3: Bet/Raise to 107", "Player 3: Bet/Raise to 108", "Player 3: Bet/Raise to 109", "Player 3: Bet/Raise to 110", "Player 3: Bet/Raise to 111", "Player 3: Bet/Raise to 112", "Player 3: Bet/Raise to 113", "Player 3: Bet/Raise to 114", "Player 3: Bet/Raise to 115", "Player 3: Bet/Raise to 116", "Player 3: Bet/Raise to 117", "Player 3: Bet/Raise to 118", "Player 3: Bet/Raise to 119", "Player 3: Bet/Raise to 120"]
+
+# Apply action "Player 3: Fold"
+action: 0
+
+# State 18
+# Hand number: 0
+# Stacks: [195, 190, 165, 200] | Bets: [5, 10, 35, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=2, amount=35), Folding(commentary=None, player_index=3)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [5, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [195, 190, 165, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115]
+StringLegalActions() = ["Player 0: Fold", "Call(30)", "Player 0: Bet/Raise to 60", "Player 0: Bet/Raise to 61", "Player 0: Bet/Raise to 62", "Player 0: Bet/Raise to 63", "Player 0: Bet/Raise to 64", "Player 0: Bet/Raise to 65", "Player 0: Bet/Raise to 66", "Player 0: Bet/Raise to 67", "Player 0: Bet/Raise to 68", "Player 0: Bet/Raise to 69", "Player 0: Bet/Raise to 70", "Player 0: Bet/Raise to 71", "Player 0: Bet/Raise to 72", "Player 0: Bet/Raise to 73", "Player 0: Bet/Raise to 74", "Player 0: Bet/Raise to 75", "Player 0: Bet/Raise to 76", "Player 0: Bet/Raise to 77", "Player 0: Bet/Raise to 78", "Player 0: Bet/Raise to 79", "Player 0: Bet/Raise to 80", "Player 0: Bet/Raise to 81", "Player 0: Bet/Raise to 82", "Player 0: Bet/Raise to 83", "Player 0: Bet/Raise to 84", "Player 0: Bet/Raise to 85", "Player 0: Bet/Raise to 86", "Player 0: Bet/Raise to 87", "Player 0: Bet/Raise to 88", "Player 0: Bet/Raise to 89", "Player 0: Bet/Raise to 90", "Player 0: Bet/Raise to 91", "Player 0: Bet/Raise to 92", "Player 0: Bet/Raise to 93", "Player 0: Bet/Raise to 94", "Player 0: Bet/Raise to 95", "Player 0: Bet/Raise to 96", "Player 0: Bet/Raise to 97", "Player 0: Bet/Raise to 98", "Player 0: Bet/Raise to 99", "Player 0: Bet/Raise to 100", "Player 0: Bet/Raise to 101", "Player 0: Bet/Raise to 102", "Player 0: Bet/Raise to 103", "Player 0: Bet/Raise to 104", "Player 0: Bet/Raise to 105", "Player 0: Bet/Raise to 106", "Player 0: Bet/Raise to 107", "Player 0: Bet/Raise to 108", "Player 0: Bet/Raise to 109", "Player 0: Bet/Raise to 110", "Player 0: Bet/Raise to 111", "Player 0: Bet/Raise to 112", "Player 0: Bet/Raise to 113", "Player 0: Bet/Raise to 114", "Player 0: Bet/Raise to 115"]
+
+# Apply action "Player 0: Bet/Raise to 107"
+action: 107
+
+# State 19
+# Hand number: 0
+# Stacks: [93, 190, 165, 200] | Bets: [107, 10, 35, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=2, amount=35), Folding(commentary=None, player_index=3), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=107)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [107, 10, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 190, 165, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200]
+StringLegalActions() = ["Player 1: Fold", "Call(97)", "Player 1: Bet/Raise to 179", "Player 1: Bet/Raise to 180", "Player 1: Bet/Raise to 181", "Player 1: Bet/Raise to 182", "Player 1: Bet/Raise to 183", "Player 1: Bet/Raise to 184", "Player 1: Bet/Raise to 185", "Player 1: Bet/Raise to 186", "Player 1: Bet/Raise to 187", "Player 1: Bet/Raise to 188", "Player 1: Bet/Raise to 189", "Player 1: Bet/Raise to 190", "Player 1: Bet/Raise to 191", "Player 1: Bet/Raise to 192", "Player 1: Bet/Raise to 193", "Player 1: Bet/Raise to 194", "Player 1: Bet/Raise to 195", "Player 1: Bet/Raise to 196", "Player 1: Bet/Raise to 197", "Player 1: Bet/Raise to 198", "Player 1: Bet/Raise to 199", "Player 1: Bet/Raise to 200"]
+
+# Apply action "Player 1: Bet/Raise to 195"
+action: 195
+
+# State 20
+# Hand number: 0
+# Stacks: [93, 5, 165, 200] | Bets: [107, 195, 35, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=2, amount=35), Folding(commentary=None, player_index=3), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=107), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=195)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [107, 195, 35, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 165, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 200]
+StringLegalActions() = ["Player 2: Fold", "Call(160)", "Player 2: Bet/Raise to 200"]
+
+# Apply action "Call(160)"
+action: 1
+
+# State 21
+# Hand number: 0
+# Stacks: [93, 5, 5, 200] | Bets: [107, 195, 195, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=2, amount=35), Folding(commentary=None, player_index=3), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=107), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=195), CheckingOrCalling(commentary=None, player_index=2, amount=160)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [107, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [93, 5, 5, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 200]
+StringLegalActions() = ["Player 0: Fold", "Call(88)", "Player 0: Bet/Raise to 200"]
+
+# Apply action "Player 0: Bet/Raise to 200"
+action: 200
+
+# State 22
+# Hand number: 0
+# Stacks: [0, 5, 5, 200] | Bets: [200, 195, 195, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=2, amount=35), Folding(commentary=None, player_index=3), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=107), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=195), CheckingOrCalling(commentary=None, player_index=2, amount=160), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=200)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 1\n||Pot(s): [] \n||Bets: [200, 195, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 5, 5, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["Player 1: Fold", "Call(5)"]
+
+# Apply action "Call(5)"
+action: 1
+
+# State 23
+# Hand number: 0
+# Stacks: [0, 0, 5, 200] | Bets: [200, 200, 195, 0] | Board: [] | Hole Cards: [[Tc, As, 7h, Kh], [8d, 4s, 2d, 2h], [8h, 3h, 5h, 4d], []] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=5), BlindOrStraddlePosting(commentary=None, player_index=1, amount=10), HoleDealing(commentary=None, player_index=0, cards=(Tc,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(8d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(As,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(4s,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(3h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(7d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(7h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(5h,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Kh,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2h,), statuses=(False,)), HoleDealing(commentary=None, player_index=2, cards=(4d,), statuses=(False,)), HoleDealing(commentary=None, player_index=3, cards=(2c,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=2, amount=35), Folding(commentary=None, player_index=3), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=107), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=195), CheckingOrCalling(commentary=None, player_index=2, amount=160), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=200), CheckingOrCalling(commentary=None, player_index=1, amount=5)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+ObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+ObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+ObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+PublicObservationString() = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+PrivateObservationString(0) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [Tc, As, 7h, Kh]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+PrivateObservationString(1) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8d, 4s, 2d, 2h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+PrivateObservationString(2) = "Player: 2\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: [8h, 3h, 5h, 4d]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+PrivateObservationString(3) = "Player: 3\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 2\n||Pot(s): [] \n||Bets: [200, 200, 195, 0]\n||Board Cards: []\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??], [??, ??, ??, ??], []]\n||Per-player Starting Stacks: (200, 200, 200, 200)\n||Per-player Current Stacks: [0, 0, 5, 200]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["Player 2: Fold", "Call(5)"]
+
+# Apply action "Call(5)"
+action: 1
+
+# State 24
+# Apply action "Deal Board Card: FIVE OF SPADES (5s)"
+action: 15
+
+# State 25
+# Apply action "Deal Board Card: TEN OF DIAMONDS (Td)"
+action: 33
+
+# State 26
+# Apply action "Deal Board Card: SEVEN OF SPADES (7s)"
+action: 23
+
+# State 27
+# Apply action "Deal Board Card: FIVE OF DIAMONDS (5d)"
+action: 13
+
+# State 28
+# Apply action "Deal Board Card: FOUR OF HEARTS (4h)"
+action: 10
+
+# State 29
+# Apply action "Deal Hole Card: EIGHT OF SPADES (8s)"
+action: 27
+
+# State 30
+# Apply action "Deal Hole Card: KING OF SPADES (Ks)"
+action: 47
+
+# State 31
+# Apply action "Deal Hole Card: ACE OF HEARTS (Ah)"
+action: 50
+
+# State 32
+# Apply action "Deal Hole Card: NINE OF DIAMONDS (9d)"
+action: 29
+
+# State 33
+# Apply action "Deal Hole Card: NINE OF CLUBS (9c)"
+action: 28
+
+# State 34
+# Apply action "Deal Hole Card: ACE OF DIAMONDS (Ad)"
+action: 49
+
+# State 35
+# Apply action "Deal Hole Card: SIX OF HEARTS (6h)"
+action: 18
+
+# State 36
+# Apply action "Deal Hole Card: QUEEN OF SPADES (Qs)"
+action: 43
+
+# State 37
+# Apply action "Player 1: Bet/Raise to 20"
+action: 20
+
+# State 38
+# Hand number: 1
+# Stacks: [190, 580] | Bets: [10, 20] | Board: [] | Hole Cards: [[8s, Ah, 9c, 6h], [Ks, 9d, Ad, Qs]] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=10), BlindOrStraddlePosting(commentary=None, player_index=1, amount=5), HoleDealing(commentary=None, player_index=0, cards=(8s,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(Ks,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Ah,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(9d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(9c,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(Ad,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(Qs,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=20)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1, 1, 15, 33, 23, 13, 10, 27, 47, 50, 29, 28, 49, 18, 43, 20]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1, 1, 15, 33, 23, 13, 10, 27, 47, 50, 29, 28, 49, 18, 43, 20"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Game over.\n"
+ObservationString(1) = "Game over.\n"
+ObservationString(2) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [10, 20]\n||Board Cards: []\n||Player's Private Hole Cards: [Ks, 9d, Ad, Qs]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [190, 580]"
+ObservationString(3) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [10, 20]\n||Board Cards: []\n||Player's Private Hole Cards: [8s, Ah, 9c, 6h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [190, 580]"
+PublicObservationString() = "Game over.\n"
+PrivateObservationString(0) = "Game over.\n"
+PrivateObservationString(1) = "Game over.\n"
+PrivateObservationString(2) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [10, 20]\n||Board Cards: []\n||Player's Private Hole Cards: [Ks, 9d, Ad, Qs]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [190, 580]"
+PrivateObservationString(3) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [10, 20]\n||Board Cards: []\n||Player's Private Hole Cards: [8s, Ah, 9c, 6h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [190, 580]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60]
+StringLegalActions() = ["Player 0: Fold", "Call(10)", "Player 0: Bet/Raise to 30", "Player 0: Bet/Raise to 31", "Player 0: Bet/Raise to 32", "Player 0: Bet/Raise to 33", "Player 0: Bet/Raise to 34", "Player 0: Bet/Raise to 35", "Player 0: Bet/Raise to 36", "Player 0: Bet/Raise to 37", "Player 0: Bet/Raise to 38", "Player 0: Bet/Raise to 39", "Player 0: Bet/Raise to 40", "Player 0: Bet/Raise to 41", "Player 0: Bet/Raise to 42", "Player 0: Bet/Raise to 43", "Player 0: Bet/Raise to 44", "Player 0: Bet/Raise to 45", "Player 0: Bet/Raise to 46", "Player 0: Bet/Raise to 47", "Player 0: Bet/Raise to 48", "Player 0: Bet/Raise to 49", "Player 0: Bet/Raise to 50", "Player 0: Bet/Raise to 51", "Player 0: Bet/Raise to 52", "Player 0: Bet/Raise to 53", "Player 0: Bet/Raise to 54", "Player 0: Bet/Raise to 55", "Player 0: Bet/Raise to 56", "Player 0: Bet/Raise to 57", "Player 0: Bet/Raise to 58", "Player 0: Bet/Raise to 59", "Player 0: Bet/Raise to 60"]
+
+# Apply action "Player 0: Bet/Raise to 45"
+action: 45
+
+# State 39
+# Apply action "Player 1: Bet/Raise to 135"
+action: 135
+
+# State 40
+# Hand number: 1
+# Stacks: [155, 465] | Bets: [45, 135] | Board: [] | Hole Cards: [[8s, Ah, 9c, 6h], [Ks, 9d, Ad, Qs]] | Pots: [] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=10), BlindOrStraddlePosting(commentary=None, player_index=1, amount=5), HoleDealing(commentary=None, player_index=0, cards=(8s,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(Ks,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Ah,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(9d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(9c,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(Ad,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(6h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(Qs,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=20), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=45), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=135)]
+IsTerminal() = False
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1, 1, 15, 33, 23, 13, 10, 27, 47, 50, 29, 28, 49, 18, 43, 20, 45, 135]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1, 1, 15, 33, 23, 13, 10, 27, 47, 50, 29, 28, 49, 18, 43, 20, 45, 135"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Game over.\n"
+ObservationString(1) = "Game over.\n"
+ObservationString(2) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [45, 135]\n||Board Cards: []\n||Player's Private Hole Cards: [Ks, 9d, Ad, Qs]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [155, 465]"
+ObservationString(3) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [45, 135]\n||Board Cards: []\n||Player's Private Hole Cards: [8s, Ah, 9c, 6h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [155, 465]"
+PublicObservationString() = "Game over.\n"
+PrivateObservationString(0) = "Game over.\n"
+PrivateObservationString(1) = "Game over.\n"
+PrivateObservationString(2) = "Player: 1\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [45, 135]\n||Board Cards: []\n||Player's Private Hole Cards: [Ks, 9d, Ad, Qs]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [155, 465]"
+PrivateObservationString(3) = "Player: 0\n||Current Street: 0\n||Current Street discard/draw performed: False\n||Next Player to act: 0\n||Pot(s): [] \n||Bets: [45, 135]\n||Board Cards: []\n||Player's Private Hole Cards: [8s, Ah, 9c, 6h]\n||Per-player Hole Cards (public view): [[??, ??, ??, ??], [??, ??, ??, ??]]\n||Per-player Starting Stacks: (200, 600)\n||Per-player Current Stacks: [155, 465]"
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 1, 200]
+StringLegalActions() = ["Player 0: Fold", "Call(90)", "Player 0: Bet/Raise to 200"]
+
+# Apply action "Call(90)"
+action: 1
+
+# State 41
+# Apply action "Deal Board Card: TREY OF SPADES (3s)"
+action: 7
+
+# State 42
+# Apply action "Deal Board Card: KING OF CLUBS (Kc)"
+action: 44
+
+# State 43
+# Apply action "Deal Board Card: ACE OF CLUBS (Ac)"
+action: 48
+
+# State 44
+# Apply action "Player 0: Bet/Raise to 16"
+action: 16
+
+# State 45
+# Apply action "Player 1: Bet/Raise to 60"
+action: 60
+
+# State 46
+# Apply action "Player 0: Fold"
+action: 0
+
+# State 47
+# Apply action "Deal Hole Card: SIX OF DIAMONDS (6d)"
+action: 17
+
+# State 48
+# Apply action "Deal Hole Card: DEUCE OF HEARTS (2h)"
+action: 2
+
+# State 49
+# Apply action "Deal Hole Card: SIX OF CLUBS (6c)"
+action: 16
+
+# State 50
+# Apply action "Deal Hole Card: DEUCE OF SPADES (2s)"
+action: 3
+
+# State 51
+# Apply action "Deal Hole Card: SIX OF HEARTS (6h)"
+action: 18
+
+# State 52
+# Apply action "Deal Hole Card: SEVEN OF DIAMONDS (7d)"
+action: 21
+
+# State 53
+# Apply action "Deal Hole Card: TEN OF DIAMONDS (Td)"
+action: 33
+
+# State 54
+# Apply action "Deal Hole Card: EIGHT OF DIAMONDS (8d)"
+action: 25
+
+# State 55
+# Apply action "Player 1: Bet/Raise to 25"
+action: 25
+
+# State 56
+# Apply action "Player 0: Bet/Raise to 46"
+action: 46
+
+# State 57
+# Apply action "Call(21)"
+action: 1
+
+# State 58
+# Apply action "Deal Board Card: ACE OF HEARTS (Ah)"
+action: 50
+
+# State 59
+# Apply action "Deal Board Card: ACE OF SPADES (As)"
+action: 51
+
+# State 60
+# Apply action "Deal Board Card: SEVEN OF CLUBS (7c)"
+action: 20
+
+# State 61
+# Apply action "Player 0: Bet/Raise to 14"
+action: 14
+
+# State 62
+# Apply action "Call(3)"
+action: 1
+
+# State 63
+# Apply action "Deal Board Card: FIVE OF CLUBS (5c)"
+action: 12
+
+# State 64
+# Apply action "Deal Board Card: FOUR OF CLUBS (4c)"
+action: 8
+
+# State 65
+# Apply action "Deal Hole Card: FIVE OF CLUBS (5c)"
+action: 12
+
+# State 66
+# Apply action "Deal Hole Card: NINE OF SPADES (9s)"
+action: 31
+
+# State 67
+# Apply action "Deal Hole Card: EIGHT OF HEARTS (8h)"
+action: 26
+
+# State 68
+# Apply action "Deal Hole Card: NINE OF DIAMONDS (9d)"
+action: 29
+
+# State 69
+# Apply action "Deal Hole Card: FIVE OF SPADES (5s)"
+action: 15
+
+# State 70
+# Apply action "Deal Hole Card: DEUCE OF DIAMONDS (2d)"
+action: 1
+
+# State 71
+# Apply action "Deal Hole Card: TEN OF HEARTS (Th)"
+action: 34
+
+# State 72
+# Apply action "Deal Hole Card: SEVEN OF HEARTS (7h)"
+action: 22
+
+# State 73
+# Apply action "Player 1: Bet/Raise to 24"
+action: 24
+
+# State 74
+# Apply action "Player 0: Bet/Raise to 70"
+action: 70
+
+# State 75
+# Apply action "Player 1: Bet/Raise to 104"
+action: 104
+
+# State 76
+# Apply action "Call(28)"
+action: 1
+
+# State 77
+# Apply action "Deal Board Card: ACE OF HEARTS (Ah)"
+action: 50
+
+# State 78
+# Apply action "Deal Board Card: FOUR OF CLUBS (4c)"
+action: 8
+
+# State 79
+# Apply action "Deal Board Card: SIX OF CLUBS (6c)"
+action: 16
+
+# State 80
+# Apply action "Deal Board Card: KING OF HEARTS (Kh)"
+action: 46
+
+# State 81
+# Apply action "Deal Board Card: JACK OF SPADES (Js)"
+action: 39
+
+# State 82
+# Hand number: 4
+# Stacks: [0, 800] | Bets: [0, 0] | Board: [[Ah], [4c], [6c], [Kh], [Js]] | Hole Cards: [[], [9s, 9d, 2d, 7h]] | Pots: [Pot(raked_amount=0, unraked_amount=0, player_indices=(1,))] | Operations: [BlindOrStraddlePosting(commentary=None, player_index=0, amount=10), BlindOrStraddlePosting(commentary=None, player_index=1, amount=5), HoleDealing(commentary=None, player_index=0, cards=(5c,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(9s,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(8h,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(9d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(5s,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(2d,), statuses=(False,)), HoleDealing(commentary=None, player_index=0, cards=(Th,), statuses=(False,)), HoleDealing(commentary=None, player_index=1, cards=(7h,), statuses=(False,)), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=24), CompletionBettingOrRaisingTo(commentary=None, player_index=0, amount=70), CompletionBettingOrRaisingTo(commentary=None, player_index=1, amount=104), CheckingOrCalling(commentary=None, player_index=0, amount=28), BetCollection(commentary=None, bets=(98, 98)), HoleCardsShowingOrMucking(commentary=None, player_index=1, hole_cards=(9s, 9d, 2d, 7h)), HoleCardsShowingOrMucking(commentary=None, player_index=0, hole_cards=(5c, 8h, 5s, Th)), BoardDealing(commentary=None, cards=(Ah,)), BoardDealing(commentary=None, cards=(4c,)), BoardDealing(commentary=None, cards=(6c,)), BoardDealing(commentary=None, cards=(Kh,)), BoardDealing(commentary=None, cards=(Js,)), HandKilling(commentary=None, player_index=0), ChipsPushing(commentary=None, amounts=(0, 196), pot_index=0, board_index=None, hand_type_index=None), ChipsPulling(commentary=None, player_index=1, amount=196)]
+IsTerminal() = True
+History() = [32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1, 1, 15, 33, 23, 13, 10, 27, 47, 50, 29, 28, 49, 18, 43, 20, 45, 135, 1, 7, 44, 48, 16, 60, 0, 17, 2, 16, 3, 18, 21, 33, 25, 25, 46, 1, 50, 51, 20, 14, 1, 12, 8, 12, 31, 26, 29, 15, 1, 34, 22, 24, 70, 104, 1, 50, 8, 16, 46, 39]
+HistoryString() = "32, 25, 26, 3, 51, 11, 6, 21, 22, 1, 14, 18, 46, 2, 9, 0, 35, 0, 107, 195, 1, 200, 1, 1, 15, 33, 23, 13, 10, 27, 47, 50, 29, 28, 49, 18, 43, 20, 45, 135, 1, 7, 44, 48, 16, 60, 0, 17, 2, 16, 3, 18, 21, 33, 25, 25, 46, 1, 50, 51, 20, 14, 1, 12, 8, 12, 31, 26, 29, 15, 1, 34, 22, 24, 70, 104, 1, 50, 8, 16, 46, 39"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "Information state string not supported."
+InformationStateString(1) = "Information state string not supported."
+InformationStateString(2) = "Information state string not supported."
+InformationStateString(3) = "Information state string not supported."
+ObservationString(0) = "Game over.\n"
+ObservationString(1) = "Game over.\n"
+ObservationString(2) = "Player: 0\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(1,))] \n||Bets: [0, 0]\n||Board Cards: [[Ah], [4c], [6c], [Kh], [Js]]\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [9s, 9d, 2d, 7h]]\n||Per-player Starting Stacks: (98, 702)\n||Per-player Current Stacks: [0, 800]"
+ObservationString(3) = "Game over.\n"
+PublicObservationString() = "Game over.\n"
+PrivateObservationString(0) = "Game over.\n"
+PrivateObservationString(1) = "Game over.\n"
+PrivateObservationString(2) = "Player: 0\n||Current Street: None\n||Current Street discard/draw performed: None\n||Next Player to act: None\n||Pot(s): [Pot(raked_amount=0, unraked_amount=0, player_indices=(1,))] \n||Bets: [0, 0]\n||Board Cards: [[Ah], [4c], [6c], [Kh], [Js]]\n||Player's Private Hole Cards: []\n||Per-player Hole Cards (public view): [[], [9s, 9d, 2d, 7h]]\n||Per-player Starting Stacks: (98, 702)\n||Per-player Current Stacks: [0, 800]"
+PrivateObservationString(3) = "Game over.\n"
+Rewards() = [-200, -200, 600, -200]
+Returns() = [-200, -200, 600, -200]

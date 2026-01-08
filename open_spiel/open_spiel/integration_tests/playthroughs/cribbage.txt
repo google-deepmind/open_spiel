@@ -1,0 +1,2061 @@
+game: cribbage
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Cribbage"
+GameType.max_num_players = 4
+GameType.min_num_players = 2
+GameType.parameter_specification = ["players", "winner_bonus_reward"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = False
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "cribbage"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 2757
+PolicyTensorShape() = [2757]
+MaxChanceOutcomes() = 52
+GetParameters() = {players=2,winner_bonus_reward=1000.0}
+NumPlayers() = 2
+MinUtility() = -1149.0
+MaxUtility() = 1149.0
+UtilitySum() = None
+MaxGameLength() = 4400
+ToString() = "cribbage()"
+
+# State 0
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Card
+# Dealer: 0
+# Cur player: -1
+# Scores: 0 0
+# ---------------------------------
+# Crib:
+# P0 Hand:
+# P1 Hand:
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+ChanceOutcomes() = [(0,0.0192308), (1,0.0192308), (2,0.0192308), (3,0.0192308), (4,0.0192308), (5,0.0192308), (6,0.0192308), (7,0.0192308), (8,0.0192308), (9,0.0192308), (10,0.0192308), (11,0.0192308), (12,0.0192308), (13,0.0192308), (14,0.0192308), (15,0.0192308), (16,0.0192308), (17,0.0192308), (18,0.0192308), (19,0.0192308), (20,0.0192308), (21,0.0192308), (22,0.0192308), (23,0.0192308), (24,0.0192308), (25,0.0192308), (26,0.0192308), (27,0.0192308), (28,0.0192308), (29,0.0192308), (30,0.0192308), (31,0.0192308), (32,0.0192308), (33,0.0192308), (34,0.0192308), (35,0.0192308), (36,0.0192308), (37,0.0192308), (38,0.0192308), (39,0.0192308), (40,0.0192308), (41,0.0192308), (42,0.0192308), (43,0.0192308), (44,0.0192308), (45,0.0192308), (46,0.0192308), (47,0.0192308), (48,0.0192308), (49,0.0192308), (50,0.0192308), (51,0.0192308)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["Deal AC", "Deal 2C", "Deal 3C", "Deal 4C", "Deal 5C", "Deal 6C", "Deal 7C", "Deal 8C", "Deal 9C", "Deal TC", "Deal JC", "Deal QC", "Deal KC", "Deal AD", "Deal 2D", "Deal 3D", "Deal 4D", "Deal 5D", "Deal 6D", "Deal 7D", "Deal 8D", "Deal 9D", "Deal TD", "Deal JD", "Deal QD", "Deal KD", "Deal AH", "Deal 2H", "Deal 3H", "Deal 4H", "Deal 5H", "Deal 6H", "Deal 7H", "Deal 8H", "Deal 9H", "Deal TH", "Deal JH", "Deal QH", "Deal KH", "Deal AS", "Deal 2S", "Deal 3S", "Deal 4S", "Deal 5S", "Deal 6S", "Deal 7S", "Deal 8S", "Deal 9S", "Deal TS", "Deal JS", "Deal QS", "Deal KS"]
+
+# Apply action "Deal 3D"
+action: 15
+
+# State 1
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Card
+# Dealer: 0
+# Cur player: -1
+# Scores: 0 0
+# ---------------------------------
+# Crib:
+# P0 Hand: 3D
+# P1 Hand:
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = [15]
+HistoryString() = "15"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+ChanceOutcomes() = [(0,0.0196078), (1,0.0196078), (2,0.0196078), (3,0.0196078), (4,0.0196078), (5,0.0196078), (6,0.0196078), (7,0.0196078), (8,0.0196078), (9,0.0196078), (10,0.0196078), (11,0.0196078), (12,0.0196078), (13,0.0196078), (14,0.0196078), (16,0.0196078), (17,0.0196078), (18,0.0196078), (19,0.0196078), (20,0.0196078), (21,0.0196078), (22,0.0196078), (23,0.0196078), (24,0.0196078), (25,0.0196078), (26,0.0196078), (27,0.0196078), (28,0.0196078), (29,0.0196078), (30,0.0196078), (31,0.0196078), (32,0.0196078), (33,0.0196078), (34,0.0196078), (35,0.0196078), (36,0.0196078), (37,0.0196078), (38,0.0196078), (39,0.0196078), (40,0.0196078), (41,0.0196078), (42,0.0196078), (43,0.0196078), (44,0.0196078), (45,0.0196078), (46,0.0196078), (47,0.0196078), (48,0.0196078), (49,0.0196078), (50,0.0196078), (51,0.0196078)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["Deal AC", "Deal 2C", "Deal 3C", "Deal 4C", "Deal 5C", "Deal 6C", "Deal 7C", "Deal 8C", "Deal 9C", "Deal TC", "Deal JC", "Deal QC", "Deal KC", "Deal AD", "Deal 2D", "Deal 4D", "Deal 5D", "Deal 6D", "Deal 7D", "Deal 8D", "Deal 9D", "Deal TD", "Deal JD", "Deal QD", "Deal KD", "Deal AH", "Deal 2H", "Deal 3H", "Deal 4H", "Deal 5H", "Deal 6H", "Deal 7H", "Deal 8H", "Deal 9H", "Deal TH", "Deal JH", "Deal QH", "Deal KH", "Deal AS", "Deal 2S", "Deal 3S", "Deal 4S", "Deal 5S", "Deal 6S", "Deal 7S", "Deal 8S", "Deal 9S", "Deal TS", "Deal JS", "Deal QS", "Deal KS"]
+
+# Apply action "Deal 2C"
+action: 1
+
+# State 2
+# Apply action "Deal JC"
+action: 10
+
+# State 3
+# Apply action "Deal AH"
+action: 26
+
+# State 4
+# Apply action "Deal 7D"
+action: 19
+
+# State 5
+# Apply action "Deal JD"
+action: 23
+
+# State 6
+# Apply action "Deal 8S"
+action: 46
+
+# State 7
+# Apply action "Deal 5S"
+action: 43
+
+# State 8
+# Apply action "Deal QS"
+action: 50
+
+# State 9
+# Apply action "Deal KH"
+action: 38
+
+# State 10
+# Apply action "Deal KS"
+action: 51
+
+# State 11
+# Apply action "Deal TS"
+action: 48
+
+# State 12
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Card
+# Dealer: 0
+# Cur player: 0
+# Scores: 0 0
+# ---------------------------------
+# Crib:
+# P0 Hand: AH 2C 3D 7D JC JD
+# P1 Hand: 5S 8S TS QS KH KS
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [114, 119, 123, 127, 595, 842, 851, 855, 1050, 1063, 1405, 1414, 1419, 1423, 1427]
+StringLegalActions() = ["Choose 2C JC", "Choose 2C 3D", "Choose 2C 7D", "Choose 2C JD", "Choose JC JD", "Choose 3D JC", "Choose 3D 7D", "Choose 3D JD", "Choose 7D JC", "Choose 7D JD", "Choose AH 2C", "Choose AH JC", "Choose AH 3D", "Choose AH 7D", "Choose AH JD"]
+
+# Apply action "Choose AH 2C"
+action: 1405
+
+# State 13
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Card
+# Dealer: 0
+# Cur player: 1
+# Scores: 0 0
+# ---------------------------------
+# Crib: AH 2C
+# P0 Hand: 3D 7D JC JD
+# P1 Hand: 5S 8S TS QS KH KS
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [2079, 2326, 2334, 2336, 2338, 2339, 2482, 2492, 2494, 2495, 2586, 2598, 2599, 2690, 2703]
+StringLegalActions() = ["Choose KH KS", "Choose 5S KH", "Choose 5S 8S", "Choose 5S TS", "Choose 5S QS", "Choose 5S KS", "Choose 8S KH", "Choose 8S TS", "Choose 8S QS", "Choose 8S KS", "Choose TS KH", "Choose TS QS", "Choose TS KS", "Choose QS KH", "Choose QS KS"]
+
+# Apply action "Choose 5S KS"
+action: 2339
+
+# State 14
+# Apply action "Deal 6C"
+action: 5
+
+# State 15
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Play
+# Dealer: 0
+# Cur player: 1
+# Scores: 0 0
+# ---------------------------------
+# Crib: AH 2C 5S KS
+# Starter: 6C
+# P0 Hand: 3D 7D JC JD
+# P1 Hand: 8S TS QS KH
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [38, 46, 48, 50]
+StringLegalActions() = ["Choose KH", "Choose 8S", "Choose TS", "Choose QS"]
+
+# Apply action "Choose KH"
+action: 38
+
+# State 16
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Play
+# Dealer: 0
+# Cur player: 0
+# Scores: 0 0
+# ---------------------------------
+# Crib: AH 2C 5S KS
+# Starter: 6C
+# P0 Hand: 3D 7D JC JD
+# P1 Hand: 8S TS QS
+# ---------------------------------
+# Running total: 10
+# Played cards:  KH
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [10, 15, 19, 23]
+StringLegalActions() = ["Choose JC", "Choose 3D", "Choose 7D", "Choose JD"]
+
+# Apply action "Choose 7D"
+action: 19
+
+# State 17
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Play
+# Dealer: 0
+# Cur player: 1
+# Scores: 0 0
+# ---------------------------------
+# Crib: AH 2C 5S KS
+# Starter: 6C
+# P0 Hand: 3D JC JD
+# P1 Hand: 8S TS QS
+# ---------------------------------
+# Running total: 17
+# Played cards:  KH 7D
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [46, 48, 50]
+StringLegalActions() = ["Choose 8S", "Choose TS", "Choose QS"]
+
+# Apply action "Choose TS"
+action: 48
+
+# State 18
+# ---------------------------------
+# Num players: 2
+# Round: 0
+# Phase: Play
+# Dealer: 0
+# Cur player: 0
+# Scores: 0 0
+# ---------------------------------
+# Crib: AH 2C 5S KS
+# Starter: 6C
+# P0 Hand: 3D JC JD
+# P1 Hand: 8S QS
+# ---------------------------------
+# Running total: 27
+# Played cards:  KH 7D TS
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [15]
+StringLegalActions() = ["Choose 3D"]
+
+# Apply action "Choose 3D"
+action: 15
+
+# State 19
+# Apply action "Pass"
+action: 2756
+
+# State 20
+# Apply action "Pass"
+action: 2756
+
+# State 21
+# Apply action "Choose 8S"
+action: 46
+
+# State 22
+# Apply action "Choose JD"
+action: 23
+
+# State 23
+# Apply action "Choose QS"
+action: 50
+
+# State 24
+# Apply action "Pass"
+action: 2756
+
+# State 25
+# Apply action "Pass"
+action: 2756
+
+# State 26
+# Apply action "Choose JC"
+action: 10
+
+# State 27
+# Apply action "Pass"
+action: 2756
+
+# State 28
+# Apply action "Pass"
+action: 2756
+
+# State 29
+# Apply action "Deal 7C"
+action: 6
+
+# State 30
+# Apply action "Deal TH"
+action: 35
+
+# State 31
+# Apply action "Deal JH"
+action: 36
+
+# State 32
+# Apply action "Deal 6D"
+action: 18
+
+# State 33
+# Apply action "Deal QD"
+action: 24
+
+# State 34
+# Apply action "Deal 6C"
+action: 5
+
+# State 35
+# Apply action "Deal 3C"
+action: 2
+
+# State 36
+# Apply action "Deal TC"
+action: 9
+
+# State 37
+# Apply action "Deal JS"
+action: 49
+
+# State 38
+# Apply action "Deal 2S"
+action: 40
+
+# State 39
+# Apply action "Deal 9C"
+action: 8
+
+# State 40
+# Apply action "Deal KD"
+action: 25
+
+# State 41
+# Apply action "Choose 6C JH"
+action: 348
+
+# State 42
+# Apply action "Choose 2S JS"
+action: 2181
+
+# State 43
+# Apply action "Deal 8D"
+action: 20
+
+# State 44
+# Apply action "Choose QD"
+action: 24
+
+# State 45
+# Apply action "Choose 9C"
+action: 8
+
+# State 46
+# ---------------------------------
+# Num players: 2
+# Round: 1
+# Phase: Play
+# Dealer: 1
+# Cur player: 0
+# Scores: 7 1
+# ---------------------------------
+# Crib: 2S 6C JH JS
+# Starter: 8D
+# P0 Hand: 6D 7C TH
+# P1 Hand: 3C TC KD
+# ---------------------------------
+# Running total: 19
+# Played cards:  QD 9C
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [7, 1]
+LegalActions() = [6, 18, 35]
+StringLegalActions() = ["Choose 7C", "Choose 6D", "Choose TH"]
+
+# Apply action "Choose 7C"
+action: 6
+
+# State 47
+# ---------------------------------
+# Num players: 2
+# Round: 1
+# Phase: Play
+# Dealer: 1
+# Cur player: 1
+# Scores: 7 1
+# ---------------------------------
+# Crib: 2S 6C JH JS
+# Starter: 8D
+# P0 Hand: 6D TH
+# P1 Hand: 3C TC KD
+# ---------------------------------
+# Running total: 26
+# Played cards:  QD 9C 7C
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [7, 1]
+LegalActions() = [2]
+StringLegalActions() = ["Choose 3C"]
+
+# Apply action "Choose 3C"
+action: 2
+
+# State 48
+# Apply action "Pass"
+action: 2756
+
+# State 49
+# Apply action "Pass"
+action: 2756
+
+# State 50
+# Apply action "Choose TH"
+action: 35
+
+# State 51
+# Apply action "Choose TC"
+action: 9
+
+# State 52
+# Apply action "Choose 6D"
+action: 18
+
+# State 53
+# Apply action "Pass"
+action: 2756
+
+# State 54
+# Apply action "Pass"
+action: 2756
+
+# State 55
+# Apply action "Choose KD"
+action: 25
+
+# State 56
+# Apply action "Pass"
+action: 2756
+
+# State 57
+# Apply action "Pass"
+action: 2756
+
+# State 58
+# Apply action "Deal 8D"
+action: 20
+
+# State 59
+# Apply action "Deal QH"
+action: 37
+
+# State 60
+# Apply action "Deal TH"
+action: 35
+
+# State 61
+# Apply action "Deal AS"
+action: 39
+
+# State 62
+# Apply action "Deal AD"
+action: 13
+
+# State 63
+# Apply action "Deal 3D"
+action: 15
+
+# State 64
+# Apply action "Deal 3S"
+action: 41
+
+# State 65
+# Apply action "Deal QS"
+action: 50
+
+# State 66
+# Apply action "Deal JH"
+action: 36
+
+# State 67
+# Apply action "Deal 9H"
+action: 34
+
+# State 68
+# Apply action "Deal TS"
+action: 48
+
+# State 69
+# Apply action "Deal 6H"
+action: 31
+
+# State 70
+# Apply action "Choose 3D TH"
+action: 867
+
+# State 71
+# Apply action "Choose 6H TS"
+action: 1712
+
+# State 72
+# Apply action "Deal 7S"
+action: 45
+
+# State 73
+# Apply action "Choose 3S"
+action: 41
+
+# State 74
+# Apply action "Choose AS"
+action: 39
+
+# State 75
+# Apply action "Choose JH"
+action: 36
+
+# State 76
+# Apply action "Choose 8D"
+action: 20
+
+# State 77
+# Apply action "Choose 9H"
+action: 34
+
+# State 78
+# Apply action "Choose QH"
+action: 37
+
+# State 79
+# ---------------------------------
+# Num players: 2
+# Round: 2
+# Phase: Play
+# Dealer: 0
+# Cur player: 1
+# Scores: 13 12
+# ---------------------------------
+# Crib: 3D 6H TH TS
+# Starter: 7S
+# P0 Hand: AD
+# P1 Hand: QS
+# ---------------------------------
+# Running total: 10
+# Played cards:  QH
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [13, 12]
+LegalActions() = [50]
+StringLegalActions() = ["Choose QS"]
+
+# Apply action "Choose QS"
+action: 50
+
+# State 80
+# ---------------------------------
+# Num players: 2
+# Round: 2
+# Phase: Play
+# Dealer: 0
+# Cur player: 0
+# Scores: 13 14
+# ---------------------------------
+# Crib: 3D 6H TH TS
+# Starter: 7S
+# P0 Hand: AD
+# P1 Hand:
+# ---------------------------------
+# Running total: 20
+# Played cards:  QH QS
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 2]
+Returns() = [13, 14]
+LegalActions() = [13]
+StringLegalActions() = ["Choose AD"]
+
+# Apply action "Choose AD"
+action: 13
+
+# State 81
+# Apply action "Pass"
+action: 2756
+
+# State 82
+# Apply action "Pass"
+action: 2756
+
+# State 83
+# Apply action "Deal 9H"
+action: 34
+
+# State 84
+# Apply action "Deal QH"
+action: 37
+
+# State 85
+# Apply action "Deal 6D"
+action: 18
+
+# State 86
+# Apply action "Deal JD"
+action: 23
+
+# State 87
+# Apply action "Deal 7C"
+action: 6
+
+# State 88
+# Apply action "Deal 7D"
+action: 19
+
+# State 89
+# Apply action "Deal 3C"
+action: 2
+
+# State 90
+# Apply action "Deal 4C"
+action: 3
+
+# State 91
+# Apply action "Deal JS"
+action: 49
+
+# State 92
+# Apply action "Deal KC"
+action: 12
+
+# State 93
+# Apply action "Deal TH"
+action: 35
+
+# State 94
+# Apply action "Deal QC"
+action: 11
+
+# State 95
+# Apply action "Choose 7D 9H"
+action: 1074
+
+# State 96
+# Apply action "Choose JS KC"
+action: 2612
+
+# State 97
+# Apply action "Deal 7S"
+action: 45
+
+# State 98
+# Apply action "Choose 6D"
+action: 18
+
+# State 99
+# Apply action "Choose 3C"
+action: 2
+
+# State 100
+# Apply action "Choose QH"
+action: 37
+
+# State 101
+# Apply action "Choose 4C"
+action: 3
+
+# State 102
+# Apply action "Choose 7C"
+action: 6
+
+# State 103
+# Apply action "Pass"
+action: 2756
+
+# State 104
+# Apply action "Pass"
+action: 2756
+
+# State 105
+# Apply action "Choose TH"
+action: 35
+
+# State 106
+# Apply action "Choose JD"
+action: 23
+
+# State 107
+# Apply action "Choose QC"
+action: 11
+
+# State 108
+# Apply action "Pass"
+action: 2756
+
+# State 109
+# Apply action "Pass"
+action: 2756
+
+# State 110
+# Apply action "Deal AD"
+action: 13
+
+# State 111
+# Apply action "Deal 8C"
+action: 7
+
+# State 112
+# Apply action "Deal KS"
+action: 51
+
+# State 113
+# Apply action "Deal JC"
+action: 10
+
+# State 114
+# Apply action "Deal 5H"
+action: 30
+
+# State 115
+# Apply action "Deal 3D"
+action: 15
+
+# State 116
+# Apply action "Deal 2S"
+action: 40
+
+# State 117
+# Apply action "Deal AH"
+action: 26
+
+# State 118
+# Apply action "Deal QH"
+action: 37
+
+# State 119
+# Apply action "Deal 4C"
+action: 3
+
+# State 120
+# Apply action "Deal 9D"
+action: 21
+
+# State 121
+# Apply action "Deal 8S"
+action: 46
+
+# State 122
+# Apply action "Choose AD 3D"
+action: 743
+
+# State 123
+# Apply action "Choose 2S 4C"
+action: 2135
+
+# State 124
+# Apply action "Deal 5S"
+action: 43
+
+# State 125
+# ---------------------------------
+# Num players: 2
+# Round: 4
+# Phase: Play
+# Dealer: 0
+# Cur player: 1
+# Scores: 23 21
+# ---------------------------------
+# Crib: AD 2S 3D 4C
+# Starter: 5S
+# P0 Hand: 5H 8C JC KS
+# P1 Hand: AH 8S 9D QH
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [23, 21]
+LegalActions() = [21, 26, 37, 46]
+StringLegalActions() = ["Choose 9D", "Choose AH", "Choose QH", "Choose 8S"]
+
+# Apply action "Choose QH"
+action: 37
+
+# State 126
+# ---------------------------------
+# Num players: 2
+# Round: 4
+# Phase: Play
+# Dealer: 0
+# Cur player: 0
+# Scores: 23 21
+# ---------------------------------
+# Crib: AD 2S 3D 4C
+# Starter: 5S
+# P0 Hand: 5H 8C JC KS
+# P1 Hand: AH 8S 9D
+# ---------------------------------
+# Running total: 10
+# Played cards:  QH
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [23, 21]
+LegalActions() = [7, 10, 30, 51]
+StringLegalActions() = ["Choose 8C", "Choose JC", "Choose 5H", "Choose KS"]
+
+# Apply action "Choose 5H"
+action: 30
+
+# State 127
+# Apply action "Choose 8S"
+action: 46
+
+# State 128
+# Apply action "Choose 8C"
+action: 7
+
+# State 129
+# Apply action "Choose AH"
+action: 26
+
+# State 130
+# Apply action "Choose KS"
+action: 51
+
+# State 131
+# Apply action "Choose 9D"
+action: 21
+
+# State 132
+# Apply action "Choose JC"
+action: 10
+
+# State 133
+# Apply action "Pass"
+action: 2756
+
+# State 134
+# Apply action "Pass"
+action: 2756
+
+# State 135
+# Apply action "Deal KC"
+action: 12
+
+# State 136
+# Apply action "Deal TS"
+action: 48
+
+# State 137
+# Apply action "Deal 3S"
+action: 41
+
+# State 138
+# Apply action "Deal 7H"
+action: 32
+
+# State 139
+# Apply action "Deal AH"
+action: 26
+
+# State 140
+# Apply action "Deal AD"
+action: 13
+
+# State 141
+# Apply action "Deal TC"
+action: 9
+
+# State 142
+# Apply action "Deal 4H"
+action: 29
+
+# State 143
+# Apply action "Deal 5H"
+action: 30
+
+# State 144
+# Apply action "Deal KD"
+action: 25
+
+# State 145
+# Apply action "Deal 2C"
+action: 1
+
+# State 146
+# Apply action "Deal 9C"
+action: 8
+
+# State 147
+# Apply action "Choose AD AH"
+action: 754
+
+# State 148
+# Apply action "Choose 4H 5H"
+action: 1590
+
+# State 149
+# Apply action "Deal 8S"
+action: 46
+
+# State 150
+# Apply action "Choose TS"
+action: 48
+
+# State 151
+# Apply action "Choose 9C"
+action: 8
+
+# State 152
+# Apply action "Choose KC"
+action: 12
+
+# State 153
+# Apply action "Choose 2C"
+action: 1
+
+# State 154
+# Apply action "Choose 7H"
+action: 32
+
+# State 155
+# Apply action "Choose KD"
+action: 25
+
+# State 156
+# Apply action "Choose 3S"
+action: 41
+
+# State 157
+# Apply action "Choose TC"
+action: 9
+
+# State 158
+# ---------------------------------
+# Num players: 2
+# Round: 5
+# Phase: Play
+# Dealer: 1
+# Cur player: 0
+# Scores: 47 27
+# ---------------------------------
+# Crib: AD AH 4H 5H
+# Starter: 8S
+# P0 Hand:
+# P1 Hand:
+# ---------------------------------
+# Running total: 30
+# Played cards:  7H KD 3S TC
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [47, 27]
+LegalActions() = [2756]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 2756
+
+# State 159
+# ---------------------------------
+# Num players: 2
+# Round: 5
+# Phase: Play
+# Dealer: 1
+# Cur player: 1
+# Scores: 47 27
+# ---------------------------------
+# Crib: AD AH 4H 5H
+# Starter: 8S
+# P0 Hand:
+# P1 Hand:
+# ---------------------------------
+# Running total: 30
+# Played cards:  7H KD 3S TC
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [47, 27]
+LegalActions() = [2756]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 2756
+
+# State 160
+# Apply action "Deal KC"
+action: 12
+
+# State 161
+# Apply action "Deal 8C"
+action: 7
+
+# State 162
+# Apply action "Deal 3C"
+action: 2
+
+# State 163
+# Apply action "Deal AS"
+action: 39
+
+# State 164
+# Apply action "Deal JC"
+action: 10
+
+# State 165
+# Apply action "Deal 8S"
+action: 46
+
+# State 166
+# Apply action "Deal KS"
+action: 51
+
+# State 167
+# Apply action "Deal 9D"
+action: 21
+
+# State 168
+# Apply action "Deal 3S"
+action: 41
+
+# State 169
+# Apply action "Deal JD"
+action: 23
+
+# State 170
+# Apply action "Deal 8D"
+action: 20
+
+# State 171
+# Apply action "Deal 2H"
+action: 27
+
+# State 172
+# Apply action "Choose 8C 8S"
+action: 462
+
+# State 173
+# Apply action "Choose 8D 9D"
+action: 1113
+
+# State 174
+# Apply action "Deal 5H"
+action: 30
+
+# State 175
+# Apply action "Choose 3S"
+action: 41
+
+# State 176
+# Apply action "Choose 3C"
+action: 2
+
+# State 177
+# Apply action "Choose 2H"
+action: 27
+
+# State 178
+# Apply action "Choose KC"
+action: 12
+
+# State 179
+# Apply action "Choose JD"
+action: 23
+
+# State 180
+# Apply action "Choose AS"
+action: 39
+
+# State 181
+# Apply action "Pass"
+action: 2756
+
+# State 182
+# Apply action "Pass"
+action: 2756
+
+# State 183
+# Apply action "Choose KS"
+action: 51
+
+# State 184
+# Apply action "Choose JC"
+action: 10
+
+# State 185
+# Apply action "Pass"
+action: 2756
+
+# State 186
+# Apply action "Pass"
+action: 2756
+
+# State 187
+# Apply action "Deal 4H"
+action: 29
+
+# State 188
+# Apply action "Deal 6D"
+action: 18
+
+# State 189
+# Apply action "Deal 7H"
+action: 32
+
+# State 190
+# Apply action "Deal 5S"
+action: 43
+
+# State 191
+# Apply action "Deal KD"
+action: 25
+
+# State 192
+# Apply action "Deal 9S"
+action: 47
+
+# State 193
+# Apply action "Deal TH"
+action: 35
+
+# State 194
+# Apply action "Deal 2H"
+action: 27
+
+# State 195
+# Apply action "Deal 3H"
+action: 28
+
+# State 196
+# Apply action "Deal 2D"
+action: 14
+
+# State 197
+# Apply action "Deal 3D"
+action: 15
+
+# State 198
+# Apply action "Deal AC"
+action: 0
+
+# State 199
+# Apply action "Choose 5S 9S"
+action: 2335
+
+# State 200
+# Apply action "Choose 2D 3H"
+action: 808
+
+# State 201
+# Apply action "Deal AD"
+action: 13
+
+# State 202
+# Apply action "Choose 7H"
+action: 32
+
+# State 203
+# Apply action "Choose AC"
+action: 0
+
+# State 204
+# ---------------------------------
+# Num players: 2
+# Round: 7
+# Phase: Play
+# Dealer: 1
+# Cur player: 0
+# Scores: 63 43
+# ---------------------------------
+# Crib: 2D 3H 5S 9S
+# Starter: AD
+# P0 Hand: 4H 6D KD
+# P1 Hand: 2H 3D TH
+# ---------------------------------
+# Running total: 8
+# Played cards:  7H AC
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [63, 43]
+LegalActions() = [18, 25, 29]
+StringLegalActions() = ["Choose 6D", "Choose KD", "Choose 4H"]
+
+# Apply action "Choose 4H"
+action: 29
+
+# State 205
+# ---------------------------------
+# Num players: 2
+# Round: 7
+# Phase: Play
+# Dealer: 1
+# Cur player: 1
+# Scores: 63 43
+# ---------------------------------
+# Crib: 2D 3H 5S 9S
+# Starter: AD
+# P0 Hand: 6D KD
+# P1 Hand: 2H 3D TH
+# ---------------------------------
+# Running total: 12
+# Played cards:  7H AC 4H
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [63, 43]
+LegalActions() = [15, 27, 35]
+StringLegalActions() = ["Choose 3D", "Choose 2H", "Choose TH"]
+
+# Apply action "Choose 3D"
+action: 15
+
+# State 206
+# Apply action "Choose KD"
+action: 25
+
+# State 207
+# Apply action "Choose 2H"
+action: 27
+
+# State 208
+# Apply action "Pass"
+action: 2756
+
+# State 209
+# Apply action "Pass"
+action: 2756
+
+# State 210
+# Apply action "Choose 6D"
+action: 18
+
+# State 211
+# Apply action "Choose TH"
+action: 35
+
+# State 212
+# Apply action "Pass"
+action: 2756
+
+# State 213
+# Apply action "Pass"
+action: 2756
+
+# State 214
+# Apply action "Deal QS"
+action: 50
+
+# State 215
+# Apply action "Deal 8H"
+action: 33
+
+# State 216
+# Apply action "Deal 5H"
+action: 30
+
+# State 217
+# Apply action "Deal KD"
+action: 25
+
+# State 218
+# Apply action "Deal 9H"
+action: 34
+
+# State 219
+# Apply action "Deal 6D"
+action: 18
+
+# State 220
+# Apply action "Deal TD"
+action: 22
+
+# State 221
+# Apply action "Deal 6S"
+action: 44
+
+# State 222
+# Apply action "Deal AC"
+action: 0
+
+# State 223
+# Apply action "Deal QD"
+action: 24
+
+# State 224
+# Apply action "Deal 6C"
+action: 5
+
+# State 225
+# Apply action "Deal AS"
+action: 39
+
+# State 226
+# Apply action "Choose 5H 9H"
+action: 1646
+
+# State 227
+# Apply action "Choose TD QD"
+action: 1220
+
+# State 228
+# Apply action "Deal 5D"
+action: 17
+
+# State 229
+# Apply action "Choose 6S"
+action: 44
+
+# State 230
+# Apply action "Choose KD"
+action: 25
+
+# State 231
+# Apply action "Choose AS"
+action: 39
+
+# State 232
+# Apply action "Choose 8H"
+action: 33
+
+# State 233
+# Apply action "Choose 6C"
+action: 5
+
+# State 234
+# Apply action "Choose 6D"
+action: 18
+
+# State 235
+# Apply action "Choose AC"
+action: 0
+
+# State 236
+# Apply action "Choose QS"
+action: 50
+
+# State 237
+# ---------------------------------
+# Num players: 2
+# Round: 8
+# Phase: Play
+# Dealer: 0
+# Cur player: 1
+# Scores: 65 68
+# ---------------------------------
+# Crib: 5H 9H TD QD
+# Starter: 5D
+# P0 Hand:
+# P1 Hand:
+# ---------------------------------
+# Running total: 17
+# Played cards:  6D AC QS
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [65, 68]
+LegalActions() = [2756]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 2756
+
+# State 238
+# ---------------------------------
+# Num players: 2
+# Round: 8
+# Phase: Play
+# Dealer: 0
+# Cur player: 0
+# Scores: 65 68
+# ---------------------------------
+# Crib: 5H 9H TD QD
+# Starter: 5D
+# P0 Hand:
+# P1 Hand:
+# ---------------------------------
+# Running total: 17
+# Played cards:  6D AC QS
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [65, 68]
+LegalActions() = [2756]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 2756
+
+# State 239
+# Apply action "Deal 6H"
+action: 31
+
+# State 240
+# Apply action "Deal 9C"
+action: 8
+
+# State 241
+# Apply action "Deal 2H"
+action: 27
+
+# State 242
+# Apply action "Deal 4H"
+action: 29
+
+# State 243
+# Apply action "Deal 3H"
+action: 28
+
+# State 244
+# Apply action "Deal TC"
+action: 9
+
+# State 245
+# Apply action "Deal 5C"
+action: 4
+
+# State 246
+# Apply action "Deal 4S"
+action: 42
+
+# State 247
+# Apply action "Deal 9D"
+action: 21
+
+# State 248
+# Apply action "Deal 8C"
+action: 7
+
+# State 249
+# Apply action "Deal 9S"
+action: 47
+
+# State 250
+# Apply action "Deal 8H"
+action: 33
+
+# State 251
+# Apply action "Choose 6H TC"
+action: 1673
+
+# State 252
+# Apply action "Choose 4S 8C"
+action: 2243
+
+# State 253
+# Apply action "Deal 4D"
+action: 16
+
+# State 254
+# Apply action "Choose 2H"
+action: 27
+
+# State 255
+# Apply action "Choose 8H"
+action: 33
+
+# State 256
+# Apply action "Choose 3H"
+action: 28
+
+# State 257
+# Apply action "Choose 9D"
+action: 21
+
+# State 258
+# Apply action "Choose 4H"
+action: 29
+
+# State 259
+# Apply action "Choose 5C"
+action: 4
+
+# State 260
+# Apply action "Choose 9C"
+action: 8
+
+# State 261
+# Apply action "Choose 9S"
+action: 47
+
+# State 262
+# Apply action "Pass"
+action: 2756
+
+# State 263
+# Apply action "Pass"
+action: 2756
+
+# State 264
+# Apply action "Deal JD"
+action: 23
+
+# State 265
+# Apply action "Deal JH"
+action: 36
+
+# State 266
+# Apply action "Deal 5D"
+action: 17
+
+# State 267
+# Apply action "Deal 8S"
+action: 46
+
+# State 268
+# Apply action "Deal QS"
+action: 50
+
+# State 269
+# Apply action "Deal 7D"
+action: 19
+
+# State 270
+# Apply action "Deal 7C"
+action: 6
+
+# State 271
+# Apply action "Deal AS"
+action: 39
+
+# State 272
+# Apply action "Deal 6D"
+action: 18
+
+# State 273
+# Apply action "Deal 2H"
+action: 27
+
+# State 274
+# Apply action "Deal KH"
+action: 38
+
+# State 275
+# Apply action "Deal 9H"
+action: 34
+
+# State 276
+# Apply action "Choose 7D JD"
+action: 1063
+
+# State 277
+# Apply action "Choose 2H 9H"
+action: 1490
+
+# State 278
+# Apply action "Deal 8H"
+action: 33
+
+# State 279
+# Apply action "Choose 7C"
+action: 6
+
+# State 280
+# Apply action "Choose JH"
+action: 36
+
+# State 281
+# Apply action "Choose 6D"
+action: 18
+
+# State 282
+# Apply action "Choose 5D"
+action: 17
+
+# State 283
+# ---------------------------------
+# Num players: 2
+# Round: 10
+# Phase: Play
+# Dealer: 0
+# Cur player: 1
+# Scores: 92 81
+# ---------------------------------
+# Crib: 2H 7D 9H JD
+# Starter: 8H
+# P0 Hand: 8S QS
+# P1 Hand: AS KH
+# ---------------------------------
+# Running total: 28
+# Played cards:  7C JH 6D 5D
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [92, 81]
+LegalActions() = [39]
+StringLegalActions() = ["Choose AS"]
+
+# Apply action "Choose AS"
+action: 39
+
+# State 284
+# ---------------------------------
+# Num players: 2
+# Round: 10
+# Phase: Play
+# Dealer: 0
+# Cur player: 0
+# Scores: 92 81
+# ---------------------------------
+# Crib: 2H 7D 9H JD
+# Starter: 8H
+# P0 Hand: 8S QS
+# P1 Hand: KH
+# ---------------------------------
+# Running total: 29
+# Played cards:  7C JH 6D 5D AS
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0, 0]
+Returns() = [92, 81]
+LegalActions() = [2756]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 2756
+
+# State 285
+# Apply action "Pass"
+action: 2756
+
+# State 286
+# Apply action "Choose 8S"
+action: 46
+
+# State 287
+# Apply action "Choose KH"
+action: 38
+
+# State 288
+# Apply action "Choose QS"
+action: 50
+
+# State 289
+# Apply action "Pass"
+action: 2756
+
+# State 290
+# Apply action "Pass"
+action: 2756
+
+# State 291
+# Apply action "Deal 2H"
+action: 27
+
+# State 292
+# Apply action "Deal 9S"
+action: 47
+
+# State 293
+# Apply action "Deal QD"
+action: 24
+
+# State 294
+# Apply action "Deal 3H"
+action: 28
+
+# State 295
+# Apply action "Deal 5C"
+action: 4
+
+# State 296
+# Apply action "Deal AC"
+action: 0
+
+# State 297
+# Apply action "Deal 2D"
+action: 14
+
+# State 298
+# Apply action "Deal 9D"
+action: 21
+
+# State 299
+# Apply action "Deal 8D"
+action: 20
+
+# State 300
+# Apply action "Deal 7C"
+action: 6
+
+# State 301
+# Apply action "Deal JD"
+action: 23
+
+# State 302
+# Apply action "Deal 8H"
+action: 33
+
+# State 303
+# Apply action "Choose 2H 5C"
+action: 1460
+
+# State 304
+# Apply action "Choose 8D 8H"
+action: 1125
+
+# State 305
+# Apply action "Deal AH"
+action: 26
+
+# State 306
+# Apply action "Choose AC"
+action: 0
+
+# State 307
+# Apply action "Choose 9D"
+action: 21
+
+# State 308
+# Apply action "Choose 9S"
+action: 47
+
+# State 309
+# Apply action "Choose 7C"
+action: 6
+
+# State 310
+# Apply action "Choose 3H"
+action: 28
+
+# State 311
+# Apply action "Choose 2D"
+action: 14
+
+# State 312
+# Apply action "Choose QD"
+action: 24
+
+# State 313
+# Apply action "Choose JD"
+action: 23
+
+# State 314
+# Apply action "Pass"
+action: 2756
+
+# State 315
+# Apply action "Pass"
+action: 2756
+
+# State 316
+# Apply action "Deal 3S"
+action: 41
+
+# State 317
+# Apply action "Deal 8H"
+action: 33
+
+# State 318
+# Apply action "Deal 3C"
+action: 2
+
+# State 319
+# Apply action "Deal 6D"
+action: 18
+
+# State 320
+# Apply action "Deal 5H"
+action: 30
+
+# State 321
+# Apply action "Deal QD"
+action: 24
+
+# State 322
+# Apply action "Deal 7S"
+action: 45
+
+# State 323
+# Apply action "Deal 9C"
+action: 8
+
+# State 324
+# Apply action "Deal 2S"
+action: 40
+
+# State 325
+# Apply action "Deal KS"
+action: 51
+
+# State 326
+# Apply action "Deal TS"
+action: 48
+
+# State 327
+# Apply action "Deal 5S"
+action: 43
+
+# State 328
+# ---------------------------------
+# Num players: 2
+# Round: 12
+# Phase: Card
+# Dealer: 0
+# Cur player: 0
+# Scores: 111 98
+# ---------------------------------
+# Crib:
+# P0 Hand: 3C 3S 5H 6D 8H QD
+# P1 Hand: 2S 5S 7S 9C TS KS
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39, 2756, 2756, 46, 38, 50, 2756, 2756, 27, 47, 24, 28, 4, 0, 14, 21, 20, 6, 23, 33, 1460, 1125, 26, 0, 21, 47, 6, 28, 14, 24, 23, 2756, 2756, 41, 33, 2, 18, 30, 24, 45, 8, 40, 51, 48, 43]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39, 2756, 2756, 46, 38, 50, 2756, 2756, 27, 47, 24, 28, 4, 0, 14, 21, 20, 6, 23, 33, 1460, 1125, 26, 0, 21, 47, 6, 28, 14, 24, 23, 2756, 2756, 41, 33, 2, 18, 30, 24, 45, 8, 40, 51, 48, 43"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [4, 7]
+Returns() = [111, 98]
+LegalActions() = [174, 180, 186, 189, 197, 1012, 1021, 1630, 1636, 1645, 1792, 2202, 2208, 2214, 2217]
+StringLegalActions() = ["Choose 3C 6D", "Choose 3C QD", "Choose 3C 5H", "Choose 3C 8H", "Choose 3C 3S", "Choose 6D QD", "Choose 6D 8H", "Choose 5H 6D", "Choose 5H QD", "Choose 5H 8H", "Choose 8H QD", "Choose 3S 6D", "Choose 3S QD", "Choose 3S 5H", "Choose 3S 8H"]
+
+# Apply action "Choose 3S 5H"
+action: 2214
+
+# State 329
+# ---------------------------------
+# Num players: 2
+# Round: 12
+# Phase: Card
+# Dealer: 0
+# Cur player: 1
+# Scores: 111 98
+# ---------------------------------
+# Crib: 3S 5H
+# P0 Hand: 3C 6D 8H QD
+# P1 Hand: 2S 5S 7S 9C TS KS
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = False
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39, 2756, 2756, 46, 38, 50, 2756, 2756, 27, 47, 24, 28, 4, 0, 14, 21, 20, 6, 23, 33, 1460, 1125, 26, 0, 21, 47, 6, 28, 14, 24, 23, 2756, 2756, 41, 33, 2, 18, 30, 24, 45, 8, 40, 51, 48, 43, 2214]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39, 2756, 2756, 46, 38, 50, 2756, 2756, 27, 47, 24, 28, 4, 0, 14, 21, 20, 6, 23, 33, 1460, 1125, 26, 0, 21, 47, 6, 28, 14, 24, 23, 2756, 2756, 41, 33, 2, 18, 30, 24, 45, 8, 40, 51, 48, 43, 2214"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0, 0]
+Returns() = [111, 98]
+LegalActions() = [516, 519, 2140, 2175, 2177, 2180, 2183, 2296, 2333, 2336, 2339, 2400, 2440, 2443, 2599]
+StringLegalActions() = ["Choose 9C TS", "Choose 9C KS", "Choose 2S 9C", "Choose 2S 5S", "Choose 2S 7S", "Choose 2S TS", "Choose 2S KS", "Choose 5S 9C", "Choose 5S 7S", "Choose 5S TS", "Choose 5S KS", "Choose 7S 9C", "Choose 7S TS", "Choose 7S KS", "Choose TS KS"]
+
+# Apply action "Choose 5S 7S"
+action: 2333
+
+# State 330
+# Apply action "Deal 4C"
+action: 3
+
+# State 331
+# Apply action "Choose 2S"
+action: 40
+
+# State 332
+# Apply action "Choose 3C"
+action: 2
+
+# State 333
+# Apply action "Choose KS"
+action: 51
+
+# State 334
+# Apply action "Choose QD"
+action: 24
+
+# State 335
+# Apply action "Pass"
+action: 2756
+
+# State 336
+# Apply action "Choose 6D"
+action: 18
+
+# State 337
+# Apply action "Choose TS"
+action: 48
+
+# State 338
+# Apply action "Choose 8H"
+action: 33
+
+# State 339
+# Apply action "Choose 9C"
+action: 8
+
+# State 340
+# Apply action "Pass"
+action: 2756
+
+# State 341
+# Apply action "Pass"
+action: 2756
+
+# State 342
+# ---------------------------------
+# Num players: 2
+# Round: 13
+# Phase: Card
+# Dealer: 1
+# Cur player: -1
+# Scores: 127 106
+# ---------------------------------
+# Crib:
+# P0 Hand:
+# P1 Hand:
+# ---------------------------------
+# Running total: 0
+# Played cards:
+# ---------------------------------
+IsTerminal() = True
+History() = [15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39, 2756, 2756, 46, 38, 50, 2756, 2756, 27, 47, 24, 28, 4, 0, 14, 21, 20, 6, 23, 33, 1460, 1125, 26, 0, 21, 47, 6, 28, 14, 24, 23, 2756, 2756, 41, 33, 2, 18, 30, 24, 45, 8, 40, 51, 48, 43, 2214, 2333, 3, 40, 2, 51, 24, 2756, 18, 48, 33, 8, 2756, 2756]
+HistoryString() = "15, 1, 10, 26, 19, 23, 46, 43, 50, 38, 51, 48, 1405, 2339, 5, 38, 19, 48, 15, 2756, 2756, 46, 23, 50, 2756, 2756, 10, 2756, 2756, 6, 35, 36, 18, 24, 5, 2, 9, 49, 40, 8, 25, 348, 2181, 20, 24, 8, 6, 2, 2756, 2756, 35, 9, 18, 2756, 2756, 25, 2756, 2756, 20, 37, 35, 39, 13, 15, 41, 50, 36, 34, 48, 31, 867, 1712, 45, 41, 39, 36, 20, 34, 37, 50, 13, 2756, 2756, 34, 37, 18, 23, 6, 19, 2, 3, 49, 12, 35, 11, 1074, 2612, 45, 18, 2, 37, 3, 6, 2756, 2756, 35, 23, 11, 2756, 2756, 13, 7, 51, 10, 30, 15, 40, 26, 37, 3, 21, 46, 743, 2135, 43, 37, 30, 46, 7, 26, 51, 21, 10, 2756, 2756, 12, 48, 41, 32, 26, 13, 9, 29, 30, 25, 1, 8, 754, 1590, 46, 48, 8, 12, 1, 32, 25, 41, 9, 2756, 2756, 12, 7, 2, 39, 10, 46, 51, 21, 41, 23, 20, 27, 462, 1113, 30, 41, 2, 27, 12, 23, 39, 2756, 2756, 51, 10, 2756, 2756, 29, 18, 32, 43, 25, 47, 35, 27, 28, 14, 15, 0, 2335, 808, 13, 32, 0, 29, 15, 25, 27, 2756, 2756, 18, 35, 2756, 2756, 50, 33, 30, 25, 34, 18, 22, 44, 0, 24, 5, 39, 1646, 1220, 17, 44, 25, 39, 33, 5, 18, 0, 50, 2756, 2756, 31, 8, 27, 29, 28, 9, 4, 42, 21, 7, 47, 33, 1673, 2243, 16, 27, 33, 28, 21, 29, 4, 8, 47, 2756, 2756, 23, 36, 17, 46, 50, 19, 6, 39, 18, 27, 38, 34, 1063, 1490, 33, 6, 36, 18, 17, 39, 2756, 2756, 46, 38, 50, 2756, 2756, 27, 47, 24, 28, 4, 0, 14, 21, 20, 6, 23, 33, 1460, 1125, 26, 0, 21, 47, 6, 28, 14, 24, 23, 2756, 2756, 41, 33, 2, 18, 30, 24, 45, 8, 40, 51, 48, 43, 2214, 2333, 3, 40, 2, 51, 24, 2756, 18, 48, 33, 8, 2756, 2756"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+Rewards() = [1014, -997]
+Returns() = [1127, -894]

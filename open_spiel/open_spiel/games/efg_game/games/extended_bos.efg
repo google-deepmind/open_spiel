@@ -1,0 +1,17 @@
+EFG 2 R "Modified Battle-of-the-Sexes Game in Morrill et al., Hindsight and Sequential Rationality of Correlated Play" { "Player 1" "Player 2" } ""
+
+p "ROOT" 1 1 "Root infoset" { "U" "N" } 0
+  p "U" 1 2 "P1 U" { "X" "Y" } 0
+    p "UX" 2 1 "P2 Infoset" { "X" "Y" } 0
+      t "UXX" 1 "Outcome UXX" { 2.0 3.0 }
+      t "UXY" 2 "Outcome UXY" { 0.0 0.0 }
+    p "UY" 2 1 "P2 Infoset" { "X" "Y" } 0
+      t "UYX" 3 "Outcome UYX" { 0.0 0.0 }
+      t "UYY" 4 "Outcome UYY" { 3.0 2.0 }
+  p "N" 1 3 "P1 N" { "X" "Y" } 0
+    p "NX" 2 1 "P2 Infoset" { "X" "Y" } 0
+      t "NXX" 5 "Outcome NXX" { 1.0 2.0 }
+      t "NXY" 6 "Outcome NXY" { 0.0 0.0 }
+    p "NY" 2 1 "P2 Infoset" { "X" "Y" } 0
+      t "NYX" 7 "Outcome NYX" { 0.0 0.0 }
+      t "NYY" 8 "Outcome NYY" { 2.0 1.0 }

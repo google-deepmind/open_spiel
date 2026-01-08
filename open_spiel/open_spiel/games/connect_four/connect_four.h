@@ -1,0 +1,182 @@
+// Copyright 2019 DeepMind Technologies Limited
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
+#define OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
+
+#include <functional>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
+
+// Simple game of Connect Four
+// https://en.wikipedia.org/wiki/Connect_Four
+//
+// Minimax values (win/loss/draw) available for first 8 moves, here:
+// https://archive.ics.uci.edu/ml/datasets/Connect-4
+//
+// Parameters: none
+//
+//   "egocentric_obs_tensor"   bool  Enable the egocentric observation tensors
+//                                   (default: false)
+//   "rows"                    int   Number of rows (default: 6)
+//   "columns"                 int   Number of columns (default: 7)
+//   "x_in_row"                int   Number of cells in a row (default: 4)
+
+namespace open_spiel {
+namespace connect_four {
+
+// Constants.
+inline constexpr bool kDefaultEgocentricObsTensor = false;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kDefaultNumRows = 6;
+inline constexpr int kDefaultNumCols = 7;
+inline constexpr int kDefaultXInRow = 4;
+inline constexpr int kCellStates =
+    1 + kNumPlayers;  // player 0, player 1, empty
+
+// Outcome of the game.
+enum class Outcome {
+  kPlayer1 = 0,
+  kPlayer2 = 1,
+  kUnknown,
+  kDraw,
+};
+
+// State of a cell.
+enum class CellState {
+  kEmpty,
+  kNought,
+  kCross,
+};
+
+
+struct ConnectFourStateStruct : StateStruct {
+  std::vector<std::vector<std::string>> board;
+  std::string current_player;
+  bool is_terminal;
+  std::string winner;
+
+  ConnectFourStateStruct() = default;
+  explicit ConnectFourStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override {
+    return *this;
+  }
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConnectFourStateStruct, board, current_player,
+                                 is_terminal, winner);
+};
+
+
+// State of an in-play game.
+class ConnectFourState : public State {
+ public:
+  ConnectFourState(std::shared_ptr<const Game>);
+  explicit ConnectFourState(std::shared_ptr<const Game> game,
+                            const std::string& str);
+  ConnectFourState(const ConnectFourState& other) = default;
+
+  Player CurrentPlayer() const override;
+  std::vector<Action> LegalActions() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
+  std::string ToString() const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
+  bool IsTerminal() const override;
+  std::vector<double> Returns() const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         absl::Span<float> values) const override;
+  std::unique_ptr<State> Clone() const override;
+  std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const override {
+    return {action};
+  }
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override {
+    return Clone();
+  }
+
+ protected:
+  void DoApplyAction(Action move) override;
+
+ private:
+  CellState& CellAt(int row, int col);
+  CellState CellAt(int row, int col) const;
+  bool HasLine(Player player) const;  // Does this player have a line?
+  bool HasLineFrom(Player player, int row, int col) const;
+  bool HasLineFromInDirection(Player player, int row, int col, int drow,
+                              int dcol) const;
+  bool IsFull() const;         // Is the board full?
+  Player current_player_ = 0;  // Player zero goes first
+  Outcome outcome_ = Outcome::kUnknown;
+  std::vector<CellState> board_;
+};
+
+// Game object.
+class ConnectFourGame : public Game {
+ public:
+  explicit ConnectFourGame(const GameParameters& params);
+  int NumDistinctActions() const override { return cols_; }
+  std::unique_ptr<State> NewInitialState() const override {
+    return std::unique_ptr<State>(new ConnectFourState(shared_from_this()));
+  }
+  int NumPlayers() const override { return kNumPlayers; }
+  double MinUtility() const override { return -1; }
+  absl::optional<double> UtilitySum() const override { return 0; }
+  double MaxUtility() const override { return 1; }
+  std::vector<int> ObservationTensorShape() const override {
+    return {kCellStates, rows_, cols_};
+  }
+  int MaxGameLength() const override { return rows_ * cols_; }
+
+  bool egocentric_obs_tensor() const { return egocentric_obs_tensor_; }
+  int rows() const { return rows_; }
+  int cols() const { return cols_; }
+  int x_in_row() const { return x_in_row_; }
+
+ private:
+  const int egocentric_obs_tensor_;
+  const int rows_;
+  const int cols_;
+  const int x_in_row_;
+};
+
+inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
+  switch (state) {
+    case CellState::kEmpty:
+      return stream << "Empty";
+    case CellState::kNought:
+      return stream << "O";
+    case CellState::kCross:
+      return stream << "X";
+    default:
+      SpielFatalError("Unknown cell state");
+  }
+}
+
+}  // namespace connect_four
+}  // namespace open_spiel
+
+#endif  // OPEN_SPIEL_GAMES_CONNECT_FOUR_H_

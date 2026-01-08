@@ -1,0 +1,146 @@
+game: add_noise(epsilon=1.,seed=1,game=kuhn_poker())
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Add noise to game=Kuhn Poker epsilon=1 seed=1"
+GameType.max_num_players = 10
+GameType.min_num_players = 2
+GameType.parameter_specification = ["players"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = True
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "add_noise"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
+MaxChanceOutcomes() = 3
+GetParameters() = {epsilon=1.0,game=kuhn_poker(),seed=1}
+NumPlayers() = 2
+MinUtility() = -3.0
+MaxUtility() = 3.0
+UtilitySum() = 0.0
+InformationStateTensorShape() = [11]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 11
+ObservationTensorShape() = [7]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 7
+MaxGameLength() = 3
+ToString() = "add_noise(epsilon=1.0,game=kuhn_poker(),seed=1)"
+
+# State 0
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0): ◉◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◯◯◉◉
+ChanceOutcomes() = [(0,0.333333), (1,0.333333), (2,0.333333)]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2"]
+
+# Apply action "Deal:2"
+action: 2
+
+# State 1
+# 2
+IsTerminal() = False
+History() = [2]
+HistoryString() = "2"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "2"
+InformationStateString(1) = ""
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "211"
+ObservationString(1) = ""
+ObservationTensor(0): ◉◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◉◉
+ChanceOutcomes() = [(0,0.5), (1,0.5)]
+LegalActions() = [0, 1]
+StringLegalActions() = ["Deal:0", "Deal:1"]
+
+# Apply action "Deal:1"
+action: 1
+
+# State 2
+# 2 1
+IsTerminal() = False
+History() = [2, 1]
+HistoryString() = "2, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "2"
+InformationStateString(1) = "1"
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯
+ObservationString(0) = "211"
+ObservationString(1) = "111"
+ObservationTensor(0): ◉◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◉◯◉◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["Pass", "Bet"]
+
+# Apply action "Bet"
+action: 1
+
+# State 3
+# 2 1 b
+IsTerminal() = False
+History() = [2, 1, 1]
+HistoryString() = "2, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "2b"
+InformationStateString(1) = "1b"
+InformationStateTensor(0): ◉◯◯◯◉◯◉◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◉◯◯◯◯
+ObservationString(0) = "221"
+ObservationString(1) = "121"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 2.0, 1.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["Pass", "Bet"]
+
+# Apply action "Pass"
+action: 0
+
+# State 4
+# 2 1 bp
+IsTerminal() = True
+History() = [2, 1, 1, 0]
+HistoryString() = "2, 1, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "2bp"
+InformationStateString(1) = "1bp"
+InformationStateTensor(0): ◉◯◯◯◉◯◉◉◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◉◉◯◯◯
+ObservationString(0) = "221"
+ObservationString(1) = "121"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 2.0, 1.0]
+Rewards() = [1.99437, -1.99437]
+Returns() = [1.99437, -1.99437]

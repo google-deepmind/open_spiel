@@ -1,0 +1,17 @@
+EFG 2 R "Greenwald & Sarfati Example 1" { "Player 1" "Player 2" } "Example EFCE but not CE"
+
+p "ROOT" 1 1 "Root infoset" { "L" "R" } 0
+  p "L" 2 1 "P2 infoset" { "A" "B" } 0
+    p "LA" 1 2 "Left P1 infoset" { "l1" "r1" } 0
+      t "LAl" 1 "Outcome LAl" { 2.0 2.0 }
+      t "LAr" 2 "Outcome LAr" { 0.0 2.0 }
+    p "LB" 1 2 "Left P1 infoset" { "l1" "r1" } 0
+      t "LBl" 3 "Outcome LBl" { 2.0 2.0 }
+      t "LBr" 4 "Outcome LBr" { 2.0 2.0 }
+  p "R" 2 1 "P2 infoset" { "A" "B" } 0
+    p "RA" 1 3 "Right P1 infoset" { "l2" "r2" } 0
+      t "RAl" 5 "Outcome RAl" { 0.0 0.0 }
+      t "RAr" 6 "Outcome RAr" { 0.0 0.0 }
+    p "RB" 1 3 "Right P1 infoset" { "l2" "r2" } 0
+      t "RBl" 7 "Outcome RBl" { 0.0 0.0 }
+      t "RBr" 8 "Outcome RBr" { 3.0 0.0 }
