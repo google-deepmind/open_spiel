@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2026 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -441,8 +441,8 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
         return absl::nullopt;
     }
     pocket_section = fen_copy.substr(lb + 1, rb - lb - 1);
-    //  Strip trailing space.
-    fen_copy = absl::StripAsciiWhitespace(fen_copy.substr(0, lb));
+		fen_copy.erase(lb, rb - lb + 1);
+		fen_copy = absl::StripAsciiWhitespace(fen_copy);
   }
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
@@ -604,11 +604,10 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
           std::cerr << "Invalid pocket char in FEN: " << pc << std::endl;
           return absl::nullopt;
         }
-
         if (white) {
-          board.white_pocket_.Increment(pptype, 1);
+				  board.AddToPocket(Color::kWhite, pptype, 1);
         }  else {
-           board.black_pocket_.Increment(pptype, 1);
+				  board.AddToPocket(Color::kBlack, pptype, 1);
         }
     }
   }
@@ -1333,11 +1332,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   if (move.IsDropMove()) {
       PieceType from_type = Pocket::DropPieceType(move.from.y);
       moving_piece =  Piece{to_play_, from_type};
-    if (to_play_ == Color::kBlack) {
-       black_pocket_.Decrement(from_type);
-    } else {
-      white_pocket_.Decrement(from_type);
-    }
+      RemoveFromPocket(to_play_, from_type);
   } else {
      moving_piece = at(move.from);
      set_square(move.from, kEmptyPiece);
@@ -1353,11 +1348,7 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
       if (dpt == PieceType::kKing) {
           SpielFatalError("King capture detected.");
       }
-      if (to_play_ == Color::kBlack) {
-        black_pocket_.Increment(dpt, insanity_);
-      } else {
-         white_pocket_.Increment(dpt, insanity_);
-      }
+			AddToPocket(to_play_, dpt, insanity_);
   }
 
   // Whether the move is irreversible for the purpose of the 50-moves rule. Note
@@ -1459,10 +1450,10 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
     Square captured_pawn_square = move.to;
     if (to_play_ == Color::kWhite) {
       --captured_pawn_square.y;
-      white_pocket_.Increment(PieceType::kPawn, insanity_);
+			AddToPocket(Color::kWhite, PieceType::kPawn, insanity_);
     } else {
       ++captured_pawn_square.y;
-      black_pocket_.Increment(PieceType::kPawn, insanity_);
+			AddToPocket(Color::kBlack, PieceType::kPawn, insanity_);
     }
     SPIEL_CHECK_EQ(at(captured_pawn_square),
                    (Piece{OppColor(to_play_), PieceType::kPawn}));
@@ -2130,6 +2121,61 @@ std::string CrazyhouseBoard::ToDarkFEN(
   absl::StrAppend(&fen, " ", move_number_);
 
   return fen;
+}
+
+// For purposes of the hash 
+// we  will saturate the pocket piece count at 16,
+// although the actual piece count can go beyond that. 
+static constexpr int kMaxPocketHashCount = 16;
+static const ZobristTableU64<2, 5, kMaxPocketHashCount + 1>
+    kPocketZobrist(/*seed=*/2825712);
+
+inline int HashCount(int n) {
+  return std::min(n, kMaxPocketHashCount);
+}
+
+void CrazyhouseBoard::AddToPocket(Color owner,
+                                  PieceType piece,
+                                  int count) {
+  Pocket& pocket = owner == Color::kWhite ? white_pocket_ : black_pocket_;
+
+  for (int i = 0; i < count; ++i) {
+    int old = pocket.Count(piece);
+    int new_ = old + 1;
+
+    int old_hash = HashCount(old);
+    int new_hash = HashCount(new_);
+
+    if (old_hash != new_hash) {
+      zobrist_hash_ ^=
+          kPocketZobrist[ToInt(owner)][pocket.Index(piece)][old_hash];
+      zobrist_hash_ ^=
+          kPocketZobrist[ToInt(owner)][pocket.Index(piece)][new_hash];
+    }
+
+    pocket.Increment(piece, 1);
+  }
+}
+
+void CrazyhouseBoard::RemoveFromPocket(Color owner,
+                                       PieceType piece) {
+  Pocket& pocket = owner == Color::kWhite ? white_pocket_ : black_pocket_;
+  int old = pocket.Count(piece);
+  assert(old > 0);
+
+  int new_ = old - 1;
+
+  int old_hash = HashCount(old);
+  int new_hash = HashCount(new_);
+
+  if (old_hash != new_hash) {
+    zobrist_hash_ ^=
+        kPocketZobrist[ToInt(owner)][pocket.Index(piece)][old_hash];
+    zobrist_hash_ ^=
+        kPocketZobrist[ToInt(owner)][pocket.Index(piece)][new_hash];
+  }
+
+  pocket.Decrement(piece);
 }
 
 void CrazyhouseBoard::set_square(Square sq, Piece piece) {

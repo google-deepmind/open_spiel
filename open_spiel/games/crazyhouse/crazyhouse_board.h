@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2026 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -340,6 +340,11 @@ class CrazyhouseBoard {
 
   void SetCastlingRight(Color side, CastlingDirection direction,
                         absl::optional<Square> maybe_rook_square);
+
+	void AddToPocket(Color owner, PieceType piece, int count);
+
+	void RemoveFromPocket(Color owner, PieceType piece);
+
 
   Square FindRookForCastling(Color color, CastlingDirection dir) const;
 

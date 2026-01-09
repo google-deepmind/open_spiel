@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2026 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -577,15 +577,16 @@ CrazyhouseState::ExtractFenAndMaybeMoves() const {
 absl::optional<std::vector<double>> CrazyhouseState::MaybeFinalReturns() const {
   if (king_of_hill_){
     auto next_to_play = ColorToPlayer(Board().ToPlay());
-	auto just_played = OtherPlayer(next_to_play);
-	Piece the_king = Piece{PlayerToColor(just_played), PieceType::kKing};
+	  auto just_played = OtherPlayer(next_to_play);
+	  Piece the_king = Piece{PlayerToColor(just_played), PieceType::kKing};
     Square king_square = Board().find(the_king);
+
     if (king_square.IsHillSquare()) {
       std::vector<double> returns(NumPlayers());
       returns[next_to_play] = LossUtility();
       returns[just_played] = WinUtility();
       return returns;
-   }
+    }
   }
   if (!Board().HasSufficientMaterial()) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
