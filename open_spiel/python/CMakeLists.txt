@@ -286,6 +286,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    jax/boltzmann_dqn_jax_test.py
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
     coalitional_games/least_core_lagrangian_test.py
@@ -298,6 +299,8 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       pytorch/rcfr_pytorch_test.py
       pytorch/dqn_pytorch_test.py
+      pytorch/boltzmann_dqn_pytorch_test.py
+      pytorch/nfsp_pytorch_test.py
       pytorch/deep_cfr_pytorch_test.py
       pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py

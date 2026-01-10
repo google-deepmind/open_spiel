@@ -21,7 +21,7 @@ from absl import logging
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.jax import nfsp_refactor as nfsp
+from open_spiel.python.pytorch import nfsp
 
 FLAGS = flags.FLAGS
 
@@ -38,7 +38,6 @@ flags.DEFINE_integer("reservoir_buffer_capacity", int(2e6),
                      "Size of the reservoir buffer.")
 flags.DEFINE_float("anticipatory_param", 0.1,
                    "Prob of using the rl best response as episode policy.")
-
 
 class NFSPPolicies(policy.Policy):
   """Joint policy to be evaluated."""
@@ -78,12 +77,12 @@ def main(unused_argv):
   info_state_size = env.observation_spec()["info_state"][0]
   num_actions = env.action_spec()["num_actions"]
 
-  hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
+  hidden_layers_sizes = [int(s) for s in FLAGS.hidden_layers_sizes]
   kwargs = {
-      "replay_buffer_capacity": FLAGS.replay_buffer_capacity,
-      "epsilon_decay_duration": FLAGS.num_train_episodes,
-      "epsilon_start": 0.06,
-      "epsilon_end": 0.001,
+    "replay_buffer_capacity": FLAGS.replay_buffer_capacity,
+    "epsilon_decay_duration": FLAGS.num_train_episodes,
+    "epsilon_start": 0.06,
+    "epsilon_end": 0.001,
   }
 
   # pylint: disable=g-complex-comprehension

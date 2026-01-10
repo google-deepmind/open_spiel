@@ -17,7 +17,7 @@
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
-from open_spiel.python.jax import dqn_refactor as dqn
+from open_spiel.python.jax import dqn
 import pyspiel
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
@@ -35,16 +35,19 @@ class DQNTest(absltest.TestCase):
   def test_simple_game(self):
     game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
     env = rl_environment.Environment(game=game)
-    agent = dqn.DQN(0,
-                    state_representation_size=
-                    game.information_state_tensor_shape()[0],
-                    num_actions=game.num_distinct_actions(),
-                    hidden_layers_sizes=[16],
-                    replay_buffer_capacity=100,
-                    batch_size=5,
-                    epsilon_start=0.02,
-                    epsilon_end=0.01,
-                    gradient_clipping=1.0)
+    agent = dqn.DQN(
+      0,
+      state_representation_size=
+      game.information_state_tensor_shape()[0],
+      num_actions=game.num_distinct_actions(),
+      hidden_layers_sizes=[16],
+      replay_buffer_capacity=100,
+      batch_size=5,
+      epsilon_start=0.02,
+      epsilon_end=0.01,
+      gradient_clipping=1.0,
+      allow_checkpointing=False
+    )
     total_reward = 0
 
     for _ in range(100):
@@ -62,13 +65,15 @@ class DQNTest(absltest.TestCase):
     num_actions = env.action_spec()["num_actions"]
 
     agents = [
-        dqn.DQN(  # pylint: disable=g-complex-comprehension
-            player_id,
-            state_representation_size=state_size,
-            num_actions=num_actions,
-            hidden_layers_sizes=[16],
-            replay_buffer_capacity=10,
-            batch_size=5) for player_id in [0, 1]
+      dqn.DQN(  # pylint: disable=g-complex-comprehension
+        player_id,
+        state_representation_size=state_size,
+        num_actions=num_actions,
+        hidden_layers_sizes=[16],
+        replay_buffer_capacity=10,
+        batch_size=5,
+        allow_checkpointing=False
+      ) for player_id in [0, 1]
     ]
     time_step = env.reset()
     while not time_step.last():
@@ -117,12 +122,14 @@ class DQNTest(absltest.TestCase):
 
     agents = [
         dqn.DQN(  # pylint: disable=g-complex-comprehension
-            player_id,
-            state_representation_size=state_size,
-            num_actions=num_actions,
-            hidden_layers_sizes=[16],
-            replay_buffer_capacity=10,
-            batch_size=5) for player_id in range(num_players)
+          player_id,
+          state_representation_size=state_size,
+          num_actions=num_actions,
+          hidden_layers_sizes=[16],
+          replay_buffer_capacity=10,
+          batch_size=5,
+          allow_checkpointing=False
+        ) for player_id in range(num_players)
     ]
     time_step = env.reset()
     while not time_step.last():
