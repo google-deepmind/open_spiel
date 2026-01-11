@@ -169,14 +169,16 @@ void TerminalReturnTests() {
 
 void UndoTests() {
   // Promotion + capture.
+	// Crazyhouse differs from chess in that a queen formerly a pawn is
+	// different from a queen that was always queen.
   CheckUndo("r1bqkbnr/pPpppppp/8/6n1/6p1/8/PPPPP1PP/RNBQKBNR w KQkq - 0 1",
             "bxa8=Q",
-            "Q1bqkbnr/p1pppppp/8/6n1/6p1/8/PPPPP1PP/RNBQKBNR b KQk - 0 1");
+            "E1bqkbnr/p1pppppp/8/6n1/6p1/8/PPPPP1PP/RNBQKBNR[R] b KQk - 0 1");
 
   // En passant.
   CheckUndo("rnbqkbnr/pppp1p1p/8/4pPp1/8/8/PPPPP1PP/RNBQKBNR w KQkq g6 0 2",
             "fxg6",
-            "rnbqkbnr/pppp1p1p/6P1/4p3/8/8/PPPPP1PP/RNBQKBNR b KQkq - 0 2");
+            "rnbqkbnr/pppp1p1p/6P1/4p3/8/8/PPPPP1PP/RNBQKBNR[P] b KQkq - 0 2");
 }
 
 float ValueAt(const std::vector<float>& v, const std::vector<int>& shape,
@@ -236,24 +238,27 @@ void ObservationTensorTests() {
   SPIEL_CHECK_EQ(ValueAt(v, shape, 11, "e7"), 1.0);
   SPIEL_CHECK_EQ(ValueAt(v, shape, 11, "e6"), 0.0);
 
+	// These postion values are bumped up by 8 because
+	// of the new pieces
+
   // Empty.
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 12, "e4"), 1.0);
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 12, "e2"), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 20, "e4"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 20, "e2"), 0.0);
 
   // Repetition count.
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 13, 0, 0), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 21, 0, 0), 0.0);
 
   // Side to move.
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 14, 0, 0), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 22, 0, 0), 1.0);
 
   // Irreversible move counter.
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 15, 0, 0), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 23, 0, 0), 0.0);
 
   // Castling rights.
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 16, 0, 0), 1.0);
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 17, 1, 1), 1.0);
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 18, 2, 2), 1.0);
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 19, 3, 3), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 24, 0, 0), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 25, 1, 1), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 26, 2, 2), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 27, 3, 3), 1.0);
 
   ApplySANMove("e4", &initial_state);
   ApplySANMove("e5", &initial_state);
@@ -264,22 +269,74 @@ void ObservationTensorTests() {
   SPIEL_CHECK_EQ(v.size(), game->ObservationTensorSize());
 
   // Now it's black to move.
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 14, 0, 0), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 22, 0, 0), 0.0);
 
   // White king is now on e2.
   SPIEL_CHECK_EQ(ValueAt(v, shape, 0, "e1"), 0.0);
   SPIEL_CHECK_EQ(ValueAt(v, shape, 0, "e2"), 1.0);
 
-  // Irreversible move counter incremented to 1 (king moving and losing castling
-  // rights is in fact irreversible in this case, but it doesn't reset the
-  // counter according to FIDE rules).
-  SPIEL_CHECK_FLOAT_EQ(ValueAt(v, shape, 15, 0, 0), 1.0 / 101.0);
+  // Although there is still an irreversible move counter in the plane
+	// it is always zero because there are no irrevesible moves
+	// SPIEL_CHECK_FLOAT_EQ(ValueAt(v, shape, 23, 0, 0), 1.0 / 101.0);
 
   // And white no longer has castling rights.
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 16, 0, 0), 0.0);
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 17, 1, 1), 0.0);
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 18, 2, 2), 1.0);
-  SPIEL_CHECK_EQ(ValueAt(v, shape, 19, 3, 3), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 24, 0, 0), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 25, 1, 1), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 26, 2, 2), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v, shape, 27, 3, 3), 1.0);
+
+
+	// Make a new board to check for new pieces and pockets.
+	const std::string crazy_fen = "ecakrhnb/pppppppp/8/8/8/8/PPPPPPPP/ECAKRHNB"
+		"[PppNNNnBbbQQQQqqRRrrr] w  - 0 1";
+  std::unique_ptr<State> crazy_state = game->NewInitialState(crazy_fen);
+
+  std::vector<float> v2(game->ObservationTensorSize());
+  crazy_state->ObservationTensor(crazy_state->CurrentPlayer(),
+                                  absl::MakeSpan(v2));
+
+  // Promoted Queens.
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 12, "a1"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 12, "b1"), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 13, "a8"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 13, "b8"), 0.0);
+
+  // Promoted Rooks.
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 14, "b1"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 14, "c1"), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 15, "b8"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 15, "c8"), 0.0);
+
+  // Promoted Bisops.
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 16, "c1"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 16, "d1"), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 17, "c8"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 17, "d8"), 0.0);
+
+  // Promoted Knights.
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 18, "f1"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 18, "g1"), 0.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 19, "f8"), 1.0);
+  SPIEL_CHECK_EQ(ValueAt(v2, shape, 19, "g8"), 0.0);
+
+	std::cerr << std::fixed << std::setprecision(6);
+  for (int i = 28; i <= 37; ++i) {
+     std::cerr << "plane " << i << ": "
+            << ValueAt(v2, shape, i, 0, 0) << "\n";
+  }
+
+	// Pocket counts. Here inner loop is piece type
+		"[PppNNNnBbbQQQQqqRRrrr] w  - 0 1";
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 28, 0, 0), 1.0/16);  // P
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 29, 0, 0), 3.0/16);  // N
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 30, 0, 0), 1.0/16);  // B
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 31, 0, 0), 2.0/16);  // R
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 32, 0, 0), 4.0/16);  // Q
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 33, 0, 0), 2.0/16);  // p
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 34, 0, 0), 1.0/16);  // n
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 35, 0, 0), 2.0/16);  // b
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 36, 0, 0), 3.0/16);  // r
+	SPIEL_CHECK_EQ(ValueAt(v2, shape, 37, 0, 0), 2.0/16);  // q
 }
 
 void MoveConversionTests() {
@@ -287,6 +344,7 @@ void MoveConversionTests() {
   std::mt19937 rng(23);
   for (int i = 0; i < 100; ++i) {
     std::unique_ptr<State> state = game->NewInitialState();
+		std:: cout << "MoveConversion Game # " << i << std::endl;
     while (!state->IsTerminal()) {
       const CrazyhouseState* crazyhouse_state =
           dynamic_cast<const CrazyhouseState*>(state.get());
@@ -368,7 +426,7 @@ int main(int argc, char** argv) {
   open_spiel::crazyhouse::BasicCrazyhouseTests();
   open_spiel::crazyhouse::UndoTests();
   open_spiel::crazyhouse::TerminalReturnTests();
-  // open_spiel::crazyhouse::ObservationTensorTests();
+  open_spiel::crazyhouse::ObservationTensorTests();
   open_spiel::crazyhouse::MoveConversionTests();
   open_spiel::crazyhouse::SerializaitionTests();
   open_spiel::crazyhouse::BasicCrazyhouse960Tests();

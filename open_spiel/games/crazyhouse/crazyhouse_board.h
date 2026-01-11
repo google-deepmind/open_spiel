@@ -73,13 +73,7 @@ enum class PieceType : int8_t {
 static inline constexpr std::array<PieceType, 10> kPieceTypes = {
 {PieceType::kKing, PieceType::kQueen, PieceType::kRook, PieceType::kBishop,
 PieceType::kKnight, PieceType::kPawn, PieceType::kQueenP, PieceType::kRookP,
-PieceType::kKnightP}};
-
-
-// In case all the pieces are represented in the same plane, these values are
-// used to represent each piece type.
-static inline constexpr std::array<float, 6> kPieceRepresentation = {
-{1, 0.8, 0.6, 0.4, 0.2, 0.1}};
+PieceType::kBishopP, PieceType::kKnightP}};
 
 // Tries to parse piece type from char ('K', 'Q', 'R', 'B', 'N', 'P').
 // Case-insensitive.

@@ -133,7 +133,9 @@ std::string PieceTypeToString(PieceType p, bool uppercase) {
     case PieceType::kKnightP:
       return uppercase ? "H" : "h";
     default:
-      SpielFatalError("Unknown piece.");
+      SpielFatalError(
+        std::string("Unknown piece (ptts): ") +
+         std::to_string(static_cast<int>(p)));
       return "This will never return.";
   }
 }
@@ -161,7 +163,9 @@ std::string Piece::ToUnicode() const {
         case PieceType::kKing:
           return "♚";
         default:
-          SpielFatalError("Unknown piece.");
+          SpielFatalError(
+            std::string("Unknown piece (ToUnicode): ") +
+            std::to_string(static_cast<int>(type)));
           return "This will never return.";
       }
     case Color::kWhite:
@@ -240,6 +244,14 @@ std::string Move::ToString() const {
 
 std::string Move::ToLAN(bool chess960,
                         const CrazyhouseBoard *board_ptr) const {
+  if (IsDropMove()) {
+     std::string move_text;
+     PieceType from_type = Pocket::DropPieceType(from.y);
+	   move_text += PieceTypeToString(from_type);
+	   move_text += '@';
+	   absl::StrAppend(&move_text, SquareToString(to));
+     return move_text;
+  }
   if (chess960 && is_castling()) {
     // In chess960, when castling, the LAN format is different. It includes the
     // <king position> <rook position> it is castling with.
@@ -263,9 +275,9 @@ std::string Move::ToSAN(const CrazyhouseBoard &board) const {
   std::string move_text;
   if (IsDropMove()) {
      PieceType from_type = Pocket::DropPieceType(from.y);
-	 move_text += PieceTypeToString(from_type);
-	 move_text += '@';
-	 absl::StrAppend(&move_text, SquareToString(to));
+	   move_text += PieceTypeToString(from_type);
+	   move_text += '@';
+	   absl::StrAppend(&move_text, SquareToString(to));
      return move_text;
   }
   PieceType piece_type = board.at(from).type;
@@ -1342,10 +1354,12 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   //  the king can castle in-place!
   //  That's the only possibility for move.from == move.to.
   set_square(move.to, moving_piece);
-  // Increment pockets for capture
-  if (destination_piece !=  kEmptyPiece) {
+  // Increment pockets for capture.
+	// When castling in 960 the king can stay in the same place.
+  if (destination_piece !=  kEmptyPiece && !move.is_castling()) {
       PieceType dpt = destination_piece.type;
       if (dpt == PieceType::kKing) {
+				  std::cerr << "King capture from" << SquareToString(move.from) << std::endl;
           SpielFatalError("King capture detected.");
       }
 			AddToPocket(to_play_, dpt, insanity_);
