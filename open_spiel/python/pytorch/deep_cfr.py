@@ -30,7 +30,6 @@ import torch
 from torch import nn
 import numpy as np
 import tree as np_tree
-
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
 import pyspiel
