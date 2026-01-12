@@ -247,9 +247,9 @@ std::string Move::ToLAN(bool chess960,
   if (IsDropMove()) {
      std::string move_text;
      PieceType from_type = Pocket::DropPieceType(from.y);
-	   move_text += PieceTypeToString(from_type);
-	   move_text += '@';
-	   absl::StrAppend(&move_text, SquareToString(to));
+     move_text += PieceTypeToString(from_type);
+     move_text += '@';
+     absl::StrAppend(&move_text, SquareToString(to));
      return move_text;
   }
   if (chess960 && is_castling()) {
@@ -275,9 +275,9 @@ std::string Move::ToSAN(const CrazyhouseBoard &board) const {
   std::string move_text;
   if (IsDropMove()) {
      PieceType from_type = Pocket::DropPieceType(from.y);
-	   move_text += PieceTypeToString(from_type);
-	   move_text += '@';
-	   absl::StrAppend(&move_text, SquareToString(to));
+     move_text += PieceTypeToString(from_type);
+     move_text += '@';
+     absl::StrAppend(&move_text, SquareToString(to));
      return move_text;
   }
   PieceType piece_type = board.at(from).type;
@@ -453,8 +453,8 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
         return absl::nullopt;
     }
     pocket_section = fen_copy.substr(lb + 1, rb - lb - 1);
-		fen_copy.erase(lb, rb - lb + 1);
-		fen_copy = absl::StripAsciiWhitespace(fen_copy);
+    fen_copy.erase(lb, rb - lb + 1);
+    fen_copy = absl::StripAsciiWhitespace(fen_copy);
   }
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
@@ -617,9 +617,9 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
           return absl::nullopt;
         }
         if (white) {
-				  board.AddToPocket(Color::kWhite, pptype, 1);
+          board.AddToPocket(Color::kWhite, pptype, 1);
         }  else {
-				  board.AddToPocket(Color::kBlack, pptype, 1);
+          board.AddToPocket(Color::kBlack, pptype, 1);
         }
     }
   }
@@ -1355,14 +1355,15 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
   //  That's the only possibility for move.from == move.to.
   set_square(move.to, moving_piece);
   // Increment pockets for capture.
-	// When castling in 960 the king can stay in the same place.
+  // When castling in 960 the king can stay in the same place.
   if (destination_piece !=  kEmptyPiece && !move.is_castling()) {
       PieceType dpt = destination_piece.type;
       if (dpt == PieceType::kKing) {
-				  std::cerr << "King capture from" << SquareToString(move.from) << std::endl;
+          std::cerr << "King capture from" <<
+            SquareToString(move.from) << std::endl;
           SpielFatalError("King capture detected.");
       }
-			AddToPocket(to_play_, dpt, insanity_);
+      AddToPocket(to_play_, dpt, insanity_);
   }
 
   // Whether the move is irreversible for the purpose of the 50-moves rule. Note
@@ -1464,10 +1465,10 @@ void CrazyhouseBoard::ApplyMove(const Move &move) {
     Square captured_pawn_square = move.to;
     if (to_play_ == Color::kWhite) {
       --captured_pawn_square.y;
-			AddToPocket(Color::kWhite, PieceType::kPawn, insanity_);
+      AddToPocket(Color::kWhite, PieceType::kPawn, insanity_);
     } else {
       ++captured_pawn_square.y;
-			AddToPocket(Color::kBlack, PieceType::kPawn, insanity_);
+      AddToPocket(Color::kBlack, PieceType::kPawn, insanity_);
     }
     SPIEL_CHECK_EQ(at(captured_pawn_square),
                    (Piece{OppColor(to_play_), PieceType::kPawn}));
@@ -2137,9 +2138,9 @@ std::string CrazyhouseBoard::ToDarkFEN(
   return fen;
 }
 
-// For purposes of the hash 
+// For purposes of the hash
 // we  will saturate the pocket piece count at 16,
-// although the actual piece count can go beyond that. 
+// although the actual piece count can go beyond that.
 static constexpr int kMaxPocketHashCount = 16;
 static const ZobristTableU64<2, 5, kMaxPocketHashCount + 1>
     kPocketZobrist(/*seed=*/2825712);

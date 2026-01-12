@@ -335,9 +335,9 @@ class CrazyhouseBoard {
   void SetCastlingRight(Color side, CastlingDirection direction,
                         absl::optional<Square> maybe_rook_square);
 
-	void AddToPocket(Color owner, PieceType piece, int count);
+  void AddToPocket(Color owner, PieceType piece, int count);
 
-	void RemoveFromPocket(Color owner, PieceType piece);
+  void RemoveFromPocket(Color owner, PieceType piece);
 
 
   Square FindRookForCastling(Color color, CastlingDirection dir) const;

@@ -11,6 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// Usually in crazyhouse a promoted piece reverts to a pawn when captured.
+// "Sticky promotions" means it stays promoted.
+// I threw in "King of the Hill" as an option because it was almost a gimme.
+// The insanity parameter tells how many copies of a captured piece you get
+// in the pockets. Insanity of zero is normal chess (so you can play normal
+// king of the hill.
 
 #ifndef OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_H_
 #define OPEN_SPIEL_GAMES_CRAZYHOUSE_CRAZYHOUSE_H_

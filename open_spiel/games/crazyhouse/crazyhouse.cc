@@ -575,10 +575,10 @@ CrazyhouseState::ExtractFenAndMaybeMoves() const {
 }
 
 absl::optional<std::vector<double>> CrazyhouseState::MaybeFinalReturns() const {
-  if (king_of_hill_){
+  if (king_of_hill_) {
     auto next_to_play = ColorToPlayer(Board().ToPlay());
-	  auto just_played = OtherPlayer(next_to_play);
-	  Piece the_king = Piece{PlayerToColor(just_played), PieceType::kKing};
+    auto just_played = OtherPlayer(next_to_play);
+    Piece the_king = Piece {PlayerToColor(just_played), PieceType::kKing};
     Square king_square = Board().find(the_king);
 
     if (king_square.IsHillSquare()) {
