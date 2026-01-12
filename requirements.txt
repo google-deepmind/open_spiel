@@ -13,5 +13,8 @@ pip >= 20.0.2
 attrs >= 19.3.0
 absl-py >= 0.10.0
 numpy >= 1.21.5
-scipy >= 1.10.1
+# Note! Adding upper bound while we still support Python 3.10.
+# We will remove it as soon as we remove Python 3.10 support.
+# From https://pypi.org/project/scipy/#history the last version that supported Python 3.10 was 1.15.3
+scipy >= 1.10.1, <= 1.15.3
 ml-collections >= 0.1.1
