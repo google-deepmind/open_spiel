@@ -30,7 +30,7 @@ export DEFAULT_OPTIONAL_DEPENDENCY=${DEFAULT_OPTIONAL_DEPENDENCY:-"OFF"}
 export OPEN_SPIEL_BUILD_WITH_PYTHON=${OPEN_SPIEL_BUILD_WITH_PYTHON:-"ON"}
 
 # Abseil version. Must support older versions for previous wheels on MacOS.
-export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250127.1"}
+export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250814.1"}
 
 # Each optional dependency has their own flag, that defaults to the global
 # "$DEFAULT_OPTIONAL_DEPENDENCY" if undefined. To enable an optional dependency,
