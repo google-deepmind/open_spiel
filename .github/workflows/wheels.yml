@@ -46,6 +46,8 @@ jobs:
           OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           CIBW_VERSION: 3.2.1
           CIBW_ENABLE: all
+          CIBW_BEFORE_ALL_LINUX: >
+            yum install -y openblas-devel || dnf install -y openblas-devel || apt-get install -y libopenblas-dev
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
         - os: macos-14
@@ -79,6 +81,7 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
+      CIBW_BEFORE_ALL_LINUX: ${{ matrix.CIBW_BEFORE_ALL_LINUX }}
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
