@@ -28,28 +28,26 @@ jobs:
     strategy:
       matrix:
         include:
-        # Disabled temporarily while broken.
-        # See https://github.com/google-deepmind/open_spiel/issues/1441 for details.
-        # - os: ubuntu-24.04
-        #   NAME: "Linux"
-        #   OS_TYPE: "Linux"
-        #   CI_PYBIN: python3.12
-        #   OS_PYTHON_VERSION: 3.12
-        #   OPEN_SPIEL_ABSL_VERSION: "20250814.1"
-        #   CIBW_VERSION: 3.2.1
-        #   CIBW_ENABLE: all
-        #   CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-        #   CIBW_BUILD: cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
-        # - os: ubuntu-24.04-arm
-        #   NAME: "Linux_arm64"
-        #   OS_TYPE: "Linux"
-        #   CI_PYBIN: python3.12
-        #   OS_PYTHON_VERSION: 3.12
-        #   OPEN_SPIEL_ABSL_VERSION: "20250814.1"
-        #   CIBW_VERSION: 3.2.1
-        #   CIBW_ENABLE: all
-        #   CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-        #   CIBW_BUILD: cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
+        - os: ubuntu-24.04
+          NAME: "Linux"
+          OS_TYPE: "Linux"
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          CIBW_VERSION: 3.2.1
+          CIBW_ENABLE: all
+          CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
+        - os: ubuntu-24.04-arm
+          NAME: "Linux_arm64"
+          OS_TYPE: "Linux"
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          CIBW_VERSION: 3.2.1
+          CIBW_ENABLE: all
+          CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
         - os: macos-14
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.12
