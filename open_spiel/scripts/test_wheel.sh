@@ -45,9 +45,18 @@ $PYBIN -m pip install --upgrade setuptools
 
 # Install requirements differently based on mode
 if [[ "$MODE" = "basic" ]]; then
-  # For basic mode, install all core dependencies from requirements.txt
-  # Modern scipy has prebuilt ARM64 wheels, no need to skip it
-  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+  # For basic mode, install dependencies
+  # On ARM64 manylinux2014, scipy >= 1.14 doesn't have prebuilt wheels (requires manylinux_2_27+)
+  # So we need to use an older scipy version that has manylinux2014_aarch64 wheels
+  ARCH=$(uname -m)
+  if [[ "$OS" = "Linux" && "$ARCH" = "aarch64" ]]; then
+    echo "Basic mode on ARM64: Installing core dependencies with scipy 1.13.1 (last version with manylinux2014 wheels)"
+    $PYBIN -m pip install --upgrade pip attrs absl-py numpy ml-collections -q
+    # Install scipy 1.13.1 which has manylinux2014_aarch64 wheels
+    $PYBIN -m pip install 'scipy>=1.10.1,<1.14' -q --only-binary scipy
+  else
+    $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+  fi
 else
   # Full mode installs all requirements
   $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
