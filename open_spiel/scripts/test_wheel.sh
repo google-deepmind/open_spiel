@@ -45,14 +45,9 @@ $PYBIN -m pip install --upgrade setuptools
 
 # Install requirements differently based on mode
 if [[ "$MODE" = "basic" ]]; then
-  # For basic mode, install only core dependencies (skip scipy on ARM64 to avoid build issues)
-  ARCH=$(uname -m)
-  if [[ "$OS" = "Linux" && "$ARCH" = "aarch64" ]]; then
-    echo "Basic mode on ARM64: Installing core dependencies only (skipping scipy)"
-    $PYBIN -m pip install --upgrade pip attrs absl-py numpy ml-collections -q
-  else
-    $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
-  fi
+  # For basic mode, install all core dependencies from requirements.txt
+  # Modern scipy has prebuilt ARM64 wheels, no need to skip it
+  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
 else
   # Full mode installs all requirements
   $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
