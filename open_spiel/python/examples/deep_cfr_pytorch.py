@@ -25,7 +25,7 @@ from open_spiel.python.pytorch import deep_cfr
 
 # Recommended parameters:
 #   For more, see https://github.com/aicenter/openspiel_reproductions/
-  
+
 #   Parameter                        Value
 #   ---------------------------------------
 #   num_traversals                   1500
