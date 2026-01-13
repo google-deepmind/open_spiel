@@ -19,12 +19,13 @@ Multiagent Learning", ICLR 2020; https://arxiv.org/abs/1909.12823), run this
 script with:
   - `game_name` in ['kuhn_poker', 'leduc_poker']
   - `n_players` in [2, 3, 4, 5]
-  - `meta_strategy_method` in ['alpharank', 'uniform', 'nash', 'prd']
+  - `meta_strategy_method` in ['alpharank', 'uniform', 'nash', 'prd', 'ssd']
   - `rectifier` in ['', 'rectified']
 
 The other parameters keeping their default values.
 """
 
+import threading
 import time
 
 from absl import app
@@ -44,24 +45,100 @@ from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import rl_oracle
 from open_spiel.python.algorithms.psro_v2 import rl_policy
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
+import sys
+sys.setrecursionlimit(3000)
+
+
+def get_memory_usage_mb():
+  try:
+    import psutil
+
+    rss = psutil.Process().memory_info().rss
+    return rss / (1024.0 * 1024.0)
+  except Exception:
+    try:
+      import resource
+
+      rss_kb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+      return rss_kb / 1024.0
+    except Exception:
+      return -1.0
+
+
+class MemorySampler:
+  """Background sampler that tracks peak memory usage."""
+
+  def __init__(self, interval_s=0.05):
+    self._interval_s = max(interval_s, 0.0)
+    self._running = False
+    self._thread = None
+    self.max_mb = -1.0
+
+  def __enter__(self):
+    self.start()
+    return self
+
+  def __exit__(self, exc_type, exc, exc_tb):
+    self.stop()
+
+  def start(self):
+    if self._running:
+      return
+    self._running = True
+    self._thread = threading.Thread(target=self._run, daemon=True)
+    self._thread.start()
+
+  def stop(self):
+    if not self._running:
+      return
+    self._running = False
+    if self._thread is not None:
+      self._thread.join()
+    # Capture one final sample after stopping to include post-loop usage.
+    self._record_sample()
+
+  def _run(self):
+    while self._running:
+      self._record_sample()
+      if self._interval_s == 0.0:
+        # Avoid busy spinning if configured interval is zero.
+        time.sleep(0)
+      else:
+        time.sleep(self._interval_s)
+
+  def _record_sample(self):
+    sample = get_memory_usage_mb()
+    if sample >= 0:
+      if self.max_mb < 0:
+        self.max_mb = sample
+      else:
+        self.max_mb = max(self.max_mb, sample)
+    return sample
 
 
 FLAGS = flags.FLAGS
 
 # Game-related
-flags.DEFINE_string("game_name", "kuhn_poker", "Game name.")
-flags.DEFINE_integer("n_players", 2, "The number of players.")
+flags.DEFINE_string("game_name", "leduc_poker", "Game name.")
+flags.DEFINE_integer("n_players", 3, "The number of players.")
+flags.DEFINE_string(
+  "log_path", "",
+  "Optional file path for logging exploitabilities. Leave empty to disable file logging.")
+
+flags.DEFINE_bool("use_sparse", False, "whether to use scipy sparse matrices")
+
 
 # PSRO related
-flags.DEFINE_string("meta_strategy_method", "alpharank",
-                    "Name of meta strategy computation method.")
+flags.DEFINE_string(
+  "meta_strategy_method", "ssd",
+  "Name of meta strategy computation method")
 flags.DEFINE_integer("number_policies_selected", 1,
                      "Number of new strategies trained at each PSRO iteration.")
-flags.DEFINE_integer("sims_per_entry", 1000,
+flags.DEFINE_integer("sims_per_entry", 100,
                      ("Number of simulations to run to estimate each element"
                       "of the game outcome matrix."))
 
-flags.DEFINE_integer("gpsro_iterations", 100,
+flags.DEFINE_integer("gpsro_iterations", 70,
                      "Number of training steps for GPSRO.")
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
@@ -70,7 +147,7 @@ flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
 flags.DEFINE_string("rectifier", "",
                     "Which rectifier to use. Choices are '' "
                     "(No filtering), 'rectified' for rectified.")
-flags.DEFINE_string("training_strategy_selector", "probabilistic",
+flags.DEFINE_string("training_strategy_selector", "top_k_probabilities",
                     "Which strategy selector to use. Choices are "
                     " - 'top_k_probabilities': select top "
                     "`number_policies_selected` strategies. "
@@ -111,6 +188,10 @@ flags.DEFINE_integer("learn_every", 10, "Learn every [X] steps.")
 flags.DEFINE_integer("seed", 1, "Seed.")
 flags.DEFINE_bool("local_launch", False, "Launch locally or not.")
 flags.DEFINE_bool("verbose", True, "Enables verbose printing and profiling.")
+flags.DEFINE_float(
+  "memory_sample_interval", 0.05,
+  "Seconds between asynchronous memory samples collected during each"
+  " gpsro iteration. Set to 0 for best-effort continuous sampling.")
 
 
 def init_pg_responder(env):
@@ -254,21 +335,32 @@ def gpsro_looper(env, oracle, agents):
       prd_iterations=50000,
       prd_gamma=1e-10,
       sample_from_marginals=sample_from_marginals,
-      symmetric_game=FLAGS.symmetric_game)
+      symmetric_game=FLAGS.symmetric_game,
+      use_sparse=FLAGS.use_sparse)
 
   start_time = time.time()
+  max_memory_mb = -1.0
   for gpsro_iteration in range(FLAGS.gpsro_iterations):
-    if FLAGS.verbose:
-      print("Iteration : {}".format(gpsro_iteration))
-      print("Time so far: {}".format(time.time() - start_time))
-    g_psro_solver.iteration()
+    iter_start = time.time()
+    sampler = MemorySampler(interval_s=FLAGS.memory_sample_interval)
+    sampler.start()
+    try:
+      g_psro_solver.iteration()
+    finally:
+      sampler.stop()
+    iter_end = time.time()
+    iter_time = iter_end - iter_start
+    memory_mb = get_memory_usage_mb()
+    iteration_peak_mb = sampler.max_mb if sampler.max_mb >= 0 else memory_mb
+    if iteration_peak_mb >= 0:
+      if max_memory_mb < 0:
+        max_memory_mb = iteration_peak_mb
+      else:
+        max_memory_mb = max(max_memory_mb, iteration_peak_mb)
+
     meta_game = g_psro_solver.get_meta_game()
     meta_probabilities = g_psro_solver.get_meta_strategies()
     policies = g_psro_solver.get_policies()
-
-    if FLAGS.verbose:
-      print("Meta game : {}".format(meta_game))
-      print("Probabilities : {}".format(meta_probabilities))
 
     # The following lines only work for sequential games for the moment.
     if env.game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL:
@@ -281,7 +373,34 @@ def gpsro_looper(env, oracle, agents):
 
       _ = print_policy_analysis(policies, env.game, FLAGS.verbose)
       if FLAGS.verbose:
+        print("Iteration : {}".format(gpsro_iteration))
+        print("Iteration time (s): {:.6f}".format(iter_time))
+        if memory_mb >= 0:
+          print("mb used: {:.2f}".format(memory_mb))
+        else:
+          print("mb used: n/a")
+        if iteration_peak_mb >= 0:
+          print("peak iteration mb: {:.2f}".format(iteration_peak_mb))
+        else:
+          print("peak iteration mb: n/a")
+        if max_memory_mb >= 0:
+          print("max mb so far: {:.2f}".format(max_memory_mb))
+        else:
+          print("max mb so far: n/a")
         print("Exploitabilities : {}".format(exploitabilities))
+        if FLAGS.log_path:
+          try:
+            with open(FLAGS.log_path, "a") as f:
+              f.write(
+                  str(exploitabilities)
+                  + "," + str(iter_time)
+                  + "," + str(memory_mb)
+                  + "," + str(iteration_peak_mb)
+                  + "," + str(max_memory_mb)
+                  + "\n")
+          except Exception as e:
+            if FLAGS.verbose:
+              print("Failed to write exploitabilities to {}: {}".format(FLAGS.log_path, e))
         print("Exploitabilities per player : {}".format(expl_per_player))
 
 
