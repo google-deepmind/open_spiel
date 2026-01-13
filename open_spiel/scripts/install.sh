@@ -17,7 +17,7 @@
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
-export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250127.1"}
+export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250814.1"}
 
 die() {
   echo "$*" 1>&2
