@@ -50,7 +50,7 @@ verlt() {
 #
 
 echo "Set Python version: $PY_VER"
-elif verlt $PY_VER 3.12; then
+if verlt $PY_VER 3.12; then
   echo "Detected Python version 3.11"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.9.1"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.8.1 jaxlib==0.8.1 flax==0.12.1 dm-haiku==0.0.16 optax==0.2.6 chex==0.1.91 rlax==0.1.8 distrax==0.1.7"
