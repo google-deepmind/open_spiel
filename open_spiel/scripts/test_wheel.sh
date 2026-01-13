@@ -42,7 +42,21 @@ fi
 
 PYBIN=`which $PYBIN`
 $PYBIN -m pip install --upgrade setuptools
-$PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+
+# Install requirements differently based on mode
+if [[ "$MODE" = "basic" ]]; then
+  # For basic mode, install only core dependencies (skip scipy on ARM64 to avoid build issues)
+  ARCH=$(uname -m)
+  if [[ "$OS" = "Linux" && "$ARCH" = "aarch64" ]]; then
+    echo "Basic mode on ARM64: Installing core dependencies only (skipping scipy)"
+    $PYBIN -m pip install --upgrade pip attrs absl-py numpy ml-collections -q
+  else
+    $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+  fi
+else
+  # Full mode installs all requirements
+  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+fi
 
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."

@@ -884,7 +884,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // parameter values, including defaulted values. Returns empty parameters
   // otherwise.
   GameParameters GetParameters() const {
-    absl::MutexLock lock(mutex_defaulted_parameters_);
+    absl::MutexLock lock(&mutex_defaulted_parameters_);
     GameParameters params = game_parameters_;
     params.insert(defaulted_parameters_.begin(), defaulted_parameters_.end());
     return params;
@@ -1109,7 +1109,7 @@ class Game : public std::enable_shared_from_this<Game> {
     }
 
     // Return the default value, storing it.
-    absl::MutexLock lock(mutex_defaulted_parameters_);
+    absl::MutexLock lock(&mutex_defaulted_parameters_);
     iter = defaulted_parameters_.find(key);
     if (iter == defaulted_parameters_.end()) {
       // We haven't previously defaulted this value, so store the default we
