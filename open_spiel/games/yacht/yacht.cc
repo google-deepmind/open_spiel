@@ -215,7 +215,10 @@ Player YachtState::CurrentPlayer() const {
 // Helper to check if dice form a straight
 bool YachtState::IsStraight(const std::vector<int>& dice,
   int bottom, int top) const {
-  std::vector<bool> present(dice_sides_, false);
+  if (top > dice_sides_) {
+    return false;
+  }
+  std::vector<bool> present(dice_sides_ + 1, false);
   for (int die : dice) {
     present[die] = true;
   }
