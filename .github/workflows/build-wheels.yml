@@ -41,7 +41,7 @@ jobs:
     - name: Clone dependencies
       run: |
         git clone --single-branch --depth 1 https://github.com/pybind/pybind11.git pybind11
-        git clone -b 20250127.1 --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+        git clone -b 20250814.1 --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
         git clone -b master https://github.com/nlohmann/json.git open_spiel/json
         cd open_spiel/json && git checkout 9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03 && cd ../..
         git clone -b master https://github.com/pybind/pybind11_json.git open_spiel/pybind11_json
