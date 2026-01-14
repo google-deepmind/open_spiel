@@ -1,0 +1,542 @@
+game: breakthrough
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Breakthrough"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["columns", "rows"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "breakthrough"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 768
+PolicyTensorShape() = [768]
+MaxChanceOutcomes() = 0
+GetParameters() = {columns=8,rows=8}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [3, 8, 8]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 192
+MaxGameLength() = 209
+ToString() = "breakthrough()"
+
+# State 0
+# 8bbbbbbbb
+# 7bbbbbbbb
+# 6........
+# 5........
+# 4........
+# 3........
+# 2wwwwwwww
+# 1wwwwwwww
+#  abcdefgh
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "8bbbbbbbb\n7bbbbbbbb\n6........\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
+ObservationString(1) = "8bbbbbbbb\n7bbbbbbbb\n6........\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
+ObservationTensor(0):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+ObservationTensor(1):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [98, 100, 108, 110, 112, 120, 122, 124, 132, 134, 136, 144, 146, 148, 156, 158, 160, 168, 170, 172, 180, 182]
+StringLegalActions() = ["a7a6", "a7b6", "b7a6", "b7b6", "b7c6", "c7b6", "c7c6", "c7d6", "d7c6", "d7d6", "d7e6", "e7d6", "e7e6", "e7f6", "f7e6", "f7f6", "f7g6", "g7f6", "g7g6", "g7h6", "h7g6", "h7h6"]
+
+# Apply action "c7d6"
+action: 124
+
+# State 1
+# 8bbbbbbbb
+# 7bb.bbbbb
+# 6...b....
+# 5........
+# 4........
+# 3........
+# 2wwwwwwww
+# 1wwwwwwww
+#  abcdefgh
+IsTerminal() = False
+History() = [124]
+HistoryString() = "124"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
+ObservationString(1) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
+ObservationTensor(0):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯
+◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+ObservationTensor(1):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯
+◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [584, 586, 594, 596, 598, 606, 608, 610, 618, 620, 622, 630, 632, 634, 642, 644, 646, 654, 656, 658, 666, 668]
+StringLegalActions() = ["a2a3", "a2b3", "b2a3", "b2b3", "b2c3", "c2b3", "c2c3", "c2d3", "d2c3", "d2d3", "d2e3", "e2d3", "e2e3", "e2f3", "f2e3", "f2f3", "f2g3", "g2f3", "g2g3", "g2h3", "h2g3", "h2h3"]
+
+# Apply action "d2d3"
+action: 620
+
+# State 2
+# 8bbbbbbbb
+# 7bb.bbbbb
+# 6...b....
+# 5........
+# 4........
+# 3...w....
+# 2www.wwww
+# 1wwwwwwww
+#  abcdefgh
+IsTerminal() = False
+History() = [124, 620]
+HistoryString() = "124, 620"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
+ObservationString(1) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
+ObservationTensor(0):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯
+◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉  ◯◯◯◉◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+ObservationTensor(1):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯
+◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉  ◯◯◯◉◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [16, 26, 36, 98, 100, 108, 110, 112, 132, 136, 146, 148, 156, 158, 160, 168, 170, 172, 180, 182, 228, 230, 232]
+StringLegalActions() = ["b8c7", "c8c7", "d8c7", "a7a6", "a7b6", "b7a6", "b7b6", "b7c6", "d7c6", "d7e6", "e7e6", "e7f6", "f7e6", "f7f6", "f7g6", "g7f6", "g7g6", "g7h6", "h7g6", "h7h6", "d6c5", "d6d5", "d6e5"]
+
+# Apply action "f7e6"
+action: 156
+
+# State 3
+# 8bbbbbbbb
+# 7bb.bb.bb
+# 6...bb...
+# 5........
+# 4........
+# 3...w....
+# 2www.wwww
+# 1wwwwwwww
+#  abcdefgh
+IsTerminal() = False
+History() = [124, 620, 156]
+HistoryString() = "124, 620, 156"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
+ObservationString(1) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
+ObservationTensor(0):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◯
+◯◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉  ◯◯◯◉◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+ObservationTensor(1):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◯
+◯◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉  ◯◯◯◉◯◯◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [522, 524, 526, 584, 586, 594, 596, 598, 606, 608, 632, 634, 642, 644, 646, 654, 656, 658, 666, 668, 706, 716, 726]
+StringLegalActions() = ["d3c4", "d3d4", "d3e4", "a2a3", "a2b3", "b2a3", "b2b3", "b2c3", "c2b3", "c2c3", "e2e3", "e2f3", "f2e3", "f2f3", "f2g3", "g2f3", "g2g3", "g2h3", "h2g3", "h2h3", "c1d2", "d1d2", "e1d2"]
+
+# Apply action "f2e3"
+action: 642
+
+# State 4
+# 8bbbbbbbb
+# 7bb.bb.bb
+# 6...bb...
+# 5........
+# 4........
+# 3...ww...
+# 2www.w.ww
+# 1wwwwwwww
+#  abcdefgh
+IsTerminal() = False
+History() = [124, 620, 156, 642]
+HistoryString() = "124, 620, 156, 642"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
+ObservationString(1) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
+ObservationTensor(0):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◯
+◯◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◉◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◯◉◉  ◯◯◯◉◯◉◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+ObservationTensor(1):
+◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
+◉◉◯◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◯
+◯◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◉◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◯◉◉  ◯◯◯◉◯◉◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [16, 26, 36, 52, 62, 72, 98, 100, 108, 110, 112, 132, 148, 168, 170, 172, 180, 182, 228, 230, 232, 240, 242, 244]
+StringLegalActions() = ["b8c7", "c8c7", "d8c7", "e8f7", "f8f7", "g8f7", "a7a6", "a7b6", "b7a6", "b7b6", "b7c6", "d7c6", "e7f6", "g7f6", "g7g6", "g7h6", "h7g6", "h7h6", "d6c5", "d6d5", "d6e5", "e6d5", "e6e5", "e6f5"]
+
+# Apply action "b8c7"
+action: 16
+
+# State 5
+# 8b.bbbbbb
+# 7bbbbb.bb
+# 6...bb...
+# 5........
+# 4........
+# 3...ww...
+# 2www.w.ww
+# 1wwwwwwww
+#  abcdefgh
+IsTerminal() = False
+History() = [124, 620, 156, 642, 16]
+HistoryString() = "124, 620, 156, 642, 16"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
+ObservationString(1) = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
+ObservationTensor(0):
+◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
+◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
+◯◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◉◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◯◉◉  ◯◯◯◉◯◉◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
+◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
+◯◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◯◯◉◉◯◯◯  ◉◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯◯  ◉◉◉◯◉◯◉◉  ◯◯◯◉◯◉◯◯
+◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [522, 524, 526, 534, 536, 538, 584, 586, 594, 596, 598, 606, 608, 634, 654, 656, 658, 666, 668, 706, 716, 726, 730, 740, 750]
+StringLegalActions() = ["d3c4", "d3d4", "d3e4", "e3d4", "e3e4", "e3f4", "a2a3", "a2b3", "b2a3", "b2b3", "b2c3", "c2b3", "c2c3", "e2f3", "g2f3", "g2g3", "g2h3", "h2g3", "h2h3", "c1d2", "d1d2", "e1d2", "e1f2", "f1f2", "g1f2"]
+
+# Apply action "b2b3"
+action: 596
+
+# State 6
+# Apply action "d6d5"
+action: 230
+
+# State 7
+# Apply action "g1f2"
+action: 750
+
+# State 8
+# Apply action "f8f7"
+action: 62
+
+# State 9
+# Apply action "h2h3"
+action: 668
+
+# State 10
+# Apply action "b7a6"
+action: 108
+
+# State 11
+# Apply action "h3h4"
+action: 572
+
+# State 12
+# Apply action "d7c6"
+action: 132
+
+# State 13
+# Apply action "a1b2"
+action: 682
+
+# State 14
+# Apply action "g7g6"
+action: 170
+
+# State 15
+# Apply action "e3f4"
+action: 538
+
+# State 16
+# Apply action "e7f6"
+action: 148
+
+# State 17
+# Apply action "b3b4"
+action: 500
+
+# State 18
+# Apply action "e8d7"
+action: 48
+
+# State 19
+# Apply action "a2a3"
+action: 584
+
+# State 20
+# 8b.bb..bb
+# 7b.bb.b.b
+# 6b.b.bbb.
+# 5...b....
+# 4.w...w.w
+# 3w..w....
+# 2.ww.www.
+# 1.wwwww.w
+#  abcdefgh
+IsTerminal() = False
+History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584]
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
+ObservationString(1) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
+ObservationTensor(0):
+◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
+◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
+◉◯◉◯◉◉◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯◉
+◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◉  ◉◯◉◉◉◯◉◯
+◯◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯◯  ◯◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯  ◉◯◯◉◯◯◯◉
+◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯◉  ◉◯◯◯◯◯◉◯
+ObservationTensor(1):
+◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
+◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
+◉◯◉◯◉◉◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯◉
+◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◉  ◉◯◉◉◉◯◉◯
+◯◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯◯  ◯◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯  ◉◯◯◉◯◯◯◉
+◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯◉  ◉◯◯◯◯◯◉◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [4, 24, 40, 74, 84, 100, 120, 124, 134, 182, 194, 196, 216, 218, 242, 244, 252, 254, 256, 264, 266, 268, 324, 326, 328]
+StringLegalActions() = ["a8b7", "c8b7", "d8e7", "g8g7", "h8g7", "a7b6", "c7b6", "c7d6", "d7d6", "h7h6", "a6a5", "a6b5", "c6b5", "c6c5", "e6e5", "e6f5", "f6e5", "f6f5", "f6g5", "g6f5", "g6g5", "g6h5", "d5c4", "d5d4", "d5e4"]
+
+# Apply action "g6g5"
+action: 266
+
+# State 21
+# 8b.bb..bb
+# 7b.bb.b.b
+# 6b.b.bb..
+# 5...b..b.
+# 4.w...w.w
+# 3w..w....
+# 2.ww.www.
+# 1.wwwww.w
+#  abcdefgh
+IsTerminal() = False
+History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266]
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
+ObservationString(1) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
+ObservationTensor(0):
+◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
+◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
+◉◯◉◯◉◉◯◯  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◉◉
+◯◯◯◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯◉
+◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◉  ◉◯◉◉◉◯◉◯
+◯◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯◯  ◯◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯  ◉◯◯◉◯◯◯◉
+◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯◉  ◉◯◯◯◯◯◉◯
+ObservationTensor(1):
+◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
+◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
+◉◯◉◯◉◉◯◯  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◉◉
+◯◯◯◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯◉
+◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◉  ◉◯◉◉◉◯◉◯
+◯◯◯◯◯◯◯◯  ◉◯◯◉◯◯◯◯  ◯◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯  ◉◯◯◉◯◯◯◉
+◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯◉  ◉◯◯◯◯◯◉◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [402, 404, 406, 450, 452, 455, 475, 476, 488, 522, 524, 526, 596, 598, 606, 608, 632, 634, 642, 644, 646, 654, 656, 658, 690, 706, 716, 726, 764]
+StringLegalActions() = ["b4a5", "b4b5", "b4c5", "f4e5", "f4f5", "f4g5*", "h4g5*", "h4h5", "a3a4", "d3c4", "d3d4", "d3e4", "b2b3", "b2c3", "c2b3", "c2c3", "e2e3", "e2f3", "f2e3", "f2f3", "f2g3", "g2f3", "g2g3", "g2h3", "b1a2", "c1d2", "d1d2", "e1d2", "h1h2"]
+
+# Apply action "g2g3"
+action: 656
+
+# State 22
+# Apply action "h8g7"
+action: 84
+
+# State 23
+# Apply action "b4a5"
+action: 402
+
+# State 24
+# Apply action "c7d6"
+action: 124
+
+# State 25
+# Apply action "h1g2"
+action: 762
+
+# State 26
+# Apply action "g7g6"
+action: 170
+
+# State 27
+# Apply action "h4g5*"
+action: 475
+
+# State 28
+# Apply action "d6c5"
+action: 228
+
+# State 29
+# Apply action "g5f6*"
+action: 367
+
+# State 30
+# Apply action "c5d4"
+action: 316
+
+# State 31
+# Apply action "f6e7"
+action: 258
+
+# State 32
+# Apply action "f7f6"
+action: 158
+
+# State 33
+# Apply action "g3h4"
+action: 562
+
+# State 34
+# Apply action "f6f5"
+action: 254
+
+# State 35
+# Apply action "d3c4"
+action: 522
+
+# State 36
+# Apply action "d4e3"
+action: 424
+
+# State 37
+# Apply action "e7e8"
+action: 152
+
+# State 38
+# 8b.bbw.b.
+# 7b..b...b
+# 6b.b.b.b.
+# 5w..b.b..
+# 4..w..w.w
+# 3w...b...
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
+IsTerminal() = True
+History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424, 152]
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424, 152"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+ObservationString(0) = "8b.bbw.b.\n7b..b...b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
+ObservationString(1) = "8b.bbw.b.\n7b..b...b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
+ObservationTensor(0):
+◉◯◉◉◯◯◉◯  ◯◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯◉
+◉◯◯◉◯◯◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯
+◉◯◉◯◉◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯◉
+◯◯◯◉◯◉◯◯  ◉◯◯◯◯◯◯◯  ◯◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◉  ◉◉◯◉◉◯◉◯
+◯◯◯◯◉◯◯◯  ◉◯◯◯◯◯◯◯  ◯◉◉◉◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯  ◉◯◯◉◯◯◯◉
+◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯◯  ◉◯◯◯◯◯◉◉
+ObservationTensor(1):
+◉◯◉◉◯◯◉◯  ◯◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯◉
+◉◯◯◉◯◯◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯
+◉◯◉◯◉◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◉◯◉
+◯◯◯◉◯◉◯◯  ◉◯◯◯◯◯◯◯  ◯◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◉  ◉◉◯◉◉◯◉◯
+◯◯◯◯◉◯◯◯  ◉◯◯◯◯◯◯◯  ◯◉◉◉◯◉◉◉
+◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯  ◉◯◯◉◯◯◯◉
+◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯◯  ◉◯◯◯◯◯◉◉
+Rewards() = [-1, 1]
+Returns() = [-1, 1]

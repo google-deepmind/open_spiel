@@ -1,0 +1,415 @@
+game: repeated_leduc_poker(num_hands=3)
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Repeated Leduc Poker"
+GameType.max_num_players = 10
+GameType.min_num_players = 2
+GameType.parameter_specification = ["action_mapping", "num_hands", "players", "suit_isomorphism"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "repeated_leduc_poker"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 4
+PolicyTensorShape() = [4]
+MaxChanceOutcomes() = 6
+GetParameters() = {num_hands=3,players=2}
+NumPlayers() = 2
+MinUtility() = -39.0
+MaxUtility() = 39.0
+UtilitySum() = 0.0
+InformationStateTensorShape() = [30]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 30
+ObservationTensorShape() = [16]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 16
+MaxGameLength() = 30
+ToString() = "repeated_leduc_poker(num_hands=3)"
+
+# State 0
+# Hand number: 0
+# Round: 1
+# Player: -1
+# Pot: 2
+# Money (player_0 player_1): 99 99
+# Cards (public player_0 player_1): -10000 -10000 -10000
+# Round 1 sequence:
+# Round 2 sequence:
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "Hand 0\n[Observer: 0][Private: -10000][Round 1][Player: -1][Pot: 2][Money: 99 99][Round1: ][Round2: ]"
+InformationStateString(1) = "Hand 0\n[Observer: 1][Private: -10000][Round 1][Player: -1][Pot: 2][Money: 99 99][Round1: ][Round2: ]"
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand 0\n[Observer: 0][Private: -10000][Round 1][Player: -1][Pot: 2][Money: 99 99][Ante: 1 1]"
+ObservationString(1) = "Hand 0\n[Observer: 1][Private: -10000][Round 1][Player: -1][Pot: 2][Money: 99 99][Ante: 1 1]"
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉
+ChanceOutcomes() = [(0,0.166667), (1,0.166667), (2,0.166667), (3,0.166667), (4,0.166667), (5,0.166667)]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Continue", "Chance outcome:4", "Chance outcome:5"]
+
+# Apply action "Chance outcome:0"
+action: 0
+
+# State 1
+# Hand number: 0
+# Round: 1
+# Player: -1
+# Pot: 2
+# Money (player_0 player_1): 99 99
+# Cards (public player_0 player_1): -10000 0 -10000
+# Round 1 sequence:
+# Round 2 sequence:
+IsTerminal() = False
+History() = [0]
+HistoryString() = "0"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: -1][Pot: 2][Money: 99 99][Round1: ][Round2: ]"
+InformationStateString(1) = "Hand 0\n[Observer: 1][Private: -10000][Round 1][Player: -1][Pot: 2][Money: 99 99][Round1: ][Round2: ]"
+InformationStateTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: -1][Pot: 2][Money: 99 99][Ante: 1 1]"
+ObservationString(1) = "Hand 0\n[Observer: 1][Private: -10000][Round 1][Player: -1][Pot: 2][Money: 99 99][Ante: 1 1]"
+ObservationTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉
+ChanceOutcomes() = [(1,0.2), (2,0.2), (3,0.2), (4,0.2), (5,0.2)]
+LegalActions() = [1, 2, 3, 4, 5]
+StringLegalActions() = ["Chance outcome:1", "Chance outcome:2", "Continue", "Chance outcome:4", "Chance outcome:5"]
+
+# Apply action "Chance outcome:4"
+action: 4
+
+# State 2
+# Hand number: 0
+# Round: 1
+# Player: 0
+# Pot: 2
+# Money (player_0 player_1): 99 99
+# Cards (public player_0 player_1): -10000 0 4
+# Round 1 sequence:
+# Round 2 sequence:
+IsTerminal() = False
+History() = [0, 4]
+HistoryString() = "0, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: 0][Pot: 2][Money: 99 99][Round1: ][Round2: ]"
+InformationStateString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 1][Player: 0][Pot: 2][Money: 99 99][Round1: ][Round2: ]"
+InformationStateTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: 0][Pot: 2][Money: 99 99][Ante: 1 1]"
+ObservationString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 1][Player: 0][Pot: 2][Money: 99 99][Ante: 1 1]"
+ObservationTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2]
+StringLegalActions() = ["Call", "Raise"]
+
+# Apply action "Raise"
+action: 2
+
+# State 3
+# Hand number: 0
+# Round: 1
+# Player: 1
+# Pot: 4
+# Money (player_0 player_1): 97 99
+# Cards (public player_0 player_1): -10000 0 4
+# Round 1 sequence: Raise
+# Round 2 sequence:
+IsTerminal() = False
+History() = [0, 4, 2]
+HistoryString() = "0, 4, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: 1][Pot: 4][Money: 97 99][Round1: 2][Round2: ]"
+InformationStateString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 1][Player: 1][Pot: 4][Money: 97 99][Round1: 2][Round2: ]"
+InformationStateTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: 1][Pot: 4][Money: 97 99][Ante: 3 1]"
+ObservationString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 1][Player: 1][Pot: 4][Money: 97 99][Ante: 3 1]"
+ObservationTensor(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["Fold", "Call", "Raise"]
+
+# Apply action "Raise"
+action: 2
+
+# State 4
+# Hand number: 0
+# Round: 1
+# Player: 0
+# Pot: 8
+# Money (player_0 player_1): 97 95
+# Cards (public player_0 player_1): -10000 0 4
+# Round 1 sequence: Raise, Raise
+# Round 2 sequence:
+IsTerminal() = False
+History() = [0, 4, 2, 2]
+HistoryString() = "0, 4, 2, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: 0][Pot: 8][Money: 97 95][Round1: 2 2][Round2: ]"
+InformationStateString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 1][Player: 0][Pot: 8][Money: 97 95][Round1: 2 2][Round2: ]"
+InformationStateTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 1][Player: 0][Pot: 8][Money: 97 95][Ante: 3 5]"
+ObservationString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 1][Player: 0][Pot: 8][Money: 97 95][Ante: 3 5]"
+ObservationTensor(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 5.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 5.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["Fold", "Call"]
+
+# Apply action "Call"
+action: 1
+
+# State 5
+# Apply action "Continue"
+action: 3
+
+# State 6
+# Hand number: 0
+# Round: 2
+# Player: 0
+# Pot: 10
+# Money (player_0 player_1): 95 95
+# Cards (public player_0 player_1): 3 0 4
+# Round 1 sequence: Raise, Raise, Call
+# Round 2 sequence:
+IsTerminal() = False
+History() = [0, 4, 2, 2, 1, 3]
+HistoryString() = "0, 4, 2, 2, 1, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 2][Player: 0][Pot: 10][Money: 95 95][Public: 3][Round1: 2 2 1][Round2: ]"
+InformationStateString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 2][Player: 0][Pot: 10][Money: 95 95][Public: 3][Round1: 2 2 1][Round2: ]"
+InformationStateTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 2][Player: 0][Pot: 10][Money: 95 95][Public: 3][Ante: 5 5]"
+ObservationString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 2][Player: 0][Pot: 10][Money: 95 95][Public: 3][Ante: 5 5]"
+ObservationTensor(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 5.0, 5.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 5.0, 5.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2]
+StringLegalActions() = ["Call", "Raise"]
+
+# Apply action "Raise"
+action: 2
+
+# State 7
+# Hand number: 0
+# Round: 2
+# Player: 1
+# Pot: 14
+# Money (player_0 player_1): 91 95
+# Cards (public player_0 player_1): 3 0 4
+# Round 1 sequence: Raise, Raise, Call
+# Round 2 sequence: Raise
+IsTerminal() = False
+History() = [0, 4, 2, 2, 1, 3, 2]
+HistoryString() = "0, 4, 2, 2, 1, 3, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 2][Player: 1][Pot: 14][Money: 91 95][Public: 3][Round1: 2 2 1][Round2: 2]"
+InformationStateString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 2][Player: 1][Pot: 14][Money: 91 95][Public: 3][Round1: 2 2 1][Round2: 2]"
+InformationStateTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◉◉◯◯◯◯◉◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◉◉◯◯◯◯◉◯◯◯◯◯◯
+ObservationString(0) = "Hand 0\n[Observer: 0][Private: 0][Round 2][Player: 1][Pot: 14][Money: 91 95][Public: 3][Ante: 9 5]"
+ObservationString(1) = "Hand 0\n[Observer: 1][Private: 4][Round 2][Player: 1][Pot: 14][Money: 91 95][Public: 3][Ante: 9 5]"
+ObservationTensor(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 9.0, 5.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 9.0, 5.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["Fold", "Call", "Raise"]
+
+# Apply action "Raise"
+action: 2
+
+# State 8
+# Apply action "Call"
+action: 1
+
+# State 9
+# Apply action "Continue"
+action: 3
+
+# State 10
+# Hand number: 0
+# Round: 2
+# Player: 0
+# Pot: 0
+# Money (player_0 player_1): 87 113
+# Cards (public player_0 player_1): 3 0 4
+# Round 1 sequence: Raise, Raise, Call
+# Round 2 sequence: Raise, Raise, Call
+#
+# Hand 0 finished.
+# Waiting for player 1 to continue.
+IsTerminal() = False
+History() = [0, 4, 2, 2, 1, 3, 2, 2, 1, 3]
+HistoryString() = "0, 4, 2, 2, 1, 3, 2, 2, 1, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Hand number: 0\nRound: 2\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 87 113\nCards (public player_0 player_1): 3 0 4 \nRound 1 sequence: Raise, Raise, Call\nRound 2 sequence: Raise, Raise, Call\n\nHand 0 finished.\nWaiting for player 1 to continue.\n"
+InformationStateString(1) = "Hand number: 0\nRound: 2\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 87 113\nCards (public player_0 player_1): 3 0 4 \nRound 1 sequence: Raise, Raise, Call\nRound 2 sequence: Raise, Raise, Call\n\nHand 0 finished.\nWaiting for player 1 to continue.\n"
+InformationStateTensor(0): ◉◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◉◉◯◯◯◯◉◯◉◉◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◉◉◯◯◯◯◉◯◉◉◯◯◯
+ObservationString(0) = "Hand number: 0\nRound: 2\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 87 113\nCards (public player_0 player_1): 3 0 4 \nRound 1 sequence: Raise, Raise, Call\nRound 2 sequence: Raise, Raise, Call\n\nHand 0 finished.\nWaiting for player 1 to continue.\n"
+ObservationString(1) = "Hand number: 0\nRound: 2\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 87 113\nCards (public player_0 player_1): 3 0 4 \nRound 1 sequence: Raise, Raise, Call\nRound 2 sequence: Raise, Raise, Call\n\nHand 0 finished.\nWaiting for player 1 to continue.\n"
+ObservationTensor(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 13.0, 13.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 13.0, 13.0]
+Rewards() = [0, 13]
+Returns() = [-13, 13]
+LegalActions() = [3]
+StringLegalActions() = ["Continue"]
+
+# Apply action "Continue"
+action: 3
+
+# State 11
+# Apply action "Chance outcome:4"
+action: 4
+
+# State 12
+# Apply action "Continue"
+action: 3
+
+# State 13
+# Apply action "Call"
+action: 1
+
+# State 14
+# Apply action "Call"
+action: 1
+
+# State 15
+# Apply action "Chance outcome:2"
+action: 2
+
+# State 16
+# Apply action "Raise"
+action: 2
+
+# State 17
+# Apply action "Fold"
+action: 0
+
+# State 18
+# Apply action "Continue"
+action: 3
+
+# State 19
+# Apply action "Continue"
+action: 3
+
+# State 20
+# Apply action "Chance outcome:5"
+action: 5
+
+# State 21
+# Apply action "Chance outcome:1"
+action: 1
+
+# State 22
+# Apply action "Call"
+action: 1
+
+# State 23
+# Apply action "Raise"
+action: 2
+
+# State 24
+# Apply action "Fold"
+action: 0
+
+# State 25
+# Hand number: 2
+# Round: 1
+# Player: 0
+# Pot: 0
+# Money (player_0 player_1): 99 101
+# Cards (public player_0 player_1): -10000 5 1
+# Round 1 sequence: Call, Raise, Fold
+# Round 2 sequence:
+#
+# Hand 2 finished.
+# Waiting for player 0 to continue.
+IsTerminal() = False
+History() = [0, 4, 2, 2, 1, 3, 2, 2, 1, 3, 3, 4, 3, 1, 1, 2, 2, 0, 3, 3, 5, 1, 1, 2, 0]
+HistoryString() = "0, 4, 2, 2, 1, 3, 2, 2, 1, 3, 3, 4, 3, 1, 1, 2, 2, 0, 3, 3, 5, 1, 1, 2, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Hand number: 2\nRound: 1\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 99 101\nCards (public player_0 player_1): -10000 5 1 \nRound 1 sequence: Call, Raise, Fold\nRound 2 sequence: \n\nHand 2 finished.\nWaiting for player 0 to continue.\n"
+InformationStateString(1) = "Hand number: 2\nRound: 1\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 99 101\nCards (public player_0 player_1): -10000 5 1 \nRound 1 sequence: Call, Raise, Fold\nRound 2 sequence: \n\nHand 2 finished.\nWaiting for player 0 to continue.\n"
+InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand number: 2\nRound: 1\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 99 101\nCards (public player_0 player_1): -10000 5 1 \nRound 1 sequence: Call, Raise, Fold\nRound 2 sequence: \n\nHand 2 finished.\nWaiting for player 0 to continue.\n"
+ObservationString(1) = "Hand number: 2\nRound: 1\nPlayer: 0\nPot: 0\nMoney (player_0 player_1): 99 101\nCards (public player_0 player_1): -10000 5 1 \nRound 1 sequence: Call, Raise, Fold\nRound 2 sequence: \n\nHand 2 finished.\nWaiting for player 0 to continue.\n"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0]
+Rewards() = [-1, 0]
+Returns() = [-13, 12]
+LegalActions() = [3]
+StringLegalActions() = ["Continue"]
+
+# Apply action "Continue"
+action: 3
+
+# State 26
+# Apply action "Continue"
+action: 3
+
+# State 27
+# Hand number: 2
+# Round: 1
+# Player: 0
+# Pot: 0
+# Money (player_0 player_1): 99 101
+# Cards (public player_0 player_1): -10000 5 1
+# Round 1 sequence: Call, Raise, Fold
+# Round 2 sequence:
+IsTerminal() = True
+History() = [0, 4, 2, 2, 1, 3, 2, 2, 1, 3, 3, 4, 3, 1, 1, 2, 2, 0, 3, 3, 5, 1, 1, 2, 0, 3, 3]
+HistoryString() = "0, 4, 2, 2, 1, 3, 2, 2, 1, 3, 3, 4, 3, 1, 1, 2, 2, 0, 3, 3, 5, 1, 1, 2, 0, 3, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "Hand 2\n[Observer: 0][Private: 5][Round 1][Player: 0][Pot: 0][Money: 99 101][Round1: 1 2 0][Round2: ]"
+InformationStateString(1) = "Hand 2\n[Observer: 1][Private: 1][Round 1][Player: 0][Pot: 0][Money: 99 101][Round1: 1 2 0][Round2: ]"
+InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Hand 2\n[Observer: 0][Private: 5][Round 1][Player: 0][Pot: 0][Money: 99 101][Ante: 1 3]"
+ObservationString(1) = "Hand 2\n[Observer: 1][Private: 1][Round 1][Player: 0][Pot: 0][Money: 99 101][Ante: 1 3]"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0]
+Rewards() = [0, 0]
+Returns() = [-13, 13]

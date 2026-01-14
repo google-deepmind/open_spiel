@@ -1,0 +1,17 @@
+EFG 2 R "Modified Matching Pennies Game in Morrill et al., Hindsight and Sequential Rationality of Correlated Play" { "Player 1" "Player 2" } ""
+
+p "ROOT" 1 1 "Root infoset" { "M" "N" } 0
+  p "M" 1 2 "P1 M" { "H" "T" } 0
+    p "MH" 2 1 "P2 Infoset" { "H" "T" } 0
+      t "MHH" 1 "Outcome MHH" { 1.0 -1.0 }
+      t "MHT" 2 "Outcome UXY" { -1.0 1.0 }
+    p "MT" 2 1 "P2 Infoset" { "H" "T" } 0
+      t "MTH" 3 "Outcome MTH" { -1.0 1.0 }
+      t "MTT" 4 "Outcome MTT" { 1.0 -1.0 }
+  p "N" 1 3 "P1 N" { "H" "T" } 0
+    p "NH" 2 1 "P2 Infoset" { "H" "T" } 0
+      t "NHH" 5 "Outcome NHH" { -1.0 1.0 }
+      t "NHT" 6 "Outcome NHT" { 1.0 -1.0 }
+    p "NT" 2 1 "P2 Infoset" { "H" "T" } 0
+      t "NTH" 7 "Outcome NTH" { 1.0 -1.0 }
+      t "NTT" 8 "Outcome NTT" { -1.0 1.0 }
