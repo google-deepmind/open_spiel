@@ -19,7 +19,6 @@ from enum import StrEnum
 
 import flax.nnx as nn
 import jax.numpy as jnp
-import numpy as np
 
 import jax
 import optax
@@ -162,7 +161,6 @@ class MLP(nn.Module):
   def __call__(self, x: chex.Array) -> chex.Array:
     return self.model(x)
 
-@nn.jit
 @nn.vmap(in_axes=(None, 0), out_axes=0)
 def forward(model, x: chex.Array) -> chex.Array:
   return model(x)
@@ -234,6 +232,7 @@ class DQN(rl_agent.AbstractAgent):
     chex.assert_type(discount_factor, float)
 
     self._rngkey = jax.random.key(seed)
+    
     self.player_id = player_id
     self._num_actions = num_actions
     if isinstance(hidden_layers_sizes, int):
@@ -323,6 +322,10 @@ class DQN(rl_agent.AbstractAgent):
       )
   
     self._optimizer = nn.Optimizer(self._q_network, optimizer, wrt=nn.Param)
+
+    self._graphdef_q_network = nn.graphdef((self._q_network, self._optimizer))
+    self._graphdef_target_q_network = nn.graphdef(self._target_q_network)
+
     self._jit_update = self._get_jitted_update()
     self._jit_inference = self._get_jitted_inference()
    
@@ -331,7 +334,6 @@ class DQN(rl_agent.AbstractAgent):
 
     graphdef = nn.graphdef(self._q_network)
     
-    @jax.jit
     def infer(state: nn.State, info_state: chex.Array) -> tuple[chex.Array, nn.State]:
       model = nn.merge(graphdef, state)
       q_values = model(info_state)
@@ -370,8 +372,6 @@ class DQN(rl_agent.AbstractAgent):
         return loss_values.mean()
 
     grad_fn = nn.value_and_grad(_loss_fn)
-    graphdef_q_network = nn.graphdef((self._q_network, self._optimizer))
-    graphdef_target_q_network = nn.graphdef(self._target_q_network)
 
     @jax.jit
     def update(
@@ -380,8 +380,8 @@ class DQN(rl_agent.AbstractAgent):
       batch: Transition
     ) -> tuple[chex.Numeric, nn.State]:
       
-      q_network, optimiser = nn.merge(graphdef_q_network, q_network_optimiser_state)
-      target_q_network = nn.merge(graphdef_target_q_network, target_q_network_state)
+      q_network, optimiser = nn.merge(self._graphdef_q_network, q_network_optimiser_state)
+      target_q_network = nn.merge(self._graphdef_target_q_network, target_q_network_state)
       
       main_loss, grads = grad_fn(
         q_network,
@@ -399,7 +399,7 @@ class DQN(rl_agent.AbstractAgent):
   
     return update
   
-  def select_action(self, time_step: chex.ArrayTree, rng: chex.PRNGKey, greedy: bool = True) -> rl_agent.StepOutput:
+  def select_action(self, time_step: chex.ArrayTree, greedy: bool = True) -> rl_agent.StepOutput:
     """Returns the action to be taken and updates the Q-network if needed.
 
     Args:
@@ -417,11 +417,9 @@ class DQN(rl_agent.AbstractAgent):
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
       epsilon = jnp.where(greedy, jnp.asarray(0.0), self.epsilon_schedule(self._iteration))
-      action, probs = self._act_epsilon_greedy(
-        nn.state(self._q_network), 
-        jnp.asarray(info_state), 
-        jax.nn.one_hot(jnp.asarray(legal_actions, dtype=jnp.int32), self._num_actions).sum(0), 
-        rng, 
+      action, probs = self.act_epsilon_greedy(
+        info_state, 
+        legal_actions, 
         epsilon
       )
   
@@ -431,7 +429,7 @@ class DQN(rl_agent.AbstractAgent):
     return self._act_epsilon_greedy(
         nn.state(self._q_network), 
         jnp.asarray(info_state), 
-        jax.nn.one_hot(jnp.asarray(legal_actions, dtype=jnp.int32), self._num_actions).sum(0), 
+        jnp.zeros(self._num_actions, dtype=jnp.bool).at[jnp.asarray(legal_actions, dtype=jnp.int32)].set(True),  
         self._next_rng_key(), 
         epsilon
       )
@@ -446,14 +444,14 @@ class DQN(rl_agent.AbstractAgent):
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-    rng, train_rng = jax.random.split(self._next_rng_key())
+    # rng, train_rng = jax.random.split(self._next_rng_key())
     if is_evaluation:
       self._q_network.eval()
-      return self.select_action(time_step, rng, True)
+      return self.select_action(time_step, True)
     
     self._q_network.train()
     # Act step: don't act at terminal info states or if its not our turn.
-    action, probs = self.select_action(time_step, train_rng, False)
+    action, probs = self.select_action(time_step, False)
 
     self._iteration += 1
 
@@ -461,12 +459,10 @@ class DQN(rl_agent.AbstractAgent):
       self._last_loss_value = self.learn()
 
     if self._iteration % self._update_target_network_every == 0:
-
-      updated_state = jax.jit(optax.incremental_update)(
-        nn.state(self._q_network, nn.Param),    
-        nn.state(self._target_q_network, nn.Param),   
-        1-self._tau        
+      updated_state = self._copy_weights(
+        nn.state(self._q_network, nn.Param), nn.state(self._target_q_network, nn.Param)
       )
+
       nn.update(self._target_q_network, updated_state)
 
     if self._prev_timestep is not None and self._prev_action is not None:
@@ -507,7 +503,7 @@ class DQN(rl_agent.AbstractAgent):
       reward=jnp.asarray(time_step.rewards[self.player_id], dtype=jnp.float32),
       next_info_state=jnp.asarray(time_step.observations["info_state"][self.player_id], dtype=jnp.float32),
       is_final_step=jnp.asarray(time_step.last(), dtype=jnp.bool),
-      legal_actions_mask=jax.nn.one_hot(legal_actions, self._num_actions, dtype=jnp.bool).sum(0).astype(jnp.bool)
+      legal_actions_mask=jnp.zeros(self._num_actions, dtype=jnp.bool).at[jnp.asarray(legal_actions, dtype=jnp.int32)].set(True),  
     )
     
     if self._replay_buffer is None:
@@ -545,33 +541,18 @@ class DQN(rl_agent.AbstractAgent):
       A valid epsilon-greedy action and valid action probabilities.
     """
 
-    choose_rng, act_rng = jax.random.split(rng)
-    def _act_randomly(network_state, info_state, rng, legal_actions):
-      probs = legal_actions/legal_actions.sum()
-      action = jax.random.choice(
-        rng,
-        jnp.arange(self._num_actions), 
-        p=probs
-      )
-      return action, probs
-
-    def _act_greedy(network_state, info_state, rng, legal_actions):
-      q_values = self._jit_inference(network_state, info_state)
-      
-      legal_q_values = jnp.where(
-        legal_actions, 
-        q_values, 
-        jnp.full_like(q_values, ILLEGAL_ACTION_LOGITS_PENALTY)
-      )
-      action = legal_q_values.argmax()
-      probs = jax.nn.one_hot(action.astype(int), self._num_actions)
-      return action, probs
+    q_values = self._jit_inference(network_state, info_state)
+    masked_q = jnp.where(legal_actions, q_values, ILLEGAL_ACTION_LOGITS_PENALTY)
+    greedy_action = masked_q.argmax()
     
-    return jax.lax.cond(
-      jax.random.uniform(choose_rng) < epsilon,
-      _act_randomly, _act_greedy,
-      network_state, info_state, act_rng, legal_actions
-    )
+    random_probs = legal_actions / legal_actions.sum()
+    greedy_probs = jax.nn.one_hot(greedy_action, self._num_actions)
+    
+    # Combined: (1 - eps) * greedy + (eps) * random
+    mixed_probs = (1.0 - epsilon) * greedy_probs + epsilon * random_probs
+    action = jax.random.choice(rng, self._num_actions, p=mixed_probs)
+    
+    return action, mixed_probs    
   
   def learn(self) -> float:
     """Compute the loss on sampled transitions and perform a Q-network update.
@@ -622,6 +603,22 @@ class DQN(rl_agent.AbstractAgent):
   def step_counter(self) -> int:
     return self._iteration
   
+  @partial(jax.jit, static_argnums=(0,))
+  def _copy_weights(
+    self, 
+    q_network_state: nn.State, 
+    target_q_network_state: nn.State
+  ) -> nn.Param:
+    """Soft update of the target network's weights
+      θ′ ← τ θ + (1 - τ )θ′
+    """
+    updated_state = optax.incremental_update(
+      q_network_state,    
+      target_q_network_state,   
+      1 - self._tau        
+    )
+    return updated_state
+    
   def save(self, checkpoint_dir: epath.Path, save_optimiser: bool=True) -> None:
     """Saves the RL agent's q-network.
 

@@ -48,7 +48,6 @@ class MODE(Enum):
   best_response=0
   average_policy=1
 
-
 class Optimiser(StrEnum):
   SGD="sgd"
   RMSPROP="rmsprop"
@@ -181,7 +180,6 @@ class MLP(nn.Module):
   def __call__(self, x: chex.Array) -> chex.Array:
     return self.model(x)
 
-@nn.jit
 @nn.vmap(in_axes=(None, 0), out_axes=0)
 def forward(model, x: chex.Array) -> chex.Array:
   return model(x)
@@ -257,9 +255,9 @@ class NFSP(rl_agent.AbstractAgent):
     )
 
     # Keep track of the last training loss achieved in an update step.
-    self._last_rl_loss_value = lambda: self._rl_agent.loss
-    self._sl_loss_fn = optax.softmax_cross_entropy
+    self._sl_loss_fn = jax.vmap(optax.softmax_cross_entropy)
     self._last_sl_loss_value = None
+    self._last_rl_loss_value = self._rl_agent._last_loss_value
 
     self._rngkey = jax.random.PRNGKey(seed)
 
@@ -279,11 +277,12 @@ class NFSP(rl_agent.AbstractAgent):
       raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
     
     self._avg_network_optimiser = nn.Optimizer(self._avg_network, optimiser, wrt=nn.Param)
+    self._avg_network_graphdef = nn.graphdef((self._avg_network, self._avg_network_optimiser))
   
     self._sample_episode_policy(self._next_rng_key())
     self._jit_update = self._get_jitted_sl_upate()
     self._avg_network_inference = self._get_jitted_sl_inference()
-    
+
     self._checkpointer = None
     if allow_checkpointing:
       self._checkpointer = ocp.StandardCheckpointer()
@@ -310,14 +309,12 @@ class NFSP(rl_agent.AbstractAgent):
       avg_actions_logits = jnp.where(
         legal_actions_mask,
         avg_actions_logits,
-        jnp.full_like(avg_actions_logits, jnp.finfo(jnp.float32).min)
+        dqn.ILLEGAL_ACTION_LOGITS_PENALTY
       )
       loss_values = self._sl_loss_fn(avg_actions_logits, action_probs)
       return loss_values.mean()
 
     grad_fn = nn.value_and_grad(_loss_fn)
-    graphdef = nn.graphdef((self._avg_network, self._avg_network_optimiser))
-
     
     @jax.jit
     def update(
@@ -325,7 +322,7 @@ class NFSP(rl_agent.AbstractAgent):
       batch: Transition
     ) -> tuple[chex.Numeric, nn.State]:
       
-      avg_network, optimiser = nn.merge(graphdef, avg_network_state)
+      avg_network, optimiser = nn.merge(self._avg_network_graphdef, avg_network_state)
 
       main_loss, grads = grad_fn(
         avg_network,
@@ -376,7 +373,7 @@ class NFSP(rl_agent.AbstractAgent):
       network_state, info_state
     )
     # Remove illegal actions, normalize probs
-    probs = jnp.where(legal_actions, action_probs, jnp.full_like(action_probs, jnp.finfo(jnp.float32).min))
+    probs = jnp.where(legal_actions, action_probs, dqn.ILLEGAL_ACTION_LOGITS_PENALTY)
     probs = nn.softmax(probs, axis=-1)
     action = jax.random.choice(rng, jnp.arange(len(probs)), p=jnp.asarray(probs))
     return action_values, action, probs
@@ -387,7 +384,7 @@ class NFSP(rl_agent.AbstractAgent):
 
   @property
   def loss(self):
-    return (self._last_sl_loss_value, self._last_rl_loss_value())
+    return (self._last_sl_loss_value, self._last_rl_loss_value)
 
   def step(self, time_step, is_evaluation=False):
     """Returns the action to be taken and updates the Q-networks if needed.
@@ -413,7 +410,7 @@ class NFSP(rl_agent.AbstractAgent):
           nn.state(self._avg_network), 
           self._next_rng_key(), 
           jnp.asarray(info_state), 
-          jax.nn.one_hot(legal_actions, self._num_actions).sum(0).astype(bool)
+          jnp.zeros(self._num_actions, dtype=jnp.bool).at[jnp.asarray(legal_actions, dtype=jnp.int32)].set(True),  
         )
         self._last_action_values = action_values
 
@@ -431,7 +428,7 @@ class NFSP(rl_agent.AbstractAgent):
         self._last_sl_loss_value = self._learn()
         # If learn step not triggered by rl policy, learn.
         if self._mode == MODE.average_policy:
-          self._rl_agent.learn()
+          self._last_rl_loss_value = self._rl_agent.learn()
 
       # Prepare for the next episode.
       if time_step.last():
@@ -454,12 +451,11 @@ class NFSP(rl_agent.AbstractAgent):
       agent_output: an instance of rl_agent.StepOutput.
     """
     legal_actions = time_step.observations["legal_actions"][self.player_id]
-    legal_actions_mask = np.zeros(self._num_actions)
-    legal_actions_mask[legal_actions] = 1.0
+
     transition = Transition(
       info_state=jnp.asarray(time_step.observations["info_state"][self.player_id], dtype=jnp.float32),
       action_probs=jnp.asarray(agent_output.probs, dtype=jnp.float32),
-      legal_actions_mask=jnp.asarray(legal_actions_mask, dtype=jnp.bool)
+      legal_actions_mask=jnp.zeros(self._num_actions, dtype=jnp.bool).at[jnp.asarray(legal_actions, dtype=jnp.int32)].set(True), 
     )
     
     if self._reservoir_buffer is None:
