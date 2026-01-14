@@ -304,7 +304,6 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       pytorch/boltzmann_dqn_pytorch_test.py
       pytorch/nfsp_pytorch_test.py
       pytorch/deep_cfr_pytorch_test.py
-      pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
       pytorch/policy_gradient_pytorch_test.py
       pytorch/ppo_pytorch_test.py

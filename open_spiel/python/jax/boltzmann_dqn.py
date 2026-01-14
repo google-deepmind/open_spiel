@@ -39,7 +39,7 @@ class BoltzmannDQN(dqn.DQN):
       **kwargs: kwargs passed to the underlying DQN agent.
     """
     super().__init__(*args, **kwargs)
-    self._prev_q_network_state = jax.tree.map(lambda x: x, nn.state(self._q_network))
+    self._prev_q_network_state = nn.clone(nn.state(self._q_network), variables=True)
     self._temperature = eta
 
   @partial(jax.jit, static_argnums=(0,))
@@ -111,4 +111,4 @@ class BoltzmannDQN(dqn.DQN):
 
   def update_prev_q_network(self):
     """Updates the parameters of the previous Q-network."""
-    self._prev_q_network_state = jax.tree.map(lambda x: x, nn.state(self._q_network))
+    self._prev_q_network_state = nn.clone(nn.state(self._q_network), variables=True)

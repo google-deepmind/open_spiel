@@ -97,7 +97,7 @@ class QueryableFixedSizeRingBufferTest(absltest.TestCase):
     self.assertIn("entry2", samples)
     self.assertIn("entry3", samples)
 
-  # TODO(author6) Test knn query.
+#   # TODO(author6) Test knn query.
 
 
 if __name__ == "__main__":
