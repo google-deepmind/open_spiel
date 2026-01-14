@@ -31,42 +31,23 @@ jobs:
         - os: ubuntu-24.04
           NAME: "Linux"
           OS_TYPE: "Linux"
-          CI_PYBIN: python3
-          OS_PYTHON_VERSION: 3.10
-          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           CIBW_VERSION: 3.2.1
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
+          CIBW_BUILD: cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
         - os: ubuntu-24.04-arm
           NAME: "Linux_arm64"
           OS_TYPE: "Linux"
-          CI_PYBIN: python3
-          OS_PYTHON_VERSION: 3.10
-          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           CIBW_VERSION: 3.2.1
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp310-manylinux_aarch64 cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
-        - os: macos-15-intel
-          NAME: "MacOS15_Intel_Python_lte_3.11"
-          OS_TYPE: "Darwin"
-          CI_PYBIN: python3.11
-          OS_PYTHON_VERSION: "3.11"
-          OPEN_SPIEL_ABSL_VERSION: "20250127.0"
-          CIBW_VERSION: 2.23.3
-          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp310-macosx_x86_64 cp311-macosx_x86_64
-        - os: macos-15-intel
-          NAME: "MacOS15_Intel_Python_gte_3.12"
-          OS_TYPE: "Darwin"
-          CI_PYBIN: python3.12
-          OS_PYTHON_VERSION: 3.12
-          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
-          CIBW_VERSION: 3.2.1
-          CIBW_ENABLE: all
-          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64
+          CIBW_BUILD: cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
         - os: macos-14
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.12
@@ -74,12 +55,12 @@ jobs:
           CIBW_VERSION: 3.2.1
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64 cp313-macosx_arm64
+          CIBW_BUILD: cp311-macosx_arm64 cp312-macosx_arm64 cp313-macosx_arm64
         - os: macos-15
           NAME: "MacOS15_Python_3.13"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.13
-          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           OS_PYTHON_VERSION: 3.13
           CIBW_VERSION: 3.2.1
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
@@ -95,17 +76,17 @@ jobs:
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
       CIBW_VERSION: ${{ matrix.CIBW_VERSION }}
       CIBW_ENABLE: ${{ matrix.CIBW_ENABLE }}
-      CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-      CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
+      CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+      CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
 
       - name: Install
         run: |
@@ -130,7 +111,7 @@ jobs:
           python -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh python
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine
           python -m pip install cibuildwheel==${CIBW_VERSION}
@@ -157,9 +138,10 @@ jobs:
           source ./venv/bin/activate
           ./open_spiel/scripts/test_wheel.sh full `pwd` python
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.NAME }}
           path: |
             dist/*.tar.gz
             ./wheelhouse/*.whl
+

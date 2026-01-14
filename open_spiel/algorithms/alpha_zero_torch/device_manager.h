@@ -68,7 +68,7 @@ class DeviceManager {
 
   // Gives the device with the fewest outstanding requests.
   DeviceLoan Get(int requests, int device_id = -1) {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     if (device_id < 0) {
       // The starting device changes depending on if we are allowed to
       // use the first device or not.
@@ -94,7 +94,7 @@ class DeviceManager {
 
  private:
   void Return(int device_id, int requests) {
-    absl::MutexLock lock(&m_);
+    absl::MutexLock lock(m_);
     devices[device_id].requests -= requests;
   }
 

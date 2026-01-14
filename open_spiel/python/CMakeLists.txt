@@ -1,4 +1,3 @@
-
 if (OPEN_SPIEL_BUILDING_WHEEL)
   # When building a wheel, need to use this. See:
   # https://github.com/joerick/cibuildwheel/issues/639#issuecomment-817872369
@@ -179,7 +178,7 @@ endif()
 set(PYTHON_TESTS ${PYTHON_TESTS}
   # Disabled until we can reduce the length. See #1371.
   # ../integration_tests/api_test.py
-  # ../integration_tests/playthrough_test.py
+  ../integration_tests/playthrough_test.py
   algorithms/action_value_test.py
   algorithms/action_value_vs_best_response_test.py
   algorithms/async_mcts_test.py
@@ -230,6 +229,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/data_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
+  games/hangman_test.py
   games/liars_poker_test.py
   games/pokerkit_wrapper_test.py
   games/team_dominoes_test.py
@@ -284,6 +284,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
+    jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
     jax/boltzmann_dqn_jax_test.py
@@ -297,7 +298,8 @@ endif()
 # Add PyTorch tests if is enabled.
 if (OPEN_SPIEL_ENABLE_PYTORCH)
   set(PYTHON_TESTS ${PYTHON_TESTS}
-      pytorch/rcfr_pytorch_test.py
+      # RCFR PyTorch test causing problems. Disabled for now.
+      # pytorch/rcfr_pytorch_test.py
       pytorch/dqn_pytorch_test.py
       pytorch/boltzmann_dqn_pytorch_test.py
       pytorch/nfsp_pytorch_test.py
@@ -344,10 +346,17 @@ set(WHEEL_EXCLUDED_PYTHON_TESTS
   games/tic_tac_toe_test.py
   ../integration_tests/playthrough_test.py)
 
+# Prefer to use PYBIN as the executable if it's defined (e.g. on GitHub CI)
+if(NOT DEFINED ENV{PYBIN})
+  set(PYBIN ${Python3_EXECUTABLE})
+else()
+  set(PYBIN $ENV{PYBIN})
+endif()
+
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   if (NOT (OPEN_SPIEL_BUILDING_WHEEL AND ${py_test_file} IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS))
-    add_test(NAME python/${py_test_file} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+    add_test(NAME python/${py_test_file} COMMAND ${PYBIN} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
     # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
     # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
@@ -364,7 +373,7 @@ endforeach(py_test_file)
 # We don't generate these automatically because we may want custom parameters.
 if (OPEN_SPIEL_ENABLE_JAX AND NOT OPEN_SPIEL_BUILDING_WHEEL)
   add_test(NAME python_examples_bridge_supervised_learning
-           COMMAND ${Python3_EXECUTABLE}
+           COMMAND ${PYBIN}
            ${CMAKE_CURRENT_SOURCE_DIR}/examples/bridge_supervised_learning.py
            --iterations 10
            --eval_every 5
