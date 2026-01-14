@@ -12,7 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""MCTS example."""
+"""MCTS example.
+
+This script demonstrates how to run Monte Carlo Tree Search (MCTS) agents in
+OpenSpiel.
+It allows playing a game between two agents, where the agents can be:
+- mcts: A generic Monte Carlo Tree Search agent.
+- random: A uniform random agent.
+- human: A human player (interactive).
+- gtp: An external Go Text Protocol bot.
+
+Example usage:
+  python mcts.py --game=tic_tac_toe --player1=mcts --player2=human
+"""
 
 import collections
 import random
@@ -67,7 +79,16 @@ def _opt_print(*args, **kwargs):
 
 
 def _init_bot(bot_type, game, player_id):
-  """Initializes a bot by type."""
+  """Initializes a bot by type.
+
+  Args:
+    bot_type: The string type of the bot (e.g. "mcts", "random").
+    game: The pyspiel game object.
+    player_id: The integer id of the player.
+
+  Returns:
+    A bot object (e.g. mcts.MCTSBot).
+  """
   rng = np.random.RandomState(FLAGS.seed)
   if bot_type == "mcts":
     evaluator = mcts.RandomRolloutEvaluator(FLAGS.rollout_count, rng)
@@ -92,6 +113,15 @@ def _init_bot(bot_type, game, player_id):
 
 
 def _get_action(state, action_str):
+  """Returns the action integer for a given action string.
+
+  Args:
+    state: The current pyspiel state.
+    action_str: The string representation of the action (e.g. "x(0,0)").
+
+  Returns:
+    The integer action id, or None if not found.
+  """
   for action in state.legal_actions():
     if action_str == state.action_to_string(state.current_player(), action):
       return action

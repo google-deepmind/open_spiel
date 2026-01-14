@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.jax.deep_cfr."""
-
 from absl.testing import absltest
 from absl.testing import parameterized
 
@@ -35,9 +33,11 @@ class DeepCFRTest(parameterized.TestCase):
         num_iterations=2,
         num_traversals=2,
         learning_rate=1e-3,
-        batch_size_advantage=8,
+        batch_size_advantage=None,
         batch_size_strategy=8,
-        memory_capacity=1e7)
+        memory_capacity=int(1e5),
+        seed=42,
+    )
     deep_cfr_solver.solve()
 
   def test_matching_pennies_3p(self):
@@ -53,13 +53,15 @@ class DeepCFRTest(parameterized.TestCase):
         learning_rate=1e-3,
         batch_size_advantage=8,
         batch_size_strategy=8,
-        memory_capacity=1e7)
+        memory_capacity=int(1e5),
+        seed=42,
+    )
     deep_cfr_solver.solve()
     conv = exploitability.nash_conv(
         game,
         policy.tabular_policy_from_callable(
             game, deep_cfr_solver.action_probabilities))
-    print('Deep CFR in Matching Pennies 3p. NashConv: {}'.format(conv))
+    print(f'Deep CFR in Matching Pennies 3p. NashConv: {conv}')
 
 
 if __name__ == '__main__':

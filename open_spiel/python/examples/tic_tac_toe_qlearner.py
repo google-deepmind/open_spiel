@@ -23,6 +23,8 @@ against random opponents is around 99% for player 0 and 92% for player 1.
 
 import logging
 import sys
+from typing import List, Sequence
+
 from absl import app
 from absl import flags
 import numpy as np
@@ -41,7 +43,7 @@ flags.DEFINE_boolean(
 )
 
 
-def pretty_board(time_step):
+def pretty_board(time_step: rl_environment.TimeStep) -> np.ndarray:
   """Returns the board in `time_step` in a human readable format."""
   info_state = time_step.observations["info_state"][0]
   x_locations = np.nonzero(info_state[9:18])[0]
@@ -53,7 +55,7 @@ def pretty_board(time_step):
   return board
 
 
-def command_line_action(time_step):
+def command_line_action(time_step: rl_environment.TimeStep) -> int:
   """Gets a valid action from the user on the command line."""
   current_player = time_step.observations["current_player"]
   legal_actions = time_step.observations["legal_actions"][current_player]
@@ -69,7 +71,12 @@ def command_line_action(time_step):
   return action
 
 
-def eval_against_random_bots(env, trained_agents, random_agents, num_episodes):
+def eval_against_random_bots(
+    env: rl_environment.Environment,
+    trained_agents: List[tabular_qlearner.QLearner],
+    random_agents: List[random_agent.RandomAgent],
+    num_episodes: int,
+) -> np.ndarray:
   """Evaluates `trained_agents` against `random_agents` for `num_episodes`."""
   wins = np.zeros(2)
   for player_pos in range(2):
@@ -88,7 +95,7 @@ def eval_against_random_bots(env, trained_agents, random_agents, num_episodes):
   return wins / num_episodes
 
 
-def main(_):
+def main(_: Sequence[str]) -> None:
   game = "tic_tac_toe"
   num_players = 2
 
