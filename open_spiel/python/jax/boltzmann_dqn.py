@@ -63,7 +63,7 @@ class BoltzmannDQN(dqn.DQN):
     Returns:
       a valid soft-max action and action probabilities.
     """
-    q_values = self._jit_inference(network_state, info_state)
+    q_values = self._jittable_inference(network_state, info_state)
     legal_q_values = jnp.where(
       legal_actions,
       q_values,
