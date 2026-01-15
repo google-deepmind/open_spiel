@@ -79,7 +79,6 @@ from torch import optim
 import torch.nn.functional as F
 
 from open_spiel.python import rl_agent
-from open_spiel.python.pytorch.dqn import SonnetLinear
 from open_spiel.python.pytorch.losses import rl_losses
 
 Transition = collections.namedtuple(
@@ -104,7 +103,7 @@ class MLPTorso(nn.Module):
     self._layers = []
     # Hidden layers
     for size in hidden_sizes:
-      self._layers.append(SonnetLinear(in_size=input_size, out_size=size))
+      self._layers.append(nn.Sequential(nn.Linear(input_size, size), nn.ReLU()))
       input_size = size
 
     self.model = nn.ModuleList(self._layers)
@@ -197,8 +196,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     # activate final as we plug logit and qvalue heads afterwards.
     self._net_torso = MLPTorso(info_state_size, self._layer_sizes)
     torso_out_size = self._layer_sizes[-1]
-    self._policy_logits_layer = SonnetLinear(
-        torso_out_size, self._num_actions, activate_relu=False)
+    self._policy_logits_layer = nn.Linear(torso_out_size, self._num_actions)
     # Do not remove policy_logits_network. Even if it's not used directly here,
     # other code outside this file refers to it.
     self.policy_logits_network = nn.Sequential(self._net_torso,
@@ -215,13 +213,11 @@ class PolicyGradient(rl_agent.AbstractAgent):
       raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
 
     if loss_class.__name__ == "BatchA2CLoss":
-      self._baseline_layer = SonnetLinear(
-          torso_out_size, 1, activate_relu=False)
+      self._baseline_layer = nn.Linear(torso_out_size, 1)
       self._critic_network = nn.Sequential(self._net_torso,
                                            self._baseline_layer)
     else:
-      self._q_values_layer = SonnetLinear(
-          torso_out_size, self._num_actions, activate_relu=False)
+      self._q_values_layer = nn.Linear(torso_out_size, self._num_actions)
       self._critic_network = nn.Sequential(self._net_torso,
                                            self._q_values_layer)
 

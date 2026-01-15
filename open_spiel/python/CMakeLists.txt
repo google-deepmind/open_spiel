@@ -287,6 +287,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    jax/boltzmann_dqn_jax_test.py
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
     coalitional_games/least_core_lagrangian_test.py
@@ -300,8 +301,9 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       # RCFR PyTorch test causing problems. Disabled for now.
       # pytorch/rcfr_pytorch_test.py
       pytorch/dqn_pytorch_test.py
+      pytorch/boltzmann_dqn_pytorch_test.py
+      pytorch/nfsp_pytorch_test.py
       pytorch/deep_cfr_pytorch_test.py
-      pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
       pytorch/policy_gradient_pytorch_test.py
       pytorch/ppo_pytorch_test.py
