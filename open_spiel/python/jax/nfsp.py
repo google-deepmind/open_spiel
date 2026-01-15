@@ -61,62 +61,59 @@ class ReservoirBufferState(NamedTuple):
   is_full: chex.Array
 
   def __len__(self) -> int:
-    return min(self.add_calls, self.capacity)
-  
+    return jnp.where(self.is_full, self.capacity, self.add_calls)
+
+
 class ReservoirBuffer:
   """Allows uniform sampling over a stream of data.
-    See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
-  """   
-  def __init__(self, capacity: chex.Numeric, experience: chex.ArrayTree) -> None:
-    self.capacity = capacity
-    self.experience = experience
-    self.add_calls = jnp.array(0)
 
-  def __len__(self) -> int:
-    return min(self.add_calls.item(), self.capacity.item())
+  See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
+  """
 
   @staticmethod
   @partial(jax.jit, static_argnames=("capacity",))
-  def init(capacity: chex.Numeric, experience: chex.ArrayTree) -> ReservoirBufferState:
+  def init(
+      capacity: chex.Numeric, experience: Transition
+  ) -> ReservoirBufferState:
+    """Initializes the reservoir buffer."""
+
     # Set experience value to be empty.
     experience = jax.tree.map(jnp.empty_like, experience)
     # Broadcast to [add_batch_size, ...]
     experience = jax.tree.map(
-      lambda x: jnp.broadcast_to(
-          x[jnp.newaxis, ...], (capacity, *x.shape)
-      ),
-      experience,
+        lambda x: jnp.broadcast_to(x[jnp.newaxis, ...], (capacity, *x.shape)),
+        experience,
     )
     return ReservoirBufferState(
-      capacity=capacity, 
-      experience=experience, 
-      add_calls=jnp.array(0), 
-      is_full=jnp.array(False, dtype=jnp.bool)
+        capacity=capacity,
+        experience=experience,
+        add_calls=jnp.array(0),
+        is_full=jnp.array(False, dtype=jnp.bool),
     )
-  
-  @staticmethod    
+
+  @staticmethod
   @partial(jax.jit, donate_argnums=(0,))
   def append(
-    state: ReservoirBufferState, 
-    experience: chex.ArrayTree, 
-    rng: chex.PRNGKey
+      state: ReservoirBufferState, experience: Transition, rng: chex.PRNGKey
   ) -> ReservoirBufferState:
     """Potentially adds `experience` to the reservoir buffer.
+
     Args:
       state: `ReservoirBufferState`, current state of the buffer
       experience: data to be added to the reservoir buffer.
       rng: `chex.PRNGKey`, a random seed
+
     Returns:
-      An updated `ReservoirBufferState` 
+      An updated `ReservoirBufferState`
     """
 
     # Note: count + 1 because the current item is the (count+1)-th item
     idx = jax.random.randint(rng, (), 0, state.add_calls + 1)
 
-    # 2. Logic: 
+    # 2. Logic:
     # If buffer is not full, we always add at 'count'.
     # If buffer is full, we replace at 'idx' ONLY IF idx < capacity.
-    is_full = state.is_full | state.add_calls >= state.capacity
+    is_full = state.is_full | (state.add_calls >= state.capacity)
     write_idx = jnp.where(is_full, idx, state.add_calls)
     should_update = write_idx < state.capacity
 
@@ -127,62 +124,34 @@ class ReservoirBuffer:
     new_experience = jax.tree.map(update_leaf, state.experience, experience)
 
     return ReservoirBufferState(
-      capacity=state.capacity, experience=new_experience, add_calls=state.add_calls+1, is_full=is_full)
-  
-  @staticmethod    
-  @partial(jax.jit, static_argnames=("num_samples",))
+        capacity=state.capacity,
+        experience=new_experience,
+        add_calls=state.add_calls + 1,
+        is_full=is_full,
+    )
+
+  @staticmethod
+  @partial(jax.jit, static_argnames="num_samples")
   def sample(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int) -> Transition:
     """Returns `num_samples` uniformly sampled from the buffer.
+
     Args:
       rng: `chex.PRNGKey`, a random state
       state: `ReservoirBufferState`, a buffer state
       num_samples: `int`, number of samples to draw.
+
     Returns:
       An iterable over `num_samples` random elements of the buffer.
+
     Raises:
-      AssertionError: If there are less than `num_samples` elements in the buffer
+      AssertionError: If there are less than `num_samples` elements in the
+      buffer
     """
-
-    # When full, the max time index is max_length_time_axis otherwise it is current index.
     max_size = jnp.where(state.is_full, state.capacity, state.add_calls)
-
     indices = jax.random.randint(
-      rng, shape=(num_samples,), minval=0, maxval=max_size)
-    
+        rng, shape=(num_samples,), minval=0, maxval=max_size
+    )
     return jax.tree.map(lambda x: x[indices], state.experience)
-
-class MLP(nn.Module):
-  def __init__(self,
-    input_size: int,
-    hidden_sizes: Iterable[int],
-    output_size: int,
-    final_activation: Callable = lambda x: x,
-    seed: int = 0
-  ) -> None:
-
-    _layers = []
-    def _create_linear_block(in_features, out_features, act=nn.relu):
-      return nn.Sequential(
-        nn.Linear(in_features, out_features,
-          rngs=nn.Rngs(seed)),
-        act,
-      )
-    # Input and Hidden layers
-    for size in hidden_sizes:
-      _layers.append(_create_linear_block(input_size, size, act=nn.relu))
-      input_size = size
-    # Output layer
-    _layers.append(_create_linear_block(input_size, output_size, act=lambda x: x))
-    if final_activation:
-      _layers.append(final_activation)
-    self.model = nn.Sequential(*_layers)
-
-  def __call__(self, x: chex.Array) -> chex.Array:
-    return self.model(x)
-
-@nn.vmap(in_axes=(None, 0), out_axes=0)
-def forward(model, x: chex.Array) -> chex.Array:
-  return model(x)
 
 class NFSP(rl_agent.AbstractAgent):
   """NFSP Agent implementation in JAX.
@@ -262,7 +231,7 @@ class NFSP(rl_agent.AbstractAgent):
     self._rngkey = jax.random.PRNGKey(seed)
 
     # Average policy network.
-    self._avg_network = MLP(
+    self._avg_network = dqn.MLP(
       state_representation_size, 
       self._layer_sizes, 
       num_actions, 
@@ -277,11 +246,12 @@ class NFSP(rl_agent.AbstractAgent):
       raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
     
     self._avg_network_optimiser = nn.Optimizer(self._avg_network, optimiser, wrt=nn.Param)
-    self._avg_network_graphdef = nn.graphdef((self._avg_network, self._avg_network_optimiser))
-  
-    self._sample_episode_policy(self._next_rng_key())
+    self._avg_network_graphdef_opt = nn.graphdef((self._avg_network, self._avg_network_optimiser))
+    self._avg_network_graphdef = nn.graphdef(self._avg_network)
+
     self._jit_update = self._get_jitted_sl_upate()
     self._avg_network_inference = self._get_jitted_sl_inference()
+    self._sample_episode_policy(self._next_rng_key())
 
     self._checkpointer = None
     if allow_checkpointing:
@@ -305,7 +275,7 @@ class NFSP(rl_agent.AbstractAgent):
       action_probs: chex.Array
     ) -> chex.Numeric:
       
-      avg_actions_logits = forward(avg_network, info_states)
+      avg_actions_logits = dqn.forward(avg_network, info_states)
       avg_actions_logits = jnp.where(
         legal_actions_mask,
         avg_actions_logits,
@@ -313,8 +283,6 @@ class NFSP(rl_agent.AbstractAgent):
       )
       loss_values = self._sl_loss_fn(avg_actions_logits, action_probs)
       return loss_values.mean()
-
-    grad_fn = nn.value_and_grad(_loss_fn)
     
     @jax.jit
     def update(
@@ -322,9 +290,9 @@ class NFSP(rl_agent.AbstractAgent):
       batch: Transition
     ) -> tuple[chex.Numeric, nn.State]:
       
-      avg_network, optimiser = nn.merge(self._avg_network_graphdef, avg_network_state)
+      avg_network, optimiser = nn.merge(self._avg_network_graphdef_opt, avg_network_state, copy=True)
 
-      main_loss, grads = grad_fn(
+      main_loss, grads = nn.value_and_grad(_loss_fn)(
         avg_network,
         batch.info_state, 
         batch.legal_actions_mask,
@@ -339,16 +307,14 @@ class NFSP(rl_agent.AbstractAgent):
   def _get_jitted_sl_inference(self) -> Callable:
     """Get jitted average policy network inference function."""
 
-    graphdef = nn.graphdef(self._avg_network)
-
+    @jax.jit
     def infer(
       avg_network_state: nn.State, 
       info_state: np.ndarray, 
     ) -> tuple[chex.Array, chex.Array]:
-      avg_network = nn.merge(graphdef, avg_network_state)
+      avg_network = nn.merge(self._avg_network_graphdef, avg_network_state)
       action_values = avg_network(info_state)
-      action_probs = nn.softmax(action_values, axis=-1)
-      return action_values, action_probs
+      return action_values
 
     return infer
   
@@ -369,11 +335,11 @@ class NFSP(rl_agent.AbstractAgent):
 
   @partial(jax.jit, static_argnums=(0,))
   def _act(self, network_state: nn.State, rng: chex.PRNGKey, info_state: chex.Array, legal_actions: chex.Array):
-    action_values, action_probs = self._avg_network_inference(
+    action_values = self._avg_network_inference(
       network_state, info_state
     )
     # Remove illegal actions, normalize probs
-    probs = jnp.where(legal_actions, action_probs, dqn.ILLEGAL_ACTION_LOGITS_PENALTY)
+    probs = jnp.where(legal_actions, action_values, dqn.ILLEGAL_ACTION_LOGITS_PENALTY)
     probs = nn.softmax(probs, axis=-1)
     action = jax.random.choice(rng, jnp.arange(len(probs)), p=jnp.asarray(probs))
     return action_values, action, probs
@@ -384,7 +350,7 @@ class NFSP(rl_agent.AbstractAgent):
 
   @property
   def loss(self):
-    return (self._last_sl_loss_value, self._last_rl_loss_value)
+    return (self._last_sl_loss_value, self._rl_agent._last_loss_value)
 
   def step(self, time_step, is_evaluation=False):
     """Returns the action to be taken and updates the Q-networks if needed.
@@ -405,12 +371,12 @@ class NFSP(rl_agent.AbstractAgent):
       # Act step: don't act at terminal info states.
       if not time_step.last():
         info_state = time_step.observations["info_state"][self.player_id]
-        legal_actions = time_step.observations["legal_actions"][self.player_id]
+        legal_actions = jnp.asarray(time_step.observations["legal_actions"][self.player_id], dtype=jnp.int32)
         action_values, action, probs = self._act(
           nn.state(self._avg_network), 
           self._next_rng_key(), 
           jnp.asarray(info_state), 
-          jnp.zeros(self._num_actions, dtype=jnp.bool).at[jnp.asarray(legal_actions, dtype=jnp.int32)].set(True),  
+          jnp.zeros(self._num_actions, dtype=jnp.bool).at[legal_actions].set(True),  
         )
         self._last_action_values = action_values
 

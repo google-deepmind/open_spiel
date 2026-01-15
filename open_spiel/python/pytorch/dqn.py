@@ -196,7 +196,7 @@ class DQN(rl_agent.AbstractAgent):
     replay_buffer_capacity: int=10000,
     learning_rate: float=0.01,
     update_target_network_every: int=1000,
-    weight_update_coeff: float = .005,
+    weight_update_coeff: float = .995,
     learn_every: int=10,
     discount_factor: float=1.0,
     min_buffer_size_to_learn: int=1000,
@@ -474,7 +474,7 @@ class DQN(rl_agent.AbstractAgent):
     target = (
       rewards + torch.logical_not(are_final_steps) * self._discount_factor * max_next_q).detach()
     
-    predictions = self._q_values.gather(dim=1, index=actions.unsqueeze(1)).squeeze()
+    predictions = self._q_values.gather(dim=-1, index=actions.unsqueeze(-1)).squeeze(-1)
 
     loss = self.loss_class(predictions, target)
 
@@ -525,7 +525,7 @@ class DQN(rl_agent.AbstractAgent):
       self._target_q_network.parameters(), self._q_network.parameters()):
 
       target_network_param.data.copy_(
-        (1.0 - tau) * q_network_param.data + tau * target_network_param.data
+        tau * q_network_param.data + (1.0 - tau) * target_network_param.data
       )
 
   def save(self, data_path, save_optimiser: bool=True) -> None:

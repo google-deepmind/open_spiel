@@ -142,10 +142,14 @@ class MLP(nn.Module):
   ) -> None:
 
     _layers = []
-    def _create_linear_block(in_features, out_features, act=nn.relu):
+    def _create_linear_block(in_features, out_features, act=nn.relu, scale=jnp.sqrt(2)):
       return nn.Sequential(
-        nn.Linear(in_features, out_features,
-          rngs=nn.Rngs(seed)),
+        nn.Linear(              
+          in_features,
+          out_features,
+          kernel_init=nn.initializers.glorot_uniform(),
+          rngs=nn.Rngs(seed)
+        ),
         act,
       )
     # Input and Hidden layers
@@ -153,7 +157,7 @@ class MLP(nn.Module):
       _layers.append(_create_linear_block(input_size, size, act=nn.relu))
       input_size = size
     # Output layer
-    _layers.append(_create_linear_block(input_size, output_size, act=lambda x: x))
+    _layers.append(_create_linear_block(input_size, output_size, act=lambda x: x, scale=jnp.array(1)))
     if final_activation:
       _layers.append(final_activation)
     self.model = nn.Sequential(*_layers)
@@ -206,7 +210,7 @@ class DQN(rl_agent.AbstractAgent):
     replay_buffer_capacity: int=10000,
     learning_rate: float=0.01,
     update_target_network_every: int=1000,
-    weight_update_coeff: float = .005,
+    weight_update_coeff: float = .995,
     learn_every: int=10,
     discount_factor: float=1.0,
     min_buffer_size_to_learn: int=1000,
@@ -280,7 +284,11 @@ class DQN(rl_agent.AbstractAgent):
       seed=seed
     )
 
-    nn.update(self._target_q_network, nn.state(self._q_network))
+    # compilation warmup
+    updated_state = self._copy_weights(
+      nn.state(self._q_network, nn.Param), nn.state(self._target_q_network, nn.Param), 1.
+    )
+    nn.update(self._target_q_network, updated_state)
 
     if loss_str == Loss.MSE:
       self.loss_func = jax.vmap(optax.l2_loss)
@@ -322,20 +330,20 @@ class DQN(rl_agent.AbstractAgent):
       )
   
     self._optimizer = nn.Optimizer(self._q_network, optimizer, wrt=nn.Param)
-
-    self._graphdef_q_network = nn.graphdef((self._q_network, self._optimizer))
+    
+    self._graphdef_q_network_opt = nn.graphdef((self._q_network, self._optimizer))
+    self._graphdef_q_network = nn.graphdef(self._q_network)
     self._graphdef_target_q_network = nn.graphdef(self._target_q_network)
 
-    self._jit_update = self._get_jitted_update()
-    self._jit_inference = self._get_jitted_inference()
+    self._jittable_update = self._get_jitted_update()
+    self._jittable_inference = self._get_jitted_inference()
    
   def _get_jitted_inference(self) -> Callable:
     """Get jitted Q-network inference function."""
 
-    graphdef = nn.graphdef(self._q_network)
-    
-    def infer(state: nn.State, info_state: chex.Array) -> tuple[chex.Array, nn.State]:
-      model = nn.merge(graphdef, state)
+    @jax.jit
+    def infer(state: nn.State, info_state: chex.Array) -> chex.Array:
+      model = nn.merge(self._graphdef_q_network, state, copy=True)
       q_values = model(info_state)
       return q_values
     
@@ -365,25 +373,23 @@ class DQN(rl_agent.AbstractAgent):
 
         targets = jax.lax.stop_gradient(
           rewards + jnp.logical_not(are_final_steps) * self._discount_factor * next_q_values)
-        predictions = q_values[jnp.arange(q_values.shape[0]), actions.squeeze()]
+        predictions = q_values[jnp.arange(q_values.shape[0]), actions]
 
         loss_values = self.loss_func(predictions, targets)
 
         return loss_values.mean()
 
-    grad_fn = nn.value_and_grad(_loss_fn)
-
     @jax.jit
     def update(
-      q_network_optimiser_state: nn.State,
+      q_network_opt_state: nn.State,
       target_q_network_state: nn.State, 
       batch: Transition
     ) -> tuple[chex.Numeric, nn.State]:
       
-      q_network, optimiser = nn.merge(self._graphdef_q_network, q_network_optimiser_state)
+      q_network, optimiser = nn.merge(self._graphdef_q_network_opt, q_network_opt_state, copy=True)
       target_q_network = nn.merge(self._graphdef_target_q_network, target_q_network_state)
       
-      main_loss, grads = grad_fn(
+      main_loss, grads = nn.value_and_grad(_loss_fn)(
         q_network,
         target_q_network, 
         batch.info_state, 
@@ -393,6 +399,7 @@ class DQN(rl_agent.AbstractAgent):
         batch.is_final_step,
         batch.legal_actions_mask 
       )
+
       optimiser.update(q_network, grads)
 
       return main_loss, nn.state((q_network, optimiser))
@@ -460,7 +467,7 @@ class DQN(rl_agent.AbstractAgent):
 
     if self._iteration % self._update_target_network_every == 0:
       updated_state = self._copy_weights(
-        nn.state(self._q_network, nn.Param), nn.state(self._target_q_network, nn.Param)
+        nn.state(self._q_network, nn.Param), nn.state(self._target_q_network, nn.Param), self._tau
       )
 
       nn.update(self._target_q_network, updated_state)
@@ -541,7 +548,7 @@ class DQN(rl_agent.AbstractAgent):
       A valid epsilon-greedy action and valid action probabilities.
     """
 
-    q_values = self._jit_inference(network_state, info_state)
+    q_values = self._jittable_inference(network_state, info_state)
     masked_q = jnp.where(legal_actions, q_values, ILLEGAL_ACTION_LOGITS_PENALTY)
     greedy_action = masked_q.argmax()
     
@@ -570,12 +577,12 @@ class DQN(rl_agent.AbstractAgent):
       return None
     
     transitions = self._replay_buffer_class.sample(
-    self._next_rng_key(), self._replay_buffer, self._batch_size)
-
+      self._next_rng_key(), self._replay_buffer, self._batch_size
+    )
     q_network_state = nn.state((self._q_network, self._optimizer))
     target_q_network_state = nn.state(self._target_q_network)
 
-    loss_val, new_state = self._jit_update(q_network_state, target_q_network_state, transitions)
+    loss_val, new_state = self._jittable_update(q_network_state, target_q_network_state, transitions)
     nn.update((self._q_network, self._optimizer), new_state)
     return loss_val
 
@@ -603,19 +610,19 @@ class DQN(rl_agent.AbstractAgent):
   def step_counter(self) -> int:
     return self._iteration
   
-  @partial(jax.jit, static_argnums=(0,))
   def _copy_weights(
     self, 
     q_network_state: nn.State, 
-    target_q_network_state: nn.State
+    target_q_network_state: nn.State, 
+    tau: chex.Array
   ) -> nn.Param:
     """Soft update of the target network's weights
       θ′ ← τ θ + (1 - τ )θ′
     """
-    updated_state = optax.incremental_update(
-      q_network_state,    
-      target_q_network_state,   
-      1 - self._tau        
+    updated_state = jax.jit(optax.incremental_update)(
+      q_network_state,   
+      target_q_network_state,    
+      tau        
     )
     return updated_state
     

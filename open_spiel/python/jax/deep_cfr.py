@@ -664,11 +664,11 @@ class DeepCFRSolver(policy.Policy):
   ) -> Callable:
     """Utility method to avoid boilerplate."""
 
-    @functools.partial(jax.jit)
+    @jax.jit
     def _train_step(graphdef, state, batch) -> tuple:
 
       # merge at the beginning of the function
-      model, optimiser = nn.merge(graphdef, state)
+      model, optimiser = nn.merge(graphdef, state, copy=True)
 
       loss = update_fn(model, optimiser, batch)
 

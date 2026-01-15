@@ -31,8 +31,6 @@ import tree as np_tree
 from open_spiel.python import rl_agent
 from open_spiel.python.pytorch import dqn
 
-ILLEGAL_ACTION_LOGITS_PENALTY = torch.finfo(torch.float).min
-
 def set_seed(seed):
   np.random.seed(seed)
   torch.manual_seed(seed)
@@ -50,54 +48,9 @@ class MODE(Enum):
   best_response=0
   average_policy=1
 
-
 class Optimiser(StrEnum):
   SGD="sgd"
   ADAM="adam"
-class MLP(nn.Module):
-  """A simple network built from nn.linear layers."""
-
-  def __init__(
-      self,
-      input_size: int,
-      hidden_sizes: Iterable[int],
-      output_size: int,
-      final_activation: nn.Module = None,
-      seed: int = 42
-    ) -> None:
-    """Create the MLP.
-    Args:
-      input_size: (int) number of inputs
-      hidden_sizes: (list) sizes (number of units) of each hidden layer
-      output_size: (int) number of outputs
-      final_activation: (nn.Module) an activation for the final later, defaults to None
-      seed: (int) a random seed
-    """
-
-    super().__init__()
-    set_seed(seed)
-
-    _layers = []
-
-    def _create_linear_block(in_features, out_features):
-      return nn.Sequential(
-        nn.Linear(in_features, out_features),
-        nn.ReLU()
-      )
-
-    # Input and Hidden layers
-    for size in hidden_sizes:
-      _layers.append(_create_linear_block(input_size, size))
-      input_size = size
-    # Output layer
-    _layers.append(nn.LayerNorm(input_size))
-    _layers.append(nn.Linear(input_size, output_size))
-    if final_activation:
-      _layers.append(final_activation)
-    self.model = nn.Sequential(*_layers)
-
-  def forward(self, x: torch.Tensor) -> torch.Tensor:
-    return self.model(x)
 
 class ReservoirBuffer:
   """Allows uniform sampling over a stream of data.
@@ -171,11 +124,6 @@ class ReservoirBuffer:
       self.experience
     )
 
-  def shuffle(self) -> None:
-    """Shuffling the reservoir buffer along the batch axis
-    """
-    np_tree.map_structure(lambda x: np.random.shuffle(x[:len(self)]), self.experience)   
-
 class NFSP(rl_agent.AbstractAgent):
   """NFSP Agent implementation in JAX.
 
@@ -202,6 +150,7 @@ class NFSP(rl_agent.AbstractAgent):
     **kwargs
   ) -> None:
     """Initialize the `NFSP` agent."""
+
     self.player_id = player_id
     self._num_actions = num_actions
     self._layer_sizes = hidden_layers_sizes
@@ -242,12 +191,12 @@ class NFSP(rl_agent.AbstractAgent):
     )
 
     # Keep track of the last training loss achieved in an update step.
-    self._last_rl_loss_value = lambda: self._rl_agent.loss
     self._sl_loss_fn = F.cross_entropy
     self._last_sl_loss_value = None
+    self._last_rl_loss_value = self._rl_agent._last_loss_value
 
     # Average policy network.
-    self._avg_network = MLP(
+    self._avg_network = dqn.MLP(
       state_representation_size, 
       self._layer_sizes, 
       num_actions, 
@@ -293,9 +242,9 @@ class NFSP(rl_agent.AbstractAgent):
     ).squeeze(0)
     # Remove illegal actions, normalize probs
     probs = torch.where(
-      legal_actions, 
+      torch.BoolTensor(legal_actions, device=self._device), 
       action_values, 
-      torch.full_like(action_values, ILLEGAL_ACTION_LOGITS_PENALTY)
+      torch.full_like(action_values, dqn.ILLEGAL_ACTION_LOGITS_PENALTY)
     )
     probs = F.softmax(probs, dim=-1).detach().cpu().numpy()
     action = np.random.choice(np.arange(len(probs)), p=probs)
@@ -307,7 +256,7 @@ class NFSP(rl_agent.AbstractAgent):
 
   @property
   def loss(self):
-    return (self._last_sl_loss_value, self._last_rl_loss_value())
+    return (self._last_sl_loss_value, self._rl_agent._last_loss_value)
 
   def step(self, time_step, is_evaluation=False):
     """Returns the action to be taken and updates the Q-networks if needed.
@@ -328,12 +277,12 @@ class NFSP(rl_agent.AbstractAgent):
       # Act step: don't act at terminal info states.
       if not time_step.last():
         info_state = time_step.observations["info_state"][self.player_id]
-        legal_actions = time_step.observations["legal_actions"][self.player_id]
+        legal_actions = np.asarray(time_step.observations["legal_actions"][self.player_id], dtype=np.int32)
+        legal_actions_mask = np.zeros(self._num_actions, dtype=bool)
+        legal_actions_mask[legal_actions] = True
         action_values, action, probs = self._act(
           np.asarray(info_state), 
-          F.one_hot(
-            torch.LongTensor(legal_actions, device=self._device), self._num_actions
-          ).sum(0).to(torch.bool)
+          legal_actions_mask
         )
         self._last_action_values = action_values
 
@@ -373,13 +322,13 @@ class NFSP(rl_agent.AbstractAgent):
       time_step: an instance of rl_environment.TimeStep.
       agent_output: an instance of rl_agent.StepOutput.
     """
-    legal_actions = time_step.observations["legal_actions"][self.player_id]
-    legal_actions_mask = np.zeros(self._num_actions)
-    legal_actions_mask[legal_actions] = 1.0
+    legal_actions = np.asarray(time_step.observations["legal_actions"][self.player_id], dtype=np.int32)
+    legal_actions_mask = np.zeros(self._num_actions, dtype=bool)
+    legal_actions_mask[legal_actions] = True
     transition = Transition(
       info_state=np.asarray(time_step.observations["info_state"][self.player_id], dtype=np.float32),
       action_probs=np.asarray(agent_output.probs, dtype=np.float32),
-      legal_actions_mask=np.asarray(legal_actions_mask, dtype=bool)
+      legal_actions_mask=legal_actions_mask
     )
     
     if self._reservoir_buffer is None:
@@ -414,10 +363,10 @@ class NFSP(rl_agent.AbstractAgent):
     avg_actions_logits = torch.where(
       legal_actions_mask,
       avg_actions_logits,
-      torch.full_like(avg_actions_logits, ILLEGAL_ACTION_LOGITS_PENALTY)
+      torch.full_like(avg_actions_logits, dqn.ILLEGAL_ACTION_LOGITS_PENALTY)
     )
 
-    loss = self._sl_loss_fn(avg_actions_logits, action_probs)
+    loss = self._sl_loss_fn(avg_actions_logits, action_probs).mean()
     self._optimizer.zero_grad()
     loss.backward()
 
