@@ -33,6 +33,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/crazyhouse/crazyhouse_board.h"
 #include "open_spiel/games/crazyhouse/crazyhouse_common.h"
+#include "open_spiel/games/chess/chess.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -643,7 +644,7 @@ CrazyhouseGame::CrazyhouseGame(const GameParameters& params)
     : Game(kGameType, params), chess960_(ParameterValue<bool>("chess960")
 ) {
   if (chess960_) {
-    initial_fens_ = Chess960StartingPositions();
+    initial_fens_ = chess::Chess960StartingPositions();
     SPIEL_CHECK_EQ(initial_fens_.size(), 960);
   }
   insanity_ = ParameterValue<int>("insanity");

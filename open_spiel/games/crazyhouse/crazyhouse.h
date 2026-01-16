@@ -78,9 +78,6 @@ constexpr bool kDefaultStickyPromotions = false;
 constexpr bool kDefaultKingOfHill = false;
 constexpr int kDefaultInsanity = 1;
 
-// Returns a list of all possible starting positions in chess960.
-std::vector<std::string> Chess960StartingPositions();
-
 class CrazyhouseGame;
 
 inline int ColorToPlayer(Color c) {

@@ -58,7 +58,6 @@ set(GAME_SOURCES
   crazyhouse/crazyhouse_board.h
   crazyhouse/crazyhouse_common.cc
   crazyhouse/crazyhouse_common.h
-  crazyhouse/chess960_starting_positions.cc
   cribbage/cribbage.cc
   cribbage/cribbage.h
   cursor_go/cursor_go.cc
