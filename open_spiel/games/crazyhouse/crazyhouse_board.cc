@@ -47,6 +47,9 @@ inline PieceType PromotedType(PieceType type) {
     case PieceType::kBishop: return PieceType::kBishopP;
     case PieceType::kRook: return PieceType::kRookP;
     case PieceType::kQueen: return PieceType::kQueenP;
+    default:
+      SpielFatalError("Invalid piece type for promotion");
+      return PieceType::kKnightP;  // Unreachable, but silences compiler
   }
 }
 
@@ -316,6 +319,9 @@ std::string Move::ToSAN(const CrazyhouseBoard &board) const {
     bool disambiguation_required = false;
 
     board.GenerateLegalMoves([&](const Move &move) -> bool {
+      if (move.IsDropMove()) {
+        return true;
+			}
       if (move.piece.type != piece.type) {
         return true;  // Continue generating moves.
       }
@@ -856,8 +862,8 @@ void CrazyhouseBoard::GenerateDropDestinations_(
   for (PieceType ptype : Pocket::PieceTypes()) {
     if (pocket.Count(ptype) == 0) continue;
 
-    for (int y = 0; y < board_size_; ++y) {
-      for (int x = 0; x < board_size_; ++x) {
+    for (int8_t y = 0; y < board_size_; ++y) {
+      for (int8_t x = 0; x < board_size_; ++x) {
         Square sq{x, y};
 
         // Only drop on empty squares
@@ -870,7 +876,7 @@ void CrazyhouseBoard::GenerateDropDestinations_(
         // Build the Move
         Move m;
         m.from = Square{static_cast<int8_t>(board_size_),  // sentinel X
-                        pocket.Index(ptype)};      // piece index in Y
+              static_cast<int8_t>(pocket.Index(ptype))};  // piece index in Y
         m.to = sq;
 
         // Output the move
@@ -1218,7 +1224,8 @@ absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string &move,
 
     // Construct drop move
     Move drop;
-    drop.from = Square{board_size_,
+    drop.from = Square{
+      static_cast<int8_t>(board_size_),
       static_cast<int>(Pocket::Index(ptype))};
     drop.to = *to;
     drop.piece = Piece{to_play_, ptype};
