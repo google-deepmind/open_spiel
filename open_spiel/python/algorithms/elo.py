@@ -44,8 +44,8 @@ def compute_ratings_from_matrices(
   options.smoothing_factor = smoothing_factor
   options.max_iterations = max_iterations
   options.convergence_delta = convergence_delta
-  return pyspiel.elo.compute_ratings_from_matrices(
+  return np.array(pyspiel.elo.compute_ratings_from_matrices(
       win_matrix=win_matrix.tolist(),
       draw_matrix=(draw_matrix.tolist() if draw_matrix is not None else []),
       options=options,
-  )
+  ))
