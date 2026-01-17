@@ -37,49 +37,27 @@ Martin Zinkevich, Michael Johanson, Michael Bowling, and Carmelo Piccione.
     At Advances in Neural Information Processing Systems 20 (NeurIPS). 2007.
 """
 
+from typing import Callable
 import numpy as np
 import torch
 from torch import nn
 import torch.nn.functional as F
 
+from open_spiel.python.pytorch.deep_cfr import ReservoirBuffer
 
-def tensor_to_matrix(tensor):
-  """Converts `tensor` to a matrix (a rank-2 tensor) or raises an exception.
-
-  Args:
-    tensor: The tensor to convert.
-
-  Returns:
-    A PyTorch matrix (rank-2 `torch.Tensor`).
-
-  Raises:
-    ValueError: If `tensor` cannot be trivially converted to a matrix, i.e.
-      `tensor` has a rank > 2.
-  """
-  tensor = torch.Tensor(tensor)
-  rank = tensor.ndim
-  # rank = len(list(tensor.shape))
-  if rank > 2:
-    raise ValueError(
-        ("Tensor {} cannot be converted into a matrix as it is rank "
-         "{} > 2.").format(tensor, rank))
-  elif rank < 2:
-    num_columns = 1 if rank == 0 else tensor.shape[0]
-    tensor = torch.reshape(tensor, [1, num_columns])
-  return tensor
-
-
-def with_one_hot_action_features(state_features, legal_actions,
-                                 num_distinct_actions):
+def sequence_features(
+    state_features: list[str | int], 
+    legal_actions: list[int],
+    num_distinct_actions: int,
+  ):
   """Constructs features for each sequence by extending state features.
 
   Sequences features are constructed by concatenating one-hot features
   indicating each action to the information state features and stacking them.
 
   Args:
-    state_features: The features for the information state alone. Must be a
-      `torch.Tensor` with a rank less than or equal to (if batched) 2.
-    legal_actions: The list of legal actions in this state. Determines the
+    state_features: The features of the information state.
+    legal_actions: The list of legal actions available in the state. Determines the
       number of rows in the returned feature matrix.
     num_distinct_actions: The number of globally distinct actions in the game.
       Determines the length of the action feature vector concatenated onto the
@@ -92,46 +70,15 @@ def with_one_hot_action_features(state_features, legal_actions,
   Raises:
     ValueError: If `state_features` has a rank > 2.
   """
-  state_features = tensor_to_matrix(state_features)
-  with_action_features = []
-  for action in legal_actions:
-    action_features = F.one_hot(
-        torch.tensor([action]), num_classes=num_distinct_actions)
-    all_features = torch.cat([state_features, action_features], axis=1)
-    with_action_features.append(all_features)
-  return torch.cat(with_action_features, axis=0)
+  state_features = torch.as_tensor(state_features)
+  state_features = state_features[None].repeat(len(legal_actions), 1)
+  action_features = F.one_hot(
+    torch.LongTensor(legal_actions), num_distinct_actions
+  )
+  return torch.concatenate([state_features, action_features], dim=-1)
 
 
-def sequence_features(state, num_distinct_actions):
-  """The sequence features at `state`.
-
-  Features are constructed by concatenating `state`'s normalized feature
-  vector with one-hot vectors indicating each action (see
-  `with_one_hot_action_features`).
-
-  Args:
-    state: An OpenSpiel `State`.
-    num_distinct_actions: The number of globally distinct actions in `state`'s
-      game.
-
-  Returns:
-    A `torch.Tensor` feature matrix with one row for each sequence.
-  """
-  return with_one_hot_action_features(state.information_state_tensor(),
-                                      state.legal_actions(),
-                                      num_distinct_actions)
-
-
-def num_features(game):
-  """Returns the number of features returned by `sequence_features`.
-
-  Args:
-    game: An OpenSpiel `Game`.
-  """
-  return game.information_state_tensor_size() + game.num_distinct_actions()
-
-
-class RootStateWrapper(object):
+class RootStateWrapper:
   """Analyzes the subgame at a given root state.
 
   It enumerates features for each player sequence, creates a mapping between
@@ -156,45 +103,52 @@ class RootStateWrapper(object):
       each player.
   """
 
-  def __init__(self, state):
+  def __init__(self, state, game):
     self.root = state
-    self._num_distinct_actions = len(state.legal_actions_mask(0))
+    self._num_distinct_actions = game.num_distinct_actions()
+    self.num_features = game.information_state_tensor_size() + game.num_distinct_actions()
 
     self.sequence_features = [[] for _ in range(state.num_players())]
-    self.num_player_sequences = [0] * state.num_players()
+    self.num_player_sequences = np.zeros(state.num_players(), dtype=np.int32)
     self.info_state_to_sequence_idx = {}
     self.terminal_values = {}
-    self._walk_descendants(state)
+
+    def _traverse_tree(state) -> None:
+      """Records information about `state` and its descendants."""
+      if state.is_terminal():
+        self.terminal_values[state.history_str()] = np.array(state.returns())
+        return
+
+      elif state.is_chance_node():
+        for action, _ in state.chance_outcomes():
+          _traverse_tree(state.child(action))
+        return
+
+      player = state.current_player()
+      info_state = state.information_state_string(player)
+      actions = state.legal_actions()
+
+      if info_state not in self.info_state_to_sequence_idx:
+        self.info_state_to_sequence_idx[info_state] = self.num_player_sequences[player]
+        self.sequence_features[player].append(
+            sequence_features(
+              state.information_state_tensor(), 
+              state.legal_actions(), 
+              self._num_distinct_actions
+            )
+          )
+        self.num_player_sequences[player] += len(actions)
+
+      for action in actions:
+        _traverse_tree(state.child(action))
+    
+    _traverse_tree(state)
     self.sequence_features = [
         torch.cat(rows, axis=0) for rows in self.sequence_features
     ]
 
-  def _walk_descendants(self, state):
-    """Records information about `state` and its descendants."""
-    if state.is_terminal():
-      self.terminal_values[state.history_str()] = np.array(state.returns())
-      return
 
-    elif state.is_chance_node():
-      for action, _ in state.chance_outcomes():
-        self._walk_descendants(state.child(action))
-      return
-
-    player = state.current_player()
-    info_state = state.information_state_string(player)
-    actions = state.legal_actions()
-
-    if info_state not in self.info_state_to_sequence_idx:
-      n = self.num_player_sequences[player]
-      self.info_state_to_sequence_idx[info_state] = n
-      self.sequence_features[player].append(
-          sequence_features(state, self._num_distinct_actions))
-      self.num_player_sequences[player] += len(actions)
-
-    for action in actions:
-      self._walk_descendants(state.child(action))
-
-  def sequence_weights_to_policy(self, sequence_weights, state):
+  def sequence_weights_to_policy(self, sequence_weights: list[np.ndarray], state):
     """Returns a behavioral policy at `state` from sequence weights.
 
     Args:
@@ -227,6 +181,7 @@ class RootStateWrapper(object):
                sequence_offset=sequence_offset,
                policy_len=len(weights),
                num_actions=len(actions)))
+    
     return normalized_by_sum(weights)
 
   def sequence_weights_to_policy_fn(self, player_sequence_weights):
@@ -281,7 +236,7 @@ class RootStateWrapper(object):
     regrets = np.zeros(self.num_player_sequences[regret_player])
     reach_weights = np.zeros(self.num_player_sequences[reach_weight_player])
 
-    def _walk_descendants(state, reach_probabilities, chance_reach_probability):
+    def _traverse_and_compute_regret(state, reach_probabilities, chance_reach_probability):
       """Compute `state`'s counterfactual regrets and reach weights.
 
       Args:
@@ -310,7 +265,7 @@ class RootStateWrapper(object):
       elif state.is_chance_node():
         v = 0.0
         for action, action_prob in state.chance_outcomes():
-          v += _walk_descendants(
+          v += _traverse_and_compute_regret(
               state.child(action), reach_probabilities,
               chance_reach_probability * action_prob)
         return v
@@ -343,7 +298,7 @@ class RootStateWrapper(object):
 
       reach_prob = reach_probabilities[player]
       for action_idx, action in enumerate(actions):
-        action_prob = policy[action_idx].squeeze()
+        action_prob = policy[action_idx]
         next_reach_prob = reach_prob * action_prob
 
         if is_reach_weight_player_node:
@@ -355,7 +310,7 @@ class RootStateWrapper(object):
 
         reach_probabilities[player] = next_reach_prob
 
-        action_value = _walk_descendants(
+        action_value = _traverse_and_compute_regret(
             state.child(action), reach_probabilities, chance_reach_probability)
 
         if is_regret_player_node:
@@ -371,51 +326,28 @@ class RootStateWrapper(object):
             action_values - state_value)
       return state_value
 
-    # End of _walk_descendants
-
-    _walk_descendants(self.root, np.ones(num_players), 1.0)
+    _traverse_and_compute_regret(self.root, np.ones(num_players), 1.0)
     return regrets, reach_weights
 
 
-def normalized_by_sum(v, axis=0, mutate=False):
+def normalized_by_sum(v: list, axis: int=0) -> np.ndarray:
   """Divides each element of `v` along `axis` by the sum of `v` along `axis`.
-
-  Assumes `v` is non-negative. Sets of `v` elements along `axis` that sum to
-  zero are normalized to `1 / v.shape[axis]` (a uniform distribution).
-
-  Args:
-    v: Non-negative array of values.
-    axis: An integer axis.
-    mutate: Whether or not to store the result in `v`.
-
-  Returns:
-    The normalized array.
   """
   v = np.asarray(v)
-  denominator = v.sum(axis=axis, keepdims=True)
-  denominator_is_zero = denominator == 0
+  s = v.sum(axis=axis, keepdims=True)
+  return np.where(s == 0, 1.0 / v.shape[axis], v / np.where(s == 0, 1.0, s))
 
-  # Every element of `denominator_is_zero` that is true corresponds to a
-  # set of elements in `v` along `axis` that are all zero. By setting these
-  # denominators to `v.shape[axis]` and adding 1 to each of the corresponding
-  # elements in `v`, these elements are normalized to `1 / v.shape[axis]`
-  # (a uniform distribution).
-  denominator += v.shape[axis] * denominator_is_zero
-  if mutate:
-    v += denominator_is_zero
-    v /= denominator
-  else:
-    v = (v + denominator_is_zero) / denominator
-  return v
-
-
-def relu(v):
+def relu(v: np.ndarray) -> np.ndarray:
   """Returns the element-wise maximum between `v` and 0."""
   return np.maximum(v, 0)
 
-
-def _descendant_states(state, depth_limit, depth, include_terminals,
-                       include_chance_states):
+def _descendant_states(
+    state, 
+    depth_limit: int, 
+    depth: int, 
+    include_terminals: bool,
+    include_chance_states: bool
+  ):
   """Recursive descendant state generator.
 
   Decision states are always yielded.
@@ -451,10 +383,12 @@ def _descendant_states(state, depth_limit, depth, include_terminals,
       yield substate
 
 
-def all_states(initial_state,
-               depth_limit=-1,
-               include_terminals=False,
-               include_chance_states=False):
+def all_states(
+    initial_state,
+    depth_limit: int = -1,
+    include_terminals: bool = False,
+    include_chance_states: bool = False
+  ):
   """Generates states from `initial_state`.
 
   Generates the set of states that includes only the `initial_state` and its
@@ -480,10 +414,11 @@ def all_states(initial_state,
       depth_limit=depth_limit,
       depth=0,
       include_terminals=include_terminals,
-      include_chance_states=include_chance_states)
+      include_chance_states=include_chance_states
+    )
 
 
-def sequence_weights_to_tabular_profile(root, policy_fn):
+def sequence_weights_to_tabular_profile(root, policy_fn) -> dict:
   """Returns the `dict` of `list`s of action-prob pairs-form of `policy_fn`."""
   tabular_policy = {}
   players = list(range(root.num_players()))
@@ -499,58 +434,31 @@ def sequence_weights_to_tabular_profile(root, policy_fn):
       tabular_policy[info_state] = list(zip(legal_actions, my_policy))
   return tabular_policy
 
+class ResidualMLPBlock(nn.Module):
+  def __init__(
+    self,
+    input_size: int,
+    output_size: int,
+    num_hidden_factors: int = 0,
+    hidden_activation: nn.Module = nn.ReLU(),
+  ):
+    super().__init__()
+    self._activation = hidden_activation
+    self._gate_layer = (
+        nn.Linear(num_hidden_factors, output_size)
+      ) if num_hidden_factors > 0 else None
+    self._layer = nn.Sequential(
+      nn.Linear(input_size, output_size if self._gate_layer is None else num_hidden_factors),
+      hidden_activation if self._gate_layer else nn.Identity()
+    )
 
-def feedforward_evaluate(layers,
-                         x,
-                         use_skip_connections=False,
-                         hidden_are_factored=False,
-                         hidden_activation=nn.ReLU):
-  """Evaluates `layers` as a feedforward neural network on `x`.
-
-  Args:
-    layers: The neural network layers (`torch.Tensor` -> `torch.Tensor`
-      callables).
-    x: The array-like input to evaluate. Must be trivially convertible to a
-      matrix (tensor rank <= 2).
-    use_skip_connections: Whether or not to use skip connections between layers.
-      If the layer input has too few features to be added to the layer output,
-      then the end of input is padded with zeros. If it has too many features,
-      then the input is truncated.
-    hidden_are_factored: Whether or not hidden logical layers are factored into
-      two separate linear transformations stored as adjacent elements of
-      `layers`.
-    hidden_activation: the activation function following the hidden layers.
-
-  Returns:
-    The `torch.Tensor` evaluation result.
-
-  Raises:
-    ValueError: If `x` has a rank greater than 2.
-  """
-  x = tensor_to_matrix(x)
-  i = 0
-  while i < len(layers) - 1:
-    if isinstance(layers[i], hidden_activation):
-      x = layers[i](x)
-      i += 1
-      continue
-    y = layers[i](x)
-    i += 1
-    if hidden_are_factored:
-      y = layers[i](y)
-      i += 1
-    if use_skip_connections:
-      my_num_features = x.shape[1]
-      padding = y.shape[1] - my_num_features
-      if padding > 0:
-        zeros = torch.zeros([x.shape[0], padding])
-        x = torch.cat([x, zeros], axis=1)
-      elif padding < 0:
-        x = x[0:x.shape[0], 0:y.shape[1]]
-      y = x + y
-    x = y
-  return layers[-1](x)
-
+  def forward(self, x: torch.Tensor) -> torch.Tensor:
+    residual = x.clone()
+    x = self._layer(x)
+    if self._gate_layer:
+      x = self._gate_layer(x)
+    x += residual
+    return self._activation(x)
 
 class DeepRcfrModel(nn.Module):
   """A flexible deep feedforward RCFR model class.
@@ -559,14 +467,15 @@ class DeepRcfrModel(nn.Module):
     layers: The `torch.keras.Layer` layers describing this  model.
   """
 
-  def __init__(self,
-               game,
-               num_hidden_units,
-               num_hidden_layers=1,
-               num_hidden_factors=0,
-               hidden_activation=nn.ReLU,
-               use_skip_connections=False,
-               regularizer=None):
+  def __init__(
+      self,
+      game,
+      num_hidden_units: int,
+      num_hidden_layers: int = 1,
+      num_hidden_factors: int = 0,
+      hidden_activation: nn.Module = nn.ReLU(),
+      use_skip_connections: bool = False,
+    ):
     """Creates a new `DeepRcfrModel.
 
     Args:
@@ -575,54 +484,33 @@ class DeepRcfrModel(nn.Module):
       num_hidden_layers: The number of hidden layers. Defaults to 1.
       num_hidden_factors: The number of hidden factors or the matrix rank of the
         layer. If greater than zero, hidden layers will be split into two
-        separate linear transformations, the first with
-        `num_hidden_factors`-columns and the second with
-        `num_hidden_units`-columns. The result is that the logical hidden layer
-        is a rank-`num_hidden_units` matrix instead of a rank-`num_hidden_units`
-        matrix. When `num_hidden_units < num_hidden_units`, this is effectively
-        implements weight sharing. Defaults to 0.
+        separate linear transformations. Defaults to 0
       hidden_activation: The activation function to apply over hidden layers.
         Defaults to `torch.nn.ReLU`.
       use_skip_connections: Whether or not to apply skip connections (layer
         output = layer(x) + x) on hidden layers. Zero padding or truncation is
         used to match the number of columns on layer inputs and outputs.
-      regularizer: A regularizer to apply to each layer. Defaults to `None`.
     """
-    super(DeepRcfrModel, self).__init__()
-    self._use_skip_connections = use_skip_connections
-    self._hidden_are_factored = num_hidden_factors > 0
-    self._hidden_activation = hidden_activation
-    input_size = num_features(game)
+    super().__init__()
 
-    self.layers = []
-    for _ in range(num_hidden_layers):
-      if self._hidden_are_factored:
-        self.layers.append(nn.Linear(input_size, num_hidden_factors, bias=True))
+    input_size = game.information_state_tensor_size() + game.num_distinct_actions()
+    layers = [nn.Sequential(nn.Linear(input_size, num_hidden_units), hidden_activation)]
 
-      self.layers.append(
-          nn.Linear(
-              num_hidden_factors if self._hidden_are_factored else input_size,
-              num_hidden_units,
-              bias=True))
-      if hidden_activation:
-        self.layers.append(hidden_activation())
+    layers.extend([(
+        ResidualMLPBlock(
+          num_hidden_units, num_hidden_units, num_hidden_factors, hidden_activation)
+        if use_skip_connections else
+        nn.Sequential(nn.Linear(num_hidden_units, num_hidden_units), hidden_activation)
+      ) for _ in range(num_hidden_layers)
+    ])
+  
+    layers.append(nn.Linear(num_hidden_units, 1, bias=True))
 
-    self.layers.append(nn.Linear(num_hidden_units, 1, bias=True))
+    self.layers = nn.Sequential(*layers)
 
-    self.layers = nn.ModuleList(self.layers)
-    # Construct variables for all layers by exercising the network.
-    x = torch.zeros([1, num_features(game)])
-    for layer in self.layers:
-      x = layer(x)
-
-  def __call__(self, x):
+  def __call__(self, x: torch.Tensor) -> torch.Tensor:
     """Evaluates this model on `x`."""
-    return feedforward_evaluate(
-        layers=self.layers,
-        x=x,
-        use_skip_connections=self._use_skip_connections,
-        hidden_are_factored=self._hidden_are_factored,
-        hidden_activation=self._hidden_activation)
+    return self.layers(x).squeeze(-1)
 
 
 class _RcfrSolver(object):
@@ -631,7 +519,7 @@ class _RcfrSolver(object):
   Requires that subclasses implement `evaluate_and_update_policy`.
   """
 
-  def __init__(self, game, models, truncate_negative=False):
+  def __init__(self, game, models: list[DeepRcfrModel], truncate_negative: bool=False) -> None:
     """Creates a new `_RcfrSolver`.
 
     Args:
@@ -644,7 +532,7 @@ class _RcfrSolver(object):
     self._game = game
     self._models = models
     self._truncate_negative = truncate_negative
-    self._root_wrapper = RootStateWrapper(game.new_initial_state())
+    self._root_wrapper = RootStateWrapper(game.new_initial_state(), game)
 
     self._cumulative_seq_probs = [
         np.zeros(n) for n in self._root_wrapper.num_player_sequences
@@ -665,12 +553,10 @@ class _RcfrSolver(object):
           for player in range(self._game.num_players())
       ]
     else:
-      tensor = F.relu(
-          torch.squeeze(self._models[player](
-              self._root_wrapper.sequence_features[player])))
-      return tensor.detach().numpy()
+      tensor = F.relu(self._models[player](self._root_wrapper.sequence_features[player][None]))
+      return tensor.detach().numpy().squeeze(0)
 
-  def evaluate_and_update_policy(self, train_fn):
+  def evaluate_and_update_policy(self, train_fn: Callable):
     """Performs a single step of policy evaluation and policy improvement.
 
     Args:
@@ -683,7 +569,7 @@ class _RcfrSolver(object):
     """
     raise NotImplementedError()
 
-  def current_policy(self):
+  def current_policy(self) -> dict:
     """Returns the current policy profile.
 
     Returns:
@@ -693,7 +579,7 @@ class _RcfrSolver(object):
     return self._root_wrapper.sequence_weights_to_tabular_profile(
         self._sequence_weights())
 
-  def average_policy(self):
+  def average_policy(self) -> dict:
     """Returns the average of all policies iterated.
 
     This average policy converges toward a Nash policy as the number of
@@ -710,11 +596,11 @@ class _RcfrSolver(object):
     return self._root_wrapper.sequence_weights_to_tabular_profile(
         self._cumulative_seq_probs)
 
-  def _previous_player(self, player):
+  def _previous_player(self, player: int) -> int:
     """The previous player in the turn ordering."""
     return player - 1 if player > 0 else self._game.num_players() - 1
 
-  def _average_policy_update_player(self, regret_player):
+  def _average_policy_update_player(self, regret_player: int) -> int:
     """The player for whom the average policy should be updated."""
     return self._previous_player(regret_player)
 
@@ -729,7 +615,7 @@ class RcfrSolver(_RcfrSolver):
   restrict the user to regression tree models.
   """
 
-  def __init__(self, game, models, bootstrap=None, truncate_negative=False):
+  def __init__(self, game, models: list[DeepRcfrModel], bootstrap=None, truncate_negative=False):
     self._bootstrap = bootstrap
     super(RcfrSolver, self).__init__(
         game, models, truncate_negative=truncate_negative)
@@ -756,7 +642,7 @@ class RcfrSolver(_RcfrSolver):
               regret_player, seq_prob_player, *sequence_weights))
 
       if self._bootstrap:
-        self._regret_targets[regret_player][:] = sequence_weights[regret_player]
+        self._regret_targets[regret_player] = sequence_weights[regret_player]
       if self._truncate_negative:
         regrets = np.maximum(-relu(self._regret_targets[regret_player]),
                              regrets)
@@ -764,8 +650,7 @@ class RcfrSolver(_RcfrSolver):
       self._regret_targets[regret_player] += regrets
       self._cumulative_seq_probs[seq_prob_player] += seq_probs
 
-      targets = torch.unsqueeze(
-          torch.Tensor(self._regret_targets[regret_player]), axis=1)
+      targets = torch.FloatTensor(self._regret_targets[regret_player])
       data = torch.utils.data.TensorDataset(player_seq_features[regret_player],
                                             targets)
 
@@ -773,58 +658,17 @@ class RcfrSolver(_RcfrSolver):
       train_fn(regret_player_model, data)
       sequence_weights[regret_player] = self._sequence_weights(regret_player)
 
-
-class ReservoirBuffer(object):
-  """A generic reservoir buffer data structure.
-
-  After every insertion, its contents represents a `size`-size uniform
-  random sample from the stream of candidates that have been encountered.
-  """
-
-  def __init__(self, size):
-    self.size = size
-    self.num_elements = 0
-    self._buffer = np.full([size], None, dtype=object)
-    self._num_candidates = 0
-
-  @property
-  def buffer(self):
-    return self._buffer[:self.num_elements]
-
-  def insert(self, candidate):
-    """Consider this `candidate` for inclusion in this sampling buffer."""
-    self._num_candidates += 1
-    if self.num_elements < self.size:
-      self._buffer[self.num_elements] = candidate
-      self.num_elements += 1
-      return
-    idx = np.random.choice(self._num_candidates)
-    if idx < self.size:
-      self._buffer[idx] = candidate
-
-  def insert_all(self, candidates):
-    """Consider all `candidates` for inclusion in this sampling buffer."""
-    for candidate in candidates:
-      self.insert(candidate)
-
-  def num_available_spaces(self):
-    """The number of freely available spaces in this buffer."""
-    return self.size - self.num_elements
-
-
 class ReservoirRcfrSolver(_RcfrSolver):
   """RCFR with a reservoir buffer for storing regret data.
 
   The average strategy is updated and stored in a full game-size table.
   """
 
-  def __init__(self, game, models, buffer_size, truncate_negative=False):
+  def __init__(self, game, models: list[DeepRcfrModel], buffer_size: int, truncate_negative: bool=False):
     self._buffer_size = buffer_size
     super(ReservoirRcfrSolver, self).__init__(
         game, models, truncate_negative=truncate_negative)
-    self._reservoirs = [
-        ReservoirBuffer(self._buffer_size) for _ in range(game.num_players())
-    ]
+    self._reservoirs = [None for _ in range(game.num_players())]
 
   def evaluate_and_update_policy(self, train_fn):
     """Performs a single step of policy evaluation and policy improvement.
@@ -847,17 +691,22 @@ class ReservoirRcfrSolver(_RcfrSolver):
         regrets = np.maximum(-relu(sequence_weights[regret_player]), regrets)
 
       next_data = list(
-          zip(player_seq_features[regret_player],
-              torch.unsqueeze(torch.Tensor(regrets), axis=1)))
+          zip(player_seq_features[regret_player].numpy(), np.array(regrets)))
 
-      self._reservoirs[regret_player].insert_all(next_data)
+      for data in next_data:
+        if self._reservoirs[regret_player] is None:
+          self._reservoirs[regret_player] = ReservoirBuffer.init(self._buffer_size, data)
+        self._reservoirs[regret_player].append(data)
 
       self._cumulative_seq_probs[seq_prob_player] += seq_probs
 
-      my_buffer = list(
-          torch.stack(a) for a in zip(*self._reservoirs[regret_player].buffer))
+      
+      X, y = [], []
+      for _x, _y in zip(*self._reservoirs[regret_player].experience):
+        X.append(torch.from_numpy(_x))
+        y.append(torch.tensor(_y))
 
-      data = torch.utils.data.TensorDataset(*my_buffer)
+      data = torch.utils.data.TensorDataset(torch.stack(X), torch.stack(y))
 
       regret_player_model = self._models[regret_player]
       train_fn(regret_player_model, data)
