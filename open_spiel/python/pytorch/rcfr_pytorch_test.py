@@ -54,41 +54,27 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
 
   def test_with_one_hot_action_features_single_state_vector(self):
     information_state_features = [1., 2., 3.]
-    features = rcfr.with_one_hot_action_features(
+    features = rcfr.sequence_features(
         information_state_features,
         legal_actions=[0, 1],
         num_distinct_actions=3)
     np.testing.assert_array_equal([1., 2., 3., 1., 0., 0.], features[0])
     np.testing.assert_array_equal([1., 2., 3., 0., 1., 0.], features[1])
 
-    features = rcfr.with_one_hot_action_features(
+    features = rcfr.sequence_features(
         information_state_features,
         legal_actions=[1, 2],
         num_distinct_actions=3)
     np.testing.assert_array_equal([1., 2., 3., 0., 1., 0.], features[0])
     np.testing.assert_array_equal([1., 2., 3., 0., 0., 1.], features[1])
 
-  def test_sequence_features(self):
-    state = _GAME.new_initial_state()
-    while state.is_chance_node():
-      state.apply_action(state.legal_actions()[0])
-    assert len(state.legal_actions()) == 2
-    features = rcfr.sequence_features(state, 3)
-
-    x = state.information_state_tensor()
-    np.testing.assert_array_equal(x + [1., 0., 0.], features[0])
-    np.testing.assert_array_equal(x + [0., 1., 0.], features[1])
-
-  def test_num_features(self):
-    assert rcfr.num_features(_GAME) == 13
-
   def test_root_state_wrapper_num_sequences(self):
-    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
     assert root_state_wrapper.num_player_sequences[0] == 12
     assert root_state_wrapper.num_player_sequences[1] == 12
 
   def test_root_state_wrapper_sequence_indices(self):
-    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
     self.assertEqual(
         {
             # Info state string -> initial sequence index map for player 1.
@@ -109,7 +95,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
         root_state_wrapper.info_state_to_sequence_idx)
 
   def test_root_state_wrapper_sequence_features(self):
-    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
 
     p1_info_state_features = [
         [1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0.],
@@ -162,7 +148,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
                                   root_state_wrapper.sequence_features[1])
 
   def test_root_state_wrapper_sequence_terminal_values(self):
-    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
 
     expected_terminal_values = {}
     no_call_histories_p1_win = [
@@ -203,7 +189,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
         rcfr.normalized_by_sum([1., 2., 3., 4.]), [0.1, 0.2, 0.3, 0.4])
 
   def test_counterfactual_regrets_and_reach_weights_value_error(self):
-    root = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
 
     # Initialize arbitrary weights to generate an arbitrary profile.
     sequence_weights1_with_a_missing_sequence = [
@@ -242,7 +228,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
           0, 1, sequence_weights1_with_a_missing_sequence, sequence_weights2)
 
   def test_counterfactual_regrets_and_reach_weights(self):
-    root = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
 
     # Initialize arbitrary weights to generate an arbitrary profile.
     sequence_weights1 = [
@@ -345,7 +331,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
     self.assertLen(list(states), 58)
 
   def test_sequence_weights_to_tabular_profile(self):
-    root = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
 
     def policy_fn(state):
       """Generates a policy profile by treating sequence indices as weights."""
@@ -385,7 +371,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
     self.assertAlmostEqual(profile, expected_profile, delta=1e-06)
 
   def test_cfr(self):
-    root = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
     num_half_iterations = 6
 
     cumulative_regrets = [np.zeros(n) for n in root.num_player_sequences]
@@ -414,7 +400,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
 
   def test_rcfr_functions(self):
     models = [_new_model() for _ in range(_GAME.num_players())]
-    root = rcfr.RootStateWrapper(_GAME.new_initial_state())
+    root = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
 
     num_half_iterations = 4
     num_epochs = 100
@@ -446,8 +432,7 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
 
       data = torch.utils.data.TensorDataset(
           root.sequence_features[regret_player],
-          torch.unsqueeze(
-              torch.Tensor(cumulative_regrets[regret_player]), axis=1))
+              torch.Tensor(cumulative_regrets[regret_player]))
       data = torch.utils.data.DataLoader(
           data, batch_size=_BATCH_SIZE, shuffle=True)
 
@@ -500,37 +485,6 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
     average_policy = patient.average_policy()
     self.assertLess(pyspiel.nash_conv(_GAME, average_policy), 0.91)
 
-  def test_reservior_buffer_insert(self):
-    buffer_size = 10
-    patient = rcfr.ReservoirBuffer(buffer_size)
-
-    x_buffer = []
-    for i in range(buffer_size):
-      patient.insert(i)
-      x_buffer.append(i)
-      assert patient.num_elements == len(x_buffer)
-      np.testing.assert_array_equal(x_buffer, patient.buffer)
-
-    assert patient.num_available_spaces() == 0
-
-    for i in range(buffer_size):
-      patient.insert(buffer_size + i)
-      assert patient.num_elements == buffer_size
-
-  def test_reservior_buffer_insert_all(self):
-    buffer_size = 10
-    patient = rcfr.ReservoirBuffer(buffer_size)
-
-    x_buffer = list(range(buffer_size))
-    patient.insert_all(x_buffer)
-    assert patient.num_elements == buffer_size
-    np.testing.assert_array_equal(x_buffer, patient.buffer)
-
-    assert patient.num_available_spaces() == 0
-
-    x_buffer = list(range(buffer_size, 2 * buffer_size))
-    patient.insert_all(x_buffer)
-    assert patient.num_elements == buffer_size
 
   def test_rcfr_with_buffer(self):
     buffer_size = 12

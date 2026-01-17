@@ -20,6 +20,7 @@ import jaxlib
 import haiku
 import chex
 import optax
+import flax
 print(jax.__version__)
 EOT
 
