@@ -1,16 +1,8 @@
 # OpenSpiel Installation on Windows
 
-OpenSpiel has limited support on Windows and is not being regularly tested,
-which means support could break at any time. This may change in the future, but
-for now please be aware that Windows support is experimental. Please report any
-bugs or problems you encounter.
-
-OpenSpiel has limited support on Windows and is not being regularly tested,
-which means support could break at any time. This may change in the future
-(contributions are welcome), with Github Actions supporting
-[windows workers](https://docs.github.com/en/actions/using-github-hosted-runners/customizing-github-hosted-runners#installing-software-on-windows-runners!),
-but for now please be aware that Windows support is experimental. Please report
-any bugs or problems you encounter.
+OpenSpiel now has official support for Windows with pre-built binary wheels
+available on PyPI. Windows wheels are built and tested automatically via GitHub
+Actions CI for Python 3.11, 3.12, and 3.13.
 
 ## Option 1: Quick Installation using pip (Recommended)
 

@@ -1,11 +1,10 @@
 # Builds and tests the OpenSpiel wheels using cibuildwheel.
 #
-# Each wheel is built via the manylinux2014 pypa Docker image on Linux and
-# standard MacOS X on 10.15. Each binary wheel is built only for x86_64. Basic
-# API tests are run within the Docker environment that built the wheel. Full
-# tests (tests that use extra dependencies such as PyTorch, JAX, Tensorflow)
-# are tested in the Github Actions CI environment (Ubuntu 20.04 and Mac OS
-# 10.15).
+# Each wheel is built via the manylinux2014 pypa Docker image on Linux,
+# standard MacOS X, and Windows using MSVC. Each binary wheel is built for
+# x86_64 (and arm64 where supported). Basic API tests are run within the build
+# environment. Full tests (tests that use extra dependencies such as PyTorch,
+# JAX, Tensorflow) are tested in the Github Actions CI environment.
 name: wheels
 
 on:
@@ -146,3 +145,77 @@ jobs:
             dist/*.tar.gz
             ./wheelhouse/*.whl
 
+  # Windows wheel builds - separate job due to different build process (no cibuildwheel)
+  build_windows_wheels:
+    name: Build wheels on Windows Python ${{ matrix.python-version }}
+    runs-on: windows-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13', '3.14']
+
+    env:
+      OPEN_SPIEL_BUILDING_WHEEL: ON
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install CMake
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+          refreshenv
+        shell: pwsh
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build wheel setuptools
+        shell: pwsh
+
+      - name: Clone dependencies
+        run: |
+          git clone --single-branch --depth 1 https://github.com/pybind/pybind11.git pybind11
+          git clone -b 20250814.1 --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+          git clone -b master https://github.com/nlohmann/json.git open_spiel/json
+          cd open_spiel/json && git checkout 9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03 && cd ../..
+          git clone -b master https://github.com/pybind/pybind11_json.git open_spiel/pybind11_json
+          cd open_spiel/pybind11_json && git checkout d0bf434be9d287d73a963ff28745542daf02c08f && cd ../..
+          git clone -b master https://github.com/pybind/pybind11_abseil.git open_spiel/pybind11_abseil
+          cd open_spiel/pybind11_abseil && git checkout 73992b5 && cd ../..
+          git clone -b develop --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel/games/bridge/double_dummy_solver
+        shell: pwsh
+
+      - name: Build wheel
+        run: |
+          python -m build --wheel --outdir dist/
+          if (!(Test-Path dist/*.whl)) { Write-Error "No wheel file generated"; exit 1 }
+          Get-ChildItem dist/*.whl
+        shell: pwsh
+
+      - name: Test wheel installation
+        run: |
+          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
+          python -m pip install $wheel.FullName
+          python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
+        shell: pwsh
+
+      - name: Run basic tests
+        run: |
+          python -c "import pyspiel; print('Registered games:', len(pyspiel.registered_names()))"
+          python -c "import pyspiel; g = pyspiel.load_game('kuhn_poker'); print('Kuhn poker loaded successfully')"
+          python -c "import pyspiel; g = pyspiel.load_game('leduc_poker'); print('Leduc poker loaded successfully')"
+        shell: pwsh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: wheels-windows-py${{ matrix.python-version }}
+          path: dist/*.whl
