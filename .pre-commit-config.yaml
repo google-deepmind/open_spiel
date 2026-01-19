@@ -1,0 +1,87 @@
+# Taken from
+# https://github.com/google/flax/blob/main/.pre-commit-config.yaml
+
+# Install the pre-commit hooks below with
+# 'pre-commit install'
+
+# Auto-update the version of the hooks with
+# 'pre-commit autoupdate'
+
+# Run the hooks on all files with
+# 'pre-commit run --all'
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+    - id: check-added-large-files
+    - id: check-case-conflict
+    - id: check-merge-conflict
+    - id: check-symlinks
+    - id: check-yaml
+    - id: debug-statements
+    - id: end-of-file-fixer
+    - id: mixed-line-ending
+    - id: requirements-txt-fixer
+    - id: trailing-whitespace
+      exclude: ^docs.*\.md$
+  # Clang-format the C++ part of the code base automatically
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: "v21.1.8"
+    hooks:
+      - id: clang-format
+        types_or: [ c++, c, cuda ]
+
+  # CMake format the CMakeLists.txt files
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        additional_dependencies:
+          - pyyaml
+  # strips data from the jupyter notebooks
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.6.1
+    hooks:
+      - id: nbstripout
+        args: [
+          --keep-output,
+          --keep-count,
+          --extra-keys,
+          "cell.metadata.executionInfo cell.metadata.id metadata.kernelspec metadata.vscode metadata.colab cell.metadata.executionInfo.user cell.metadata.executionInfo.user_tz cell.metadata.colab",
+        ]
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   # Ruff version.
+  #   rev: v0.1.3
+  #   hooks:
+  #     # Run the Ruff linter.
+  #     - id: ruff
+  #       args: [--fix, --exit-non-zero-on-fix]
+  #    # Disable Ruff formatter for now
+  #    # # Run the Ruff formatter.
+  #    # - id: ruff-format
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.16.0
+    hooks:
+      - id: pyupgrade
+        args: [--py310-plus]
+
+  # Li  nt python code with PyLint
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [ python ]
+        args:
+          [
+            "-rn", # Only display messages
+            "-sn", # Don't display the score
+            "--rcfile=.pylintrc",
+          ]
+  # Sort includes
+  - repo: https://github.com/PyCQA/isort
+    rev: "7.0.0"
+    hooks:
+      - id: isort
