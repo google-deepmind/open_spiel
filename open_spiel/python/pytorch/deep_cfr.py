@@ -88,21 +88,21 @@ class MLP(nn.Module):
     super().__init__()
     set_seed(seed)
 
-    _layers = []
+    layers_ = []
 
     def _create_linear_block(in_features, out_features):
       return nn.Sequential(nn.Linear(in_features, out_features), nn.ReLU())
 
     # Input and Hidden layers
     for size in hidden_sizes:
-      _layers.append(_create_linear_block(input_size, size))
+      layers_.append(_create_linear_block(input_size, size))
       input_size = size
     # Output layer
-    _layers.append(nn.LayerNorm(input_size))
-    _layers.append(nn.Linear(input_size, output_size))
+    layers_.append(nn.LayerNorm(input_size))
+    layers_.append(nn.Linear(input_size, output_size))
     if final_activation:
-      _layers.append(final_activation)
-    self.model = nn.Sequential(*_layers)
+      layers_.append(final_activation)
+    self.model = nn.Sequential(*layers_)
 
   def forward(self, x: torch.Tensor) -> torch.Tensor:
     return self.model(x)
@@ -139,10 +139,10 @@ class ReservoirBuffer:
       cls, capacity: int, experience: AdvantageMemory | StrategyMemory
   ) -> "ReservoirBuffer":
     # Initialize buffer by replicating the structure of the experience
-    _experience = np_tree.map_structure(
+    experience_ = np_tree.map_structure(
         lambda x: np.empty((capacity, *x.shape), dtype=x.dtype), experience
     )
-    return cls(np.array(capacity), _experience)
+    return cls(np.array(capacity), experience_)
 
   def append_to_reservoir(
       self,
@@ -192,9 +192,7 @@ class ReservoirBuffer:
     max_size = len(self)
     if max_size < num_samples:
       raise ValueError(
-          "{} elements could not be sampled from size {}".format(
-              num_samples, max_size
-          )
+          f"{num_samples} elements could not be sampled from size {max_size}"
       )
 
     indices = np.random.choice(max_size, size=(num_samples,), replace=False)

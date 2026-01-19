@@ -12,16 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
+"""Tests for open_spiel.python.pytorch.boltzmann_dqn."""
 
-import jax
+from absl.testing import absltest
 
 from open_spiel.python import rl_agent_policy
 from open_spiel.python import rl_environment
 from open_spiel.python.pytorch import boltzmann_dqn
 import pyspiel
-
-jax.config.update("jax_threefry_partitionable", False)
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.

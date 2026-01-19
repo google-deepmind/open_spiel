@@ -42,10 +42,10 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+import pyspiel
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
-import pyspiel
 
 # pylint: disable=g-importing-member
 from open_spiel.python.utils.lru_cache import LRUCache
@@ -184,7 +184,7 @@ class MLP(nn.Module):
       seed: int = 0,
   ) -> None:
 
-    _layers = []
+    layers_ = []
 
     def _create_linear_block(in_features, out_features, act=nn.relu):
       return nn.Sequential(
@@ -199,16 +199,16 @@ class MLP(nn.Module):
 
     # Input and Hidden layers
     for size in hidden_sizes:
-      _layers.append(_create_linear_block(input_size, size, act=nn.relu))
+      layers_.append(_create_linear_block(input_size, size, act=nn.relu))
       input_size = size
     # Output layer
-    _layers.append(nn.LayerNorm(input_size, rngs=nn.Rngs(seed)))
-    _layers.append(
+    layers_.append(nn.LayerNorm(input_size, rngs=nn.Rngs(seed)))
+    layers_.append(
         _create_linear_block(input_size, output_size, act=lambda x: x)
     )
     if final_activation:
-      _layers.append(final_activation)
-    self.model = nn.Sequential(*_layers)
+      layers_.append(final_activation)
+    self.model = nn.Sequential(*layers_)
 
   def __call__(self, x: chex.Array) -> chex.Array:
     outputs = self.model(x)
@@ -712,8 +712,8 @@ class DeepCFRSolver(policy.Policy):
     rng = self._next_rng_key()
 
     for _ in range(self._advantage_network_train_steps):
-      rng, _rng = jax.random.split(rng)
-      batch = ReservoirBuffer.sample(_rng, buffer_state, batch_size)
+      rng, rng_ = jax.random.split(rng)
+      batch = ReservoirBuffer.sample(rng_, buffer_state, batch_size)
       state, main_loss = self._jittable_adv_update(
           self._advantage_graphdefs[player], state, batch
       )
@@ -753,8 +753,8 @@ class DeepCFRSolver(policy.Policy):
 
     rng = self._next_rng_key()
     for _ in range(self._advantage_network_train_steps):
-      rng, _rng = jax.random.split(rng)
-      batch = ReservoirBuffer.sample(_rng, buffer_state, batch_size)
+      rng, rng_ = jax.random.split(rng)
+      batch = ReservoirBuffer.sample(rng_, buffer_state, batch_size)
       state, main_loss = self._jittable_policy_update(
           self._policy_graphdef, state, batch
       )

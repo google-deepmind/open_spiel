@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
+"""Tests for open_spiel.python.jax.boltzmann_dqn."""
 
-import jax
+from absl.testing import absltest
 
 from open_spiel.python import rl_agent_policy
 from open_spiel.python import rl_environment
 from open_spiel.python.jax import boltzmann_dqn
 import pyspiel
 
-jax.config.update("jax_threefry_partitionable", False)
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.
@@ -73,7 +72,7 @@ class DQNTest(absltest.TestCase):
     # This will use the soft-max actions.
     policy = rl_agent_policy.RLAgentPolicy(game, agent, 0, False)
     probs = policy.action_probabilities(game.new_initial_state())
-    self.assertAlmostEqual(probs[0], 0.50, places=2)
+    self.assertAlmostEqual(probs[0], 0.48, places=2)
 
 
 if __name__ == "__main__":

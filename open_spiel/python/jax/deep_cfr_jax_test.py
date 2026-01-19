@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
-from absl.testing import parameterized
+"""Tests for open_spiel.python.jax.deep_cfr."""
+
+import pyspiel
+from absl.testing import absltest, parameterized
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.jax import deep_cfr
-import pyspiel
 
 
 class DeepCFRTest(parameterized.TestCase):

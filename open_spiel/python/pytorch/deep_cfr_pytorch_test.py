@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl import app
-from absl import logging
-from absl.testing import absltest
-from absl.testing import parameterized
+"""Tests for open_spiel.python.jax.deep_cfr."""
+
+
+import pyspiel
 import torch
+from absl import app, logging
+from absl.testing import absltest, parameterized
 
 from open_spiel.python import policy
-import pyspiel
 from open_spiel.python.pytorch import deep_cfr
 
 SEED = 24984617

@@ -17,11 +17,12 @@ This algorithm is a variation of DQN that uses a softmax policy directly with
 the unregularized action-value function. See https://arxiv.org/abs/2102.01585.
 """
 
+from functools import partial
+
+import chex
+import flax.nnx as nn
 import jax
 import jax.numpy as jnp
-import flax.nnx as nn
-from functools import partial
-import chex
 
 from open_spiel.python.jax import dqn
 
@@ -39,24 +40,27 @@ class BoltzmannDQN(dqn.DQN):
       **kwargs: kwargs passed to the underlying DQN agent.
     """
     super().__init__(*args, **kwargs)
-    self._prev_q_network_state = nn.clone(nn.state(self._q_network), variables=True)
+    self._prev_q_network_state = nn.clone(
+      nn.state(self._q_network), variables=True
+    )
     self._temperature = eta
 
   @partial(jax.jit, static_argnums=(0,))
   def _boltzmann_action_probs(
-      self, 
-      network_state: nn.State, 
-      info_state: chex.Array, 
-      legal_actions: chex.Array,
-      rng: chex.PRNGKey, 
-      coeff: chex.Array
-    ):
+    self,
+    network_state: nn.State,
+    info_state: chex.Array,
+    legal_actions: chex.Array,
+    rng: chex.PRNGKey,
+    coeff: chex.Array,
+  ):
     """Returns a valid soft-max action and action probabilities.
 
     Args:
-      params: NNX state of the Q-network.
+      network_state: nn.State of the Q-network.
       info_state: Observations from the environment.
       legal_actions: List of legal actions.
+      rng: chex.PRNGKey for randomness
       coeff: If not None, then the terms in softmax function will be
         element-wise multiplied with these coefficients.
 
@@ -67,7 +71,7 @@ class BoltzmannDQN(dqn.DQN):
     legal_q_values = jnp.where(
       legal_actions,
       q_values,
-      jnp.full_like(q_values, dqn.ILLEGAL_ACTION_LOGITS_PENALTY)
+      jnp.full_like(q_values, dqn.ILLEGAL_ACTION_LOGITS_PENALTY),
     )
     # Apply temperature and subtract the maximum value for numerical stability.
     temp = legal_q_values / self._temperature
@@ -78,37 +82,36 @@ class BoltzmannDQN(dqn.DQN):
   def _act_epsilon_greedy(
     self,
     network_state: nn.State,
-    info_state: chex.Array, 
-    legal_actions: chex.Array, 
+    info_state: chex.Array,
+    legal_actions: chex.Array,
     rng: chex.PRNGKey,
-    epsilon: float
-    ):
+    epsilon: float,
+  ):
     """Returns a selected action and the probabilities of legal actions."""
 
-    if epsilon == 0.0: #greeddy evaluation
+    if epsilon == 0.0:  # greeddy evaluation
       # Soft-max normalized by the action probabilities from the previous
       # Q-network.
       prev_rng, rng = jax.random.split(rng)
       _, prev_probs = self._boltzmann_action_probs(
         self._prev_q_network_state,
-        info_state, 
+        info_state,
         legal_actions,
         prev_rng,
-        jnp.ones(self._num_actions)
+        jnp.ones(self._num_actions),
       )
       return self._boltzmann_action_probs(
-        network_state, 
-        info_state,
-        legal_actions, 
-        rng,
-        prev_probs
+        network_state, info_state, legal_actions, rng, prev_probs
       )
 
     # During training, we use the DQN action selection, which will be
     # epsilon-greedy.
     return super()._act_epsilon_greedy(
-        network_state, info_state, legal_actions, rng, epsilon)
+      network_state, info_state, legal_actions, rng, epsilon
+    )
 
   def update_prev_q_network(self):
     """Updates the parameters of the previous Q-network."""
-    self._prev_q_network_state = nn.clone(nn.state(self._q_network), variables=True)
+    self._prev_q_network_state = nn.clone(
+      nn.state(self._q_network), variables=True
+    )

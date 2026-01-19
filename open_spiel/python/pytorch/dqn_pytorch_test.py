@@ -15,12 +15,13 @@
 """Tests for open_spiel.python.algorithms.dqn."""
 
 import random
-from absl.testing import absltest
+
 import numpy as np
+import pyspiel
 import torch
+from absl.testing import absltest
 
 from open_spiel.python import rl_environment
-import pyspiel
 from open_spiel.python.pytorch import dqn
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going

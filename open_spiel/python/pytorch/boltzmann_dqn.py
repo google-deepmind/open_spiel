@@ -17,11 +17,13 @@ This algorithm is a variation of DQN that uses a softmax policy directly with
 the unregularized action-value function. See https://arxiv.org/abs/2102.01585.
 """
 
+from copy import deepcopy
+
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from copy import deepcopy
+
 from open_spiel.python.pytorch import dqn
 
 
@@ -41,46 +43,60 @@ class BoltzmannDQN(dqn.DQN):
     self._prev_q_network = deepcopy(self._q_network)
     self._temperature = eta
 
-  def _boltzmann_action_probs(self, network: nn.Module, info_state, legal_actions, coeff=None):
-    """Returns a valid soft-max action and action probabilities.
+  def _boltzmann_action_probs(
+    self,
+    network: nn.Module,
+    info_state: list,
+    legal_actions: list,
+    coeff: np.ndarray = None,
+  ):
+    """Returns a valid softmax action and action probabilities.
 
     Args:
-      params: Parameters of the Q-network.
-      info_state: Observations from the environment.
-      legal_actions: List of legal actions.
-      coeff: If not None, then the terms in softmax function will be
-        element-wise multiplied with these coefficients.
+      network (nn.Module): Parameters of the Q-network.
+      info_state (list): Observations from the environment.
+      legal_actions (list): List of legal actions.
+      coeff (np.ndarray): If not None, then the terms in softmax
+        function will be element-wise multiplied with these coefficients.
 
     Returns:
-      a valid soft-max action and action probabilities.
+      A valid softmax action and action probabilities.
     """
-    info_state = torch.FloatTensor(np.asarray(info_state).reshape(1, -1), device=self._device)
+    info_state = torch.FloatTensor(
+      np.asarray(info_state).reshape(1, -1), device=self._device
+    )
     q_values = network(info_state).detach().squeeze(0)
 
-    illegal_actions_mask = torch.logical_not(torch.BoolTensor(legal_actions, device=self._device))
-    legal_q_values = q_values.masked_fill(illegal_actions_mask, dqn.ILLEGAL_ACTION_LOGITS_PENALTY)
+    illegal_actions_mask = torch.logical_not(
+      torch.BoolTensor(legal_actions, device=self._device)
+    )
+    legal_q_values = q_values.masked_fill(
+      illegal_actions_mask, dqn.ILLEGAL_ACTION_LOGITS_PENALTY
+    )
     # Apply temperature and subtract the maximum value for numerical stability.
     temp = legal_q_values / self._temperature
     probs = F.softmax(coeff * temp, -1).detach().cpu().numpy()
     action = np.random.choice(np.arange(self._num_actions), p=probs)
     return action, probs
 
-  def _act_epsilon_greedy(self, info_state, legal_actions, epsilon):
+  def _act_epsilon_greedy(
+    self, info_state: list, legal_actions: list, epsilon: float
+  ) -> tuple:
     """Returns a selected action and the probabilities of legal actions."""
-    if epsilon == 0: # greedy evaluation mode
+    if epsilon == 0:  # greedy evaluation mode
       # Soft-max normalized by the action probabilities from the previous
       # Q-network.
       _, prev_probs = self._boltzmann_action_probs(
         self._prev_q_network,
-        info_state, 
+        info_state,
         legal_actions,
-        torch.ones(self._num_actions, device=self._device)
+        torch.ones(self._num_actions, device=self._device),
       )
       return self._boltzmann_action_probs(
         self._q_network,
         info_state,
-        legal_actions, 
-        torch.as_tensor(prev_probs, device=self._device)
+        legal_actions,
+        torch.as_tensor(prev_probs, device=self._device),
       )
 
     # During training, we use the DQN action selection, which will be
