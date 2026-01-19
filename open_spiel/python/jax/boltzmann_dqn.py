@@ -54,7 +54,7 @@ class BoltzmannDQN(dqn.DQN):
     """Returns a valid soft-max action and action probabilities.
 
     Args:
-      params: State of the Q-network.
+      params: NNX state of the Q-network.
       info_state: Observations from the environment.
       legal_actions: List of legal actions.
       coeff: If not None, then the terms in softmax function will be

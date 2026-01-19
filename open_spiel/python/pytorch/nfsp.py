@@ -18,8 +18,8 @@ See the paper https://arxiv.org/abs/1603.01121 for more details.
 """
 
 from typing import NamedTuple, Iterable
-from enum import Enum, StrEnum
-from pathlib import Path
+import enum
+import pathlib
 import contextlib
 
 import torch.nn as nn
@@ -44,11 +44,11 @@ class Transition(NamedTuple):
   action_probs: np.ndarray 
   legal_actions_mask: np.ndarray
 
-class MODE(Enum):
-  best_response=0
-  average_policy=1
+class MODE(enum.Enum):
+  BEST_RESPONSE=0
+  AVERAGE_POLICY=1
 
-class Optimiser(StrEnum):
+class Optimiser(enum.StrEnum):
   SGD="sgd"
   ADAM="adam"
 
@@ -67,11 +67,11 @@ class ReservoirBuffer:
   @classmethod
   def init(cls, capacity: int, experience: Transition) -> "ReservoirBuffer":
     # Initialize buffer by replicating the structure of the experience
-    _experience = np_tree.map_structure(
+    experience_ = np_tree.map_structure(
       lambda x: np.empty((capacity, *x.shape), dtype=x.dtype),
       experience
     )
-    return cls(np.array(capacity), _experience)
+    return cls(np.array(capacity), experience_)
 
   def append(self, experience: Transition) -> None:
     """Potentially adds `experience` to the reservoir buffer.
@@ -79,7 +79,7 @@ class ReservoirBuffer:
       experience: data to be added to the reservoir buffer.
       
     Returns:
-      None as the method updated the buffer in-place
+      None as the method updates the buffer in-place.
     """
     # Determine the insertion index
     # Note: count + 1 because the current item is the (count+1)-th item
@@ -111,11 +111,11 @@ class ReservoirBuffer:
     Returns:
       An iterable over `num_samples` random elements of the buffer.
     Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
+      ValueError: If there are less than `num_samples` elements in the buffer.
     """
     max_size = len(self)
     if max_size < num_samples:
-      raise ValueError("{} elements could not be sampled from size {}".format(num_samples, max_size))
+      raise ValueError(f"{num_samples} elements could not be sampled from size {max_size}")
 
     indices = np.random.choice(max_size, size=(num_samples,), replace=False)
 
@@ -232,9 +232,9 @@ class NFSP(rl_agent.AbstractAgent):
   
   def _sample_episode_policy(self) -> None:
     if np.random.uniform() < self._anticipatory_param:
-      self._mode = MODE.best_response
+      self._mode = MODE.BEST_RESPONSE
     else:
-      self._mode = MODE.average_policy
+      self._mode = MODE.AVERAGE_POLICY
 
   def _act(self, info_state: np.ndarray, legal_actions: np.ndarray):
     action_values = self._avg_network(
@@ -256,7 +256,7 @@ class NFSP(rl_agent.AbstractAgent):
 
   @property
   def loss(self):
-    return (self._last_sl_loss_value, self._rl_agent._last_loss_value)
+    return (self._last_sl_loss_value, self._rl_agent.loss)
 
   def step(self, time_step, is_evaluation=False):
     """Returns the action to be taken and updates the Q-networks if needed.
@@ -268,12 +268,12 @@ class NFSP(rl_agent.AbstractAgent):
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-    if self._mode == MODE.best_response:
+    if self._mode == MODE.BEST_RESPONSE:
       agent_output = self._rl_agent.step(time_step, is_evaluation)
       if not is_evaluation and not time_step.last():
-        self._add_transition(time_step, agent_output)
+        self.add_transition(time_step, agent_output)
 
-    elif self._mode == MODE.average_policy:
+    elif self._mode == MODE.AVERAGE_POLICY:
       # Act step: don't act at terminal info states.
       if not time_step.last():
         info_state = time_step.observations["info_state"][self.player_id]
@@ -289,9 +289,9 @@ class NFSP(rl_agent.AbstractAgent):
         agent_output = rl_agent.StepOutput(action=action, probs=probs)
 
       if self._prev_timestep and not is_evaluation:
-        self._rl_agent._add_transition(self._prev_timestep, self._prev_action, time_step)
+        self._rl_agent.add_transition(self._prev_timestep, self._prev_action, time_step)
     else:
-      raise ValueError("Invalid mode ({})".format(self._mode))
+      raise ValueError(f"Invalid mode ({self._mode})")
 
     if not is_evaluation:
       self._iteration += 1
@@ -299,7 +299,7 @@ class NFSP(rl_agent.AbstractAgent):
       if self._iteration % self._learn_every == 0 and self._reservoir_buffer:
         self._last_sl_loss_value = self._learn()
         # If learn step not triggered by rl policy, learn.
-        if self._mode == MODE.average_policy:
+        if self._mode == MODE.AVERAGE_POLICY:
           self._rl_agent.learn()
 
       # Prepare for the next episode.
@@ -313,7 +313,7 @@ class NFSP(rl_agent.AbstractAgent):
         self._prev_action = agent_output.action
     return agent_output
 
-  def _add_transition(self, time_step, agent_output: rl_agent.StepOutput) -> None:
+  def add_transition(self, time_step, agent_output: rl_agent.StepOutput) -> None:
     """Adds the new transition using `time_step` to the reservoir buffer.
 
     Transitions are in the form (time_step, agent_output.probs, legal_mask).
@@ -354,9 +354,9 @@ class NFSP(rl_agent.AbstractAgent):
 
     transitions = self._reservoir_buffer.sample(self._batch_size)
 
-    info_states = torch.FloatTensor(transitions.info_state, device=self._device)
-    action_probs = torch.FloatTensor(transitions.action_probs, device=self._device).detach()
-    legal_actions_mask = torch.BoolTensor(transitions.legal_actions_mask, device=self._device)
+    info_states = torch.tensor(transitions.info_state, device=self._device, dtype=torch.float32)
+    action_probs = torch.tensor(transitions.action_probs, device=self._device, dtype=torch.float32).detach()
+    legal_actions_mask = torch.tensor(transitions.legal_actions_mask, device=self._device, dtype=torch.bool)
 
     avg_actions_logits = self._avg_network(info_states)
 
@@ -378,7 +378,7 @@ class NFSP(rl_agent.AbstractAgent):
 
     return loss.item()
 
-  def save(self, checkpoint_dir: Path, save_optimiser: bool = True) -> None:
+  def save(self, checkpoint_dir: pathlib.Path, save_optimiser: bool = True) -> None:
     """Saves the average policy network and the inner RL agent's q-network.
 
     Args:
@@ -397,7 +397,7 @@ class NFSP(rl_agent.AbstractAgent):
     torch.save(checkpoint, checkpoint_dir)
 
 
-  def restore(self, checkpoint_dir: Path, load_optimiser: bool = True) -> None:
+  def restore(self, checkpoint_dir: pathlib.Path, load_optimiser: bool = True) -> None:
     """Restores the average policy network and the inner RL agent's q-network.
 
     Args:
@@ -415,5 +415,5 @@ class NFSP(rl_agent.AbstractAgent):
 
     self._iteration = checkpoint["iteration"]
     self._last_sl_loss_value = checkpoint["last_loss_value"]
-    self._last_rl_loss_value = self._rl_agent._last_loss_value
+    self._last_rl_loss_value = self._rl_agent.loss
 

@@ -14,8 +14,8 @@
 """DQN agent implemented in JAX."""
 
 from typing import Iterable, NamedTuple, Callable, Any
-from functools import partial
-from enum import StrEnum
+import functools
+import enum
 
 import flax.nnx as nn
 import jax.numpy as jnp
@@ -24,7 +24,7 @@ import jax
 import optax
 import chex
 
-import etils.epath as epath
+import etils.epath
 import orbax.checkpoint as ocp
 
 from open_spiel.python import rl_agent
@@ -32,7 +32,7 @@ from open_spiel.python import rl_agent
 ILLEGAL_ACTION_LOGITS_PENALTY = jnp.finfo(jnp.float32).min
 
 class Transition(NamedTuple):
-  """Data structure for the Replay buffer"""
+  """Data structure for the Replay buffer."""
   info_state: chex.Array
   action: chex.Array
   reward: chex.Array
@@ -52,15 +52,13 @@ class ReplayBufferState(NamedTuple):
 
 class ReplayBuffer:
   """ReplayBuffer of fixed size with a FIFO replacement policy.
-
-  Stored transitions can be sampled uniformly.
-
-  The underlying datastructure is a ring buffer, allowing 0(1) adding and
-  sampling.
+    Stored transitions can be sampled uniformly.
+    The underlying datastructure is a ring buffer, allowing 0(1) adding and
+    sampling.
   """
 
   @staticmethod
-  @partial(jax.jit, static_argnames=("capacity",))
+  @functools.partial(jax.jit, static_argnames=("capacity",))
   def init(capacity: chex.Numeric, experience: chex.ArrayTree) -> ReplayBufferState:
     # Set experience value to be empty.
 
@@ -76,7 +74,7 @@ class ReplayBuffer:
       capacity=capacity, experience=experience, entry_index=jnp.array(0), is_full=jnp.array(False, dtype=jnp.bool))
   
   @staticmethod    
-  @partial(jax.jit, donate_argnums=(0,))
+  @functools.partial(jax.jit, donate_argnums=(0,))
   def append(
     state: ReplayBufferState, 
     experience: chex.ArrayTree, 
@@ -86,7 +84,7 @@ class ReplayBuffer:
       state: `ReplayBufferState`, current state of the buffer
       experience: data to be added to the reservoir buffer.
     Returns:
-      An updated `ReplayBufferState` 
+      An updated `ReplayBufferState`.
     """
 
     chex.assert_trees_all_equal_dtypes(experience, state.experience)
@@ -110,7 +108,7 @@ class ReplayBuffer:
     )
   
   @staticmethod    
-  @partial(jax.jit, static_argnames=("num_samples",))
+  @functools.partial(jax.jit, static_argnames=("num_samples",))
   def sample(rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int) -> Transition:
     """Returns `num_samples` uniformly sampled from the buffer.
     Args:
@@ -120,7 +118,7 @@ class ReplayBuffer:
     Returns:
       An iterable over `num_samples` random elements of the buffer.
     Raises:
-      AssertionError: If there are less than `num_samples` elements in the buffer
+      AssertionError: If there are less than `num_samples` elements in the buffer.
     """
 
     # When full, the max time index is max_length_time_axis otherwise it is current index.
@@ -141,8 +139,8 @@ class MLP(nn.Module):
     seed: int = 0
   ) -> None:
 
-    _layers = []
-    def _create_linear_block(in_features, out_features, act=nn.relu, scale=jnp.sqrt(2)):
+    layers_ = []
+    def _create_linear_block(in_features, out_features, act=nn.relu):
       return nn.Sequential(
         nn.Linear(              
           in_features,
@@ -154,13 +152,13 @@ class MLP(nn.Module):
       )
     # Input and Hidden layers
     for size in hidden_sizes:
-      _layers.append(_create_linear_block(input_size, size, act=nn.relu))
+      layers_.append(_create_linear_block(input_size, size, act=nn.relu))
       input_size = size
     # Output layer
-    _layers.append(_create_linear_block(input_size, output_size, act=lambda x: x, scale=jnp.array(1)))
+    layers_.append(_create_linear_block(input_size, output_size, act=lambda x: x))
     if final_activation:
-      _layers.append(final_activation)
-    self.model = nn.Sequential(*_layers)
+      layers_.append(final_activation)
+    self.model = nn.Sequential(*layers_)
 
   def __call__(self, x: chex.Array) -> chex.Array:
     return self.model(x)
@@ -169,16 +167,16 @@ class MLP(nn.Module):
 def forward(model, x: chex.Array) -> chex.Array:
   return model(x)
 
-class Loss(StrEnum):
+class Loss(enum.StrEnum):
   MSE="mse"
   HUBER="huber"
 
-class Optimiser(StrEnum):
+class Optimiser(enum.StrEnum):
   SGD="sgd"
   RMSPROP="rmsprop"
   ADAM="adam"
 
-class EpsilonDecaySchedule(StrEnum):
+class EpsilonDecaySchedule(enum.StrEnum):
   LINEAR="linear"
   EXP="exp" 
 
@@ -293,7 +291,7 @@ class DQN(rl_agent.AbstractAgent):
     if loss_str == Loss.MSE:
       self.loss_func = jax.vmap(optax.l2_loss)
     elif loss_str == Loss.HUBER:
-      self.loss_func = jax.vmap(partial(optax.huber_loss, delta=huber_loss_parameter))
+      self.loss_func = jax.vmap(functools.partial(optax.huber_loss, delta=huber_loss_parameter))
     else:
       raise ValueError("Not implemented, choose from 'mse', 'huber'.")
     
@@ -474,7 +472,7 @@ class DQN(rl_agent.AbstractAgent):
 
     if self._prev_timestep is not None and self._prev_action is not None:
       # We may omit record adding here if it's done elsewhere.
-      self._add_transition(self._prev_timestep, self._prev_action, time_step)
+      self.add_transition(self._prev_timestep, self._prev_action, time_step)
 
     if time_step.last():  # prepare for the next episode.
       self._prev_timestep = None
@@ -486,7 +484,7 @@ class DQN(rl_agent.AbstractAgent):
 
     return rl_agent.StepOutput(action=action, probs=probs)
   
-  def _add_transition(
+  def add_transition(
     self, 
     prev_time_step: chex.ArrayTree | None, 
     prev_action: chex.Array | None, 
@@ -526,7 +524,7 @@ class DQN(rl_agent.AbstractAgent):
     self._rngkey, subkey = jax.random.split(self._rngkey)
     return subkey
 
-  @partial(jax.jit, static_argnums=(0,))
+  @functools.partial(jax.jit, static_argnums=(0,))
   def _act_epsilon_greedy(
     self, 
     network_state: nn.State,
@@ -617,7 +615,7 @@ class DQN(rl_agent.AbstractAgent):
     tau: chex.Array
   ) -> nn.Param:
     """Soft update of the target network's weights
-      θ′ ← τ θ + (1 - τ )θ′
+      θ′ ← τ θ + (1 - τ )θ′.
     """
     updated_state = jax.jit(optax.incremental_update)(
       q_network_state,   
@@ -626,42 +624,42 @@ class DQN(rl_agent.AbstractAgent):
     )
     return updated_state
     
-  def save(self, checkpoint_dir: epath.Path, save_optimiser: bool=True) -> None:
+  def save(self, checkpoint_dir: etils.epath.Path, save_optimiser: bool=True) -> None:
     """Saves the RL agent's q-network.
 
     Args:
-      checkpoint_dir (epath.Path): directory from which checkpoints will be restored.
+      checkpoint_dir (etils.epath.Path): directory from which checkpoints will be restored.
       save_optimiser (bool, optional): whether save only the optimiser (if it's been saved) 
         or just the network's weights. Defaults to True.
     """
     assert self._checkpointer, "Checkpointing disallowed. Set `allow_checkpointing` in the contructor"
     if isinstance(checkpoint_dir, str):
-      checkpoint_dir = epath.Path(checkpoint_dir)
+      checkpoint_dir = etils.epath.Path(checkpoint_dir)
     if save_optimiser:
-      self._checkpointer.save(checkpoint_dir / 'optimiser', nn.state((self._q_network, self._optimizer)), force=True)
+      self._checkpointer.save(checkpoint_dir / "optimiser", nn.state((self._q_network, self._optimizer)), force=True)
     else:
-      self._checkpointer.save(checkpoint_dir / 'state', nn.state(self._q_network))
+      self._checkpointer.save(checkpoint_dir / "state", nn.state(self._q_network))
     self._checkpointer.wait_until_finished()
 
-  def load(self, checkpoint_dir, load_optimiser: bool=True) -> None:
+  def load(self, checkpoint_dir: etils.epath.Path, load_optimiser: bool=True) -> None:
     """Restores the RL agent's q-network.
 
     Args:
-      checkpoint_dir (epath.Path): directory from which checkpoints will be restored.
+      checkpoint_dir (etils.epath.Path): directory from which checkpoints will be restored.
       load_optimiser (bool, optional): whether load only the optimiser (if it's been saved) 
         or just the network's weights. Defaults to True.
     """
     assert self._checkpointer, "Checkpointing disallowed. Set `allow_checkpointing` in the contructor"
     if isinstance(checkpoint_dir, str):
-      checkpoint_dir = epath.Path(checkpoint_dir)
-    checkpoint_dir = epath.Path(checkpoint_dir)
+      checkpoint_dir = etils.epath.Path(checkpoint_dir)
+    checkpoint_dir = etils.epath.Path(checkpoint_dir)
 
     if load_optimiser:
-      state_restored = self._checkpointer.restore(checkpoint_dir / 'optimiser', nn.state((self._q_network, self._optimizer)))
+      state_restored = self._checkpointer.restore(checkpoint_dir / "optimiser", nn.state((self._q_network, self._optimizer)))
       nn.update((self._q_network, self._optimizer), state_restored)
     
     else:
-      state_restored = self._checkpointer.restore(checkpoint_dir / 'state', nn.state(self._q_network))
+      state_restored = self._checkpointer.restore(checkpoint_dir / "state", nn.state(self._q_network))
       nn.update(self._q_network, state_restored)
     self._checkpointer.wait_until_finished()
     

@@ -21,9 +21,9 @@ See the paper https://arxiv.org/abs/1603.01121 for more details.
 """
 
 from typing import NamedTuple, Iterable, Callable
-from enum import Enum, StrEnum
-import etils.epath as epath
-from functools import partial
+import enum
+import etils.epath
+import functools
 import contextlib
 
 
@@ -44,11 +44,11 @@ class Transition(NamedTuple):
   action_probs: chex.Array 
   legal_actions_mask: chex.Array
 
-class MODE(Enum):
-  best_response=0
-  average_policy=1
+class MODE(enum.Enum):
+  BEST_RESPONSE=0
+  AVERAGE_POLICY=1
 
-class Optimiser(StrEnum):
+class Optimiser(enum.StrEnum):
   SGD="sgd"
   RMSPROP="rmsprop"
   ADAM="adam"
@@ -71,7 +71,7 @@ class ReservoirBuffer:
   """
 
   @staticmethod
-  @partial(jax.jit, static_argnames=("capacity",))
+  @functools.partial(jax.jit, static_argnames=("capacity",))
   def init(
       capacity: chex.Numeric, experience: Transition
   ) -> ReservoirBufferState:
@@ -92,7 +92,7 @@ class ReservoirBuffer:
     )
 
   @staticmethod
-  @partial(jax.jit, donate_argnums=(0,))
+  @functools.partial(jax.jit, donate_argnums=(0,))
   def append(
       state: ReservoirBufferState, experience: Transition, rng: chex.PRNGKey
   ) -> ReservoirBufferState:
@@ -104,7 +104,7 @@ class ReservoirBuffer:
       rng: `chex.PRNGKey`, a random seed
 
     Returns:
-      An updated `ReservoirBufferState`
+      An updated `ReservoirBufferState`.
     """
 
     # Note: count + 1 because the current item is the (count+1)-th item
@@ -131,7 +131,7 @@ class ReservoirBuffer:
     )
 
   @staticmethod
-  @partial(jax.jit, static_argnames="num_samples")
+  @functools.partial(jax.jit, static_argnames="num_samples")
   def sample(rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int) -> Transition:
     """Returns `num_samples` uniformly sampled from the buffer.
 
@@ -145,7 +145,7 @@ class ReservoirBuffer:
 
     Raises:
       AssertionError: If there are less than `num_samples` elements in the
-      buffer
+      buffer.
     """
     max_size = jnp.where(state.is_full, state.capacity, state.add_calls)
     indices = jax.random.randint(
@@ -226,7 +226,7 @@ class NFSP(rl_agent.AbstractAgent):
     # Keep track of the last training loss achieved in an update step.
     self._sl_loss_fn = jax.vmap(optax.softmax_cross_entropy)
     self._last_sl_loss_value = None
-    self._last_rl_loss_value = self._rl_agent._last_loss_value
+    self._last_rl_loss_value = self._rl_agent.loss
 
     self._rngkey = jax.random.PRNGKey(seed)
 
@@ -329,11 +329,11 @@ class NFSP(rl_agent.AbstractAgent):
 
   def _sample_episode_policy(self, rng: chex.PRNGKey) -> None:
     if jax.random.uniform(rng) < self._anticipatory_param:
-      self._mode = MODE.best_response
+      self._mode = MODE.BEST_RESPONSE
     else:
-      self._mode = MODE.average_policy
+      self._mode = MODE.AVERAGE_POLICY
 
-  @partial(jax.jit, static_argnums=(0,))
+  @functools.partial(jax.jit, static_argnums=(0,))
   def _act(self, network_state: nn.State, rng: chex.PRNGKey, info_state: chex.Array, legal_actions: chex.Array):
     action_values = self._avg_network_inference(
       network_state, info_state
@@ -350,7 +350,7 @@ class NFSP(rl_agent.AbstractAgent):
 
   @property
   def loss(self):
-    return (self._last_sl_loss_value, self._rl_agent._last_loss_value)
+    return (self._last_sl_loss_value, self._rl_agent.loss)
 
   def step(self, time_step, is_evaluation=False):
     """Returns the action to be taken and updates the Q-networks if needed.
@@ -358,16 +358,17 @@ class NFSP(rl_agent.AbstractAgent):
     Args:
       time_step: an instance of rl_environment.TimeStep.
       is_evaluation: bool, whether this is a training or evaluation call.
+        Defaults to False.
 
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-    if self._mode == MODE.best_response:
+    if self._mode == MODE.BEST_RESPONSE:
       agent_output = self._rl_agent.step(time_step, is_evaluation)
       if not is_evaluation and not time_step.last():
-        self._add_transition(time_step, agent_output)
+        self.add_transition(time_step, agent_output)
 
-    elif self._mode == MODE.average_policy:
+    elif self._mode == MODE.AVERAGE_POLICY:
       # Act step: don't act at terminal info states.
       if not time_step.last():
         info_state = time_step.observations["info_state"][self.player_id]
@@ -383,9 +384,9 @@ class NFSP(rl_agent.AbstractAgent):
         agent_output = rl_agent.StepOutput(action=action, probs=probs)
 
       if self._prev_timestep and not is_evaluation:
-        self._rl_agent._add_transition(self._prev_timestep, self._prev_action, time_step)
+        self._rl_agent.add_transition(self._prev_timestep, self._prev_action, time_step)
     else:
-      raise ValueError("Invalid mode ({})".format(self._mode))
+      raise ValueError(f"Invalid mode ({self._mode})")
 
     if not is_evaluation:
       self._iteration += 1
@@ -393,7 +394,7 @@ class NFSP(rl_agent.AbstractAgent):
       if self._iteration % self._learn_every == 0:
         self._last_sl_loss_value = self._learn()
         # If learn step not triggered by rl policy, learn.
-        if self._mode == MODE.average_policy:
+        if self._mode == MODE.AVERAGE_POLICY:
           self._last_rl_loss_value = self._rl_agent.learn()
 
       # Prepare for the next episode.
@@ -407,7 +408,7 @@ class NFSP(rl_agent.AbstractAgent):
         self._prev_action = agent_output.action
     return agent_output
 
-  def _add_transition(self, time_step, agent_output: rl_agent.StepOutput) -> None:
+  def add_transition(self, time_step, agent_output: rl_agent.StepOutput) -> None:
     """Adds the new transition using `time_step` to the reservoir buffer.
 
     Transitions are in the form (time_step, agent_output.probs, legal_mask).
@@ -453,26 +454,26 @@ class NFSP(rl_agent.AbstractAgent):
 
     return loss_val
 
-  def save(self, checkpoint_dir: epath.Path, save_optimiser: bool = True) -> None:
+  def save(self, checkpoint_dir: etils.epath.Path, save_optimiser: bool = True) -> None:
     """Saves the average policy network and the inner RL agent's q-network.
 
     Args:
-      checkpoint_dir (epath.Path): directory from which checkpoints will be restored.
+      checkpoint_dir (etils.epath.Path): directory from which checkpoints will be restored.
       save_optimiser (bool, optional): whether save only the optimiser (if it's been saved) 
         or just the network's weights. Defaults to True.
     """
     assert self._checkpointer, "Checkpointing disallowed. Set `allow_checkpointing` in the contructor"
-    checkpoint_dir = epath.Path(checkpoint_dir)
+    checkpoint_dir = etils.epath.Path(checkpoint_dir)
 
     self._rl_agent.save(checkpoint_dir / "q_network", save_optimiser)
     if save_optimiser:
-      self._checkpointer.save(checkpoint_dir / 'optimiser', nn.state((self._avg_network, self._avg_network_optimiser)), force=True)
+      self._checkpointer.save(checkpoint_dir / "optimiser", nn.state((self._avg_network, self._avg_network_optimiser)), force=True)
     else:
-      self._checkpointer.save(checkpoint_dir / 'state', nn.state(self._avg_network))
+      self._checkpointer.save(checkpoint_dir / "state", nn.state(self._avg_network))
     self._checkpointer.wait_until_finished()
 
 
-  def restore(self, checkpoint_dir: epath.Path, load_optimiser: bool = True) -> None:
+  def restore(self, checkpoint_dir: etils.epath.Path, load_optimiser: bool = True) -> None:
     """Restores the average policy network and the inner RL agent's q-network.
 
     Args:
@@ -481,18 +482,18 @@ class NFSP(rl_agent.AbstractAgent):
         or just the network's weights. Defaults to True.
     """
     assert self._checkpointer, "Checkpointing disallowed. Set `allow_checkpointing` in the contructor"
-    checkpoint_dir = epath.Path(checkpoint_dir)
+    checkpoint_dir = etils.epath.Path(checkpoint_dir)
 
     self._rl_agent.load(checkpoint_dir / "q_network", load_optimiser)
 
     if load_optimiser:
       state_restored = self._checkpointer.restore(
-        checkpoint_dir / 'optimiser', nn.state((self._avg_network, self._avg_network_optimiser))
+        checkpoint_dir / "optimiser", nn.state((self._avg_network, self._avg_network_optimiser))
       )
       nn.update((self._avg_network, self._avg_network_optimiser), state_restored)
     
     else:
-      state_restored = self._checkpointer.restore(checkpoint_dir / 'state', nn.state(self._avg_network))
+      state_restored = self._checkpointer.restore(checkpoint_dir / "state", nn.state(self._avg_network))
       nn.update(self._avg_network, state_restored)
 
     self._checkpointer.wait_until_finished()

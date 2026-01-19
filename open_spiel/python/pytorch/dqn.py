@@ -14,8 +14,9 @@
 
 """DQN agent implemented in PyTorch."""
 from typing import Iterable, NamedTuple, Callable
-from functools import partial
-from enum import StrEnum
+import functools
+import pathlib
+import enum
 
 import numpy as np
 import tree as np_tree
@@ -28,7 +29,7 @@ from open_spiel.python import rl_agent
 ILLEGAL_ACTION_LOGITS_PENALTY = torch.finfo(torch.float).min
 
 class Transition(NamedTuple):
-  """Data structure for the Replay buffer"""
+  """Data structure for the Replay buffer."""
   info_state: np.ndarray
   action: np.ndarray
   reward: np.ndarray 
@@ -37,8 +38,7 @@ class Transition(NamedTuple):
   legal_actions_mask: np.ndarray
 
 class ReplayBuffer:
-  """Generic Replay memory for DQN
-  """   
+  """Generic Replay memory for DQN."""   
   def __init__(self, capacity: np.ndarray, experience: Transition) -> None:
     self.capacity = capacity
     self.experience = experience
@@ -50,11 +50,11 @@ class ReplayBuffer:
   @classmethod
   def init(cls, capacity: int, experience: Transition) -> "ReplayBuffer":
     # Initialize buffer by replicating the structure of the experience
-    _experience = np_tree.map_structure(
+    experience_ = np_tree.map_structure(
       lambda x: np.empty((capacity, *x.shape), dtype=x.dtype),
       experience
     )
-    return cls(np.array(capacity), _experience)
+    return cls(np.array(capacity), experience_)
 
   def append(
     self, 
@@ -65,7 +65,7 @@ class ReplayBuffer:
       experience: data to be added to the replay buffer.
       
     Returns:
-      None as the method updated the buffer in-place
+      None as the method updated the buffer in-place.
     """
 
     index = self.entry_index % self.capacity
@@ -89,11 +89,11 @@ class ReplayBuffer:
     Returns:
       An iterable over `num_samples` random elements of the buffer.
     Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
+      ValueError: If there are less than `num_samples` elements in the buffer.
     """
     max_size = len(self)
     if max_size < num_samples:
-      raise ValueError("{} elements could not be sampled from size {}".format(num_samples, max_size))
+      raise ValueError(f"{num_samples} elements could not be sampled from size {max_size}")
 
     indices = np.random.choice(max_size, size=(num_samples,), replace=False)
 
@@ -123,16 +123,16 @@ class MLP(nn.Module):
     ) -> None:
     """Create the MLP.
     Args:
-      input_size: (int) number of inputs
-      hidden_sizes: (list) sizes (number of units) of each hidden layer
-      output_size: (int) number of outputs
-      final_activation: (nn.Module) final activation of the networ, if necessary.
-        Defaults to None
+      input_size: (int) number of inputs.
+      hidden_sizes: (list) sizes (number of units) of each hidden layer.
+      output_size: (int) number of outputs.
+      final_activation: (nn.Module) final activation of the network.
+        Defaults to None.
     """
 
     super().__init__()
     set_seed(seed)
-    _layers = []
+    layers_ = []
 
     def _create_linear_block(in_features, out_features):
       return nn.Sequential(
@@ -142,32 +142,34 @@ class MLP(nn.Module):
 
     # Input and Hidden layers
     for size in hidden_sizes:
-      _layers.append(_create_linear_block(input_size, size))
+      layers_.append(_create_linear_block(input_size, size))
       input_size = size
     # Output layer
-    _layers.append(nn.Linear(input_size, output_size))
+    layers_.append(nn.Linear(input_size, output_size))
     if final_activation:
-      _layers.append(final_activation)
-    self.model = nn.Sequential(*_layers)
+      layers_.append(final_activation)
+    self.model = nn.Sequential(*layers_)
     
   def forward(self, x: torch.Tensor) -> torch.Tensor:
     return self.model(x)
 
-class Loss(StrEnum):
+class Loss(enum.StrEnum):
   MSE="mse"
   HUBER="huber"
 
-class Optimiser(StrEnum):
+class Optimiser(enum.StrEnum):
   SGD="sgd"
   RMSPROP="rmsprop"
   ADAM="adam"
 
-class EpsilonDecaySchedule(StrEnum):
+class EpsilonDecaySchedule(enum.StrEnum):
   LINEAR="linear"
   EXP="exp" 
 
 # EPSILON DECAY SCHEDULES
-def exponential_schedule(start_e: float, end_e: float, duration: float) -> Callable:
+def exponential_schedule(
+    start_e: float, end_e: float, duration: float
+  ) -> Callable:
   def _call(t: int) -> float:
     decay_steps = min(t, duration)
     return end_e + (start_e - end_e) * np.exp(-1. * decay_steps / duration)
@@ -283,7 +285,9 @@ class DQN(rl_agent.AbstractAgent):
     if loss_str == Loss.MSE:
       self.loss_class = F.mse_loss
     elif loss_str == Loss.HUBER:
-      self.loss_class = partial(F.smooth_l1_loss, beta=huber_loss_parameter)
+      self.loss_class = functools.partial(
+        F.smooth_l1_loss, beta=huber_loss_parameter
+      )
     else:
       raise ValueError("Not implemented, choose from 'mse', 'huber'.")
     
@@ -368,7 +372,7 @@ class DQN(rl_agent.AbstractAgent):
 
     if self._prev_timestep is not None and self._prev_action is not None:
       # We may omit record adding here if it's done elsewhere.
-      self._add_transition(self._prev_timestep, self._prev_action, time_step)
+      self.add_transition(self._prev_timestep, self._prev_action, time_step)
 
     if time_step.last():  # prepare for the next episode.
       self._prev_timestep = None
@@ -380,7 +384,7 @@ class DQN(rl_agent.AbstractAgent):
 
     return rl_agent.StepOutput(action=action, probs=probs)
 
-  def _add_transition(self, prev_time_step, prev_action, time_step):
+  def add_transition(self, prev_time_step, prev_action, time_step):
     """Adds the new transition using `time_step` to the replay buffer.
 
     Adds the transition from `self._prev_timestep` to `time_step` by
@@ -427,7 +431,7 @@ class DQN(rl_agent.AbstractAgent):
       action = np.random.choice(legal_actions)
       probs[legal_actions] = 1.0 / len(legal_actions)
     else:
-      info_state = torch.FloatTensor(np.asarray(info_state).reshape(1, -1), device=self._device)
+      info_state = torch.tensor(np.asarray(info_state).reshape(1, -1), device=self._device, dtype=torch.float32)
       q_values = self._q_network(info_state).detach().squeeze(0)
       legal_q_values = q_values[legal_actions]
       action = legal_actions[torch.argmax(legal_q_values)]
@@ -455,12 +459,12 @@ class DQN(rl_agent.AbstractAgent):
 
     transitions = self._replay_buffer.sample(self._batch_size)
 
-    info_states = torch.FloatTensor(transitions.info_state, device=self._device)
-    actions = torch.LongTensor(transitions.action , device=self._device)
-    rewards = torch.FloatTensor(transitions.reward, device=self._device)
-    next_info_states = torch.FloatTensor(transitions.next_info_state, device=self._device)
-    are_final_steps = torch.BoolTensor(transitions.is_final_step, device=self._device)
-    legal_actions_mask = torch.BoolTensor(transitions.legal_actions_mask, device=self._device)
+    info_states = torch.tensor(transitions.info_state, device=self._device, dtype=torch.float32)
+    actions = torch.tensor(transitions.action , device=self._device, dtype=torch.long)
+    rewards = torch.tensor(transitions.reward, device=self._device, dtype=torch.float32)
+    next_info_states = torch.tensor(transitions.next_info_state, device=self._device, dtype=torch.float32)
+    are_final_steps = torch.tensor(transitions.is_final_step, device=self._device, dtype=torch.bool)
+    legal_actions_mask = torch.tensor(transitions.legal_actions_mask, device=self._device, dtype=torch.bool)
 
     self._q_values = self._q_network(info_states)
     self._target_q_values = self._target_q_network(next_info_states).detach()
@@ -514,11 +518,11 @@ class DQN(rl_agent.AbstractAgent):
     return self._iteration
   
   def _copy_weights(self, tau: float) -> None:
-    """Soft update of the target network's weights
+    """Soft update of the target network's weights.
       θ′ ← τ θ + (1 - τ )θ′
 
     Args:
-        tau (float): main network parameters' weight
+        tau (float): main network parameters' weight.
     """
     #Ugly formatting
     for target_network_param, q_network_param in zip(
@@ -528,14 +532,15 @@ class DQN(rl_agent.AbstractAgent):
         tau * q_network_param.data + (1.0 - tau) * target_network_param.data
       )
 
-  def save(self, data_path, save_optimiser: bool=True) -> None:
+  def save(self, data_path: pathlib.Path, save_optimiser: bool=True) -> None:
     """Save checkpoint/trained model and optimizer.
 
     Args:
-      data_path: Path for saving model. It can be relative or absolute but the
+      data_path: pathlib.Path for saving model. It can be relative or absolute but the
         filename should be included. For example: q_network.pt or
         /path/to/q_network.pt
-      save_optimiser: bool
+      save_optimiser: bool whether to save the optimiser or not.
+        Defaults to True.
     """
     checkpoint = { 
       "iteration": self._iteration,
@@ -547,23 +552,22 @@ class DQN(rl_agent.AbstractAgent):
     torch.save(checkpoint, data_path)
 
 
-  def load(self, data_path, load_optimiser: bool=True) -> None:
+  def load(self, data_path: pathlib.Path, load_optimiser: bool=True) -> None:
     """Load checkpoint/trained model and optimizer.
 
     Args:
-      data_path: Path for loading model. It can be relative or absolute but the
+      data_path: pathlib.Path for loading model. It can be relative or absolute but the
         filename should be included. For example: q_network.pt or
         /path/to/q_network.pt
-      optimizer_data_path: Path for loading the optimizer states. It can be
-        relative or absolute but the filename should be included. For example:
-        optimizer.pt or /path/to/optimizer.pt
+      load_optimiser: bool, whether to learn the optimiser's state of not. 
+        Defaults to True.
     """
     checkpoint = torch.load(data_path, weights_only=True, map_location=self._device)
-    self._q_network.load_state_dict(checkpoint['model_state_dict'])
-    self._target_q_network.load_state_dict(checkpoint['model_state_dict'])
+    self._q_network.load_state_dict(checkpoint["model_state_dict"])
+    self._target_q_network.load_state_dict(checkpoint["model_state_dict"])
     
     if load_optimiser:
-      self._optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+      self._optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
     self._iteration = checkpoint["iteration"]
     self._last_loss_value = checkpoint["last_loss_value"]
