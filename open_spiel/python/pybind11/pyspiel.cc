@@ -664,6 +664,13 @@ PYBIND11_MODULE(pyspiel, m) {
         "Returns a new game object for the specified short name using given "
         "parameters");
 
+  m.def("load_games",
+        py::overload_cast<const std::string&, const std::string&>(
+          &open_spiel::LoadGames),
+        py::arg("multi_game_string"),
+        py::arg("separator") = "/",
+        "Returns a list of game objects for the specified multigame string");
+
   m.def("load_matrix_game", open_spiel::algorithms::LoadMatrixGame,
         "Loads a game as a matrix game (will fail if not a matrix game.");
 
