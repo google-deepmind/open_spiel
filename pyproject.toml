@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open_spiel"
-version = "1.2"
+version = "1.6.11"
 license = { file = "LICENSE" }
 description = "A Framework for Reinforcement Learning in Games"
-requires-python = ">=3.7"
+requires-python = ">=3.11"
 authors = [
     { name = "The OpenSpiel authors", email = "open_spiel@google.com" },
 ]
