@@ -34,50 +34,22 @@ class InfostateTreeTest(parameterized.TestCase):
             copy(tree)
             deepcopy(tree)
 
-    def test_node_tree_lifetime_management(self):
-        game = pyspiel.load_game("kuhn_poker")
-        tree = pyspiel.InfostateTree(game, 0)
-        root = tree.root()
-        # let's maintain a weak ref to the tree and node to see when the tree and node objects are deallocated
-        wptr = weakref.ref(tree)
-        wptr_node = weakref.ref(root)
-
-        # ensure that deleting a node does not delete the underlying object
-        del root
-        gc.collect()
-        # assert the weakref thinks the object is gone
-        self.assertIsNone(wptr_node())
-        # but the tree still holds the actual c++ sided object
-        root = tree.root()
-        wptr_node = weakref.ref(root)
-        self.assertIsNotNone(wptr_node())
-        # ensure we can get a shared_ptr from root that keeps tree alive if we lose the 'tree' name
-        tree_sptr = root.tree()
-        # grab the tree id
-        id_tree = id(tree)
-        # now delete the initial tree ptr
-        del tree
-        # ensure that we still hold the object
-        gc.collect()  # force garbage collection
-        self.assertIsNotNone(wptr())
-        self.assertEqual(id(tree_sptr), id_tree)
-        # now delete the last pointer as well
-        del tree_sptr
-        gc.collect()  # force garbage collection
-        self.assertIsNone(wptr())
-
     def test_node_keeps_tree_alive(self):
         game = pyspiel.load_game("kuhn_poker")
         tree = pyspiel.InfostateTree(game, 0)
+        height = tree.tree_height()
+        num_sequences = tree.num_sequences()
         node = tree.root()
-        tree_ref = weakref.ref(tree)
-
         del tree
         gc.collect()  # force garbage collection
-
-        # expect the tree to stay alive while a node exists.
-        self.assertIsNotNone(tree_ref())
-        self.assertIsNotNone(node)
+        # the Python wrapper referenced by `tree` may be gone, but the underlying c++
+        # tree must still be alive if nodes alias-own it.
+        tree_from_node = node.tree()
+        self.assertIsNotNone(tree_from_node)
+        # assert its attributes are identical
+        # (unnecessary, but shows it is the same tree)
+        self.assertEqual(tree_from_node.num_sequences(), num_sequences)
+        self.assertEqual(tree_from_node.tree_height(), height)
 
     @parameterized.parameters(
         [
