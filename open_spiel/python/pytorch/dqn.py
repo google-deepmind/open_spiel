@@ -45,11 +45,18 @@ class ReplayBuffer:
   """Generic Replay memory for DQN."""
 
   def __init__(self, capacity: np.ndarray, experience: Transition) -> None:
+    """Replay buffer constructor.
+
+    Args:
+      capacity (np.ndarray): capacity for the buffer.
+      experience (Transition): an initialising sample for the buffer.
+    """
     self.capacity = capacity
     self.experience = experience
     self.entry_index = np.array(0)
 
   def __len__(self) -> int:
+    """Returns length of the buffer."""
     return min(self.entry_index, self.capacity).astype(int)
 
   @classmethod
@@ -65,13 +72,13 @@ class ReplayBuffer:
     experience: Transition,
   ) -> None:
     """Potentially adds `experience` to the replay buffer.
+
     Args:
       experience: data to be added to the replay buffer.
 
     Returns:
       None as the method updated the buffer in-place.
     """
-
     index = self.entry_index % self.capacity
 
     def _inplace(arr, idx, val):
@@ -90,8 +97,10 @@ class ReplayBuffer:
 
     Args:
       num_samples: `int`, number of samples to draw.
+
     Returns:
       An iterable over `num_samples` random elements of the buffer.
+
     Raises:
       ValueError: If there are less than `num_samples` elements in the buffer.
     """
@@ -127,14 +136,15 @@ class MLP(nn.Module):
     seed: int = 42,
   ) -> None:
     """Create the MLP.
+
     Args:
       input_size: (int) number of inputs.
       hidden_sizes: (list) sizes (number of units) of each hidden layer.
       output_size: (int) number of outputs.
       final_activation: (nn.Module) final activation of the network.
         Defaults to None.
-    """
 
+    """
     super().__init__()
     set_seed(seed)
     layers_ = []
@@ -225,7 +235,6 @@ class DQN(rl_agent.AbstractAgent):
     device: str = "cpu",
   ) -> None:
     """Initialize the DQN agent."""
-
     # This call to locals() is used to store every argument used to initialise
     # the class instance, so it can be copied with no hyperparameter change.
     self._kwargs = locals()
@@ -375,6 +384,8 @@ class DQN(rl_agent.AbstractAgent):
 
     Args:
       time_step: an instance of rl_environment.TimeStep.
+      is_evaluation: if the agent takes step in an environment (True)
+        or a learning step.
 
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
@@ -491,7 +502,6 @@ class DQN(rl_agent.AbstractAgent):
     Returns:
       The average loss obtained on this batch of transitions or `None`.
     """
-
     if (
       len(self._replay_buffer) < self._batch_size
       or len(self._replay_buffer) < self._min_buffer_size_to_learn
@@ -577,7 +587,8 @@ class DQN(rl_agent.AbstractAgent):
 
   def _copy_weights(self, tau: float) -> None:
     """Soft update of the target network's weights.
-      θ′ ← τ θ + (1 - τ )θ′
+
+      θ′ ← τ θ + (1 - τ )θ′.
 
     Args:
         tau (float): main network parameters' weight.

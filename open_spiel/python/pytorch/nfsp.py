@@ -59,6 +59,7 @@ class Optimiser(enum.StrEnum):
 
 class ReservoirBuffer:
   """Allows uniform sampling over a stream of data.
+
   See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
   """
 
@@ -80,6 +81,7 @@ class ReservoirBuffer:
 
   def append(self, experience: Transition) -> None:
     """Potentially adds `experience` to the reservoir buffer.
+
     Args:
       experience: data to be added to the reservoir buffer.
 
@@ -113,8 +115,10 @@ class ReservoirBuffer:
 
     Args:
       num_samples: `int`, number of samples to draw.
+
     Returns:
       An iterable over `num_samples` random elements of the buffer.
+
     Raises:
       ValueError: If there are less than `num_samples` elements in the buffer.
     """
@@ -155,7 +159,6 @@ class NFSP(rl_agent.AbstractAgent):
     **kwargs,
   ) -> None:
     """Initialize the `NFSP` agent."""
-
     self.player_id = player_id
     self._num_actions = num_actions
     self._layer_sizes = hidden_layers_sizes
@@ -363,7 +366,6 @@ class NFSP(rl_agent.AbstractAgent):
     Returns:
       The average loss obtained on this batch of transitions or `None`.
     """
-
     if (
       len(self._reservoir_buffer) < self._batch_size
       or len(self._reservoir_buffer) < self._min_buffer_size_to_learn
@@ -428,7 +430,6 @@ class NFSP(rl_agent.AbstractAgent):
     """Restores the average policy network and the inner RL agent's q-network.
 
     Args:
-      
       checkpoint_dir (pathlib.Path): target checkpoint directory.
       load_optimiser (bool, optional): whether load only the optimiser
         or just the network's weights. Defaults to True.

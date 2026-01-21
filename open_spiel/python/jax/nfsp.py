@@ -77,7 +77,6 @@ class ReservoirBuffer:
     capacity: chex.Numeric, experience: Transition
   ) -> ReservoirBufferState:
     """Initializes the reservoir buffer."""
-
     # Set experience value to be empty.
     experience = jax.tree.map(jnp.empty_like, experience)
     # Broadcast to [add_batch_size, ...]
@@ -107,7 +106,6 @@ class ReservoirBuffer:
     Returns:
       An updated `ReservoirBufferState`.
     """
-
     # Note: count + 1 because the current item is the (count+1)-th item
     idx = jax.random.randint(rng, (), 0, state.add_calls + 1)
 
@@ -183,7 +181,6 @@ class NFSP(rl_agent.AbstractAgent):
     **kwargs,
   ) -> None:
     """Initialize the `NFSP` agent."""
-
     chex.assert_type(
       [
         num_actions,

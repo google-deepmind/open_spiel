@@ -88,7 +88,6 @@ class BoltzmannDQN(dqn.DQN):
     epsilon: float,
   ):
     """Returns a selected action and the probabilities of legal actions."""
-
     if epsilon == 0.0:  # greeddy evaluation
       # Soft-max normalized by the action probabilities from the previous
       # Q-network.

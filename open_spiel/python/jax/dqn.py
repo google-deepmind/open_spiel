@@ -53,7 +53,8 @@ class ReplayBufferState(NamedTuple):
 
 class ReplayBuffer:
   """ReplayBuffer of fixed size with a FIFO replacement policy.
-    Stored transitions can be sampled uniformly.
+
+  Stored transitions can be sampled uniformly.
     The underlying datastructure is a ring buffer, allowing 0(1) adding and
     sampling.
   """
@@ -85,13 +86,14 @@ class ReplayBuffer:
     experience: chex.ArrayTree,
   ) -> ReplayBufferState:
     """Potentially adds `experience` to the replay buffer.
+
     Args:
       state (ReplayBufferState): current state of the buffer
       experience (chex.ArrayTree): data to be added to the reservoir buffer.
+
     Returns:
       An updated `ReplayBufferState`.
     """
-
     chex.assert_trees_all_equal_dtypes(experience, state.experience)
 
     index = state.entry_index % state.capacity
@@ -118,14 +120,15 @@ class ReplayBuffer:
     rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int
   ) -> Transition:
     """Returns `num_samples` uniformly sampled from the buffer.
+
     Args:
       rng: (chex.PRNGKey): a random state
       state: (ReplayBufferState): a buffer state
       num_samples: (int): number of samples to draw.
+
     Returns:
       An iterable over `num_samples` random elements of the buffer.
     """
-
     max_size = jnp.where(state.is_full, state.capacity, state.entry_index)
     indices = jax.random.randint(
       rng, shape=(num_samples,), minval=0, maxval=max_size
@@ -255,7 +258,6 @@ class DQN(rl_agent.AbstractAgent):
     allow_checkpointing: bool = True,
   ) -> None:
     """Initialize the DQN agent."""
-
     # This call to locals() is used to store every argument used to initialize
     # the class instance, so it can be copied with no hyperparameter change.
     self._kwargs = locals()
@@ -458,6 +460,8 @@ class DQN(rl_agent.AbstractAgent):
 
     Args:
       time_step: an instance of rl_environment.TimeStep.
+      greedy: if to take action greedily of sample it from
+        the logits
 
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
@@ -480,6 +484,7 @@ class DQN(rl_agent.AbstractAgent):
     return rl_agent.StepOutput(action=action, probs=probs)
 
   def act_epsilon_greedy(self, info_state, legal_actions, epsilon):
+    """A public wrapper for `_act_epsilon_greedy`."""
     return self._act_epsilon_greedy(
       nn.state(self._q_network),
       jnp.asarray(info_state),
@@ -601,14 +606,15 @@ class DQN(rl_agent.AbstractAgent):
     Action probabilities are given by a softmax over legal q-values.
 
     Args:
+      network_state: `nnx.State` of the Q-network
       info_state: hashable representation of the information state.
       legal_actions: list of legal actions at `info_state`.
+      rng: `chex.PRNGKey` to control randomness
       epsilon: float, probability of taking an exploratory action.
 
     Returns:
       A valid epsilon-greedy action and valid action probabilities.
     """
-
     q_values = self._jittable_inference(network_state, info_state)
     masked_q = jnp.where(legal_actions, q_values, ILLEGAL_ACTION_LOGITS_PENALTY)
     greedy_action = masked_q.argmax()
@@ -679,7 +685,8 @@ class DQN(rl_agent.AbstractAgent):
     target_q_network_state: nn.State,
     tau: chex.Array,
   ) -> nn.Param:
-    """Soft update of the target network's weights
+    """Soft update of the target network's weights.
+
     θ′ ← τ θ + (1 - τ )θ′.
     """
     updated_state = jax.jit(optax.incremental_update)(
