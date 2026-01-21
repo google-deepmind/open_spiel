@@ -12,34 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from absl.testing import absltest
+import pyspiel
 import torch
 import torch.nn.functional as F
+from absl.testing import absltest
 
-import pyspiel
 from open_spiel.python.pytorch import neurd
 
-_GAME = pyspiel.load_game('kuhn_poker')
+_GAME = pyspiel.load_game("kuhn_poker")
 
 
 def _new_model():
   return neurd.DeepNeurdModel(
-      _GAME,
-      num_hidden_layers=1,
-      num_hidden_units=13,
-      num_hidden_factors=1,
-      use_skip_connections=True,
-      autoencode=True)
+    _GAME,
+    num_hidden_layers=1,
+    num_hidden_units=13,
+    num_hidden_factors=1,
+    use_skip_connections=True,
+    autoencode=True,
+  )
 
 
 class NeurdTest(absltest.TestCase):
-
   def setUp(self):
     super(NeurdTest, self).setUp()
     torch.manual_seed(42)
 
   def test_neurd(self):
-    num_iterations = 2
+    num_iterations = 4
     models = [_new_model() for _ in range(_GAME.num_players())]
 
     solver = neurd.CounterfactualNeurdSolver(_GAME, models)
@@ -49,18 +49,20 @@ class NeurdTest(absltest.TestCase):
 
     def _train(model, data):
       neurd.train(
-          model=model,
-          data=data,
-          batch_size=12,
-          step_size=10.0,
-          autoencoder_loss=F.huber_loss)
+        model=model,
+        data=data,
+        batch_size=12,
+        step_size=10.0,
+        autoencoder_loss=F.huber_loss,
+      )
 
-    for _ in range(num_iterations):
+    for it in range(num_iterations):
       solver.evaluate_and_update_policy(_train)
 
     average_policy = solver.average_policy()
+
     self.assertLess(pyspiel.nash_conv(_GAME, average_policy), 0.91)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   absltest.main()
