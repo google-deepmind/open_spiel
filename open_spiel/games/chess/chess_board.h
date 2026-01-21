@@ -30,10 +30,10 @@
 namespace open_spiel {
 namespace chess {
 
-using chess_common::kInvalidSquare;  // NOLINT
+using chess_common::kInvalidSquare; // NOLINT
 using chess_common::Offset;
 using chess_common::Square;
-using chess_common::SquareToString;  // NOLINT
+using chess_common::SquareToString; // NOLINT
 
 template <std::size_t... Dims>
 using ZobristTableU64 = chess_common::ZobristTable<uint64_t, Dims...>;
@@ -48,7 +48,7 @@ inline Color OppColor(Color color) {
 
 std::string ColorToString(Color c);
 
-inline std::ostream& operator<<(std::ostream& stream, Color c) {
+inline std::ostream &operator<<(std::ostream &stream, Color c) {
   return stream << ColorToString(c);
 }
 
@@ -84,11 +84,11 @@ absl::optional<PieceType> PieceTypeFromChar(char c);
 std::string PieceTypeToString(PieceType p, bool uppercase = true);
 
 struct Piece {
-  bool operator==(const Piece& other) const {
+  bool operator==(const Piece &other) const {
     return type == other.type && color == other.color;
   }
 
-  bool operator!=(const Piece& other) const { return !(*this == other); }
+  bool operator!=(const Piece &other) const { return !(*this == other); }
 
   std::string ToUnicode() const;
   std::string ToString() const;
@@ -100,17 +100,19 @@ struct Piece {
 static inline constexpr Piece kEmptyPiece =
     Piece{Color::kEmpty, PieceType::kEmpty};
 
-inline std::ostream& operator<<(std::ostream& stream, const Piece& p) {
+inline std::ostream &operator<<(std::ostream &stream, const Piece &p) {
   return stream << p.ToString();
 }
 
 inline absl::optional<int8_t> ParseRank(char c) {
-  if (c >= '1' && c <= '8') return c - '1';
+  if (c >= '1' && c <= '8')
+    return c - '1';
   return absl::nullopt;
 }
 
 inline absl::optional<int8_t> ParseFile(char c) {
-  if (c >= 'a' && c <= 'h') return c - 'a';
+  if (c >= 'a' && c <= 'h')
+    return c - 'a';
   return absl::nullopt;
 }
 
@@ -128,9 +130,9 @@ inline std::string FileToString(int8_t file) {
 inline constexpr std::array<Offset, 8> kKnightOffsets = {
     {{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {2, -1}, {2, 1}, {1, -2}, {1, 2}}};
 
-absl::optional<Square> SquareFromString(const std::string& s);
+absl::optional<Square> SquareFromString(const std::string &s);
 
-bool IsLongDiagonal(const chess::Square& from_sq, const chess::Square& to_sq,
+bool IsLongDiagonal(const chess::Square &from_sq, const chess::Square &to_sq,
                     int board_size);
 
 // Forward declare ChessBoard here because it's needed in Move::ToSAN.
@@ -144,13 +146,10 @@ struct Move {
   CastlingDirection castle_dir = CastlingDirection::kNone;
 
   Move() : castle_dir(CastlingDirection::kNone) {}
-  Move(const Square& from, const Square& to, const Piece& piece,
+  Move(const Square &from, const Square &to, const Piece &piece,
        PieceType promotion_type = PieceType::kEmpty,
        CastlingDirection castle_dir = CastlingDirection::kNone)
-      : from(from),
-        to(to),
-        piece(piece),
-        promotion_type(promotion_type),
+      : from(from), to(to), piece(piece), promotion_type(promotion_type),
         castle_dir(castle_dir) {}
 
   std::string ToString() const;
@@ -159,7 +158,7 @@ struct Move {
   // In the case of chess960, the castling move is converted to the format
   // <king position> <rook position> it is castling with so it needs the board.
   std::string ToLAN(bool chess960 = false,
-                    const ChessBoard* board_ptr = nullptr) const;
+                    const ChessBoard *board_ptr = nullptr) const;
 
   // Converts to standard algebraic notation, as required by portable game
   // notation (PGN). It is a chess move notation that is designed to be
@@ -207,24 +206,24 @@ struct Move {
   //              resulting in checkmate in a surprisingly good move)
   // * O-O-O!!N+/- (a surprisingly good long castle that is a theoretical
   //                novelty that gives white a clear but not winning advantage)
-  std::string ToSAN(const ChessBoard& board) const;
+  std::string ToSAN(const ChessBoard &board) const;
 
   bool is_castling() const { return castle_dir != CastlingDirection::kNone; }
 
-  bool operator==(const Move& other) const {
+  bool operator==(const Move &other) const {
     return from == other.from && to == other.to && piece == other.piece &&
            promotion_type == other.promotion_type &&
            castle_dir == other.castle_dir;
   }
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const Move& m) {
+inline std::ostream &operator<<(std::ostream &stream, const Move &m) {
   return stream << m.ToString();
 }
 
 bool IsMoveCharacter(char c);
 
-std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
+std::pair<std::string, std::string> SplitAnnotations(const std::string &move);
 
 inline constexpr int kMaxBoardSize = 8;
 inline constexpr int kDefaultBoardSize = 8;
@@ -250,28 +249,27 @@ enum PseudoLegalMoveSettings {
 
 // Some chess variants (RBC) allow a "pass" action/move
 inline constexpr open_spiel::Action kPassAction = 0;
-inline const chess::Move kPassMove =
-    Move(Square{-1, -1}, Square{-1, -1},
-         Piece{Color::kEmpty, PieceType::kEmpty});
+inline const chess::Move kPassMove = Move(
+    Square{-1, -1}, Square{-1, -1}, Piece{Color::kEmpty, PieceType::kEmpty});
 
 class ChessBoard {
- public:
+public:
   ChessBoard(int board_size = kDefaultBoardSize,
              bool king_in_check_allowed = false, bool allow_pass_move = false,
              bool allow_king_promotion = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  static absl::optional<ChessBoard> BoardFromFEN(
-      const std::string& fen, int board_size = 8,
-      bool king_in_check_allowed = false, bool allow_pass_move = false,
-      bool allow_king_promotion = false);
+  static absl::optional<ChessBoard>
+  BoardFromFEN(const std::string &fen, int board_size = 8,
+               bool king_in_check_allowed = false, bool allow_pass_move = false,
+               bool allow_king_promotion = false);
 
-  const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
+  const Piece &at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
   void set_square(Square sq, Piece p);
 
-  const std::array<Piece, k2dMaxBoardSize>& pieces() const { return board_; }
+  const std::array<Piece, k2dMaxBoardSize> &pieces() const { return board_; }
 
   Color ToPlay() const { return to_play_; }
   void SetToPlay(Color c);
@@ -282,8 +280,8 @@ class ChessBoard {
   int32_t IrreversibleMoveCounter() const { return irreversible_move_counter_; }
   int32_t Movenumber() const { return move_number_; }
 
-  absl::optional<Square> MaybeCastlingRookSquare(
-      Color side, CastlingDirection direction) const;
+  absl::optional<Square>
+  MaybeCastlingRookSquare(Color side, CastlingDirection direction) const;
 
   bool CastlingRight(Color color, CastlingDirection dir) const {
     return MaybeCastlingRookSquare(color, dir).has_value();
@@ -297,7 +295,7 @@ class ChessBoard {
   Square FindRookForCastling(Color color, CastlingDirection dir) const;
 
   // Find the location of any one piece of the given type, or kInvalidSquare.
-  Square find(const Piece& piece) const;
+  Square find(const Piece &piece) const;
 
   // Pseudo-legal moves are moves that may leave the king in check, but are
   // otherwise legal.
@@ -305,38 +303,38 @@ class ChessBoard {
   // The yield function should return whether generation should continue.
   // For performance reasons, we do not guarantee that no more moves will be
   // generated if yield returns false. It is only for optimization.
-  using MoveYieldFn = std::function<bool(const Move&)>;
-  void GenerateLegalMoves(const MoveYieldFn& yield) const {
+  using MoveYieldFn = std::function<bool(const Move &)>;
+  void GenerateLegalMoves(const MoveYieldFn &yield) const {
     GenerateLegalMoves(yield, to_play_);
   }
-  void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
+  void GenerateLegalMoves(const MoveYieldFn &yield, Color color) const;
   void GeneratePseudoLegalMoves(
-      const MoveYieldFn& yield, Color color,
+      const MoveYieldFn &yield, Color color,
       PseudoLegalMoveSettings settings =
           PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
 
   // Optimization for computing number of pawn tries for kriegspiel
-  void GenerateLegalPawnCaptures(const MoveYieldFn& yield, Color color) const;
+  void GenerateLegalPawnCaptures(const MoveYieldFn &yield, Color color) const;
   void GeneratePseudoLegalPawnCaptures(
-      const MoveYieldFn& yield, Color color,
+      const MoveYieldFn &yield, Color color,
       PseudoLegalMoveSettings settings =
           PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
 
   bool HasLegalMoves() const {
     bool found = false;
-    GenerateLegalMoves([&found](const Move&) {
+    GenerateLegalMoves([&found](const Move &) {
       found = true;
-      return false;  // We don't need any more moves.
+      return false; // We don't need any more moves.
     });
     return found;
   }
 
-  bool IsMoveLegal(const Move& tested_move) const {
+  bool IsMoveLegal(const Move &tested_move) const {
     bool found = false;
-    GenerateLegalMoves([&found, &tested_move](const Move& found_move) {
+    GenerateLegalMoves([&found, &tested_move](const Move &found_move) {
       if (tested_move == found_move) {
         found = true;
-        return false;  // We don't need any more moves.
+        return false; // We don't need any more moves.
       }
       return true;
     });
@@ -359,67 +357,67 @@ class ChessBoard {
 
   // Parses a move in standard algebraic notation or long algebraic notation
   // (see below). Returns absl::nullopt on failure.
-  absl::optional<Move> ParseMove(const std::string& move,
+  absl::optional<Move> ParseMove(const std::string &move,
                                  bool chess960 = false) const;
 
   // Parses a move in standard algebraic notation as defined by FIDE.
   // https://en.wikipedia.org/wiki/Algebraic_notation_(chess).
   // Returns absl::nullopt on failure.
-  absl::optional<Move> ParseSANMove(const std::string& move) const;
+  absl::optional<Move> ParseSANMove(const std::string &move) const;
 
   // Parses a move in long algebraic notation.
   // Long algebraic notation is not standardized and there are many variants,
   // but the one we care about is of the form "e2e4" and "f7f8q". This is the
   // form used by chess engine text protocols that are of interest to us.
   // Returns absl::nullopt on failure.
-  absl::optional<Move> ParseLANMove(const std::string& move,
+  absl::optional<Move> ParseLANMove(const std::string &move,
                                     bool chess960 = false) const;
 
-  void ApplyMove(const Move& move);
+  void ApplyMove(const Move &move);
 
   // Applies a pseudo-legal move and returns whether it's legal. This avoids
   // applying and copying the whole board once for legality testing, and once
   // for actually applying the move.
-  bool TestApplyMove(const Move& move);
+  bool TestApplyMove(const Move &move);
 
-  bool InBoardArea(const Square& sq) const {
+  bool InBoardArea(const Square &sq) const {
     return sq.x >= 0 && sq.x < board_size_ && sq.y >= 0 && sq.y < board_size_;
   }
 
-  bool IsEmpty(const Square& sq) const {
-    const Piece& piece = board_[SquareToIndex_(sq)];
+  bool IsEmpty(const Square &sq) const {
+    const Piece &piece = board_[SquareToIndex_(sq)];
     return piece.type == PieceType::kEmpty;
   }
 
-  bool IsEnemy(const Square& sq, Color our_color) const {
-    const Piece& piece = board_[SquareToIndex_(sq)];
+  bool IsEnemy(const Square &sq, Color our_color) const {
+    const Piece &piece = board_[SquareToIndex_(sq)];
     return piece.type != PieceType::kEmpty && piece.color != our_color;
   }
 
-  bool IsFriendly(const Square& sq, Color our_color) const {
-    const Piece& piece = board_[SquareToIndex_(sq)];
+  bool IsFriendly(const Square &sq, Color our_color) const {
+    const Piece &piece = board_[SquareToIndex_(sq)];
     return piece.color == our_color;
   }
 
-  bool IsEmptyOrEnemy(const Square& sq, Color our_color) const {
-    const Piece& piece = board_[SquareToIndex_(sq)];
+  bool IsEmptyOrEnemy(const Square &sq, Color our_color) const {
+    const Piece &piece = board_[SquareToIndex_(sq)];
     return piece.color != our_color;
   }
 
   /* Whether the square is on the pawn starting rank for our_color. */
-  bool IsPawnStartingRank(const Square& sq, Color our_color) const {
+  bool IsPawnStartingRank(const Square &sq, Color our_color) const {
     return ((our_color == Color::kWhite && sq.y == 1) ||
             (our_color == Color::kBlack && sq.y == (board_size_ - 2)));
   }
 
-  bool IsPawnPromotionRank(const Square& sq) const {
+  bool IsPawnPromotionRank(const Square &sq) const {
     // No need to test for color here because a pawn can't be on the "wrong"
     // promotion rank.
     return sq.y == 0 || sq.y == (board_size_ - 1);
   }
 
   /* Whether the sq is under attack by the opponent. */
-  bool UnderAttack(const Square& sq, Color our_color) const;
+  bool UnderAttack(const Square &sq, Color our_color) const;
 
   bool InCheck() const {
     return UnderAttack(find(Piece{to_play_, PieceType::kKing}), to_play_);
@@ -456,13 +454,13 @@ class ChessBoard {
    *    an en passant capture
    *
    */
-  std::string ToDarkFEN(const ObservationTable& observability_table,
+  std::string ToDarkFEN(const ObservationTable &observability_table,
                         Color color) const;
 
   bool IsBreachingMove(Move move) const;
-  void BreachingMoveToCaptureMove(Move* move) const;
+  void BreachingMoveToCaptureMove(Move *move) const;
 
- private:
+protected:
   size_t SquareToIndex_(Square sq) const { return sq.y * board_size_ + sq.x; }
 
   /* Generate*Destinations functions call yield(sq) for every potential
@@ -490,12 +488,12 @@ class ChessBoard {
   // King moves without castling.
   template <typename YieldFn>
   void GenerateKingDestinations_(Square sq, Color color,
-                                 const YieldFn& yield) const;
+                                 const YieldFn &yield) const;
 
   template <typename YieldFn>
   void GenerateCastlingDestinations_(Square sq, Color color,
                                      PseudoLegalMoveSettings settings,
-                                     const YieldFn& yield) const;
+                                     const YieldFn &yield) const;
   bool CanCastle(Square king_sq, Color color,
                  PseudoLegalMoveSettings settings) const;
   bool CanCastleBetween(Square from_sq, Square to_sq,
@@ -506,40 +504,40 @@ class ChessBoard {
   template <typename YieldFn>
   void GenerateQueenDestinations_(Square sq, Color color,
                                   PseudoLegalMoveSettings settings,
-                                  const YieldFn& yield) const;
+                                  const YieldFn &yield) const;
 
   template <typename YieldFn>
   void GenerateRookDestinations_(Square sq, Color color,
                                  PseudoLegalMoveSettings settings,
-                                 const YieldFn& yield) const;
+                                 const YieldFn &yield) const;
 
   template <typename YieldFn>
   void GenerateBishopDestinations_(Square sq, Color color,
                                    PseudoLegalMoveSettings settings,
-                                   const YieldFn& yield) const;
+                                   const YieldFn &yield) const;
 
   template <typename YieldFn>
   void GenerateKnightDestinations_(Square sq, Color color,
-                                   const YieldFn& yield) const;
+                                   const YieldFn &yield) const;
 
   template <typename YieldFn>
   // Pawn moves without captures.
   void GeneratePawnDestinations_(Square sq, Color color,
                                  PseudoLegalMoveSettings settings,
-                                 const YieldFn& yield) const;
+                                 const YieldFn &yield) const;
 
   template <typename YieldFn>
   // Pawn diagonal capture destinations, with or without en passant.
   void GeneratePawnCaptureDestinations_(Square sq, Color color,
                                         PseudoLegalMoveSettings settings,
                                         bool include_ep,
-                                        const YieldFn& yield) const;
+                                        const YieldFn &yield) const;
 
   // Helper function.
   template <typename YieldFn>
   void GenerateRayDestinations_(Square sq, Color color,
                                 PseudoLegalMoveSettings settings,
-                                Offset offset_step, const YieldFn& yield) const;
+                                Offset offset_step, const YieldFn &yield) const;
 
   void SetIrreversibleMoveCounter(int c);
   void SetMovenumber(int move_number);
@@ -562,25 +560,25 @@ class ChessBoard {
   // Set to the square of the rook if castling is still possible in that
   // direction, otherwise nullopt.
   struct {
-    absl::optional<Square> left_castle;   // -x direction, AKA long castle
-    absl::optional<Square> right_castle;  // +x direction, AKA short castle
+    absl::optional<Square> left_castle;  // -x direction, AKA long castle
+    absl::optional<Square> right_castle; // +x direction, AKA short castle
   } castling_rights_[2];
 
   uint64_t zobrist_hash_;
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const ChessBoard& board) {
+inline std::ostream &operator<<(std::ostream &stream, const ChessBoard &board) {
   return stream << board.DebugString();
 }
 
-inline std::ostream& operator<<(std::ostream& stream, const PieceType& pt) {
+inline std::ostream &operator<<(std::ostream &stream, const PieceType &pt) {
   return stream << PieceTypeToString(pt);
 }
 
 ChessBoard MakeDefaultBoard();
 std::string DefaultFen(int board_size);
 
-}  // namespace chess
-}  // namespace open_spiel
+} // namespace chess
+} // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_IMPL_CHESS_CHESS_BOARD_H_
+#endif // OPEN_SPIEL_GAMES_IMPL_CHESS_CHESS_BOARD_H_
