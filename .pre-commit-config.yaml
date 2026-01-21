@@ -11,7 +11,7 @@
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: "v4.4.0"
+    rev: "v6.0.0"
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -41,7 +41,7 @@ repos:
 
   # Sort includes
   - repo: https://github.com/PyCQA/isort
-    rev: "5.12.0"
+    rev: "7.0.0"
     hooks:
       - id: isort
 
@@ -58,7 +58,7 @@ repos:
 
     # Format Python code with pyink
   - repo: https://github.com/google/pyink
-    rev: 23.3.0
+    rev: 25.12.0
     hooks:
       - id: pyink
         language_version: python3
@@ -66,7 +66,7 @@ repos:
 
   # Clang-format the C++ part of the code base automatically
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: "v16.0.3"
+    rev: "v21.1.8"
     hooks:
       - id: clang-format
         types_or: [ c++, c, cuda ]
