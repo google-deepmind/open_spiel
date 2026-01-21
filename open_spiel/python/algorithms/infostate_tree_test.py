@@ -66,6 +66,19 @@ class InfostateTreeTest(parameterized.TestCase):
         gc.collect()  # force garbage collection
         self.assertIsNone(wptr())
 
+    def test_node_keeps_tree_alive(self):
+        game = pyspiel.load_game("kuhn_poker")
+        tree = pyspiel.InfostateTree(game, 0)
+        node = tree.root()
+        tree_ref = weakref.ref(tree)
+
+        del tree
+        gc.collect()  # force garbage collection
+
+        # expect the tree to stay alive while a node exists.
+        self.assertIsNotNone(tree_ref())
+        self.assertIsNotNone(node)
+
     @parameterized.parameters(
         [
             # test for matrix mp

@@ -200,6 +200,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
   algorithms/ismcts_agent_test.py
+  algorithms/infostate_tree_test.py
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
