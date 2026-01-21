@@ -33,7 +33,6 @@
 
 namespace open_spiel {
 namespace gomoku {
-namespace {
 
 // Facts about the game.
 const GameType kGameType{
@@ -62,184 +61,156 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new GomokuGame(params));
 }
 
-GomokuGame::GomokuGame(const GameParameters& params) 
-    : Game(kGameType, params), 
-	   size_(ParameterValue<int>("size")),
-     dims_(ParameterValue<int>("dims"),
-     connect_(ParameterValue<int>("connect")),
-     wrap_(ParameterValue<int>("wrap"))
+std::ostream& operator<<(std::ostream& os, Stone s) {
+  switch (s) {
+    case Stone::kEmpty: return os << "Empty";
+    case Stone::kBlack: return os << "Black";
+    case Stone::kWhite: return os << "White";
+  }
+  return os << "Unknown";
 }
+
+GomokuGame::GomokuGame(const GameParameters& params)
+    : Game(kGameType, params),
+      size_(ParameterValue<int>("size")),
+      dims_(ParameterValue<int>("dims")),
+      connect_(ParameterValue<int>("connect")),
+      wrap_(ParameterValue<bool>("wrap")) {
+				total_size_ = 1;
+				for (int i = 0; i < dims_; ++i) {
+					total_size_ *= size_;
+				}
+}
+
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
-}  // namespace
-
-CellState PlayerToState(Player player) {
-  switch (player) {
-    case 0:
-      return CellState::kCross;
-    case 1:
-      return CellState::kNought;
-    default:
-      SpielFatalError(absl::StrCat("Invalid player id ", player));
-      return CellState::kEmpty;
-  }
-}
-
-std::string PlayerToString(Player player) {
-  switch (player) {
-    case 0:
-      return "x";
-    case 1:
-      return "o";
-    default:
-      return DefaultPlayerString(player);
-  }
-}
-
-CellState StringToCellState(const std::string& s) {
-  if (s == "x") return CellState::kCross;
-  if (s == "o") return CellState::kNought;
-  if (s == ".") return CellState::kEmpty;
-  SpielFatalError(absl::StrCat("Invalid cell string: ", s));
-}
-
-std::string StateToString(CellState state) {
-  switch (state) {
-    case CellState::kEmpty:
-      return ".";
-    case CellState::kNought:
-      return "o";
-    case CellState::kCross:
-      return "x";
-    default:
-      SpielFatalError("Unknown state.");
-  }
-}
-
-bool BoardHasLine(const std::array<CellState, kNumCells>& board,
-                  const Player player) {
-  CellState c = PlayerToState(player);
-  return (board[0] == c && board[1] == c && board[2] == c) ||
-         (board[3] == c && board[4] == c && board[5] == c) ||
-         (board[6] == c && board[7] == c && board[8] == c) ||
-         (board[0] == c && board[3] == c && board[6] == c) ||
-         (board[1] == c && board[4] == c && board[7] == c) ||
-         (board[2] == c && board[5] == c && board[8] == c) ||
-         (board[0] == c && board[4] == c && board[8] == c) ||
-         (board[2] == c && board[4] == c && board[6] == c);
-}
-
-std::vector<CellState> GomokuState::Board() const {
-  std::vector<CellState> board(board_.begin(), board_.end());
-  return board;
-}
 
 
 void GomokuState::DoApplyAction(Action move) {
-  SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
-  board_[move] = PlayerToState(CurrentPlayer());
-  if (HasLine(current_player_)) {
-    outcome_ = current_player_;
-  }
+	SPIEL_CHECK_EQ(board_.AtIndex(move), Stone::kEmpty);
+  board_.AtIndex(move) = current_player_ == kBlackPlayer
+                    ? Stone::kBlack
+                    : Stone::kWhite;
   current_player_ = 1 - current_player_;
-  num_moves_ += 1;
+  move_count_ += 1;
 }
 
 std::vector<Action> GomokuState::LegalActions() const {
   if (IsTerminal()) return {};
-  // Can move in any empty cell.
-  std::vector<Action> moves;
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    if (board_[cell] == CellState::kEmpty) {
-      moves.push_back(cell);
+
+  std::vector<Action> actions;
+  actions.reserve(board_.NumCells());
+
+  for (Action i = 0; i < static_cast<Action>(board_.NumCells()); ++i) {
+    if (board_.AtIndex(i) == Stone::kEmpty) {
+      actions.push_back(i);
     }
   }
-  return moves;
+  return actions;
 }
+
 
 std::string GomokuState::ActionToString(Player player,
                                            Action action_id) const {
   return game_->ActionToString(player, action_id);
 }
 
-bool GomokuState::HasLine(Player player) const {
-  return BoardHasLine(board_, player);
-}
-
-bool GomokuState::IsFull() const { return num_moves_ == kNumCells; }
-
-GomokuState::GomokuState(std::shared_ptr<const Game> game) : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
-}
 
 std::string GomokuState::ToString() const {
-  std::string str;
-  for (int r = 0; r < kNumRows; ++r) {
-    for (int c = 0; c < kNumCols; ++c) {
-      absl::StrAppend(&str, StateToString(BoardAt(r, c)));
-    }
-    if (r < (kNumRows - 1)) {
-      absl::StrAppend(&str, "\n");
+  std::string s;
+  s.reserve(1 + board_.NumCells());
+
+  // Player to move
+  s.push_back(current_player_ == kBlackPlayer ? 'B' : 'W');
+
+  // Board contents in flattened order
+  for (std::size_t i = 0; i < board_.NumCells(); ++i) {
+    switch (board_.AtIndex(i)) {
+      case Stone::kBlack: s.push_back('b'); break;
+      case Stone::kWhite: s.push_back('w'); break;
+      case Stone::kEmpty: s.push_back('.'); break;
     }
   }
-  return str;
-}
-
-std::unique_ptr<StateStruct> GomokuState::ToStruct() const {
-  auto rv = std::make_unique<GomokuStateStruct>();
-  std::vector<std::string> board;
-  board.reserve(board_.size());
-  for (const CellState& cell : board_) {
-    board.push_back(StateToString(cell));
-  }
-  rv->current_player = PlayerToString(CurrentPlayer());
-  rv->board = board;
-  return rv;
-}
-
-std::unique_ptr<ObservationStruct> GomokuState::ToObservationStruct(
-    Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  return std::make_unique<GomokuObservationStruct>(this->ToJson());
-}
-
-std::unique_ptr<ActionStruct> GomokuState::ActionToStruct(
-    Player player, Action action_id) const {
-  auto action_struct = std::make_unique<GomokuActionStruct>();
-  action_struct->row = action_id / kNumCols;
-  action_struct->col = action_id % kNumCols;
-  return action_struct;
-}
-
-Action GomokuState::StructToAction(
-    const ActionStruct& action_struct) const {
-  const auto* ttt_action_struct =
-      dynamic_cast<const GomokuActionStruct*>(&action_struct);
-  SPIEL_CHECK_TRUE(ttt_action_struct != nullptr);
-  SPIEL_CHECK_GE(ttt_action_struct->row, 0);
-  SPIEL_CHECK_LT(ttt_action_struct->row, kNumRows);
-  SPIEL_CHECK_GE(ttt_action_struct->col, 0);
-  SPIEL_CHECK_LT(ttt_action_struct->col, kNumCols);
-  return ttt_action_struct->row * kNumCols + ttt_action_struct->col;
-}
-
-bool GomokuState::IsTerminal() const {
-  return outcome_ != kInvalidPlayer || IsFull();
+  return s;
 }
 
 std::vector<double> GomokuState::Returns() const {
-  if (HasLine(Player{0})) {
-    return {1.0, -1.0};
-  } else if (HasLine(Player{1})) {
-    return {-1.0, 1.0};
+  auto maybe_final_returns = MaybeFinalReturns();
+  if (maybe_final_returns) {
+    return *maybe_final_returns;
   } else {
     return {0.0, 0.0};
   }
 }
+
+bool GomokuState::CheckWinFromLastMove() const {
+  if (history_.empty()) return false;
+	const auto& last = history_.back();
+  Action last_move = last.action;
+
+  const Grid<Stone>::Coord start =
+      board_.Unflatten(last_move);
+  const Stone stone = board_.At(start);
+
+  SPIEL_CHECK_NE(stone, Stone::kEmpty);
+
+  for (const auto& dir : board_.Directions()) {
+    if (!board_.IsCanonical(dir)) continue;
+
+    int count = 1;  // include the starting stone
+
+    // forward direction
+    {
+      auto c = start;
+      while (count < connect_ && board_.Step(c, dir) &&
+             board_.At(c) == stone) {
+        ++count;
+      }
+    }
+
+    // backward direction
+    {
+      auto neg_dir = dir;
+      for (int& v : neg_dir) v = -v;
+
+      auto c = start;
+      while (count < connect_ && board_.Step(c, neg_dir) &&
+             board_.At(c) == stone) {
+        ++count;
+      }
+    }
+
+    if (count >= connect_) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+absl::optional<std::vector<double>> GomokuState::MaybeFinalReturns() const {
+	const auto& last = history_.back();
+  Action last_move = last.action;
+  if (last_move != kInvalidAction) {
+    if (CheckWinFromLastMove()) {
+      std::vector<double> returns(2, -1.0);
+      // winner is the player who made the last move
+      returns[CurrentPlayer() ^ 1] = 1.0;
+      return returns;
+    }
+  }
+
+  // draw by full board
+  if (move_count_ == board_.NumCells()) {
+    return std::vector<double>{0.0, 0.0};
+  }
+
+  return absl::nullopt;
+}
+
 
 std::string GomokuState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
@@ -253,25 +224,19 @@ std::string GomokuState::ObservationString(Player player) const {
   return ToString();
 }
 
+//TODO implement this
 void GomokuState::ObservationTensor(Player player,
                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // Treat `values` as a 2-d tensor.
-  TensorView<2> view(values, {kCellStates, kNumCells}, true);
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
-  }
 }
 
 void GomokuState::UndoAction(Player player, Action move) {
-  board_[move] = CellState::kEmpty;
+	board_.AtIndex(move) = Stone::kEmpty;
   current_player_ = player;
-  outcome_ = kInvalidPlayer;
-  num_moves_ -= 1;
+  move_count_ -= 1;
   history_.pop_back();
-  --move_number_;
 }
 
 std::unique_ptr<State> GomokuState::Clone() const {
@@ -284,90 +249,78 @@ std::string GomokuGame::ActionToString(Player player,
   return "";
 }
 
-GomokuState::GomokuState(std::shared_ptr<const Game> game
-  const std::string& state_str = "")
+// TODO implement this
+std::vector<int> GomokuGame::ObservationTensorShape() const {
+	return {15, 15, 3};
+}
+
+// TODO implement this
+int GomokuGame::MaxGameLength() const {
+	return total_size_;
+}
+
+int GomokuGame::NumDistinctActions() const {
+	return total_size_;
+}
+
+
+
+GomokuState::GomokuState(std::shared_ptr<const Game> game,
+                         const std::string& state_str)
     : State(game),
+      size_(static_cast<const GomokuGame&>(*game).Size()),
+      dims_(static_cast<const GomokuGame&>(*game).Dims()),
+      connect_(static_cast<const GomokuGame&>(*game).Connect()),
+      wrap_(static_cast<const GomokuGame&>(*game).Wrap()),
       board_(
-          static_cast<std::size_t>(game->GetSize()),
-          static_cast<std::size_t>(game->GetDims()),
-          game->GetWrapr()),
-      current_player_(kPlayer0),
+        static_cast<std::size_t>(static_cast<const GomokuGame&>(*game).Size()),
+        static_cast<std::size_t>(static_cast<const GomokuGame&>(*game).Dims()),
+        static_cast<const GomokuGame&>(*game).Wrap()),
+      current_player_(kBlackPlayer),
       move_count_(0) {
   if (state_str.empty()) {
     board_.Fill(Stone::kEmpty);
-    current_player_ = kPlayer0;
+    current_player_ = kBlackPlayer;
     return;
   }
+	const std::size_t expected =
+    1 + board_.NumCells();  // size^dims
 
-  board_.Fill(Stone::kEmpty);
+   SPIEL_CHECK_EQ(state_str.size(), expected);
+  switch (state_str[0]) {
+    case 'W':
+      current_player_ = kWhitePlayer;
+			break;
+    case 'B': 
+			current_player_ = kBlackPlayer;
+			break;
+    default:
+      SpielFatalError("Invalid player char in state string");
+  }
+	for (std::size_t i = 0; i < board_.NumCells(); ++i) {
+    char c = state_str[i + 1];
+    Stone s;
+
+      switch (c) {
+        case 'b':
+				  s = Stone::kBlack;
+				  break;
+        case 'w':
+				  s = Stone::kWhite;
+				  break;
+        case '.':
+				  s = Stone::kEmpty;
+				  break;
+        case ' ': s = Stone::kEmpty;
+				  break;
+        default:
+          SpielFatalError("Invalid board char in state string");
+    }
+
+    board_.AtIndex(i) = s;
+  }
 }
 
-GomokuState::GomokuState(const std::shared_ptr<const Game> game,
-                               const nlohmann::json& json) : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
-
-  GomokuStateStruct state_struct(json);
-  if (state_struct.board.size() != kNumCells) {
-    SpielFatalError(absl::StrFormat("Invalid board size: expected %d, got %d",
-                                    kNumCells, state_struct.board.size()));
-  }
-  num_moves_ = 0;
-  int num_x = 0;
-  int num_o = 0;
-  for (Action action = 0; action < state_struct.board.size(); ++action) {
-    CellState cell_state = StringToCellState(state_struct.board[action]);
-    if (cell_state != CellState::kEmpty) {
-      board_[action] = cell_state;
-      num_moves_++;
-      if (cell_state == CellState::kCross) {
-        num_x++;
-      } else {
-        num_o++;
-      }
-    }
-  }
-  if (num_x < num_o || num_x > num_o + 1) {
-    SpielFatalError(absl::StrFormat(
-        "Invalid board state: invalid number of pieces, got x = %d, o = %d",
-        num_x, num_o));
-  }
-  current_player_ = (num_x == num_o ? 0 : 1);
-
-  bool x_wins = HasLine(0);
-  bool o_wins = HasLine(1);
-
-  if (x_wins && o_wins) {
-    SpielFatalError("Invalid board state: both players have a line.");
-  }
-
-  if (x_wins) {
-    if (num_x != num_o + 1) {
-      SpielFatalError(absl::StrFormat(
-          "Invalid board state: x has a line, but number of pieces is "
-          "inconsistent, got x = %d, o = %d",
-          num_x, num_o));
-    }
-    outcome_ = 0;
-  } else if (o_wins) {
-    if (num_x != num_o) {
-      SpielFatalError(absl::StrFormat(
-          "Invalid board state: o has a line, but number of pieces is "
-          "inconsistent, got x = %d, o = %d",
-          num_x, num_o));
-    }
-    outcome_ = 1;
-  } else {
-    outcome_ = kInvalidPlayer;
-  }
-
-  if (state_struct.current_player != PlayerToString(CurrentPlayer())) {
-    SpielFatalError(absl::StrCat("Invalid current player: expected ",
-                                 PlayerToString(CurrentPlayer()),
-                                 ", got ", state_struct.current_player));
-  }
-
-  starting_state_str_ = this->ToJson();
-}
 
 
 }  // namespace gomoku
