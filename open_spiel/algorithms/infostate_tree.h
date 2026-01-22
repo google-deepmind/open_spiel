@@ -399,10 +399,10 @@ class InfostateTree final : public std::enable_shared_from_this<InfostateTree> {
   // Compute best response and value based on gradient from opponents.
   // This consumes the gradient vector, as it is used to compute the value.
   std::pair<double, SfStrategy> BestResponse(
-      TreeplexVector<double>&& gradient) const;
+      TreeplexVector<double> gradient) const;
   // Compute best response value based on gradient from opponents over leaves.
   // This consumes the gradient vector, as it is used to compute the value.
-  double BestResponseValue(LeafVector<double>&& gradient) const;
+  double BestResponseValue(LeafVector<double> gradient) const;
 
    // -- For debugging ----------------------------------------------------------
    friend std::ostream& operator<<(std::ostream& os, const InfostateTree& tree);
