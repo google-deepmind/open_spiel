@@ -27,8 +27,8 @@
 #include <random>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
@@ -39,8 +39,8 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/games/universal_poker/logic/gamedef.h"
@@ -56,33 +56,33 @@ namespace {
 
 std::string BettingAbstractionToString(const BettingAbstraction &betting) {
   switch (betting) {
-    case BettingAbstraction::kFC: {
-      return "BettingAbstration: FC";
-      break;
-    }
-    case BettingAbstraction::kFCHPA: {
-      return "BettingAbstration: FCPHA";
-      break;
-    }
-    case BettingAbstraction::kFCPA: {
-      return "BettingAbstration: FCPA";
-      break;
-    }
-    case BettingAbstraction::kFULLGAME: {
-      return "BettingAbstraction: FULLGAME";
-      break;
-    }
-    default:
-      SpielFatalError("Unknown betting abstraction.");
-      break;
+  case BettingAbstraction::kFC: {
+    return "BettingAbstration: FC";
+    break;
+  }
+  case BettingAbstraction::kFCHPA: {
+    return "BettingAbstration: FCPHA";
+    break;
+  }
+  case BettingAbstraction::kFCPA: {
+    return "BettingAbstration: FCPA";
+    break;
+  }
+  case BettingAbstraction::kFULLGAME: {
+    return "BettingAbstraction: FULLGAME";
+    break;
+  }
+  default:
+    SpielFatalError("Unknown betting abstraction.");
+    break;
   }
 }
 
 // Does not support chance actions.
 // TODO(author1): Remove all of the many varieties of action types and
 // switch to use a single enum, preferably project_acpc_server::ActionType.
-acpc_cpp::ACPCState::ACPCActionType UniversalPokerActionTypeToACPCActionType(
-    StateActionType type) {
+acpc_cpp::ACPCState::ACPCActionType
+UniversalPokerActionTypeToACPCActionType(StateActionType type) {
   if (type == StateActionType::ACTION_DEAL) {
     SpielFatalError("ACPC does not support deal action types.");
   }
@@ -102,7 +102,7 @@ acpc_cpp::ACPCState::ACPCActionType UniversalPokerActionTypeToACPCActionType(
   return acpc_cpp::ACPCState::ACPC_INVALID;
 }
 
-}  // namespace
+} // namespace
 
 const GameType kGameType{
     /*short_name=*/"universal_poker",
@@ -219,8 +219,9 @@ open_spiel::RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 // Returns how many actions are available at a choice node (3 when limit
 // and 4 for no limit).
-// TODO(author2): Is that a bug? There are 5 actions? Is no limit means
-// "bet bot" is added? or should "all in" be also added?
+// Actions are: Fold, Call/Check, Bet/Raise (Limit), All-in (No-Limit).
+// Note: In FCHPA, there are 5 actions (including Half-Pot), but that is handled
+// separately in NumDistinctActions.
 inline uint32_t GetMaxBettingActions(const acpc_cpp::ACPCGame &acpc_game) {
   return acpc_game.IsLimitGame() ? 3 : 4;
 }
@@ -230,17 +231,13 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
     : State(game),
       acpc_game_(
           static_cast<const UniversalPokerGame *>(game.get())->GetACPCGame()),
-      acpc_state_(acpc_game_),
-      deck_(/*num_suits=*/acpc_game_->NumSuitsDeck(),
-            /*num_ranks=*/acpc_game_->NumRanksDeck()),
-      cur_player_(kChancePlayerId),
-      possibleActions_(ACTION_DEAL),
-      betting_abstraction_(
-          static_cast<const UniversalPokerGame *>(game.get())
-              ->betting_abstraction()),
-      calc_odds_num_sims_(
-          static_cast<const UniversalPokerGame *>(game.get())
-              ->calc_odds_num_sims()) {
+      acpc_state_(acpc_game_), deck_(/*num_suits=*/acpc_game_->NumSuitsDeck(),
+                                     /*num_ranks=*/acpc_game_->NumRanksDeck()),
+      cur_player_(kChancePlayerId), possibleActions_(ACTION_DEAL),
+      betting_abstraction_(static_cast<const UniversalPokerGame *>(game.get())
+                               ->betting_abstraction()),
+      calc_odds_num_sims_(static_cast<const UniversalPokerGame *>(game.get())
+                              ->calc_odds_num_sims()) {
   // -- Optionally apply subgame parameters. -----------------------------------
   // Pot size.
   const int pot_size = game->GetParameters().at("potSize").int_value();
@@ -262,7 +259,7 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
     // Advance the round according to the number of board cards.
     int num_cards = cs.NumCards();
     int round = 0;
-    do  {
+    do {
       num_cards -= acpc_game_->NumBoardCards(round);
       round++;
     } while (round < acpc_game_->NumRounds() && num_cards > 0);
@@ -274,7 +271,7 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
   if (!handReaches.empty()) {
     std::stringstream iss(handReaches);
     double number;
-    while ( iss >> number ) {
+    while (iss >> number) {
       handReaches_.push_back(number);
     }
     SPIEL_CHECK_EQ(handReaches_.size(), kSubgameUniqueHands * 2);
@@ -313,13 +310,17 @@ std::string UniversalPokerState::ToString() const {
                     "): [");
     for (StateActionType action : ALL_ACTIONS) {
       if (action & possibleActions_) {
-        if (action == ACTION_ALL_IN) absl::StrAppend(&str, " ACTION_ALL_IN ");
-        if (action == ACTION_BET) absl::StrAppend(&str, " ACTION_BET ");
+        if (action == ACTION_ALL_IN)
+          absl::StrAppend(&str, " ACTION_ALL_IN ");
+        if (action == ACTION_BET)
+          absl::StrAppend(&str, " ACTION_BET ");
         if (action == ACTION_CHECK_CALL) {
           absl::StrAppend(&str, " ACTION_CHECK_CALL ");
         }
-        if (action == ACTION_FOLD) absl::StrAppend(&str, " ACTION_FOLD ");
-        if (action == ACTION_DEAL) absl::StrAppend(&str, " ACTION_DEAL ");
+        if (action == ACTION_FOLD)
+          absl::StrAppend(&str, " ACTION_FOLD ");
+        if (action == ACTION_DEAL)
+          absl::StrAppend(&str, " ACTION_DEAL ");
       }
     }
   }
@@ -339,9 +340,9 @@ std::string UniversalPokerState::ActionToString(Player player,
       move_str = absl::StrCat("Deal(", move, ")");
     } else {
       uint8_t card = ChanceOutcomeToCard(move);
-      std::string card_str = logic::CardSet(
-          acpc_game_->NumSuitsDeck(),
-          acpc_game_->NumRanksDeck()).CardToString(card);
+      std::string card_str =
+          logic::CardSet(acpc_game_->NumSuitsDeck(), acpc_game_->NumRanksDeck())
+              .CardToString(card);
       move_str = absl::StrCat("Deal ", card_str);
     }
   } else if (static_cast<ActionType>(move) == ActionType::kFold) {
@@ -547,13 +548,15 @@ std::string UniversalPokerState::InformationStateString(Player player) const {
   std::string money;
   money.reserve(acpc_game_->GetNbPlayers() * 2);
   for (auto p = Player{0}; p < acpc_game_->GetNbPlayers(); p++) {
-    if (p != Player{0}) absl::StrAppend(&money, " ");
+    if (p != Player{0})
+      absl::StrAppend(&money, " ");
     absl::StrAppend(&money, acpc_state_.Money(p));
   }
   std::string sequences;
   sequences.reserve(acpc_state_.GetRound() * 2);
   for (auto r = 0; r <= acpc_state_.GetRound(); r++) {
-    if (r != 0) absl::StrAppend(&sequences, "|");
+    if (r != 0)
+      absl::StrAppend(&sequences, "|");
     absl::StrAppend(&sequences, acpc_state_.BettingSequence(r));
   }
 
@@ -595,9 +598,8 @@ std::unique_ptr<State> UniversalPokerState::Clone() const {
   return absl::make_unique<UniversalPokerState>(*this);
 }
 
-
-int GetHoleCardsReachIndex(int card_a, int card_b,
-                           int num_suits, int num_ranks) {
+int GetHoleCardsReachIndex(int card_a, int card_b, int num_suits,
+                           int num_ranks) {
   // CardSet uses kSuitChars of "cdhs", but we need the inverse i.e. "shdc"
   // according to https://github.com/Sandholm-Lab/LibratusEndgames
   const int a_suit = num_suits - 1 - suitOfCard(card_a);
@@ -605,9 +607,9 @@ int GetHoleCardsReachIndex(int card_a, int card_b,
   const int a_rank = rankOfCard(card_a);
   const int b_rank = rankOfCard(card_b);
   // Order by rank, then order by suit.
-  const int lesser_card = a_rank < b_rank
-                              || (a_rank == b_rank && a_suit < b_suit)
-                          ? card_a : card_b;
+  const int lesser_card =
+      a_rank < b_rank || (a_rank == b_rank && a_suit < b_suit) ? card_a
+                                                               : card_b;
   // We use ints, so this is ok.
   const int higher_card = card_a + card_b - lesser_card;
 
@@ -630,18 +632,18 @@ int GetHoleCardsReachIndex(int card_a, int card_b,
   const int j = higher_rank * num_suits + higher_suit;
   const int n = num_suits * num_ranks;
   // Compute index k in the triangle.
-  return i * (2*n - i - 3) / 2 + j - 1;
+  return i * (2 * n - i - 3) / 2 + j - 1;
 }
 
 // Normally distribution of cards happens in a tree, one card at a time to each
 // player. We flatten this distribution and omit repetitions.
 // The yield function is called for each unique tuples of cards the players can
 // receive.
-void DistributeHands(const logic::CardSet& full_deck,
-                     uint8_t num_players,
+void DistributeHands(const logic::CardSet &full_deck, uint8_t num_players,
                      uint8_t num_hole_cards,
                      std::function<void(/*per_player_hole_cards=*/
-                            std::vector<std::vector<uint8_t>>)> yield) {
+                                        std::vector<std::vector<uint8_t>>)>
+                         yield) {
   // Taken and modified from CardSet::SampleCards()
   int nbCards = num_hole_cards * num_players;
 
@@ -676,13 +678,13 @@ void DistributeHands(const logic::CardSet& full_deck,
   SPIEL_CHECK_EQ(n_choose_k, 270725);
 }
 
-std::vector <int> UniversalPokerState::GetEncodingBase() const {
+std::vector<int> UniversalPokerState::GetEncodingBase() const {
   const int num_hole_cards = acpc_game_->GetNbHoleCardsRequired();
-  SPIEL_CHECK_EQ(num_hole_cards, 2);  // Only this case is implemented.
+  SPIEL_CHECK_EQ(num_hole_cards, 2); // Only this case is implemented.
   const int num_distribute_cards = num_hole_cards * num_players_;
-  const int full_deck_cards = acpc_game_->NumSuitsDeck()
-                            * acpc_game_->NumRanksDeck();
-    return std::vector <int>(num_distribute_cards, full_deck_cards);
+  const int full_deck_cards =
+      acpc_game_->NumSuitsDeck() * acpc_game_->NumRanksDeck();
+  return std::vector<int>(num_distribute_cards, full_deck_cards);
 }
 
 // Distribute the hole cards to each player in one large chance node.
@@ -698,18 +700,18 @@ UniversalPokerState::DistributeHandCardsInSubgame() const {
   const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
                                  acpc_game_->NumRanksDeck());
 
-  int possible_hands = kSubgameUniqueHands;  // 52*51/2
-  const int possible_hand_pairs = 270725 * 6;  // (52 choose 4) * choose_hands
+  int possible_hands = kSubgameUniqueHands;   // 52*51/2
+  const int possible_hand_pairs = 270725 * 6; // (52 choose 4) * choose_hands
   const double hole_cards_chance_prob = 1. / possible_hand_pairs;
 
   const int reach_offset = possible_hands;
-  SPIEL_DCHECK_EQ(reach_offset*num_players_, handReaches_.size());
+  SPIEL_DCHECK_EQ(reach_offset * num_players_, handReaches_.size());
 
   std::vector<std::pair<Action, double>> outcomes;
   outcomes.reserve(possible_hand_pairs);
-  double normalizer = 0.;  // We need to normalize the probs.
-  const std::vector <int> encoding_bases = GetEncodingBase();
-  const auto add_outcome = [&](const std::vector<std::vector<uint8_t>>& cards) {
+  double normalizer = 0.; // We need to normalize the probs.
+  const std::vector<int> encoding_bases = GetEncodingBase();
+  const auto add_outcome = [&](const std::vector<std::vector<uint8_t>> &cards) {
     // Encode OpenSpiel action.
     // logic::CardSet uses 64 bits for its representation, the same size as
     // open_spiel::Action. This means that we cannot easily encode distribution
@@ -734,7 +736,7 @@ UniversalPokerState::DistributeHandCardsInSubgame() const {
       const int hole_idx = GetHoleCardsReachIndex(cards[pl][0], cards[pl][1],
                                                   acpc_game_->NumSuitsDeck(),
                                                   acpc_game_->NumRanksDeck());
-      const double player_reach = handReaches_[pl*reach_offset + hole_idx];
+      const double player_reach = handReaches_[pl * reach_offset + hole_idx];
       p *= player_reach;
     }
 
@@ -754,7 +756,8 @@ UniversalPokerState::DistributeHandCardsInSubgame() const {
   DistributeHands(full_deck, NumPlayers(), num_hole_cards, add_outcome);
 
   SPIEL_CHECK_GT(normalizer, 0.);
-  for (auto&[action, p] : outcomes) p /= normalizer;
+  for (auto &[action, p] : outcomes)
+    p /= normalizer;
   SPIEL_CHECK_EQ(outcomes.size(), possible_hand_pairs);
   return outcomes;
 }
@@ -815,17 +818,16 @@ logic::CardSet UniversalPokerState::HoleCards(Player player) const {
 
 logic::CardSet UniversalPokerState::BoardCards() const {
   logic::CardSet board_cards;
-  const int num_board_cards =
-      std::min(board_cards_dealt_,
-               static_cast<int>(acpc_game_->GetTotalNbBoardCards()));
+  const int num_board_cards = std::min(
+      board_cards_dealt_, static_cast<int>(acpc_game_->GetTotalNbBoardCards()));
   for (int i = 0; i < num_board_cards; ++i) {
     board_cards.AddCard(acpc_state_.board_cards(i));
   }
   return board_cards;
 }
 
-std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
-    const {
+std::vector<std::pair<Action, double>>
+UniversalPokerState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
 
   // Two cases:
@@ -857,16 +859,18 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
       std::vector<Action> actions;
       actions.reserve(deck_.NumCards());
       for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
-        if (deck_.ContainsCards(all_cards[i])) actions.push_back(i);
+        if (deck_.ContainsCards(all_cards[i]))
+          actions.push_back(i);
       }
       return actions;
     } else {
       // Strip away probability outcomes.
       std::vector<std::pair<Action, double>> outcomes =
           DistributeHandCardsInSubgame();
-      std::vector <Action> actions;
+      std::vector<Action> actions;
       actions.reserve(outcomes.size());
-      for (auto&[action, p] : outcomes) actions.push_back(action);
+      for (auto &[action, p] : outcomes)
+        actions.push_back(action);
       return actions;
     }
   }
@@ -874,10 +878,14 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
   std::vector<Action> legal_actions;
 
   if (betting_abstraction_ != BettingAbstraction::kFULLGAME) {
-    if (ACTION_FOLD & possibleActions_) legal_actions.push_back(kFold);
-    if (ACTION_CHECK_CALL & possibleActions_) legal_actions.push_back(kCall);
-    if (ACTION_BET & possibleActions_) legal_actions.push_back(kBet);
-    if (ACTION_ALL_IN & possibleActions_) legal_actions.push_back(kAllIn);
+    if (ACTION_FOLD & possibleActions_)
+      legal_actions.push_back(kFold);
+    if (ACTION_CHECK_CALL & possibleActions_)
+      legal_actions.push_back(kCall);
+    if (ACTION_BET & possibleActions_)
+      legal_actions.push_back(kBet);
+    if (ACTION_ALL_IN & possibleActions_)
+      legal_actions.push_back(kAllIn);
 
     // For legacy reasons, kHalfPot is the biggest action (in terms of the
     // action representation).
@@ -972,7 +980,7 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
       int num_cards_before_dist = deck_.NumCards();
       for (int pl = 0; pl < num_players_; ++pl) {
         for (int i = 0; i < num_hole_cards; ++i) {
-          int card = cards.at(pl*num_hole_cards + i);
+          int card = cards.at(pl * num_hole_cards + i);
           SPIEL_CHECK_GE(rankOfCard(card), 0);
           SPIEL_CHECK_LT(rankOfCard(card), MAX_RANKS);
           SPIEL_CHECK_GE(suitOfCard(card), 0);
@@ -1061,7 +1069,8 @@ std::unique_ptr<StateStruct> UniversalPokerState::ToStruct() const {
   }
   std::string betting_history;
   for (int r = 0; r <= acpc_state_.GetRound(); ++r) {
-    if (r > 0) absl::StrAppend(&betting_history, "/");
+    if (r > 0)
+      absl::StrAppend(&betting_history, "/");
     absl::StrAppend(&betting_history, acpc_state_.BettingSequence(r));
   }
   rv->betting_history = betting_history;
@@ -1095,8 +1104,9 @@ std::unique_ptr<StateStruct> UniversalPokerState::ToStruct() const {
   return rv;
 }
 
-std::unique_ptr<State> UniversalPokerState::ResampleFromInfostate(
-    int player_id, std::function<double()> rng) const {
+std::unique_ptr<State>
+UniversalPokerState::ResampleFromInfostate(int player_id,
+                                           std::function<double()> rng) const {
   std::unique_ptr<HistoryDistribution> potential_histories =
       GetHistoriesConsistentWithInfostate(player_id);
   const int index = SamplerFromRng(rng)(potential_histories->second);
@@ -1106,15 +1116,19 @@ std::unique_ptr<State> UniversalPokerState::ResampleFromInfostate(
 std::unique_ptr<HistoryDistribution>
 UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   // This is only implemented for 2 players.
-  if (acpc_game_->GetNbPlayers() != 2) return {};
+  if (acpc_game_->GetNbPlayers() != 2)
+    return {};
 
   logic::CardSet is_cards;
   logic::CardSet our_cards = HoleCards(player_id);
-  for (uint8_t card : our_cards.ToCardArray()) is_cards.AddCard(card);
-  for (uint8_t card : BoardCards().ToCardArray()) is_cards.AddCard(card);
+  for (uint8_t card : our_cards.ToCardArray())
+    is_cards.AddCard(card);
+  for (uint8_t card : BoardCards().ToCardArray())
+    is_cards.AddCard(card);
   logic::CardSet fresh_deck(/*num_suits=*/acpc_game_->NumSuitsDeck(),
                             /*num_ranks=*/acpc_game_->NumRanksDeck());
-  for (uint8_t card : is_cards.ToCardArray()) fresh_deck.RemoveCard(card);
+  for (uint8_t card : is_cards.ToCardArray())
+    fresh_deck.RemoveCard(card);
   auto dist = absl::make_unique<HistoryDistribution>();
 
   // We only consider half the possible hands as we only look at each pair of
@@ -1126,16 +1140,19 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
     logic::CardSet subset_deck = fresh_deck;
     subset_deck.RemoveCard(hole_card1);
     for (uint8_t hole_card2 : subset_deck.ToCardArray()) {
-      if (hole_card1 < hole_card2) continue;
+      if (hole_card1 < hole_card2)
+        continue;
       std::unique_ptr<State> root = game_->NewInitialState();
       if (player_id == 0) {
-        for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
+        for (uint8_t card : our_cards.ToCardArray())
+          root->ApplyAction(card);
         root->ApplyAction(hole_card1);
         root->ApplyAction(hole_card2);
       } else if (player_id == 1) {
         root->ApplyAction(hole_card1);
         root->ApplyAction(hole_card2);
-        for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
+        for (uint8_t card : our_cards.ToCardArray())
+          root->ApplyAction(card);
       }
       SPIEL_CHECK_FALSE(root->IsChanceNode());
       dist->first.push_back(std::move(root));
@@ -1147,8 +1164,9 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   return dist;
 }
 
-std::vector<double> UniversalPokerState::CalculateOdds(
-    int num_simulations, std::mt19937& rng) const {
+std::vector<double>
+UniversalPokerState::CalculateOdds(int num_simulations,
+                                   std::mt19937 &rng) const {
   std::vector<double> win_percentages(NumPlayers(), 0.0);
   std::vector<double> draw_percentages(NumPlayers(), 0.0);
   std::vector<Player> active_players;
@@ -1244,8 +1262,8 @@ std::vector<double> UniversalPokerState::CalculateOdds(
 
   std::vector<double> result(2 * NumPlayers());
   for (Player p = 0; p < NumPlayers(); ++p) {
-    result[2*p] = win_percentages[p];
-    result[2*p+1] = draw_percentages[p];
+    result[2 * p] = win_percentages[p];
+    result[2 * p + 1] = draw_percentages[p];
   }
   return result;
 }
@@ -1255,10 +1273,8 @@ std::vector<double> UniversalPokerState::CalculateOdds(
  * @param params
  */
 UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
-    : Game(kGameType, params),
-      gameDesc_(parseParameters(params)),
-      acpc_game_(gameDesc_),
-      potSize_(ParameterValue<int>("potSize")),
+    : Game(kGameType, params), gameDesc_(parseParameters(params)),
+      acpc_game_(gameDesc_), potSize_(ParameterValue<int>("potSize")),
       boardCards_(ParameterValue<std::string>("boardCards")),
       handReaches_(ParameterValue<std::string>("handReaches")),
       calc_odds_num_sims_(ParameterValue<int>("calcOddsNumSims", 0)) {
@@ -1426,7 +1442,8 @@ int UniversalPokerGame::NumDistinctActions() const {
 
 int UniversalPokerGame::MaxGameLength() const {
   // We cache this as this is very slow to calculate.
-  if (max_game_length_) return *max_game_length_;
+  if (max_game_length_)
+    return *max_game_length_;
 
   // Make a good guess here because brute forcing the tree is far too slow
   // One Terminal Action
@@ -1469,10 +1486,10 @@ int UniversalPokerGame::MaxGameLength() const {
     double pot_size = maxBlind * NumPlayers();
     while (pot_size / NumPlayers() < maxStack) {
       max_num_raises++;
-      pot_size += NumPlayers() * pot_size/2;
+      pot_size += NumPlayers() * pot_size / 2;
     }
   } else if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
-    max_num_raises = (maxStack + maxBlind - 1)/maxBlind;  // ceil divide
+    max_num_raises = (maxStack + maxBlind - 1) / maxBlind; // ceil divide
   } else {
     SpielFatalError("Unknown Betting Abstraction");
   }
@@ -1550,7 +1567,7 @@ const char *actions = "0df0c000p0000000a";
 
 void UniversalPokerState::ApplyChoiceAction(StateActionType action_type,
                                             int size) {
-  SPIEL_CHECK_GE(cur_player_, 0);  // No chance not terminal.
+  SPIEL_CHECK_GE(cur_player_, 0); // No chance not terminal.
   const auto &up_game = static_cast<const UniversalPokerGame &>(*game_);
 
   // We redirect these actions to check/call, as they are semantically a
@@ -1566,7 +1583,8 @@ void UniversalPokerState::ApplyChoiceAction(StateActionType action_type,
   // actionSequenceSizing value will be identical regardless of what size stack
   // the caller has in all-in situations.
   actionSequenceSizings_.push_back(size);
-  if (action_type == ACTION_DEAL) SpielFatalError("Cannot apply deal action.");
+  if (action_type == ACTION_DEAL)
+    SpielFatalError("Cannot apply deal action.");
   acpc_state_.DoAction(UniversalPokerActionTypeToACPCActionType(action_type),
                        size);
   _CalculateActionsAndNodeType();
@@ -1622,7 +1640,8 @@ void UniversalPokerState::_CalculateActionsAndNodeType() {
     int allInSize = 0;
     // We have to call this as this sets potSize and allInSize_.
     bool valid_to_raise = acpc_state_.RaiseIsValid(&potSize, &allInSize);
-    if (betting_abstraction_ == BettingAbstraction::kFC) return;
+    if (betting_abstraction_ == BettingAbstraction::kFC)
+      return;
     if (valid_to_raise) {
       if (acpc_game_->IsLimitGame()) {
         potSize = 0;
@@ -1654,83 +1673,83 @@ int UniversalPokerState::GetPossibleActionCount() const {
   return __builtin_popcount(possibleActions_);
 }
 
-open_spiel::Action ACPCActionToOpenSpielAction(
-    const project_acpc_server::Action &action,
-    const UniversalPokerState &state) {
+open_spiel::Action
+ACPCActionToOpenSpielAction(const project_acpc_server::Action &action,
+                            const UniversalPokerState &state) {
   // We assign this here as we cannot initialize a variable within a switch
   // statement.
   const auto &up_game =
       static_cast<const UniversalPokerGame &>(*state.GetGame());
   switch (action.type) {
-    case project_acpc_server::ActionType::a_fold:
-      return ActionType::kFold;
-    case project_acpc_server::ActionType::a_call:
+  case project_acpc_server::ActionType::a_fold:
+    return ActionType::kFold;
+  case project_acpc_server::ActionType::a_call:
+    return ActionType::kCall;
+  case project_acpc_server::ActionType::a_raise:
+    SPIEL_CHECK_NE(state.betting(), BettingAbstraction::kFC);
+    // Note: the following code is being kept for legacy reasons. Previous
+    // comment kept here for posterity:
+    // """
+    // The maximum utility is exactly equal to the all-in amount for both
+    // players.
+    // """
+    // (Said comment however A. assumes a heads-up game and B. is technically
+    // incorrect anyways; see MaxUtility for more details.)
+    if (action.size == up_game.MaxCommitment() * up_game.NumPlayers()) {
       return ActionType::kCall;
-    case project_acpc_server::ActionType::a_raise:
-      SPIEL_CHECK_NE(state.betting(), BettingAbstraction::kFC);
-      // Note: the following code is being kept for legacy reasons. Previous
-      // comment kept here for posterity:
-      // """
-      // The maximum utility is exactly equal to the all-in amount for both
-      // players.
-      // """
-      // (Said comment however A. assumes a heads-up game and B. is technically
-      // incorrect anyways; see MaxUtility for more details.)
-      if (action.size == up_game.MaxCommitment() * up_game.NumPlayers()) {
-        return ActionType::kCall;
-      }
-      if (action.size == state.PotSize(0.5)) {
-        return ActionType::kHalfPot;
-      }
-      if (action.size == state.PotSize()) return ActionType::kBet;
-      if (action.size == state.AllInSize()) return ActionType::kAllIn;
-      if (state.betting() == BettingAbstraction::kFCHPA) {
-        return action.size;
-      }
-      if (state.betting() != BettingAbstraction::kFULLGAME) {
-        SpielFatalError(absl::StrCat(
-            "Unsupported bet size: ", action.size, ", pot: ", state.PotSize(),
-            ", all_in: ", state.AllInSize(),
-            ", max_commitment: ", state.acpc_state().raw_state().maxSpent,
-            ", state: ", state.ToString(),
-            ", history: ", state.HistoryString()));
-      }
-      SPIEL_CHECK_EQ(state.betting(), BettingAbstraction::kFULLGAME);
-      return ActionType::kBet + action.size;
-    case project_acpc_server::ActionType::a_invalid:
-      SpielFatalError("Invalid action type.");
-    default:
-      SpielFatalError(absl::StrCat("Type not found. Type: ", action.type));
+    }
+    if (action.size == state.PotSize(0.5)) {
+      return ActionType::kHalfPot;
+    }
+    if (action.size == state.PotSize())
+      return ActionType::kBet;
+    if (action.size == state.AllInSize())
+      return ActionType::kAllIn;
+    if (state.betting() == BettingAbstraction::kFCHPA) {
+      return action.size;
+    }
+    if (state.betting() != BettingAbstraction::kFULLGAME) {
+      SpielFatalError(absl::StrCat(
+          "Unsupported bet size: ", action.size, ", pot: ", state.PotSize(),
+          ", all_in: ", state.AllInSize(),
+          ", max_commitment: ", state.acpc_state().raw_state().maxSpent,
+          ", state: ", state.ToString(), ", history: ", state.HistoryString()));
+    }
+    SPIEL_CHECK_EQ(state.betting(), BettingAbstraction::kFULLGAME);
+    return ActionType::kBet + action.size;
+  case project_acpc_server::ActionType::a_invalid:
+    SpielFatalError("Invalid action type.");
+  default:
+    SpielFatalError(absl::StrCat("Type not found. Type: ", action.type));
   }
   // Will never get called.
   return kInvalidAction;
 }
 
-std::shared_ptr<const Game> LoadUniversalPokerGameFromACPCGamedef(
-    const std::string &acpc_gamedef) {
+std::shared_ptr<const Game>
+LoadUniversalPokerGameFromACPCGamedef(const std::string &acpc_gamedef) {
   return LoadGame(logic::GamedefToOpenSpielParameters(acpc_gamedef));
 }
 
 std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937 &rng, int pot_size,
                                               std::string board_cards,
                                               std::vector<double> hand_reach) {
-  constexpr const char* base_game =
-      "universal_poker("
-      "betting=nolimit,"
-      "numPlayers=2,"
-      "numRounds=4,"
-      "blind=100 50,"
-      "firstPlayer=2 1 1 1,"
-      "numSuits=4,"
-      "numRanks=13,"
-      "numHoleCards=2,"
-      "numBoardCards=0 3 1 1,"
-      "stack=20000 20000,"
-      "bettingAbstraction=fcpa,"
-      "potSize=%d,"
-      "boardCards=%s,"
-      "handReaches=%s"
-    ")";
+  constexpr const char *base_game = "universal_poker("
+                                    "betting=nolimit,"
+                                    "numPlayers=2,"
+                                    "numRounds=4,"
+                                    "blind=100 50,"
+                                    "firstPlayer=2 1 1 1,"
+                                    "numSuits=4,"
+                                    "numRanks=13,"
+                                    "numHoleCards=2,"
+                                    "numBoardCards=0 3 1 1,"
+                                    "stack=20000 20000,"
+                                    "bettingAbstraction=fcpa,"
+                                    "potSize=%d,"
+                                    "boardCards=%s,"
+                                    "handReaches=%s"
+                                    ")";
 
   if (pot_size == -1) {
     // 40k is total money in the game -- sum of the players stacks (20k+20k).
@@ -1766,7 +1785,7 @@ std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937 &rng, int pot_size,
     SPIEL_CHECK_NE(1.0, next_after_one);
     SPIEL_CHECK_LT(1.0, next_after_one);
     std::uniform_real_distribution<double> dist(0.0, next_after_one);
-    for (int i = 0; i < 2*kSubgameUniqueHands; ++i) {
+    for (int i = 0; i < 2 * kSubgameUniqueHands; ++i) {
       hand_reach.push_back(dist(rng));
     }
   }
@@ -1803,7 +1822,7 @@ class UniformRestrictedActionsFactory : public BotFactory {
       // First, we check if it's universal poker. Add the bet action if it's a
       // limit ACPC game or Leduc poker.
       if (game->GetType().short_name == "universal_poker") {
-        const auto *up_game = down_cast<const UniversalPokerGame*>(game.get());
+        const auto *up_game = down_cast<const UniversalPokerGame *>(game.get());
         if (up_game->GetACPCGame()->IsLimitGame()) {
           actions.push_back(ActionType::kBet);
         }
@@ -1838,5 +1857,5 @@ class UniformRestrictedActionsFactory : public BotFactory {
 REGISTER_SPIEL_BOT("uniform_restricted_actions",
                    UniformRestrictedActionsFactory);
 
-}  // namespace universal_poker
-}  // namespace open_spiel
+} // namespace universal_poker
+} // namespace open_spiel

@@ -104,8 +104,8 @@ class PhantomTTTState : public State {
   int bits_per_action_;
   int longest_sequence_;
 
-  // TODO(author2): Use the base class history_ instead.
-  std::vector<std::pair<int, Action>> action_sequence_;
+  std::vector<std::pair<int, Action>> GetActionSequence() const;
+  
   std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> x_view_;
   std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> o_view_;
 };
