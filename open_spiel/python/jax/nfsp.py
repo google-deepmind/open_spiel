@@ -20,25 +20,139 @@ PRs improving the runtime are welcome.
 See the paper https://arxiv.org/abs/1603.01121 for more details.
 """
 
-import collections
 import contextlib
 import enum
-import os
+import functools
+from typing import Iterable, NamedTuple
 
-import haiku as hk
+import chex
+import etils.epath
+import flax.nnx as nn
 import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+import orbax.checkpoint as ocp
 
 from open_spiel.python import rl_agent
 from open_spiel.python.jax import dqn
-from open_spiel.python.utils.reservoir_buffer import ReservoirBuffer
 
-Transition = collections.namedtuple(
-    "Transition", "info_state action_probs legal_actions_mask")
 
-MODE = enum.Enum("mode", "best_response average_policy")
+class Transition(NamedTuple):
+  info_state: chex.Array
+  action_probs: chex.Array
+  legal_actions_mask: chex.Array
+
+
+class MODE(enum.Enum):
+  BEST_RESPONSE = 0
+  AVERAGE_POLICY = 1
+
+
+class Optimiser(enum.StrEnum):
+  SGD = "sgd"
+  RMSPROP = "rmsprop"
+  ADAM = "adam"
+
+
+class ReservoirBufferState(NamedTuple):
+  experience: chex.ArrayTree
+  capacity: chex.Numeric
+  add_calls: chex.Array
+  is_full: chex.Array
+
+  def __len__(self) -> int:
+    return jnp.where(self.is_full, self.capacity, self.add_calls)
+
+
+class ReservoirBuffer:
+  """Allows uniform sampling over a stream of data.
+
+  See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
+  """
+
+  @staticmethod
+  @functools.partial(jax.jit, static_argnames=("capacity",))
+  def init(
+      capacity: chex.Numeric, experience: Transition
+  ) -> ReservoirBufferState:
+    """Initializes the reservoir buffer."""
+    # Set experience value to be empty.
+    experience = jax.tree.map(jnp.empty_like, experience)
+    # Broadcast to [add_batch_size, ...]
+    experience = jax.tree.map(
+        lambda x: jnp.broadcast_to(x[jnp.newaxis, ...], (capacity, *x.shape)),
+        experience,
+    )
+    return ReservoirBufferState(
+        capacity=capacity,
+        experience=experience,
+        add_calls=jnp.array(0),
+        is_full=jnp.array(False, dtype=jnp.bool),
+    )
+
+  @staticmethod
+  @functools.partial(jax.jit, donate_argnums=(0,))
+  def append(
+      state: ReservoirBufferState, experience: Transition, rng: chex.PRNGKey
+  ) -> ReservoirBufferState:
+    """Potentially adds `experience` to the reservoir buffer.
+
+    Args:
+      state: `ReservoirBufferState`, current state of the buffer
+      experience: data to be added to the reservoir buffer.
+      rng: `chex.PRNGKey`, a random seed
+
+    Returns:
+      An updated `ReservoirBufferState`.
+    """
+    # Note: count + 1 because the current item is the (count+1)-th item
+    idx = jax.random.randint(rng, (), 0, state.add_calls + 1)
+
+    # 2. Logic:
+    # If buffer is not full, we always add at 'count'.
+    # If buffer is full, we replace at 'idx' ONLY IF idx < capacity.
+    is_full = state.is_full | (state.add_calls >= state.capacity)
+    write_idx = jnp.where(is_full, idx, state.add_calls)
+    should_update = write_idx < state.capacity
+
+    def update_leaf(buffer_leaf, exp_leaf):
+      new_val = jnp.where(should_update, exp_leaf, buffer_leaf[write_idx])
+      return buffer_leaf.at[write_idx].set(new_val)
+
+    new_experience = jax.tree.map(update_leaf, state.experience, experience)
+
+    return ReservoirBufferState(
+        capacity=state.capacity,
+        experience=new_experience,
+        add_calls=state.add_calls + 1,
+        is_full=is_full,
+    )
+
+  @staticmethod
+  @functools.partial(jax.jit, static_argnames="num_samples")
+  def sample(
+      rng: chex.PRNGKey, state: ReservoirBufferState, num_samples: int
+  ) -> Transition:
+    """Returns `num_samples` uniformly sampled from the buffer.
+
+    Args:
+      rng: `chex.PRNGKey`, a random state
+      state: `ReservoirBufferState`, a buffer state
+      num_samples: `int`, number of samples to draw.
+
+    Returns:
+      An iterable over `num_samples` random elements of the buffer.
+
+    Raises:
+      AssertionError: If there are less than `num_samples` elements in the
+      buffer.
+    """
+    max_size = jnp.where(state.is_full, state.capacity, state.add_calls)
+    indices = jax.random.randint(
+        rng, shape=(num_samples,), minval=0, maxval=max_size
+    )
+    return jax.tree.map(lambda x: x[indices], state.experience)
 
 
 class NFSP(rl_agent.AbstractAgent):
@@ -47,21 +161,39 @@ class NFSP(rl_agent.AbstractAgent):
   See open_spiel/python/examples/kuhn_nfsp.py for an usage example.
   """
 
-  def __init__(self,
-               player_id,
-               state_representation_size,
-               num_actions,
-               hidden_layers_sizes,
-               reservoir_buffer_capacity,
-               anticipatory_param,
-               batch_size=128,
-               rl_learning_rate=0.01,
-               sl_learning_rate=0.01,
-               min_buffer_size_to_learn=1000,
-               learn_every=64,
-               optimizer_str="sgd",
-               **kwargs):
+  def __init__(
+      self,
+      player_id: int,
+      state_representation_size: chex.Shape,
+      num_actions: int,
+      hidden_layers_sizes: Iterable[int],
+      reservoir_buffer_capacity: int,
+      anticipatory_param: float,
+      replay_buffer_class: object = ReservoirBuffer,
+      batch_size: int = 128,
+      rl_learning_rate: float = 0.01,
+      sl_learning_rate: float = 0.01,
+      min_buffer_size_to_learn: int = 1000,
+      learn_every: int = 64,
+      optimizer_str="sgd",
+      seed: int = 42,
+      allow_checkpointing: bool = True,
+      **kwargs,
+  ) -> None:
     """Initialize the `NFSP` agent."""
+    chex.assert_type(
+        [
+            num_actions,
+            seed,
+            batch_size,
+            min_buffer_size_to_learn,
+            reservoir_buffer_capacity,
+            learn_every,
+        ],
+        int,
+    )
+    chex.assert_type(anticipatory_param, float)
+
     self.player_id = player_id
     self._num_actions = num_actions
     self._layer_sizes = hidden_layers_sizes
@@ -70,12 +202,18 @@ class NFSP(rl_agent.AbstractAgent):
     self._anticipatory_param = anticipatory_param
     self._min_buffer_size_to_learn = min_buffer_size_to_learn
 
-    self._reservoir_buffer = ReservoirBuffer(reservoir_buffer_capacity)
+    self._replay_buffer_class = replay_buffer_class
+    assert hasattr(replay_buffer_class, "init")
+    assert hasattr(replay_buffer_class, "append")
+    assert hasattr(replay_buffer_class, "sample")
+
+    self._reservoir_buffer_capacity = int(reservoir_buffer_capacity)
+    self._reservoir_buffer = None
     self._prev_timestep = None
     self._prev_action = None
 
     # Step counter to keep track of learning.
-    self._step_counter = 0
+    self._iteration = 0
 
     # Inner RL agent
     kwargs.update({
@@ -85,64 +223,49 @@ class NFSP(rl_agent.AbstractAgent):
         "min_buffer_size_to_learn": min_buffer_size_to_learn,
         "optimizer_str": optimizer_str,
     })
-    self._rl_agent = dqn.DQN(player_id, state_representation_size,
-                             num_actions, hidden_layers_sizes, **kwargs)
+    self._rl_agent = dqn.DQN(
+        player_id,
+        state_representation_size,
+        num_actions,
+        hidden_layers_sizes,
+        allow_checkpointing=allow_checkpointing,
+        **kwargs,
+    )
 
     # Keep track of the last training loss achieved in an update step.
-    self._last_rl_loss_value = lambda: self._rl_agent.loss
+    self._sl_loss_fn = jax.vmap(optax.softmax_cross_entropy)
     self._last_sl_loss_value = None
+    self._last_rl_loss_value = self._rl_agent.loss
+
+    self._rngkey = jax.random.PRNGKey(seed)
 
     # Average policy network.
-    def network(x):
-      mlp = hk.nets.MLP(self._layer_sizes + [num_actions])
-      return mlp(x)
+    self._avg_network = dqn.MLP(
+        state_representation_size, self._layer_sizes, num_actions, seed=seed + 1
+    )
 
-    self.hk_avg_network = hk.without_apply_rng(hk.transform(network))
-
-    def avg_network_policy(param, info_state):
-      action_values = self.hk_avg_network.apply(param, info_state)
-      action_probs = jax.nn.softmax(action_values, axis=1)
-      return action_values, action_probs
-
-    self._avg_network_policy = jax.jit(avg_network_policy)
-
-    rng = jax.random.PRNGKey(42)
-    x = jnp.ones([1, state_representation_size])
-    self.params_avg_network = self.hk_avg_network.init(rng, x)
-    self.params_avg_network = jax.device_put(self.params_avg_network)
-
-    self._savers = [
-        ("q_network", self._rl_agent.params_q_network),
-        ("avg_network", self.params_avg_network)
-    ]
-
-    if optimizer_str == "adam":
-      opt_init, opt_update = optax.chain(
-          optax.scale_by_adam(b1=0.9, b2=0.999, eps=1e-8),
-          optax.scale(sl_learning_rate))
-    elif optimizer_str == "sgd":
-      opt_init, opt_update = optax.sgd(sl_learning_rate)
+    if optimizer_str == Optimiser.ADAM:
+      optimiser = optax.adam(sl_learning_rate)
+    elif optimizer_str == Optimiser.SGD:
+      optimiser = optax.sgd(sl_learning_rate)
     else:
-      raise ValueError("Not implemented. Choose from ['adam', 'sgd'].")
-    self._opt_update_fn = self._get_update_func(opt_update)
-    self._opt_state = opt_init(self.params_avg_network)
-    self._loss_and_grad = jax.value_and_grad(self._loss_avg, has_aux=False)
+      raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
 
-    self._sample_episode_policy()
-    self._jit_update = jax.jit(self.get_update())
+    self._avg_network_optimiser = nn.Optimizer(
+        self._avg_network, optimiser, wrt=nn.Param
+    )
+    self._avg_network_graphdef_opt = nn.graphdef(
+        (self._avg_network, self._avg_network_optimiser)
+    )
+    self._avg_network_graphdef = nn.graphdef(self._avg_network)
 
-  def _get_update_func(self, opt_update):
+    self._jit_update = self._get_jitted_sl_upate()
+    self._avg_network_inference = self._get_jitted_sl_inference()
+    self._sample_episode_policy(self._next_rng_key())
 
-    def update(params, opt_state, gradient):
-      """Learning rule (stochastic gradient descent)."""
-      updates, opt_state = opt_update(gradient, opt_state)
-      new_params = optax.apply_updates(params, updates)
-      return new_params, opt_state
-
-    return update
-
-  def get_step_counter(self):
-    return self._step_counter
+    self._checkpointer = None
+    if allow_checkpointing:
+      self._checkpointer = ocp.StandardCheckpointer()
 
   @contextlib.contextmanager
   def temp_mode_as(self, mode):
@@ -152,34 +275,99 @@ class NFSP(rl_agent.AbstractAgent):
     yield
     self._mode = previous_mode
 
-  def _sample_episode_policy(self):
-    if np.random.rand() < self._anticipatory_param:
-      self._mode = MODE.best_response
-    else:
-      self._mode = MODE.average_policy
+  def _get_jitted_sl_upate(self):
+    """Get jitted average policy network update function."""
 
-  def _act(self, info_state, legal_actions):
-    info_state = np.reshape(info_state, [1, -1])
-    action_values, action_probs = self._avg_network_policy(
-        self.params_avg_network, info_state
-        )
+    def _loss_fn(
+        avg_network: nn.Module,
+        info_states: chex.Array,
+        legal_actions_mask: chex.Array,
+        action_probs: chex.Array,
+    ) -> chex.Numeric:
+      avg_actions_logits = dqn.forward(avg_network, info_states)
+      avg_actions_logits = jnp.where(
+          legal_actions_mask,
+          avg_actions_logits,
+          dqn.ILLEGAL_ACTION_LOGITS_PENALTY,
+      )
+      loss_values = self._sl_loss_fn(avg_actions_logits, action_probs)
+      return loss_values.mean()
 
-    self._last_action_values = action_values[0]
-    # Remove illegal actions, normalize probs
-    probs = np.zeros(self._num_actions)
-    action_probs = np.asarray(action_probs)
-    probs[legal_actions] = action_probs[0][legal_actions]
-    probs /= sum(probs)
-    action = np.random.choice(len(probs), p=probs)
-    return action, probs
+    @jax.jit
+    def update(
+        avg_network_state: nn.State, batch: Transition
+    ) -> tuple[chex.Numeric, nn.State]:
+      avg_network, optimiser = nn.merge(
+          self._avg_network_graphdef_opt, avg_network_state, copy=True
+      )
+
+      main_loss, grads = nn.value_and_grad(_loss_fn)(
+          avg_network,
+          batch.info_state,
+          batch.legal_actions_mask,
+          batch.action_probs,
+      )
+      optimiser.update(avg_network, grads)
+
+      return main_loss, nn.state((avg_network, optimiser))
+
+    return update
+
+  def _get_jitted_sl_inference(self):
+    """Get jitted average policy network inference function."""
+
+    @jax.jit
+    def infer(
+        avg_network_state: nn.State,
+        info_state: np.ndarray,
+    ) -> tuple[chex.Array, chex.Array]:
+      avg_network = nn.merge(self._avg_network_graphdef, avg_network_state)
+      action_values = avg_network(info_state)
+      return action_values
+
+    return infer
 
   @property
-  def mode(self):
+  def step_counter(self) -> int:
+    return self._iteration
+
+  def _next_rng_key(self) -> chex.PRNGKey:
+    """Get the next rng subkey from class rngkey."""
+    self._rngkey, subkey = jax.random.split(self._rngkey)
+    return subkey
+
+  def _sample_episode_policy(self, rng: chex.PRNGKey) -> None:
+    if jax.random.uniform(rng) < self._anticipatory_param:
+      self._mode = MODE.BEST_RESPONSE
+    else:
+      self._mode = MODE.AVERAGE_POLICY
+
+  @functools.partial(jax.jit, static_argnums=(0,))
+  def _act(
+      self,
+      network_state: nn.State,
+      rng: chex.PRNGKey,
+      info_state: chex.Array,
+      legal_actions: chex.Array,
+  ):
+    action_values = self._avg_network_inference(network_state, info_state)
+    # Remove illegal actions, normalize probs
+    probs = jnp.where(
+        legal_actions, action_values, dqn.ILLEGAL_ACTION_LOGITS_PENALTY
+    )
+    probs = nn.softmax(probs, axis=-1)
+    action = jax.random.choice(
+        rng, jnp.arange(len(probs)), p=jnp.asarray(probs)
+    )
+    return action_values, action, probs
+
+  @property
+  def mode(self) -> MODE:
     return self._mode
 
   @property
   def loss(self):
-    return (self._last_sl_loss_value, self._last_rl_loss_value())
+    return (self._last_sl_loss_value, self._rl_agent.loss)
 
   def step(self, time_step, is_evaluation=False):
     """Returns the action to be taken and updates the Q-networks if needed.
@@ -187,41 +375,55 @@ class NFSP(rl_agent.AbstractAgent):
     Args:
       time_step: an instance of rl_environment.TimeStep.
       is_evaluation: bool, whether this is a training or evaluation call.
+        Defaults to False.
 
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-    if self._mode == MODE.best_response:
+    if self._mode == MODE.BEST_RESPONSE:
       agent_output = self._rl_agent.step(time_step, is_evaluation)
       if not is_evaluation and not time_step.last():
-        self._add_transition(time_step, agent_output)
+        self.add_transition(time_step, agent_output)
 
-    elif self._mode == MODE.average_policy:
+    elif self._mode == MODE.AVERAGE_POLICY:
       # Act step: don't act at terminal info states.
       if not time_step.last():
         info_state = time_step.observations["info_state"][self.player_id]
-        legal_actions = time_step.observations["legal_actions"][self.player_id]
-        action, probs = self._act(info_state, legal_actions)
+        legal_actions = jnp.asarray(
+            time_step.observations["legal_actions"][self.player_id],
+            dtype=jnp.int32,
+        )
+        action_values, action, probs = self._act(
+            nn.state(self._avg_network),
+            self._next_rng_key(),
+            jnp.asarray(info_state),
+            jnp.zeros(self._num_actions, dtype=jnp.bool)
+            .at[legal_actions]
+            .set(True),
+        )
+        self._last_action_values = action_values
+
         agent_output = rl_agent.StepOutput(action=action, probs=probs)
 
       if self._prev_timestep and not is_evaluation:
-        self._rl_agent.add_transition(self._prev_timestep, self._prev_action,
-                                      time_step)
+        self._rl_agent.add_transition(
+            self._prev_timestep, self._prev_action, time_step
+        )
     else:
-      raise ValueError("Invalid mode ({})".format(self._mode))
+      raise ValueError(f"Invalid mode ({self._mode})")
 
     if not is_evaluation:
-      self._step_counter += 1
+      self._iteration += 1
 
-      if self._step_counter % self._learn_every == 0:
+      if self._iteration % self._learn_every == 0:
         self._last_sl_loss_value = self._learn()
         # If learn step not triggered by rl policy, learn.
-        if self._mode == MODE.average_policy:
-          self._rl_agent.learn()
+        if self._mode == MODE.AVERAGE_POLICY:
+          self._last_rl_loss_value = self._rl_agent.learn()
 
       # Prepare for the next episode.
       if time_step.last():
-        self._sample_episode_policy()
+        self._sample_episode_policy(self._next_rng_key())
         self._prev_timestep = None
         self._prev_action = None
         return
@@ -230,7 +432,9 @@ class NFSP(rl_agent.AbstractAgent):
         self._prev_action = agent_output.action
     return agent_output
 
-  def _add_transition(self, time_step, agent_output):
+  def add_transition(
+      self, time_step, agent_output: rl_agent.StepOutput
+  ) -> None:
     """Adds the new transition using `time_step` to the reservoir buffer.
 
     Transitions are in the form (time_step, agent_output.probs, legal_mask).
@@ -240,30 +444,28 @@ class NFSP(rl_agent.AbstractAgent):
       agent_output: an instance of rl_agent.StepOutput.
     """
     legal_actions = time_step.observations["legal_actions"][self.player_id]
-    legal_actions_mask = np.zeros(self._num_actions)
-    legal_actions_mask[legal_actions] = 1.0
+
     transition = Transition(
-        info_state=(time_step.observations["info_state"][self.player_id][:]),
-        action_probs=agent_output.probs,
-        legal_actions_mask=legal_actions_mask)
-    self._reservoir_buffer.add(transition)
+        info_state=jnp.asarray(
+            time_step.observations["info_state"][self.player_id],
+            dtype=jnp.float32,
+        ),
+        action_probs=jnp.asarray(agent_output.probs, dtype=jnp.float32),
+        legal_actions_mask=jnp.zeros(self._num_actions, dtype=jnp.bool)
+        .at[jnp.asarray(legal_actions, dtype=jnp.int32)]
+        .set(True),
+    )
 
-  def _loss_avg(self, param_avg, info_states, action_probs):
-    avg_logit = self.hk_avg_network.apply(param_avg, info_states)
-    loss_value = -jnp.sum(
-        action_probs * jax.nn.log_softmax(avg_logit)) / avg_logit.shape[0]
-    return loss_value
+    if self._reservoir_buffer is None:
+      self._reservoir_buffer = self._replay_buffer_class.init(
+          self._reservoir_buffer_capacity, transition
+      )
 
-  def get_update(self):
-    def update(param_avg, opt_state_avg, info_states, action_probs):
-      loss_val, grad_val = self._loss_and_grad(param_avg, info_states,
-                                               action_probs)
-      new_param_avg, new_opt_state_avg = self._opt_update_fn(
-          param_avg, opt_state_avg, grad_val)
-      return new_param_avg, new_opt_state_avg, loss_val
-    return update
+    self._reservoir_buffer = self._replay_buffer_class.append(
+        self._reservoir_buffer, transition, self._next_rng_key()
+    )
 
-  def _learn(self):
+  def _learn(self) -> None:
     """Compute the loss on sampled transitions and perform a avg-network update.
 
     If there are not enough elements in the buffer, no loss is computed and
@@ -272,51 +474,81 @@ class NFSP(rl_agent.AbstractAgent):
     Returns:
       The average loss obtained on this batch of transitions or `None`.
     """
-    if (len(self._reservoir_buffer) < self._batch_size or
-        len(self._reservoir_buffer) < self._min_buffer_size_to_learn):
+    if (
+        len(self._reservoir_buffer) < self._batch_size
+        or len(self._reservoir_buffer) < self._min_buffer_size_to_learn
+    ):
       return None
 
-    transitions = self._reservoir_buffer.sample(self._batch_size)
-    info_states = np.asarray([t.info_state for t in transitions])
-    action_probs = np.asarray([t.action_probs for t in transitions])
+    transitions = self._replay_buffer_class.sample(
+        self._next_rng_key(), self._reservoir_buffer, self._batch_size
+    )
+    avg_network_state = nn.state(
+        (self._avg_network, self._avg_network_optimiser)
+    )
 
-    self.params_avg_network, self._opt_state, loss_val_avg = self._jit_update(
-        self.params_avg_network, self._opt_state, info_states, action_probs)
-    return loss_val_avg
+    loss_val, new_state = self._jit_update(avg_network_state, transitions)
+    nn.update((self._avg_network, self._avg_network_optimiser), new_state)
 
-  def _full_checkpoint_name(self, checkpoint_dir, name):
-    checkpoint_filename = "_".join([name, "pid" + str(self.player_id)])
-    return os.path.join(checkpoint_dir, checkpoint_filename)
+    return loss_val
 
-  def _latest_checkpoint_filename(self, name):
-    checkpoint_filename = "_".join([name, "pid" + str(self.player_id)])
-    return checkpoint_filename + "_latest"
-
-  def save(self, checkpoint_dir):
+  def save(
+      self, checkpoint_dir: etils.epath.Path, save_optimiser: bool = True
+  ) -> None:
     """Saves the average policy network and the inner RL agent's q-network.
 
-    Note that this does not save the experience replay buffers and should
-    only be used to restore the agent's policy, not resume training.
-
     Args:
-      checkpoint_dir: directory where checkpoints will be saved.
+      checkpoint_dir (etils.epath.Path): target checkpoint dir.
+      save_optimiser (bool, optional): whether save only the optimiser or just
+        the network's weights. Defaults to True.
     """
-    raise NotImplementedError
+    assert (
+        self._checkpointer
+    ), "Checkpointing disallowed. Set `allow_checkpointing` in the contructor"
+    checkpoint_dir = etils.epath.Path(checkpoint_dir)
 
-  def has_checkpoint(self, checkpoint_dir):
-    for name, _ in self._savers:
-      path = self._full_checkpoint_name(checkpoint_dir, name)
-      if os.path.exists(path):
-        return True
-    return False
+    self._rl_agent.save(checkpoint_dir / "q_network", save_optimiser)
+    if save_optimiser:
+      self._checkpointer.save(
+          checkpoint_dir / "optimiser",
+          nn.state((self._avg_network, self._avg_network_optimiser)),
+          force=True,
+      )
+    else:
+      self._checkpointer.save(
+          checkpoint_dir / "state", nn.state(self._avg_network)
+      )
+    self._checkpointer.wait_until_finished()
 
-  def restore(self, checkpoint_dir):
+  def restore(
+      self, checkpoint_dir: etils.epath.Path, load_optimiser: bool = True
+  ) -> None:
     """Restores the average policy network and the inner RL agent's q-network.
 
-    Note that this does not restore the experience replay buffers and should
-    only be used to restore the agent's policy, not resume training.
-
     Args:
-      checkpoint_dir: directory from which checkpoints will be restored.
+      checkpoint_dir (etils.epath.Path): target checkpoint dir.
+      load_optimiser (bool, optional): whether load only the optimiser or just
+        the network's weights. Defaults to True.
     """
-    raise NotImplementedError
+    assert (
+        self._checkpointer
+    ), "Checkpointing disallowed. Set `allow_checkpointing` in the contructor"
+    checkpoint_dir = etils.epath.Path(checkpoint_dir)
+
+    self._rl_agent.load(checkpoint_dir / "q_network", load_optimiser)
+
+    if load_optimiser:
+      state_restored = self._checkpointer.restore(
+          checkpoint_dir / "optimiser",
+          nn.state((self._avg_network, self._avg_network_optimiser)),
+      )
+      nn.update(
+          (self._avg_network, self._avg_network_optimiser), state_restored
+      )
+    else:
+      state_restored = self._checkpointer.restore(
+          checkpoint_dir / "state", nn.state(self._avg_network)
+      )
+      nn.update(self._avg_network, state_restored)
+
+    self._checkpointer.wait_until_finished()
