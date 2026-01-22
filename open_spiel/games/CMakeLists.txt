@@ -50,6 +50,10 @@ set(GAME_SOURCES
   coop_box_pushing/coop_box_pushing.h
   coordinated_mp/coordinated_mp.cc
   coordinated_mp/coordinated_mp.h
+  crazyhouse/crazyhouse.cc
+  crazyhouse/crazyhouse.h
+  crazyhouse/crazyhouse_board.cc
+  crazyhouse/crazyhouse_board.h
   crazy_eights/crazy_eights.cc
   crazy_eights/crazy_eights.h
   cribbage/cribbage.cc
@@ -397,6 +401,10 @@ add_executable(coordinated_mp_test coordinated_mp/coordinated_mp_test.cc ${OPEN_
         $<TARGET_OBJECTS:algorithms>)
 add_test(coordinated_mp_test coordinated_mp_test)
 
+add_executable(crazyhouse_test crazyhouse/crazyhouse_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crazyhouse_test crazyhouse_test)
+
 add_executable(crazy_eights_test crazy_eights/crazy_eights_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(crazy_eights_test crazy_eights_test)
@@ -515,6 +523,11 @@ add_executable(kuhn_poker_test kuhn_poker/kuhn_poker_test.cc ${OPEN_SPIEL_OBJECT
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(kuhn_poker_test kuhn_poker_test)
+
+add_executable(kuhn_consistency_test kuhn_poker/kuhn_consistency_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>
+               $<TARGET_OBJECTS:algorithms>)
+add_test(kuhn_consistency_test kuhn_consistency_test)
 
 add_executable(latent_ttt_test latent_ttt/latent_ttt_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
