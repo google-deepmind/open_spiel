@@ -261,6 +261,19 @@ std::shared_ptr<const Game> LoadGame(const std::string& game_string) {
   return LoadGame(GameParametersFromString(game_string));
 }
 
+std::vector<std::shared_ptr<const Game>> LoadGames(
+    const std::string& multi_game_string,
+    const std::string& separator) {
+  std::vector<std::shared_ptr<const Game>> games;
+  std::vector<std::string> game_strings =
+      absl::StrSplit(multi_game_string, separator);
+  for (std::string game_string : game_strings) {
+    absl::StripAsciiWhitespace(&game_string);
+    games.push_back(LoadGame(game_string));
+  }
+  return games;
+}
+
 std::shared_ptr<const Game> LoadGame(const std::string& short_name,
                                      const GameParameters& params) {
   std::shared_ptr<const Game> result =

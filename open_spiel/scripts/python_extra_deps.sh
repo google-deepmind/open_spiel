@@ -50,13 +50,7 @@ verlt() {
 #
 
 echo "Set Python version: $PY_VER"
-if verlt $PY_VER 3.11; then
-  echo "Detected Python version 3.10"
-  export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.9.1"
-  export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.6.2 jaxlib==0.6.2 flax==0.10.7 dm-haiku==0.0.16 optax==0.2.6 chex==0.1.90 rlax==0.1.7 distrax==0.1.5"
-  export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.26.1 tensorflow==2.14.0 tensorflow-probability==0.22.1 tensorflow_datasets==4.9.7 keras==2.14.0"
-  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==3.2 matplotlib==3.10.7 mock==4.0.2 nashpy==0.0.19 scipy==1.15.3 testresources==2.0.1 cvxopt==1.3.2 cvxpy==1.7.5 ecos==2.0.14 osqp==1.0.4"
-elif verlt $PY_VER 3.12; then
+if verlt $PY_VER 3.12; then
   echo "Detected Python version 3.11"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.9.1"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.8.1 jaxlib==0.8.1 flax==0.12.1 dm-haiku==0.0.16 optax==0.2.6 chex==0.1.91 rlax==0.1.8 distrax==0.1.7"

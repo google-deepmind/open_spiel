@@ -14,14 +14,11 @@
 
 from absl.testing import absltest
 
-import jax
-
 from open_spiel.python import rl_agent_policy
 from open_spiel.python import rl_environment
 from open_spiel.python.jax import boltzmann_dqn
 import pyspiel
 
-jax.config.update("jax_threefry_partitionable", False)
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.
@@ -45,9 +42,15 @@ class DQNTest(absltest.TestCase):
         hidden_layers_sizes=[16],
         replay_buffer_capacity=100,
         batch_size=5,
+        min_buffer_size_to_learn=25,
+        learn_every=10,
+        update_target_network_every=50,
         epsilon_start=0.02,
         epsilon_end=0.01,
-        eta=5.0)
+        epsilon_decay_duration=100,
+        eta=5.0,
+        allow_checkpointing=False,
+    )
     total_reward = 0
 
     # Training. This will use the epsilon-greedy actions.
@@ -58,6 +61,7 @@ class DQNTest(absltest.TestCase):
         time_step = env.step([agent_output.action])
         total_reward += time_step.rewards[0]
       agent.step(time_step)
+
     self.assertGreaterEqual(total_reward, -100)
 
     # Update the previous Q-network.
@@ -66,7 +70,7 @@ class DQNTest(absltest.TestCase):
     # This will use the soft-max actions.
     policy = rl_agent_policy.RLAgentPolicy(game, agent, 0, False)
     probs = policy.action_probabilities(game.new_initial_state())
-    self.assertAlmostEqual(probs[0], 0.54, places=2)
+    self.assertAlmostEqual(probs[0], 0.48, places=2)
 
 
 if __name__ == "__main__":

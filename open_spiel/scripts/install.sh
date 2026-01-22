@@ -17,7 +17,7 @@
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
-export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250127.1"}
+export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250814.1"}
 
 die() {
   echo "$*" 1>&2
@@ -287,12 +287,13 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     EXT_DEPS="${EXT_DEPS} rustc cargo"
   fi
 
-  APT_GET=`which apt-get`
-  if [ "$APT_GET" = "" ]
+  if command -v apt-get &> /dev/null
   then
-     echo "This script assumes a Debian-based Linux distribution. Please install these packages manually or using your distribution's package manager:"
-     echo "$EXT_DEPS"
-     exit 1
+      APT_GET=$(command -v apt-get)
+  else
+    echo "This script assumes a Debian-based Linux distribution. Please install these packages manually or using your distribution's package manager:"
+    echo "$EXT_DEPS"
+    exit 1
   fi
 
   # We install the packages only if they are not present yet.

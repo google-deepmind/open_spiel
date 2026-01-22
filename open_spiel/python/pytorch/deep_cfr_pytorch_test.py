@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.pytorch.deep_cfr."""
-
 from absl import app
 from absl import logging
 from absl.testing import absltest
@@ -41,7 +39,9 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
         learning_rate=1e-3,
         batch_size_advantage=None,
         batch_size_strategy=None,
-        memory_capacity=1e7)
+        memory_capacity=1e7,
+        seed=SEED,
+    )
     deep_cfr_solver.solve()
 
   def test_matching_pennies_3p(self):
@@ -55,7 +55,8 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
         learning_rate=1e-3,
         batch_size_advantage=None,
         batch_size_strategy=None,
-        memory_capacity=1e7)
+        memory_capacity=int(1e7),
+    )
     deep_cfr_solver.solve()
     conv = pyspiel.nash_conv(
         game,

@@ -14,15 +14,22 @@
 
 #include "open_spiel/games/gamut/gamut.h"
 
+#include <cstdlib>
 #include <memory>
 #include <random>
 #include <string>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/matrix_game.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/tensor_game.h"
 #include "open_spiel/utils/file.h"
 
 namespace open_spiel {
@@ -42,7 +49,7 @@ GamutGenerator::GamutGenerator(const std::string& java_path,
                                const std::string& jar_path, int tmpfile_seed)
     : java_path_(java_path),
       jar_path_(jar_path),
-      rng_(tmpfile_seed == 0 ? std::random_device{}() : tmpfile_seed),
+      rng_(tmpfile_seed == 0 ? std::random_device{}() : tmpfile_seed), // NOLINT
       rand_string_(kAlphaChars) {}
 
 std::shared_ptr<const Game> GamutGenerator::GenerateGame(
@@ -85,7 +92,7 @@ std::shared_ptr<const Game> GamutGenerator::GenerateGame(
   // Lock here to prevent concurrently writing / removal.
   std::shared_ptr<const Game> game;
   {
-    absl::MutexLock lock(&generation_mutex_);
+    absl::MutexLock lock(generation_mutex_);
     // Get a temporary file and add it to the arguments.
     std::string tmp_filename = TmpFile();
     arguments.push_back("-f");

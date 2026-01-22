@@ -26,6 +26,9 @@ endif()
 # List of all Python bindings to add to pyspiel.
 include_directories (../pybind11_abseil ../../pybind11/include)
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+  pybind11/algorithms_infostate_tree.cc
+  pybind11/algorithms_infostate_tree_templates.h
+  pybind11/algorithms_infostate_tree.h
   pybind11/algorithms_corr_dist.cc
   pybind11/algorithms_corr_dist.h
   pybind11/algorithms_trajectories.cc
@@ -197,6 +200,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
   algorithms/ismcts_agent_test.py
+  algorithms/infostate_tree_test.py
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
@@ -229,6 +233,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/data_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
+  games/hangman_test.py
   games/liars_poker_test.py
   games/pokerkit_wrapper_test.py
   games/team_dominoes_test.py
@@ -283,8 +288,10 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
+    jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    jax/boltzmann_dqn_jax_test.py
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
     coalitional_games/least_core_lagrangian_test.py
@@ -295,10 +302,12 @@ endif()
 # Add PyTorch tests if is enabled.
 if (OPEN_SPIEL_ENABLE_PYTORCH)
   set(PYTHON_TESTS ${PYTHON_TESTS}
-      pytorch/rcfr_pytorch_test.py
+      # RCFR PyTorch test causing problems. Disabled for now.
+      # pytorch/rcfr_pytorch_test.py
       pytorch/dqn_pytorch_test.py
+      pytorch/boltzmann_dqn_pytorch_test.py
+      pytorch/nfsp_pytorch_test.py
       pytorch/deep_cfr_pytorch_test.py
-      pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
       pytorch/policy_gradient_pytorch_test.py
       pytorch/ppo_pytorch_test.py

@@ -884,7 +884,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // parameter values, including defaulted values. Returns empty parameters
   // otherwise.
   GameParameters GetParameters() const {
-    absl::MutexLock lock(&mutex_defaulted_parameters_);
+    absl::MutexLock lock(mutex_defaulted_parameters_);
     GameParameters params = game_parameters_;
     params.insert(defaulted_parameters_.begin(), defaulted_parameters_.end());
     return params;
@@ -1109,7 +1109,7 @@ class Game : public std::enable_shared_from_this<Game> {
     }
 
     // Return the default value, storing it.
-    absl::MutexLock lock(&mutex_defaulted_parameters_);
+    absl::MutexLock lock(mutex_defaulted_parameters_);
     iter = defaulted_parameters_.find(key);
     if (iter == defaulted_parameters_.end()) {
       // We haven't previously defaulted this value, so store the default we
@@ -1205,6 +1205,13 @@ std::shared_ptr<const Game> LoadGame(const std::string& game_string);
 // Returns a new game object with the specified parameters.
 std::shared_ptr<const Game> LoadGame(const std::string& short_name,
                                      const GameParameters& params);
+
+// Loads multiple games from a single string separated by a separator string
+// (with whitespace allowed).
+// E.g. "tic_tac_toe / leduc_poker / breakthrough(rows=6, columns=6)".
+std::vector<std::shared_ptr<const Game>> LoadGames(
+    const std::string& multi_game_string,
+    const std::string& separator = "/");
 
 // Returns a new game object with the specified parameters; reads the name
 // of the game from the 'name' parameter (which is not passed to the game

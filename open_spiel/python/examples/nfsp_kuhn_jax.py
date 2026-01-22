@@ -78,7 +78,7 @@ def main(unused_argv):
   info_state_size = env.observation_spec()["info_state"][0]
   num_actions = env.action_spec()["num_actions"]
 
-  hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
+  hidden_layers_sizes = [int(s) for s in FLAGS.hidden_layers_sizes]
   kwargs = {
       "replay_buffer_capacity": FLAGS.replay_buffer_capacity,
       "epsilon_decay_duration": FLAGS.num_train_episodes,
@@ -99,7 +99,7 @@ def main(unused_argv):
       )
       for idx in range(num_players)
   ]
-  expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
+  expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.AVERAGE_POLICY)
 
   for ep in range(FLAGS.num_train_episodes):
     if (ep + 1) % FLAGS.eval_every == 0:
