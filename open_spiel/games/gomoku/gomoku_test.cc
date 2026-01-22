@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2026 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 #include <string>
 
-#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/games/gomoku/gomoku.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -32,11 +31,21 @@ void BasicGomokuTests() {
   testing::RandomSimTest(*LoadGame("gomoku"), 100);
 }
 
+void Whatever(){
+	auto game = LoadGame("gomoku");
+	std::unique_ptr<State> state = game->NewInitialState();
+	for (Action action : state->LegalActions()) {
+		std::cerr << state->ActionToString(action) << std::endl;
+	}
+}
+
+
 
 }  // namespace
 }  // namespace gomoku
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+	// open_spiel::gomoku::Whatever();
   open_spiel::gomoku::BasicGomokuTests();
 }

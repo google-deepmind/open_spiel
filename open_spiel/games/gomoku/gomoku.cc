@@ -61,6 +61,10 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new GomokuGame(params));
 }
 
+REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 std::ostream& operator<<(std::ostream& os, Stone s) {
   switch (s) {
     case Stone::kEmpty: return os << "Empty";
@@ -76,17 +80,30 @@ GomokuGame::GomokuGame(const GameParameters& params)
       dims_(ParameterValue<int>("dims")),
       connect_(ParameterValue<int>("connect")),
       wrap_(ParameterValue<bool>("wrap")) {
-				total_size_ = 1;
-				for (int i = 0; i < dims_; ++i) {
-					total_size_ *= size_;
-				}
+	total_size_ = 1;
+	for (int i = 0; i < dims_; ++i) {
+		total_size_ *= size_;
+	}
+	strides_.resize(dims_);
+  std::size_t stride = 1;
+  for (int d = dims_ - 1; d >= 0; --d) {
+    strides_[d] = stride;
+    stride *= size_;
+  }
 }
 
 
-REGISTER_SPIEL_GAME(kGameType, Factory);
+std::vector<int> GomokuGame::UnflattenAction(Action action_id) const {
+	SPIEL_CHECK_LT(action_id, NumDistinctActions());
+  std::vector<int> coord(dims_);
+  std::size_t index = action_id;
 
-RegisterSingleTensorObserver single_tensor(kGameType.short_name);
-
+  for (std::size_t d = 0; d < dims_; ++d) {
+    coord[d] = static_cast<int>(index / strides_[d]);
+    index %= strides_[d];
+  }
+  return coord;
+}
 
 
 void GomokuState::DoApplyAction(Action move) {
@@ -96,10 +113,62 @@ void GomokuState::DoApplyAction(Action move) {
                     : Stone::kWhite;
   current_player_ = 1 - current_player_;
   move_count_ += 1;
+	CheckWinFromLastMove(move);
+}
+
+void GomokuState::CheckWinFromLastMove(Action last_move) {
+
+  const Grid<Stone>::Coord start =
+      board_.Unflatten(last_move);
+  const Stone stone = board_.At(start);
+
+  SPIEL_CHECK_NE(stone, Stone::kEmpty);
+
+  for (const auto& dir : board_.Directions()) {
+    if (!board_.IsCanonical(dir)) continue;
+
+    int count = 1;  // include the starting stone
+
+    // forward direction
+    {
+      auto c = start;
+      while (count < connect_ && board_.Step(c, dir) &&
+             board_.At(c) == stone) {
+        ++count;
+      }
+    }
+
+    // backward direction
+    {
+      auto neg_dir = dir;
+      for (int& v : neg_dir) v = -v;
+
+      auto c = start;
+      while (count < connect_ && board_.Step(c, neg_dir) &&
+             board_.At(c) == stone) {
+        ++count;
+      }
+    }
+    // currrent player just moved
+    if (count >= connect_) {
+			terminal_ = true;
+			if (current_player_ == 0){
+				black_score_ = 1.0;
+				white_score_ = -1.0;
+			} else {
+				black_score_ = -1.0;
+				white_score_ = 1.0;
+			}
+      return;
+    }
+  }
+  if (move_count_ + initial_stones_ == board_.NumCells()) {
+		terminal_ = true;
+	}
 }
 
 std::vector<Action> GomokuState::LegalActions() const {
-  if (IsTerminal()) return {};
+  if (terminal_) return {};
 
   std::vector<Action> actions;
   actions.reserve(board_.NumCells());
@@ -138,77 +207,7 @@ std::string GomokuState::ToString() const {
 }
 
 std::vector<double> GomokuState::Returns() const {
-  auto maybe_final_returns = MaybeFinalReturns();
-  if (maybe_final_returns) {
-    return *maybe_final_returns;
-  } else {
-    return {0.0, 0.0};
-  }
-}
-
-bool GomokuState::CheckWinFromLastMove() const {
-  if (history_.empty()) return false;
-	const auto& last = history_.back();
-  Action last_move = last.action;
-
-  const Grid<Stone>::Coord start =
-      board_.Unflatten(last_move);
-  const Stone stone = board_.At(start);
-
-  SPIEL_CHECK_NE(stone, Stone::kEmpty);
-
-  for (const auto& dir : board_.Directions()) {
-    if (!board_.IsCanonical(dir)) continue;
-
-    int count = 1;  // include the starting stone
-
-    // forward direction
-    {
-      auto c = start;
-      while (count < connect_ && board_.Step(c, dir) &&
-             board_.At(c) == stone) {
-        ++count;
-      }
-    }
-
-    // backward direction
-    {
-      auto neg_dir = dir;
-      for (int& v : neg_dir) v = -v;
-
-      auto c = start;
-      while (count < connect_ && board_.Step(c, neg_dir) &&
-             board_.At(c) == stone) {
-        ++count;
-      }
-    }
-
-    if (count >= connect_) {
-      return true;
-    }
-  }
-  return false;
-}
-
-
-absl::optional<std::vector<double>> GomokuState::MaybeFinalReturns() const {
-	const auto& last = history_.back();
-  Action last_move = last.action;
-  if (last_move != kInvalidAction) {
-    if (CheckWinFromLastMove()) {
-      std::vector<double> returns(2, -1.0);
-      // winner is the player who made the last move
-      returns[CurrentPlayer() ^ 1] = 1.0;
-      return returns;
-    }
-  }
-
-  // draw by full board
-  if (move_count_ == board_.NumCells()) {
-    return std::vector<double>{0.0, 0.0};
-  }
-
-  return absl::nullopt;
+	return {black_score_, white_score_};
 }
 
 
@@ -224,12 +223,39 @@ std::string GomokuState::ObservationString(Player player) const {
   return ToString();
 }
 
-//TODO implement this
+std::vector<int> GomokuGame::ObservationTensorShape() const {
+	return {2, total_size_};
+}
+
+inline absl::optional<Player> StoneOwner(Stone stone) {
+  if (stone == Stone::kEmpty) return absl::nullopt;
+	if (stone == Stone::kBlack) return static_cast<Player>(0);
+  return static_cast<Player>(1);
+}
+
 void GomokuState::ObservationTensor(Player player,
-                                       absl::Span<float> values) const {
+                                    absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
+  const int num_cells = board_.NumCells();
+  SPIEL_CHECK_EQ(values.size(), 2 * num_cells);
+
+  std::fill(values.begin(), values.end(), 0.0f);
+
+  const Player opponent = Opponent(player);
+
+  for (int i = 0; i < num_cells; ++i) {
+		const Stone stone = board_.AtIndex(i);
+    const auto owner = StoneOwner(stone);
+    if (owner.has_value()) {
+      if (*owner == player) {
+         values[i] = 1.0f;
+      } else {
+        values[num_cells + i] = 1.0f;
+      }
+    } 
+  }
 }
 
 void GomokuState::UndoAction(Player player, Action move) {
@@ -243,18 +269,19 @@ std::unique_ptr<State> GomokuState::Clone() const {
   return std::unique_ptr<State>(new GomokuState(*this));
 }
 
-// TODO implement this
 std::string GomokuGame::ActionToString(Player player,
-                                          Action action_id) const {
-  return "";
+          Action action_id) const {
+  const auto coord = UnflattenAction(action_id);
+
+  std::ostringstream oss;
+  for (std::size_t d = 0; d < coord.size(); ++d) {
+    if (d > 0) oss << ",";
+    oss << coord[d];
+  }
+  return oss.str();
 }
 
-// TODO implement this
-std::vector<int> GomokuGame::ObservationTensorShape() const {
-	return {15, 15, 3};
-}
 
-// TODO implement this
 int GomokuGame::MaxGameLength() const {
 	return total_size_;
 }
@@ -262,8 +289,6 @@ int GomokuGame::MaxGameLength() const {
 int GomokuGame::NumDistinctActions() const {
 	return total_size_;
 }
-
-
 
 GomokuState::GomokuState(std::shared_ptr<const Game> game,
                          const std::string& state_str)
@@ -277,7 +302,10 @@ GomokuState::GomokuState(std::shared_ptr<const Game> game,
         static_cast<std::size_t>(static_cast<const GomokuGame&>(*game).Dims()),
         static_cast<const GomokuGame&>(*game).Wrap()),
       current_player_(kBlackPlayer),
-      move_count_(0) {
+      move_count_(0),
+      initial_stones_(0),
+			black_score_(0.0),
+			white_score_(0.0){
   if (state_str.empty()) {
     board_.Fill(Stone::kEmpty);
     current_player_ = kBlackPlayer;
@@ -304,9 +332,11 @@ GomokuState::GomokuState(std::shared_ptr<const Game> game,
       switch (c) {
         case 'b':
 				  s = Stone::kBlack;
+					initial_stones_++;
 				  break;
         case 'w':
 				  s = Stone::kWhite;
+					initial_stones_++;
 				  break;
         case '.':
 				  s = Stone::kEmpty;
@@ -316,7 +346,6 @@ GomokuState::GomokuState(std::shared_ptr<const Game> game,
         default:
           SpielFatalError("Invalid board char in state string");
     }
-
     board_.AtIndex(i) = s;
   }
 }

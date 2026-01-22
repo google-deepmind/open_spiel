@@ -63,15 +63,20 @@ class GomokuState : public State {
 
   GomokuState(const GomokuState&) = default;
   GomokuState& operator=(const GomokuState&) = default;
-
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
 
+	static Player Opponent(Player player) {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, kNumPlayers);
+		return player - 1;
+	}
+
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
 	bool IsTerminal() const override {
-    return static_cast<bool>(MaybeFinalReturns());
+    return terminal_;
   }
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
@@ -86,19 +91,18 @@ class GomokuState : public State {
   void DoApplyAction(Action move) override;
 
  private:
-  bool CheckWinFromLastMove() const;
-  absl::optional<std::vector<double>> MaybeFinalReturns() const;
-
-  Player current_player_ = 0;         // Player zero goes first
-  Player outcome_ = kInvalidPlayer;
+  void CheckWinFromLastMove(Action move);
+  Player current_player_ = 0;   // Player zero goes first by default
   int move_count_ = 0;
   Grid<Stone> board_;
 	int size_;
 	int dims_;
 	int connect_;
 	bool wrap_;
-
-
+	int initial_stones_;
+	float black_score_;
+	float white_score_;
+	bool terminal_ =  false;
 };
 
 // Game object.
@@ -132,6 +136,8 @@ class GomokuGame : public Game {
 	int connect_;
 	int wrap_;
 	int total_size_;
+	std::vector<std::size_t> strides_;
+	std::vector<int> UnflattenAction(Action action_id) const;
 };
 
 }  // namespace gomoku
