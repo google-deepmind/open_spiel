@@ -35,6 +35,7 @@
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/algorithms_corr_dist.h"
+#include "open_spiel/python/pybind11/algorithms_infostate_tree.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/evaluation_elo.h"
@@ -56,13 +57,13 @@
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_leduc_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
+#include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
+#include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
 #include "open_spiel/python/pybind11/games_spades.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
 #include "open_spiel/python/pybind11/games_tic_tac_toe.h"
 #include "open_spiel/python/pybind11/games_tiny_bridge.h"
 #include "open_spiel/python/pybind11/games_trade_comm.h"
-#include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
-#include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -748,6 +749,8 @@ PYBIND11_MODULE(pyspiel, m) {
     throw SpielException(string);
   });
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
+  py::register_exception<ForbiddenException>(m, "ForbiddenError",
+                                             PyExc_RuntimeError);
 
   // Register other bits of the API.
   init_pyspiel_bots(m);                     // Bots and bot-related algorithms.
@@ -783,6 +786,8 @@ PYBIND11_MODULE(pyspiel, m) {
   bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
+  init_pyspiel_infostate_tree(
+      m);  // Infostate-Tree and associated classes (Id etc.)
 
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT

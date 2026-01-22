@@ -214,15 +214,16 @@ void InfostateTree::CollectNodesAtDepth(InfostateNode* node, size_t depth) {
     CollectNodesAtDepth(child, depth + 1);
 }
 
-std::ostream& InfostateTree::operator<<(std::ostream& os) const {
-  return os << "Infostate tree for player " << acting_player_ << ".\n"
-            << "Tree height: " << tree_height_ << '\n'
-            << "Root branching: " << root_branching_factor() << '\n'
-            << "Number of decision infostate nodes: " << num_decisions() << '\n'
-            << "Number of sequences: " << num_sequences() << '\n'
-            << "Number of leaves: " << num_leaves() << '\n'
+std::ostream& operator<<(std::ostream& os, const InfostateTree& tree) {
+  return os << "Infostate tree for player " << tree.acting_player_ << ".\n"
+            << "Tree height: " << tree.tree_height_ << '\n'
+            << "Root branching: " << tree.root_branching_factor() << '\n'
+            << "Number of decision infostate nodes: " << tree.num_decisions()
+            << '\n'
+            << "Number of sequences: " << tree.num_sequences() << '\n'
+            << "Number of leaves: " << tree.num_leaves() << '\n'
             << "Tree certificate: " << '\n'
-            << root().MakeCertificate() << '\n';
+            << tree.root().MakeCertificate() << '\n';
 }
 
 std::unique_ptr<InfostateNode> InfostateTree::MakeNode(
@@ -536,7 +537,7 @@ absl::optional<DecisionId> InfostateTree::DecisionIdForSequence(
   }
 }
 absl::optional<InfostateNode*> InfostateTree::DecisionForSequence(
-    const SequenceId& sequence_id) {
+    const SequenceId& sequence_id) const {
   SPIEL_DCHECK_TRUE(sequence_id.BelongsToTree(this));
   InfostateNode* node = sequences_.at(sequence_id.id());
   SPIEL_DCHECK_TRUE(node);
@@ -646,7 +647,7 @@ std::pair<size_t, size_t> InfostateTree::CollectStartEndSequenceIds(
 }
 
 std::pair<double, SfStrategy> InfostateTree::BestResponse(
-    TreeplexVector<double>&& gradient) const {
+    TreeplexVector<double> gradient) const {
   SPIEL_CHECK_EQ(this, gradient.tree());
   SPIEL_CHECK_EQ(num_sequences(), gradient.size());
   SfStrategy response(this);
@@ -698,7 +699,7 @@ std::pair<double, SfStrategy> InfostateTree::BestResponse(
   return {gradient[empty_sequence()], response};
 }
 
-double InfostateTree::BestResponseValue(LeafVector<double>&& gradient) const {
+double InfostateTree::BestResponseValue(LeafVector<double> gradient) const {
   // Loop over all heights.
   for (int d = tree_height_ - 1; d >= 0; d--) {
     int left_offset = 0;

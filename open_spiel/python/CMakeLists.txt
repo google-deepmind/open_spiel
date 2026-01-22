@@ -26,6 +26,9 @@ endif()
 # List of all Python bindings to add to pyspiel.
 include_directories (../pybind11_abseil ../../pybind11/include)
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+  pybind11/algorithms_infostate_tree.cc
+  pybind11/algorithms_infostate_tree.tcc
+  pybind11/algorithms_infostate_tree.h
   pybind11/algorithms_corr_dist.cc
   pybind11/algorithms_corr_dist.h
   pybind11/algorithms_trajectories.cc
@@ -197,6 +200,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
   algorithms/ismcts_agent_test.py
+  algorithms/infostate_tree_test.py
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
