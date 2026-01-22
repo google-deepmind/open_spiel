@@ -195,27 +195,37 @@ void init_pyspiel_infostate_tree(::pybind11::module &m) {
   py::class_<InfostateTree, std::shared_ptr<InfostateTree>>(m, "InfostateTree",
                                                             py::is_final())
       .def(py::init(
-               [](const Game &game, Player acting_player, int max_move_limit) {
-                 return MakeInfostateTree(game, acting_player, max_move_limit);
+               [](const Game &game, Player acting_player, bool store_world_states, int max_move_limit) {
+                 return MakeInfostateTree(game, acting_player, store_world_states, max_move_limit);
                }),
            py::arg("game"), py::arg("acting_player"),
+           py::kw_only(),
+           py::arg("store_world_states") = false,
            py::arg("max_move_limit") = 1000)
       .def(py::init([](const std::vector<const State *> &start_states,
                        const std::vector<double> &chance_reach_probs,
                        std::shared_ptr<Observer> infostate_observer,
-                       Player acting_player, int max_move_ahead_limit) {
+                       Player acting_player, bool store_world_states,
+                       int max_move_ahead_limit) {
              return MakeInfostateTree(start_states, chance_reach_probs,
                                       std::move(infostate_observer),
-                                      acting_player, max_move_ahead_limit);
+                                      acting_player, store_world_states,
+                                      max_move_ahead_limit);
            }),
            py::arg("start_states"), py::arg("chance_reach_probs"),
            py::arg("infostate_observer"), py::arg("acting_player"),
+           py::kw_only(),
+           py::arg("store_world_states") = false,
            py::arg("max_move_limit") = 1000)
       .def(py::init([](const std::vector<const InfostateNode *> &start_nodes,
-                       int max_move_ahead_limit) {
-             return MakeInfostateTree(start_nodes, max_move_ahead_limit);
+                       bool store_world_states, int max_move_ahead_limit) {
+             return MakeInfostateTree(start_nodes, store_world_states,
+                                      max_move_ahead_limit);
            }),
-           py::arg("start_nodes"), py::arg("max_move_limit") = 1000)
+           py::arg("start_nodes"),
+           py::kw_only(),
+           py::arg("store_world_states") = false,
+           py::arg("max_move_limit") = 1000)
       .def("root",
            [](InfostateTree &tree) {
              return make_aliasing_node_ptr(tree.mutable_root());
@@ -227,6 +237,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m) {
       .def("num_sequences", &InfostateTree::num_sequences)
       .def("num_leaves", &InfostateTree::num_leaves)
       .def("empty_sequence", &InfostateTree::empty_sequence)
+      .def("stores_all_world_states", &InfostateTree::stores_all_world_states)
       .def(
           "observation_infostate",
           [](const InfostateTree &tree, const SequenceId &id) {
