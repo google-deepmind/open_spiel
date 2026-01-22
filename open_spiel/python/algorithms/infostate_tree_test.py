@@ -73,20 +73,20 @@ class InfostateTreeTest(parameterized.TestCase):
                 game=pyspiel.load_game("kuhn_poker"),
                 players=[0],
                 expected_certificate=(
-                    "(("  # Root node, 1st is getting a card
-                    "("  # 2nd is getting card
-                    "["  # 1st acts
-                    "(("  # 1st bet, and 2nd acts
+                    "(("  # Root node, p1 is getting a card
+                    "("  # p2 is getting card
+                    "["  # p1 acts
+                    "(("  # p1 bet, and p2 acts
                     "(({}))"
                     "(({}))"
                     "(({}))"
                     "(({}))"
                     "))"
-                    "(("  # 1st checks, and 2nd acts
-                    # 2nd checked
+                    "(("  # p1 checks, and p2 acts
+                    # p2 checked
                     "(({}))"
                     "(({}))"
-                    # 2nd betted
+                    # p2 bet
                     "[({}"
                     "{})"
                     "({}"
@@ -196,7 +196,7 @@ class InfostateTreeTest(parameterized.TestCase):
             ")"
             ")"  # </dummy>
         )
-        tree = pyspiel.InfostateTree(pyspiel.load_game("kuhn_poker"), 0, 2)
+        tree = pyspiel.InfostateTree(pyspiel.load_game("kuhn_poker"), 0, max_move_limit=2)
         self.assertEqual(tree.root().make_certificate(), expected_certificate)
 
         # Test leaf nodes in Kuhn Poker tree
@@ -220,7 +220,7 @@ class InfostateTreeTest(parameterized.TestCase):
         max_moves = game.max_move_number()
         for move_limit in range(max_moves):
             for pl in range(game.num_players()):
-                tree = pyspiel.InfostateTree(game, pl, move_limit)
+                tree = pyspiel.InfostateTree(game, pl, max_move_limit=move_limit)
                 self.check_tree_leaves(tree, move_limit)
                 self.check_continuation(tree)
 
