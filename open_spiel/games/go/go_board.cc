@@ -35,22 +35,21 @@ namespace {
 // The order is important because it is used to index 3x3 patterns!
 //
 inline constexpr std::array<int, 9> Dir8 = {{
-    kVirtualBoardSize,  // new line
-    -1,                 // new line
-    +1,                 // new line
+    kVirtualBoardSize, // new line
+    -1,                // new line
+    +1,                // new line
     -static_cast<int>(kVirtualBoardSize),
     +static_cast<int>(kVirtualBoardSize) - 1,
     +static_cast<int>(kVirtualBoardSize) + 1,
     -static_cast<int>(kVirtualBoardSize) - 1,
     -static_cast<int>(kVirtualBoardSize) + 1,
-    0  // Dummy element.
+    0 // Dummy element.
 }};
 
 // Calls f for all 4 direct neighbours of p.
 // f should have type void f(VirtualPoint n), but is passed as a template so we
 // can elide the function call overhead.
-template <typename F>
-void Neighbours(VirtualPoint p, const F& f) {
+template <typename F> void Neighbours(VirtualPoint p, const F &f) {
   f(p + kVirtualBoardSize);
   f(p + 1);
   f(p - 1);
@@ -68,25 +67,24 @@ std::vector<VirtualPoint> MakeBoardPoints(int board_size) {
   return points;
 }
 
-template <int board_size>
-const std::vector<VirtualPoint>& GetBoardPoints() {
+template <int board_size> const std::vector<VirtualPoint> &GetBoardPoints() {
   static std::vector<VirtualPoint> points = MakeBoardPoints(board_size);
   return points;
 }
 
 char GoColorToChar(GoColor c) {
   switch (c) {
-    case GoColor::kBlack:
-      return 'X';
-    case GoColor::kWhite:
-      return 'O';
-    case GoColor::kEmpty:
-      return '+';
-    case GoColor::kGuard:
-      return '#';
-    default:
-      SpielFatalError(absl::StrCat("Unknown color ", c, " in GoColorToChar."));
-      return '!';
+  case GoColor::kBlack:
+    return 'X';
+  case GoColor::kWhite:
+    return 'O';
+  case GoColor::kEmpty:
+    return '+';
+  case GoColor::kGuard:
+    return '#';
+  default:
+    SpielFatalError(absl::StrCat("Unknown color ", c, " in GoColorToChar."));
+    return '!';
   }
 }
 
@@ -102,12 +100,12 @@ std::string MoveAsAscii(VirtualPoint p, GoColor c) {
   return encoded;
 }
 
-}  // namespace
+} // namespace
 
 Neighbours4::Neighbours4(const VirtualPoint p)
     : dir_(static_cast<VirtualPoint>(0)), p_(p) {}
 
-Neighbours4& Neighbours4::operator++() {
+Neighbours4 &Neighbours4::operator++() {
   ++dir_;
   return *this;
 }
@@ -117,7 +115,8 @@ const VirtualPoint Neighbours4::operator*() const { return p_ + Dir8[dir_]; }
 Neighbours4::operator bool() const { return dir_ < 4; }
 
 std::pair<int, int> VirtualPointTo2DPoint(VirtualPoint p) {
-  if (p == kInvalidPoint || p == kVirtualPass) return std::make_pair(-1, -1);
+  if (p == kInvalidPoint || p == kVirtualPass)
+    return std::make_pair(-1, -1);
 
   const int row = static_cast<int>(p) / kVirtualBoardSize;
   const int col = static_cast<int>(p) % kVirtualBoardSize;
@@ -133,22 +132,24 @@ VirtualPoint VirtualPointFrom2DPoint(std::pair<int, int> row_col) {
 // all sides of the board. Thus we need to map a coordinate in that space
 // to a coordinate in the normal board.
 Action VirtualActionToAction(int virtual_action, int board_size) {
-  if (virtual_action == kVirtualPass) return board_size * board_size;
+  if (virtual_action == kVirtualPass)
+    return board_size * board_size;
   const int virtual_row = static_cast<int>(virtual_action) / kVirtualBoardSize;
   const int virtual_col = static_cast<int>(virtual_action) % kVirtualBoardSize;
   return board_size * (virtual_row - 1) + (virtual_col - 1);
 }
 
 int ActionToVirtualAction(Action action, int board_size) {
-  if (action == board_size * board_size) return kVirtualPass;
+  if (action == board_size * board_size)
+    return kVirtualPass;
   int row = action / board_size;
   int column = action % board_size;
   return (row + 1) * kVirtualBoardSize + (column + 1);
 }
 
-const std::vector<VirtualPoint>& BoardPoints(int board_size) {
-#define CASE_GET_POINTS(n) \
-  case n:                  \
+const std::vector<VirtualPoint> &BoardPoints(int board_size) {
+#define CASE_GET_POINTS(n)                                                     \
+  case n:                                                                      \
     return GetBoardPoints<n>()
 
   switch (board_size) {
@@ -170,8 +171,8 @@ const std::vector<VirtualPoint>& BoardPoints(int board_size) {
     CASE_GET_POINTS(17);
     CASE_GET_POINTS(18);
     CASE_GET_POINTS(19);
-    default:
-      SpielFatalError("unsupported board size");
+  default:
+    SpielFatalError("unsupported board size");
   }
 
 #undef CASE_GET_POINTS
@@ -179,64 +180,66 @@ const std::vector<VirtualPoint>& BoardPoints(int board_size) {
 
 GoColor OppColor(GoColor c) {
   switch (c) {
-    case GoColor::kBlack:
-      return GoColor::kWhite;
-    case GoColor::kWhite:
-      return GoColor::kBlack;
-    case GoColor::kEmpty:
-    case GoColor::kGuard:
-      return c;
-    default:
-      SpielFatalError(absl::StrCat("Unknown color ", c, " in OppColor."));
-      return c;
+  case GoColor::kBlack:
+    return GoColor::kWhite;
+  case GoColor::kWhite:
+    return GoColor::kBlack;
+  case GoColor::kEmpty:
+  case GoColor::kGuard:
+    return c;
+  default:
+    SpielFatalError(absl::StrCat("Unknown color ", c, " in OppColor."));
+    return c;
   }
 }
 
-std::ostream& operator<<(std::ostream& os, GoColor c) {
+std::ostream &operator<<(std::ostream &os, GoColor c) {
   return os << GoColorToString(c);
 }
 
 std::string GoColorToString(GoColor c) {
   switch (c) {
-    case GoColor::kBlack:
-      return "B";
-    case GoColor::kWhite:
-      return "W";
-    case GoColor::kEmpty:
-      return "EMPTY";
-    case GoColor::kGuard:
-      return "GUARD";
-    default:
-      SpielFatalError(
-          absl::StrCat("Unknown color ", c, " in GoColorToString."));
-      return "This will never return.";
+  case GoColor::kBlack:
+    return "B";
+  case GoColor::kWhite:
+    return "W";
+  case GoColor::kEmpty:
+    return "EMPTY";
+  case GoColor::kGuard:
+    return "GUARD";
+  default:
+    SpielFatalError(absl::StrCat("Unknown color ", c, " in GoColorToString."));
+    return "This will never return.";
   }
 }
 
-std::ostream& operator<<(std::ostream& os, VirtualPoint p) {
+std::ostream &operator<<(std::ostream &os, VirtualPoint p) {
   return os << VirtualPointToString(p);
 }
 
 std::string VirtualPointToString(VirtualPoint p) {
   switch (p) {
-    case kInvalidPoint:
-      return "INVALID_POINT";
-    case kVirtualPass:
-      return "PASS";
-    default: {
-      auto row_col = VirtualPointTo2DPoint(p);
-      char col = 'a' + row_col.second;
-      if (col >= 'i') ++col;  // Go / SGF labeling skips 'i'.
-      return absl::StrCat(std::string(1, col), row_col.first + 1);
-    }
+  case kInvalidPoint:
+    return "INVALID_POINT";
+  case kVirtualPass:
+    return "PASS";
+  default: {
+    auto row_col = VirtualPointTo2DPoint(p);
+    char col = 'a' + row_col.second;
+    if (col >= 'i')
+      ++col; // Go / SGF labeling skips 'i'.
+    return absl::StrCat(std::string(1, col), row_col.first + 1);
+  }
   }
 }
 
 VirtualPoint MakePoint(std::string s) {
   std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 
-  if (s == "pass") return kVirtualPass;
-  if (s.size() < 2 || s.size() > 3) return kInvalidPoint;
+  if (s == "pass")
+    return kVirtualPass;
+  if (s.size() < 2 || s.size() > 3)
+    return kInvalidPoint;
 
   int col = s[0] < 'i' ? s[0] - 'a' : s[0] - 'a' - 1;
   int row = s[1] - '0';
@@ -262,7 +265,7 @@ void GoBoard::Clear() {
   zobrist_hash_ = 0;
 
   for (int i = 0; i < board_.size(); ++i) {
-    Vertex& v = board_[i];
+    Vertex &v = board_[i];
     v.color = GoColor::kGuard;
     v.chain_head = static_cast<VirtualPoint>(i);
     v.chain_next = static_cast<VirtualPoint>(i);
@@ -276,7 +279,8 @@ void GoBoard::Clear() {
 
   for (VirtualPoint p : BoardPoints(board_size_)) {
     Neighbours(p, [this, p](VirtualPoint n) {
-      if (IsEmpty(n)) chain(p).add_liberty(n);
+      if (IsEmpty(n))
+        chain(p).add_liberty(n);
     });
   }
 
@@ -336,7 +340,8 @@ VirtualPoint GoBoard::SingleLiberty(VirtualPoint p) const {
 
   // Make sure the liberty actually borders the group.
   for (auto n = Neighbours4(liberty); n; ++n) {
-    if (ChainHead(*n) == head) return liberty;
+    if (ChainHead(*n) == head)
+      return liberty;
   }
 
   SpielFatalError(
@@ -362,7 +367,7 @@ void GoBoard::JoinChainsAround(VirtualPoint p, GoColor c) {
   Neighbours(
       p, [this, c, &largest_chain_head, &largest_chain_size](VirtualPoint n) {
         if (PointColor(n) == c) {
-          Chain& c = chain(n);
+          Chain &c = chain(n);
           if (c.num_stones > largest_chain_size) {
             largest_chain_size = c.num_stones;
             largest_chain_head = ChainHead(n);
@@ -452,7 +457,7 @@ void GoBoard::InitNewChain(VirtualPoint p) {
   board_[p].chain_head = p;
   board_[p].chain_next = p;
 
-  Chain& c = chain(p);
+  Chain &c = chain(p);
   c.reset();
   c.num_stones += 1;
 
@@ -470,10 +475,14 @@ bool GoBoard::IsInBoardArea(VirtualPoint p) const {
 }
 
 bool GoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
-  if (p == kVirtualPass) return true;
-  if (!IsInBoardArea(p)) return false;
-  if (!IsEmpty(p) || p == LastKoPoint()) return false;
-  if (chain(p).num_pseudo_liberties > 0) return true;
+  if (p == kVirtualPass)
+    return true;
+  if (!IsInBoardArea(p))
+    return false;
+  if (!IsEmpty(p) || p == LastKoPoint())
+    return false;
+  if (chain(p).num_pseudo_liberties > 0)
+    return true;
 
   // For all checks below, the newly placed stone is completely surrounded by
   // enemy and friendly stones.
@@ -484,14 +493,16 @@ bool GoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
   Neighbours(p, [this, c, &has_liberty](VirtualPoint n) {
     has_liberty |= (PointColor(n) == c && !chain(n).in_atari());
   });
-  if (has_liberty) return true;
+  if (has_liberty)
+    return true;
 
   // Allow to play if the placed stone will kill at least one group.
   bool kills_group = false;
   Neighbours(p, [this, c, &kills_group](VirtualPoint n) {
     kills_group |= (PointColor(n) == OppColor(c) && chain(n).in_atari());
   });
-  if (kills_group) return true;
+  if (kills_group)
+    return true;
 
   return false;
 }
@@ -512,7 +523,7 @@ void GoBoard::Chain::reset() {
   liberty_vertex_sum_squared = 0;
 }
 
-void GoBoard::Chain::merge(const Chain& other) {
+void GoBoard::Chain::merge(const Chain &other) {
   num_stones += other.num_stones;
   num_pseudo_liberties += other.num_pseudo_liberties;
   liberty_vertex_sum += other.liberty_vertex_sum;
@@ -554,7 +565,7 @@ std::string GoBoard::ToString() {
   return stream.str();
 }
 
-std::ostream& operator<<(std::ostream& os, const GoBoard& board) {
+std::ostream &operator<<(std::ostream &os, const GoBoard &board) {
   os << "\n";
   for (int row = board.board_size() - 1; row >= 0; --row) {
     os << std::setw(2) << std::setfill(' ') << (row + 1) << " ";
@@ -576,10 +587,6 @@ std::ostream& operator<<(std::ostream& os, const GoBoard& board) {
     }
   }
 
-  // TODO(author9): Make this a public URL.
-  // os << "http://jumper/goboard/" << encoded << "&size=" << board.board_size()
-  //    << std::endl;
-
   return os;
 }
 
@@ -600,36 +607,37 @@ void GoBoard::GroupIter::step() {
 
 // Returns the number of points surrounded entirely by one color.
 // Aborts early and returns 0 if the area borders both black and white stones.
-int NumSurroundedPoints(const GoBoard& board, const VirtualPoint p,
-                        std::array<bool, kVirtualBoardPoints>* marked,
-                        bool* reached_black, bool* reached_white) {
-  if ((*marked)[p]) return 0;
+int NumSurroundedPoints(const GoBoard &board, const VirtualPoint p,
+                        std::array<bool, kVirtualBoardPoints> *marked,
+                        bool *reached_black, bool *reached_white) {
+  if ((*marked)[p])
+    return 0;
   (*marked)[p] = true;
 
   int num_points = 1;
   Neighbours(p, [&board, &num_points, marked, reached_black,
                  reached_white](VirtualPoint n) {
     switch (board.PointColor(n)) {
-      case GoColor::kBlack:
-        *reached_black = true;
-        break;
-      case GoColor::kWhite:
-        *reached_white = true;
-        break;
-      case GoColor::kEmpty:
-        num_points +=
-            NumSurroundedPoints(board, n, marked, reached_black, reached_white);
-        break;
-      case GoColor::kGuard:
-        // Ignore the border.
-        break;
+    case GoColor::kBlack:
+      *reached_black = true;
+      break;
+    case GoColor::kWhite:
+      *reached_white = true;
+      break;
+    case GoColor::kEmpty:
+      num_points +=
+          NumSurroundedPoints(board, n, marked, reached_black, reached_white);
+      break;
+    case GoColor::kGuard:
+      // Ignore the border.
+      break;
     }
   });
 
   return num_points;
 }
 
-float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
+float TrompTaylorScore(const GoBoard &board, float komi, int handicap) {
   // The delta of how many points on the board black and white have occupied,
   // from black's point of view, i.e. Black points - White points.
   int occupied_delta = 0;
@@ -641,28 +649,29 @@ float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
 
   for (VirtualPoint p : BoardPoints(board.board_size())) {
     switch (board.PointColor(p)) {
-      case GoColor::kBlack:
-        ++occupied_delta;
-        break;
-      case GoColor::kWhite:
-        --occupied_delta;
-        break;
-      case GoColor::kEmpty: {
-        if (marked[p]) continue;
-        // If some empty points are surrounded entirely by one player, they
-        // count as that player's territory.
-        bool reached_black = false, reached_white = false;
-        int n = NumSurroundedPoints(board, p, &marked, &reached_black,
-                                    &reached_white);
-        if (reached_black && !reached_white) {
-          occupied_delta += n;
-        } else if (!reached_black && reached_white) {
-          occupied_delta -= n;
-        }
-        break;
+    case GoColor::kBlack:
+      ++occupied_delta;
+      break;
+    case GoColor::kWhite:
+      --occupied_delta;
+      break;
+    case GoColor::kEmpty: {
+      if (marked[p])
+        continue;
+      // If some empty points are surrounded entirely by one player, they
+      // count as that player's territory.
+      bool reached_black = false, reached_white = false;
+      int n = NumSurroundedPoints(board, p, &marked, &reached_black,
+                                  &reached_white);
+      if (reached_black && !reached_white) {
+        occupied_delta += n;
+      } else if (!reached_black && reached_white) {
+        occupied_delta -= n;
       }
-      case GoColor::kGuard:
-        SpielFatalError("unexpected color");
+      break;
+    }
+    case GoColor::kGuard:
+      SpielFatalError("unexpected color");
     }
   }
 
@@ -673,20 +682,19 @@ float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
   return score;
 }
 
-GoBoard CreateBoard(const std::string& initial_stones) {
+GoBoard CreateBoard(const std::string &initial_stones) {
   GoBoard board(19);
 
   int row = 0;
-  for (const auto& line : absl::StrSplit(initial_stones, '\n')) {
+  for (const auto &line : absl::StrSplit(initial_stones, '\n')) {
     int col = 0;
     bool stones_started = false;
-    for (const auto& c : line) {
+    for (const auto &c : line) {
       if (c == ' ') {
         if (stones_started) {
-          SpielFatalError(
-              "Whitespace is only allowed at the start of "
-              "the line. To represent empty intersections, "
-              "use +");
+          SpielFatalError("Whitespace is only allowed at the start of "
+                          "the line. To represent empty intersections, "
+                          "use +");
         }
         continue;
       } else if (c == 'X') {
@@ -706,5 +714,5 @@ GoBoard CreateBoard(const std::string& initial_stones) {
   return board;
 }
 
-}  // namespace go
-}  // namespace open_spiel
+} // namespace go
+} // namespace open_spiel
