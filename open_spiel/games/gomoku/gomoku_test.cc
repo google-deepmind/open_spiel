@@ -39,6 +39,17 @@ void Whatever(){
 	}
 }
 
+void TestMoveToActionLoop() {
+	auto game = LoadGame("gomoku");
+
+  const GomokuGame* gomoku  = dynamic_cast<const GomokuGame*>(game.get());
+
+  SPIEL_CHECK_TRUE(gomoku != nullptr);
+  for (Action a = 0; a < gomoku->NumDistinctActions(); ++a) {
+    SPIEL_CHECK_EQ(gomoku->MoveToAction(gomoku->ActionToMove(a)), a);
+  }
+}
+
 
 
 }  // namespace
@@ -48,4 +59,5 @@ void Whatever(){
 int main(int argc, char** argv) {
 	// open_spiel::gomoku::Whatever();
   open_spiel::gomoku::BasicGomokuTests();
+  open_spiel::gomoku::TestMoveToActionLoop();
 }

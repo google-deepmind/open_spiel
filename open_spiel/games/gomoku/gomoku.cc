@@ -105,6 +105,33 @@ std::vector<int> GomokuGame::UnflattenAction(Action action_id) const {
   return coord;
 }
 
+std::vector<int> GomokuGame::ActionToMove(Action action) const {
+  SPIEL_CHECK_GE(action, 0);
+  SPIEL_CHECK_LT(action, NumDistinctActions());
+
+  std::vector<int> move(dims_);
+  std::size_t index = action;
+
+  for (int d = 0; d < dims_; ++d) {
+    move[d] = static_cast<int>(index / strides_[d]);
+    index %= strides_[d];
+  }
+  return move;
+}
+
+Action GomokuGame::MoveToAction(const std::vector<int>& move) const {
+  SPIEL_CHECK_EQ(move.size(), dims_);
+
+  std::size_t action = 0;
+  for (int d = 0; d < dims_; ++d) {
+    SPIEL_CHECK_GE(move[d], 0);
+    SPIEL_CHECK_LT(move[d], size_);
+    action += move[d] * strides_[d];
+  }
+
+  return static_cast<Action>(action);
+}
+
 
 void GomokuState::DoApplyAction(Action move) {
 	SPIEL_CHECK_EQ(board_.AtIndex(move), Stone::kEmpty);

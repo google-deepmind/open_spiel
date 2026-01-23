@@ -124,6 +124,8 @@ class GomokuGame : public Game {
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
   std::string ActionToString(Player player, Action action_id) const override;
+	std::vector<int> ActionToMove(Action action) const;
+  Action MoveToAction(const std::vector<int>& move) const;
 
 	int Size() const { return size_; }
 	int Dims() const { return dims_; }
