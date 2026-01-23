@@ -107,7 +107,7 @@ class DeepNeurdModel(nn.Module):
 
     layers_.append(
       nn.Linear(
-        input_size,
+        num_hidden_units,
         1 + self._autoencode * rcfr.num_features(game),
       )
     )

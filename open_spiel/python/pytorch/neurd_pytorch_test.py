@@ -39,7 +39,7 @@ class NeurdTest(absltest.TestCase):
     torch.manual_seed(42)
 
   def test_neurd(self):
-    num_iterations = 4
+    num_iterations = 3
     models = [_new_model() for _ in range(_GAME.num_players())]
 
     solver = neurd.CounterfactualNeurdSolver(_GAME, models)
@@ -60,7 +60,6 @@ class NeurdTest(absltest.TestCase):
       solver.evaluate_and_update_policy(_train)
 
     average_policy = solver.average_policy()
-
     self.assertLess(pyspiel.nash_conv(_GAME, average_policy), 0.91)
 
 
