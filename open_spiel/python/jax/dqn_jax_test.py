@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.jax.dqn."""
-
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
@@ -35,16 +33,18 @@ class DQNTest(absltest.TestCase):
   def test_simple_game(self):
     game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
     env = rl_environment.Environment(game=game)
-    agent = dqn.DQN(0,
-                    state_representation_size=
-                    game.information_state_tensor_shape()[0],
-                    num_actions=game.num_distinct_actions(),
-                    hidden_layers_sizes=[16],
-                    replay_buffer_capacity=100,
-                    batch_size=5,
-                    epsilon_start=0.02,
-                    epsilon_end=0.01,
-                    gradient_clipping=1.0)
+    agent = dqn.DQN(
+        0,
+        state_representation_size=game.information_state_tensor_shape()[0],
+        num_actions=game.num_distinct_actions(),
+        hidden_layers_sizes=[16],
+        replay_buffer_capacity=100,
+        batch_size=5,
+        epsilon_start=0.02,
+        epsilon_end=0.01,
+        gradient_clipping=1.0,
+        allow_checkpointing=False,
+    )
     total_reward = 0
 
     for _ in range(100):
@@ -68,7 +68,10 @@ class DQNTest(absltest.TestCase):
             num_actions=num_actions,
             hidden_layers_sizes=[16],
             replay_buffer_capacity=10,
-            batch_size=5) for player_id in [0, 1]
+            batch_size=5,
+            allow_checkpointing=False,
+        )
+        for player_id in [0, 1]
     ]
     time_step = env.reset()
     while not time_step.last():
@@ -79,6 +82,21 @@ class DQNTest(absltest.TestCase):
 
     for agent in agents:
       agent.step(time_step)
+
+    total_eval_reward = [0] * 2
+
+    for _ in range(1000):
+      time_step = env.reset()
+      while not time_step.last():
+        current_player = time_step.observations["current_player"]
+        current_agent = agents[current_player]
+        agent_output = current_agent.step(time_step, is_evaluation=True)
+        time_step = env.step([agent_output.action])
+        total_eval_reward = [
+            t + r for t, r in zip(total_eval_reward, time_step.rewards)
+        ]
+
+    self.assertGreaterEqual(abs(total_eval_reward[0]), 1000)
 
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
@@ -107,7 +125,10 @@ class DQNTest(absltest.TestCase):
             num_actions=num_actions,
             hidden_layers_sizes=[16],
             replay_buffer_capacity=10,
-            batch_size=5) for player_id in range(num_players)
+            batch_size=5,
+            allow_checkpointing=False,
+        )
+        for player_id in range(num_players)
     ]
     time_step = env.reset()
     while not time_step.last():

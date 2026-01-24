@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.algorithms.dqn."""
-
 import random
+
 from absl.testing import absltest
 import numpy as np
 import torch
@@ -52,7 +51,8 @@ class DQNTest(absltest.TestCase):
         epsilon_decay_duration=1000,
         batch_size=32,
         epsilon_start=0.5,
-        epsilon_end=0.01)
+        epsilon_end=0.01,
+    )
     total_eval_reward = 0
     for _ in range(1000):
       time_step = env.reset()
@@ -80,7 +80,9 @@ class DQNTest(absltest.TestCase):
             num_actions=num_actions,
             hidden_layers_sizes=[16],
             replay_buffer_capacity=10,
-            batch_size=5) for player_id in [0, 1]
+            batch_size=5,
+        )
+        for player_id in [0, 1]
     ]
     time_step = env.reset()
     while not time_step.last():
@@ -91,6 +93,14 @@ class DQNTest(absltest.TestCase):
 
     for agent in agents:
       agent.step(time_step)
+
+    for _ in range(100):
+      time_step = env.reset()
+      while not time_step.last():
+        current_player = time_step.observations["current_player"]
+        current_agent = agents[current_player]
+        agent_output = current_agent.step(time_step, is_evaluation=True)
+        time_step = env.step([agent_output.action])
 
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
@@ -119,9 +129,12 @@ class DQNTest(absltest.TestCase):
             num_actions=num_actions,
             hidden_layers_sizes=[16],
             replay_buffer_capacity=10,
-            batch_size=5) for player_id in range(num_players)
+            batch_size=5,
+        )
+        for player_id in range(num_players)
     ]
     time_step = env.reset()
+
     while not time_step.last():
       current_player = time_step.observations["current_player"]
       agent_output = [agent.step(time_step) for agent in agents]
@@ -129,7 +142,6 @@ class DQNTest(absltest.TestCase):
 
     for agent in agents:
       agent.step(time_step)
-
 
 if __name__ == "__main__":
   random.seed(SEED)

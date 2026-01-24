@@ -15,11 +15,15 @@
 #include "open_spiel/algorithms/infostate_tree.h"
 
 #include <algorithm>
+#include <array>
+#include <cstddef>
+#include <limits>
 #include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
-#include "open_spiel/games/goofspiel/goofspiel.h"
-#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -62,7 +66,7 @@ std::shared_ptr<InfostateTree> MakeTree(const std::string& game_name,
                                         Player player,
                                         int max_move_limit = 1000) {
   std::shared_ptr<InfostateTree> tree =
-      MakeInfostateTree(*LoadGame(game_name), player, max_move_limit);
+      MakeInfostateTree(*LoadGame(game_name), player, false, max_move_limit);
   SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   return tree;
 }
@@ -86,7 +90,7 @@ std::shared_ptr<InfostateTree> MakeTree(
 
   std::shared_ptr<InfostateTree> tree =
       MakeInfostateTree(start_state_ptrs, start_reaches, infostate_observer,
-                        player, max_move_limit);
+                        player, false, max_move_limit);
   SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   return tree;
 }
@@ -297,8 +301,7 @@ void CheckTreeLeaves(const InfostateTree& tree, int move_limit) {
     int terminal_cnt = 0;
     int max_move_number = std::numeric_limits<int>::min();
     int min_move_number = std::numeric_limits<int>::max();
-    for (const std::unique_ptr<State>& state :
-         leaf_node->corresponding_states()) {
+    for (const auto& state : leaf_node->corresponding_states()) {
       if (state->IsTerminal()) terminal_cnt++;
       max_move_number = std::max(max_move_number, state->MoveNumber());
       min_move_number = std::min(min_move_number, state->MoveNumber());
