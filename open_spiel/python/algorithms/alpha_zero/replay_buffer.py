@@ -76,7 +76,9 @@ def append(
   )
 
 
-def sample(rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int) -> Experience:
+def sample(
+  rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int
+) -> Experience:
   """Returns `num_samples` uniformly sampled from the buffer.
   Args:
     rng: `chex.PRNGKey`, a random state
@@ -90,14 +92,18 @@ def sample(rng: chex.PRNGKey, state: ReplayBufferState, num_samples: int) -> Exp
 
   # When full, the max time index is max_length_time_axis otherwise it is current index.
   max_size = jnp.where(state.is_full, state.capacity, state.entry_index)
-  indices = jax.random.randint(rng, shape=(num_samples,), minval=0, maxval=max_size)
+  indices = jax.random.randint(
+    rng, shape=(num_samples,), minval=0, maxval=max_size
+  )
   return jax.tree.map(lambda x: x[indices], state.experience)
 
 
 class Buffer:
   """A fixed size buffer that keeps the newest values."""
 
-  def __init__(self, max_size: int, force_cpu: bool = False, seed: int = 0) -> None:
+  def __init__(
+    self, max_size: int, force_cpu: bool = False, seed: int = 0
+  ) -> None:
     self.max_size = max_size
     self._total_seen = jnp.array(0)
 
@@ -107,7 +113,9 @@ class Buffer:
 
     self._init = jax.jit(init, backend=backend, static_argnames=("capacity",))
     self._append = jax.jit(append, backend=backend, donate_argnums=(0,))
-    self._sample = jax.jit(sample, backend=backend, static_argnames=("num_samples",))
+    self._sample = jax.jit(
+      sample, backend=backend, static_argnames=("num_samples",)
+    )
 
     self.buffer_state = None
 

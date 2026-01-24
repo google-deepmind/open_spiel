@@ -14,6 +14,8 @@
 
 """An MCTS Evaluator for an AlphaZero model."""
 
+from typing import Any
+
 import jax
 import numpy as np
 import pyspiel
@@ -25,7 +27,9 @@ from open_spiel.python.utils import lru_cache
 class AlphaZeroEvaluator(mcts.Evaluator):
   """An AlphaZero MCTS Evaluator."""
 
-  def __init__(self, game, model, cache_size=2**16):
+  def __init__(
+    self, game: pyspiel.Game, model: Any, cache_size: int = 2**16
+  ) -> None:
     """An AlphaZero MCTS Evaluator."""
     if game.num_players() != 2:
       raise ValueError("Game must be for two players.")
@@ -38,15 +42,15 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     self._model = model  # nn.cached_partial?
     self._cache = lru_cache.LRUCache(cache_size)
 
-  def cache_info(self):
+  def cache_info(self) -> lru_cache.CacheInfo:
     return self._cache.info()
 
-  def clear_cache(self):
+  def clear_cache(self) -> None:
     # Clear all compilation and staging caches.
     jax.clear_caches()
     self._cache.clear()
 
-  def _inference(self, state):
+  def _inference(self, state: pyspiel.State) -> tuple:
     # Make a singleton batch
     obs = np.asarray(state.observation_tensor())
     mask = np.asarray(state.legal_actions_mask())
@@ -59,12 +63,12 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     )
     return value, policy
 
-  def evaluate(self, state) -> np.ndarray:
+  def evaluate(self, state: pyspiel.State) -> np.ndarray:
     """Returns a value for the given state."""
     value, _ = self._inference(state)
     return np.array([value, -value])
 
-  def prior(self, state):
+  def prior(self, state: pyspiel.State) -> list[tuple[int, float]]:
     if state.is_chance_node():
       return state.chance_outcomes()
     else:

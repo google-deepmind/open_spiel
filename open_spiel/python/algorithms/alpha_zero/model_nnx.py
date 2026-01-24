@@ -11,7 +11,11 @@ import optax
 import orbax.checkpoint as orbax
 from flax.training import train_state
 
-from open_spiel.python.algorithms.alpha_zero.utils import Losses, TrainInput, flatten
+from open_spiel.python.algorithms.alpha_zero.utils import (
+  Losses,
+  TrainInput,
+  flatten,
+)
 
 warnings.warn("Pay attention that you've been using the `nnx` api")
 
@@ -131,7 +135,9 @@ class ResidualBlock(nn.Module):
     activation: str,
     seed: int = 0,
   ) -> None:
-    self.conv1 = ConvBlock(in_features, out_features, kernel_size, activation, seed)
+    self.conv1 = ConvBlock(
+      in_features, out_features, kernel_size, activation, seed
+    )
     # activation's applied separately
     self.conv2 = ConvBlock(out_features, out_features, kernel_size, None, seed)
     self.activation = Activation(activation)
@@ -266,7 +272,9 @@ class AlphaZeroModel(nn.Module):
     if model_type == "mlp":
       self.torso = nn.Sequential(
         Flatten(),
-        MLPBlock(np.prod(input_shape), nn_width, activation=activation, seed=seed),
+        MLPBlock(
+          np.prod(input_shape), nn_width, activation=activation, seed=seed
+        ),
         *[
           MLPBlock(nn_width, nn_width, activation=activation, seed=seed + _seed)
           for _seed in range(1, nn_depth)
@@ -287,7 +295,9 @@ class AlphaZeroModel(nn.Module):
         lambda x: x.reshape(input_shape),
         ConvBlock(input_shape[-1], nn_width, (3, 3), activation, seed=seed),
         *[
-          ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed + _seed)
+          ResidualBlock(
+            nn_width, nn_width, (3, 3), activation, seed=seed + _seed
+          )
           for _seed in range(nn_depth)
         ],
       )
@@ -295,7 +305,12 @@ class AlphaZeroModel(nn.Module):
       raise ValueError(f"Unknown model type: {self.model_type}")
 
     self.policy_head = PolicyHead(
-      (*input_shape[:-1], nn_width), nn_width, output_size, model_type, activation, seed
+      (*input_shape[:-1], nn_width),
+      nn_width,
+      output_size,
+      model_type,
+      activation,
+      seed,
     )
     self.value_head = ValueHead(
       (*input_shape[:-1], nn_width), nn_width, model_type, activation, seed
@@ -318,7 +333,9 @@ class TrainState(train_state.TrainState):
 class Model:
   valid_model_types = ["mlp", "conv2d", "resnet"]
 
-  def __init__(self, state: TrainState, path: str, update_step_fn: Callable) -> None:
+  def __init__(
+    self, state: TrainState, path: str, update_step_fn: Callable
+  ) -> None:
     self._state = state
     self._path = path
     self._update_step_fn = update_step_fn
@@ -384,7 +401,8 @@ class Model:
     def mask_fn(path, _):
       # path is a tuple of segments, e.g., ('linear1', 'bias')
       names = [
-        str(p.key) if isinstance(p, jax.tree_util.DictKey) else str(p) for p in path
+        str(p.key) if isinstance(p, jax.tree_util.DictKey) else str(p)
+        for p in path
       ]
       # Return True to APPLY decay, False to MASK it
       return ("bias" not in names) and ("bn" not in names)
@@ -429,7 +447,9 @@ class Model:
           jnp.full_like(policy_logits, jnp.finfo(jnp.float32).min),
         )
 
-        policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
+        policy_loss = optax.softmax_cross_entropy(
+          policy_logits, policy_targets
+        ).mean()
         value_loss = optax.l2_loss(value_preds, value_targets).mean()
 
         l2_reg_loss = (
@@ -455,15 +475,19 @@ class Model:
       model = nn.merge(state.graphdef, state.params, state.batch_stats)
       model.train()
 
-      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
-        model,
-        observations,
-        legals_mask,
-        policy_targets,
-        value_targets,
+      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = (
+        grad_fn(
+          model,
+          observations,
+          legals_mask,
+          policy_targets,
+          value_targets,
+        )
       )
 
-      new_state = state.apply_gradients(grads=grads, batch_stats=new_batch_stats)
+      new_state = state.apply_gradients(
+        grads=grads, batch_stats=new_batch_stats
+      )
 
       return new_state, (policy_loss, value_loss, l2_reg_loss)
 
@@ -484,7 +508,9 @@ class Model:
     return sum(np.prod(p.shape) for p in jax.tree.leaves(self._state.params))
 
   def print_trainable_variables(self) -> None:
-    model = nn.merge(self._state.graphdef, self._state.params, self._state.batch_stats)
+    model = nn.merge(
+      self._state.graphdef, self._state.params, self._state.batch_stats
+    )
     nn.display(model)
     flat_params, _ = jax.tree.flatten(self._state.params)
     for i, p in enumerate(flat_params):
@@ -493,7 +519,9 @@ class Model:
   def inference(
     self, observation: chex.Array, legals_mask: chex.Array
   ) -> tuple[chex.Array, chex.Array]:
-    model = nn.merge(self._state.graphdef, self._state.params, self._state.batch_stats)
+    model = nn.merge(
+      self._state.graphdef, self._state.params, self._state.batch_stats
+    )
     model.eval()
 
     observation = jnp.asarray(observation, dtype=jnp.float32)
@@ -511,7 +539,11 @@ class Model:
 
   def update(self, batch: Sequence[TrainInput] | chex.ArrayTree) -> Losses:
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
-      self._state, batch.observation, batch.legals_mask, batch.policy, batch.value
+      self._state,
+      batch.observation,
+      batch.legals_mask,
+      batch.policy,
+      batch.value,
     )
 
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)

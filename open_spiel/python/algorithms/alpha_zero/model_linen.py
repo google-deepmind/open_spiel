@@ -15,7 +15,11 @@ import orbax.checkpoint
 from flax.training import train_state
 from flax.traverse_util import flatten_dict, unflatten_dict
 
-from open_spiel.python.algorithms.alpha_zero.utils import Losses, TrainInput, flatten
+from open_spiel.python.algorithms.alpha_zero.utils import (
+  Losses,
+  TrainInput,
+  flatten,
+)
 
 flax.config.update("flax_use_orbax_checkpointing", True)
 warnings.warn("Pay attention that you've been using the `linen` api")
@@ -73,7 +77,9 @@ class ConvBlock(nn.Module):
 
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
-    y = nn.Conv(features=self.features, kernel_size=self.kernel_size, padding="SAME")(x)
+    y = nn.Conv(
+      features=self.features, kernel_size=self.kernel_size, padding="SAME"
+    )(x)
     y = nn.BatchNorm(use_running_average=not training, axis_name="batch")(y)
     y = Activation(self.activation)(y)
     return y
@@ -199,7 +205,9 @@ class AlphaZeroModel(nn.Module):
       raise ValueError(f"Unknown model type: {self.model_type}")
 
     policy_logits = PolicyHead(
-      model_type=self.model_type, nn_width=self.nn_width, output_size=self.output_size
+      model_type=self.model_type,
+      nn_width=self.nn_width,
+      output_size=self.output_size,
     )(x, training)
     value_out = ValueHead(model_type=self.model_type, nn_width=self.nn_width)(
       x, training
@@ -224,10 +232,7 @@ class Model:
     self._state = state
     self._path = path
     self._update_step_fn = update_step_fn
-
-    # we're using the latest checkpointing API
-    # https://flax-linen.readthedocs.io/en/latest/guides/training_techniques/use_checkpointing.html
-
+    
     self._checkpointer = None
     if self._path is not None:
       self._checkpointer = orbax.checkpoint.PyTreeCheckpointer()
@@ -296,22 +301,33 @@ class Model:
       optimiser = optax.adam(learning_rate=learning_rate)
     else:
       optimiser = optax.adamw(
-        learning_rate=learning_rate, weight_decay=weight_decay, mask=mask_only_biases
+        learning_rate=learning_rate,
+        weight_decay=weight_decay,
+        mask=mask_only_biases,
       )
 
     state = cls._create_train_state(model.apply, variables, optimiser)
 
     @jax.jit
-    def update_step_fn(state, observations, legals_mask, policy_targets, value_targets):
+    def update_step_fn(
+      state, observations, legals_mask, policy_targets, value_targets
+    ):
       def loss_fn(
-        params, batch_stats, observations, legals_mask, policy_targets, value_targets
+        params,
+        batch_stats,
+        observations,
+        legals_mask,
+        policy_targets,
+        value_targets,
       ):
         variables = {"params": params, "batch_stats": batch_stats}
 
         @functools.partial(
           jax.vmap, in_axes=(0, 0, 0, 0), out_axes=(0, None), axis_name="batch"
         )
-        def _per_example_loss(observations, legals_mask, policy_targets, value_targets):
+        def _per_example_loss(
+          observations, legals_mask, policy_targets, value_targets
+        ):
           (policy_logits, value_preds), new_model_state = state.apply_fn(
             variables, observations, training=True, mutable=["batch_stats"]
           )
@@ -321,7 +337,9 @@ class Model:
             policy_logits,
             jnp.full_like(policy_logits, jnp.finfo(jnp.float32).min),
           )
-          policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets)
+          policy_loss = optax.softmax_cross_entropy(
+            policy_logits, policy_targets
+          )
           value_loss = optax.l2_loss(value_preds, value_targets)
 
           return (policy_loss, value_loss), new_model_state["batch_stats"]
@@ -345,19 +363,28 @@ class Model:
         if not decouple_weight_decay:
           total_loss = total_loss + l2_reg_loss
 
-        return total_loss, (policy_loss, value_loss, l2_reg_loss, new_model_state)
+        return total_loss, (
+          policy_loss,
+          value_loss,
+          l2_reg_loss,
+          new_model_state,
+        )
 
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
-      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
-        state.params,
-        state.batch_stats,
-        observations,
-        legals_mask,
-        policy_targets,
-        value_targets,
+      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = (
+        grad_fn(
+          state.params,
+          state.batch_stats,
+          observations,
+          legals_mask,
+          policy_targets,
+          value_targets,
+        )
       )
 
-      new_state = state.apply_gradients(grads=grads, batch_stats=new_batch_stats)
+      new_state = state.apply_gradients(
+        grads=grads, batch_stats=new_batch_stats
+      )
       return new_state, (policy_loss, value_loss, l2_reg_loss)
 
     return cls(state, path, update_step_fn)
@@ -381,7 +408,9 @@ class Model:
     for i, p in enumerate(flat_params):
       print(f"Param {i}: {p.shape}")
 
-  def inference(self, observation, legals_mask) -> tuple[chex.Array, chex.Array]:
+  def inference(
+    self, observation: list, legals_mask: list
+  ) -> tuple[chex.Array, chex.Array]:
     observation = jnp.asarray(observation, dtype=jnp.float32)
     legals_mask = jnp.asarray(legals_mask, dtype=jnp.bool)
 
@@ -401,13 +430,19 @@ class Model:
       policy = nn.softmax(policy_logits, axis=-1)
       return value, policy
 
-    value, policy = _predict(self._state.params, self._state.batch_stats, observation)
+    value, policy = _predict(
+      self._state.params, self._state.batch_stats, observation
+    )
 
     return value, policy
 
   def update(self, batch: Sequence[TrainInput]) -> Losses:
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
-      self._state, batch.observation, batch.legals_mask, batch.policy, batch.value
+      self._state,
+      batch.observation,
+      batch.legals_mask,
+      batch.policy,
+      batch.value,
     )
 
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
@@ -425,7 +460,9 @@ class Model:
     )
     if self._checkpointer:
       self._checkpointer.save(
-        path, args=orbax.checkpoint.args.PyTreeSave(item=sharded_state), force=True
+        path,
+        args=orbax.checkpoint.args.PyTreeSave(item=sharded_state),
+        force=True,
       )
 
     return step
@@ -440,7 +477,9 @@ class Model:
     sharding = jax.sharding.SingleDeviceSharding(device)
 
     restore_args_tree = jax.tree.map(
-      lambda _: orbax.checkpoint.type_handlers.ArrayRestoreArgs(sharding=sharding),
+      lambda _: orbax.checkpoint.type_handlers.ArrayRestoreArgs(
+        sharding=sharding
+      ),
       target,
     )
 

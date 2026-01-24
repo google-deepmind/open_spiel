@@ -81,6 +81,7 @@ Currently, the framework supports two APIs:
 1. Implement sharding for multi-processing or multi-hostage (`xmap, jax.shard_map`) training and inference to reduce the overhead.
 2. Add support of different logging methods, like `wandb` and such
 3. Add Tensorboard support for a "on-line" logging
+4. Currently the checkpointer is hardcoded to be a single-device! This makes it viable due to incoming API changes.
 
 
 

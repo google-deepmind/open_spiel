@@ -252,7 +252,9 @@ def _play_game(
       )
       action_str = state.action_to_string(state.current_player(), action)
       actions.append(action_str)
-      logger.opt_print(f"Player {state.current_player()} sampled action: {action_str}")
+      logger.opt_print(
+        f"Player {state.current_player()} sampled action: {action_str}"
+      )
       state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
 
@@ -291,7 +293,7 @@ def update_checkpoint(
 
 @watcher
 def actor(
-  *, config: Config, game: Any, logger: Any, queue: spawn._ProcessQueue
+  *, config: Config, game: pyspiel.Game, logger: Any, queue: spawn._ProcessQueue
 ) -> None:
   """An actor process runner that generates games and returns trajectories."""
   logger.print("Initializing model")
@@ -307,13 +309,20 @@ def actor(
       return
     queue.put(
       _play_game(
-        logger, game_num, game, bots, config.temperature, config.temperature_drop
+        logger,
+        game_num,
+        game,
+        bots,
+        config.temperature,
+        config.temperature_drop,
       )
     )
 
 
 @watcher
-def evaluator(*, game: Any, config: Config, logger: Any, queue) -> None:
+def evaluator(
+  *, game: pyspiel.Game, config: Config, logger: Any, queue
+) -> None:
   """A process that plays the latest checkpoint vs standard MCTS."""
   results = buffer_lib.Buffer(config.evaluation_window, force_cpu=True)
 
@@ -361,7 +370,7 @@ def evaluator(*, game: Any, config: Config, logger: Any, queue) -> None:
 @watcher
 def learner(
   *,
-  game: Any,
+  game: pyspiel.Game,
   config: Config,
   actors: list[spawn.Process],
   evaluators: list[spawn.Process],
@@ -375,7 +384,9 @@ def learner(
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
-  logger.print(f"Model type: {config.nn_model}({config.nn_width}, {config.nn_depth})")
+  logger.print(
+    f"Model type: {config.nn_model}({config.nn_width}, {config.nn_depth})"
+  )
   logger.print("Model size:", model.num_trainable_variables, "variables")
 
   save_path = model.save_checkpoint(0)
@@ -499,8 +510,9 @@ def learner(
     logger.print("Step:", step)
     logger.print(
       (
-        f"Collected {num_states:5} states from {num_trajectories:3} games, {(num_states / seconds):.1f} states/s. "
-        f"{(num_states / (config.actors * seconds)):.1f} states/(s*actor), " 
+        f"Collected {num_states:5} states from {num_trajectories:3} games, "
+        f"{(num_states / seconds):.1f} states/s. "
+        f"{(num_states / (config.actors * seconds)):.1f} states/(s*actor), "
         f"game length: {(num_states / num_trajectories):.1f}"
       )
     )
