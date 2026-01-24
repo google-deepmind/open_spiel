@@ -239,6 +239,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/algorithms/greedy_policy_test.py
   mfg/algorithms/nash_conv_test.py
   mfg/algorithms/policy_value_test.py
+  games/param_social_dilemma_test.py
+  games/param_social_dilemma_bots_test.py
   mfg/games/crowd_modelling_test.py
   mfg/games/predator_prey_test.py
   mfg/games/dynamic_routing_test.py
