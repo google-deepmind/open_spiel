@@ -1206,6 +1206,13 @@ std::shared_ptr<const Game> LoadGame(const std::string& game_string);
 std::shared_ptr<const Game> LoadGame(const std::string& short_name,
                                      const GameParameters& params);
 
+// Loads multiple games from a single string separated by a separator string
+// (with whitespace allowed).
+// E.g. "tic_tac_toe / leduc_poker / breakthrough(rows=6, columns=6)".
+std::vector<std::shared_ptr<const Game>> LoadGames(
+    const std::string& multi_game_string,
+    const std::string& separator = "/");
+
 // Returns a new game object with the specified parameters; reads the name
 // of the game from the 'name' parameter (which is not passed to the game
 // implementation).

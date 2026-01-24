@@ -15,7 +15,7 @@
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
-from open_spiel.python.jax import nfsp
+from open_spiel.python.pytorch import nfsp
 
 
 class NFSPTest(absltest.TestCase):
@@ -33,11 +33,10 @@ class NFSPTest(absltest.TestCase):
             hidden_layers_sizes=[16],
             reservoir_buffer_capacity=10,
             anticipatory_param=0.1,
-            allow_checkpointing=False,
         )
         for player_id in [0, 1]
     ]
-    for _ in range(10):
+    for unused_ep in range(10):
       time_step = env.reset()
       while not time_step.last():
         current_player = time_step.observations["current_player"]
@@ -46,6 +45,7 @@ class NFSPTest(absltest.TestCase):
         time_step = env.step([agent_output.action])
       for agent in agents:
         agent.step(time_step)
+
 
 if __name__ == "__main__":
   absltest.main()

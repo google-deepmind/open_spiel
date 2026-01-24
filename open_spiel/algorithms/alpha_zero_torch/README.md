@@ -28,11 +28,11 @@ that may be useful.
 
 ## Setting up LibTorch AlphaZero
 
-1.  In [global_variables.sh](../../scripts/global_variables.sh), find the
+1.  In `../../scripts/global_variables.sh`, find the
     `OPEN_SPIEL_BUILD_WITH_LIBNOP` variable and set its value to `"ON"`.
-2.  In [global_variables.sh](../../scripts/global_variables.sh), find the
+2.  In `../../scripts/global_variables.sh`, find the
     `OPEN_SPIEL_BUILD_WITH_LIBTORCH` variable and set its value to `"ON"`.
-3.  In [global_variables.sh](../../scripts/global_variables.sh), find the
+3.  In `../../scripts/global_variables.sh`, find the
     `OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL` variable and set its value to
     the LibTorch version URL compatible with your OS and hardware (see the
     comments in global_variables.sh for the URLs):
@@ -80,3 +80,11 @@ $ ./build/examples/alpha_zero_torch_game_example --game=tic_tac_toe --player1=az
 ```
 Run with the `--help` flag to see a complete list of flags and a brief
 description of each.
+
+<!-- disableFinding(HEADING_FUNCTION) -->
+## TD(lambda) returns
+
+There was a contribution [#940](https://github.com/google-deepmind/open_spiel/pull/940)
+that added TD(lambda) returns. It was never merged and correctness never fully
+verified, but may be useful if you would like lambda returns.
+
