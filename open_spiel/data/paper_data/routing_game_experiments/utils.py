@@ -21,7 +21,6 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy as policy_module
 from open_spiel.python import rl_environment
@@ -30,7 +29,7 @@ from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms import external_sampling_mccfr as external_mccfr
 from open_spiel.python.algorithms import fictitious_play
-from open_spiel.python.algorithms import nfsp
+from open_spiel.python.pytorch import nfsp
 from open_spiel.python.algorithms import noisy_policy
 from open_spiel.python.games import dynamic_routing
 from open_spiel.python.games import dynamic_routing_utils
@@ -769,13 +768,11 @@ def neural_ficticious_self_play(seq_game,
 
   # freq_epoch_printing = num_epoch // 10
   agents = [
-      nfsp.NFSP(sess, idx, info_state_size, num_actions, hidden_layers_sizes,
+      nfsp.NFSP(idx, info_state_size, num_actions, hidden_layers_sizes,
                 **kwargs) for idx in range(num_players)
   ]
   joint_avg_policy = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
-  sess.run(tf.global_variables_initializer())
-  # print("TF initialized.")
   tick_time = time.time()
   for _ in range(num_epoch):
     # if ep % freq_epoch_printing == 0:

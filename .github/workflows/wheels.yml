@@ -132,7 +132,7 @@ jobs:
 
       # Install the built wheel and run the full tests on this host. The full
       # tests include all the ones that use the machine learning libraries,
-      # such as Tensorflow, PyTorch, and JAX.
+      # such as PyTorch, and JAX.
       - name: Install bdist_wheel and full tests
         run: |
           source ./venv/bin/activate

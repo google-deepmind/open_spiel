@@ -20,7 +20,7 @@ from absl.testing import parameterized
 import numpy as np
 import torch
 import torch.nn as nn
-# Note: this import needs to come before Tensorflow to fix a malloc error.
+
 import pyspiel  # pylint: disable=g-bad-import-order
 
 from open_spiel.python.pytorch import rcfr
