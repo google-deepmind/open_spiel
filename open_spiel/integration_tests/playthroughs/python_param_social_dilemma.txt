@@ -1,0 +1,272 @@
+game: python_param_social_dilemma
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Python Parameterized Social Dilemma"
+GameType.max_num_players = 10
+GameType.min_num_players = 2
+GameType.parameter_specification = ["dynamic_payoffs", "max_game_length", "num_actions", "num_players", "payoff_change_prob", "payoff_matrix", "reward_noise_std"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "python_param_social_dilemma"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
+MaxChanceOutcomes() = 0
+GetParameters() = {dynamic_payoffs=False,max_game_length=10,num_actions=2,num_players=3,payoff_change_prob=0.0,payoff_matrix=,reward_noise_std=0.0}
+NumPlayers() = 3
+MinUtility() = 0.0
+MaxUtility() = 50.0
+UtilitySum() = None
+MaxGameLength() = 10
+ToString() = "python_param_social_dilemma()"
+
+# State 0
+# initial
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "initial"
+ObservationString(1) = "initial"
+ObservationString(2) = "initial"
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["C", "C", "D"]
+actions: [0, 0, 1]
+
+# State 1
+# t0:[C,C,D]
+IsTerminal() = False
+History() = [0, 0, 1]
+HistoryString() = "0, 0, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D]"
+ObservationString(1) = "t0:[C,C,D]"
+ObservationString(2) = "t0:[C,C,D]"
+Rewards() = [2, 2, 3.3333333333333335]
+Returns() = [2, 2, 3.3333333333333335]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["D", "C", "D"]
+actions: [1, 0, 1]
+
+# State 2
+# t0:[C,C,D] t1:[D,C,D]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1]
+HistoryString() = "0, 0, 1, 1, 0, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D]"
+Rewards() = [1.6666666666666667, 1, 1.6666666666666667]
+Returns() = [3.6666666666666665, 3, 5]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["C", "C", "C"]
+actions: [0, 0, 0]
+
+# State 3
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C]"
+Rewards() = [3, 3, 3]
+Returns() = [6.666666666666667, 6, 8]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["D", "D", "D"]
+actions: [1, 1, 1]
+
+# State 4
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D]"
+Rewards() = [0, 0, 0]
+Returns() = [6.666666666666667, 6, 8]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["C", "D", "C"]
+actions: [0, 1, 0]
+
+# State 5
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C]"
+Rewards() = [2, 3.3333333333333335, 2]
+Returns() = [8.666666666666666, 9.333333333333334, 10]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["D", "C", "C"]
+actions: [1, 0, 0]
+
+# State 6
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C]"
+Rewards() = [3.3333333333333335, 2, 2]
+Returns() = [12, 11.333333333333334, 12]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["C", "C", "D"]
+actions: [0, 0, 1]
+
+# State 7
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D]"
+Rewards() = [2, 2, 3.3333333333333335]
+Returns() = [14, 13.333333333333334, 15.333333333333334]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["D", "D", "C"]
+actions: [1, 1, 0]
+
+# State 8
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C]"
+Rewards() = [1.6666666666666667, 1.6666666666666667, 1]
+Returns() = [15.666666666666666, 15, 16.333333333333332]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["C", "D", "D"]
+actions: [0, 1, 1]
+
+# State 9
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D]
+IsTerminal() = False
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D]"
+Rewards() = [1, 1.6666666666666667, 1.6666666666666667]
+Returns() = [16.666666666666668, 16.666666666666668, 18]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+LegalActions(2) = [0, 1]
+StringLegalActions(0) = ["C", "D"]
+StringLegalActions(1) = ["C", "D"]
+StringLegalActions(2) = ["C", "D"]
+
+# Apply joint action ["D", "C", "C"]
+actions: [1, 0, 0]
+
+# State 10
+# t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D] t9:[D,C,C]
+IsTerminal() = True
+History() = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0]
+HistoryString() = "0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+ObservationString(0) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D] t9:[D,C,C]"
+ObservationString(1) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D] t9:[D,C,C]"
+ObservationString(2) = "t0:[C,C,D] t1:[D,C,D] t2:[C,C,C] t3:[D,D,D] t4:[C,D,C] t5:[D,C,C] t6:[C,C,D] t7:[D,D,C] t8:[C,D,D] t9:[D,C,C]"
+Rewards() = [3.3333333333333335, 2, 2]
+Returns() = [20, 18.666666666666668, 20]

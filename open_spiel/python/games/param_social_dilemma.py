@@ -28,7 +28,7 @@ _DEFAULT_PARAMS = {
     "num_players": 3,
     "num_actions": 2,
     "max_game_length": 10,
-    "payoff_matrix": None,
+    "payoff_matrix": "",
     "reward_noise_std": 0.0,
     "dynamic_payoffs": False,
     "payoff_change_prob": 0.0
@@ -67,11 +67,13 @@ class ParamSocialDilemmaGame(pyspiel.Game):
         self._dynamic_payoffs = params.get("dynamic_payoffs", False)
         self._payoff_change_prob = params.get("payoff_change_prob", 0.0)
         
-        payoff_matrix = params.get("payoff_matrix")
-        if payoff_matrix is None:
+        payoff_matrix_str = params.get("payoff_matrix", "")
+        if not payoff_matrix_str or payoff_matrix_str == "":
             self._payoff_matrix = self._create_default_payoff_matrix()
         else:
-            self._payoff_matrix = np.array(payoff_matrix)
+            # Parse the payoff matrix from string representation
+            # Expected format: "[[val1,val2,...],[val1,val2,...],...]"
+            self._payoff_matrix = self._parse_payoff_matrix(payoff_matrix_str)
         
         if self._reward_noise_std > 0:
             game_type = pyspiel.GameType(
@@ -127,6 +129,21 @@ class ParamSocialDilemmaGame(pyspiel.Game):
                     payoff_matrix[idx][player] = 5.0 * num_cooperators / self._num_players
         
         return payoff_matrix
+    
+    def _parse_payoff_matrix(self, matrix_str):
+        """Parse payoff matrix from string representation.
+        
+        Expected format: Nested list representation as string.
+        Example: "[[3.0,3.0],[0.0,5.0],[5.0,0.0],[1.0,1.0]]"
+        """
+        import ast
+        try:
+            parsed = ast.literal_eval(matrix_str)
+            return np.array(parsed)
+        except (ValueError, SyntaxError) as e:
+            raise ValueError(
+                f"Invalid payoff_matrix format: {matrix_str}. "
+                f"Expected nested list representation. Error: {e}")
     
     def new_initial_state(self):
         return ParamSocialDilemmaState(self)
