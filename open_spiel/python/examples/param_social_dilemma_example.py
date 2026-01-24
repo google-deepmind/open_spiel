@@ -141,7 +141,7 @@ def main():
     
     game = pyspiel.load_game("python_param_social_dilemma", {
         "num_players": 2,
-        "payoff_matrix": custom_payoff.tolist(),
+        "payoff_matrix": str(custom_payoff.tolist()),
         "max_game_length": 10
     })
     
