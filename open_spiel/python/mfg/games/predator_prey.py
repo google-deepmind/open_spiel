@@ -312,7 +312,7 @@ class MFGPredatorPreyState(pyspiel.State):
     if self._population is not None:
       assert 0 <= self._population < self.num_players()
     # When set, <int>[2] numpy array representing the x, y position on the grid.
-    self._pos = None  # type: Optional[np.ndarray]
+    self._pos: Optional[np.ndarray] = None
     self._t = 0
     self.size = game.size
     # Number of states in the grid.

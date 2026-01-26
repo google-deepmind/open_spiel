@@ -1,0 +1,95 @@
+# To run all pre-commit checks, use:
+#
+#     pre-commit run -a
+#
+# To install pre-commit hooks that run every time you commit:
+#
+#     pre-commit install
+#
+
+
+repos:
+  # Standard hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v6.0.0"
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      #        Check docstring-first currently clashes with an integrated file:
+      #        open_spiel/python/algorithms/psro_v2/strategy_selectors.py:281: Multiple module docstrings (first docstring on line 15).
+      #      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: requirements-txt-fixer
+      - id: trailing-whitespace
+
+  # Check for basic python "dont's"
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: "v1.10.0"
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      #        Python-no-log-warn clashes in multiple places where logging.warn has been used
+      #      - id: python-no-log-warn
+      - id: python-no-eval
+      - id: python-use-type-annotations
+
+  # Sort includes
+  - repo: https://github.com/PyCQA/isort
+    rev: "7.0.0"
+    hooks:
+      - id: isort
+
+#  # Format Python code with black
+#  black uses an uncompromisable 4-indent as the formatting basis of
+#  python files which clashes with google's pylint configuration.
+#  That's why we are using pyink instead which allows 2-indent.
+#  - repo: https://github.com/psf/black
+#    rev: 23.3.0
+#    hooks:
+#      - id: black
+#        language_version: python3
+#        types: [ python ]
+
+    # Format Python code with pyink
+  - repo: https://github.com/google/pyink
+    rev: 25.12.0
+    hooks:
+      - id: pyink
+        language_version: python3
+        types: [python]
+
+  # Clang-format the C++ part of the code base automatically
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: "v21.1.8"
+    hooks:
+      - id: clang-format
+        types_or: [ c++, c, cuda ]
+
+  # CMake format the CMakeLists.txt files
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        additional_dependencies:
+          - pyyaml
+
+  # Lint python code with PyLint
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [ python ]
+        args:
+          [
+            "-rn", # Only display messages
+            "-sn", # Don't display the score
+            "--rcfile=.pylintrc",
+          ]
