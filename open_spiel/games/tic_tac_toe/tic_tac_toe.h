@@ -169,6 +169,7 @@ class TicTacToeGame : public Game {
   }
   int MaxGameLength() const override { return kNumCells; }
   std::string ActionToString(Player player, Action action_id) const override;
+  int MaxSerializationLength() const override { return 19; }
 };
 
 CellState PlayerToState(Player player);
