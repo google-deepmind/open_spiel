@@ -19,6 +19,7 @@ from absl.testing import parameterized
 
 import numpy as np
 import pyspiel  # pylint: disable=g-bad-import-order
+
 import torch
 from torch import nn
 

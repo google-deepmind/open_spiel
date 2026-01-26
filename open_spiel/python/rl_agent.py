@@ -26,7 +26,6 @@ class AbstractAgent(metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def __init__(self,
                player_id,
-               session=None,
                observation_spec=None,
                name="agent",
                **agent_specific_kwargs):
@@ -35,9 +34,8 @@ class AbstractAgent(metaclass=abc.ABCMeta):
     Args:
       player_id: integer, mandatory. Corresponds to the player position in the
         game and is used to index the observation list.
-      session: optional Tensorflow session.
       observation_spec: optional dict containing observation specifications.
-      name: string. Must be used to scope TF variables. Defaults to `agent`.
+      name: string. Must be used to scope variables. Defaults to `agent`.
       **agent_specific_kwargs: optional extra args.
     """
 
