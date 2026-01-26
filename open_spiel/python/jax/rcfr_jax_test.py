@@ -12,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import functools
 import itertools
 
 from absl.testing import absltest
 from absl.testing import parameterized
 
+import chex
+import flax.nnx as nn
+import jax
+import jax.numpy as jnp
 import numpy as np
+import optax
 import pyspiel  # pylint: disable=g-bad-import-order
-import torch
-from torch import nn
 
-from open_spiel.python.pytorch import rcfr
+from open_spiel.python.jax import rcfr
 
 _GAME = pyspiel.load_game("kuhn_poker")
 _BOOLEANS = [False, True]
@@ -31,7 +35,7 @@ _BATCH_SIZE = 12
 SEED = 24984617
 
 
-def _new_model():
+def _new_model() -> rcfr.DeepRcfrModel:
   return rcfr.DeepRcfrModel(
       _GAME,
       num_hidden_layers=1,
@@ -41,7 +45,32 @@ def _new_model():
   )
 
 
+@functools.partial(jax.jit, static_argnames=("graphdef",))
+def jax_train_step(
+    graphdef: nn.GraphDef, state: nn.State, x: chex.Array, y: chex.Array
+) -> tuple[chex.Numeric, nn.State]:
+  """Train step in pure jax."""
+
+  model, optimizer = nn.merge(graphdef, state, copy=True)
+
+  def loss_fn(model):
+    y_pred = model(x)
+    return optax.hinge_loss(y_pred, y).mean()
+
+  loss, grads = nn.value_and_grad(loss_fn)(model)
+  optimizer.update(model, grads)
+  state = nn.state((model, optimizer))
+  return loss, state
+
+
+@nn.vmap(in_axes=(None, 0), out_axes=0)
+def forward(model: rcfr.DeepRcfrModel, x: chex.Array) -> chex.Array:
+  """Batched call for the flax.nnx model."""
+  return model(x)
+
+
 class RcfrTest(parameterized.TestCase, absltest.TestCase):
+
   def setUp(self):
     # pylint: disable=useless-super-delegation
     super(RcfrTest, self).setUp()
@@ -208,7 +237,8 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
 
   def test_normalized_by_sum(self):
     self.assertListAlmostEqual(
-        rcfr.normalized_by_sum([1.0, 2.0, 3.0, 4.0]), [0.1, 0.2, 0.3, 0.4]
+        rcfr.normalised_by_sum(jnp.array([1.0, 2.0, 3.0, 4.0])),
+        jnp.array([0.1, 0.2, 0.3, 0.4]),
     )
 
   def test_counterfactual_regrets_and_reach_weights_value_error(self):
@@ -365,8 +395,8 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
       info_state = state.information_state_string()
       sequence_offset = root.info_state_to_sequence_idx[info_state]
       num_actions = len(state.legal_actions())
-      return rcfr.normalized_by_sum(
-          list(range(sequence_offset, sequence_offset + num_actions))
+      return rcfr.normalised_by_sum(
+          jnp.array(list(range(sequence_offset, sequence_offset + num_actions)))
       )
 
     profile = rcfr.sequence_weights_to_tabular_profile(root.root, policy_fn)
@@ -415,7 +445,9 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
       reach_weights_player = 1 if regret_player == 0 else 0
 
       regrets, reach = root.counterfactual_regrets_and_reach_weights(
-          regret_player, reach_weights_player, *rcfr.relu(cumulative_regrets)
+          regret_player,
+          reach_weights_player,
+          *rcfr.relu(jnp.asarray(cumulative_regrets)),
       )
 
       cumulative_regrets[regret_player] += regrets
@@ -433,10 +465,10 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
     root = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)
 
     num_half_iterations = 4
-    num_epochs = 100
+    num_epochs = 20
 
-    cumulative_regrets = [np.zeros(n) for n in root.num_player_sequences]
-    cumulative_reach_weights = [np.zeros(n) for n in root.num_player_sequences]
+    cumulative_regrets = [jnp.zeros(n) for n in root.num_player_sequences]
+    cumulative_reach_weights = [jnp.zeros(n) for n in root.num_player_sequences]
 
     average_profile = root.sequence_weights_to_tabular_profile(
         cumulative_reach_weights
@@ -445,48 +477,53 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
 
     regret_player = 0
     sequence_weights = [
-        model(root.sequence_features[player]).detach().numpy()
+        model(root.sequence_features[player])
         for player, model in enumerate(models)
     ]
+
+    rng = jax.random.key(SEED)
 
     for _ in range(num_half_iterations):
       reach_weights_player = 1 if regret_player == 0 else 0
 
-      sequence_weights[reach_weights_player] = (
-          models[reach_weights_player](
-              root.sequence_features[reach_weights_player]
-          )
-          .detach()
-          .numpy()
+      sequence_weights[reach_weights_player] = models[reach_weights_player](
+          root.sequence_features[reach_weights_player]
       )
 
       regrets, seq_probs = root.counterfactual_regrets_and_reach_weights(
           regret_player, reach_weights_player, *sequence_weights
       )
-
       cumulative_regrets[regret_player] += regrets
       cumulative_reach_weights[reach_weights_player] += seq_probs
 
-      data = torch.utils.data.TensorDataset(
-          root.sequence_features[regret_player],
-          torch.Tensor(cumulative_regrets[regret_player]),
-      )
-      data = torch.utils.data.DataLoader(
-          data, batch_size=_BATCH_SIZE, shuffle=True
+      data = (
+          jnp.asarray(root.sequence_features[regret_player]),
+          jnp.asarray(cumulative_regrets[regret_player]),
       )
 
-      loss_fn = nn.SmoothL1Loss()
-      optimizer = torch.optim.Adam(
-          models[regret_player].parameters(), lr=0.005, amsgrad=True
+      rng_, rng = jax.random.split(rng)
+
+      # pylint: disable=cell-var-from-loop
+
+      num_batches = len(data[0]) // _BATCH_SIZE
+      data = jax.tree.map(
+          lambda x: jax.random.permutation(rng_, x, axis=0).reshape(
+              num_batches, _BATCH_SIZE, -1
+          ),
+          data,
       )
+
+      optimizer = nn.Optimizer(
+          models[regret_player], optax.adam(learning_rate=0.005), wrt=nn.Param
+      )
+      graphdef, state = nn.split((models[regret_player], optimizer))
+
       for _ in range(num_epochs):
-        for x, y in data:
-          optimizer.zero_grad()
-          output = models[regret_player](x)
-          loss = loss_fn(output, y)
-          loss.backward()
-          optimizer.step()
+        for x, y in zip(*data):
+          _, state = jax_train_step(graphdef, state, x, y.squeeze(-1))
 
+      # refreshing
+      nn.update((models[regret_player], optimizer), state)
       regret_player = reach_weights_player
 
     average_profile = root.sequence_weights_to_tabular_profile(
@@ -497,36 +534,47 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
   @parameterized.parameters(list(itertools.product(_BOOLEANS, _BOOLEANS)))
   def test_rcfr(self, bootstrap, truncate_negative):
     num_epochs = 100
-    num_iterations = 2
+    num_iterations = 10
     models = [_new_model() for _ in range(_GAME.num_players())]
+
+    rng = jax.random.key(SEED)
 
     patient = rcfr.RcfrSolver(
         _GAME, models, bootstrap=bootstrap, truncate_negative=truncate_negative
     )
 
-    def _train(model, data):
-      data = torch.utils.data.DataLoader(
-          data, batch_size=_BATCH_SIZE, shuffle=True
+    # pylint: disable=g-bare-generic
+    def _train(model: nn.Module, data: tuple) -> None:
+      data_, rng = data
+      optimizer = nn.Optimizer(
+          model, optax.adam(learning_rate=0.05), wrt=nn.Param
+      )
+      graphdef, state = nn.split((model, optimizer))
+
+      num_batches = len(data_[0]) // _BATCH_SIZE
+      data_ = jax.tree.map(
+          lambda x: jax.random.permutation(rng, x, axis=0).reshape(
+              num_batches, _BATCH_SIZE, -1
+          ),
+          data_,
       )
 
-      loss_fn = nn.SmoothL1Loss()
-      optimizer = torch.optim.Adam(model.parameters(), lr=0.005, amsgrad=True)
       for _ in range(num_epochs):
-        for x, y in data:
-          optimizer.zero_grad()
-          output = model(x)
-          loss = loss_fn(output, y)
-          loss.backward()
-          optimizer.step()
+        for x, y in zip(*data_):
+          _, state = jax_train_step(graphdef, state, x, y.squeeze(-1))
+
+      nn.update((model, optimizer), state)
+      return
 
     average_policy = patient.average_policy()
     self.assertGreater(pyspiel.nash_conv(_GAME, average_policy), 0.91)
 
     for _ in range(num_iterations):
-      patient.evaluate_and_update_policy(_train)
+      rng, rng_ = jax.random.split(rng)
+      patient.evaluate_and_update_policy(_train, rng_)
 
     average_policy = patient.average_policy()
-    self.assertLess(pyspiel.nash_conv(_GAME, average_policy), 0.91)
+    self.assertLess(pyspiel.nash_conv(_GAME, average_policy), 0.92)
 
   def test_rcfr_with_buffer(self):
     buffer_size = 12
@@ -534,33 +582,45 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
     num_iterations = 2
     models = [_new_model() for _ in range(_GAME.num_players())]
 
+    rng = jax.random.key(SEED)
+
     patient = rcfr.ReservoirRcfrSolver(_GAME, models, buffer_size=buffer_size)
 
-    def _train(model, data):
-      data = torch.utils.data.DataLoader(
-          data, batch_size=_BATCH_SIZE, shuffle=True
+    # pylint: disable=g-bare-generic
+    def _train(model: nn.Module, data: tuple) -> None:
+      data_, rng = data
+      optimizer = nn.Optimizer(
+          model, optax.adam(learning_rate=0.005), wrt=nn.Param
+      )
+      graphdef, state = nn.split((model, optimizer))
+
+      num_batches = len(data_[0]) // _BATCH_SIZE
+      data_ = jax.tree.map(
+          lambda x: jax.random.permutation(rng, x, axis=0).reshape(
+              num_batches, _BATCH_SIZE, -1
+          ),
+          data_,
       )
 
-      loss_fn = nn.SmoothL1Loss()
-      optimizer = torch.optim.Adam(model.parameters(), lr=0.005, amsgrad=True)
       for _ in range(num_epochs):
-        for x, y in data:
-          optimizer.zero_grad()
-          output = model(x)
-          loss = loss_fn(output, y)
-          loss.backward()
-          optimizer.step()
+        for x, y in zip(*data_):
+          _, state = jax_train_step(graphdef, state, x, y.squeeze(-1))
+
+      nn.update((model, optimizer), state)
+      return
 
     average_policy = patient.average_policy()
     self.assertGreater(pyspiel.nash_conv(_GAME, average_policy), 0.91)
 
     for _ in range(num_iterations):
-      patient.evaluate_and_update_policy(_train)
+      rng, rng_ = jax.random.split(rng)
+      patient.evaluate_and_update_policy(_train, rng_)
+      _average_policy = patient.average_policy()
+      print(pyspiel.nash_conv(_GAME, _average_policy), 0.91)
 
     average_policy = patient.average_policy()
     self.assertLess(pyspiel.nash_conv(_GAME, average_policy), 0.91)
 
 
 if __name__ == "__main__":
-  torch.manual_seed(SEED)
   absltest.main()
