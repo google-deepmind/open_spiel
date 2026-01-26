@@ -18,6 +18,7 @@ read -r -d '' TESTSCRIPT << EOT
 import jax
 import jaxlib
 import haiku
+import flax
 import chex
 import optax
 import flax
