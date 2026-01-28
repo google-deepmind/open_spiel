@@ -53,6 +53,7 @@
 #include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
 #include "open_spiel/python/pybind11/games_go.h"
+#include "open_spiel/python/pybind11/games_gomoku.h"
 #include "open_spiel/python/pybind11/games_hearts.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_leduc_poker.h"
@@ -773,6 +774,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_euchre(m);
   init_pyspiel_games_gin_rummy(m);
   init_pyspiel_games_go(m);
+  init_pyspiel_games_gomoku(m);
   init_pyspiel_games_hearts(m);
   init_pyspiel_games_kuhn_poker(m);
   init_pyspiel_games_leduc_poker(m);

@@ -1,5 +1,5 @@
 // Copyright 2026 DeepMind Technologies Limited
-//
+//    
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -12,32 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/python/pybind11/games_gomoku.h"
+
+#include <memory>
+#include <string>
+#include <utility> 
+
 #include "open_spiel/games/gomoku/gomoku.h"
-
 #include "open_spiel/spiel.h"
-#include "pybind11/pybind11.h"
-#include "pybind11/stl.h"
+#include "pybind11/include/pybind11/cast.h"
+#include "pybind11/include/pybind11/pybind11.h"
 
-namespace py = pybind11;
-namespace open_spiel {
+namespace py = ::pybind11;
+using open_spiel::Game;
+using open_spiel::Action;
+using open_spiel::gomoku::GomokuGame;
 
-void init_pybind_gomoku(py::module& m) {
-  py::class_<Game, std::shared_ptr<Game>>(m, "Game")
-      .def("action_to_move",
-           [](const Game& game, Action action) {
-             const auto* gomoku =
-                 dynamic_cast<const GomokuGame*>(&game);
-             SPIEL_CHECK_TRUE(gomoku != nullptr);
-             return gomoku->ActionToMove(action);
-           })
-      .def("move_to_action",
-           [](const Game& game, const std::vector<int>& move) {
-             const auto* gomoku =
-                 dynamic_cast<const GomokuGame*>(&game);
-             SPIEL_CHECK_TRUE(gomoku != nullptr);
-             return gomoku->MoveToAction(move);
-           });
+void init_pyspiel_games_gomoku(::pybind11::module &m) {
+  py::module_ gomoku = m.def_submodule("gomoku");
+  gomoku.def(
+      "action_to_move",
+      [](const Game& game, Action action) {
+        const auto* gomoku_game =
+            dynamic_cast<const GomokuGame*>(&game);
+        SPIEL_CHECK_TRUE(gomoku_game != nullptr);
+        return gomoku_game->ActionToMove(action);
+      },
+      py::arg("game"), py::arg("action"));
+
+  gomoku.def(
+      "move_to_action",
+      [](const Game& game, const std::vector<int>& coord) {
+        const auto* gomoku_game =
+            dynamic_cast<const GomokuGame*>(&game);
+        SPIEL_CHECK_TRUE(gomoku_game != nullptr);
+        return gomoku_game->MoveToAction(coord);
+      },
+      py::arg("game"), py::arg("coord"));
 }
-
-}  // namespace open_spiel
-
