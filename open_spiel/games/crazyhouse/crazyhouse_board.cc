@@ -1063,6 +1063,11 @@ absl::optional<Move> CrazyhouseBoard::ParseMove(const std::string &move,
 absl::optional<Move> CrazyhouseBoard::ParseSANMove(
     const std::string &move_str) const {
   std::string move = move_str;
+	auto drop_move = ParseDropMove(move);
+  if (drop_move) {
+    return drop_move;
+  }
+
 
   if (move.empty()) return absl::nullopt;
 
@@ -1105,7 +1110,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
   // A move starts with a single letter identifying the piece. This may be
   // omitted for pawns.
   PieceType piece_type = PieceType::kPawn;
-  std::string pieces = "PNBRQK";
+  std::string pieces = "PNBRQKHACE";
   if (pieces.find(move[0]) != std::string::npos) {  // NOLINT
     auto maybe_piece_type = PieceTypeFromChar(move[0]);
     if (!maybe_piece_type) {
@@ -1177,6 +1182,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
                       source_rank, promotion_type, this](const Move &move) {
     PieceType moving_piece_type = at(move.from).type;
     if (move.to == destination_square && moving_piece_type == piece_type &&
+				(!move.IsDropMove()) &&
         (!source_file || move.from.x == *source_file) &&
         (!source_rank || move.from.y == *source_rank) &&
         (!promotion_type || move.promotion_type == *promotion_type)) {
@@ -1191,14 +1197,11 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
   return absl::optional<Move>();
 }
 
-absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string &move,
-                                              bool chess960) const {
+absl::optional<Move> CrazyhouseBoard::ParseDropMove(
+		const std::string &move) const {
   if (move.empty()) {
     return absl::nullopt;
   }
-
-  // Check for drop moves first
-  // Crazyhouse drop move: P@e4
   if (move.size() == 4 && move[1] == '@') {
     char pc = move[0];
     char file = move[2];
@@ -1230,6 +1233,19 @@ absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string &move,
     drop.to = *to;
     drop.piece = Piece{to_play_, ptype};
     return drop;
+  }
+
+  return absl::nullopt;
+}
+
+absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string &move,
+                                              bool chess960) const {
+  if (move.empty()) {
+    return absl::nullopt;
+  }
+  auto drop_move = ParseDropMove(move);
+  if (drop_move) {
+    return drop_move;
   }
 
 
