@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
@@ -29,6 +30,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/games/gomoku/gomoku_grid.h"
+
 
 // Simple game of Noughts and Crosses:
 // https://en.wikipedia.org/wiki/Tic-tac-toe
@@ -41,6 +43,7 @@ namespace gomoku {
 inline constexpr int kDefaultSize = 15;
 inline constexpr int kDefaultDims = 2;
 inline constexpr int kDefaultConnect = 5;
+inline constexpr bool kDefaultAnti= false;
 inline constexpr bool kDefaultWrap= false;
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kBlackPlayer = 0;
@@ -86,6 +89,7 @@ class GomokuState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
+	uint64_t HashValue() const;
 
  protected:
   void DoApplyAction(Action move) override;
@@ -103,6 +107,7 @@ class GomokuState : public State {
 	float black_score_;
 	float white_score_;
 	bool terminal_ =  false;
+	uint64_t zobrist_hash_ = 0;
 };
 
 // Game object.
@@ -126,20 +131,28 @@ class GomokuGame : public Game {
   std::string ActionToString(Player player, Action action_id) const override;
 	std::vector<int> ActionToMove(Action action) const;
   Action MoveToAction(const std::vector<int>& move) const;
+	const std::vector<std::array<uint64_t, 2>>& ZobristTable() const {
+    return zobrist_table_;
+  }
+	uint64_t PlayerToMoveHash() const { return player_to_move_hash_; }
 
 	int Size() const { return size_; }
 	int Dims() const { return dims_; }
 	int Connect() const { return connect_; }
+	bool Anti() const { return anti_; }
 	bool Wrap() const { return wrap_; }
 
  private:
 	int size_;
 	int dims_;
 	int connect_;
-	int wrap_;
+	bool anti_;
+	bool wrap_;
 	int total_size_;
 	std::vector<std::size_t> strides_;
 	std::vector<int> UnflattenAction(Action action_id) const;
+	std::vector<std::array<uint64_t, 2>> zobrist_table_;
+	uint64_t player_to_move_hash_;
 };
 
 }  // namespace gomoku

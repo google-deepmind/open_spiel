@@ -23,6 +23,8 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/abseil-cpp/absl/random/random.h"
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
@@ -53,6 +55,7 @@ const GameType kGameType{
    {{"size", GameParameter(kDefaultSize)},
     {"dims", GameParameter(kDefaultDims)},
     {"connect", GameParameter(kDefaultConnect)},
+    {"anti", GameParameter(kDefaultAnti)},
     {"wrap", GameParameter(kDefaultWrap)}
 	 }
 };
@@ -74,11 +77,24 @@ std::ostream& operator<<(std::ostream& os, Stone s) {
   return os << "Unknown";
 }
 
+int StoneToInt(Stone s) {
+  switch (s) {
+    case Stone::kEmpty: return -1;
+    case Stone::kBlack: return 0;
+    case Stone::kWhite: return 1;
+  }
+	SpielFatalError("Unknown stone.");
+  return 0; // never happens
+
+}
+
+
 GomokuGame::GomokuGame(const GameParameters& params)
     : Game(kGameType, params),
       size_(ParameterValue<int>("size")),
       dims_(ParameterValue<int>("dims")),
       connect_(ParameterValue<int>("connect")),
+      anti_(ParameterValue<bool>("anti")),
       wrap_(ParameterValue<bool>("wrap")) {
 	total_size_ = 1;
 	for (int i = 0; i < dims_; ++i) {
@@ -90,6 +106,13 @@ GomokuGame::GomokuGame(const GameParameters& params)
     strides_[d] = stride;
     stride *= size_;
   }
+	absl::BitGen gen(absl::SeedSeq{52616});
+  zobrist_table_.resize(total_size_);
+  for (int i = 0; i < total_size_; ++i) {
+    zobrist_table_[i][0] = absl::Uniform<uint64_t>(gen);
+    zobrist_table_[i][1] = absl::Uniform<uint64_t>(gen);
+  }
+	player_to_move_hash_ = absl::Uniform<uint64_t>(gen);
 }
 
 
@@ -132,12 +155,20 @@ Action GomokuGame::MoveToAction(const std::vector<int>& move) const {
   return static_cast<Action>(action);
 }
 
+uint64_t GomokuState::HashValue() const {
+  return zobrist_hash_;
+}
 
 void GomokuState::DoApplyAction(Action move) {
 	SPIEL_CHECK_EQ(board_.AtIndex(move), Stone::kEmpty);
   board_.AtIndex(move) = current_player_ == kBlackPlayer
                     ? Stone::kBlack
                     : Stone::kWhite;
+	const auto* gomoku = static_cast<const GomokuGame*>(game_.get());
+	zobrist_hash_ ^=
+		gomoku->ZobristTable()[move][current_player_];
+	zobrist_hash_ ^=
+		gomoku->PlayerToMoveHash();
   current_player_ = 1 - current_player_;
   move_count_ += 1;
 	CheckWinFromLastMove(move);
@@ -148,6 +179,7 @@ void GomokuState::CheckWinFromLastMove(Action last_move) {
   const Grid<Stone>::Coord start =
       board_.Unflatten(last_move);
   const Stone stone = board_.At(start);
+	const auto* gomoku = static_cast<const GomokuGame*>(game_.get());
 
   SPIEL_CHECK_NE(stone, Stone::kEmpty);
 
@@ -185,6 +217,10 @@ void GomokuState::CheckWinFromLastMove(Action last_move) {
 			} else {
 				black_score_ = -1.0;
 				white_score_ = 1.0;
+			}
+			if (gomoku->Anti()){
+					black_score_ *= -1;
+					white_score_ *= -1;
 			}
       return;
     }
@@ -338,6 +374,7 @@ GomokuState::GomokuState(std::shared_ptr<const Game> game,
     current_player_ = kBlackPlayer;
     return;
   }
+	const auto* gomoku = static_cast<const GomokuGame*>(game_.get());
 	const std::size_t expected =
     1 + board_.NumCells();  // size^dims
 
@@ -374,6 +411,15 @@ GomokuState::GomokuState(std::shared_ptr<const Game> game,
           SpielFatalError("Invalid board char in state string");
     }
     board_.AtIndex(i) = s;
+  }
+	for (int i = 0; i < board_.NumCells(); ++i) {
+    if (board_.AtIndex(i) != Stone::kEmpty) {
+      zobrist_hash_ ^= 
+       gomoku->ZobristTable()[i][StoneToInt(board_.AtIndex(i))];
+    }
+  }
+	if (current_player_ == 1) {
+    zobrist_hash_ ^= gomoku->PlayerToMoveHash();
   }
 }
 

@@ -18,23 +18,47 @@
 from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
-import numpy as np
 
 import pyspiel
 from open_spiel.python.utils import file_utils
-
-chess = pyspiel.chess
-gomoku = pyspiel.gomoku
+import numpy as np
 
 
 FLAGS = flags.FLAGS
 
 
-class GamesChessTest(parameterized.TestCase):
-  def test_gomoku_game_sim(self):
-    pass
+class GamesGomokuTest(parameterized.TestCase):
+  def test_gomoku_game_funs(self):
+    game = pyspiel.load_game("gomoku")
+    print("dims", game.dims())
+    print("size", game.size())
+    print("wrap", game.wrap())
+    print("connect", game.connect())
+    print("anti", game.anti())
+    coord = [2, 3]
+    action = game.move_to_action(coord=coord)
+    print(action)
+    move = game.action_to_move(action)
+    print(move)
 
+  def test_gomoku_hash(self):
+    game = pyspiel.load_game("gomoku")
+    state = game.new_initial_state()
+    print("hash", state.hash_value())
+    state.apply_action(1)
+    print("hash", state.hash_value())
+
+  def test_gommoku_game_sim(self):
+      game = pyspiel.load_game("gomoku")
+      for _ in range(10):
+        state = game.new_initial_state()
+        mc = 0
+        while not state.is_terminal():
+          legal_actions = state.legal_actions()
+          action = np.random.choice(legal_actions)
+          state.apply_action(action)
+          mc += 1
+        print("mc", mc)
 
 if __name__ == "__main__":
-  np.random.seed(87375711)
   absltest.main()

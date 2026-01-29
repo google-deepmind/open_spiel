@@ -26,27 +26,46 @@
 namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::Action;
+using open_spiel::State;
 using open_spiel::gomoku::GomokuGame;
+using open_spiel::gomoku::GomokuState;
 
-void init_pyspiel_games_gomoku(::pybind11::module &m) {
-  py::module_ gomoku = m.def_submodule("gomoku");
-  gomoku.def(
-      "action_to_move",
-      [](const Game& game, Action action) {
-        const auto* gomoku_game =
-            dynamic_cast<const GomokuGame*>(&game);
-        SPIEL_CHECK_TRUE(gomoku_game != nullptr);
-        return gomoku_game->ActionToMove(action);
+void open_spiel::init_pyspiel_games_gomoku(::pybind11::module &m) {
+  // py::module_ gomoku = m.def_submodule("gomoku");
+	py::classh<GomokuGame, Game>(m, "GomokuGame")
+    .def("move_to_action",
+      [](const GomokuGame& g, const std::vector<int>& coord) {
+        return g.MoveToAction(coord);
       },
-      py::arg("game"), py::arg("action"));
+      py::arg("coord"))
+    .def("action_to_move",
+      [](const GomokuGame& g, Action action) {
+         return g.ActionToMove(action);
+      },
+      py::arg("action"))
+	  .def("size", &GomokuGame::Size)
+    .def("dims", &GomokuGame::Dims)
+    .def("connect", &GomokuGame::Connect)
+    .def("wrap", &GomokuGame::Wrap)
+	  .def("anti", &GomokuGame::Anti)
+		.def(py::pickle(
+       [](std::shared_ptr<const GomokuGame> game) {
+         return game->ToString();
+       },
+       [](const std::string& data) {
+         return std::dynamic_pointer_cast<GomokuGame>(
+           std::const_pointer_cast<Game>(LoadGame(data)));
+       }));;
 
-  gomoku.def(
-      "move_to_action",
-      [](const Game& game, const std::vector<int>& coord) {
-        const auto* gomoku_game =
-            dynamic_cast<const GomokuGame*>(&game);
-        SPIEL_CHECK_TRUE(gomoku_game != nullptr);
-        return gomoku_game->MoveToAction(coord);
+  py::classh<GomokuState, State>(m, "GomokuState")
+    .def("hash_value", &GomokuState::HashValue)
+		.def(py::pickle(
+       [](const GomokuState& state) {
+       return SerializeGameAndState(*state.GetGame(), state);
       },
-      py::arg("game"), py::arg("coord"));
+      [](const std::string& data) {
+      auto game_and_state = DeserializeGameAndState(data);
+      return dynamic_cast<GomokuState*>(
+          game_and_state.second.release());
+      }));
 }
