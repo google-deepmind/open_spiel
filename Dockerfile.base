@@ -4,6 +4,9 @@ ARG PYTHON_VERSION=3.12
 
 FROM ubuntu:${UBUNTU_VERSION} as base
 
+#re-declaring it locally
+ARG PYTHON_VERSION=3.12
+
 ARG DEBIAN_FRONTEND=noninteractive
 # using all processes by devault
 ARG NPROC=12
