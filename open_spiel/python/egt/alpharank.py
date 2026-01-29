@@ -25,9 +25,28 @@ All equations and variable names correspond to the following paper:
 
 import numpy as np
 import scipy.linalg as la
+import scipy.sparse as sps
+import scipy.sparse.linalg as spla
 
 from open_spiel.python.egt import alpharank_visualizer
 from open_spiel.python.egt import utils
+
+
+def _log_matrix_sparsity(matrix, label):
+  """Print sparsity stats for the provided matrix."""
+  if matrix is None:
+    return
+  total = matrix.shape[0] * matrix.shape[1]
+  if not total:
+    density = 0.0
+    nnz = 0
+  elif sps.isspmatrix(matrix):
+    nnz = matrix.nnz
+    density = (nnz / total) * 100.0
+  else:
+    nnz = np.count_nonzero(matrix)
+    density = (nnz / total) * 100.0
+  print(f"{label}: {nnz}/{total} non-zero entries ({density:.2f}% density).")
 
 
 def _get_payoff(payoff_table_k, payoffs_are_hpt_format, strat_profile, k=None):
@@ -153,7 +172,12 @@ def _get_rho_sr(payoff_table,
       assert payoff_sum is not None
       u = alpha * m / (m - 1) * (payoff_rs - payoff_sum / 2)
 
-    if np.isclose(u, 0, atol=1e-14):
+    if (
+      np.isclose(u, 0, atol=1e-14) or
+      np.isclose((1 - np.exp(-m * u)), 0, atol=1e-5) or
+      (1 - np.exp(-m * u)) == float('inf') or
+      (1 - np.exp(-m * u)) == float('-inf')
+      ):
       # To avoid divide by 0, use first-order approximation when u is near 0
       result = 1 / m
     else:
@@ -231,7 +255,12 @@ def _get_rho_sr_multipop(payoff_table_k,
 
   if use_fast_compute:
     u = alpha * (f_r - f_s)
-    if np.isclose(u, 0, atol=1e-14):
+    if (
+      np.isclose(u, 0, atol=1e-14) or
+      np.isclose((1 - np.exp(-m * u)), 0, atol=1e-5) or
+      (1 - np.exp(-m * u)) == float('inf') or
+      (1 - np.exp(-m * u)) == float('-inf')
+      ):
       # To avoid divide by 0, use first-order approximation when u is near 0
       result = 1 / m
     else:
@@ -256,7 +285,8 @@ def _get_singlepop_transition_matrix(payoff_table,
                                      use_local_selection_model,
                                      payoff_sum,
                                      use_inf_alpha=False,
-                                     inf_alpha_eps=0.1):
+                                     inf_alpha_eps=0.1,
+                                     use_sparse=False):
   """Gets the Markov transition matrix for a single-population game.
 
   Args:
@@ -282,11 +312,15 @@ def _get_singlepop_transition_matrix(payoff_table,
       [payoff_table], payoffs_are_hpt_format)
   num_strats = num_strats_per_population[0]
 
-  c = np.zeros((num_strats, num_strats))
+  if use_sparse:
+    c = sps.dok_matrix((num_strats, num_strats), dtype=float)
+  else:
+    c = np.zeros((num_strats, num_strats))
   rhos = np.zeros((num_strats, num_strats))
 
   # r and s are, respectively, the column and row strategy profiles
   for s in range(num_strats):  # Current strategy
+    row_mass = 0.0
     for r in range(num_strats):  # Next strategy
       if s != r:  # Compute off-diagonal fixation probabilities
         if use_inf_alpha:
@@ -298,24 +332,37 @@ def _get_singlepop_transition_matrix(payoff_table,
           payoff_sr = _get_payoff(
               payoff_table, payoffs_are_hpt_format, strat_profile=[s, r], k=0)
           if np.isclose(payoff_rs, payoff_sr, atol=1e-14):
-            c[s, r] = eta * 0.5
+            prob = eta * 0.5
           elif payoff_rs > payoff_sr:
             # Transition to r since its payoff is higher than s, but remove some
             # small amount of mass, inf_alpha_eps, to keep the chain irreducible
-            c[s, r] = eta * (1 - inf_alpha_eps)
+            prob = eta * (1 - inf_alpha_eps)
           else:
             # Transition with very small probability
-            c[s, r] = eta * inf_alpha_eps
+            prob = eta * inf_alpha_eps
         else:
           rhos[s, r] = _get_rho_sr(payoff_table, payoffs_are_hpt_format, m, r,
                                    s, alpha, game_is_constant_sum,
                                    use_local_selection_model, payoff_sum)
           eta = 1. / (num_strats - 1)
-          c[s, r] = eta * rhos[s, r]
+          prob = eta * rhos[s, r]
+
+        if prob:
+          if use_sparse:
+            c[s, r] = prob
+          else:
+            c[s, r] = prob
+          row_mass += prob
     # Fixation probability of competing only against one's own strategy is 1
     # rhos[s,s] = 1. # Commented as self-fixations are not interesting (for now)
-    c[s, s] = 1 - sum(c[s, :])  # Diagonals
+    diag_val = 1 - row_mass
+    if use_sparse:
+      c[s, s] = diag_val
+    else:
+      c[s, s] = diag_val
 
+  if use_sparse:
+    return c.tocsr(), rhos
   return c, rhos
 
 
@@ -324,21 +371,25 @@ def _get_multipop_transition_matrix(payoff_tables,
                                     m,
                                     alpha,
                                     use_inf_alpha=False,
-                                    inf_alpha_eps=0.1):
+                                    inf_alpha_eps=0.1,
+                                    use_sparse=False):
   """Gets Markov transition matrix for multipopulation games."""
 
   num_strats_per_population = utils.get_num_strats_per_population(
       payoff_tables, payoffs_are_hpt_format)
   num_profiles = utils.get_num_profiles(num_strats_per_population)
-
   eta = 1. / (np.sum(num_strats_per_population - 1))
 
-  c = np.zeros((num_profiles, num_profiles))
+  if use_sparse:
+    c = sps.dok_matrix((num_profiles, num_profiles), dtype=float)
+  else:
+    c = np.zeros((num_profiles, num_profiles))
   rhos = np.zeros((num_profiles, num_profiles))
 
   for id_row_profile in range(num_profiles):
     row_profile = utils.get_strat_profile_from_id(num_strats_per_population,
                                                   id_row_profile)
+    row_mass = 0.0
 
     next_profile_gen = utils.get_valid_next_profiles(num_strats_per_population,
                                                      row_profile)
@@ -358,15 +409,15 @@ def _get_multipop_transition_matrix(payoff_tables,
             row_profile,
             k=index_population_that_changed)
         if np.isclose(payoff_col, payoff_row, atol=1e-14):
-          c[id_row_profile, id_col_profile] = eta * 0.5
+          prob = eta * 0.5
         elif payoff_col > payoff_row:
           # Transition to col strategy since its payoff is higher than row
           # strategy, but remove some small amount of mass, inf_alpha_eps, to
           # keep the chain irreducible
-          c[id_row_profile, id_col_profile] = eta * (1 - inf_alpha_eps)
+          prob = eta * (1 - inf_alpha_eps)
         else:
           # Transition with very small probability
-          c[id_row_profile, id_col_profile] = eta * inf_alpha_eps
+          prob = eta * inf_alpha_eps
       else:
         rhos[id_row_profile, id_col_profile] = _get_rho_sr_multipop(
             payoff_table_k=payoff_tables[index_population_that_changed],
@@ -376,28 +427,45 @@ def _get_multipop_transition_matrix(payoff_tables,
             r=col_profile,
             s=row_profile,
             alpha=alpha)
-        c[id_row_profile,
-          id_col_profile] = eta * rhos[id_row_profile, id_col_profile]
-    # Special case of self-transition
-    c[id_row_profile, id_row_profile] = 1 - sum(c[id_row_profile, :])
+        prob = eta * rhos[id_row_profile, id_col_profile]
 
+      if prob:
+        c[id_row_profile, id_col_profile] = prob
+        row_mass += prob
+    # Special case of self-transition
+    diag_val = 1 - row_mass
+    c[id_row_profile, id_row_profile] = diag_val
+
+  if use_sparse:
+    return c.tocsr(), rhos
   return c, rhos
 
 
-def _get_stationary_distr(c):
+def _get_stationary_distr(c, use_sparse=False):
   """Gets stationary distribution of transition matrix c."""
 
-  eigenvals, left_eigenvecs, _ = la.eig(c, left=True, right=True)
+  if use_sparse:
+    c_sparse = c if sps.isspmatrix(c) else sps.csr_matrix(c)
+    try:
+      eigenvals, eigenvecs = spla.eigs(c_sparse.T, k=1, which='LM')
+    except Exception:
+      raise Exception('Sparse eigenvalue decomposition did not find 1 stationary distribution')
+    left_vec = eigenvecs[:, 0]
+  else:
+    eigenvals, left_eigenvecs, _ = la.eig(c, left=True, right=True)
 
-  mask = abs(eigenvals - 1.) < 1e-10
-  left_eigenvecs = left_eigenvecs[:, mask]
-  num_stationary_eigenvecs = np.shape(left_eigenvecs)[1]
-  if num_stationary_eigenvecs != 1:
-    raise ValueError('Expected 1 stationary distribution, but found %d' %
-                     num_stationary_eigenvecs)
-  left_eigenvecs *= 1. / sum(left_eigenvecs)
+    mask = abs(eigenvals - 1.) < 1e-10
+    left_eigenvecs = left_eigenvecs[:, mask]
+    num_stationary_eigenvecs = np.shape(left_eigenvecs)[1]
+    if num_stationary_eigenvecs != 1:
+      raise ValueError('Expected 1 stationary distribution, but found %d' %
+                       num_stationary_eigenvecs)
+    left_vec = left_eigenvecs[:, 0]
 
-  return left_eigenvecs.real.flatten()
+  pi = left_vec.real
+  pi_sum = np.sum(pi)
+  pi /= pi_sum
+  return pi.flatten()
 
 
 def print_results(payoff_tables,
@@ -420,7 +488,9 @@ def print_results(payoff_tables,
     print('\nFixation probability matrix (rho_{r,s}/rho_m):\n',
           np.around(rhos / rho_m, decimals=2))
   if c is not None:
-    print('\nMarkov transition matrix (c):\n', np.around(c, decimals=2))
+    c_to_print = c.toarray() if sps.isspmatrix(c) else c
+    print('\nMarkov transition matrix (c):\n',
+          np.around(c_to_print, decimals=2))
   if pi is not None:
     print('\nStationary distribution (pi):\n', pi)
 
@@ -434,7 +504,8 @@ def sweep_pi_vs_epsilon(payoff_tables,
                         max_iters=100,
                         min_epsilon=1e-14,
                         num_strats_to_label=10,
-                        legend_sort_clusters=False):
+                        legend_sort_clusters=False,
+                        use_sparse=False):
   """Computes infinite-alpha distribution for a range of perturbations.
 
   The range of response graph perturbations is defined in epsilon_list.
@@ -464,6 +535,7 @@ def sweep_pi_vs_epsilon(payoff_tables,
       the legend according to orderings for earlier alpha values. Primarily for
       visualization purposes! Rankings for lower alpha values should be
       interpreted carefully.
+    use_sparse: If true, use scipy sparse arrays and solvers.
 
   Returns:
    pi: AlphaRank stationary distribution.
@@ -500,7 +572,8 @@ def sweep_pi_vs_epsilon(payoff_tables,
     try:
       pi_prev = pi
       _, _, pi, _, _ = compute(payoff_tables, m=m, alpha=alpha,
-                               use_inf_alpha=True, inf_alpha_eps=epsilon)
+               use_inf_alpha=True, inf_alpha_eps=epsilon,
+               use_sparse=use_sparse)
       epsilon_pi_hist[epsilon] = pi
       # Stop when pi converges
       if num_iters > min_iters and np.allclose(pi, pi_prev):
@@ -565,7 +638,8 @@ def sweep_pi_vs_alpha(payoff_tables,
                       rtol=1e-5,
                       atol=1e-8,
                       num_strats_to_label=10,
-                      legend_sort_clusters=False):
+                      legend_sort_clusters=False,
+                      use_sparse=False):
   """Computes stationary distribution, pi, for range of selection intensities.
 
   The range of selection intensities is defined in alpha_list and corresponds
@@ -588,12 +662,12 @@ def sweep_pi_vs_alpha(payoff_tables,
       the legend according to orderings for earlier alpha values. Primarily for
       visualization purposes! Rankings for lower alpha values should be
       interpreted carefully.
+    use_sparse: If true, use scipy sparse arrays and solvers.
 
   Returns:
    pi: AlphaRank stationary distribution.
    alpha: The AlphaRank selection-intensity level resulting from sweep.
   """
-
   payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
   num_populations = len(payoff_tables)
   num_strats_per_population = utils.get_num_strats_per_population(
@@ -620,7 +694,8 @@ def sweep_pi_vs_alpha(payoff_tables,
 
   while 1:
     try:
-      _, _, pi, _, _ = compute(payoff_tables, alpha=alpha, m=m)
+      _, _, pi, _, _ = compute(payoff_tables, alpha=alpha, m=m,
+               use_sparse=use_sparse)
       pi_list = np.append(pi_list, np.reshape(pi, (-1, 1)), axis=1)
       alpha_list.append(alpha)
       # Stop when pi converges
@@ -669,7 +744,8 @@ def compute_and_report_alpharank(payoff_tables,
                                  m=50,
                                  alpha=100,
                                  verbose=False,
-                                 num_top_strats_to_print=8):
+                                 num_top_strats_to_print=8,
+                                 use_sparse=False):
   """Computes and visualizes Alpha-Rank outputs.
 
   Args:
@@ -680,12 +756,14 @@ def compute_and_report_alpharank(payoff_tables,
     alpha: Fermi distribution temperature parameter.
     verbose: Set to True to print intermediate results.
     num_top_strats_to_print: Number of top strategies to print.
+    use_sparse: If true, use scipy sparse arrays and solvers.
 
   Returns:
     pi: AlphaRank stationary distribution/rankings.
   """
   payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
-  rhos, rho_m, pi, _, _ = compute(payoff_tables, m=m, alpha=alpha)
+  rhos, rho_m, pi, _, _ = compute(payoff_tables, m=m, alpha=alpha,
+                                  use_sparse=use_sparse)
   strat_labels = utils.get_strat_profile_labels(payoff_tables,
                                                 payoffs_are_hpt_format)
 
@@ -709,7 +787,8 @@ def compute(payoff_tables,
             use_local_selection_model=True,
             verbose=False,
             use_inf_alpha=False,
-            inf_alpha_eps=0.01):
+            inf_alpha_eps=0.01,
+            use_sparse=False):
   """Computes the finite population stationary statistics.
 
   Args:
@@ -724,6 +803,8 @@ def compute(payoff_tables,
     verbose: Set to True to print intermediate results.
     use_inf_alpha: Use infinite-alpha alpharank model.
     inf_alpha_eps: Noise term to use in infinite-alpha alpharank model.
+    use_sparse: If true, store transition matrices sparsely and use sparse
+      eigensolvers when computing stationary distributions.
 
   Returns:
     rhos: Matrix of strategy-to-strategy fixation probabilities.
@@ -752,7 +833,6 @@ def compute(payoff_tables,
     print('num_strats_per_population:', num_strats_per_population)
 
   if num_populations == 1:
-    # User fast closed-form analysis for constant-sum single-population games
     game_is_constant_sum, payoff_sum = utils.check_is_constant_sum(
         payoff_tables[0], payoffs_are_hpt_format)
     if verbose:
@@ -768,7 +848,8 @@ def compute(payoff_tables,
         use_local_selection_model,
         payoff_sum,
         use_inf_alpha=use_inf_alpha,
-        inf_alpha_eps=inf_alpha_eps)
+        inf_alpha_eps=inf_alpha_eps,
+        use_sparse=use_sparse)
     num_profiles = num_strats_per_population[0]
   else:
     c, rhos = _get_multipop_transition_matrix(
@@ -777,10 +858,12 @@ def compute(payoff_tables,
         m,
         alpha,
         use_inf_alpha=use_inf_alpha,
-        inf_alpha_eps=inf_alpha_eps)
+        inf_alpha_eps=inf_alpha_eps,
+        use_sparse=use_sparse)
     num_profiles = utils.get_num_profiles(num_strats_per_population)
-
-  pi = _get_stationary_distr(c)
+  if verbose or use_sparse:
+    _log_matrix_sparsity(c, 'a-rank transition matrix sparsity')
+  pi = _get_stationary_distr(c, use_sparse=use_sparse)
 
   rho_m = 1. / m if not use_inf_alpha else 1  # Neutral fixation probability
   if verbose:
