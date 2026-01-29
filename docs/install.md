@@ -187,8 +187,8 @@ docker run -it --entrypoint /bin/bash openspiel
 Finally you can run examples using:
 
 ```bash
-docker run openspiel python3 python/examples/matrix_game_example.py
-docker run openspiel python3 python/examples/example.py
+docker run openspiel python python/examples/matrix_game_example.py
+docker run openspiel python python/examples/example.py
 ```
 
 
@@ -197,7 +197,7 @@ Option 3 (Jupyter Notebook):
 Installs OpenSpiel with an additional Jupyter Notebook environment.
 
 ```bash
-docker build -t openspiel-notebook -f Dockerfile.jupyter --rm .
+docker build --target jupyterlab -t openspiel-notebook -f Dockerfile.base --rm .
 docker run -it --rm -p 8888:8888 openspiel-notebook
 ```
 
