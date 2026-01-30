@@ -22,8 +22,8 @@
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -79,12 +79,12 @@ const GameType kImperfectRecallGameType{
     {{"obstype", GameParameter(std::string(kDefaultObsType))},
      {"gameversion", GameParameter(std::string(kDefaultGameVersion))}}};
 
-std::shared_ptr<const Game> Factory(const GameParameters& params) {
+std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new PhantomTTTGame(params, kGameType));
 }
 
-std::shared_ptr<const Game> ImperfectRecallFactory(
-    const GameParameters& params) {
+std::shared_ptr<const Game>
+ImperfectRecallFactory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new ImperfectRecallPTTTGame(params));
 }
 
@@ -92,20 +92,18 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
-RegisterSingleTensorObserver single_tensor_imperfect_recall(
-    kImperfectRecallGameType.short_name);
+RegisterSingleTensorObserver
+    single_tensor_imperfect_recall(kImperfectRecallGameType.short_name);
 
-}  // namespace
+} // namespace
 
-ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
+ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters &params)
     : PhantomTTTGame(params, kImperfectRecallGameType) {}
 
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
                                  GameVersion game_version,
                                  ObservationType obs_type)
-    : State(game),
-      state_(game),
-      obs_type_(obs_type),
+    : State(game), state_(game), obs_type_(obs_type),
       game_version_(game_version) {
   std::fill(begin(x_view_), end(x_view_), CellState::kEmpty);
   std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
@@ -124,7 +122,7 @@ PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
 void PhantomTTTState::DoApplyAction(Action move) {
   // Current player's view.
   Player cur_player = CurrentPlayer();
-  auto& cur_view = cur_player == 0 ? x_view_ : o_view_;
+  auto &cur_view = cur_player == 0 ? x_view_ : o_view_;
 
   // Either occupied or not
   if (game_version_ == GameVersion::kClassicalPhantomTicTacToe) {
@@ -143,19 +141,20 @@ void PhantomTTTState::DoApplyAction(Action move) {
   }
 
   // Update current player's view, and action sequence.
+  // Update current player's view.
   SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
   cur_view[move] = state_.BoardAt(move);
-  action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 
   // Note: do not modify player's turn here, it will have been done above
   // if necessary.
 }
 
 std::vector<Action> PhantomTTTState::LegalActions() const {
-  if (IsTerminal()) return {};
+  if (IsTerminal())
+    return {};
   std::vector<Action> moves;
   const Player player = CurrentPlayer();
-  const auto& cur_view = player == 0 ? x_view_ : o_view_;
+  const auto &cur_view = player == 0 ? x_view_ : o_view_;
 
   for (Action move = 0; move < kNumCells; ++move) {
     if (cur_view[move] == CellState::kEmpty) {
@@ -166,8 +165,17 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
   return moves;
 }
 
+std::vector<std::pair<int, Action>> PhantomTTTState::GetActionSequence() const {
+  std::vector<std::pair<int, Action>> action_sequence;
+  action_sequence.reserve(history_.size());
+  for (const auto &player_action : history_) {
+    action_sequence.push_back({player_action.player, player_action.action});
+  }
+  return action_sequence;
+}
+
 std::string PhantomTTTState::ViewToString(Player player) const {
-  const auto& cur_view = player == 0 ? x_view_ : o_view_;
+  const auto &cur_view = player == 0 ? x_view_ : o_view_;
   std::string str;
   for (int r = 0; r < kNumRows; ++r) {
     for (int c = 0; c < kNumCols; ++c) {
@@ -184,8 +192,9 @@ std::string PhantomTTTState::ActionSequenceToString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
+  std::vector<std::pair<int, Action>> action_sequence = GetActionSequence();
   std::string str;
-  for (const auto& player_with_action : action_sequence_) {
+  for (const auto &player_with_action : action_sequence) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
       absl::StrAppend(&str, player_with_action.first, ",");
@@ -223,7 +232,7 @@ void PhantomTTTState::InformationStateTensor(Player player,
   // Then the action sequence follows (one-hot encoded, per action).
   // Encoded in the same way as InformationStateAsString, so full sequences
   // which may contain action value 10 to represent "I don't know."
-  const auto& player_view = player == 0 ? x_view_ : o_view_;
+  const auto &player_view = player == 0 ? x_view_ : o_view_;
   SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
                                     longest_sequence_ * bits_per_action_);
   std::fill(values.begin(), values.end(), 0.);
@@ -234,12 +243,16 @@ void PhantomTTTState::InformationStateTensor(Player player,
   // Now encode the sequence. Each (player, action) pair uses 11 bits:
   //   - first bit is the player taking the action (0 or 1)
   //   - next 10 bits is the one-hot encoded action (10 = "I don't know")
+  // Now encode the sequence. Each (player, action) pair uses 11 bits:
+  //   - first bit is the player taking the action (0 or 1)
+  //   - next 10 bits is the one-hot encoded action (10 = "I don't know")
+  std::vector<std::pair<int, Action>> action_sequence = GetActionSequence();
   int offset = kNumCells * kCellStates;
-  for (const auto& player_with_action : action_sequence_) {
+  for (const auto &player_with_action : action_sequence) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
       if (obs_type_ == ObservationType::kRevealNumTurns) {
-        values[offset] = player_with_action.first;  // Player 0 or 1
+        values[offset] = player_with_action.first; // Player 0 or 1
         values[offset + 1 + player_with_action.second] = 1.0;
       } else {
         // Here we don't need to encode the player since we won't see opponent
@@ -252,7 +265,7 @@ void PhantomTTTState::InformationStateTensor(Player player,
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns.
       values[offset] = player_with_action.first;
-      values[offset + 1 + kNumCells] = 1.0;  // I don't know.
+      values[offset + 1 + kNumCells] = 1.0; // I don't know.
       offset += bits_per_action_;
     } else {
       // Do not reveal anything about the number of actions taken by opponent.
@@ -266,7 +279,7 @@ std::string PhantomTTTState::ObservationString(Player player) const {
   SPIEL_CHECK_LT(player, num_players_);
   std::string observation = ViewToString(player);
   if (obs_type_ == ObservationType::kRevealNumTurns) {
-    absl::StrAppend(&observation, "\nTotal turns: ", action_sequence_.size());
+    absl::StrAppend(&observation, "\nTotal turns: ", history_.size());
   }
   return observation;
 }
@@ -279,14 +292,14 @@ void PhantomTTTState::ObservationTensor(Player player,
   std::fill(values.begin(), values.end(), 0.);
 
   // First 27 bits encodes the player's view in the same way as TicTacToe.
-  const auto& player_view = player == 0 ? x_view_ : o_view_;
+  const auto &player_view = player == 0 ? x_view_ : o_view_;
   for (int cell = 0; cell < kNumCells; ++cell) {
     values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
   }
 
   // Then a one-hot to represent total number of turns.
   if (obs_type_ == ObservationType::kRevealNumTurns) {
-    values[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
+    values[kNumCells * kCellStates + history_.size()] = 1.0;
   }
 }
 
@@ -295,7 +308,7 @@ std::unique_ptr<State> PhantomTTTState::Clone() const {
 }
 
 void PhantomTTTState::UndoAction(Player player, Action move) {
-  Action last_move = action_sequence_.back().second;
+  Action last_move = history_.back().action;
   SPIEL_CHECK_EQ(last_move, move);
 
   if (state_.BoardAt(move) == PlayerToState(player)) {
@@ -305,9 +318,9 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
   }
 
   // Undo the action from that player's view, and pop from the action seq
-  auto& player_view = player == 0 ? x_view_ : o_view_;
+  // Undo the action from that player's view
+  auto &player_view = player == 0 ? x_view_ : o_view_;
   player_view[move] = CellState::kEmpty;
-  action_sequence_.pop_back();
 
   history_.pop_back();
   --move_number_;
@@ -315,7 +328,7 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
   // if necessary.
 }
 
-PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
+PhantomTTTGame::PhantomTTTGame(const GameParameters &params, GameType game_type)
     : Game(game_type, params),
       game_(std::static_pointer_cast<const tic_tac_toe::TicTacToeGame>(
           LoadGame("tic_tac_toe"))) {
@@ -359,5 +372,5 @@ std::vector<int> PhantomTTTGame::ObservationTensorShape() const {
   }
 }
 
-}  // namespace phantom_ttt
-}  // namespace open_spiel
+} // namespace phantom_ttt
+} // namespace open_spiel
