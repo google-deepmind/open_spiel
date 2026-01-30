@@ -199,14 +199,32 @@ TabularPolicy SequenceFormLpSpecification::OptimalPolicy(Player for_player) {
     }
     for (int i = 0; i < actions.size(); ++i) {
       double prob;
-      if (rp_sum) {
+      if (rp_sum > 1e-10) {
         prob = node_spec_[node->child_at(i)].var_reach_prob->solution_value() /
                rp_sum;
       } else {
         // If the infostate is unreachable, the strategy is not defined.
-        // However some code in the library may require having the strategy,
-        // so we just put an uniform strategy here.
-        prob = 1. / actions.size();
+        // We use reduced costs to identify optimal actions for subgame perfection.
+        std::vector<int> optimal_actions;
+        for (int j = 0; j < actions.size(); ++j) {
+          double rc = node_spec_[node->child_at(j)].var_reach_prob->reduced_cost();
+          if (std::abs(rc) < 1e-8) {
+            optimal_actions.push_back(j);
+          }
+        }
+        if (optimal_actions.empty()) {
+          // Fallback to uniform if no optimal actions found via reduced costs.
+          prob = 1. / actions.size();
+        } else {
+          // Uniform over optimal actions.
+          prob = 0.0;
+          for (int opt_idx : optimal_actions) {
+            if (opt_idx == i) {
+              prob = 1. / optimal_actions.size();
+              break;
+            }
+          }
+        }
       }
       state_policy.push_back({actions[i], prob});
     }
