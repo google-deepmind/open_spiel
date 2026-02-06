@@ -42,7 +42,14 @@ fi
 
 PYBIN=`which $PYBIN`
 $PYBIN -m pip install --upgrade setuptools
-$PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+
+# Install requirements differently based on mode
+if [[ "$MODE" = "basic" ]]; then
+  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+else
+  # Full mode installs all requirements
+  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+fi
 
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."
@@ -53,25 +60,35 @@ if [[ "$MODE" = "full" ]]; then
 fi
 
 if [[ "$MODE" = "full" ]]; then
-  if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.11" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp311-cp311-manylinux*.whl`
-    ${PYBIN} -m pip install $file
-  elif [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-manylinux*.whl`
-    ${PYBIN} -m pip install $file
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
-    file=`ls wheelhouse/open_spiel-*-cp312-cp312-*.whl`
-    ${PYBIN} -m pip install $file
-  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.13" ]]; then
-    # Python 3.13 is only used to build the Python 3.14 wheel.
-    # So in this case, there is no Python version on the machine matching
-    # a wheel that was built, so simply skip the full tests.
-    echo "Skipping full tests for Python 3.14 wheel."
+  # Special case: Skip full tests on macOS Python 3.13 (only cp314 wheel built)
+  if [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.13" ]]; then
+    echo "Skipping full tests on macOS Python 3.13 (only Python 3.14 wheel available)"
     exit 0
-  else
-    echo "Config not found for full tests: $OS / $OS_PYTHON_VERSION"
-    exit -1
   fi
+  
+  # Dynamically detect Python version and install matching wheel
+  PYTHON_VERSION=$(${PYBIN} --version 2>&1 | awk '{print $2}' | cut -d. -f1,2 | tr -d '.')
+  echo "Detected Python version: ${PYTHON_VERSION}, installing matching wheel for ${OS}"
+  
+  if [[ "$OS" = "Linux" ]]; then
+    # Match both x86_64 and aarch64 wheels
+    WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-manylinux*.whl 2>/dev/null | head -1)
+  elif [[ "$OS" = "Darwin" ]]; then
+    WHEEL_FILE=$(ls wheelhouse/open_spiel-*-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-*.whl 2>/dev/null | head -1)
+  else
+    echo "ERROR: Unsupported OS: ${OS}"
+    exit 1
+  fi
+  
+  if [[ -z "$WHEEL_FILE" ]]; then
+    echo "ERROR: No wheel found for Python ${PYTHON_VERSION} on ${OS}"
+    echo "Available wheels:"
+    ls wheelhouse/*.whl 2>/dev/null || echo "No wheels found in wheelhouse/"
+    exit 1
+  fi
+  
+  echo "Installing wheel: $WHEEL_FILE"
+  ${PYBIN} -m pip install "$WHEEL_FILE"
 fi
 
 export OPEN_SPIEL_BUILDING_WHEEL="ON"
