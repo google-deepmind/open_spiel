@@ -286,7 +286,6 @@ include_directories(..)
 add_subdirectory (algorithms)
 add_subdirectory (bots)
 add_subdirectory (evaluation)
-add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 
@@ -336,4 +335,5 @@ if (BUILD_SHARED_LIB)
   )
 endif()
 
+add_subdirectory (examples)
 add_subdirectory (tests)
