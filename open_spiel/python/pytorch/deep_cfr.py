@@ -135,7 +135,7 @@ class ReservoirBuffer:
     return min(self.add_calls.item(), self.capacity.item())
 
   @classmethod
-  def init_reservoir(
+  def init(
       cls, capacity: int, experience: AdvantageMemory | StrategyMemory
   ) -> "ReservoirBuffer":
     # Initialize buffer by replicating the structure of the experience
@@ -144,7 +144,7 @@ class ReservoirBuffer:
     )
     return cls(np.array(capacity), experience_)
 
-  def append_to_reservoir(
+  def append(
       self,
       experience: AdvantageMemory | StrategyMemory,
   ) -> None:
@@ -325,7 +325,7 @@ class DeepCFRSolver(policy.Policy):
   def _get_buffer_init(
       self, capacity: int, data: AdvantageMemory | StrategyMemory
   ) -> ReservoirBuffer:
-    return ReservoirBuffer.init_reservoir(capacity, data)
+    return ReservoirBuffer.init(capacity, data)
 
   @property
   def advantage_buffers(self):
@@ -391,7 +391,7 @@ class DeepCFRSolver(policy.Policy):
           self._memory_capacity, data
       )
 
-    self._strategy_memories.append_to_reservoir(data)
+    self._strategy_memories.append(data)
 
   def _append_to_advantage_buffer(
       self, player: int, data: AdvantageMemory
@@ -401,7 +401,7 @@ class DeepCFRSolver(policy.Policy):
           self._memory_capacity, data
       )
 
-    self._advantage_memories[player].append_to_reservoir(data)
+    self._advantage_memories[player].append(data)
 
   def _traverse_game_tree(self, state, player):
     """Performs a traversal of the game tree.
