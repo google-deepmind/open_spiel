@@ -48,9 +48,7 @@ class Grid {
   void Fill(const T& value) { std::fill(data_.begin(), data_.end(), value); }
 
   std::size_t Flatten(const Coord& coord) const {
-    if (coord.size() != dims_) {
-      throw std::invalid_argument("Coordinate has wrong dimension");
-    }
+    SPIEL_CHECK_EQ(coord.size(), dims_);
 
     std::size_t index = 0;
     for (std::size_t d = 0; d < dims_; ++d) {
@@ -60,9 +58,8 @@ class Grid {
         c %= static_cast<int>(size_);
         if (c < 0) c += static_cast<int>(size_);
       } else {
-        if (c < 0 || c >= static_cast<int>(size_)) {
-          throw std::out_of_range("Coordinate out of bounds");
-        }
+        SPIEL_CHECK_GE(c, 0);
+        SPIEL_CHECK_LE(c, static_cast<int>(size_));
       }
 
       index += static_cast<std::size_t>(c) * strides_[d];
@@ -71,9 +68,7 @@ class Grid {
   }
 
   Coord Unflatten(std::size_t index) const {
-    if (index >= data_.size()) {
-      throw std::out_of_range("Index out of bounds");
-    }
+    SPIEL_CHECK_LE(index,  data_.size());
 
     Coord coord(dims_);
     for (std::size_t d = 0; d < dims_; ++d) {
@@ -84,9 +79,8 @@ class Grid {
   }
 
   bool Step(Coord& coord, const Direction& dir) const {
-    if (coord.size() != dims_ || dir.size() != dims_) {
-      throw std::invalid_argument("Dimension mismatch in Step()");
-    }
+    SPIEL_CHECK_EQ(coord.size(), dims_);
+    SPIEL_CHECK_EQ(dir.size(), dims_);
 
     for (std::size_t d = 0; d < dims_; ++d) {
       int next = coord[d] + dir[d];
@@ -128,6 +122,71 @@ class Grid {
     }
     return false;  // zero vector should not be present
   }
+  // These are the one-step basic rotations. To get all rotations apply these
+  // 1, 2, or 3 times. In 3 or more dimensions we must also compose them.
+  std::vector<std::pair<int, int>> GenRotations() const {
+    std::vector<std::pair<int, int>> rotations;
+      for (int i = 0; i < dims_; ++i) {
+        for (int j = i + 1; j < dims_; ++j) {
+          rotations.emplace_back(i, j);
+        }
+      }
+    return rotations;
+  }
+
+  Grid<T> ApplyRotation(int i, int j) const {
+    SPIEL_CHECK_LT(i, j);
+    SPIEL_CHECK_LT(j, dims_);
+
+    Grid<T> result(size_, dims_, wrap_);
+
+    const int L = size_;
+
+    for (int idx = 0; idx < NumCells(); ++idx) {
+       Coord old = Unflatten(idx);
+       Coord neu = old;
+
+       const int x = old[i];
+       const int y = old[j];
+
+       neu[i] = (L - 1) - y;
+       neu[j] = x;
+
+       result.At(neu) =  At(old);
+     }
+
+    return result;
+  }
+
+  // Get reflections aligned with grid axes. Diagonal reflections can be formed
+  // by composing these straigh reflections with rotations.
+  std::vector<int> GenReflections() const {
+    std::vector<int> refs;
+    for (int k = 0; k < dims_; ++k) {
+      refs.push_back(k);
+    }
+    return refs;
+  }
+
+  Grid<T> ApplyReflection(int k) const {
+    SPIEL_CHECK_LT(k, dims_);
+
+    Grid<T> result(size_, dims_, wrap_);
+    const int L = size_;
+
+    for (int idx = 0; idx < NumCells(); ++idx) {
+       Coord old = Unflatten(idx);
+       Coord neu = old;
+
+       neu[k] = (L - 1) - old[k];
+
+       result.At(neu) = At(old);
+    }
+
+    return result;
+  }
+
+  int Size() const { return size_; }
 
  protected:
   static std::size_t ComputeTotalSize(std::size_t size, std::size_t dims) {

@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "open_spiel/games/gomoku/gomoku.h"
 #include "open_spiel/spiel.h"
@@ -31,16 +33,9 @@ void BasicGomokuTests() {
   testing::RandomSimTest(*LoadGame("gomoku"), 100);
 }
 
-void Whatever(){
-	auto game = LoadGame("gomoku");
-	std::unique_ptr<State> state = game->NewInitialState();
-	for (Action action : state->LegalActions()) {
-		std::cerr << state->ActionToString(action) << std::endl;
-	}
-}
 
 void TestMoveToActionLoop() {
-	auto game = LoadGame("gomoku");
+  auto game = LoadGame("gomoku");
 
   const GomokuGame* gomoku  = dynamic_cast<const GomokuGame*>(game.get());
 
@@ -50,14 +45,51 @@ void TestMoveToActionLoop() {
   }
 }
 
+void TestObservationTensor() {
+  std::shared_ptr<const Game> game = LoadGame("gomoku");
+  std::unique_ptr<State> state = game->NewInitialState();
 
+
+  const int num_cells = game->ObservationTensorShape()[1];
+  const int tensor_size = 3 * num_cells;
+
+  std::vector<float> obs(tensor_size);
+
+  // Initial position
+  state->ObservationTensor(/*player=*/0, absl::MakeSpan(obs));
+
+  // Planes 0 & 1: no stones
+  for (int i = 0; i < 2 * num_cells; ++i) {
+    SPIEL_CHECK_EQ(obs[i], 0.0f);
+  }
+  // Plane 2: Black to move
+  for (int i = 2 * num_cells; i < 3 * num_cells; ++i) {
+    SPIEL_CHECK_EQ(obs[i], 1.0f);
+  }
+
+  // Make two moves: Black 0, White 1
+  state->ApplyAction(0);
+  // white on move
+	state->ObservationTensor(/*player=*/0, absl::MakeSpan(obs));
+  SPIEL_CHECK_EQ(obs[2 * num_cells], 0.0f);
+  state->ApplyAction(1);
+
+  state->ObservationTensor(/*player=*/0, absl::MakeSpan(obs));
+  SPIEL_CHECK_EQ(obs[0], 1.0f);
+
+  // White stone at 1
+  SPIEL_CHECK_EQ(obs[num_cells + 1], 1.0f);
+
+  // Turn plane: Black again
+  SPIEL_CHECK_EQ(obs[2 * num_cells], 1.0f);
+}
 
 }  // namespace
 }  // namespace gomoku
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-	// open_spiel::gomoku::Whatever();
   open_spiel::gomoku::BasicGomokuTests();
   open_spiel::gomoku::TestMoveToActionLoop();
+  open_spiel::gomoku::TestObservationTensor();
 }

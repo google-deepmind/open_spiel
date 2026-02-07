@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_GOMOKU_H_
-#define OPEN_SPIEL_GAMES_GOMOKU_H_
+#ifndef OPEN_SPIEL_GAMES_GOMOKU_GOMOKU_H_
+#define OPEN_SPIEL_GAMES_GOMOKU_GOMOKU_H_
 
 #include <array>
 #include <memory>
@@ -43,25 +43,43 @@ namespace gomoku {
 inline constexpr int kDefaultSize = 15;
 inline constexpr int kDefaultDims = 2;
 inline constexpr int kDefaultConnect = 5;
-inline constexpr bool kDefaultAnti= false;
-inline constexpr bool kDefaultWrap= false;
+inline constexpr bool kDefaultAnti = false;
+inline constexpr bool kDefaultWrap = false;
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kBlackPlayer = 0;
 inline constexpr int kWhitePlayer = 1;
 
 
-// 
+//
 enum class Stone {
-	kEmpty,
-	kBlack,
-	kWhite,
+  kEmpty,
+  kBlack,
+  kWhite,
 };
 
+// Treating positions equivalent under a symmetry operation as
+// equivalent can speed up a tree search,
+// but searchingbthe whole symmetry space may be more trouble
+// than it is worth. There are additional symmetries resulting from composed
+// rotations in 3 or more dimensions that we do not see here, and the
+// possible translation symmetries when wrap is true are probably not even
+// worth thinking about.
+
+struct SymmetryPolicy {
+  // If symmetric hashing is used at all, basic rotations are always included.
+
+  // Allow straight (axis) reflections.
+  bool allow_reflections = false;
+
+  // Allow compositions of reflections with rotations
+  // (i.e. diagonal / rotated reflections).
+  bool allow_reflection_rotations = false;
+};
 
 // State of an in-play game.
 class GomokuState : public State {
  public:
-	explicit GomokuState(std::shared_ptr<const Game> game,
+  explicit GomokuState(std::shared_ptr<const Game> game,
                      const std::string& state_str = "");
 
   GomokuState(const GomokuState&) = default;
@@ -70,15 +88,15 @@ class GomokuState : public State {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
 
-	static Player Opponent(Player player) {
+  static Player Opponent(Player player) {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, kNumPlayers);
-		return player - 1;
-	}
+    return player - 1;
+  }
 
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
-	bool IsTerminal() const override {
+  bool IsTerminal() const override {
     return terminal_;
   }
   std::vector<double> Returns() const override;
@@ -89,7 +107,18 @@ class GomokuState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
-	uint64_t HashValue() const;
+  uint64_t HashValue() const;
+  void SetSymmetryPolicy(const SymmetryPolicy& policy) {
+    symmetry_policy_ = policy;
+  }
+  const SymmetryPolicy& GetSymmetryPolicy() const {
+    return symmetry_policy_;
+  }
+  uint64_t ComputeZobrist(const Grid<Stone>& grid) const;
+  uint64_t SymmetricHash() const;
+  absl::optional<std::vector<Grid<Stone>::Coord>>
+    FindWinLineFromLastMove(Action last_move) const;
+  const std::vector<Grid<Stone>::Coord>& WinningLine() const;
 
  protected:
   void DoApplyAction(Action move) override;
@@ -99,15 +128,17 @@ class GomokuState : public State {
   Player current_player_ = 0;   // Player zero goes first by default
   int move_count_ = 0;
   Grid<Stone> board_;
-	int size_;
-	int dims_;
-	int connect_;
-	bool wrap_;
-	int initial_stones_;
-	float black_score_;
-	float white_score_;
-	bool terminal_ =  false;
-	uint64_t zobrist_hash_ = 0;
+  int size_;
+  int dims_;
+  int connect_;
+  bool wrap_;
+  int initial_stones_;
+  float black_score_;
+  float white_score_;
+  bool terminal_ =  false;
+  uint64_t zobrist_hash_ = 0;
+  SymmetryPolicy symmetry_policy_;
+  std::vector<Grid<Stone>::Coord> winning_line_;
 };
 
 // Game object.
@@ -129,33 +160,33 @@ class GomokuGame : public Game {
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
   std::string ActionToString(Player player, Action action_id) const override;
-	std::vector<int> ActionToMove(Action action) const;
+  std::vector<int> ActionToMove(Action action) const;
   Action MoveToAction(const std::vector<int>& move) const;
-	const std::vector<std::array<uint64_t, 2>>& ZobristTable() const {
+  const std::vector<std::array<uint64_t, 2>>& ZobristTable() const {
     return zobrist_table_;
   }
-	uint64_t PlayerToMoveHash() const { return player_to_move_hash_; }
+  uint64_t PlayerToMoveHash() const { return player_to_move_hash_; }
 
-	int Size() const { return size_; }
-	int Dims() const { return dims_; }
-	int Connect() const { return connect_; }
-	bool Anti() const { return anti_; }
-	bool Wrap() const { return wrap_; }
+  int Size() const { return size_; }
+  int Dims() const { return dims_; }
+  int Connect() const { return connect_; }
+  bool Anti() const { return anti_; }
+  bool Wrap() const { return wrap_; }
 
  private:
-	int size_;
-	int dims_;
-	int connect_;
-	bool anti_;
-	bool wrap_;
-	int total_size_;
-	std::vector<std::size_t> strides_;
-	std::vector<int> UnflattenAction(Action action_id) const;
-	std::vector<std::array<uint64_t, 2>> zobrist_table_;
-	uint64_t player_to_move_hash_;
+  int size_;
+  int dims_;
+  int connect_;
+  bool anti_;
+  bool wrap_;
+  int total_size_;
+  std::vector<std::size_t> strides_;
+  std::vector<int> UnflattenAction(Action action_id) const;
+  std::vector<std::array<uint64_t, 2>> zobrist_table_;
+  uint64_t player_to_move_hash_;
 };
 
 }  // namespace gomoku
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_GOMOKU_H_
+#endif  // OPEN_SPIEL_GAMES_GOMOKU_GOMOKU_H_"

@@ -29,24 +29,80 @@ FLAGS = flags.FLAGS
 
 class GamesGomokuTest(parameterized.TestCase):
   def test_gomoku_game_funs(self):
+    # Default 15 x 15 grid, 5 in a row wins, no wrap.
     game = pyspiel.load_game("gomoku")
-    print("dims", game.dims())
-    print("size", game.size())
-    print("wrap", game.wrap())
-    print("connect", game.connect())
-    print("anti", game.anti())
+    dims = game.dims()
+    self.assertEqual(
+      dims, 2, f"Incorrect dims {dims}")
+    size = game.size()
+    self.assertEqual(
+      size, 15, f"Incorrect size {size}")
+    connect = game.connect()
+    self.assertEqual(
+      connect, 5, f"Incorrect connect {connect}")
+    wrap= game.wrap()
+    self.assertEqual(
+      wrap, False, f"Incorrect wrap {wrap}")
+    anti = game.anti()
+    self.assertEqual(
+      anti, False, f"Incorrect anti {anti}")
+
     coord = [2, 3]
     action = game.move_to_action(coord=coord)
-    print(action)
+    print("action", action)
     move = game.action_to_move(action)
-    print(move)
+    self.assertEqual(coord, move, f"Coord {coord} move {move}")
 
   def test_gomoku_hash(self):
     game = pyspiel.load_game("gomoku")
     state = game.new_initial_state()
-    print("hash", state.hash_value())
+    hash0 = state.hash_value()
+    self.assertEqual(hash0, 0, f"Initial board hash {hash0}")
     state.apply_action(1)
+<<<<<<< HEAD
     print("hash", state.hash_value())
+=======
+    hash1 = state.hash_value()
+    sym1 = state.symmetric_hash()
+    # States related by symmetry shoud have different hashes
+    # but the same symmetric hash.
+    state = game.new_initial_state()
+    state.apply_action(5)
+    hash2 =  state.hash_value()
+    sym2 = state.symmetric_hash()
+    self.assertNotEqual(hash1, hash2, f"Hash1 {hash1} Hash2 {hash2}")
+    self.assertEqual(sym1, sym2, f"Hash1 {sym1} Hash2 {sym2}")
+
+    # We can change symmetry policy during a game.
+    # Change allow_reflections from false to true.
+    state = game.new_initial_state()
+    policy = state.get_symmetry_policy()
+    print("policy", policy)
+    self.assertEqual(policy.allow_reflections, False, f"Wrong symmetry ploicy")
+    # verify policy is correct here
+    state.apply_action(0)
+    state.apply_action(1)
+    sym11 = state.symmetric_hash()
+    # set symmetry policy here
+    policy.allow_reflections = True
+    policy = state.get_symmetry_policy()
+    self.assertEqual(policy.allow_reflections, True, f"Wrong symmetry ploicy")
+    sym12 = state.symmetric_hash()
+
+    state = game.new_initial_state()
+    policy = state.get_symmetry_policy()
+    # verify policy is correct here
+    self.assertEqual(policy.allow_reflections, False, f"Wrong symmetry policy")
+    state.apply_action(2)
+    state.apply_action(1)
+    sym21 = state.symmetric_hash()
+    # set symmetry policy here
+    policy.allow_reflections = True
+    sym22 = state.symmetric_hash()
+    self.assertNotEqual(sym11, sym21, f"Hash1 {sym11} Hash2 {sym21}")
+    self.assertEqual(sym12, sym22, f"Hash1 {sym12} Hash2 {sym22}")
+
+>>>>>>> 09f40196 (Cleaned up lint, added tests)
 
   def test_gommoku_game_sim(self):
       game = pyspiel.load_game("gomoku")
@@ -58,7 +114,59 @@ class GamesGomokuTest(parameterized.TestCase):
           action = np.random.choice(legal_actions)
           state.apply_action(action)
           mc += 1
-        print("mc", mc)
 
+<<<<<<< HEAD
+=======
+  def test_winning_line(self):
+      game = pyspiel.load_game("gomoku(size=3,connect=3)")
+      state = game.new_initial_state()
+      state.apply_action(0)
+      state.apply_action(1)
+      state.apply_action(4)
+      state.apply_action(2)
+      state.apply_action(8)
+      win = state.winning_line()
+      self.assertEqual(win, [[0, 0], [1, 1], [2, 2]], f"win {win}")
+      returns = state.returns()
+      self.assertEqual(returns, [1.0, -1.0], f"returns {returns}")
+
+      # same "winning line", but with anti it is the losing line.
+      game = pyspiel.load_game("gomoku(size=3,connect=3,anti=true)")
+      state = game.new_initial_state()
+      state.apply_action(0)
+      state.apply_action(1)
+      state.apply_action(4)
+      state.apply_action(2)
+      state.apply_action(8)
+      win = state.winning_line()
+      self.assertEqual(win, [[0, 0], [1, 1], [2, 2]], f"win {win}")
+      returns = state.returns()
+      self.assertEqual(returns, [-1.0, 1.0], f"returns {returns}")
+
+      # wrap winning line
+      game = pyspiel.load_game("gomoku(size=4,connect=3,wrap=true)")
+      state = game.new_initial_state()
+      state.apply_action(2)
+      state.apply_action(3)
+      state.apply_action(7)
+      state.apply_action(6)
+      state.apply_action(8)
+      win = state.winning_line()
+      self.assertEqual(win, [[0, 2], [1, 3], [2, 0]], f"win {win}")
+      returns = state.returns()
+      self.assertEqual(returns, [1.0, -1.0], f"returns {returns}")
+
+  def test_consistent_hash(self):
+      game = pyspiel.load_game("gomoku")
+      state = game.new_initial_state()
+      state.apply_action(0)
+      hash1 = state.hash_value()
+      game = pyspiel.load_game("gomoku")
+      state = game.new_initial_state()
+      state.apply_action(0)
+      hash2 = state.hash_value()
+      self.assertEqual(hash1, hash2, f"Hash1 {hash1} Hash2 {hash2}")
+
+>>>>>>> 09f40196 (Cleaned up lint, added tests)
 if __name__ == "__main__":
   absltest.main()
