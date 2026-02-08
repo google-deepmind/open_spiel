@@ -70,7 +70,7 @@ void TestObservationTensor() {
   // Make two moves: Black 0, White 1
   state->ApplyAction(0);
   // white on move
-	state->ObservationTensor(/*player=*/0, absl::MakeSpan(obs));
+  state->ObservationTensor(/*player=*/0, absl::MakeSpan(obs));
   SPIEL_CHECK_EQ(obs[2 * num_cells], 0.0f);
   state->ApplyAction(1);
 

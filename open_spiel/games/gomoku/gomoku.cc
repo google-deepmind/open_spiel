@@ -174,42 +174,44 @@ void GomokuState::DoApplyAction(Action move) {
   CheckWinFromLastMove(move);
 }
 
-void GomokuState::CheckWinFromLastMove(Action last_move) {
+absl::optional<std::vector<Grid<Stone>::Coord>>
+GomokuState::FindWinLineFromLastMove(Action last_move) const {
+  using Coord = Grid<Stone>::Coord;
 
-  const Grid<Stone>::Coord start =
-      board_.Unflatten(last_move);
+  const Coord start = board_.Unflatten(last_move);
   const Stone stone = board_.At(start);
-	const auto* gomoku = static_cast<const GomokuGame*>(game_.get());
 
   SPIEL_CHECK_NE(stone, Stone::kEmpty);
 
   for (const auto& dir : board_.Directions()) {
     if (!board_.IsCanonical(dir)) continue;
 
-    int count = 1;  // include the starting stone
+    std::vector<Coord> line;
+    line.push_back(start);
 
-    // forward direction
+    // forward
     {
       Coord c = start;
       while (static_cast<int>(line.size()) < connect_ &&
              board_.Step(c, dir) &&
              board_.At(c) == stone) {
-        ++count;
+        line.push_back(c);
       }
     }
 
-    // backward direction
+    // backward
     {
-      auto neg_dir = dir;
+      Coord neg_dir = dir;
       for (int& v : neg_dir) v = -v;
 
       Coord c = start;
       while (static_cast<int>(line.size()) < connect_ &&
              board_.Step(c, neg_dir) &&
              board_.At(c) == stone) {
-        ++count;
+        line.insert(line.begin(), c);
       }
     }
+
     if (static_cast<int>(line.size()) >= connect_) {
       line.resize(connect_);  // arbitrary truncation is fine
       return line;
@@ -372,6 +374,57 @@ int GomokuGame::NumDistinctActions() const {
   return total_size_;
 }
 
+uint64_t GomokuState::ComputeZobrist(
+  const Grid<Stone>& grid) const {
+    const auto* gomoku = static_cast<const GomokuGame*>(game_.get());
+    uint64_t h = 0;
+    for (int i = 0; i < grid.NumCells(); ++i) {
+      Stone s = grid.AtIndex(i);
+      if (s != Stone::kEmpty) {
+         h ^= gomoku->ZobristTable()[i][StoneToInt(s)];
+      }
+    }
+    if (current_player_ == 1) {
+      h ^= gomoku->PlayerToMoveHash();
+    }
+    return h;
+}
+
+uint64_t GomokuState::SymmetricHash() const {
+  uint64_t best = ComputeZobrist(board_);
+
+  // --- Basic rotations ---
+  for (auto [i, j] : board_.GenRotations()) {
+    Grid<Stone> rotated = board_;
+    for (int r = 0; r < 3; ++r) {  // 90, 180, 270
+      rotated = rotated.ApplyRotation(i, j);
+      best = std::min(best, ComputeZobrist(rotated));
+    }
+  }
+
+  // --- Reflections ---
+  if (symmetry_policy_.allow_reflections) {
+    for (int axis = 0; axis < dims_; ++axis) {
+      Grid<Stone> refl = board_.ApplyReflection(axis);
+      best = std::min(best, ComputeZobrist(refl));
+
+      // --- Reflection + rotations ---
+      if (symmetry_policy_.allow_reflection_rotations) {
+        for (auto [i, j] : board_.GenRotations()) {
+          Grid<Stone> rotated = refl;
+          for (int r = 0; r < 3; ++r) {
+            rotated = rotated.ApplyRotation(i, j);
+            best = std::min(best, ComputeZobrist(rotated));
+          }
+        }
+      }
+    }
+  }
+
+  return best;
+}
+
+
 GomokuState::GomokuState(std::shared_ptr<const Game> game,
                          const std::string& state_str)
     : State(game),
@@ -433,6 +486,8 @@ GomokuState::GomokuState(std::shared_ptr<const Game> game,
   }
   zobrist_hash_ = ComputeZobrist(board_);
 }
+
+
 
 }  // namespace gomoku
 }  // namespace open_spiel

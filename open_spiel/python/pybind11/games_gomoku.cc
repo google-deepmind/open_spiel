@@ -27,6 +27,7 @@ namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::Action;
 using open_spiel::State;
+using open_spiel::gomoku::SymmetryPolicy;
 using open_spiel::gomoku::GomokuGame;
 using open_spiel::gomoku::GomokuState;
 
@@ -55,10 +56,14 @@ void open_spiel::init_pyspiel_games_gomoku(::pybind11::module &m) {
        [](const std::string& data) {
          return std::dynamic_pointer_cast<GomokuGame>(
            std::const_pointer_cast<Game>(LoadGame(data)));
-       }));;
+       }));
 
   py::classh<GomokuState, State>(m, "GomokuState")
     .def("hash_value", &GomokuState::HashValue)
+    .def("symmetric_hash", &GomokuState::SymmetricHash)
+		.def("winning_line", &GomokuState::WinningLine,
+       py::return_value_policy::reference_internal)
+
 		.def(py::pickle(
        [](const GomokuState& state) {
        return SerializeGameAndState(*state.GetGame(), state);
@@ -67,5 +72,18 @@ void open_spiel::init_pyspiel_games_gomoku(::pybind11::module &m) {
       auto game_and_state = DeserializeGameAndState(data);
       return dynamic_cast<GomokuState*>(
           game_and_state.second.release());
-      }));
+      }))
+	  .def("set_symmetry_policy",
+         &GomokuState::SetSymmetryPolicy)
+    .def("get_symmetry_policy",
+         &GomokuState::GetSymmetryPolicy,
+         py::return_value_policy::reference_internal);
+
+  py::class_<SymmetryPolicy>(m, "SymmetryPolicy")
+    .def(py::init<>())
+    .def_readwrite("allow_reflections",
+                   &SymmetryPolicy::allow_reflections)
+    .def_readwrite("allow_reflection_rotations",
+                   &SymmetryPolicy::allow_reflection_rotations);
+
 }

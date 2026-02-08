@@ -54,14 +54,11 @@ class GamesGomokuTest(parameterized.TestCase):
     self.assertEqual(coord, move, f"Coord {coord} move {move}")
 
   def test_gomoku_hash(self):
-    game = pyspiel.load_game("gomoku")
+    game = pyspiel.load_game("gomoku(size=3,connect=3)")
     state = game.new_initial_state()
     hash0 = state.hash_value()
     self.assertEqual(hash0, 0, f"Initial board hash {hash0}")
     state.apply_action(1)
-<<<<<<< HEAD
-    print("hash", state.hash_value())
-=======
     hash1 = state.hash_value()
     sym1 = state.symmetric_hash()
     # States related by symmetry shoud have different hashes
@@ -78,7 +75,7 @@ class GamesGomokuTest(parameterized.TestCase):
     state = game.new_initial_state()
     policy = state.get_symmetry_policy()
     print("policy", policy)
-    self.assertEqual(policy.allow_reflections, False, f"Wrong symmetry ploicy")
+    self.assertEqual(policy.allow_reflections, False, f"Wrong symmetry policy")
     # verify policy is correct here
     state.apply_action(0)
     state.apply_action(1)
@@ -86,7 +83,7 @@ class GamesGomokuTest(parameterized.TestCase):
     # set symmetry policy here
     policy.allow_reflections = True
     policy = state.get_symmetry_policy()
-    self.assertEqual(policy.allow_reflections, True, f"Wrong symmetry ploicy")
+    self.assertEqual(policy.allow_reflections, True, f"Wrong symmetry policy")
     sym12 = state.symmetric_hash()
 
     state = game.new_initial_state()
@@ -102,7 +99,6 @@ class GamesGomokuTest(parameterized.TestCase):
     self.assertNotEqual(sym11, sym21, f"Hash1 {sym11} Hash2 {sym21}")
     self.assertEqual(sym12, sym22, f"Hash1 {sym12} Hash2 {sym22}")
 
->>>>>>> 09f40196 (Cleaned up lint, added tests)
 
   def test_gommoku_game_sim(self):
       game = pyspiel.load_game("gomoku")
@@ -115,8 +111,6 @@ class GamesGomokuTest(parameterized.TestCase):
           state.apply_action(action)
           mc += 1
 
-<<<<<<< HEAD
-=======
   def test_winning_line(self):
       game = pyspiel.load_game("gomoku(size=3,connect=3)")
       state = game.new_initial_state()
@@ -167,6 +161,5 @@ class GamesGomokuTest(parameterized.TestCase):
       hash2 = state.hash_value()
       self.assertEqual(hash1, hash2, f"Hash1 {hash1} Hash2 {hash2}")
 
->>>>>>> 09f40196 (Cleaned up lint, added tests)
 if __name__ == "__main__":
   absltest.main()
