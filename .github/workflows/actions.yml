@@ -5,6 +5,13 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  # This allows manual triggering of workflows
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Workflow dispatch (triggered manually)'
+        required: false
+        default: 'build_and_test (manual)'
 
 jobs:
   build:
