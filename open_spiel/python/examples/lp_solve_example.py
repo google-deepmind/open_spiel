@@ -31,7 +31,7 @@ def main(_):
 
   payoff_matrix = [[1., 1., 1.], [2., 0., 1.], [0., 2., 2.]]
   mixture = lp_solver.is_dominated(
-      0, payoff_matrix, 0, lp_solver.DOMINANCE_WEAK, return_mixture=True)
+      0, payoff_matrix, 0, lp_solver.DominanceType.DOMINANCE_WEAK, return_mixture=True)
   print("mixture strategy : {}".format(mixture))
   print("payoff vector    : {}".format(mixture.dot(payoff_matrix)))
 

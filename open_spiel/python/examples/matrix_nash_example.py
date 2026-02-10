@@ -82,13 +82,13 @@ def main(_):
   if FLAGS.solver != "linear":
     if FLAGS.mode == "all":
       game, _ = lp_solver.iterated_dominance(
-          game, tol=FLAGS.tol, mode=lp_solver.DOMINANCE_STRICT)
+          game, tol=FLAGS.tol, mode=lp_solver.DominanceType.DOMINANCE_STRICT)
       num_rows, num_cols = game.num_rows(), game.num_cols()
       print("discarded strictly dominated actions yielding shape (%d, %d)" %
             (num_rows, num_cols))
     if FLAGS.mode == "one":
       game, _ = lp_solver.iterated_dominance(
-          game, tol=FLAGS.tol, mode=lp_solver.DOMINANCE_VERY_WEAK)
+          game, tol=FLAGS.tol, mode=lp_solver.DominanceType.DOMINANCE_VERY_WEAK)
       num_rows, num_cols = game.num_rows(), game.num_cols()
       print("discarded very weakly dominated actions yielding shape (%d, %d)" %
             (num_rows, num_cols))

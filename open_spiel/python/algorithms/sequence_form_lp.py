@@ -62,13 +62,13 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
   if state.is_terminal():
     returns = state.returns()
     # Left-most term of: -Ay + E^t p >= 0
-    lps[0].add_or_reuse_constraint(parent_isa_keys[0], lp_solver.CONS_TYPE_GEQ)
+    lps[0].add_or_reuse_constraint(parent_isa_keys[0], lp_solver.ConstraintType.CONS_TYPE_GEQ)
     lps[0].add_to_cons_coeff(parent_isa_keys[0], parent_isa_keys[1],
                              -1.0 * returns[0] * chance_reach)
     # Right-most term of: -Ay + E^t p >= 0
     lps[0].set_cons_coeff(parent_isa_keys[0], parent_is_keys[0], 1.0)
     # Left-most term of: x^t (-A) - q^t F <= 0
-    lps[1].add_or_reuse_constraint(parent_isa_keys[1], lp_solver.CONS_TYPE_LEQ)
+    lps[1].add_or_reuse_constraint(parent_isa_keys[1], lp_solver.ConstraintType.CONS_TYPE_LEQ)
     lps[1].add_to_cons_coeff(parent_isa_keys[1], parent_isa_keys[0],
                              -1.0 * returns[0] * chance_reach)
     # Right-most term of: x^t (-A) - q^t F <= 0
@@ -91,21 +91,21 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
     # p
     lps[0].add_or_reuse_variable(info_state)
     # -Ay + E^t p >= 0
-    lps[0].add_or_reuse_constraint(parent_isa_keys[0], lp_solver.CONS_TYPE_GEQ)
+    lps[0].add_or_reuse_constraint(parent_isa_keys[0], lp_solver.ConstraintType.CONS_TYPE_GEQ)
     lps[0].set_cons_coeff(parent_isa_keys[0], parent_is_keys[0], 1.0)
     lps[0].set_cons_coeff(parent_isa_keys[0], info_state, -1.0)
     # x^t E^t = e^t
-    lps[1].add_or_reuse_constraint(info_state, lp_solver.CONS_TYPE_EQ)
+    lps[1].add_or_reuse_constraint(info_state, lp_solver.ConstraintType.CONS_TYPE_EQ)
     lps[1].set_cons_coeff(info_state, parent_isa_keys[0], -1.0)
   else:
     # q
     lps[1].add_or_reuse_variable(info_state)
     # x^t (-A) - q^t F <= 0
-    lps[1].add_or_reuse_constraint(parent_isa_keys[1], lp_solver.CONS_TYPE_LEQ)
+    lps[1].add_or_reuse_constraint(parent_isa_keys[1], lp_solver.ConstraintType.CONS_TYPE_LEQ)
     lps[1].set_cons_coeff(parent_isa_keys[1], parent_is_keys[1], -1.0)
     lps[1].set_cons_coeff(parent_isa_keys[1], info_state, 1.0)
     # -Fy = -f
-    lps[0].add_or_reuse_constraint(info_state, lp_solver.CONS_TYPE_EQ)
+    lps[0].add_or_reuse_constraint(info_state, lp_solver.ConstraintType.CONS_TYPE_EQ)
     lps[0].set_cons_coeff(info_state, parent_isa_keys[1], -1.0)
 
   # Add to the infostate maps
@@ -207,8 +207,8 @@ def solve_zero_sum_game(game, solver=None):
   }]
   infoset_action_maps = [{}, {}]
   lps = [
-      lp_solver.LinearProgram(lp_solver.OBJ_MIN),  # Eq. (8)
-      lp_solver.LinearProgram(lp_solver.OBJ_MAX)  # Eq. (9)
+      lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MIN),  # Eq. (8)
+      lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MAX)  # Eq. (9)
   ]
   # Root-level variables and constraints.
   lps[0].add_or_reuse_variable(_EMPTY_INFOSET_ACTION_KEYS[1], lb=0)  # y root
@@ -219,12 +219,12 @@ def solve_zero_sum_game(game, solver=None):
   lps[0].set_obj_coeff(_EMPTY_INFOSET_KEYS[0], 1.0)  # e^t p
   lps[1].set_obj_coeff(_EMPTY_INFOSET_KEYS[1], -1.0)  # -q^t f
   # y_root = 1  (-Fy = -f)
-  lps[0].add_or_reuse_constraint(_EMPTY_INFOSET_KEYS[1], lp_solver.CONS_TYPE_EQ)
+  lps[0].add_or_reuse_constraint(_EMPTY_INFOSET_KEYS[1], lp_solver.ConstraintType.CONS_TYPE_EQ)
   lps[0].set_cons_coeff(_EMPTY_INFOSET_KEYS[1], _EMPTY_INFOSET_ACTION_KEYS[1],
                         -1.0)
   lps[0].set_cons_rhs(_EMPTY_INFOSET_KEYS[1], -1.0)
   # x_root = 1  (x^t E^t = e^t)
-  lps[1].add_or_reuse_constraint(_EMPTY_INFOSET_KEYS[0], lp_solver.CONS_TYPE_EQ)
+  lps[1].add_or_reuse_constraint(_EMPTY_INFOSET_KEYS[0], lp_solver.ConstraintType.CONS_TYPE_EQ)
   lps[1].set_cons_coeff(_EMPTY_INFOSET_KEYS[0], _EMPTY_INFOSET_ACTION_KEYS[0],
                         1.0)
   lps[1].set_cons_rhs(_EMPTY_INFOSET_KEYS[0], 1.0)
