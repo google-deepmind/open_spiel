@@ -451,7 +451,7 @@ def is_dominated(
     for r in range(num_rows):
       if r != action:
         lp.set_obj_coeff(r, -1)
-    mixture = lp.solve(**options)
+    mixture = lp.solve(solver = cp.ECOS, **options)
     if mixture is not None and np.sum(mixture) < 1 - tol:
       mixture = mixture / np.sum(mixture)
     else:
