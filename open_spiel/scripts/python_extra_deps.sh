@@ -54,23 +54,23 @@ if verlt $PY_VER 3.12; then
   echo "Detected Python version 3.11"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.9.1"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.8.1 jaxlib==0.8.1 flax==0.12.1 dm-haiku==0.0.16 optax==0.2.6 chex==0.1.91 rlax==0.1.8 distrax==0.1.7"
-  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==3.2 matplotlib==3.10.7 mock==4.0.2 nashpy==0.0.43 scipy==1.16.3 testresources==2.0.1 cvxpy[GLPK]==1.7.5 ecos==2.0.14 osqp==1.0.4 pokerkit==0.6.3"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==3.2 matplotlib==3.10.7 mock==4.0.2 nashpy==0.0.43 scipy==1.16.3 testresources==2.0.1 cvxpy[GLPK,ECOS]==1.7.5 osqp==1.0.4 pokerkit==0.6.3"
 elif verlt $PY_VER 3.13; then
   echo "Detected Python version 3.12"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.9.1"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.8.1 jaxlib==0.8.1 flax==0.12.1 dm-haiku==0.0.16 optax==0.2.6 chex==0.1.91 rlax==0.1.8 distrax==0.1.7"
-  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.10.7 mock==5.1.0 nashpy==0.0.43 scipy==1.16.3 testresources==2.0.1 cvxpy[GLPK]==1.7.5 ecos==2.0.14 osqp==1.0.4 pokerkit==0.6.3"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.10.7 mock==5.1.0 nashpy==0.0.43 scipy==1.16.3 testresources==2.0.1 cvxpy[GLPK,ECOS]==1.7.5 osqp==1.0.4 pokerkit==0.6.3"
 elif verlt $PY_VER 3.14; then
   echo "Detected Python version 3.13"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.9.1"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.8.1 jaxlib==0.8.1 flax==0.12.1 dm-haiku==0.0.16 optax==0.2.6 chex==0.1.91 rlax==0.1.8 distrax==0.1.7"
-  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.10.7 mock==5.1.0 nashpy==0.0.43 scipy==1.16.3 testresources==2.0.1 cvxpy[GLPK]==1.7.5 ecos==2.0.14 osqp==1.0.4 pokerkit==0.6.3"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==8.23.0 networkx==3.3 matplotlib==3.10.7 mock==5.1.0 nashpy==0.0.43 scipy==1.16.3 testresources==2.0.1 cvxpy[GLPK,ECOS]==1.7.5 osqp==1.0.4 pokerkit==0.6.3"
 else
   # TODO(author5). Added in #1381, but not working yet. Come back to this.
   echo "Detected Python version 3.14"
   export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==2.10.0"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.9.0.1 jaxlib==0.9.0.1 dm-haiku==0.0.16 optax==0.2.7 chex==0.1.91 rlax==0.1.8 distrax==0.1.7 flax==0.12.3"
-  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==9.10.0 networkx==3.6.1 matplotlib==3.10.8 mock==5.2.0 nashpy==0.0.43 scipy==1.17.0 testresources==2.0.2 cvxpy[GLPK]==1.8.1 ecos==2.0.14 osqp==1.1.0 tensorflow_datasets==4.9.9 pokerkit==0.7.3"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==9.10.0 networkx==3.6.1 matplotlib==3.10.8 mock==5.2.0 nashpy==0.0.43 scipy==1.17.0 testresources==2.0.2 cvxpy[GLPK,ECOS]==1.8.1 osqp==1.1.0 tensorflow_datasets==4.9.9 pokerkit==0.7.3"
 fi
 
 
