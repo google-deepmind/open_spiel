@@ -61,6 +61,7 @@ void open_spiel::init_pyspiel_games_gomoku(::pybind11::module &m) {
   py::classh<GomokuState, State>(m, "GomokuState")
     .def("hash_value", &GomokuState::HashValue)
     .def("symmetric_hash", &GomokuState::SymmetricHash)
+    .def("pretty", &GomokuState::Pretty)
 		.def("winning_line", &GomokuState::WinningLine,
        py::return_value_policy::reference_internal)
 

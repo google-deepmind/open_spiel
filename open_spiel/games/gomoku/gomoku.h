@@ -74,6 +74,15 @@ struct SymmetryPolicy {
   bool allow_reflection_rotations = false;
 };
 
+inline char StoneToChar(Stone s) {
+  switch (s) {
+    case Stone::kBlack: return 'X';
+    case Stone::kWhite: return 'O';
+    case Stone::kEmpty: return '.';
+  }
+  return '?';  // Should never happen
+}
+
 // State of an in-play game.
 class GomokuState : public State {
  public:
@@ -117,6 +126,8 @@ class GomokuState : public State {
   absl::optional<std::vector<Grid<Stone>::Coord>>
     FindWinLineFromLastMove(Action last_move) const;
   const std::vector<Grid<Stone>::Coord>& WinningLine() const;
+  // Return a string that represents the state as boards or stacks or boards
+  std::string Pretty() const;
 
  protected:
   void DoApplyAction(Action move) override;

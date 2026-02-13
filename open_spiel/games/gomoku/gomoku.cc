@@ -360,6 +360,41 @@ std::unique_ptr<State> GomokuState::Clone() const {
   return std::unique_ptr<State>(new GomokuState(*this));
 }
 
+std::string GomokuState::Pretty() const {
+  using Coord = Grid<Stone>::Coord;
+  std::ostringstream oss;
+  if (dims_ == 2) {
+    for (int y = 0; y < size_; ++y) {
+      for (int x = 0; x < size_; ++x) {
+        Coord coord = {x, y};
+        Stone stone = board_.At(coord);
+        oss << StoneToChar(stone) << " ";
+      }
+      oss << '\n';
+    }
+    oss << '\n';
+  }
+  if (dims_ == 3) {
+    for (int z = 0; z < size_; ++z) {
+      for (int y = 0; y < size_; ++y) {
+        for (int x = 0; x < size_; ++x) {
+          Coord coord = {x, y, z};
+          Stone stone = board_.At(coord);
+          oss << StoneToChar(stone) << " ";
+        }
+        oss << '\n';
+      }
+      oss << '\n';
+      for (int i = 0; i <  size_; ++i) {
+         oss << "==";
+      }
+      oss << '\n';
+    }
+    oss << '\n';
+  }
+  return oss.str();
+}
+
 std::string GomokuGame::ActionToString(Player player,
           Action action_id) const {
   const auto coord = UnflattenAction(action_id);
