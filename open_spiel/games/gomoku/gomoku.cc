@@ -343,10 +343,17 @@ void GomokuState::ObservationTensor(Player player,
 }
 
 void GomokuState::UndoAction(Player player, Action move) {
-  board_.AtIndex(move) = Stone::kEmpty;
-  current_player_ = player;
-  move_count_ -= 1;
+  SPIEL_CHECK_FALSE(history_.empty());
+  Action old = history_.back().action;
   history_.pop_back();
+  board_.AtIndex(old) = Stone::kEmpty;
+  current_player_ = 1 - current_player_;
+  move_count_ -= 1;
+  terminal_ = false;
+  winning_line_.clear();
+  black_score_ = 0.0;
+  white_score_ = 0.0;
+  zobrist_hash_ = ComputeZobrist(board_);
 }
 
 std::unique_ptr<State> GomokuState::Clone() const {

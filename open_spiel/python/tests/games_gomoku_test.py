@@ -161,5 +161,23 @@ class GamesGomokuTest(parameterized.TestCase):
       hash2 = state.hash_value()
       self.assertEqual(hash1, hash2, f"Hash1 {hash1} Hash2 {hash2}")
 
+  def test_undo(self):
+    game = pyspiel.load_game("gomoku")
+    state = game.new_initial_state()
+    while not state.is_terminal():
+      old = state.clone()
+      player = state.current_player()
+      legal_actions = state.legal_actions()
+      action = np.random.choice(legal_actions)
+      state.apply_action(action)
+    state.undo_action(player, action)
+    self.assertEqual(str(state), str(old))
+    self.assertEqual(state.legal_actions(), old.legal_actions())
+    self.assertEqual(state.hash_value(), old.hash_value())
+    self.assertEqual(state.returns(), old.returns())
+
+
+
+
 if __name__ == "__main__":
   absltest.main()
