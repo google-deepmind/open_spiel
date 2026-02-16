@@ -514,6 +514,13 @@ void HashTest() {
   SPIEL_CHECK_TRUE(ch_state4 != nullptr);
   SPIEL_CHECK_NE(ch_state3->Board().HashValue(),
     ch_state4->Board().HashValue());
+  // promote some pieces
+  const std::string fen5 =
+    "rhaekbnr/cpp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR[p] b KQkq - 0 2";
+  auto state5 = game->NewInitialState(fen5);
+  CrazyhouseState* ch_state5 = dynamic_cast<CrazyhouseState*>(state5.get());
+  SPIEL_CHECK_TRUE(ch_state5 != nullptr);
+  auto hv = ch_state5->Board().HashValue();
 }
 
 }  // namespace

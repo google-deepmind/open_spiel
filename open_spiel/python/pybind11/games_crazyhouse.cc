@@ -98,6 +98,7 @@ void open_spiel::init_pyspiel_games_crazyhouse(py::module& m) {
       .def("num_repetitions", &CrazyhouseState::NumRepetitions)
       .def("parse_move_to_action", &CrazyhouseState::ParseMoveToAction)
       .def("start_fen", &CrazyhouseState::StartFEN)
+      .def("in_check", &CrazyhouseState::InCheck)
       // Pickle support
       .def(py::pickle(
           [](const CrazyhouseState& state) {  // __getstate__

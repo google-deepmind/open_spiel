@@ -154,9 +154,10 @@ struct Move {
         castle_dir(castle_dir) {}
 
   std::string ToString() const;
-  // Our encoding of drop moves does not support weird-sized boards.
+  // Crazyhouse does not support weird-sized boards.
   bool IsDropMove() const {
-    return from.x >= 8;
+    SPIEL_CHECK_LE(from.x, 8);
+    return from.x == 8;
   }
 
   // Converts to long algebraic notation, as required by the UCI protocol.
@@ -413,9 +414,9 @@ class CrazyhouseBoard {
   absl::optional<Move> ParseMove(const std::string& move,
                                  bool chess960 = false) const;
 
-	// For both LAN and SAN we first check for a drop move with syntax like N@d4
-	// All drop moves are shown with a drop syntax, so Nd4 always mean a knight
-	// on the board moved. 
+  // For both LAN and SAN we first check for a drop move with syntax like N@d4
+  // All drop moves are shown with a drop syntax, so Nd4 always mean a knight
+  // on the board moved.
   absl::optional<Move> ParseDropMove(const std::string& move) const;
   // Parses a move in standard algebraic notation as defined by FIDE.
   // https://en.wikipedia.org/wiki/Algebraic_notation_(chess).

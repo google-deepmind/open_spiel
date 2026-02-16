@@ -321,7 +321,7 @@ std::string Move::ToSAN(const CrazyhouseBoard &board) const {
     board.GenerateLegalMoves([&](const Move &move) -> bool {
       if (move.IsDropMove()) {
         return true;
-			}
+      }
       if (move.piece.type != piece.type) {
         return true;  // Continue generating moves.
       }
@@ -665,7 +665,7 @@ void CrazyhouseBoard::GenerateLegalMoves(const MoveYieldFn &yield,
 
           auto ks = king_square;
           if (!(move.IsDropMove()) && at(move.from).type == PieceType::kKing) {
-            ks =  move.to;
+            ks = move.to;
           }
           if (board_copy.UnderAttack(ks, color)) {
             return true;
@@ -1063,7 +1063,7 @@ absl::optional<Move> CrazyhouseBoard::ParseMove(const std::string &move,
 absl::optional<Move> CrazyhouseBoard::ParseSANMove(
     const std::string &move_str) const {
   std::string move = move_str;
-	auto drop_move = ParseDropMove(move);
+  auto drop_move = ParseDropMove(move);
   if (drop_move) {
     return drop_move;
   }
@@ -1182,7 +1182,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
                       source_rank, promotion_type, this](const Move &move) {
     PieceType moving_piece_type = at(move.from).type;
     if (move.to == destination_square && moving_piece_type == piece_type &&
-				(!move.IsDropMove()) &&
+        (!move.IsDropMove()) &&
         (!source_file || move.from.x == *source_file) &&
         (!source_rank || move.from.y == *source_rank) &&
         (!promotion_type || move.promotion_type == *promotion_type)) {
@@ -1198,7 +1198,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
 }
 
 absl::optional<Move> CrazyhouseBoard::ParseDropMove(
-		const std::string &move) const {
+    const std::string &move) const {
   if (move.empty()) {
     return absl::nullopt;
   }
@@ -1229,7 +1229,7 @@ absl::optional<Move> CrazyhouseBoard::ParseDropMove(
     Move drop;
     drop.from = Square{
       static_cast<int8_t>(board_size_),
-      static_cast<int>(Pocket::Index(ptype))};
+      static_cast<int8_t>(Pocket::Index(ptype))};
     drop.to = *to;
     drop.piece = Piece{to_play_, ptype};
     return drop;
@@ -2217,7 +2217,7 @@ void CrazyhouseBoard::RemoveFromPocket(Color owner,
 }
 
 void CrazyhouseBoard::set_square(Square sq, Piece piece) {
-  static const ZobristTableU64<k2dMaxBoardSize, 3, 7> kZobristValues(
+  static const ZobristTableU64<k2dMaxBoardSize, 3, 11> kZobristValues(
       /*seed=*/2765481);
 
   // First, remove the current piece from the hash.

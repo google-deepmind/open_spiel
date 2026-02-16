@@ -141,6 +141,15 @@ class GamesCrazyhouseTest(parameterized.TestCase):
           action = np.random.choice(legal_actions)
           state.apply_action(action)
 
+    def test_in_check(self):
+        game = pyspiel.load_game("crazyhouse")
+        state = game.new_initial_state()
+        state.apply_action(state.parse_move_to_action('e2e4'))
+        state.apply_action(state.parse_move_to_action('f7f5'))
+        self.assertFalse(state.in_check())
+        state.apply_action(state.parse_move_to_action('d1h5'))
+        self.assertTrue(state.in_check())
+
 
 if __name__ == "__main__":
   np.random.seed(87375711)

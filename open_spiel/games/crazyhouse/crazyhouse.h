@@ -175,6 +175,10 @@ class CrazyhouseState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 
+  bool InCheck() const {
+    return current_board_.InCheck();
+  }
+
   // Current board.
   CrazyhouseBoard& Board() { return current_board_; }
   const CrazyhouseBoard& Board() const { return current_board_; }
