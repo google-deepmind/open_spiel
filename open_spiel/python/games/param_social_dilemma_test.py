@@ -86,7 +86,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
         
         game = pyspiel.load_game("python_param_social_dilemma",
                                 {"num_players": 2,
-                                 "payoff_matrix": custom_payoff.tolist()})
+                                 "payoff_matrix": str(custom_payoff.tolist())})
         state = game.new_initial_state()
         state.apply_actions([0, 0])
         rewards = state.rewards()

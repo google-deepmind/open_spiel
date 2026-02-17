@@ -20,6 +20,7 @@ A flexible N-player simultaneous-move game that supports:
 - Optional stochastic rewards with configurable noise
 """
 
+import ast
 import enum
 import numpy as np
 import pyspiel
@@ -28,7 +29,7 @@ _DEFAULT_PARAMS = {
     "num_players": 3,
     "num_actions": 2,
     "max_game_length": 10,
-    "payoff_matrix": None,
+    "payoff_matrix": "default",
     "reward_noise_std": 0.0,
     "dynamic_payoffs": False,
     "payoff_change_prob": 0.0
@@ -67,11 +68,17 @@ class ParamSocialDilemmaGame(pyspiel.Game):
         self._dynamic_payoffs = params.get("dynamic_payoffs", False)
         self._payoff_change_prob = params.get("payoff_change_prob", 0.0)
         
-        payoff_matrix = params.get("payoff_matrix")
-        if payoff_matrix is None:
+        payoff_matrix_str = params.get("payoff_matrix", "default")
+        if payoff_matrix_str == "default":
             self._payoff_matrix = self._create_default_payoff_matrix()
         else:
-            self._payoff_matrix = np.array(payoff_matrix)
+            try:
+                parsed = ast.literal_eval(payoff_matrix_str)
+                self._payoff_matrix = np.array(parsed, dtype=np.float64)
+            except (ValueError, SyntaxError) as e:
+                raise ValueError(
+                    f"Invalid payoff_matrix format: {payoff_matrix_str}. "
+                    f"Expected nested list as string. Error: {e}")
         
         if self._reward_noise_std > 0:
             game_type = pyspiel.GameType(
