@@ -19,6 +19,20 @@ jobs:
       matrix:
         include:
         - os: ubuntu-24.04
+          OS_PYTHON_VERSION: "3.14"
+          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+        - os: ubuntu-24.04
+          OS_PYTHON_VERSION: "3.13"
+          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+        - os: ubuntu-24.04
           OS_PYTHON_VERSION: "3.12"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
