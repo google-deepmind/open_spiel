@@ -291,8 +291,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
-    # Disabled while broken.
-    # See https://github.com/google-deepmind/open_spiel/issues/1483
     algorithms/alpha_zero/evaluator_test.py
     algorithms/alpha_zero/model_test.py
     jax/deep_cfr_jax_test.py
