@@ -12,28 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.algorithms.alpha_zero.evaluator."""
-
 from absl.testing import absltest
+from absl.testing import parameterized
+import jax.numpy as jnp
 import numpy as np
 
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
-from open_spiel.python.algorithms.alpha_zero import model as model_lib
+from open_spiel.python.algorithms.alpha_zero import utils
 import pyspiel
 
 
-def build_model(game):
-  return model_lib.Model.build_model(
-      "mlp", game.observation_tensor_shape(), game.num_distinct_actions(),
-      nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
+def build_model(api_version: str, game):
+  return utils.api_selector(api_version).Model.build_model(
+      "mlp",
+      game.observation_tensor_shape(),
+      game.num_distinct_actions(),
+      nn_width=64,
+      nn_depth=2,
+      weight_decay=1e-4,
+      learning_rate=0.01,
+      path=None,
+  )
 
 
-class EvaluatorTest(absltest.TestCase):
+class EvaluatorTest(parameterized.TestCase):
 
-  def test_evaluator_caching(self):
+  @parameterized.parameters(utils.AVIALABLE_APIS)
+  def test_evaluator_caching(self, api_version: str) -> None:
     game = pyspiel.load_game("tic_tac_toe")
-    model = build_model(game)
+    model = build_model(api_version, game)
     evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
 
     state = game.new_initial_state()
@@ -42,7 +50,14 @@ class EvaluatorTest(absltest.TestCase):
     action = state.legal_actions()[0]
     policy = np.zeros(len(act_mask), dtype=float)
     policy[action] = 1
-    train_inputs = [model_lib.TrainInput(obs, act_mask, policy, value=1)]
+    train_inputs = [
+        utils.TrainInput(
+            observation=jnp.asarray(obs),
+            legals_mask=jnp.asarray(act_mask),
+            policy=jnp.asarray(policy),
+            value=jnp.asarray(1),
+        )
+    ]
 
     value = evaluator.evaluate(state)
     self.assertEqual(value[0], -value[1])
@@ -60,7 +75,7 @@ class EvaluatorTest(absltest.TestCase):
     self.assertEqual(info.hits, 3)
 
     for _ in range(20):
-      model.update(train_inputs)
+      model.update(utils.TrainInput.stack(train_inputs))
 
     # Still equal due to not clearing the cache
     value3 = evaluator.evaluate(state)[0]
@@ -79,6 +94,7 @@ class EvaluatorTest(absltest.TestCase):
     # Now they differ from before
     value4 = evaluator.evaluate(state)[0]
     value5 = evaluator.evaluate(state)[0]
+
     self.assertNotEqual(value, value4)
     self.assertEqual(value4, value5)
 
@@ -93,12 +109,14 @@ class EvaluatorTest(absltest.TestCase):
     self.assertEqual(info.misses, 1)
     self.assertEqual(info.hits, 2)
 
-  def test_works_with_mcts(self):
+  @parameterized.parameters(utils.AVIALABLE_APIS)
+  def test_works_with_mcts(self, api_version: str) -> None:
     game = pyspiel.load_game("tic_tac_toe")
-    model = build_model(game)
+    model = build_model(api_version, game)
     evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
     bot = mcts.MCTSBot(
-        game, 1., 20, evaluator, solve=False, dirichlet_noise=(0.25, 1.))
+        game, 1.0, 20, evaluator, solve=False, dirichlet_noise=(0.25, 1.0)
+    )
     root = bot.mcts_search(game.new_initial_state())
     self.assertEqual(root.explore_count, 20)
 
