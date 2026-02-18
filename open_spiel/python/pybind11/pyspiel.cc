@@ -49,6 +49,7 @@
 #include "open_spiel/python/pybind11/games_colored_trails.h"
 #include "open_spiel/python/pybind11/games_connect_four.h"
 #include "open_spiel/python/pybind11/games_crazy_eights.h"
+#include "open_spiel/python/pybind11/games_crazyhouse.h"
 #include "open_spiel/python/pybind11/games_dots_and_boxes.h"
 #include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
@@ -766,6 +767,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_blackjack(m);
   init_pyspiel_games_bridge(m);
   init_pyspiel_games_chess(m);
+  init_pyspiel_games_crazyhouse(m);
   init_pyspiel_games_colored_trails(m);
   init_pyspiel_games_connect_four(m);
   init_pyspiel_games_crazy_eights(m);
