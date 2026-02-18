@@ -161,8 +161,8 @@ Linux versions).
 
 ## Installing via Docker
 
-Please note that we don't regularly test the Docker installation. As such, it
-may not work at any given time. If you encounter a problem, please
+We don't regularly test the Docker installation. As such, it may not work at any
+given time. If you encounter a problem, please
 [open an issue](https://github.com/deepmind/open_spiel/issues).
 
 Option 1 (Basic, 3.13GB):
@@ -187,17 +187,16 @@ docker run -it --entrypoint /bin/bash openspiel
 Finally you can run examples using:
 
 ```bash
-docker run openspiel python3 python/examples/matrix_game_example.py
-docker run openspiel python3 python/examples/example.py
+docker run openspiel python python/examples/matrix_game_example.py
+docker run openspiel python python/examples/example.py
 ```
-
 
 Option 3 (Jupyter Notebook):
 
 Installs OpenSpiel with an additional Jupyter Notebook environment.
 
 ```bash
-docker build -t openspiel-notebook -f Dockerfile.jupyter --rm .
+docker build --target jupyterlab -t openspiel-notebook -f Dockerfile.base --rm .
 docker run -it --rm -p 8888:8888 openspiel-notebook
 ```
 
@@ -277,7 +276,9 @@ python3 -m pip install --upgrade -r requirements.txt
 
 ##### Optional dependencies
 
-Additionally, if you intend to use one of the optional Python dependencies (see [open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh)), you must manually install and/or upgrade them. The installation scripts will not install or upgrade these dependencies. e.g.:
+Additionally, if you intend to use one of the optional Python dependencies (see
+`scripts/install.sh`), you must manually install and/or upgrade them. The
+installation scripts will not install or upgrade these dependencies. e.g.:
 
 ```bash
 python3 -m pip install --upgrade torch==x.xx.x jax==x.x.x
