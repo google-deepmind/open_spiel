@@ -969,6 +969,13 @@ class Game : public std::enable_shared_from_this<Game> {
   // State::Serialize (i.e. that method should also be overridden).
   virtual std::unique_ptr<State> DeserializeState(const std::string& str) const;
 
+  // The maximum length of the string returned by State::Serialize() for any
+  // state in this game. This is useful for allocating fixed-size buffers when
+  // working with vectorized game states.
+  // The default implementation assumes the default serialization format.
+  // Games that override State::Serialize must override this method.
+  virtual int MaxSerializationLength() const;
+
   // The maximum length of any one game (in terms of number of decision nodes
   // visited in the game tree). For a simultaneous action game, this is the
   // maximum number of joint decisions. In a turn-based game, this is the
