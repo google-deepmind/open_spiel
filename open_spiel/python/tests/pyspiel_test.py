@@ -123,6 +123,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "phantom_ttt",
     "phantom_ttt_ir",
     "pig",
+    "python_ant_foraging",
     "python_block_dominoes",
     "python_dynamic_routing",
     "python_hangman",

@@ -226,6 +226,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   egt/utils_test.py
   environments/catch_test.py
   environments/cliff_walking_test.py
+  games/ant_foraging_test.py
   games/block_dominoes_test.py
   games/chat_game_test.py
   games/chat_games/envs/base_envs/base_envs_test.py
