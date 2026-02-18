@@ -293,8 +293,8 @@ if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
     # Disabled while broken.
     # See https://github.com/google-deepmind/open_spiel/issues/1483
-    # algorithms/alpha_zero/evaluator_test.py
-    # algorithms/alpha_zero/model_test.py
+    algorithms/alpha_zero/evaluator_test.py
+    algorithms/alpha_zero/model_test.py
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
