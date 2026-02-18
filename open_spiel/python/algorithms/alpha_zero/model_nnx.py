@@ -58,10 +58,14 @@ activations_dict = {
 
 
 def get_batch_stats(layer: nn.Module) -> nn.BatchStat:
+  """Filter to get the model's parameters."""
+
   return nn.state(layer, nn.BatchStat)
 
 
 def get_layer_parameters(layer: nn.Module) -> nn.Param:
+  """Filter to get the model's BatchNorm stats."""
+
   return nn.state(layer, nn.Param)
 
 
@@ -93,6 +97,7 @@ class Activation(nn.Module):
 
 
 class MLPBlock(nn.Module):
+  """Multi layer perceptron block with a Linear layer + Activation."""
 
   def __init__(
       self, in_features: int, out_features: int, activation: str, seed: int = 0
@@ -399,7 +404,8 @@ class Model:
       seed: int = 0,
       decouple_weight_decay: bool = False,
   ) -> "Model":
-    """Builds a model."""
+    """Builds the model."""
+
     if model_type not in cls.valid_model_types:
       raise ValueError(
           f"Invalid model type: {model_type}, expected one of:"
@@ -579,6 +585,7 @@ class Model:
     return utils.Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
 
   def save_checkpoint(self, step: int) -> int:
+    """Saves a checkpoint of the model."""
     path = os.path.join(self._path, f"checkpoint-{step}")
     if self._checkpointer:
       self._checkpointer.save(path, self._state, force=True)
@@ -587,7 +594,7 @@ class Model:
     return step
 
   def load_checkpoint(self, step: int) -> None:
-    # model = nn.eval_shape(lambda: self._model)
+    """Loads a checkpoint of the model."""
     if self._checkpointer:
       self._state = self._checkpointer.restore(
           os.path.join(self._path, f"checkpoint-{step}"), self._state

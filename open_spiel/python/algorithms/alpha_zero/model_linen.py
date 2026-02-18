@@ -92,7 +92,7 @@ class ConvBlock(nn.Module):
   activation: Optional[str] = "relu"
 
   @nn.compact
-  def __call__(self, x: chex.Array, train: bool = False) -> chex.Array:
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     y = nn.Conv(
         features=self.features, kernel_size=self.kernel_size, padding="SAME"
     )(x)
@@ -107,10 +107,10 @@ class ResidualBlock(nn.Module):
   activation: Optional[str] = "relu"
 
   @nn.compact
-  def __call__(self, x: chex.Array, train: bool = False) -> chex.Array:
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     residual = x
-    y = ConvBlock(self.filters, self.kernel_size, self.activation)(x, train)
-    y = ConvBlock(self.filters, self.kernel_size, None)(y, train)
+    y = ConvBlock(self.filters, self.kernel_size, self.activation)(x, training)
+    y = ConvBlock(self.filters, self.kernel_size, None)(y, training)
     y = Activation(self.activation)(y + residual)
     return y
 
@@ -124,7 +124,7 @@ class PolicyHead(nn.Module):
   activation: Optional[str] = "relu"
 
   @nn.compact
-  def __call__(self, x: chex.Array, train: bool = False) -> chex.Array:
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     if self.model_type != "mlp":
       x = ConvBlock(features=2, kernel_size=(1, 1), activation=self.activation)(
           x, training
@@ -143,7 +143,7 @@ class ValueHead(nn.Module):
   activation: Optional[str] = "relu"
 
   @nn.compact
-  def __call__(self, x: chex.Array, train: bool = False) -> chex.Array:
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     if self.model_type != "mlp":
       x = ConvBlock(features=1, kernel_size=(1, 1), activation=self.activation)(
           x, training
@@ -196,7 +196,7 @@ class AlphaZeroModel(nn.Module):
 
   @nn.compact
   def __call__(
-      self, observations: chex.Array, train: bool
+      self, observations: chex.Array, training: bool
   ) -> tuple[chex.Array, chex.Array]:
     # torso:
     x = observations
@@ -211,18 +211,18 @@ class AlphaZeroModel(nn.Module):
             features=self.nn_width,
             kernel_size=(3, 3),
             activation=self.activation,
-        )(x, train)
+        )(x, training)
     elif self.model_type == "resnet":
       x = observations.reshape(self.input_shape)
       x = ConvBlock(
           features=self.nn_width, kernel_size=(3, 3), activation=self.activation
-      )(x, train)
+      )(x, training)
       for _ in range(self.nn_depth):
         x = ResidualBlock(
             filters=self.nn_width,
             kernel_size=(3, 3),
             activation=self.activation,
-        )(x, train)
+        )(x, training)
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
 
@@ -288,7 +288,8 @@ class Model:
       seed: int = 0,
       decouple_weight_decay: bool = False,
   ) -> "Model":
-    """Builds a model."""
+    """Builds the model."""
+    
     if model_type not in cls.valid_model_types:
       raise ValueError(
           f"Invalid model type: {model_type}, expected one of:"
