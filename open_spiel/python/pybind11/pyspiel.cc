@@ -34,6 +34,7 @@
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
+#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 #include "open_spiel/python/pybind11/algorithms_corr_dist.h"
 #include "open_spiel/python/pybind11/algorithms_infostate_tree.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
@@ -76,11 +77,11 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 // Includes needed for absl::optional.
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
+#include "pybind11_abseil/status_casters.h"
 
 // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
@@ -293,14 +294,17 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("utility_sum", &GameInfo::utility_sum)
       .def_readonly("max_game_length", &GameInfo::max_game_length);
 
-  py::class_<GameStruct> game_struct(m, "GameStruct");
-  game_struct.def("to_json", &GameStruct::ToJson);
+  py::class_<SpielStruct> spiel_struct(m, "SpielStruct");
+  spiel_struct.def("to_json", &SpielStruct::ToJson);
 
-  py::class_<StateStruct, GameStruct>(m, "StateStruct");
+  py::class_<StateStruct, SpielStruct>(m, "StateStruct");
 
-  py::class_<ObservationStruct, GameStruct>(m, "ObservationStruct");
+  py::class_<ObservationStruct, SpielStruct>(m, "ObservationStruct");
 
-  py::class_<ActionStruct, GameStruct>(m, "ActionStruct");
+  py::class_<ActionStruct, SpielStruct>(m, "ActionStruct");
+
+  py::class_<GameParametersStruct, SpielStruct>(m, "GameParametersStruct")
+      .def_readwrite("game_name", &GameParametersStruct::game_name);
 
   m.attr("INVALID_ACTION") = py::int_(open_spiel::kInvalidAction);
 
@@ -318,11 +322,11 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
       .def("apply_action_with_legality_check",
-           py::overload_cast<Action>(
-               &State::ApplyActionWithLegalityCheck))
+           py::overload_cast<Action>(&State::ApplyActionWithLegalityCheck))
       .def("apply_actions", &State::ApplyActions)
       .def("apply_actions_with_legality_checks",
            &State::ApplyActionsWithLegalityChecks)
+      .def("validate_action_struct", &State::ValidateActionStruct)
       .def("apply_action_struct", &State::ApplyActionStruct)
       .def("undo_action", &State::UndoAction)
       .def("legal_actions",
@@ -350,7 +354,20 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("action_to_struct",
            (std::unique_ptr<ActionStruct>(State::*)(Action) const) &
                State::ActionToStruct)
-      .def("struct_to_action", &State::StructToAction)
+      .def("struct_to_actions", &State::StructToActions)
+      .def(
+          "actions_to_struct",
+          [](const State& state, Player player,
+             const std::vector<Action>& actions) {
+            return state.ActionsToStruct(player, absl::MakeSpan(actions));
+          },
+          py::arg("player"), py::arg("actions"))
+      .def(
+          "actions_to_struct",
+          [](const State& state, const std::vector<Action>& actions) {
+            return state.ActionsToStruct(absl::MakeSpan(actions));
+          },
+          py::arg("actions"))
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
       .def("to_string", &State::ToString)
@@ -667,12 +684,21 @@ PYBIND11_MODULE(pyspiel, m) {
         "Returns a new game object for the specified short name using given "
         "parameters");
 
+  m.def("load_game",
+        py::overload_cast<const GameParametersStruct&>(&open_spiel::LoadGame),
+        "Returns a new game object from a GameParametersStruct");
+
   m.def("load_games",
         py::overload_cast<const std::string&, const std::string&>(
           &open_spiel::LoadGames),
         py::arg("multi_game_string"),
         py::arg("separator") = "/",
         "Returns a list of game objects for the specified multigame string");
+
+  m.def("load_game_from_json", &open_spiel::LoadGameFromJson,
+        "Load a game from a JSON string containing 'game_name' and optional "
+        "parameters. Example: load_game_from_json('{\"game_name\": "
+        "\"tic_tac_toe\"}')");
 
   m.def("load_matrix_game", open_spiel::algorithms::LoadMatrixGame,
         "Loads a game as a matrix game (will fail if not a matrix game.");

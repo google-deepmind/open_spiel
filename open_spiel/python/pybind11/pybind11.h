@@ -25,6 +25,7 @@
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
@@ -189,6 +190,35 @@ class PyBot : public BotBase, public ::pybind11::trampoline_self_life_support {
     );
   }
 };
+
+// Helper template for binding game-specific structs (StateStruct, ActionStruct,
+// ObservationStruct). Provides standard constructors that all structs need.
+//
+// Usage:
+//   bind_spiel_struct<TicTacToeStateStruct, StateStruct>(m,
+//   "TicTacToeStateStruct")
+//       .def_readwrite("current_player", &TicTacToeStateStruct::current_player)
+//       .def_readwrite("board", &TicTacToeStateStruct::board);
+//
+// This automatically adds:
+//   - Default constructor: def(py::init<>())
+//   - JSON string constructor: def(py::init<std::string>())
+//   - JSON object constructor: def(py::init<const nlohmann::json>())
+//   - Python dict constructor: def(py::init([](py::dict d) {...}))
+template <typename StructType, typename BaseType>
+auto bind_spiel_struct(pybind11::module_& m, const char* name) {
+  return pybind11::class_<StructType, BaseType>(m, name)
+      .def(pybind11::init<>())
+      .def(pybind11::init<std::string>())
+      .def(pybind11::init<const nlohmann::json>())
+      .def(pybind11::init([](pybind11::dict d) {
+        // Convert Python dict to JSON string, then construct from that
+        pybind11::module_ json_module = pybind11::module_::import("json");
+        std::string json_str = json_module.attr("dumps")(d).cast<std::string>();
+        return StructType(json_str);
+      }));
+}
+
 }  // namespace open_spiel
 
 // Custom caster for GameParameter (essentially a variant).
