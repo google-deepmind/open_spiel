@@ -28,7 +28,7 @@ The Parameterized Social Dilemma is a flexible N-player simultaneous-move game d
 import pyspiel
 
 game = pyspiel.load_game("python_param_social_dilemma", {
-    "num_players": 3,
+    "players": 3,
     "max_game_length": 10
 })
 
@@ -59,7 +59,7 @@ custom_payoff[1, 0] = [5, 0]
 custom_payoff[1, 1] = [1, 1]
 
 game = pyspiel.load_game("python_param_social_dilemma", {
-    "num_players": 2,
+    "players": 2,
     "payoff_matrix": custom_payoff.tolist()
 })
 ```
@@ -68,7 +68,7 @@ game = pyspiel.load_game("python_param_social_dilemma", {
 
 ```python
 game = pyspiel.load_game("python_param_social_dilemma", {
-    "num_players": 2,
+    "players": 2,
     "reward_noise_std": 0.5
 })
 ```
@@ -77,7 +77,7 @@ game = pyspiel.load_game("python_param_social_dilemma", {
 
 ```python
 game = pyspiel.load_game("python_param_social_dilemma", {
-    "num_players": 4,
+    "players": 4,
     "dynamic_payoffs": True,
     "payoff_change_prob": 0.1
 })

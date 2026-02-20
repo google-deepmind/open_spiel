@@ -132,7 +132,7 @@ This creates a social dilemma where individual incentive conflicts with collecti
 import pyspiel
 
 game = pyspiel.load_game("python_param_social_dilemma", {
-    "num_players": 3,
+    "players": 3,
     "max_game_length": 10
 })
 

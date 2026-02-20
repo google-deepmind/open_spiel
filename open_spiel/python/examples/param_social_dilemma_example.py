@@ -76,7 +76,7 @@ def main():
     print("\n1. Basic 3-player game with deterministic rewards")
     print("-" * 70)
     game = pyspiel.load_game("python_param_social_dilemma", {
-        "num_players": 3,
+        "players": 3,
         "max_game_length": 5
     })
     
@@ -89,7 +89,7 @@ def main():
     print("\n2. 5-player game with stochastic rewards")
     print("-" * 70)
     game = pyspiel.load_game("python_param_social_dilemma", {
-        "num_players": 5,
+        "players": 5,
         "max_game_length": 10,
         "reward_noise_std": 0.1
     })
@@ -110,7 +110,7 @@ def main():
     print("\n3. 4-player game with dynamic payoffs")
     print("-" * 70)
     game = pyspiel.load_game("python_param_social_dilemma", {
-        "num_players": 4,
+        "players": 4,
         "max_game_length": 8,
         "dynamic_payoffs": True,
         "payoff_change_prob": 0.1
@@ -140,7 +140,7 @@ def main():
     custom_payoff[1, 1] = [1, 1]
     
     game = pyspiel.load_game("python_param_social_dilemma", {
-        "num_players": 2,
+        "players": 2,
         "payoff_matrix": str(custom_payoff.tolist()),
         "max_game_length": 10
     })
@@ -160,7 +160,7 @@ def main():
     print("-" * 70)
     for num_players in [2, 3, 5, 8]:
         game = pyspiel.load_game("python_param_social_dilemma", {
-            "num_players": num_players,
+            "players": num_players,
             "max_game_length": 5
         })
         

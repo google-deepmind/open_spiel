@@ -23,7 +23,7 @@ import pyspiel
 class ParamSocialDilemmaBotsTest(absltest.TestCase):
 
     def test_always_cooperate_bot(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         state = game.new_initial_state()
         bot = param_social_dilemma_bots.AlwaysCooperateBot(player_id=0)
         
@@ -35,7 +35,7 @@ class ParamSocialDilemmaBotsTest(absltest.TestCase):
         self.assertEqual(action, param_social_dilemma.Action.COOPERATE)
 
     def test_always_defect_bot(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         state = game.new_initial_state()
         bot = param_social_dilemma_bots.AlwaysDefectBot(player_id=0)
         
@@ -47,7 +47,7 @@ class ParamSocialDilemmaBotsTest(absltest.TestCase):
         self.assertEqual(action, param_social_dilemma.Action.DEFECT)
 
     def test_tit_for_tat_bot(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         state = game.new_initial_state()
         bot = param_social_dilemma_bots.TitForTatBot(player_id=0, num_players=2)
         
@@ -60,7 +60,7 @@ class ParamSocialDilemmaBotsTest(absltest.TestCase):
         self.assertEqual(action, param_social_dilemma.Action.DEFECT)
 
     def test_grim_trigger_bot(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         state = game.new_initial_state()
         bot = param_social_dilemma_bots.GrimTriggerBot(player_id=0, num_players=2)
         
@@ -83,7 +83,7 @@ class ParamSocialDilemmaBotsTest(absltest.TestCase):
         self.assertEqual(action, param_social_dilemma.Action.DEFECT)
 
     def test_pavlov_bot(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         state = game.new_initial_state()
         bot = param_social_dilemma_bots.PavlovBot(player_id=0, num_players=2)
         
@@ -91,7 +91,7 @@ class ParamSocialDilemmaBotsTest(absltest.TestCase):
         self.assertEqual(action, param_social_dilemma.Action.COOPERATE)
 
     def test_tit_for_two_tats_bot(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         state = game.new_initial_state()
         bot = param_social_dilemma_bots.TitForTwoTatsBot(player_id=0, num_players=2)
         
@@ -109,7 +109,7 @@ class ParamSocialDilemmaBotsTest(absltest.TestCase):
         self.assertEqual(action, param_social_dilemma.Action.DEFECT)
 
     def test_gradual_bot(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         state = game.new_initial_state()
         bot = param_social_dilemma_bots.GradualBot(player_id=0, num_players=2)
         
@@ -118,7 +118,7 @@ class ParamSocialDilemmaBotsTest(absltest.TestCase):
 
     def test_bots_in_game(self):
         game = pyspiel.load_game("python_param_social_dilemma", {
-            "num_players": 2,
+            "players": 2,
             "max_game_length": 5
         })
         

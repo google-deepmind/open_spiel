@@ -26,7 +26,7 @@ import numpy as np
 import pyspiel
 
 _DEFAULT_PARAMS = {
-    "num_players": 3,
+    "players": 3,
     "num_actions": 2,
     "max_game_length": 10,
     "payoff_matrix": "default",
@@ -61,7 +61,7 @@ class Action(enum.IntEnum):
 class ParamSocialDilemmaGame(pyspiel.Game):
     
     def __init__(self, params=_DEFAULT_PARAMS):
-        self._num_players = params.get("num_players", 3)
+        self._num_players = params.get("players", 3)
         self._num_actions = params.get("num_actions", 2)
         self._max_game_length = params.get("max_game_length", 10)
         self._reward_noise_std = params.get("reward_noise_std", 0.0)

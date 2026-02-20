@@ -32,12 +32,12 @@ class ParamSocialDilemmaTest(absltest.TestCase):
         self.assertFalse(game._dynamic_payoffs)
 
     def test_two_player_game(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 2})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 2})
         self.assertEqual(game._num_players, 2)
         self.assertEqual(game.num_players(), 2)
 
     def test_five_player_game(self):
-        game = pyspiel.load_game("python_param_social_dilemma", {"num_players": 5})
+        game = pyspiel.load_game("python_param_social_dilemma", {"players": 5})
         self.assertEqual(game._num_players, 5)
         state = game.new_initial_state()
         self.assertEqual(state.current_player(), pyspiel.PlayerId.SIMULTANEOUS)
@@ -55,7 +55,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
 
     def test_stochastic_rewards(self):
         game = pyspiel.load_game("python_param_social_dilemma",
-                                {"reward_noise_std": 0.5, "num_players": 2})
+                                {"reward_noise_std": 0.5, "players": 2})
         self.assertEqual(game._reward_noise_std, 0.5)
         
         state = game.new_initial_state()
@@ -73,7 +73,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
         game = pyspiel.load_game("python_param_social_dilemma",
                                 {"dynamic_payoffs": True, 
                                  "payoff_change_prob": 0.5,
-                                 "num_players": 2})
+                                 "players": 2})
         self.assertTrue(game._dynamic_payoffs)
         self.assertEqual(game._payoff_change_prob, 0.5)
 
@@ -85,7 +85,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
         custom_payoff[1, 1] = [1, 1]
         
         game = pyspiel.load_game("python_param_social_dilemma",
-                                {"num_players": 2,
+                                {"players": 2,
                                  "payoff_matrix": str(custom_payoff.tolist())})
         state = game.new_initial_state()
         state.apply_actions([0, 0])
@@ -96,7 +96,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
 
     def test_game_progression(self):
         game = pyspiel.load_game("python_param_social_dilemma",
-                                {"num_players": 3, "max_game_length": 5})
+                                {"players": 3, "max_game_length": 5})
         state = game.new_initial_state()
         
         for step in range(5):
@@ -111,7 +111,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
 
     def test_returns_accumulation(self):
         game = pyspiel.load_game("python_param_social_dilemma",
-                                {"num_players": 2, "max_game_length": 3})
+                                {"players": 2, "max_game_length": 3})
         state = game.new_initial_state()
         
         initial_returns = state.returns()
@@ -127,7 +127,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
 
     def test_legal_actions(self):
         game = pyspiel.load_game("python_param_social_dilemma",
-                                {"num_players": 3, "num_actions": 3})
+                                {"players": 3, "num_actions": 3})
         state = game.new_initial_state()
         
         for player in range(game._num_players):
@@ -144,7 +144,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
 
     def test_random_simulation(self):
         game = pyspiel.load_game("python_param_social_dilemma",
-                                {"num_players": 3, "max_game_length": 10})
+                                {"players": 3, "max_game_length": 10})
         pyspiel.random_sim_test(game, num_sims=5, serialize=False, verbose=False)
 
     def test_turn_based_conversion(self):
@@ -154,7 +154,7 @@ class ParamSocialDilemmaTest(absltest.TestCase):
 
     def test_observer(self):
         game = pyspiel.load_game("python_param_social_dilemma",
-                                {"num_players": 2})
+                                {"players": 2})
         state = game.new_initial_state()
         observer = game.make_py_observer()
         

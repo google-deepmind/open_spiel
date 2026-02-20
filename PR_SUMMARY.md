@@ -100,7 +100,7 @@ pyspiel.random_sim_test(game, num_sims=5, serialize=False, verbose=False)
 import pyspiel
 
 game = pyspiel.load_game("python_param_social_dilemma", {
-    "num_players": 3,
+    "players": 3,
     "max_game_length": 10
 })
 

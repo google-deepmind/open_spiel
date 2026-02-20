@@ -54,7 +54,7 @@ def run_tournament(num_rounds=100):
     scores = np.zeros((num_bots, num_bots))
     
     game = pyspiel.load_game("python_param_social_dilemma", {
-        "num_players": 2,
+        "players": 2,
         "max_game_length": 10
     })
     
@@ -106,7 +106,7 @@ def demonstrate_n_player_tournament():
     print("=" * 70)
     
     game = pyspiel.load_game("python_param_social_dilemma", {
-        "num_players": 3,
+        "players": 3,
         "max_game_length": 10
     })
     

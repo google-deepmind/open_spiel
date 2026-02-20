@@ -234,6 +234,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/dynamic_routing_utils_test.py
   games/hangman_test.py
   games/liars_poker_test.py
+  games/param_social_dilemma_test.py
+  games/param_social_dilemma_bots_test.py
   games/pokerkit_wrapper_test.py
   games/team_dominoes_test.py
   games/tic_tac_toe_test.py
