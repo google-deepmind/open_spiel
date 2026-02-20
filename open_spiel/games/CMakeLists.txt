@@ -96,6 +96,9 @@ set(GAME_SOURCES
   go/go.h
   go/go_board.cc
   go/go_board.h
+  gomoku/gomoku.cc
+  gomoku/gomoku.h
+  gomoku/gomoku_grid.h
   goofspiel/goofspiel.cc
   goofspiel/goofspiel.h
   havannah/havannah.cc
@@ -495,6 +498,10 @@ add_test(go_test go_test)
 add_executable(phantom_go_test phantom_go/phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(phantom_go_test phantom_go_test)
+
+add_executable(gomoku_test gomoku/gomoku_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(gomoku_test gomoku_test)
 
 add_executable(goofspiel_test goofspiel/goofspiel_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
