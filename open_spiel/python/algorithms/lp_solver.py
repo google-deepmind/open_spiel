@@ -14,23 +14,65 @@
 
 """LP Solver for two-player zero-sum games."""
 
-import cvxopt
+import enum
+
+import cvxpy as cp
 import numpy as np
+
 from open_spiel.python.egt import utils
 import pyspiel
 
+# pylint: disable=g-bare-generic
+# pylint: disable=dangerous-default-value
+
+DEFAULT_ECOS_SOLVER_KWARGS = dict(
+    solver="ECOS",
+    max_iters=100000000,
+    abstol=1e-7,
+    reltol=1e-7,
+    feastol=1e-7,
+    abstol_inacc=1e-7,
+    reltol_inacc=1e-7,
+    feastol_inacc=1e-7,
+    verbose=False,
+)
+
+DEFAULT_OSQP_SOLVER_KWARGS = dict(
+    solver="OSQP",
+    max_iter=1000000000,
+    eps_abs=1e-8,
+    eps_rel=1e-8,
+    eps_prim_inf=1e-8,
+    eps_dual_inf=1e-8,
+    polish_refine_iter=100,
+    check_termination=1000,
+    sigma=1e-7,  # Default 1e-6
+    delta=1e-7,  # Default 1e-06
+    verbose=False,
+)
+
+DEFAULT_SOLVER = cp.ECOS
+DEFAULT_SOLVER_KWARGS = DEFAULT_ECOS_SOLVER_KWARGS
+
+
 # Constants that determine the type of objective (max vs. min) and type of
 # constraints (<=, >=, =).
-OBJ_MAX = 1
-OBJ_MIN = 2
-CONS_TYPE_LEQ = 3
-CONS_TYPE_GEQ = 4
-CONS_TYPE_EQ = 5
+class ObjectiveType(enum.Enum):
+  OBJ_MAX = 1
+  OBJ_MIN = 2
+
+
+class ConstraintType(enum.Enum):
+  CONS_TYPE_LEQ = 1
+  CONS_TYPE_GEQ = 2
+  CONS_TYPE_EQ = 3
+
 
 # Constants that determine the type of dominance to find.
-DOMINANCE_STRICT = 1
-DOMINANCE_VERY_WEAK = 2
-DOMINANCE_WEAK = 3
+class DominanceType(enum.Enum):
+  DOMINANCE_STRICT = 1
+  DOMINANCE_VERY_WEAK = 2
+  DOMINANCE_WEAK = 3
 
 
 class _Variable(object):
@@ -69,15 +111,21 @@ class LinearProgram(object):
   """A object used to provide a user-friendly API for building LPs."""
 
   def __init__(self, objective):
-    assert objective == OBJ_MIN or objective == OBJ_MAX
-    self._valid_constraint_types = [CONS_TYPE_EQ, CONS_TYPE_LEQ, CONS_TYPE_GEQ]
+    assert (
+        objective == ObjectiveType.OBJ_MIN or objective == ObjectiveType.OBJ_MAX
+    )
+    self._valid_constraint_types = [
+        ConstraintType.CONS_TYPE_EQ,
+        ConstraintType.CONS_TYPE_LEQ,
+        ConstraintType.CONS_TYPE_GEQ,
+    ]
     self._objective = objective
     self._obj_coeffs = {}  # var label -> value
-    self._vars = {}  # var label -> var
-    self._cons = {}  # cons label -> constraint
-    self._var_list = []
-    self._leq_cons_list = []
-    self._eq_cons_list = []
+    self._vars: dict[str, _Variable] = {}  # var label -> var
+    self._cons: dict[str, _Constraint] = {}  # cons label -> constraint
+    self._var_list: list[_Variable] = []
+    self._leq_cons_list: list[_Constraint] = []
+    self._eq_cons_list: list[_Constraint] = []
 
   def add_or_reuse_variable(self, label, lb=None, ub=None):
     """Adds a variable to this LP, or reuses one if the label exists.
@@ -99,7 +147,7 @@ class LinearProgram(object):
     self._vars[label] = var
     self._var_list.append(var)
 
-  def add_or_reuse_constraint(self, label, ctype):
+  def add_or_reuse_constraint(self, label: str, ctype) -> None:
     """Adds a constraint to this LP, or reuses one if the label exists.
 
      If the constraint is already present, simply checks it's the same type as
@@ -115,11 +163,14 @@ class LinearProgram(object):
       # Do not re-add, but ensure it's the same type
       assert cons.ctype == ctype
       return
-    if ctype == CONS_TYPE_LEQ or ctype == CONS_TYPE_GEQ:
+    if (
+        ctype == ConstraintType.CONS_TYPE_LEQ
+        or ctype == ConstraintType.CONS_TYPE_GEQ
+    ):
       cons = _Constraint(len(self._leq_cons_list), ctype)
       self._cons[label] = cons
       self._leq_cons_list.append(cons)
-    elif ctype == CONS_TYPE_EQ:
+    elif ctype == ConstraintType.CONS_TYPE_EQ:
       cons = _Constraint(len(self._eq_cons_list), ctype)
       self._cons[label] = cons
       self._eq_cons_list.append(cons)
@@ -153,12 +204,16 @@ class LinearProgram(object):
   def get_num_cons(self):
     return len(self._leq_cons_list), len(self._eq_cons_list)
 
-  def solve(self, solver=None):
+  def solve(self,
+            solver=DEFAULT_SOLVER,
+            solver_kwargs=DEFAULT_SOLVER_KWARGS, **kwargs) -> dict:
     """Solves the LP.
 
     Args:
       solver: the solver to use ('blas', 'lapack', 'glpk'). Defaults to None,
         which then uses the cvxopt internal default.
+      solver_kwargs: additional keyword arguments to pass to the solver.
+      **kwargs: additional keyword arguments to pass to the solver.
 
     Returns:
       The solution as a dict of var label -> value, one for each variable.
@@ -189,33 +244,39 @@ class LinearProgram(object):
         num_leq_cons += 1
       if var.ub is not None:
         num_leq_cons += 1
-    # Make the matrices (some need to be dense).
-    c = cvxopt.matrix([0.0] * num_vars)
-    h = cvxopt.matrix([0.0] * num_leq_cons)
-    g_mat = cvxopt.spmatrix([], [], [], (num_leq_cons, num_vars))
+
+    # Make the variables (some need to be dense).
+    # Unlike cvxopt, cvxpy handles them automatically
+    c = np.zeros((num_vars,))
+    h = np.zeros((num_leq_cons,))
+    g_mat = np.zeros((num_leq_cons, num_vars))
     a_mat = None
     b = None
     if num_eq_cons > 0:
-      a_mat = cvxopt.spmatrix([], [], [], (num_eq_cons, num_vars))
-      b = cvxopt.matrix([0.0] * num_eq_cons)
-    # Objective coefficients: c
+      a_mat = np.zeros((num_eq_cons, num_vars))
+      b = np.zeros((num_eq_cons,))
+
     for var_label in self._obj_coeffs:
       value = self._obj_coeffs[var_label]
       vid = self._vars[var_label].vid
-      if self._objective == OBJ_MAX:
-        c[vid] = -value  # negate the value because it's a max
-      else:
-        c[vid] = value  # min objective matches cvxopt
+      c[vid] = value  # min objective matches cvxopt
+
     # Inequality constraints: G, h
     row = 0
     for cons in self._leq_cons_list:
       # If it's >= then need to negate all coeffs and the rhs
       if cons.rhs is not None:
-        h[row] = cons.rhs if cons.ctype == CONS_TYPE_LEQ else -cons.rhs
+        h[row] = (
+            cons.rhs
+            if cons.ctype == ConstraintType.CONS_TYPE_LEQ
+            else -cons.rhs
+        )
       for var_label in cons.coeffs:
         value = cons.coeffs[var_label]
         vid = self._vars[var_label].vid
-        g_mat[(row, vid)] = value if cons.ctype == CONS_TYPE_LEQ else -value
+        g_mat[(row, vid)] = (
+            value if cons.ctype == ConstraintType.CONS_TYPE_LEQ else -value
+        )
       row += 1
     # Inequality constraints: variables upper and lower bounds
     for var in self._var_list:
@@ -238,11 +299,34 @@ class LinearProgram(object):
           a_mat[(row, vid)] = value
         row += 1
     # Solve!
+
+    x = cp.Variable(shape=(num_vars,), name="x")
+
+    obj_expr = c.T @ x
+
+    constraints = [g_mat @ x <= h]
+
     if num_eq_cons > 0:
-      sol = cvxopt.solvers.lp(c, g_mat, h, a_mat, b, solver=solver)
+      constraints += [a_mat @ x == b]
+
+    if self._objective == ObjectiveType.OBJ_MAX:
+      objective = cp.Maximize(obj_expr)
+    elif self._objective == ObjectiveType.OBJ_MIN:
+      objective = cp.Minimize(obj_expr)
     else:
-      sol = cvxopt.solvers.lp(c, g_mat, h, solver=solver)
-    return sol["x"]
+      raise TypeError("Wrong objective type.")
+
+    problem = cp.Problem(objective, constraints)
+    try:
+      kwargs_ = dict(solver_kwargs, **kwargs)
+      kwargs_["solver"] = solver
+      problem.solve(**kwargs_)
+      value = x.value
+    except cp.SolverError as e:
+      print(f"Something went wrong, as of {e}")
+      value = None
+
+    return value
 
 
 def solve_zero_sum_matrix_game(game):
@@ -281,20 +365,19 @@ def solve_zero_sum_matrix_game(game):
   assert game.get_type().utility == pyspiel.GameType.Utility.ZERO_SUM
   num_rows = game.num_rows()
   num_cols = game.num_cols()
-  cvxopt.solvers.options["show_progress"] = False
 
   # First, do the row player (player 0).
-  lp0 = LinearProgram(OBJ_MAX)
+  lp0 = LinearProgram(ObjectiveType.OBJ_MAX)
   for r in range(num_rows):  # one var per action / pure strategy
     lp0.add_or_reuse_variable(r, lb=0)
   lp0.add_or_reuse_variable(num_rows)  # V
   lp0.set_obj_coeff(num_rows, 1.0)  # max V
   for c in range(num_cols):
-    lp0.add_or_reuse_constraint(c, CONS_TYPE_GEQ)
+    lp0.add_or_reuse_constraint(c, ConstraintType.CONS_TYPE_GEQ)
     for r in range(num_rows):
       lp0.set_cons_coeff(c, r, game.player_utility(0, r, c))
     lp0.set_cons_coeff(c, num_rows, -1.0)  # -V >= 0
-  lp0.add_or_reuse_constraint(num_cols + 1, CONS_TYPE_EQ)
+  lp0.add_or_reuse_constraint(num_cols + 1, ConstraintType.CONS_TYPE_EQ)
   lp0.set_cons_rhs(num_cols + 1, 1.0)
   for r in range(num_rows):
     lp0.set_cons_coeff(num_cols + 1, r, 1.0)
@@ -303,17 +386,17 @@ def solve_zero_sum_matrix_game(game):
   p0_sol_val = sol[-1]
 
   # Now, the column player (player 1).
-  lp1 = LinearProgram(OBJ_MAX)
+  lp1 = LinearProgram(ObjectiveType.OBJ_MAX)
   for c in range(num_cols):  # one var per action / pure strategy
     lp1.add_or_reuse_variable(c, lb=0)
   lp1.add_or_reuse_variable(num_cols)  # V
   lp1.set_obj_coeff(num_cols, 1)  # max V
   for r in range(num_rows):
-    lp1.add_or_reuse_constraint(r, CONS_TYPE_GEQ)
+    lp1.add_or_reuse_constraint(r, ConstraintType.CONS_TYPE_GEQ)
     for c in range(num_cols):
       lp1.set_cons_coeff(r, c, game.player_utility(1, r, c))
     lp1.set_cons_coeff(r, num_cols, -1.0)  # -V >= 0
-  lp1.add_or_reuse_constraint(num_rows + 1, CONS_TYPE_EQ)
+  lp1.add_or_reuse_constraint(num_rows + 1, ConstraintType.CONS_TYPE_EQ)
   lp1.set_cons_rhs(num_rows + 1, 1.0)
   for c in range(num_cols):
     lp1.set_cons_coeff(num_rows + 1, c, 1.0)
@@ -324,12 +407,14 @@ def solve_zero_sum_matrix_game(game):
   return p0_sol, p1_sol, p0_sol_val, p1_sol_val
 
 
-def is_dominated(action,
-                 game_or_payoffs,
-                 player,
-                 mode=DOMINANCE_STRICT,
-                 tol=1e-7,
-                 return_mixture=False):
+def is_dominated(
+    action,
+    game_or_payoffs,
+    player,
+    mode=DominanceType.DOMINANCE_STRICT,
+    tol=1e-7,
+    return_mixture=False,
+):
   """Determines whether a pure strategy is dominated by any mixture strategies.
 
   Args:
@@ -350,7 +435,11 @@ def is_dominated(action,
   # For more detail, please refer to Sec 4.5.2 of Shoham & Leyton-Brown, 2009:
   # Multiagent Systems: Algorithmic, Game-Theoretic, and Logical Foundations
   # http://www.masfoundations.org/mas.pdf
-  assert mode in (DOMINANCE_STRICT, DOMINANCE_VERY_WEAK, DOMINANCE_WEAK)
+  assert mode in (
+      DominanceType.DOMINANCE_STRICT,
+      DominanceType.DOMINANCE_VERY_WEAK,
+      DominanceType.DOMINANCE_WEAK,
+  )
   payoffs = (
       utils.game_payoffs_array(game_or_payoffs)[player]
       if isinstance(game_or_payoffs, pyspiel.NormalFormGame)
@@ -363,10 +452,7 @@ def is_dominated(action,
   payoffs = payoffs.reshape((payoffs.shape[0], -1))
   num_rows, num_cols = payoffs.shape
 
-  cvxopt.solvers.options["show_progress"] = False
-  cvxopt.solvers.options["maxtol"] = tol
-  cvxopt.solvers.options["feastol"] = tol
-  lp = LinearProgram(OBJ_MAX)
+  lp = LinearProgram(ObjectiveType.OBJ_MAX)
 
   # One var for every row probability, fixed to 0 if inactive
   for r in range(num_rows):
@@ -376,12 +462,12 @@ def is_dominated(action,
       lp.add_or_reuse_variable(r, lb=0)
 
   # For the strict LP we normalize the payoffs to be strictly positive
-  if mode == DOMINANCE_STRICT:
+  if mode == DominanceType.DOMINANCE_STRICT:
     to_subtract = payoffs.min() - 1
   else:
     to_subtract = 0
     # For non-strict LPs the probabilities must sum to 1
-    lp.add_or_reuse_constraint(num_cols, CONS_TYPE_EQ)
+    lp.add_or_reuse_constraint(num_cols, ConstraintType.CONS_TYPE_EQ)
     lp.set_cons_rhs(num_cols, 1)
     for r in range(num_rows):
       if r != action:
@@ -389,36 +475,33 @@ def is_dominated(action,
 
   # The main dominance constraint
   for c in range(num_cols):
-    lp.add_or_reuse_constraint(c, CONS_TYPE_GEQ)
+    lp.add_or_reuse_constraint(c, ConstraintType.CONS_TYPE_GEQ)
     lp.set_cons_rhs(c, payoffs[action, c] - to_subtract)
     for r in range(num_rows):
       if r != action:
         lp.set_cons_coeff(c, r, payoffs[r, c] - to_subtract)
 
-  if mode == DOMINANCE_STRICT:
+  if mode == DominanceType.DOMINANCE_STRICT:
     # Minimize sum of probabilities
     for r in range(num_rows):
       if r != action:
         lp.set_obj_coeff(r, -1)
     mixture = lp.solve()
     if mixture is not None and np.sum(mixture) < 1 - tol:
-      mixture = np.squeeze(mixture, 1) / np.sum(mixture)
+      mixture = mixture / np.sum(mixture)
     else:
       mixture = None
 
-  if mode == DOMINANCE_VERY_WEAK:
+  if mode == DominanceType.DOMINANCE_VERY_WEAK:
     # Check feasibility
     mixture = lp.solve()
-    if mixture is not None:
-      mixture = np.squeeze(mixture, 1)
 
-  if mode == DOMINANCE_WEAK:
+  if mode == DominanceType.DOMINANCE_WEAK:
     # Check feasibility and whether there's any advantage
     for r in range(num_rows):
       lp.set_obj_coeff(r, payoffs[r].sum())
     mixture = lp.solve()
     if mixture is not None:
-      mixture = np.squeeze(mixture, 1)
       if (np.dot(mixture, payoffs) - payoffs[action]).sum() <= tol:
         mixture = None
 
@@ -426,11 +509,11 @@ def is_dominated(action,
 
 
 def _pure_dominated_from_advantages(advantages, mode, tol=1e-7):
-  if mode == DOMINANCE_STRICT:
+  if mode == DominanceType.DOMINANCE_STRICT:
     return (advantages > tol).all(1)
-  if mode == DOMINANCE_WEAK:
+  if mode == DominanceType.DOMINANCE_WEAK:
     return (advantages >= -tol).all(1) & (advantages.sum(1) > tol)
-  if mode == DOMINANCE_VERY_WEAK:
+  if mode == DominanceType.DOMINANCE_VERY_WEAK:
     return (advantages >= -tol).all(1)
 
 
@@ -480,8 +563,9 @@ def iterated_dominance(game_or_payoffs, mode, tol=1e-7):
         payoffs_live = payoffs[player]
         for opponent in range(payoffs.shape[0]):
           if opponent != player:
-            payoffs_live = payoffs_live.compress(live_actions[opponent],
-                                                 opponent)
+            payoffs_live = payoffs_live.compress(
+                live_actions[opponent], opponent
+            )
 
         # reshaping to (player_actions, joint_opponent_actions)
         payoffs_live = np.moveaxis(payoffs_live, player, 0)
@@ -509,7 +593,8 @@ def iterated_dominance(game_or_payoffs, mode, tol=1e-7):
                 0,
                 mode,
                 tol,
-                return_mixture=True)
+                return_mixture=True,
+            )
             if mixture is None:
               continue
             # if it is, mark any other actions dominated by that policy
@@ -526,14 +611,22 @@ def iterated_dominance(game_or_payoffs, mode, tol=1e-7):
     payoffs = payoffs.compress(live, player + 1)
 
   if isinstance(game_or_payoffs, pyspiel.MatrixGame):
-    return pyspiel.MatrixGame(game_or_payoffs.get_type(),
-                              game_or_payoffs.get_parameters(), [
-                                  game_or_payoffs.row_action_name(action)
-                                  for action in live_actions[0].nonzero()[0]
-                              ], [
-                                  game_or_payoffs.col_action_name(action)
-                                  for action in live_actions[1].nonzero()[0]
-                              ], *payoffs), live_actions
+    return (
+        pyspiel.MatrixGame(
+            game_or_payoffs.get_type(),
+            game_or_payoffs.get_parameters(),
+            [
+                game_or_payoffs.row_action_name(action)
+                for action in live_actions[0].nonzero()[0]
+            ],
+            [
+                game_or_payoffs.col_action_name(action)
+                for action in live_actions[1].nonzero()[0]
+            ],
+            *payoffs,
+        ),
+        live_actions,
+    )
   else:
     return payoffs, live_actions
 

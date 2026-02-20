@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.algorithms.alpha_zero.model."""
+import itertools
+from typing import Any
 
 from absl.testing import absltest
 from absl.testing import parameterized
-
+from flax import linen
+from flax import nnx
+import jax.numpy as jnp
 import numpy as np
 
-from open_spiel.python.algorithms.alpha_zero import model as model_lib
+from open_spiel.python.algorithms.alpha_zero import utils
 import pyspiel
 
 solved = {}
@@ -42,22 +45,39 @@ def solve_game(state):
   best_actions = np.where((values == value) & act_mask)
   policy = np.zeros_like(act_mask)
   policy[best_actions[0][0]] = 1  # Choose the first for a deterministic policy.
-  solved[state_str] = model_lib.TrainInput(obs, act_mask, policy, value)
+  solved[state_str] = utils.TrainInput(
+      observation=jnp.asarray(obs, dtype=jnp.float32),
+      legals_mask=jnp.asarray(act_mask, dtype=jnp.bool),
+      policy=jnp.asarray(policy, dtype=jnp.float32),
+      value=jnp.asarray(value, dtype=jnp.float32),
+  )
   return value
 
 
-def build_model(game, model_type):
-  return model_lib.Model.build_model(
-      model_type, game.observation_tensor_shape(), game.num_distinct_actions(),
-      nn_width=32, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
+def build_model(game: Any, api_version: str, model_type: str):
+  return utils.api_selector(api_version).Model.build_model(
+      model_type,
+      game.observation_tensor_shape(),
+      game.num_distinct_actions(),
+      nn_width=32,
+      nn_depth=2,
+      weight_decay=1e-4,
+      learning_rate=0.01,
+      path=None,
+  )
 
 
 class ModelTest(parameterized.TestCase):
 
-  @parameterized.parameters(model_lib.Model.valid_model_types)
-  def test_model_learns_simple(self, model_type):
+  @parameterized.parameters(
+      itertools.product(
+          utils.AVIALABLE_APIS,
+          utils.api_selector(utils.AVIALABLE_APIS[0]).Model.valid_model_types,
+      )
+  )
+  def test_model_learns_simple(self, api_version: str, model_type: str):
     game = pyspiel.load_game("tic_tac_toe")
-    model = build_model(game, model_type)
+    model = build_model(game, api_version, model_type)
     print("Num variables:", model.num_trainable_variables)
     model.print_trainable_variables()
 
@@ -69,19 +89,25 @@ class ModelTest(parameterized.TestCase):
       action = state.legal_actions()[0]
       policy = np.zeros(len(act_mask), dtype=float)
       policy[action] = 1
-      train_inputs.append(model_lib.TrainInput(obs, act_mask, policy, value=1))
+      train_inputs.append(
+          utils.TrainInput(
+              observation=jnp.asarray(obs),
+              legals_mask=jnp.asarray(act_mask),
+              policy=jnp.asarray(policy),
+              value=jnp.asarray(1),
+          )
+      )
       state.apply_action(action)
-      value, policy = model.inference([obs], [act_mask])
-      self.assertLen(policy, 1)
-      self.assertLen(value, 1)
-      self.assertLen(policy[0], game.num_distinct_actions())
-      self.assertLen(value[0], 1)
+      value, policy = model.inference(obs, act_mask)
+      self.assertLen(policy, game.num_distinct_actions())
+      self.assertEqual(value.ndim, 0)  # value is a scalar
 
     losses = []
     policy_loss_goal = 0.05
     value_loss_goal = 0.05
+
     for i in range(200):
-      loss = model.update(train_inputs)
+      loss = model.update(utils.TrainInput.stack(train_inputs))
       print(i, loss)
       losses.append(loss)
       if loss.policy < policy_loss_goal and loss.value < value_loss_goal:
@@ -93,12 +119,18 @@ class ModelTest(parameterized.TestCase):
     self.assertLess(losses[-1].value, value_loss_goal)
     self.assertLess(losses[-1].policy, policy_loss_goal)
 
-  @parameterized.parameters(model_lib.Model.valid_model_types)
-  def test_model_learns_optimal(self, model_type):
+  @absltest.skip("Too slow for the CI, because it takes much time.")
+  @parameterized.parameters(
+      itertools.product(
+          utils.AVIALABLE_APIS,
+          utils.api_selector(utils.AVIALABLE_APIS[0]).Model.valid_model_types,
+      )
+  )
+  def test_model_learns_optimal(self, api_version: str, model_type: str):
     game = pyspiel.load_game("tic_tac_toe")
     solve_game(game.new_initial_state())
 
-    model = build_model(game, model_type)
+    model = build_model(game, api_version, model_type)
     print("Num variables:", model.num_trainable_variables)
     model.print_trainable_variables()
 
@@ -108,7 +140,7 @@ class ModelTest(parameterized.TestCase):
     policy_loss_goal = 0.12
     value_loss_goal = 0.12
     for i in range(500):
-      loss = model.update(train_inputs)
+      loss = model.update(utils.TrainInput.stack(train_inputs))
       print(i, loss)
       losses.append(loss)
       if loss.policy < policy_loss_goal and loss.value < value_loss_goal:
@@ -119,6 +151,52 @@ class ModelTest(parameterized.TestCase):
     self.assertGreater(losses[0].total, losses[-1].total)
     self.assertLess(losses[-1].value, value_loss_goal)
     self.assertLess(losses[-1].policy, policy_loss_goal)
+
+  @absltest.skip("May save to the disk")
+  @parameterized.parameters(
+      itertools.product(
+          utils.AVIALABLE_APIS,
+          utils.api_selector(utils.AVIALABLE_APIS[0]).Model.valid_model_types,
+      )
+  )
+  def test_conversions(self, api_version: str, model_type: str):
+    game = pyspiel.load_game("tic_tac_toe")
+    model = build_model(game, api_version, model_type)
+
+    if isinstance(model, linen.Module):
+      nnx_model = build_model(game, "nnx", model_type)
+      nnx_model._state = utils.api_selector("linen").Model._create_train_state(
+          utils.linen_to_nnx(model._model), model._state.tx
+      )
+      model = nnx_model
+    elif isinstance(model, nnx.Module):
+      config = {
+          "model_type": model_type,
+          "input_shape": game.observation_tensor_shape(),
+          "output_size": game.num_distinct_actions(),
+          "nn_width": 32,
+          "nn_depth": 2,
+      }
+      apply_fn, variables = utils.nnx_to_linen(
+          model._model, game.observation_tensor_shape(), **config
+      )
+      linen_model = build_model(game, "linen", model_type)
+      linen_model._state = utils.api_selector("nnx").Model._create_train_state(
+          apply_fn, variables, model._state.tx
+      )
+      model = linen_model
+
+    state = game.new_initial_state()
+    while not state.is_terminal():
+      obs = state.observation_tensor()
+      act_mask = state.legal_actions_mask()
+      action = state.legal_actions()[0]
+      policy = np.zeros(len(act_mask), dtype=float)
+      policy[action] = 1
+      state.apply_action(action)
+      value, policy = model.inference(obs, act_mask)
+      self.assertLen(policy, game.num_distinct_actions())
+      self.assertEqual(value.ndim, 0)
 
 
 if __name__ == "__main__":

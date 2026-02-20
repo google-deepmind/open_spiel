@@ -82,18 +82,21 @@ def main(_):
   if FLAGS.solver != "linear":
     if FLAGS.mode == "all":
       game, _ = lp_solver.iterated_dominance(
-          game, tol=FLAGS.tol, mode=lp_solver.DOMINANCE_STRICT)
+          game, tol=FLAGS.tol, mode=lp_solver.DominanceType.DOMINANCE_STRICT
+      )
       num_rows, num_cols = game.num_rows(), game.num_cols()
       print("discarded strictly dominated actions yielding shape (%d, %d)" %
             (num_rows, num_cols))
     if FLAGS.mode == "one":
       game, _ = lp_solver.iterated_dominance(
-          game, tol=FLAGS.tol, mode=lp_solver.DOMINANCE_VERY_WEAK)
+          game, tol=FLAGS.tol, mode=lp_solver.DominanceType.DOMINANCE_VERY_WEAK
+      )
       num_rows, num_cols = game.num_rows(), game.num_cols()
       print("discarded very weakly dominated actions yielding shape (%d, %d)" %
             (num_rows, num_cols))
 
   # game is now finalized
+  equilibria = None
   num_rows, num_cols = game.num_rows(), game.num_cols()
   row_actions = [game.row_action_name(row) for row in range(num_rows)]
   col_actions = [game.col_action_name(col) for col in range(num_cols)]
@@ -164,6 +167,7 @@ def main(_):
       print("using nashpy Lemke-Howson solver")
       equilibria = matrix_nash.lemke_howson_solve(row_payoffs, col_payoffs)
   print("equilibria:" if FLAGS.mode == "all" else "an equilibrium:")
+  assert equilibria is not None
   equilibria = iter(equilibria)
   # check that there's at least one equilibrium
   try:

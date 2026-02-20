@@ -338,6 +338,7 @@ class RootStateWrapper:
           if not reach_weight_player_plays_down_this_line:
             continue
           sequence_idx = sequence_idx_offset + action_idx
+
           reach_weights[sequence_idx] += next_reach_prob
 
         reach_probabilities[player] = next_reach_prob

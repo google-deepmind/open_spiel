@@ -52,6 +52,12 @@ set(GAME_SOURCES
   coordinated_mp/coordinated_mp.h
   crazy_eights/crazy_eights.cc
   crazy_eights/crazy_eights.h
+  crazyhouse/crazyhouse.cc
+  crazyhouse/crazyhouse.h
+  crazyhouse/crazyhouse_board.cc
+  crazyhouse/crazyhouse_board.h
+  crazyhouse/crazyhouse_common.cc
+  crazyhouse/crazyhouse_common.h
   cribbage/cribbage.cc
   cribbage/cribbage.h
   cursor_go/cursor_go.cc
@@ -90,6 +96,9 @@ set(GAME_SOURCES
   go/go.h
   go/go_board.cc
   go/go_board.h
+  gomoku/gomoku.cc
+  gomoku/gomoku.h
+  gomoku/gomoku_grid.h
   goofspiel/goofspiel.cc
   goofspiel/goofspiel.h
   havannah/havannah.cc
@@ -396,6 +405,10 @@ add_executable(coordinated_mp_test coordinated_mp/coordinated_mp_test.cc ${OPEN_
         $<TARGET_OBJECTS:algorithms>)
 add_test(coordinated_mp_test coordinated_mp_test)
 
+add_executable(crazyhouse_test crazyhouse/crazyhouse_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crazyhouse_test crazyhouse_test)
+
 add_executable(crazy_eights_test crazy_eights/crazy_eights_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(crazy_eights_test crazy_eights_test)
@@ -485,6 +498,10 @@ add_test(go_test go_test)
 add_executable(phantom_go_test phantom_go/phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(phantom_go_test phantom_go_test)
+
+add_executable(gomoku_test gomoku/gomoku_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(gomoku_test gomoku_test)
 
 add_executable(goofspiel_test goofspiel/goofspiel_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

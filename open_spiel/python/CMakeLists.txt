@@ -49,6 +49,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_bridge.h
   pybind11/games_chess.cc
   pybind11/games_chess.h
+  pybind11/games_crazyhouse.cc
+  pybind11/games_crazyhouse.h
   pybind11/games_crazy_eights.cc
   pybind11/games_crazy_eights.h
   pybind11/games_colored_trails.cc
@@ -63,6 +65,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_gin_rummy.h
   pybind11/games_go.cc
   pybind11/games_go.h
+  pybind11/games_gomoku.cc
+  pybind11/games_gomoku.h
   pybind11/games_hearts.cc
   pybind11/games_hearts.h
   pybind11/games_kuhn_poker.cc
@@ -226,6 +230,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   egt/utils_test.py
   environments/catch_test.py
   environments/cliff_walking_test.py
+  games/ant_foraging_test.py
   games/block_dominoes_test.py
   games/chat_game_test.py
   games/chat_games/envs/base_envs/base_envs_test.py
@@ -257,9 +262,11 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_chess_test.py
   tests/games_connect_four_test.py
   tests/games_crazy_eights_test.py
+  tests/games_crazyhouse_test.py
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
+  tests/games_gomoku_test.py
   tests/games_hearts_test.py
   tests/games_repeated_poker_test.py
   tests/games_sim_test.py
@@ -289,6 +296,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
+    algorithms/alpha_zero/evaluator_test.py
+    algorithms/alpha_zero/model_test.py
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py

@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Examples of how to use the C++ API:
-// - https://github.com/pytorch/examples/tree/master/cpp
-// - https://github.com/prabhuomkar/pytorch-cpp
+#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CRAZYHOUSE_H_
+#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CRAZYHOUSE_H_
 
-#include "open_spiel/spiel_utils.h"
-#include "torch/torch.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
-namespace {
-
-void TestMatrixMultiplication() {
-  at::Tensor mat = torch::rand({3, 3});
-  at::Tensor identity = torch::ones({3, 3});
-  at::Tensor multiplied = mat * identity;
-  int num_identical_elements = (mat == multiplied).sum().item().to<int>();
-  SPIEL_CHECK_EQ(num_identical_elements, 9);
+namespace open_spiel {
+void init_pyspiel_games_crazyhouse(::pybind11::module& m);
 }
 
-}  // namespace
-
-int main() { TestMatrixMultiplication(); }
+#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CRAZYHOUSE_H_

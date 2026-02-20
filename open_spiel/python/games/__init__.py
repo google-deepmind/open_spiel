@@ -26,6 +26,7 @@ pyspiel.register_game(_GAME_TYPE, KuhnPokerGame)
 ```
 """
 
+from open_spiel.python.games import ant_foraging
 from open_spiel.python.games import block_dominoes
 from open_spiel.python.games import chat_game
 from open_spiel.python.games import dynamic_routing
