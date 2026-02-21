@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=61", "cmake>=3.17"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "open_spiel"
+version = "1.6.11"
+license = { file = "LICENSE" }
+description = "A Framework for Reinforcement Learning in Games"
+requires-python = ">=3.11"
+authors = [
+    { name = "The OpenSpiel authors", email = "open_spiel@google.com" },
+]
+dynamic = ["readme", "dependencies"]
+
+[tool.setuptools.dynamic]
+readme = { file = "README.md", content-type = "text/markdown"}
+dependencies = { file = "requirements.txt" }
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "pylint"
+]
+
+[project.urls]
+homepage = "https://github.com/deepmind/open_spiel"
+
+[tool.setuptools]
+zip-safe = false
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["open_spiel", "open_spiel.*"]
+
+
+[tool.pyink]
+line-length = 80
+pyink-indentation = 2
+include = '\.pyi?$'
+exclude = '''
+/(
+\.eggs
+| \.git
+| \.hg
+| \.mypy_cache
+| \.nox
+| \.tox
+| \.venv
+| _build
+| buck-out
+| build
+| dist
+)/
+'''
+
+[tool.black]
+line-length = 80
+include = '\.pyi?$'
+exclude = '''
+/(
+\.eggs
+| \.git
+| \.hg
+| \.mypy_cache
+| \.nox
+| \.tox
+| \.venv
+| _build
+| buck-out
+| build
+| dist
+)/
+'''
+
+[tool.isort]
+profile = "black"

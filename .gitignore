@@ -67,3 +67,5 @@ Package.resolved
 # Visual Studio generated files
 open_spiel/.vs
 /.env
+
+open_spiel.egg-info/
