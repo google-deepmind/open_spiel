@@ -71,8 +71,7 @@ def main(unused_argv):
 
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()
   for player, losses in enumerate(advantage_losses):
-    logging.info("Advantage for player %d: %s", player,
-                 losses[:2] + ["..."] + losses[-2:])
+    logging.info("Advantage for player %d: %s", player, losses)
     assert deep_cfr_solver.advantage_buffers[player] is not None
     logging.info(
         f"Advantage Buffer Size for player {player}:"
