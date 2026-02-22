@@ -183,6 +183,11 @@ class MCTSBot : public Bot {
   // Run MCTS on a given state, and return the resulting search tree.
   std::unique_ptr<SearchNode> MCTSearch(const State& state);
 
+  std::string Serialize() const;
+  static std::unique_ptr<MCTSBot> Deserialize(
+      const std::string& str, std::shared_ptr<const Game> game,
+      std::shared_ptr<Evaluator> evaluator);
+
  private:
   // Applies the UCT policy to play the game until reaching a leaf node.
   //

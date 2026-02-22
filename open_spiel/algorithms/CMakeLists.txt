@@ -140,6 +140,10 @@ add_executable(is_mcts_test is_mcts_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(is_mcts_test is_mcts_test)
 
+add_executable(mcts_test mcts_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(mcts_test mcts_test)
+
 add_executable(matrix_game_utils_test matrix_game_utils_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(matrix_game_utils_test matrix_game_utils_test)
