@@ -1,0 +1,69 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "cmake>=3.15",
+    "ninja; platform_system != 'Windows'",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "open-spiel"
+version = "1.6.10"
+description = "A Framework for Reinforcement Learning in Games"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [ {name = "The OpenSpiel authors", email = "open_spiel@google.com"} ]
+keywords = ["reinforcement learning", "game theory", "artificial intelligence", "games"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Games/Entertainment",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "absl-py>=0.10.0",
+    "attrs>=19.3.0",
+    "numpy>=1.21.5",
+    "scipy>=1.10.1",
+    "ml-collections>=0.1.1",
+]
+
+[project.optional-dependencies]
+full = [
+    "matplotlib",
+    "nashpy",
+    "networkx",
+    "pillow",
+    "pygame",
+    "pygraphviz",
+    "scipy",
+    "tensorflow",
+    "torch",
+]
+
+[project.urls]
+Homepage = "https://github.com/deepmind/open_spiel"
+Repository = "https://github.com/deepmind/open_spiel.git"
+Documentation = "https://openspiel.readthedocs.io/"
+"Bug Tracker" = "https://github.com/deepmind/open_spiel/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["open_spiel*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.so", "*.pyd", "*.dll"]
