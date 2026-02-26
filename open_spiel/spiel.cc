@@ -505,6 +505,19 @@ std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   return state;
 }
 
+int Game::MaxSerializationLength() const {
+  // Default implementation assumes the default serialization format:
+  // history actions joined by \n, each action as decimal number.
+  // Games that override State::Serialize must override this method.
+  int num_actions = NumDistinctActions();
+  int max_action_digits = 1;
+  if (num_actions > 1) {
+    max_action_digits = static_cast<int>(std::log10(num_actions - 1)) + 1;
+  }
+  int max_history_length = MaxHistoryLength();
+  return max_history_length * (max_action_digits + 1) + 1;
+}
+
 std::string SerializeGameAndState(const Game& game, const State& state) {
   std::string str = "";
 
