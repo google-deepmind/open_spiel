@@ -96,6 +96,8 @@ set(GAME_SOURCES
   go/go.h
   go/go_board.cc
   go/go_board.h
+  go/sgf_reader.cc
+  go/sgf_reader.h
   gomoku/gomoku.cc
   gomoku/gomoku.h
   gomoku/gomoku_grid.h
@@ -494,6 +496,10 @@ add_test(gin_rummy_test gin_rummy_test)
 add_executable(go_test go/go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(go_test go_test)
+
+add_executable(sgf_reader_test go/sgf_reader_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(sgf_reader_test sgf_reader_test)
 
 add_executable(phantom_go_test phantom_go/phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

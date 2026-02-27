@@ -47,13 +47,6 @@
 namespace open_spiel {
 namespace {
 
-constexpr const int kSerializationVersion = 1;
-constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
-constexpr const char* kSerializeGameSectionHeader = "[Game]";
-constexpr const char* kSerializeGameRNGStateSectionHeader = "[GameRNGState]";
-constexpr const char* kSerializeStateSectionHeader = "[State]";
-constexpr const char* kSerializeStartingState = "starting_state=";
-
 // Returns the available parameter keys, to be used as a utility function.
 std::string ListValidParameters(
     const GameParameters& param_spec) {

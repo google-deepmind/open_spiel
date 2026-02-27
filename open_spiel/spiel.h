@@ -38,6 +38,13 @@
 
 namespace open_spiel {
 
+constexpr const int kSerializationVersion = 1;
+constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
+constexpr const char* kSerializeGameSectionHeader = "[Game]";
+constexpr const char* kSerializeGameRNGStateSectionHeader = "[GameRNGState]";
+constexpr const char* kSerializeStateSectionHeader = "[State]";
+constexpr const char* kSerializeStartingState = "starting_state=";
+
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,
 // zero-sum games with perfect information. (Though can be made applicable to

@@ -760,7 +760,13 @@ PYBIND11_MODULE(pyspiel, m) {
         py::arg("state_checker_fn") =
             py::cpp_function(&testing::DefaultStateChecker),
         py::arg("mean_field_population") = -1, py::arg("observer") = nullptr,
+        py::arg("specific_initial_state") = nullptr,
         "Run the C++ tests on a game");
+
+  m.def("random_sim_test_with_specific_initial_state",
+        testing::RandomSimTestWithSpecificInitialState, py::arg("game"),
+        py::arg("num_sims"), py::arg("specific_initial_state"),
+        "Run the C++ tests on a game with a specific initial state.");
 
   m.def("build_state_from_history_string", BuildStateFromHistoryString,
         "Builds a state from a game string and history string.",

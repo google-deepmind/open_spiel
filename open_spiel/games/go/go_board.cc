@@ -14,7 +14,16 @@
 
 #include "open_spiel/games/go/go_board.h"
 
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <cstdint>
 #include <iomanip>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
