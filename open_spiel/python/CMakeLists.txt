@@ -206,6 +206,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/infostate_tree_test.py
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
+  algorithms/minimax_solver_test.py
   algorithms/minimax_test.py
   algorithms/nfg_utils_test.py
   algorithms/noisy_policy_test.py
