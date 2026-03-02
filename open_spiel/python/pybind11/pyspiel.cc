@@ -42,6 +42,7 @@
 #include "open_spiel/python/pybind11/evaluation_elo.h"
 #include "open_spiel/python/pybind11/evaluation_sco.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
+#include "open_spiel/python/pybind11/games_catch.h"
 #include "open_spiel/python/pybind11/games_backgammon.h"
 #include "open_spiel/python/pybind11/games_bargaining.h"
 #include "open_spiel/python/pybind11/games_blackjack.h"
@@ -820,6 +821,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_bargaining(m);
   init_pyspiel_games_blackjack(m);
   init_pyspiel_games_bridge(m);
+  init_pyspiel_games_catch(m);
   init_pyspiel_games_chess(m);
   init_pyspiel_games_crazyhouse(m);
   init_pyspiel_games_colored_trails(m);
