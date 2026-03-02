@@ -296,7 +296,7 @@ class State {
   // In the case of chance nodes, the behavior of this function depends on
   // GameType::chance_mode. If kExplicit, then the outcome should be
   // directly applied. If kSampled, then a dummy outcome is passed and the
-  // sampling of and outcome should be done in this function and then applied.
+  // sampling of an outcome should be done in this function and then applied.
   //
   // Games should implement DoApplyAction.
   virtual void ApplyAction(Action action_id);
@@ -533,7 +533,7 @@ class State {
   std::string HistoryString() const { return absl::StrJoin(History(), ", "); }
 
   // Return how many moves have been done so far in the game.
-  // When players make simultaneous moves, this counts only as a one move.
+  // When players make simultaneous moves, this counts only as a single move.
   // Chance transitions count also as one move.
   // Note that game transformations are not required to preserve the move
   // number in the transformed game.
@@ -590,7 +590,7 @@ class State {
   // For details, see Section 3.1 of https://arxiv.org/abs/1908.09453
   // or Section 2.1 of https://arxiv.org/abs/1906.11110
 
-  // There are currently no use-case for calling this function with
+  // There are currently no use-cases for calling this function with
   // `kChancePlayerId`. Thus, games are expected to raise an error in those
   // cases using (and it's tested in api_test.py). Use this:
   //   SPIEL_CHECK_GE(player, 0);
@@ -612,7 +612,7 @@ class State {
   // this is required in some applications (e.g. final observation in an RL
   // environment).
   //
-  // There are currently no use-case for calling this function with
+  // There are currently no use-cases for calling this function with
   // `kChancePlayerId`. Thus, games are expected to raise an error in those
   // cases.
   //
@@ -780,8 +780,8 @@ class State {
   virtual std::string Serialize() const;
 
   // Resamples a new history from the information state from player_id's view.
-  // This resamples a private for the other players, but holds player_id's
-  // privates constant, and the public information constant.
+  // This resamples a private history for the other players, but holds
+  // player_id's privates constant, and the public information constant.
   // The privates are sampled uniformly at each chance node. For games with
   // partially-revealed actions that require some policy, we sample uniformly
   // from the list of actions that are consistent with what player_id observed.

@@ -75,11 +75,11 @@
 // (kNumReversibleMovesToDraw). This is to make sure that random play
 // in the game would stop after a limited number of steps.
 //
-// > "Turn phase: [..] if the opponent captured a piece on their turn,
+// > "Turn start phase: [..] if the opponent captured a piece on their turn,
 // >  the current player is given the capture square"
 //
-// Turn phase is eliminated: all the capture information can be deduced as the
-// difference of player's pieces observations in the sensing phase.
+// Turn start phase is eliminated: all the capture information can be deduced as
+// the difference of player's pieces observations in the sensing phase.
 //
 // > "Sense phase: the player chooses any square on the chessboard to target
 // >  their sensor. Then, the true state of the game board in a three square by

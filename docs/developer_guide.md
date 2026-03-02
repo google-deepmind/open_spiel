@@ -73,7 +73,7 @@ games and any special considerations are noted in the steps.
     It should build and the test should run, and can be verified by rebuilding
     and running the example `build/examples/example --game=new_game`. Note:
     Python games cannot be run using this example; use
-    `open_spiel/python/examples/example.py` instead. 
+    `open_spiel/python/examples/example.py` instead.
 7.  Now, change the implementations of the functions in `NewGameGame` and
     `NewGameState` to reflect your new game’s logic. Most API functions should
     be clear from the game you copied from. If not, each API function that is
@@ -105,7 +105,7 @@ games and any special considerations are noted in the steps.
 ## Conditional dependencies
 
 The goal is to make it possible to optionally include external dependencies and
-build against them. The setup was designed to met the following needs:
+build against them. The setup was designed to meet the following needs:
 
 -   **Single source of truth**: We want a single action to be sufficient to
     manage the conditional install and build. Thus, we use bash environment
@@ -160,7 +160,7 @@ Leduc poker. We will use an example based on this
     `LeducPoker::SetPrivateCards`).
 3.  That's it for the core game logic. To expose these methods to Python, add
     them to the Python module (via pybind11). Some games already have
-    game-specific functionality, so if a files named `games_leduc_poker.h` and
+    game-specific functionality, so if files named `games_leduc_poker.h` and
     `games_leduc_poker.cc` exist within `python/pybind11`, add to them (skip to
     Step 5).
 4.  If the games-specific files do not exist for your game of interest, then:
@@ -178,14 +178,14 @@ Leduc poker. We will use an example based on this
     `games_backgammon.cc`). If it is unclear, do not hesitate to ask, but also
     please check the
     [pybind11 documentation](https://pybind11.readthedocs.io/en/stable/).
-6.  Add a simple test to `python/games_sim_test.py` to check that it worked. For
-    inspiration, see e.g. `test_leduc_get_and_set_private_cards`.
+6.  Add a simple test to `python/tests/games_sim_test.py` to check that it
+    worked. For inspiration, see e.g. `test_leduc_get_and_set_private_cards`.
 
 ## Language APIs
 
 There are four other language APIs that expose functionality from the C++ core.
 
--   [Python](https://github.com/deepmind/open_spiel/tree/master/open_spiel/python).
+-   [Python](https://github.com/deepmind/open_spiel/tree/master/open_spiel/python)
 -   [Julia](https://github.com/deepmind/open_spiel/tree/master/open_spiel/julia)
 -   [Go](https://github.com/deepmind/open_spiel/tree/master/open_spiel/go)
     (unmaintained)

@@ -45,7 +45,7 @@ constexpr int kNumRepetitionsToDraw = 3;
 // Facts about the game.
 const GameType kGameType{
     /*short_name=*/"rbc",
-    /*long_name=*/"Reconnaisance Blind Chess",
+    /*long_name=*/"Reconnaissance Blind Chess",
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kDeterministic,
     GameType::Information::kImperfectInformation,
