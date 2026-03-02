@@ -617,8 +617,8 @@ class StructApiTest(absltest.TestCase):
 
     state.apply_action(center_action)
 
-    with self.assertRaises(RuntimeError):
-      state.validate_action_struct(action_struct)
+    status = state.validate_action_struct(action_struct)
+    self.assertFalse(status.ok())
 
   def test_apply_action_struct_invalid(self):
     """Test apply_action_struct raises error and doesn't mutate state."""
@@ -629,8 +629,8 @@ class StructApiTest(absltest.TestCase):
     state.apply_action(center_action)
     state_str_before = str(state)
 
-    with self.assertRaises(RuntimeError):
-      state.apply_action_struct(action_struct)
+    status = state.apply_action_struct(action_struct)
+    self.assertFalse(status.ok())
 
     self.assertEqual(str(state), state_str_before)
 

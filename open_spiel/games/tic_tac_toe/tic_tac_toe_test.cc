@@ -15,11 +15,11 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/status/status.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/status.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -77,7 +77,7 @@ void TestActionStruct() {
 
   // Test ApplyActionStruct.
   auto state2 = game->NewInitialState();
-  absl::Status status = state2->ApplyActionStruct(*action_struct);
+  Status status = state2->ApplyActionStruct(*action_struct);
   SPIEL_CHECK_TRUE(status.ok());
   SPIEL_CHECK_EQ(state2->ToString(), "...\n.x.\n...");
 
@@ -87,7 +87,7 @@ void TestActionStruct() {
 
   // Test ValidateActionStruct with invalid action (cell already occupied).
   state3->ApplyAction(4);  // Play in center
-  absl::Status validation_status = state3->ValidateActionStruct(*action_struct);
+  Status validation_status = state3->ValidateActionStruct(*action_struct);
   SPIEL_CHECK_FALSE(validation_status.ok());
 
   // Test JSON parsing.

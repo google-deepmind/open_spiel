@@ -27,7 +27,6 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/btree_map.h"
-#include "open_spiel/abseil-cpp/absl/status/status.h"
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/ascii.h"
@@ -42,6 +41,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/status.h"
 #include "open_spiel/utils/usage_logging.h"
 
 namespace open_spiel {
@@ -488,30 +488,30 @@ void State::ApplyActionsWithLegalityChecks(const std::vector<Action>& actions) {
   ApplyActions(actions);
 }
 
-absl::Status State::ValidateActionStruct(
+Status State::ValidateActionStruct(
     const ActionStruct& action_struct) const {
   std::vector<Action> actions = StructToActions(action_struct);
   std::vector<Action> legal = LegalActions();
   for (Action action : actions) {
     if (absl::c_find(legal, action) == legal.end()) {
-      return absl::InvalidArgumentError(absl::StrCat(
+      return ErrorStatus(absl::StrCat(
           "Illegal action: ", action_struct.ToJson(),
           " (action ", action, " = '", ActionToString(action),
           "' is not legal)"));
     }
   }
-  return absl::OkStatus();
+  return OkStatus();
 }
 
-absl::Status State::ApplyActionStruct(const ActionStruct& action_struct) {
-  absl::Status status = ValidateActionStruct(action_struct);
+Status State::ApplyActionStruct(const ActionStruct& action_struct) {
+  Status status = ValidateActionStruct(action_struct);
   if (!status.ok()) {
     return status;
   }
   for (Action action : StructToActions(action_struct)) {
     ApplyAction(action);
   }
-  return absl::OkStatus();
+  return OkStatus();
 }
 
 std::vector<int> State::LegalActionsMask(Player player) const {

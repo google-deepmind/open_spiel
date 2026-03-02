@@ -24,13 +24,13 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
-#include "open_spiel/abseil-cpp/absl/status/status.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/utils/nlohmann_json.h"  // IWYU pragma: keep
+#include "open_spiel/utils/status.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
@@ -306,13 +306,13 @@ class State {
 
   // Validates an action struct without applying it. Returns OkStatus
   // if valid, or an error status if invalid. Does not mutate state.
-  virtual absl::Status ValidateActionStruct(
+  virtual Status ValidateActionStruct(
       const ActionStruct& action_struct) const;
 
   // Applies an action in its structured format. Validates first, then applies
   // if valid. Returns OkStatus on success, or an error status if the
   // action was invalid (in which case state is unchanged).
-  virtual absl::Status ApplyActionStruct(const ActionStruct& action_struct);
+  virtual Status ApplyActionStruct(const ActionStruct& action_struct);
 
   // `LegalActions(Player player)` is valid for all nodes in all games,
   // returning an empty list for players who don't act at this state. The

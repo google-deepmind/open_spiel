@@ -75,6 +75,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/status.h"
 #include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -189,6 +190,21 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("DECISION", open_spiel::StateType::kDecision)
       .value("MEAN_FIELD", open_spiel::StateType::kMeanField)
       .export_values();
+
+  py::enum_<open_spiel::StatusValue>(m, "StatusValue")
+      .value("OK_STATUS", open_spiel::StatusValue::kOk)
+      .value("ERROR_STATUS", open_spiel::StatusValue::kError)
+      .export_values();
+
+  py::class_<open_spiel::Status>(m, "Status")
+      .def(py::init<open_spiel::StatusValue, std::string>(),
+           py::arg("status_value"),
+           py::arg("message"))
+      .def("ok", &open_spiel::Status::ok)
+      .def("message", &open_spiel::Status::message)
+      .def("to_string", &open_spiel::Status::ToString)
+      .def("__str__", &open_spiel::Status::ToString)
+      .def("__repr__", &open_spiel::Status::ToString);
 
   py::class_<GameType> game_type(m, "GameType");
   game_type
@@ -669,6 +685,11 @@ PYBIND11_MODULE(pyspiel, m) {
         return open_spiel::tensor_game::CreateTensorGame(flat_utilities, shape);
       },
       "Creates an arbitrary matrix game from dimensions and utilities.");
+
+  m.def("ok_status", &open_spiel::OkStatus, "Returns an OkStatus.");
+
+  // Args: message (string)
+  m.def("error_status", &open_spiel::ErrorStatus, "Returns an ErrorStatus.");
 
   m.def("game_to_nfg_string", open_spiel::GameToNFGString,
         "Get the Gambit .nfg text for a normal-form game.");
