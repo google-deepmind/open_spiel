@@ -169,37 +169,49 @@ std::vector<VPNetModel::InferenceOutputs> VPNetModel::Inference(
   //   - Their default data type is a 32-bit float
   //   - Use the byte data type for boolean
 
+  // Clone first to take ownership from the raw blob, then move to device.
+  // This avoids the previous pattern of .to(device).clone() which performed
+  // two allocations: one for the device transfer and one for the clone.
   torch::Tensor torch_inf_inputs =
       torch::from_blob(raw_observations.data(),
                        {inference_batch_size, flat_input_size_})
-          .to(torch_device_)
-          .clone();
+          .clone()
+          .to(torch_device_);
   torch::Tensor torch_inf_legal_mask =
       torch::from_blob(raw_legal_mask.data(),
                        {inference_batch_size, num_actions_},
                        torch::TensorOptions().dtype(torch::kByte))
-          .to(torch_device_)
-          .clone();
+          .clone()
+          .to(torch_device_);
 
-  // Run the inference.
+  // Run the inference with gradient tracking disabled.
+  // NoGradGuard prevents LibTorch from building the autograd computation
+  // graph, saving memory and compute since we never backprop through
+  // inference.
   model_->eval();
+  torch::NoGradGuard no_grad;
   std::vector<torch::Tensor> torch_outputs =
       model_(torch_inf_inputs, torch_inf_legal_mask);
 
-  torch::Tensor value_batch = torch_outputs[0];
-  torch::Tensor policy_batch = torch_outputs[1];
+  // Move outputs to CPU in a single transfer, then use accessors for
+  // zero-overhead element access. This replaces the previous per-element
+  // .item<>() pattern which triggered a GPU-to-CPU sync on every call.
+  torch::Tensor value_cpu = torch_outputs[0].to(torch::kCPU).contiguous();
+  torch::Tensor policy_cpu = torch_outputs[1].to(torch::kCPU).contiguous();
+
+  auto value_acc = value_cpu.accessor<float, 2>();
+  auto policy_acc = policy_cpu.accessor<float, 2>();
 
   // Copy the Torch tensor output to the appropriate structure.
   std::vector<InferenceOutputs> output;
   output.reserve(inference_batch_size);
   for (int batch = 0; batch < inference_batch_size; ++batch) {
-    double value = value_batch[batch].item<double>();
+    double value = static_cast<double>(value_acc[batch][0]);
 
     ActionsAndProbs state_policy;
     state_policy.reserve(inputs[batch].legal_actions.size());
     for (Action action : inputs[batch].legal_actions) {
-      state_policy.push_back(
-          {action, policy_batch[batch][action].item<float>()});
+      state_policy.push_back({action, policy_acc[batch][action]});
     }
 
     output.push_back({value, state_policy});
@@ -232,26 +244,27 @@ VPNetModel::LossInfo VPNetModel::Learn(const std::vector<TrainInputs>& inputs) {
   // Torch tensors by default use a dense, row-aligned memory layout.
   //   - Their default data type is a 32-bit float
   //   - Use the byte data type for boolean
+  // Clone first to take ownership from the raw blob, then move to device.
   torch::Tensor torch_train_inputs =
       torch::from_blob(raw_train_inputs.data(),
                        {training_batch_size, flat_input_size_})
-          .to(torch_device_)
-          .clone();
+          .clone()
+          .to(torch_device_);
   torch::Tensor torch_train_legal_mask =
       torch::from_blob(raw_legal_mask.data(),
                        {training_batch_size, num_actions_},
                        torch::TensorOptions().dtype(torch::kByte))
-          .to(torch_device_)
-          .clone();
+          .clone()
+          .to(torch_device_);
   torch::Tensor torch_policy_targets =
       torch::from_blob(raw_policy_targets.data(),
                        {training_batch_size, num_actions_})
-          .to(torch_device_)
-          .clone();
+          .clone()
+          .to(torch_device_);
   torch::Tensor torch_value_targets =
       torch::from_blob(raw_value_targets.data(), {training_batch_size, 1})
-          .to(torch_device_)
-          .clone();
+          .clone()
+          .to(torch_device_);
 
   // Run a training step and get the losses.
   model_->train();
