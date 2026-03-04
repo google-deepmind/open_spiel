@@ -172,7 +172,11 @@ const GameType kGameType{
         // maxraises - the maximum number of raises on each round. If not
         // specified, it will default to UINT8_MAX.
         {"maxRaises", GameParameter(std::string(""))},
-        // The number of different suits in the deck
+        // The number of different suits in the deck.
+        // WARNING: Must be 4. The ACPC card encoding uses
+        // makeCard(rank, suit) = rank * MAX_SUITS + suit where MAX_SUITS is
+        // hardcoded to 4 in project_acpc_server/game.h. Using numSuits < 4
+        // causes ChanceOutcomeToCard() to produce out-of-bounds indices.
         {"numSuits", GameParameter(4)},
         // The number of different ranks in the deck
         {"numRanks", GameParameter(6)},
@@ -1137,7 +1141,11 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
         root->ApplyAction(hole_card2);
         for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
       }
-      SPIEL_CHECK_FALSE(root->IsChanceNode());
+      const int total_hole_cards =
+          acpc_game_->GetNbPlayers() * acpc_game_->GetNbHoleCardsRequired();
+      for (int i = total_hole_cards; i < History().size(); ++i) {
+        root->ApplyAction(History()[i]);
+      }
       dist->first.push_back(std::move(root));
     }
   }
