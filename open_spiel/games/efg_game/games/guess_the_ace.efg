@@ -1,0 +1,12 @@
+EFG 2 R "Guess the Ace" { "Player 1" "Player 2" }
+""
+
+p "ROOT" 1 1 "P1_Root" { "Quit" "Play" } 0
+ t "P1_Quits" 1 "Outcome_Quit" { 0.0, 0.0 }
+ c "Card_Dealt" 1 "" { "AS" 1/52 "Not_AS" 51/52 } 0
+  p "P2_Decision_AS" 2 1 "P2_Guess" { "Yes" "No" } 0
+   t "P2_Right_AS" 2 "Outcome_AS_Yes" { -1000.0, 1000.0 }
+   t "P2_Wrong_AS" 3 "Outcome_AS_No" { 1000.0, -1000.0 }
+  p "P2_Decision_NotAS" 2 1 "P2_Guess" { "Yes" "No" } 0
+   t "P2_Wrong_NotAS" 4 "Outcome_NotAS_Yes" { 1000.0, -1000.0 }
+   t "P2_Right_NotAS" 5 "Outcome_NotAS_No" { -1000.0, 1000.0 }

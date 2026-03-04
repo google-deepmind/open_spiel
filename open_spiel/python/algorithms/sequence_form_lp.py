@@ -23,6 +23,12 @@ In this implementation, we follow closely the construction in Koller, Megiddo,
 and von Stengel, Fast Algorithms for Finding Randomized Strategies in Game Trees
 http://theory.stanford.edu/~megiddo/pdf/stoc94.pdf. Specifically, we construct
 and solve equations (8) and (9) from this paper.
+
+Additionally, we implement the construction to compute the subgame perfect
+equilibrium using perturbed LPs covered in Peter Bro Miltersen and Troels
+Bjerre Sørensen, Computing sequential equilibria for two-player games
+https://www.itu.dk/~trbj/papers/seqeqsoda.pdf. Specifically, we construct
+and solve equations (8) and (9) from this paper.
 """
 
 from open_spiel.python import policy
@@ -32,12 +38,22 @@ import pyspiel
 _DELIMITER = " -=- "
 _EMPTY_INFOSET_KEYS = ["***EMPTY_INFOSET_P0***", "***EMPTY_INFOSET_P1***"]
 _EMPTY_INFOSET_ACTION_KEYS = [
-    "***EMPTY_INFOSET_ACTION_P0***", "***EMPTY_INFOSET_ACTION_P1***"
+  "***EMPTY_INFOSET_ACTION_P0***",
+  "***EMPTY_INFOSET_ACTION_P1***",
 ]
 
 
-def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
-                   chance_reach, lps, parent_is_keys, parent_isa_keys):
+def _construct_lps(
+    state,
+    infosets,
+    infoset_actions,
+    infoset_action_maps,
+    chance_reach,
+    lps,
+    parent_is_keys,
+    parent_isa_keys,
+    eps=0.0,
+):
   """Build the linear programs recursively from this state.
 
   Args:
@@ -58,6 +74,8 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
       constraints and variables.
     parent_is_keys: a list of parent information state keys for this state
     parent_isa_keys: a list of parent (infostate, action) keys
+    eps: eps: perturbation strength (0.0 = classic KMvS Nash,
+      1e-8 = sequential eq.)
   """
   if state.is_terminal():
     returns = state.returns()
@@ -65,16 +83,18 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
     lps[0].add_or_reuse_constraint(
         parent_isa_keys[0], lp_solver.ConstraintType.CONS_TYPE_GEQ
     )
-    lps[0].add_to_cons_coeff(parent_isa_keys[0], parent_isa_keys[1],
-                             -1.0 * returns[0] * chance_reach)
+    lps[0].add_to_cons_coeff(
+        parent_isa_keys[0], parent_isa_keys[1], -1.0 * returns[0] * chance_reach
+    )
     # Right-most term of: -Ay + E^t p >= 0
     lps[0].set_cons_coeff(parent_isa_keys[0], parent_is_keys[0], 1.0)
     # Left-most term of: x^t (-A) - q^t F <= 0
     lps[1].add_or_reuse_constraint(
         parent_isa_keys[1], lp_solver.ConstraintType.CONS_TYPE_LEQ
     )
-    lps[1].add_to_cons_coeff(parent_isa_keys[1], parent_isa_keys[0],
-                             -1.0 * returns[0] * chance_reach)
+    lps[1].add_to_cons_coeff(
+        parent_isa_keys[1], parent_isa_keys[0], -1.0 * returns[0] * chance_reach
+    )
     # Right-most term of: x^t (-A) - q^t F <= 0
     lps[1].set_cons_coeff(parent_isa_keys[1], parent_is_keys[1], -1.0)
     return
@@ -82,8 +102,17 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
   if state.is_chance_node():
     for action, prob in state.chance_outcomes():
       new_state = state.child(action)
-      _construct_lps(new_state, infosets, infoset_actions, infoset_action_maps,
-                     prob * chance_reach, lps, parent_is_keys, parent_isa_keys)
+      _construct_lps(
+          new_state,
+          infosets,
+          infoset_actions,
+          infoset_action_maps,
+          prob * chance_reach,
+          lps,
+          parent_is_keys,
+          parent_isa_keys,
+          eps,
+      )
     return
 
   player = state.current_player()
@@ -137,19 +166,31 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
       infoset_action_maps[player][info_state].append(isa_key)
 
     # x and y variables, and finish equality constraints coeff
+    # x ≥ k_ε and y ≥ l_ε to force sequential equilibrium
+    # This is exactly equivalent to introducing explicit slack variables u/v
+    # in the dual (the solver handles u/v automatically).
     if player == 0:
-      lps[1].add_or_reuse_variable(isa_key, lb=0)  # x
+      lps[1].add_or_reuse_variable(isa_key, lb=eps)  # x
       lps[1].set_cons_coeff(info_state, isa_key, 1.0)  # x^t E^t = e^t
     else:
-      lps[0].add_or_reuse_variable(isa_key, lb=0)  # y
+      lps[0].add_or_reuse_variable(isa_key, lb=eps)  # y
       lps[0].set_cons_coeff(info_state, isa_key, 1.0)  # -Fy = -f
 
     new_parent_isa_keys = parent_isa_keys[:]
     new_parent_isa_keys[player] = isa_key
 
     new_state = state.child(action)
-    _construct_lps(new_state, infosets, infoset_actions, infoset_action_maps,
-                   chance_reach, lps, new_parent_is_keys, new_parent_isa_keys)
+    _construct_lps(
+        new_state,
+        infosets,
+        infoset_actions,
+        infoset_action_maps,
+        chance_reach,
+        lps,
+        new_parent_is_keys,
+        new_parent_isa_keys,
+        eps,
+    )
 
 
 def solve_zero_sum_game(game, solver=lp_solver.DEFAULT_SOLVER):
@@ -158,8 +199,8 @@ def solve_zero_sum_game(game, solver=lp_solver.DEFAULT_SOLVER):
   Args:
     game: the spiel game tp solve (must be zero-sum, sequential, and have chance
       mode of deterministic or explicit stochastic).
-    solver: a specific solver to use, sent to cvxopt (i.e. 'lapack', 'blas',
-      'glpk'). A value of None uses cvxopt's default solver.
+    solver: a specific solver to use, sent to cvxpy (i.e. 'ecos', 'osqp ',
+      'glpk'). A value of None uses cvxpy's default solver.
 
   Returns:
     A 4-tuple containing:
@@ -173,8 +214,9 @@ def solve_zero_sum_game(game, solver=lp_solver.DEFAULT_SOLVER):
   assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL
   assert (
       game.get_type().chance_mode == pyspiel.GameType.ChanceMode.DETERMINISTIC
-      or game.get_type().chance_mode ==
-      pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC)
+      or game.get_type().chance_mode
+      == pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC
+  )
   # There are several import matrices and vectors that form the LPs that
   # are built by this function:
   #
@@ -212,15 +254,14 @@ def solve_zero_sum_game(game, solver=lp_solver.DEFAULT_SOLVER):
   #  - infoset-actions1 inequality constraints (other than var lower-bounds)
   #  - infosets0 equality constraints
   infosets = [{_EMPTY_INFOSET_KEYS[0]: 0}, {_EMPTY_INFOSET_KEYS[1]: 0}]
-  infoset_actions = [{
-      _EMPTY_INFOSET_ACTION_KEYS[0]: 0
-  }, {
-      _EMPTY_INFOSET_ACTION_KEYS[1]: 0
-  }]
+  infoset_actions = [
+    {_EMPTY_INFOSET_ACTION_KEYS[0]: 0},
+    {_EMPTY_INFOSET_ACTION_KEYS[1]: 0},
+  ]
   infoset_action_maps = [{}, {}]
   lps = [
-      lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MIN),  # Eq. (8)
-      lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MAX),  # Eq. (9)
+    lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MIN),  # Eq. (8)
+    lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MAX),  # Eq. (9)
   ]
   # Root-level variables and constraints.
   lps[0].add_or_reuse_variable(_EMPTY_INFOSET_ACTION_KEYS[1], lb=0)  # y root
@@ -234,24 +275,34 @@ def solve_zero_sum_game(game, solver=lp_solver.DEFAULT_SOLVER):
   lps[0].add_or_reuse_constraint(
       _EMPTY_INFOSET_KEYS[1], lp_solver.ConstraintType.CONS_TYPE_EQ
   )
-  lps[0].set_cons_coeff(_EMPTY_INFOSET_KEYS[1], _EMPTY_INFOSET_ACTION_KEYS[1],
-                        -1.0)
+  lps[0].set_cons_coeff(
+      _EMPTY_INFOSET_KEYS[1], _EMPTY_INFOSET_ACTION_KEYS[1], -1.0
+  )
   lps[0].set_cons_rhs(_EMPTY_INFOSET_KEYS[1], -1.0)
   # x_root = 1  (x^t E^t = e^t)
   lps[1].add_or_reuse_constraint(
       _EMPTY_INFOSET_KEYS[0], lp_solver.ConstraintType.CONS_TYPE_EQ
   )
-  lps[1].set_cons_coeff(_EMPTY_INFOSET_KEYS[0], _EMPTY_INFOSET_ACTION_KEYS[0],
-                        1.0)
+  lps[1].set_cons_coeff(
+      _EMPTY_INFOSET_KEYS[0], _EMPTY_INFOSET_ACTION_KEYS[0], 1.0
+  )
   lps[1].set_cons_rhs(_EMPTY_INFOSET_KEYS[0], 1.0)
-  _construct_lps(game.new_initial_state(), infosets, infoset_actions,
-                 infoset_action_maps, 1.0, lps, _EMPTY_INFOSET_KEYS[:],
-                 _EMPTY_INFOSET_ACTION_KEYS[:])
+  _construct_lps(
+      game.new_initial_state(),
+      infosets,
+      infoset_actions,
+      infoset_action_maps,
+      1.0,
+      lps,
+      _EMPTY_INFOSET_KEYS[:],
+      _EMPTY_INFOSET_ACTION_KEYS[:],
+      eps=0.0,
+  )
   # Solve the programs.
   solutions = [lps[0].solve(solver=solver), lps[1].solve(solver=solver)]
   # Extract the policies (convert from realization plan to behavioral form).
   policies = [policy.TabularPolicy(game), policy.TabularPolicy(game)]
-  for i in range(2):
+  for i in range(len(policies)):
     for info_state in infoset_action_maps[i]:
       total_weight = 0
       num_actions = 0
@@ -268,6 +319,169 @@ def solve_zero_sum_game(game, solver=lp_solver.DEFAULT_SOLVER):
         action = int(action_str)
         pr_action = rel_weight / total_weight if total_weight > 0 else unif_pr
         state_policy[action] = pr_action
-  return (solutions[0][lps[0].get_var_id(_EMPTY_INFOSET_KEYS[0])],
-          solutions[1][lps[1].get_var_id(_EMPTY_INFOSET_KEYS[1])], policies[0],
-          policies[1])
+  return (
+      solutions[0][lps[0].get_var_id(_EMPTY_INFOSET_KEYS[0])],
+      solutions[1][lps[1].get_var_id(_EMPTY_INFOSET_KEYS[1])],
+      policies[0],
+      policies[1],
+  )
+
+
+def solve_zero_sum_subgame_perfect(
+    game, 
+    solver=lp_solver.DEFAULT_SOLVER, 
+    eps: float = 0.0
+):
+  """Solve the two-player zero-sum game using sequence-form LPs.
+    This function computes a subgame-perfect equilibrium.
+
+  Args:
+    game: the spiel game tp solve (must be zero-sum, sequential, and have chance
+      mode of deterministic or explicit stochastic).
+    solver: a specific solver to use, sent to cvxpy (i.e. 'ecos', 'osqp',
+      'glpk'). A value of None uses cvxpy's default solver.
+    eps: eps: perturbation strength (
+      0.0 = classic KMvS Nash, 1e-8 = sequential eq.)
+
+  Returns:
+    A 4-tuple containing:
+      - player 0 value
+      - player 1 value
+      - player 0 policy: a policy.TabularPolicy for player 0
+      - player 1 policy: a policy.TabularPolicy for player 1
+  """
+  assert game.num_players() == 2
+  assert game.get_type().utility == pyspiel.GameType.Utility.ZERO_SUM
+  assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL
+  assert (
+    game.get_type().chance_mode == pyspiel.GameType.ChanceMode.DETERMINISTIC
+    or game.get_type().chance_mode
+    == pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC
+  )
+  # There are several import matrices and vectors that form the LPs that
+  # are built by this function:
+  #
+  # A is expected payoff to p1 of each (infoset0,action0) + (infoset1,action1)
+  #   belong to p1 and p2 respectively, which lead to a terminal state. It has
+  #   dimensions (infoset-actions0) x (infoset-actions1)
+  # E,F are p1 / p2's strategy matrices (infosets) x (infoset-actions)
+  # e,f are infosets+ x 1 column vector of (1 0 0 ... 0)
+  # p,q are unconstrained variables each with infosets x 1.
+  # x,y are realization plans of size infoset-actions
+  #
+  # In each of the computations above there is a special "root infoset" and
+  # "root infoset-action" denote \emptyset. So the values are actually equal to
+  # number of infosets + 1 and infoset-actions + 1.
+  #
+  # Equation (2.4) is   min_{p,u,y} e^T p - (k_eps)^T u
+  #
+  #             s.t.  -Ay + E^T p - u >= 0
+  #                   -Fy             = -f
+  #                     y             >= l_eps
+  #                                 u >= 0
+  #
+  # Equation (2.5) is   max_{q,v,x} q^T f + v^T (l_eps)
+  #
+  #             s.t.  -x^T(-A) + q^T F + v  <= 0
+  #                   x^T E^T               = e^T
+  #                   x                     >= k_eps
+  #                                      v  >= 0
+  #
+  # So, the first LP has:
+  #  - |y| + |p| variables (infoset-actions1 + infosets0)
+  #  - infoset-actions0 inequality constraints (other than var lower-bounds)
+  #  - infosets1 equality constraints
+  #
+  # And the second LP has:
+  #  - |x| + |q| variables (infoset-actions0 + infosets1)
+  #  - infoset-actions1 inequality constraints (other than var lower-bounds)
+  #  - infosets0 equality constraints
+  # 
+  # NOTE: slacks are handled by the solver.
+  # 
+  infosets = [{_EMPTY_INFOSET_KEYS[0]: 0}, {_EMPTY_INFOSET_KEYS[1]: 0}]
+  infoset_actions = [
+    {_EMPTY_INFOSET_ACTION_KEYS[0]: 0},
+    {_EMPTY_INFOSET_ACTION_KEYS[1]: 0},
+  ]
+  infoset_action_maps = [{}, {}]
+  lps = [
+    lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MIN),  # Eq. (2.4)
+    lp_solver.LinearProgram(lp_solver.ObjectiveType.OBJ_MAX),  # Eq. (2.5)
+  ]
+
+  # Root-level variables and constraints.
+  lps[0].add_or_reuse_variable(_EMPTY_INFOSET_ACTION_KEYS[1], lb=0)  # y_root
+  lps[0].add_or_reuse_variable(_EMPTY_INFOSET_KEYS[0])  # p_root
+
+  lps[1].add_or_reuse_variable(_EMPTY_INFOSET_ACTION_KEYS[0], lb=0)  # x_root
+  lps[1].add_or_reuse_variable(_EMPTY_INFOSET_KEYS[1])  # q_root
+
+  # objective coefficients
+  lps[0].set_obj_coeff(_EMPTY_INFOSET_KEYS[0], 1.0)
+  lps[1].set_obj_coeff(_EMPTY_INFOSET_KEYS[1], -1.0)
+
+  # y_root = 1  (-Fy = -f), same eq. constraints
+  lps[0].add_or_reuse_constraint(
+      _EMPTY_INFOSET_KEYS[1], lp_solver.ConstraintType.CONS_TYPE_EQ
+  )
+  lps[0].set_cons_coeff(
+      _EMPTY_INFOSET_KEYS[1], _EMPTY_INFOSET_ACTION_KEYS[1], -1.0
+  )
+  lps[0].set_cons_rhs(_EMPTY_INFOSET_KEYS[1], -1.0)
+
+  # x_root = 1  (x^t E^t = e^t), same eq. constraints
+  lps[1].add_or_reuse_constraint(
+      _EMPTY_INFOSET_KEYS[0], lp_solver.ConstraintType.CONS_TYPE_EQ
+  )
+  lps[1].set_cons_coeff(
+      _EMPTY_INFOSET_KEYS[0], _EMPTY_INFOSET_ACTION_KEYS[0], 1.0
+  )
+  lps[1].set_cons_rhs(_EMPTY_INFOSET_KEYS[0], 1.0)
+
+  _construct_lps(
+      game.new_initial_state(),
+      infosets,
+      infoset_actions,
+      infoset_action_maps,
+      1.0,
+      lps,
+      _EMPTY_INFOSET_KEYS[:],
+      _EMPTY_INFOSET_ACTION_KEYS[:],
+      eps if eps > 0.0 else 0.0,
+  )
+
+  # Solve the programs.
+  solutions = [lps[0].solve(solver=solver), lps[1].solve(solver=solver)]
+  # Extract the policies (convert from realization plan to behavioral form).
+  policies = [policy.TabularPolicy(game), policy.TabularPolicy(game)]
+  for pl_index in range(len(policies)):
+    for info_state in infoset_action_maps[pl_index]:
+      total_weight = 0
+      num_actions = 0
+      for isa_key in infoset_action_maps[pl_index][info_state]:
+        total_weight += solutions[1 - pl_index][
+          lps[1 - pl_index].get_var_id(isa_key)
+        ]
+        num_actions += 1
+      unif_pr = 1.0 / num_actions
+      state_policy = policies[pl_index].policy_for_key(info_state)
+      for isa_key in infoset_action_maps[pl_index][info_state]:
+        # The 1 - i here is due to Eq (2.4) yielding a solution for player 1 and
+        # Eq (2.5) -- a solution for player 0.
+        rel_weight = solutions[1 - pl_index][
+          lps[1 - pl_index].get_var_id(isa_key)
+        ]
+        _, action_str = isa_key.split(_DELIMITER)
+        action = int(action_str)
+        pr_action = (
+          rel_weight / total_weight if total_weight > 1e-20 else unif_pr
+        )
+        state_policy[action] = pr_action
+
+  return (
+      solutions[0][lps[0].get_var_id(_EMPTY_INFOSET_KEYS[0])],
+      solutions[1][lps[1].get_var_id(_EMPTY_INFOSET_KEYS[1])],
+      policies[0],
+      policies[1],
+  )

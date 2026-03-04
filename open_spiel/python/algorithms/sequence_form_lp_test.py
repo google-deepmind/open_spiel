@@ -14,15 +14,16 @@
 
 """Tests for LP solvers."""
 
-from absl.testing import absltest
+import pyspiel
+from absl.testing import absltest, parameterized
 
 from open_spiel.python import policy
-from open_spiel.python.algorithms import exploitability
-from open_spiel.python.algorithms import sequence_form_lp
-import pyspiel
+from open_spiel.python.algorithms import expected_game_score as egs
+from open_spiel.python.algorithms import exploitability, sequence_form_lp
+from open_spiel.python.utils import file_utils
 
 
-class SFLPTest(absltest.TestCase):
+class SFLPTest(parameterized.TestCase):
 
   def test_rock_paper_scissors(self):
     game = pyspiel.load_game_as_turn_based("matrix_rps")
@@ -77,6 +78,37 @@ class SFLPTest(absltest.TestCase):
     merged_policy = policy.merge_tabular_policies([pi1, pi2], game)
     expl_pi = exploitability.exploitability(game, merged_policy)
     self.assertAlmostEqual(0.0, expl_pi)
+
+  @parameterized.parameters(
+      "guess_the_ace", 
+      "kuhn_poker_with_raise", 
+      "kuhn_poker"
+  )
+  def test_subgame_perfection_guess_the_ace(self, name):
+
+    # for the subgame perfect equilibrium test
+    filename = file_utils.find_file(
+       f"open_spiel/games/efg_game/games/{name}.efg", 2
+    )
+    game = pyspiel.load_game("efg_game(filename=" + filename + ")")
+    val_classic, _, pi1, pi2 = sequence_form_lp.solve_zero_sum_subgame_perfect(
+        game, eps=0.0
+    )
+
+    merged_policy = policy.merge_tabular_policies([pi1, pi2], game)
+    expl_pi = exploitability.exploitability(game, merged_policy)
+    self.assertAlmostEqual(0.0, expl_pi)
+
+    val_noisy, _ , pi1sp, pi2sp = sequence_form_lp.solve_zero_sum_subgame_perfect(
+        game, eps=1e-8
+    )
+
+    merged_policy_sp = policy.merge_tabular_policies([pi1sp, pi2sp], game)
+    expl_pi_sp = exploitability.exploitability(game, merged_policy_sp)
+    self.assertTrue(expl_pi_sp < 1e-6)
+
+    self.assertAlmostEqual(val_classic, val_noisy, 6)
+
 
   @absltest.skip("Takes too long. Might not pass.")
   def test_tictactoe(self):
