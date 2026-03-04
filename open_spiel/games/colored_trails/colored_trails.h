@@ -68,11 +68,13 @@ constexpr int kDefaultTradeDistanceUpperBound =
 // Minimum gain required when generating boards.
 constexpr int kBaseScoreEpsilon = 20;
 
-
-
 // Default 10-board database used for tests, etc. See
 // colored_trails/boards100.txt and create your own using
 // colored_trails/colored_trails_board_generator.
+// WARNING: These boards are generated for board_size=4 only. Using a different
+// board_size without providing a custom boards_file via the "boards_file"
+// parameter will trigger a SPIEL_CHECK_EQ(_size, size) assertion failure
+// in Board::ParseFromLine.
 constexpr const char* kDefaultBoardsString =
     "4 5 3 DEADCACCADBDBECC BCD BDDDD AAABCC 4 5 15 12\n"
     "4 5 3 CCADBEEAEDDDDACD ACCD AABC ABBCDDE 14 7 8 11\n"
