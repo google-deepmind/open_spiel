@@ -15,9 +15,16 @@
 #include "open_spiel/games/catch/catch.h"
 
 #include <algorithm>
-#include <utility>
+#include <memory>
+#include <string>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
@@ -82,7 +89,7 @@ int CatchState::CurrentPlayer() const {
 std::vector<Action> CatchState::LegalActions() const {
   if (IsTerminal()) return {};
   if (initialized_) {
-    return {0, 1, 2};  // Left, stay, right.
+    return {kLeft, kStay, kRight};
   }
   std::vector<Action> moves;
   moves.reserve(num_columns_);

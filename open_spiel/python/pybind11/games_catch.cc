@@ -29,6 +29,12 @@ using open_spiel::catch_::CatchState;
 using open_spiel::catch_::CatchGame;
 
 void open_spiel::init_pyspiel_games_catch(py::module& m) {
+  py::module_ catch_ = m.def_submodule("catch");
+
+  catch_.attr("LEFT_ACTION") = py::int_(open_spiel::catch_::kLeft);
+  catch_.attr("STAY_ACTION") = py::int_(open_spiel::catch_::kStay);
+  catch_.attr("RIGHT_ACTION") = py::int_(open_spiel::catch_::kRight);
+
   py::classh<CatchState, State>(m, "CatchState")
       .def("ball_row", &CatchState::ball_row)
       .def("ball_col", &CatchState::ball_col)

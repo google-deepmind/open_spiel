@@ -50,6 +50,11 @@ inline constexpr int kNumActions = 3;
 inline constexpr int kDefaultRows = 10;
 inline constexpr int kDefaultColumns = 5;
 
+// Actions.
+inline constexpr Action kLeft = 0;
+inline constexpr Action kStay = 1;
+inline constexpr Action kRight = 2;
+
 // State of a cell.
 enum class CellState {
   kEmpty,
