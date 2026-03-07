@@ -147,9 +147,13 @@ class Agent:
 def _train_avg_policy(agent):
     num_epoch = 8
     epoch_steps = int(np.ceil(agent.cfg.avg_policy_batch_steps / num_epoch))
-    dataloader_train = torch.utils.data.DataLoader(
-            agent.avg_policy_buffer,
-            batch_size=agent.cfg.avg_policy_batch_size, shuffle=True)
+
+    buf = agent.avg_policy_buffer
+    dataset = torch.utils.data.TensorDataset(
+            torch.from_numpy(buf.experience.state),
+            torch.from_numpy(buf.experience.policy),
+            torch.from_numpy(buf.experience.t),
+            )
     optimizer = torch.optim.Adam(
             agent.avg_policy_net.parameters(),
             lr=agent.cfg.avg_policy_learning_rate)
@@ -159,7 +163,13 @@ def _train_avg_policy(agent):
 
         agent.avg_policy_net.train()
         for _ in range(epoch_steps):
-            batch = next(iter(dataloader_train))
+            indices = np.random.choice(
+                    len(buf),
+                    size=(agent.cfg.avg_policy_batch_size,), replace=False)
+            batch = Behaviour(
+                    state=dataset.tensors[0][indices],
+                    policy=dataset.tensors[1][indices],
+                    t=dataset.tensors[2][indices])
 
             loss = _get_avg_policy_loss(agent, batch)
             optimizer.zero_grad()
@@ -209,9 +219,13 @@ def _train_regret(cfg, agent):
 
         num_epoch = 8
         epoch_steps = int(np.ceil(agent.cfg.regret_batch_steps / num_epoch))
-        dataloader_train = torch.utils.data.DataLoader(
-                agent.regret_buffers[player],
-                batch_size=agent.cfg.regret_batch_size, shuffle=True)
+        buf = agent.regret_buffers[player]
+        dataset = torch.utils.data.TensorDataset(
+                torch.from_numpy(buf.experience.state),
+                torch.from_numpy(buf.experience.regret),
+                torch.from_numpy(buf.experience.mask),
+                torch.from_numpy(buf.experience.t),
+                )
         regret_net = agent.regret_nets[player]
         regret_net.reset()
         optimizer = torch.optim.Adam(
@@ -221,7 +235,14 @@ def _train_regret(cfg, agent):
             agent.regret_t += 1
 
             for _ in range(epoch_steps):
-                batch = next(iter(dataloader_train))
+                indices = np.random.choice(
+                        len(buf),
+                        size=(agent.cfg.regret_batch_size,), replace=False)
+                batch = StateRegret(
+                        state=dataset.tensors[0][indices],
+                        regret=dataset.tensors[1][indices],
+                        mask=dataset.tensors[2][indices],
+                        t=dataset.tensors[3][indices])
 
                 loss = _get_regret_loss(agent, player, batch)
 
@@ -287,9 +308,12 @@ def _train_value(cfg, agent, player):
 
     num_epoch = 8
     epoch_steps = int(np.ceil(agent.cfg.value_batch_steps / num_epoch))
-    dataloader_train = torch.utils.data.DataLoader(
-            agent.value_buffers[player],
-            batch_size=agent.cfg.value_batch_size, shuffle=True)
+    buf = agent.value_buffers[player]
+    dataset = torch.utils.data.TensorDataset(
+            torch.from_numpy(buf.experience.state),
+            torch.from_numpy(buf.experience.action),
+            torch.from_numpy(buf.experience.value),
+            )
     value_net = agent.value_nets[player]
     value_net.reset()
     optimizer = torch.optim.Adam(
@@ -300,7 +324,12 @@ def _train_value(cfg, agent, player):
 
         agent.value_nets[player].train()
         for _ in range(epoch_steps):
-            batch = next(iter(dataloader_train))
+            indices = np.random.choice(
+                    len(buf), size=(agent.cfg.value_batch_size,), replace=False)
+            batch = StateActionValue(
+                    state=dataset.tensors[0][indices],
+                    action=dataset.tensors[1][indices],
+                    value=dataset.tensors[2][indices])
 
             loss = _get_value_loss(agent, player, batch)
 
