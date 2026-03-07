@@ -134,6 +134,9 @@ class ReservoirBuffer:
   def __len__(self) -> int:
     return min(self.add_calls.item(), self.capacity.item())
 
+  def __getitem__(self, idx):
+    return np_tree.map_structure(lambda data: data[idx], self.experience)
+
   @classmethod
   def init(
       cls, capacity: int, experience: AdvantageMemory | StrategyMemory
@@ -204,6 +207,10 @@ class ReservoirBuffer:
     np_tree.map_structure(
         lambda x: np.random.shuffle(x[: len(self)]), self.experience
     )
+
+  def clear(self) -> None:
+    """Clears the reservoir buffer."""
+    self.add_calls = np.array(0)
 
 
 class DeepCFRSolver(policy.Policy):
