@@ -11,7 +11,6 @@ part of the project.
 > Checkout the C++ [API](../../games/mfg/README.md) documentaion
 
 
-
 The API encompasses the following directories:
 ```Bash
 ├── algorithms
@@ -37,7 +36,7 @@ A classic MFG that was derived from broad analisys of "Mean Field Games for Pede
 * *Actions*: Moving to adjacent cells.
 * *Reward*: A combination of a terminal reward (reaching a goal) and an instantaneous cost that is proportional to the density of other agents in the same cell.
 
-* *The "Mean Field"*: Instead of tracking $N$ individual players, the game tracks a probability distribution (the "population state"). Each agent optimizes its path based on the assumption that the rest of the crowd will also move to minimize their own congestion.
+Instead of tracking $N$ individual players, the game tracks a probability distribution (i.e., the "population state"). Each agent optimises its path based on the assumption that the rest of the crowd will also move to minimise their own congestion.
 
 The environment is configurable in the following high-level ways:
 - Congestion coefficients matrix.
@@ -104,15 +103,15 @@ This is a MFG form of a classic "Normal Form" (one-shot) game.
 
 ### Periodic aversion
 
-The game was introduced  to study ergodic MFG with explicit solution in Almulla, N.; Ferreira, R.; and Gomes, D. 2017. Two numerical approaches to stationary mean-field games. Dyn. Games Appl. 7(4):657-682 (https://arxiv.org/abs/1511.06576).
+The game was introduced  to study ergodic MFG with explicit solution in Almulla, N.; Ferreira, R.; and Gomes, D. 2017 of "Two numerical approaches to stationary mean-field games". Dyn. Games Appl. 7(4):657-682 (https://arxiv.org/abs/1511.06576).
 
 The environment is a 1D line of a certain size (e.g., 0 to 10), but it is periodic. This means if an agent moves past the maximum value, they "wrap around" to the beginning.
 
 * *State*: each agent is defined by their `(position, time_step)`.
 
-* *Actions*: at each step, the agent chooses a movement, modelled by a discrete set of "steps" (e.g., move left, stay, or move right).
+* *Actions*: at each time step, the agent chooses a movement, modelled by a discrete set of discrete navigation actions (e.g., move left, stay, or move right).
 
-* *Reward* (or negative cost) is composed of the following factors: `Congestion Cost` + `Movement Cost` + `Goal Distance`. If the agent is alone, this penalty is zero, but if the agent is in a "crowd," the penalty increases by a predefined function.
+* *Reward* (here, negative cost) is composed of the following factors: `Congestion Cost` + `Movement Cost` + `Goal Distance`. If the agent is alone, this penalty is zero, but if the agent is in a "crowd," the penalty increases by a predefined function.
 
 The game tracks the distribution of all agents across the circle at every time step. It could be useful to study circular flows and "traffic waves" that don't have a starting or ending point.
 
@@ -120,13 +119,12 @@ The game tracks the distribution of all agents across the circle at every time s
 
 This game corresponds to the predator-prey game described in section 5.4 of "Scaling up Mean Field Games with Online Mirror Descent" (https://arxiv.org/abs/2103.00623)
 
-* *State*: positions and targets of both agents (predator and prey) on a 2D grid.
+* *State*: positions and targets of both agents (predator and prey) on the 2D grid.
 * *Actions*: both populations can move in the standard grid directions (Up, Down, Left, Right, Stay).
 * *Rewards* are "coupled" between the two populations:
     1. Predator Reward ($R_{pred}$): $R = \text{Goal distance} - \eta * \log(\mu(x))$ where $\mu$ is a stationary distribution,
     2. Prey Reward ($R_{prey}$) which is defined likewise,
-    3. Additional Congestion Penalty.
-
+    3. A Congestion Penalty.
 
 The environment is configurable in the following high-level ways:
 - Number of populations.
@@ -138,12 +136,12 @@ The environment is configurable in the following high-level ways:
 
 > [!NOTE] 
 > This game is only implemented in C++, see [garnet.cc](../../games/mfg/garnet.cc).
+> `Python` contrbutions are welcome
 
 This game corresponds to a garnet defined in section 5.1 of
 "Scaling up Mean Field Games with Online Mirror Descent" (https://arxiv.org/abs/2103.00623.pdf)
 
-
-Garnet is a parametrized family of randomly generated static Mean Field Games. The reward is parametrized by $\eta$ as $r(x,a) - \eta * \log(\mu(x))$ where $r(x,a)$ is sampled uniformly over $[0,1]$ only with probability the sparsity and $0.0$ otherwise.
+Quoting the paper, Garnet is a parametrised family of randomly generated static Mean Field Games. The reward is parametrized by $\eta$ as $r(x,a) - \eta * \log(\mu(x))$ where $r(x,a)$ is sampled uniformly over $[0,1]$ only with probability the sparsity and $0.0$ otherwise.
 
 The environment is configurable in the following high-level ways:
 - Number of actions.
@@ -175,3 +173,6 @@ File tree of the implemented algorithms, implemented in the api, most of them ar
 │   ├── regret_matching.py
 │   └── regret_minimizer.py
 ```
+
+## Additional readings
+- "Bench-MFG: A Benchmark Suite for Learning in Stationary Mean Field Game" (https://arxiv.org/abs/2602.12517)
