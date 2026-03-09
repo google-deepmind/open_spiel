@@ -57,23 +57,23 @@ SIMULTANEOUS_PLAYER_ID = pyspiel.PlayerId.SIMULTANEOUS
 
 # Custom exception classes for better error handling
 class RLEnvironmentError(Exception):
-    """Base exception for RL environment errors."""
-    pass
+  """Base exception for RL environment errors."""
+  pass
 
 
 class IllegalActionError(RLEnvironmentError):
-    """Raised when an illegal action is attempted."""
-    pass
+  """Raised when an illegal action is attempted."""
+  pass
 
 
 class InvalidStateError(RLEnvironmentError):
-    """Raised when the environment is in an invalid state."""
-    pass
+  """Raised when the environment is in an invalid state."""
+  pass
 
 
 class InvalidParameterError(RLEnvironmentError):
-    """Raised when invalid parameters are provided."""
-    pass
+  """Raised when invalid parameters are provided."""
+  pass
 
 
 class TimeStep(
