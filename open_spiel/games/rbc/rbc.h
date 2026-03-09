@@ -137,7 +137,9 @@ enum class MovePhase {
 };
 
 struct SenseWindow {
-  bool operator==(const SenseWindow& other) const = default;
+  bool operator==(const SenseWindow& other) const {
+    return min_corner == other.min_corner && max_corner == other.max_corner;
+  }
 
   std::string ToString() const {
     return chess::SquareToString(min_corner) + ":" +
@@ -226,7 +228,7 @@ class RbcState : public State {
 
   absl::optional<std::vector<double>> MaybeFinalReturns() const;
 
-  SenseWindow SenseWindow(Player player) const;
+  SenseWindow GetSenseWindow(Player player) const;
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.
