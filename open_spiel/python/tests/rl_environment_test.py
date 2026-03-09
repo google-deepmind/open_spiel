@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.pybind11.pyspiel."""
-
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
@@ -111,12 +109,11 @@ class RLEnvironmentTest(absltest.TestCase):
       actions = [act[0] for act in time_step.observations["legal_actions"]]
       time_step = env.step(actions)
 
-  def test_set_and_get_state(self):
+  def setup_set_and_get_state(self):
     env_ttt1 = rl_environment.Environment("tic_tac_toe")
     env_ttt2 = rl_environment.Environment("tic_tac_toe")
     env_kuhn1 = rl_environment.Environment("kuhn_poker", players=2)
     env_kuhn2 = rl_environment.Environment("kuhn_poker", players=3)
-
     env_ttt1.reset()
     env_ttt2.reset()
     env_kuhn1.reset()
@@ -125,18 +122,39 @@ class RLEnvironmentTest(absltest.TestCase):
     # Transfering states between identical games should work.
     env_ttt1.set_state(env_ttt2.get_state)
     env_ttt2.set_state(env_ttt1.get_state)
+    return env_ttt1, env_ttt2, env_kuhn1, env_kuhn2
+
+  def test_set_and_get_state_kuhn1_get_state_fail(self):
+    env_ttt1, _, env_kuhn1, _ = self.setup_set_and_get_state()
 
     # Transfering states between different games or games with different
     # parameters should fail.
-    with self.assertRaises(AssertionError):
+    with self.assertRaises(rl_environment.InvalidStateError):
       self.fail(env_ttt1.set_state(env_kuhn1.get_state))
-    with self.assertRaises(AssertionError):
+
+  def test_set_and_get_state_ttt1_get_state_fail(self):
+    env_ttt1, _, env_kuhn1, _ = self.setup_set_and_get_state()
+
+    # Transfering states between different games or games with different
+    # parameters should fail.
+    with self.assertRaises(rl_environment.InvalidStateError):
       self.fail(env_kuhn1.set_state(env_ttt1.get_state))
 
-    with self.assertRaises(AssertionError):
+  def test_set_and_get_state_kuhn2_get_state_fail(self):
+    _, _, env_kuhn1, env_kuhn2 = self.setup_set_and_get_state()
+
+    # Transfering states between different games or games with different
+    # parameters should fail.
+    with self.assertRaises(rl_environment.InvalidStateError):
       self.fail(env_kuhn1.set_state(env_kuhn2.get_state))
-    with self.assertRaises(AssertionError):
-      self.fail(env_kuhn2.set_state(env_kuhn1.get_state))
+
+  def test_set_and_get_state_ttt2_get_state_fail(self):
+    _, env_ttt2, env_kuhn1, _ = self.setup_set_and_get_state()
+
+    # Transfering states between different games or games with different
+    # parameters should fail.
+    with self.assertRaises(rl_environment.InvalidStateError):
+      self.fail(env_ttt2.set_state(env_kuhn1.get_state))
 
 
 if __name__ == "__main__":
