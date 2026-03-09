@@ -12,11 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/rbc/rbc.h"
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "open_spiel/games/chess/chess.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/games/rbc/rbc.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -178,6 +186,92 @@ void TestPawnBreachingMoveTwoSquares() {
   SPIEL_CHECK_TRUE(down_cast<RbcState*>(state.get())->illegal_move_attempted());
 }
 
+void TestSenseUncentered() {
+  auto game = LoadGame("rbc", {{"sense_centered", GameParameter(false)}});
+  auto state = game->NewInitialState();
+  auto rbc_game = down_cast<const RbcGame*>(game.get());
+  SPIEL_CHECK_EQ(state->ActionToString(0), "Sense a1");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense a1"), 0);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(0),
+                 (SenseWindow{{0, 0}, {2, 2}}));
+  SPIEL_CHECK_EQ(state->ActionToString(30), "Sense a6");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense a6"), 30);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(30),
+                 (SenseWindow{{0, 5}, {2, 7}}));
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_EQ(legal_actions.size(), 36);
+  state->ApplyAction(state->StringToAction("Sense f6"));
+  std::string obs_string = state->ObservationString();
+  SPIEL_CHECK_EQ(obs_string,
+                 "5bnr/5ppp/5   /8/8/8/PPPPPPPP/RNBQKBNR KQ m - w -");
+}
+
+void TestSenseCentered() {
+  auto game = LoadGame("rbc", {{"sense_centered", GameParameter(true)}});
+  auto state = game->NewInitialState();
+  auto rbc_game = down_cast<const RbcGame*>(game.get());
+  SPIEL_CHECK_EQ(state->ActionToString(0), "Sense b2");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense b2"), 0);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(0),
+                 (SenseWindow{{0, 0}, {2, 2}}));
+  SPIEL_CHECK_EQ(state->ActionToString(30), "Sense b7");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense b7"), 30);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(30),
+                 (SenseWindow{{0, 5}, {2, 7}}));
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_EQ(legal_actions.size(), 36);
+  state->ApplyAction(state->StringToAction("Sense g7"));
+  std::string obs_string = state->ObservationString();
+  SPIEL_CHECK_EQ(obs_string,
+                 "5bnr/5ppp/5   /8/8/8/PPPPPPPP/RNBQKBNR KQ m - w -");
+}
+
+void TestSenseBorder() {
+  auto game = LoadGame("rbc", {{"sense_border", GameParameter(true)}});
+  auto state = game->NewInitialState();
+  auto rbc_game = down_cast<const RbcGame*>(game.get());
+  SPIEL_CHECK_EQ(state->ActionToString(Player{0}, 0), "Sense a1");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense a1"), 0);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(0),
+                 (SenseWindow{{0, 0}, {2, 2}}));
+  SPIEL_CHECK_EQ(state->ActionToString(Player{0}, 56), "Sense a8");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense a8"), 56);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(56),
+                 (SenseWindow{{0, 7}, {2, 7}}));
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_EQ(legal_actions.size(), 64);
+
+  state->ApplyAction(state->StringToAction("Sense g7"));
+  std::string obs_string = state->ObservationString();
+  SPIEL_CHECK_EQ(obs_string, "6nr/6pp/8/8/8/8/PPPPPPPP/RNBQKBNR KQ m - w -");
+}
+
+void TestSenseCenteredAndBorder() {
+  auto game = LoadGame("rbc", {{"sense_centered", GameParameter(true)},
+                               {"sense_border", GameParameter(true)}});
+  auto state = game->NewInitialState();
+  auto rbc_game = down_cast<const RbcGame*>(game.get());
+  SPIEL_CHECK_EQ(state->ActionToString(Player{0}, 0), "Sense a1");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense a1"), 0);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(0),
+                 (SenseWindow{{0, 0}, {1, 1}}));
+  SPIEL_CHECK_EQ(state->ActionToString(9), "Sense b2");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense b2"), 9);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(9),
+                 (SenseWindow{{0, 0}, {2, 2}}));
+  SPIEL_CHECK_EQ(state->ActionToString(49), "Sense b7");
+  SPIEL_CHECK_EQ(state->StringToAction("Sense b7"), 49);
+  SPIEL_CHECK_EQ(rbc_game->ActionToSenseWindow(49),
+                 (SenseWindow{{0, 5}, {2, 7}}));
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_EQ(legal_actions.size(), 64);
+
+  state->ApplyAction(state->StringToAction("Sense g7"));
+  std::string obs_string = state->ObservationString();
+  SPIEL_CHECK_EQ(obs_string,
+                 "5bnr/5ppp/5   /8/8/8/PPPPPPPP/RNBQKBNR KQ m - w -");
+}
+
 void BasicRbcTests(int board_size) {
   GameParameters params;
   params["board_size"] = GameParameter(board_size);
@@ -199,6 +293,10 @@ int main(int argc, char** argv) {
   open_spiel::rbc::TestKingCaptureEndsTheGame();
   open_spiel::rbc::TestMakeKingMoveInCheck();
   open_spiel::rbc::TestPawnBreachingMoveTwoSquares();
+  open_spiel::rbc::TestSenseUncentered();
+  open_spiel::rbc::TestSenseCentered();
+  open_spiel::rbc::TestSenseBorder();
+  open_spiel::rbc::TestSenseCenteredAndBorder();
 
   open_spiel::rbc::BasicRbcTests(/*board_size=*/8);
   open_spiel::rbc::BasicRbcTests(/*board_size=*/4);

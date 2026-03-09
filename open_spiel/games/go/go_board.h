@@ -18,6 +18,8 @@
 #include <array>
 #include <cstdint>
 #include <ostream>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"

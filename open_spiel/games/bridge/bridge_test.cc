@@ -14,10 +14,13 @@
 
 #include "open_spiel/games/bridge/bridge.h"
 
+#include <random>
+
 #include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
 #include "open_spiel/games/bridge/bridge_uncontested_bidding.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -84,6 +87,255 @@ void DeserializeDoubleDummyResults() {
   SPIEL_CHECK_EQ(serialized, new_state->Serialize());
 }
 
+void ResamplePlayPhaseTests() {
+  testing::ResampleInfostateTest(
+      *LoadGame("bridge(use_double_dummy_result=false)"), 10);
+}
+
+void ResamplePreservesPlayerCards() {
+  std::mt19937 rng(42);
+  UniformProbabilitySampler sampler;
+  auto game = LoadGame("bridge(use_double_dummy_result=false)");
+  for (int sim = 0; sim < 10; ++sim) {
+    auto state = game->NewInitialState();
+    while (!state->IsTerminal()) {
+      if (state->IsChanceNode()) {
+        auto outcomes = state->ChanceOutcomes();
+        state->ApplyAction(SampleAction(outcomes, rng).first);
+        continue;
+      }
+      if (state->CurrentPlayer() >= 0) {
+        for (int p = 0; p < kNumPlayers; ++p) {
+          auto resampled = state->ResampleFromInfostate(p, sampler);
+          auto* orig = dynamic_cast<const BridgeState*>(state.get());
+          auto* resamp = dynamic_cast<const BridgeState*>(resampled.get());
+          SPIEL_CHECK_EQ(orig->CurrentPhase(), resamp->CurrentPhase());
+          for (int card = 0; card < kNumCards; ++card) {
+            if (orig->PrivateObservationTensor(p)[card] == 1.0) {
+              SPIEL_CHECK_EQ(resamp->PrivateObservationTensor(p)[card], 1.0);
+            }
+          }
+        }
+      }
+      auto actions = state->LegalActions();
+      std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+      state->ApplyAction(actions[dist(rng)]);
+    }
+  }
+}
+
+void ResamplePreservesDummyCards() {
+  std::mt19937 rng(123);
+  UniformProbabilitySampler sampler;
+  auto game = LoadGame("bridge(use_double_dummy_result=false)");
+  for (int sim = 0; sim < 10; ++sim) {
+    auto state = game->NewInitialState();
+    while (!state->IsTerminal()) {
+      if (state->IsChanceNode()) {
+        auto outcomes = state->ChanceOutcomes();
+        state->ApplyAction(SampleAction(outcomes, rng).first);
+        continue;
+      }
+      auto* bridge_state = dynamic_cast<const BridgeState*>(state.get());
+      if (bridge_state->CurrentPhase() == 2 && state->CurrentPlayer() >= 0) {
+        for (int p = 0; p < kNumPlayers; ++p) {
+          auto resampled = state->ResampleFromInfostate(p, sampler);
+          SPIEL_CHECK_EQ(state->InformationStateString(p),
+                         resampled->InformationStateString(p));
+          SPIEL_CHECK_EQ(state->InformationStateTensor(p),
+                         resampled->InformationStateTensor(p));
+        }
+      }
+      auto actions = state->LegalActions();
+      std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+      state->ApplyAction(actions[dist(rng)]);
+    }
+  }
+}
+
+void ResampleCanPlayToCompletion() {
+  std::mt19937 rng(77);
+  UniformProbabilitySampler sampler;
+  auto game = LoadGame("bridge(use_double_dummy_result=false)");
+  for (int sim = 0; sim < 10; ++sim) {
+    auto state = game->NewInitialState();
+    while (state->IsChanceNode()) {
+      auto outcomes = state->ChanceOutcomes();
+      state->ApplyAction(SampleAction(outcomes, rng).first);
+    }
+    auto actions = state->LegalActions();
+    std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+    state->ApplyAction(actions[dist(rng)]);
+
+    while (!state->IsTerminal()) {
+      if (state->IsChanceNode()) {
+        auto outcomes = state->ChanceOutcomes();
+        state->ApplyAction(SampleAction(outcomes, rng).first);
+        continue;
+      }
+      int p = state->CurrentPlayer();
+      auto resampled = state->ResampleFromInfostate(p, sampler);
+      while (!resampled->IsTerminal()) {
+        auto res_actions = resampled->LegalActions();
+        SPIEL_CHECK_FALSE(res_actions.empty());
+        std::uniform_int_distribution<int> res_dist(0, res_actions.size() - 1);
+        resampled->ApplyAction(res_actions[res_dist(rng)]);
+      }
+      SPIEL_CHECK_TRUE(resampled->IsTerminal());
+      auto returns = resampled->Returns();
+      double sum = 0;
+      for (double r : returns) sum += r;
+      SPIEL_CHECK_TRUE(Near(sum, 0.0, 1e-9));
+      auto orig_actions = state->LegalActions();
+      std::uniform_int_distribution<int> orig_dist(0, orig_actions.size() - 1);
+      state->ApplyAction(orig_actions[orig_dist(rng)]);
+    }
+  }
+}
+
+void ResampleProducesDifferentHands() {
+  std::mt19937 rng(99);
+  UniformProbabilitySampler sampler;
+  auto game = LoadGame("bridge(use_double_dummy_result=false)");
+  int different_count = 0;
+  int total_count = 0;
+  for (int sim = 0; sim < 5; ++sim) {
+    auto state = game->NewInitialState();
+    while (!state->IsTerminal()) {
+      if (state->IsChanceNode()) {
+        auto outcomes = state->ChanceOutcomes();
+        state->ApplyAction(SampleAction(outcomes, rng).first);
+        continue;
+      }
+      auto* bridge_state = dynamic_cast<const BridgeState*>(state.get());
+      if (bridge_state->CurrentPhase() == 1 ||
+          bridge_state->CurrentPhase() == 2) {
+        int p = state->CurrentPlayer();
+        auto resampled = state->ResampleFromInfostate(p, sampler);
+        if (state->ToString() != resampled->ToString()) {
+          ++different_count;
+        }
+        ++total_count;
+      }
+      auto actions = state->LegalActions();
+      std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+      state->ApplyAction(actions[dist(rng)]);
+    }
+  }
+  SPIEL_CHECK_GT(different_count, 0);
+}
+
+void ResampleAtOpeningLead() {
+  std::mt19937 rng(200);
+  UniformProbabilitySampler sampler;
+  auto game = LoadGame("bridge(use_double_dummy_result=false)");
+  for (int sim = 0; sim < 20; ++sim) {
+    auto state = game->NewInitialState();
+    while (state->IsChanceNode()) {
+      auto outcomes = state->ChanceOutcomes();
+      state->ApplyAction(SampleAction(outcomes, rng).first);
+    }
+    bool reached_opening_lead = false;
+    while (!state->IsTerminal()) {
+      if (state->IsChanceNode()) {
+        auto outcomes = state->ChanceOutcomes();
+        state->ApplyAction(SampleAction(outcomes, rng).first);
+        continue;
+      }
+      auto* bridge_state = dynamic_cast<const BridgeState*>(state.get());
+      if (bridge_state->CurrentPhase() == 2 && !reached_opening_lead) {
+        reached_opening_lead = true;
+        for (int p = 0; p < kNumPlayers; ++p) {
+          auto resampled = state->ResampleFromInfostate(p, sampler);
+          SPIEL_CHECK_EQ(state->InformationStateString(p),
+                         resampled->InformationStateString(p));
+          SPIEL_CHECK_EQ(state->InformationStateTensor(p),
+                         resampled->InformationStateTensor(p));
+          SPIEL_CHECK_EQ(state->CurrentPlayer(), resampled->CurrentPlayer());
+        }
+      }
+      auto actions = state->LegalActions();
+      std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+      state->ApplyAction(actions[dist(rng)]);
+    }
+  }
+}
+
+void ResampleMidTrick() {
+  std::mt19937 rng(300);
+  UniformProbabilitySampler sampler;
+  auto game = LoadGame("bridge(use_double_dummy_result=false)");
+  for (int sim = 0; sim < 10; ++sim) {
+    auto state = game->NewInitialState();
+    bool tested_mid_trick = false;
+    while (!state->IsTerminal()) {
+      if (state->IsChanceNode()) {
+        auto outcomes = state->ChanceOutcomes();
+        state->ApplyAction(SampleAction(outcomes, rng).first);
+        continue;
+      }
+      auto* bridge_state = dynamic_cast<const BridgeState*>(state.get());
+      if (bridge_state->CurrentPhase() == 2 && !tested_mid_trick) {
+        auto actions = state->LegalActions();
+        std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+        state->ApplyAction(actions[dist(rng)]);
+        if (state->IsTerminal()) break;
+        bridge_state = dynamic_cast<const BridgeState*>(state.get());
+        if (bridge_state->CurrentPhase() == 2) {
+          tested_mid_trick = true;
+          for (int p = 0; p < kNumPlayers; ++p) {
+            auto resampled = state->ResampleFromInfostate(p, sampler);
+            SPIEL_CHECK_EQ(state->InformationStateString(p),
+                           resampled->InformationStateString(p));
+            SPIEL_CHECK_EQ(state->InformationStateTensor(p),
+                           resampled->InformationStateTensor(p));
+            SPIEL_CHECK_EQ(state->CurrentPlayer(), resampled->CurrentPlayer());
+          }
+        }
+        continue;
+      }
+      auto actions = state->LegalActions();
+      std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+      state->ApplyAction(actions[dist(rng)]);
+    }
+  }
+}
+
+void ResampleFromAllPlayerPerspectives() {
+  std::mt19937 rng(400);
+  UniformProbabilitySampler sampler;
+  auto game = LoadGame("bridge(use_double_dummy_result=false)");
+  for (int sim = 0; sim < 10; ++sim) {
+    auto state = game->NewInitialState();
+    int play_steps = 0;
+    while (!state->IsTerminal()) {
+      if (state->IsChanceNode()) {
+        auto outcomes = state->ChanceOutcomes();
+        state->ApplyAction(SampleAction(outcomes, rng).first);
+        continue;
+      }
+      auto* bridge_state = dynamic_cast<const BridgeState*>(state.get());
+      if (bridge_state->CurrentPhase() == 2) {
+        ++play_steps;
+        if (play_steps % 4 == 0) {
+          for (int p = 0; p < kNumPlayers; ++p) {
+            auto resampled = state->ResampleFromInfostate(p, sampler);
+            auto* resamp = dynamic_cast<const BridgeState*>(resampled.get());
+            SPIEL_CHECK_EQ(bridge_state->CurrentPhase(),
+                           resamp->CurrentPhase());
+            SPIEL_CHECK_EQ(state->CurrentPlayer(), resampled->CurrentPlayer());
+            SPIEL_CHECK_EQ(state->InformationStateString(p),
+                           resampled->InformationStateString(p));
+          }
+        }
+      }
+      auto actions = state->LegalActions();
+      std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+      state->ApplyAction(actions[dist(rng)]);
+    }
+  }
+}
+
 }  // namespace
 }  // namespace bridge
 }  // namespace open_spiel
@@ -94,4 +346,12 @@ int main(int argc, char** argv) {
   open_spiel::bridge::BasicGameTests();
   open_spiel::bridge::SerializeDoubleDummyResults();
   open_spiel::bridge::DeserializeDoubleDummyResults();
+  open_spiel::bridge::ResamplePlayPhaseTests();
+  open_spiel::bridge::ResamplePreservesPlayerCards();
+  open_spiel::bridge::ResamplePreservesDummyCards();
+  open_spiel::bridge::ResampleCanPlayToCompletion();
+  open_spiel::bridge::ResampleProducesDifferentHands();
+  open_spiel::bridge::ResampleAtOpeningLead();
+  open_spiel::bridge::ResampleMidTrick();
+  open_spiel::bridge::ResampleFromAllPlayerPerspectives();
 }

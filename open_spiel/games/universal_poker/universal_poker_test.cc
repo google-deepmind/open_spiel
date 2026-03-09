@@ -1213,6 +1213,92 @@ void TestStateStruct() {
   SPIEL_CHECK_EQ(up_state_struct->best_hand_rank_types[1], "Straight");
 }
 
+void TestResampleFromInfostate1HoleCard() {
+  std::shared_ptr<const Game> game = LoadGame("universal_poker");
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(0);
+  state->ApplyAction(4);
+  state->ApplyAction(1);
+  state->ApplyAction(1);
+  state->ApplyAction(8);
+
+  std::mt19937 rng(42);
+  auto rng_func = [&rng]() -> double {
+    return std::uniform_real_distribution<double>(0.0, 1.0)(rng);
+  };
+
+  auto* up_state = down_cast<UniversalPokerState*>(state.get());
+  auto dist = up_state->GetHistoriesConsistentWithInfostate(0);
+  SPIEL_CHECK_TRUE(dist != nullptr);
+  int deck_size = 4 * 6;
+  int known_cards = 1 + 1;
+  int remaining = deck_size - known_cards;
+  SPIEL_CHECK_EQ(dist->first.size(), remaining);
+
+  std::string orig_infostate_p0 = state->InformationStateString(0);
+  for (const auto& s : dist->first) {
+    SPIEL_CHECK_EQ(s->CurrentPlayer(), state->CurrentPlayer());
+    SPIEL_CHECK_EQ(s->InformationStateString(0), orig_infostate_p0);
+  }
+
+  std::unique_ptr<State> resampled = state->ResampleFromInfostate(0, rng_func);
+  SPIEL_CHECK_TRUE(resampled != nullptr);
+  SPIEL_CHECK_EQ(resampled->InformationStateString(0), orig_infostate_p0);
+
+  std::string orig_infostate_p1 = state->InformationStateString(1);
+  resampled = state->ResampleFromInfostate(1, rng_func);
+  SPIEL_CHECK_TRUE(resampled != nullptr);
+  SPIEL_CHECK_EQ(resampled->InformationStateString(1), orig_infostate_p1);
+}
+
+void TestResampleFromInfostate2HoleCards() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker("
+      "betting=nolimit,"
+      "numPlayers=2,"
+      "numRounds=2,"
+      "blind=100 50,"
+      "firstPlayer=2 1,"
+      "numSuits=4,"
+      "numRanks=3,"
+      "numHoleCards=2,"
+      "numBoardCards=0 1,"
+      "stack=1000 1000,"
+      "bettingAbstraction=fcpa)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(0);
+  state->ApplyAction(1);
+  state->ApplyAction(4);
+  state->ApplyAction(5);
+  state->ApplyAction(1);
+  state->ApplyAction(1);
+  state->ApplyAction(8);
+
+  std::mt19937 rng(42);
+  auto rng_func = [&rng]() -> double {
+    return std::uniform_real_distribution<double>(0.0, 1.0)(rng);
+  };
+
+  auto* up_state = down_cast<UniversalPokerState*>(state.get());
+  auto dist = up_state->GetHistoriesConsistentWithInfostate(0);
+  SPIEL_CHECK_TRUE(dist != nullptr);
+  int deck_size = 4 * 3;
+  int known_cards = 2 + 1;
+  int remaining = deck_size - known_cards;
+  int expected_hands = remaining * (remaining - 1) / 2;
+  SPIEL_CHECK_EQ(dist->first.size(), expected_hands);
+
+  std::string orig_infostate_p0 = state->InformationStateString(0);
+  for (const auto& s : dist->first) {
+    SPIEL_CHECK_EQ(s->CurrentPlayer(), state->CurrentPlayer());
+    SPIEL_CHECK_EQ(s->InformationStateString(0), orig_infostate_p0);
+  }
+
+  std::unique_ptr<State> resampled = state->ResampleFromInfostate(0, rng_func);
+  SPIEL_CHECK_TRUE(resampled != nullptr);
+  SPIEL_CHECK_EQ(resampled->InformationStateString(0), orig_infostate_p0);
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -1257,4 +1343,6 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::CalculateOddsTestInitialState();
   open_spiel::universal_poker::CalculateOddsTestTerminalState();
   open_spiel::universal_poker::TestStateStruct();
+  open_spiel::universal_poker::TestResampleFromInfostate1HoleCard();
+  open_spiel::universal_poker::TestResampleFromInfostate2HoleCards();
 }

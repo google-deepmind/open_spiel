@@ -3,10 +3,10 @@ game: rbc
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
 GameType.information = Information.IMPERFECT_INFORMATION
-GameType.long_name = "Reconnaisance Blind Chess"
+GameType.long_name = "Reconnaissance Blind Chess"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["board_size", "fen", "sense_size"]
+GameType.parameter_specification = ["board_size", "fen", "sense_border", "sense_centered", "sense_size"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 4674
 PolicyTensorShape() = [4674]
 MaxChanceOutcomes() = 0
-GetParameters() = {board_size=8,fen=rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1,sense_size=3}
+GetParameters() = {board_size=8,fen=rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1,sense_border=False,sense_centered=False,sense_size=3}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0

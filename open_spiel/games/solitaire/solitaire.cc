@@ -1458,8 +1458,8 @@ bool SolitaireState::IsReversible(const Card& source,
     case LocationType::kTableau: {
       // Move is irreversible if its source is a bottom card or over a hidden
       // card. Basically if it's the first non-hidden_ card in the pile/tableau.
-      auto it = std::find_if(source_pile->GetCards().begin(),
-                             source_pile->GetCards().end(),
+      auto cards = source_pile->GetCards();
+      auto it = std::find_if(cards.begin(), cards.end(),
                              [](const Card& card) { return card.GetHidden(); });
 
       return !(*it == source);

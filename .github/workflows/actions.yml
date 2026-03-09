@@ -5,12 +5,33 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  # This allows manual triggering of workflows
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Workflow dispatch (triggered manually)'
+        required: false
+        default: 'build_and_test (manual)'
 
 jobs:
   build:
     strategy:
       matrix:
         include:
+        - os: ubuntu-24.04
+          OS_PYTHON_VERSION: "3.14"
+          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+        - os: ubuntu-24.04
+          OS_PYTHON_VERSION: "3.13"
+          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: ubuntu-24.04
           OS_PYTHON_VERSION: "3.12"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
@@ -55,25 +76,32 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:  ${{ matrix.OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL }}
 
     steps:
-    - uses: actions/checkout@v6
-    - uses: julia-actions/setup-julia@v2
-      with:
-        version: 1.8
-    - uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.OS_PYTHON_VERSION }}
-    - name: Ad-hoc fix
-      if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
-      run: |
-        # workaround for https://github.com/deepmind/open_spiel/issues/606
-        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -e 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
-    - name: Install
-      run: |
-        pwd
-        ./open_spiel/scripts/ci_python_prechecks.sh
-        chmod +x install.sh
-        ./install.sh
-    - name: Build and test
-      run: |
-        python3 --version
-        ./open_spiel/scripts/ci_script.sh
+      
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.8'
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.OS_PYTHON_VERSION }}
+
+      - name: Ad-hoc fix
+        if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
+        run: |
+          # workaround for https://github.com/deepmind/open_spiel/issues/606
+          sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -e 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
+      - name: Install
+        run: |
+          pwd
+          ./open_spiel/scripts/ci_python_prechecks.sh
+          chmod +x install.sh
+          ./install.sh
+      - name: Build and test
+        run: |
+          python3 --version
+          ./open_spiel/scripts/ci_script.sh

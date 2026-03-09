@@ -23,7 +23,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
@@ -202,16 +202,14 @@ std::unique_ptr<ActionStruct> TicTacToeState::ActionToStruct(
   return action_struct;
 }
 
-Action TicTacToeState::StructToAction(
+std::vector<Action> TicTacToeState::StructToActions(
     const ActionStruct& action_struct) const {
-  const auto* ttt_action_struct =
-      dynamic_cast<const TicTacToeActionStruct*>(&action_struct);
-  SPIEL_CHECK_TRUE(ttt_action_struct != nullptr);
-  SPIEL_CHECK_GE(ttt_action_struct->row, 0);
-  SPIEL_CHECK_LT(ttt_action_struct->row, kNumRows);
-  SPIEL_CHECK_GE(ttt_action_struct->col, 0);
-  SPIEL_CHECK_LT(ttt_action_struct->col, kNumCols);
-  return ttt_action_struct->row * kNumCols + ttt_action_struct->col;
+  const auto* a = SafeActionCast<TicTacToeActionStruct>(action_struct);
+  SPIEL_CHECK_GE(a->row, 0);
+  SPIEL_CHECK_LT(a->row, kNumRows);
+  SPIEL_CHECK_GE(a->col, 0);
+  SPIEL_CHECK_LT(a->col, kNumCols);
+  return {a->row * kNumCols + a->col};
 }
 
 bool TicTacToeState::IsTerminal() const {
@@ -272,10 +270,10 @@ std::string TicTacToeGame::ActionToString(Player player,
 }
 
 TicTacToeState::TicTacToeState(const std::shared_ptr<const Game> game,
-                               const nlohmann::json& json) : State(game) {
+                               const TicTacToeStateStruct& state_struct)
+    : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
 
-  TicTacToeStateStruct state_struct(json);
   if (state_struct.board.size() != kNumCells) {
     SpielFatalError(absl::StrFormat("Invalid board size: expected %d, got %d",
                                     kNumCells, state_struct.board.size()));

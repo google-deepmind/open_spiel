@@ -23,7 +23,7 @@ then
   echo "Usage: test_wheel <mode (full|basic)> <project main dir> [python binary]"
   echo ""
   echo "Basic mode tests only the python functionaly (no ML libraries)"
-  echo "Full mode installs the extra ML libraries and the wheel. (requires Python >= 3.7 for JAX)."
+  echo "Full mode installs the extra ML libraries and the wheel. (requires Python >= 3.11 for JAX)."
   exit -1
 fi
 

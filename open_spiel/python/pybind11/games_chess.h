@@ -17,7 +17,7 @@
 
 #include "open_spiel/python/pybind11/pybind11.h"
 
-// Initialze the Python interface for games/negotiation.
+// Initialize the Python interface for chess.
 namespace open_spiel {
 void init_pyspiel_games_chess(::pybind11::module &m);
 }

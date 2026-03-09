@@ -22,10 +22,12 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
+#include "open_spiel/games/go/sgf_reader.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -51,9 +53,9 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"komi", GameParameter(7.5)},
-     {"board_size", GameParameter(19)},
-     {"handicap", GameParameter(0)},
+    {{"komi", GameParameter(kDefaultKomi)},
+     {"board_size", GameParameter(kDefaultBoardSize)},
+     {"handicap", GameParameter(kDefaultHandicap)},
      // After the maximum game length, the game will end arbitrarily and the
      // score is computed as usual (i.e. number of stones + komi).
      // It's advised to only use shorter games to compute win-rates.
@@ -118,7 +120,8 @@ GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
       komi_(komi),
       handicap_(handicap),
       max_game_length_(game_->MaxGameLength()),
-      to_play_(GoColor::kBlack) {
+      to_play_(GoColor::kBlack),
+      initial_sgf_string_("") {
   ResetBoard();
 }
 
@@ -299,6 +302,16 @@ void GoState::ResetBoard() {
   superko_ = false;
 }
 
+std::string GoState::Serialize() const {
+  std::string ser_str = State::Serialize();
+  if (!initial_sgf_string_.empty()) {
+    return absl::StrCat(kSerializeStartingState, initial_sgf_string_, "\n",
+                        ser_str);
+  } else {
+    return ser_str;
+  }
+}
+
 GoGame::GoGame(const GameParameters& params)
     : Game(kGameType, params),
       komi_(ParameterValue<double>("komi")),
@@ -306,6 +319,52 @@ GoGame::GoGame(const GameParameters& params)
       handicap_(ParameterValue<int>("handicap")),
       max_game_length_(ParameterValue<int>(
           "max_game_length", DefaultMaxGameLength(board_size_))) {}
+
+std::unique_ptr<State> GoGame::NewInitialState(
+    const std::string& sgf_string) const {
+  VectorOfGamesAndStates games_and_states = LoadGamesFromSGFString(sgf_string);
+  const GameAndState& game_and_state = games_and_states.back();
+
+  // First check that the game parameters are the same.
+  const GoGame* other_game =
+      down_cast<const GoGame*>(game_and_state.first.get());
+  SPIEL_CHECK_EQ(board_size_, other_game->board_size_);
+  SPIEL_CHECK_EQ(komi_, other_game->komi_);
+  SPIEL_CHECK_EQ(handicap_, other_game->handicap_);
+
+  const auto* other_state =
+      static_cast<const GoState*>(game_and_state.second.get());
+  auto state = std::unique_ptr<State>(
+      new GoState(shared_from_this(), board_size_, komi_, handicap_));
+
+  // if there's a history, just play back the moves
+  if (!other_state->History().empty()) {
+    for (const auto& action : other_state->History()) {
+      state->ApplyAction(action);
+    }
+    // Do not save the SGF string in this case because it is already included
+    // in the state.
+    static_cast<GoState*>(state.get())->initial_sgf_string_ = "";
+  } else {
+    // if there isn't, then just copy the boards
+    GoBoard* my_board = static_cast<GoState*>(state.get())->mutable_board();
+    *my_board = other_state->board();
+
+    // Change all the whitespace in the SGF string so that there are no
+    // newlines.
+    std::string sgf_string_copy = sgf_string;
+    for (int i = 0; i < sgf_string_copy.length(); ++i) {
+      if (absl::ascii_isspace(sgf_string_copy[i])) {
+        sgf_string_copy[i] = ' ';
+      }
+    }
+    static_cast<GoState*>(state.get())->initial_sgf_string_ = sgf_string_copy;
+  }
+
+  SPIEL_CHECK_EQ(state->ToString(), other_state->ToString());
+
+  return state;
+}
 
 }  // namespace go
 }  // namespace open_spiel

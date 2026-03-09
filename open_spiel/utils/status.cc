@@ -12,23 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Examples of how to use the C++ API:
-// - https://github.com/pytorch/examples/tree/master/cpp
-// - https://github.com/prabhuomkar/pytorch-cpp
+#include "open_spiel/utils/status.h"
 
-#include "open_spiel/spiel_utils.h"
-#include "torch/torch.h"
+#include <iostream>
+#include <string>
 
-namespace {
+namespace open_spiel {
 
-void TestMatrixMultiplication() {
-  at::Tensor mat = torch::rand({3, 3});
-  at::Tensor identity = torch::ones({3, 3});
-  at::Tensor multiplied = mat * identity;
-  int num_identical_elements = (mat == multiplied).sum().item().to<int>();
-  SPIEL_CHECK_EQ(num_identical_elements, 9);
+Status OkStatus() {
+  return Status(StatusValue::kOk, "");
 }
 
-}  // namespace
+Status ErrorStatus(const std::string& message) {
+  return Status(StatusValue::kError, message);
+}
 
-int main() { TestMatrixMultiplication(); }
+std::string Status::ToString() const {
+  switch (status_value_) {
+    case StatusValue::kOk:
+      return "OkStatus";
+    case StatusValue::kError:
+      return "ErrorStatus: " + message_;
+  }
+}
+
+std::ostream& operator<<(std::ostream& os, const Status& status) {
+  os << status.ToString();
+  return os;
+}
+
+}  // namespace open_spiel

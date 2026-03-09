@@ -173,7 +173,7 @@ def main(argv: Sequence[str]) -> None:
       _AVG_POL_NUM_TRAINING_STEPS_PER_ITERATION.value)
 
   # Metrics writer will also log the metrics to stderr.
-  just_logging = _LOGDIR.value is None or jax.host_id() > 0
+  just_logging = _LOGDIR.value is None or jax.process_index() > 0
   writer = metrics.create_default_writer(
       _LOGDIR.value, just_logging=just_logging)
 

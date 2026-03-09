@@ -14,15 +14,22 @@
 
 #include "open_spiel/games/nfg_game/nfg_game.h"
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <functional>
 #include <memory>
+#include <numeric>
+#include <string>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/matrix_game.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tensor_game.h"
@@ -52,7 +59,8 @@ const GameType kGameType{/*short_name=*/"nfg_game",
                          /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
                          {{"filename", GameParameter(std::string(""))}},
-                         /*default_loadable=*/false};
+                         /*default_loadable=*/false,
+                         /*is_concrete*/false};
 
 class NFGGameParser {
  public:

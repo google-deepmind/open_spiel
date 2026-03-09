@@ -454,7 +454,7 @@ KriegspielUmpireMessage GetUmpireMessage(const chess::ChessBoard &chess_board,
       msg.square = move.to;
   }
 
-  // todo optimze when undo is optimized
+  // todo optimize when undo is optimized
   chess::ChessBoard board_copy = chess_board;
   board_copy.ApplyMove(move);
 

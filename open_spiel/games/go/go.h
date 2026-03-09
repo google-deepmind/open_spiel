@@ -44,6 +44,10 @@ namespace open_spiel {
 namespace go {
 
 // Constants.
+constexpr float kDefaultKomi = 7.5;
+constexpr int kDefaultBoardSize = 19;
+constexpr int kDefaultHandicap = 0;
+
 inline constexpr int NumPlayers() { return 2; }
 inline constexpr double LossUtility() { return -1; }
 inline constexpr double WinUtility() { return 1; }
@@ -99,6 +103,9 @@ struct GoStateStruct : StateStruct {
 // The pass action is board_size * board_size.
 class GoState : public State {
  public:
+  friend class SGFReader;  // for mutable_board().
+  friend class GoGame;     // also for mutable_board(), constructing by SGF.
+
   // Constructs a Go state for the empty board.
   GoState(std::shared_ptr<const Game> game, int board_size, float komi,
           int handicap);
@@ -125,6 +132,10 @@ class GoState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 
+  // Custom serialize only necessary when starting from an SGF string.
+  // Uses standard serialization otherwise.
+  virtual std::string Serialize() const override;
+
   const GoBoard& board() const { return board_; }
 
  protected:
@@ -134,6 +145,12 @@ class GoState : public State {
   void ResetBoard();
 
   GoBoard board_;
+
+  // Use with care. Modifying the board directly can lead to undefined behavior.
+  // The history is not maintained properly when using this method. This method
+  // is mainly used by the SGF reader to create arbitrary boards from SGF files
+  // via the AB[] and AW[] properties.
+  GoBoard* mutable_board() { return &board_; }
 
   // RepetitionTable records which positions we have already encountered.
   // We are already indexing by board hash, so there is no need to hash that
@@ -152,6 +169,10 @@ class GoState : public State {
   const int max_game_length_;
   GoColor to_play_;
   bool superko_;
+
+  // Only used when calling NewInitialState(sgf_string). The SGF string is
+  // saved here to ensure that the state is properly serialized.
+  std::string initial_sgf_string_;
 };
 
 // Game object.
@@ -167,6 +188,11 @@ class GoGame : public Game {
     return std::unique_ptr<State>(
         new GoState(shared_from_this(), board_size_, komi_, handicap_));
   }
+
+  // Starts a go game from the given SGF string. If there are multiple games in
+  // the SGF string, only the last one is used.
+  std::unique_ptr<State> NewInitialState(
+      const std::string& sgf_string) const override;
 
   std::vector<int> ObservationTensorShape() const override {
     // Planes: black, white, empty, and a bias plane indicating komi (whether
@@ -187,6 +213,8 @@ class GoGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
 
   int MaxGameLength() const override { return max_game_length_; }
+
+  Action PassAction() const { return board_size_ * board_size_; }
 
  private:
   const float komi_;

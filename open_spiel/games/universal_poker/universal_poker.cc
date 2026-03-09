@@ -172,7 +172,11 @@ const GameType kGameType{
         // maxraises - the maximum number of raises on each round. If not
         // specified, it will default to UINT8_MAX.
         {"maxRaises", GameParameter(std::string(""))},
-        // The number of different suits in the deck
+        // The number of different suits in the deck.
+        // WARNING: Must be 4. The ACPC card encoding uses
+        // makeCard(rank, suit) = rank * MAX_SUITS + suit where MAX_SUITS is
+        // hardcoded to 4 in project_acpc_server/game.h. Using numSuits < 4
+        // causes ChanceOutcomeToCard() to produce out-of-bounds indices.
         {"numSuits", GameParameter(4)},
         // The number of different ranks in the deck
         {"numRanks", GameParameter(6)},
@@ -1105,9 +1109,9 @@ std::unique_ptr<State> UniversalPokerState::ResampleFromInfostate(
 
 std::unique_ptr<HistoryDistribution>
 UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
-  // This is only implemented for 2 players.
   if (acpc_game_->GetNbPlayers() != 2) return {};
 
+  const int num_hole_cards = acpc_game_->GetNbHoleCardsRequired();
   logic::CardSet is_cards;
   logic::CardSet our_cards = HoleCards(player_id);
   for (uint8_t card : our_cards.ToCardArray()) is_cards.AddCard(card);
@@ -1117,31 +1121,40 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   for (uint8_t card : is_cards.ToCardArray()) fresh_deck.RemoveCard(card);
   auto dist = absl::make_unique<HistoryDistribution>();
 
-  // We only consider half the possible hands as we only look at each pair of
-  // hands once, i.e. order does not matter.
-  const int num_hands =
-      0.5 * fresh_deck.NumCards() * (fresh_deck.NumCards() - 1);
-  dist->first.reserve(num_hands);
-  for (uint8_t hole_card1 : fresh_deck.ToCardArray()) {
-    logic::CardSet subset_deck = fresh_deck;
-    subset_deck.RemoveCard(hole_card1);
-    for (uint8_t hole_card2 : subset_deck.ToCardArray()) {
-      if (hole_card1 < hole_card2) continue;
-      std::unique_ptr<State> root = game_->NewInitialState();
-      if (player_id == 0) {
-        for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
-        root->ApplyAction(hole_card1);
-        root->ApplyAction(hole_card2);
-      } else if (player_id == 1) {
-        root->ApplyAction(hole_card1);
-        root->ApplyAction(hole_card2);
-        for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
-      }
-      SPIEL_CHECK_FALSE(root->IsChanceNode());
-      dist->first.push_back(std::move(root));
+  const std::vector<uint8_t> deck_cards = fresh_deck.ToCardArray();
+  const int deck_size = deck_cards.size();
+
+  std::vector<int> indices(num_hole_cards);
+  for (int i = 0; i < num_hole_cards; ++i) indices[i] = i;
+
+  while (true) {
+    std::vector<uint8_t> opp_hand;
+    opp_hand.reserve(num_hole_cards);
+    for (int idx : indices) opp_hand.push_back(deck_cards[idx]);
+
+    std::unique_ptr<State> root = game_->NewInitialState();
+    if (player_id == 0) {
+      for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
+      for (uint8_t card : opp_hand) root->ApplyAction(card);
+    } else if (player_id == 1) {
+      for (uint8_t card : opp_hand) root->ApplyAction(card);
+      for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
+    }
+    const int total_hole_cards = acpc_game_->GetNbPlayers() * num_hole_cards;
+    for (int i = total_hole_cards; i < History().size(); ++i) {
+      root->ApplyAction(History()[i]);
+    }
+    dist->first.push_back(std::move(root));
+
+    int i = num_hole_cards - 1;
+    while (i >= 0 && indices[i] == deck_size - num_hole_cards + i) --i;
+    if (i < 0) break;
+    ++indices[i];
+    for (int j = i + 1; j < num_hole_cards; ++j) {
+      indices[j] = indices[j - 1] + 1;
     }
   }
-  SPIEL_DCHECK_EQ(dist->first.size(), num_hands);
+
   const double divisor = 1. / static_cast<double>(dist->first.size());
   dist->second.assign(dist->first.size(), divisor);
   return dist;

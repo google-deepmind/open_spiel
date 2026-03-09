@@ -78,13 +78,12 @@ class SFLPTest(absltest.TestCase):
     expl_pi = exploitability.exploitability(game, merged_policy)
     self.assertAlmostEqual(0.0, expl_pi)
 
-  # TODO(author5): currently does not work because TTT's information state is
-  # not perfect recall. Enable this test when fixed.
-  # def test_tictactoe(self):
-  #   game = pyspiel.load_game("tic_tac_toe")
-  #   val1, val2 = sequence_form_lp.solve_zero_sum_game(game)
-  #   self.assertAlmostEqual(val1, 0)
-  #   self.assertAlmostEqual(val2, 0)
+  @absltest.skip("Takes too long. Might not pass.")
+  def test_tictactoe(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    val1, val2, _, _ = sequence_form_lp.solve_zero_sum_game(game)
+    self.assertAlmostEqual(val1, 0)
+    self.assertAlmostEqual(val2, 0)
 
   # This test takes too long for non-glpk solvers, and glpk solver is not
   # supported within google's internal cvxopt import. When solving via glpk,
@@ -94,11 +93,12 @@ class SFLPTest(absltest.TestCase):
   # Neller & Lanctot 2013, An Introduction to Counterfactual Regret Minimization
   # http://modelai.gettysburg.edu/2013/cfr/cfr.pdf
   #
-  # def test_liars_dice(self):
-  #  game = pyspiel.load_game("liars_dice")
-  #  val1, val2 = sequence_form_lp.solve_zero_sum_game(game, solver="glpk")
-  #  self.assertAlmostEqual(val1, -0.027131782945736)
-  #  self.assertAlmostEqual(val2, 0.027131782945736)
+  @absltest.skip("Might've taken too long.")
+  def test_liars_dice(self):
+    game = pyspiel.load_game("liars_dice")
+    val1, val2, _, _ = sequence_form_lp.solve_zero_sum_game(game, solver="ecos")
+    self.assertAlmostEqual(val1, -0.027131782945736)
+    self.assertAlmostEqual(val2, 0.027131782945736)
 
 
 if __name__ == "__main__":
