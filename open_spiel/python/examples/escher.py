@@ -38,11 +38,12 @@ def main(unused_argv):
     train_cfg = escher.TrainConfig(game)
     train_cfg.iterations = 100
     train_cfg.evaluation_interval = 20
+    train_cfg.nashconv = True
 
     escher.train(train_cfg, agent)
 
     average_policy = policy.tabular_policy_from_callable(
-            game, agent.action_probabilities)
+            game, lambda s: _action_probabilities(agent, s))
     pyspiel_policy = policy.python_policy_to_pyspiel_policy(average_policy)
     conv = pyspiel.nash_conv(game, pyspiel_policy)
     logging.info(f"ESCHER in {FLAGS.game_name} - NashConv: {conv}")
@@ -60,6 +61,16 @@ def main(unused_argv):
     else:
         logging.info(f"Computed player 0 value: {avg_policy_vals[0]:.2f}")
         logging.info(f"Computed player 1 value: {avg_policy_vals[1]:.2f}")
+
+
+def _action_probabilities(agent, state):
+    probs = agent.action_probabilities(state)
+
+    prob_dict = {}
+    for a, m in enumerate(state.legal_actions_mask()):
+        if m == 1:
+            prob_dict[a] = probs[a]
+    return prob_dict
 
 
 if __name__ == "__main__":

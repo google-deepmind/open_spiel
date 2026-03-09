@@ -137,11 +137,7 @@ class Agent:
             probs = torch.mul(probs, mask)
             probs = probs / torch.sum(probs)
 
-        prob_dict = {}
-        for a, m in enumerate(mask_np):
-            if m == 1:
-                prob_dict[a] = probs[a]
-        return prob_dict
+        return probs.cpu().numpy()
 
 
 def _train_avg_policy(agent):
@@ -180,6 +176,7 @@ def _train_avg_policy(agent):
 def _gather_regret_data(game, agent, player):
     for _ in range(agent.cfg.regret_traversals):
         state = game.new_initial_state()
+        agent.num_touched += 1
         while not state.is_terminal():
             if state.is_chance_node():
                 actions, probs = zip(*state.chance_outcomes())
@@ -210,6 +207,7 @@ def _gather_regret_data(game, agent, player):
             action = np.random.choice(
                     range(len(sample_policy)), p=sample_policy)
             state = state.child(action)
+            agent.num_touched += 1
 
 
 def _train_regret(cfg, agent):
@@ -395,7 +393,7 @@ def _match_regret(net, obs, mask_np):
         return regrets / summed
 
     # Just use the best regret, if regrets cannot be normalized.
-    max_id, max_regret = 0, raw_regrets[0]
+    max_id, max_regret = -1, float("-inf")
     for i, m in enumerate(mask_np):
         if m == 1 and raw_regrets[i] > max_regret:
             max_id, max_regret = i, raw_regrets[i]
@@ -423,13 +421,6 @@ def _get_regret(agent, state, policy, num_players):
     return regret
 
 
-def _calc_nashconv(game, agent):
-    policy = open_spiel.python.policy.tabular_policy_from_callable(
-            game, agent.action_probabilities)
-    conv = open_spiel.python.algorithms.exploitability.nash_conv(game, policy)
-    return conv
-
-
 class TrainConfig:
     """A TrainConfig is a configuration for the training of an Escher agent."""
 
@@ -443,6 +434,8 @@ class TrainConfig:
         self.device = "cpu"
         self.iterations = 999999
         self.evaluation_interval = 1
+        self.nashconv = False
+        self.games_vs_random = 1000
 
 
 def train(cfg, agent):
@@ -463,10 +456,64 @@ def train(cfg, agent):
 
         if agent.t % cfg.evaluation_interval == 0:
             _train_avg_policy(agent)
-            conv = _calc_nashconv(cfg.game, agent)
-            logging.info("iteration %d nashconv %f", agent.t, conv)
+            if cfg.nashconv:
+                conv = _calc_nashconv(cfg.game, agent)
+                logging.info(
+                        "iteration %d states %d nashconv %f",
+                        agent.t, agent.num_touched, conv)
+            reward = _play_against_random(cfg.game, agent, cfg.games_vs_random)
+            logging.info(
+                    "iteration %d states %d reward_vs_random %f",
+                    agent.t, agent.num_touched, reward)
 
         agent.t += 1
+
+
+def _play_once_against_random(game, agent):
+    reward = 0
+    for player in range(game.num_players()):
+        state = game.new_initial_state()
+        while not state.is_terminal():
+            if state.is_chance_node():
+                outcomes, probs = zip(*state.chance_outcomes())
+                a = np.random.choice(outcomes, p=probs)
+                state.apply_action(a)
+                continue
+
+            if state.current_player() == player:
+                policy = agent.action_probabilities(state)
+            else:
+                mask = np.array(state.legal_actions_mask(), dtype=int)
+                policy = mask / np.sum(mask)
+            action = np.random.choice(range(len(policy)), p=policy)
+            state.apply_action(action)
+
+        reward += state.returns()[player]
+
+    return reward / game.num_players()
+
+
+def _play_against_random(game, agent, n):
+    reward = 0
+    for _ in range(n):
+        reward += _play_once_against_random(game, agent)
+    return reward / n
+
+
+def _calc_nashconv(game, agent):
+    def _action_probabilities(state):
+        probs = agent.action_probabilities(state)
+
+        prob_dict = {}
+        for a, m in enumerate(state.legal_actions_mask()):
+            if m == 1:
+                prob_dict[a] = probs[a]
+        return prob_dict
+
+    policy = open_spiel.python.policy.tabular_policy_from_callable(
+            game, _action_probabilities)
+    conv = open_spiel.python.algorithms.exploitability.nash_conv(game, policy)
+    return conv
 
 
 class Transition(typing.NamedTuple):

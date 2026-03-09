@@ -44,6 +44,8 @@ class EscherTest(parameterized.TestCase):
 
         train_cfg = escher.TrainConfig(game)
         train_cfg.iterations = 2
+        train_cfg.nashconv = True
+        train_cfg.games_vs_random = 1
         escher.train(train_cfg, agent)
 
 
