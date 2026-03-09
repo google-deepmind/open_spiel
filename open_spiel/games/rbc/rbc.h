@@ -228,7 +228,7 @@ class RbcState : public State {
 
   absl::optional<std::vector<double>> MaybeFinalReturns() const;
 
-  SenseWindow SenseWindow(Player player) const;
+  SenseWindow GetSenseWindow(Player player) const;
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.

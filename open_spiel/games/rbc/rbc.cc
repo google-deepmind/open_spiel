@@ -176,7 +176,7 @@ class RbcObserver : public Observer {
                                            int player) const {
     chess::Color color = chess::PlayerToColor(player);
     const chess::ChessBoard& board = state.Board();
-    const SenseWindow sense_window = state.SenseWindow(player);
+    const SenseWindow sense_window = state.GetSenseWindow(player);
     chess::ObservationTable observability_table =
         ComputeObservationTable(board, color, sense_window);
     const int board_size = game.board_size();
@@ -301,7 +301,7 @@ class RbcObserver : public Observer {
         prefix + "_right_castling", allocator);
 
     // Last sensing
-    SenseWindow sense_window = state.SenseWindow(player);
+    SenseWindow sense_window = state.GetSenseWindow(player);
     for (const chess::PieceType& piece_type : chess::kPieceTypes) {
       WritePieces(static_cast<chess::Color>(1 - player), piece_type,
                   state.Board(), sense_window, prefix + "_sense", allocator);
@@ -559,7 +559,7 @@ absl::optional<std::vector<double>> RbcState::MaybeFinalReturns() const {
   return absl::nullopt;
 }
 
-SenseWindow RbcState::SenseWindow(Player player) const {
+SenseWindow RbcState::GetSenseWindow(Player player) const {
   // Make sure that the sense from last round does not reveal a new hidden move:
   // Allow players to perceive only results of the last sensing.
   if (phase_ == MovePhase::kMoving && CurrentPlayer() == player) {
