@@ -139,10 +139,10 @@ class LinearProgram:
       ub: an upper-bound value for this variable
     """
     var = self._vars.get(label)
-    # if var is not None:
-    #   # Do not re-add, but ensure it's the same
-    #   assert var.lb == lb and var.ub == ub
-    #   return
+    if var is not None:
+      # Do not re-add, but ensure it's the same
+      assert var.lb == lb and var.ub == ub
+      return
     var = _Variable(len(self._var_list), lb, ub)
     self._vars[label] = var
     self._var_list.append(var)
