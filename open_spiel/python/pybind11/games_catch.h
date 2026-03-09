@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
-#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
+#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CATCH_H_
+#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CATCH_H_
 
 #include "open_spiel/python/pybind11/pybind11.h"
 
-// Initialize the Python interface for chess.
 namespace open_spiel {
-void init_pyspiel_games_chess(::pybind11::module &m);
+void init_pyspiel_games_catch(::pybind11::module &m);
 }
 
-#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
+#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CATCH_H_

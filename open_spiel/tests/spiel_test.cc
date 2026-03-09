@@ -400,7 +400,7 @@ struct DummyStateStruct : StateStruct {
   NLOHMANN_DEFINE_TYPE_INTRUSIVE(DummyStateStruct, x, y, z);
 };
 
-void GameStructTests() {
+void BasicStructTests() {
   DummyStateStruct s;
   s.x = 123;
   s.y = "abc";
@@ -429,6 +429,22 @@ void GameStructTests() {
   SPIEL_CHECK_FALSE(s3.z.has_value());
 }
 
+// Note: Invalid game name and missing game_name tests are handled in Python.
+void LoadGameFromJsonTest() {
+  // Test basic game loading from JSON.
+  {
+    auto game = LoadGameFromJson(R"({"game_name": "tic_tac_toe"})");
+    SPIEL_CHECK_EQ(game->GetType().short_name, "tic_tac_toe");
+  }
+
+  // Test game loading with parameters.
+  {
+    auto game = LoadGameFromJson(
+        R"({"game_name": "connect_four", "columns": 8})");
+    SPIEL_CHECK_EQ(game->GetType().short_name, "connect_four");
+  }
+}
+
 
 }  // namespace
 }  // namespace testing
@@ -447,5 +463,6 @@ int main(int argc, char** argv) {
   open_spiel::testing::ConcreteGamesTest();
   open_spiel::testing::PlayerIdToStringTest();
   open_spiel::testing::GetParametersFromStringTest();
-  open_spiel::testing::GameStructTests();
+  open_spiel::testing::BasicStructTests();
+  open_spiel::testing::LoadGameFromJsonTest();
 }

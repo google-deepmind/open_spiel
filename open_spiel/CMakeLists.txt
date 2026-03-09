@@ -177,6 +177,8 @@ set (OPEN_SPIEL_CORE_FILES
   spiel_utils.h
   tensor_game.cc
   tensor_game.h
+  utils/status.h
+  utils/status.cc
   utils/usage_logging.h
   utils/usage_logging.cc
 )

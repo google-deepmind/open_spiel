@@ -49,10 +49,10 @@ players. Transitions are actions taken by players (in case of a simultaneous
 node, the transition is composed of the actions for all players).
 
 Note that in most games, we deal with chance (i.e. any source of randomness)
-using a an explicit player (the "chance" player, which has id
-`kChancePlayerId`). For example, in Poker, the root state would just be the
-players without any cards, and the first transitions will be chance nodes to
-deal the cards to the players (in practice once card is dealt per transition).
+using an explicit player (the "chance" player, which has id `kChancePlayerId`).
+For example, in Poker, the root state would just be the players without any
+cards, and the first transitions will be chance nodes to deal the cards to the
+players (in practice one card is dealt per transition).
 
 See `spiel.h` for the full API description. For example,
 `game.NewInitialState()` will return the root `State`. Then,

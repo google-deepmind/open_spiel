@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <iterator>
 #include <map>
+#include <random>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
@@ -32,25 +33,24 @@ namespace open_spiel {
 namespace euchre {
 namespace {
 
-const GameType kGameType{
-    /*short_name=*/"euchre",
-    /*long_name=*/"Euchre",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/kNumPlayers,
-    /*min_num_players=*/kNumPlayers,
-    /*provides_information_state_string=*/false,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
-    /*parameter_specification=*/
-    {
-        {"allow_lone_defender", GameParameter(false)},
-        {"stick_the_dealer", GameParameter(true)},
-    }};
+const GameType kGameType{/*short_name=*/"euchre",
+                         /*long_name=*/"Euchre",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/kNumPlayers,
+                         /*min_num_players=*/kNumPlayers,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/false,
+                         /*parameter_specification=*/
+                         {
+                             {"allow_lone_defender", GameParameter(false)},
+                             {"stick_the_dealer", GameParameter(true)},
+                         }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new EuchreGame(params));
@@ -235,6 +235,37 @@ std::string EuchreState::FormatPoints() const {
   for (int i = 0; i < kNumPlayers; ++i)
     absl::StrAppend(&rv, "\n", DirString(i), ": ", points_[i]);
   return rv;
+}
+
+std::string EuchreState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  if (IsTerminal()) return ToString();
+  std::string rv = "Dealer: ";
+  absl::StrAppend(&rv, DirString(dealer_), "\n");
+  if (upcard_ != kInvalidAction)
+    absl::StrAppend(&rv, "Upcard: ", CardString(upcard_), "\n");
+  absl::StrAppend(&rv, "Hand:\n");
+  auto cards = FormatHand(player, /*mark_voids=*/true);
+  for (int suit = kNumSuits - 1; suit >= 0; --suit)
+    absl::StrAppend(&rv, cards[suit], "\n");
+  if (history_.size() > kFirstBiddingActionInHistory)
+    absl::StrAppend(&rv, FormatBidding());
+  if (declarer_go_alone_.has_value()) {
+    absl::StrAppend(&rv, "Declarer go alone: ",
+                    declarer_go_alone_.value() ? "true" : "false", "\n");
+    if (allow_lone_defender_) {
+      absl::StrAppend(&rv, "Defender go alone: ",
+                      lone_defender_ != kInvalidPlayer ? "true" : "false",
+                      "\n");
+    }
+  }
+  if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay(), FormatPoints());
+  return rv;
+}
+
+std::string EuchreState::ObservationString(Player player) const {
+  return InformationStateString(player);
 }
 
 void EuchreState::InformationStateTensor(Player player,
@@ -715,6 +746,181 @@ void Trick::Play(Player player, int card) {
     winning_card_ = card;
     winning_player_ = player;
   }
+}
+
+// Generates a new state consistent with player_id's information set by
+// preserving known cards (own hand, played cards) and reshuffling unknown
+// cards among opponents, respecting void-suit constraints inferred from play.
+std::unique_ptr<State> EuchreState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  SPIEL_CHECK_TRUE(phase_ == Phase::kBidding || phase_ == Phase::kDiscard ||
+                   phase_ == Phase::kGoAlone || phase_ == Phase::kPlay ||
+                   phase_ == Phase::kGameOver);
+
+  std::unique_ptr<State> clone = game_->NewInitialState();
+
+  // Dealer selection is public.
+  clone->ApplyAction(dealer_);
+
+  // Classify each dealt card as "known" or "shuffleable".
+  // A card's holder is known if: (a) it belongs to player_id (own hand), or
+  // (b) it has been played (holder_ is nullopt, so its original holder is
+  // public knowledge from the trick history).
+  // All other cards (unplayed cards in opponents' hands) are shuffleable.
+  std::vector<std::vector<int>> known(kNumPlayers);
+  std::vector<int> shuffleable;
+  for (int card = 0; card < kNumCards; ++card) {
+    absl::optional<Player> p = initial_deal_[card];
+    if (!p.has_value()) continue;  // Not dealt (kitty, excluding upcard).
+    if (*p == player_id || !holder_[card].has_value()) {
+      known[*p].push_back(card);
+    } else {
+      shuffleable.push_back(card);
+    }
+  }
+
+  // Detect void suits: scan trick history to find players who didn't follow
+  // the led suit. Uses CardSuit(card, trump_suit_) to correctly treat the
+  // left bower as belonging to the trump suit.
+  std::array<std::array<bool, kNumSuits>, kNumPlayers> void_in{};
+  if (num_cards_played_ > 0 && trump_suit_ != Suit::kInvalidSuit) {
+    int play_start = history_.size() - num_cards_played_;
+    int cards_per_trick = num_active_players_;
+    int num_complete_tricks = num_cards_played_ / cards_per_trick;
+    int cards_in_partial = num_cards_played_ % cards_per_trick;
+    int num_tricks_to_scan =
+        num_complete_tricks + (cards_in_partial > 0 ? 1 : 0);
+    for (int t = 0; t < num_tricks_to_scan; ++t) {
+      int trick_size =
+          (t < num_complete_tricks) ? cards_per_trick : cards_in_partial;
+      Player leader = tricks_[t].Leader();
+      int first_card = history_[play_start].action;
+      Suit led_suit = CardSuit(first_card, trump_suit_);
+      Player player = leader;
+      for (int j = 1; j < trick_size; ++j) {
+        player = (player + 1) % kNumPlayers;
+        while (!active_players_[player]) {
+          player = (player + 1) % kNumPlayers;
+        }
+        int card = history_[play_start + j].action;
+        if (CardSuit(card, trump_suit_) != led_suit) {
+          void_in[player][static_cast<int>(led_suit)] = true;
+        }
+      }
+      play_start += trick_size;
+    }
+  }
+
+  // Determine how many unknown cards each opponent still needs.
+  std::array<int, kNumPlayers> cards_needed{};
+  std::vector<Player> hidden_players;
+  for (int p = 0; p < kNumPlayers; ++p) {
+    if (p == player_id) continue;
+    int total_cards = kNumTricks;
+    cards_needed[p] = total_cards - static_cast<int>(known[p].size());
+    if (cards_needed[p] > 0) {
+      hidden_players.push_back(p);
+    }
+  }
+
+  std::mt19937 shuffle_rng(rng() * std::mt19937::max());
+
+  // Start with known cards, then distribute shuffleable cards below.
+  std::vector<std::vector<int>> player_cards(kNumPlayers);
+  for (int p = 0; p < kNumPlayers; ++p) {
+    player_cards[p] = known[p];
+  }
+
+  // Distribute shuffleable cards among hidden players, respecting voids.
+  // 2 hidden players: partition into only_a / only_b / either buckets.
+  if (hidden_players.size() == 2 && trump_suit_ != Suit::kInvalidSuit) {
+    Player a = hidden_players[0];
+    Player b = hidden_players[1];
+    std::vector<int> only_a, only_b, either;
+    for (int card : shuffleable) {
+      int suit = static_cast<int>(CardSuit(card, trump_suit_));
+      bool a_ok = !void_in[a][suit];
+      bool b_ok = !void_in[b][suit];
+      if (a_ok && !b_ok)
+        only_a.push_back(card);
+      else if (b_ok && !a_ok)
+        only_b.push_back(card);
+      else
+        either.push_back(card);
+    }
+    std::shuffle(either.begin(), either.end(), shuffle_rng);
+    for (int card : only_a) player_cards[a].push_back(card);
+    for (int card : only_b) player_cards[b].push_back(card);
+    int a_need = cards_needed[a] - static_cast<int>(only_a.size());
+    for (int i = 0; i < a_need; ++i) player_cards[a].push_back(either[i]);
+    for (int i = a_need; i < static_cast<int>(either.size()); ++i)
+      player_cards[b].push_back(either[i]);
+    // 3 hidden players: force-assign cards that only one player can hold,
+    // then randomly distribute the remainder.
+  } else if (hidden_players.size() == 3 && trump_suit_ != Suit::kInvalidSuit) {
+    Player a = hidden_players[0];
+    Player b = hidden_players[1];
+    Player c = hidden_players[2];
+    std::vector<int> remaining;
+    for (int card : shuffleable) {
+      int suit = static_cast<int>(CardSuit(card, trump_suit_));
+      bool a_ok = !void_in[a][suit];
+      bool b_ok = !void_in[b][suit];
+      bool c_ok = !void_in[c][suit];
+      int count = a_ok + b_ok + c_ok;
+      if (count == 1) {
+        if (a_ok)
+          player_cards[a].push_back(card);
+        else if (b_ok)
+          player_cards[b].push_back(card);
+        else
+          player_cards[c].push_back(card);
+      } else {
+        remaining.push_back(card);
+      }
+    }
+    std::shuffle(remaining.begin(), remaining.end(), shuffle_rng);
+    int idx = 0;
+    for (Player p : hidden_players) {
+      int need = cards_needed[p] - (static_cast<int>(player_cards[p].size()) -
+                                    static_cast<int>(known[p].size()));
+      for (int j = 0; j < need; ++j) {
+        player_cards[p].push_back(remaining[idx++]);
+      }
+    }
+    // Fallback: no void info available (e.g. bidding phase), uniform shuffle.
+  } else {
+    std::shuffle(shuffleable.begin(), shuffleable.end(), shuffle_rng);
+    int idx = 0;
+    for (Player p : hidden_players) {
+      for (int j = 0; j < cards_needed[p]; ++j) {
+        player_cards[p].push_back(shuffleable[idx++]);
+      }
+    }
+  }
+
+  // Deal the reshuffled cards to the clone state in the same order as the
+  // original (dealer+0, dealer+1, ..., round-robin for kNumTricks rounds).
+  for (int i = 0; i < kNumPlayers * kNumTricks; ++i) {
+    Player deal_to = (dealer_ + i) % kNumPlayers;
+    clone->ApplyAction(player_cards[deal_to].back());
+    player_cards[deal_to].pop_back();
+  }
+
+  // Deal the same upcard (public knowledge).
+  clone->ApplyAction(upcard_);
+
+  // Replay all post-deal actions (bidding, discard, go-alone, play) verbatim
+  // from the original history — these are all public actions.
+  int post_deal_start = 1 + kNumPlayers * kNumTricks + 1;
+  for (size_t i = post_deal_start; i < history_.size(); i++) {
+    clone->ApplyAction(history_.at(i).action);
+  }
+
+  SPIEL_CHECK_EQ(History().size(), clone->History().size());
+  SPIEL_CHECK_EQ(State::InformationStateTensor(player_id),
+                 clone->InformationStateTensor(player_id));
+  return clone;
 }
 
 }  // namespace euchre

@@ -15,11 +15,24 @@
 #include "open_spiel/games/rbc/rbc.h"
 
 #include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/games/chess/chess.h"
+#include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -32,7 +45,7 @@ constexpr int kNumRepetitionsToDraw = 3;
 // Facts about the game.
 const GameType kGameType{
     /*short_name=*/"rbc",
-    /*long_name=*/"Reconnaisance Blind Chess",
+    /*long_name=*/"Reconnaissance Blind Chess",
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kDeterministic,
     GameType::Information::kImperfectInformation,
@@ -47,6 +60,8 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"board_size", GameParameter(8)},
      {"sense_size", GameParameter(3)},
+     {"sense_centered", GameParameter(false)},
+     {"sense_border", GameParameter(false)},
      {"fen", GameParameter(GameParameter::Type::kString, false)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -57,8 +72,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory)
 
 chess::ObservationTable ComputeObservationTable(const chess::ChessBoard& board,
                                                 chess::Color color,
-                                                int sense_location,
-                                                int sense_size) {
+                                                SenseWindow window) {
   const int board_size = board.BoardSize();
   chess::ObservationTable observability_table{false};
 
@@ -75,15 +89,11 @@ chess::ObservationTable ComputeObservationTable(const chess::ChessBoard& board,
   }
 
   // No sense window specified.
-  if (sense_location < 0) return observability_table;
+  if (window == kSenseWindowOffBoard) return observability_table;
 
   // All pieces under the sense window.
-  int inner_size = board_size - sense_size + 1;
-  chess::Square sense_sq = chess::IndexToSquare(sense_location, inner_size);
-  SPIEL_DCHECK_LE(sense_sq.x + sense_size, board_size);
-  SPIEL_DCHECK_LE(sense_sq.y + sense_size, board_size);
-  for (int8_t x = sense_sq.x; x < sense_sq.x + sense_size; ++x) {
-    for (int8_t y = sense_sq.y; y < sense_sq.y + sense_size; ++y) {
+  for (int8_t x = window.min_corner.x; x <= window.max_corner.x; ++x) {
+    for (int8_t y = window.min_corner.y; y <= window.max_corner.y; ++y) {
       const chess::Square sq{x, y};
       size_t index = chess::SquareToIndex(sq, board_size);
       observability_table[index] = true;
@@ -165,16 +175,10 @@ class RbcObserver : public Observer {
                                            const RbcGame& game,
                                            int player) const {
     chess::Color color = chess::PlayerToColor(player);
-    const int sense_location =
-        (state.phase_ == MovePhase::kMoving && state.CurrentPlayer() == player)
-            ? state.sense_location_[player]
-            // Make sure that sense from last round does not
-            // reveal a new hidden move: allow players to
-            // perceive only results of the last sensing.
-            : kSenseLocationNonSpecified;
     const chess::ChessBoard& board = state.Board();
-    chess::ObservationTable observability_table = ComputeObservationTable(
-        board, color, sense_location, game.sense_size());
+    const SenseWindow sense_window = state.GetSenseWindow(player);
+    chess::ObservationTable observability_table =
+        ComputeObservationTable(board, color, sense_window);
     const int board_size = game.board_size();
     std::string str = "";
 
@@ -232,23 +236,19 @@ class RbcObserver : public Observer {
   }
 
   void WritePieces(chess::Color color, chess::PieceType piece_type,
-                   const chess::ChessBoard& board, int sense_location,
-                   int sense_size, const std::string& prefix,
-                   Allocator* allocator) const {
+                   const chess::ChessBoard& board, SenseWindow window,
+                   const std::string& prefix, Allocator* allocator) const {
     const std::string type_string = chess::PieceTypeToString(
         piece_type, /*uppercase=*/color == chess::Color::kWhite);
     const int board_size = board.BoardSize();
-    int inner_size = board_size - sense_size + 1;
-    chess::Square sense_square =
-        chess::IndexToSquare(sense_location, inner_size);
     auto out = allocator->Get(prefix + "_" + type_string + "_pieces",
                               {board_size, board_size});
 
-    if (sense_location < 0) return;  // No sense window specified.
-    SPIEL_DCHECK_LE(sense_square.x + sense_size, board_size);
-    SPIEL_DCHECK_LE(sense_square.y + sense_size, board_size);
-    for (int8_t x = sense_square.x; x < sense_square.x + sense_size; ++x) {
-      for (int8_t y = sense_square.y; y < sense_square.y + sense_size; ++y) {
+    // No sense window specified.
+    if (window == kSenseWindowOffBoard) return;
+
+    for (int8_t x = window.min_corner.x; x <= window.max_corner.x; ++x) {
+      for (int8_t y = window.min_corner.y; y <= window.max_corner.y; ++y) {
         const chess::Square square{x, y};
         const chess::Piece& piece_on_board = board.at(square);
         const bool write_square =
@@ -286,8 +286,10 @@ class RbcObserver : public Observer {
 
     // Piece configuration.
     for (const chess::PieceType& piece_type : chess::kPieceTypes) {
+      int8_t full_size = state.game()->board_size() - 1;
+      SenseWindow sense_window = {{0, 0}, {full_size, full_size}};
       WritePieces(static_cast<chess::Color>(player), piece_type, state.Board(),
-                  0, state.game()->board_size(), prefix, allocator);
+                  sense_window, prefix, allocator);
     }
 
     // Castling rights.
@@ -299,17 +301,10 @@ class RbcObserver : public Observer {
         prefix + "_right_castling", allocator);
 
     // Last sensing
+    SenseWindow sense_window = state.GetSenseWindow(player);
     for (const chess::PieceType& piece_type : chess::kPieceTypes) {
-      int sense_location = (state.phase_ == MovePhase::kMoving &&
-                            state.CurrentPlayer() == player)
-                               ? state.sense_location_[player]
-                               // Make sure that sense from last round does not
-                               // reveal a new hidden move: allow players to
-                               // perceive only results of the last sensing.
-                               : kSenseLocationNonSpecified;
       WritePieces(static_cast<chess::Color>(1 - player), piece_type,
-                  state.Board(), sense_location, state.game()->sense_size(),
-                  prefix + "_sense", allocator);
+                  state.Board(), sense_window, prefix + "_sense", allocator);
     }
   }
 
@@ -321,11 +316,9 @@ class RbcObserver : public Observer {
     for (int x = 0; x < board_size; ++x) {
       for (int y = 0; y < board_size; ++y) {
         for (int pl = 0; pl < 2; ++pl) {
-          num_pieces[pl] +=
-              state.Board().IsFriendly(
-                  chess::Square{static_cast<int8_t>(x),
-                                static_cast<int8_t>(y)},
-                  static_cast<chess::Color>(pl));
+          num_pieces[pl] += state.Board().IsFriendly(
+              chess::Square{static_cast<int8_t>(x), static_cast<int8_t>(y)},
+              static_cast<chess::Color>(pl));
         }
       }
     }
@@ -452,8 +445,12 @@ std::vector<Action> RbcState::LegalActions() const {
 
 std::string RbcState::ActionToString(Player player, Action action) const {
   if (phase_ == MovePhase::kSensing) {
-    std::string from = chess::SquareToString(
-        chess::IndexToSquare(action, game()->inner_size()));
+    chess::Square square = chess::IndexToSquare(action, game()->inner_size());
+    if (game()->sense_centered() && !game()->sense_border()) {
+      int8_t offset = (game()->sense_size() - 1) / 2;
+      square += chess::Offset{offset, offset};
+    }
+    std::string from = chess::SquareToString(square);
     return absl::StrCat("Sense ", from);
   } else {
     if (action == chess::kPassAction) return "pass";
@@ -562,12 +559,25 @@ absl::optional<std::vector<double>> RbcState::MaybeFinalReturns() const {
   return absl::nullopt;
 }
 
+SenseWindow RbcState::GetSenseWindow(Player player) const {
+  // Make sure that the sense from last round does not reveal a new hidden move:
+  // Allow players to perceive only results of the last sensing.
+  if (phase_ == MovePhase::kMoving && CurrentPlayer() == player) {
+    return game()->ActionToSenseWindow(sense_location_[player]);
+  }
+  return kSenseWindowOffBoard;
+}
+
 RbcGame::RbcGame(const GameParameters& params)
     : Game(kGameType, params),
       board_size_(ParameterValue<int>("board_size")),
       sense_size_(ParameterValue<int>("sense_size")),
+      sense_centered_(ParameterValue<bool>("sense_centered")),
+      sense_border_(ParameterValue<bool>("sense_border")),
       fen_(ParameterValue<std::string>("fen", chess::DefaultFen(board_size_))) {
   default_observer_ = std::make_shared<RbcObserver>(kDefaultObsType);
+  // Ensure that sense_centered_ is not true when sense_size_ is even.
+  SPIEL_CHECK_FALSE(sense_centered_ && (sense_size_ % 2 == 0));
 }
 
 std::shared_ptr<Observer> RbcGame::MakeObserver(
@@ -579,6 +589,25 @@ std::shared_ptr<Observer> RbcGame::MakeObserver(
     return std::make_shared<RbcObserver>(obs_type);
   }
   return nullptr;
+}
+
+SenseWindow RbcGame::ActionToSenseWindow(Action sense_action) const {
+  if (sense_action == kSenseLocationNonSpecified) {
+    return kSenseWindowOffBoard;
+  }
+  chess::Square square = chess::IndexToSquare(sense_action, inner_size());
+  int8_t offset = 0;
+  if (sense_centered_ && sense_border_) {
+    offset = -(sense_size_ - 1) / 2;
+  }
+  int8_t min_col = std::max(0, square.x + offset);
+  int8_t min_row = std::max(0, square.y + offset);
+  int8_t max_col = std::min(board_size_, square.x + offset + sense_size_) - 1;
+  int8_t max_row = std::min(board_size_, square.y + offset + sense_size_) - 1;
+  return SenseWindow{
+      .min_corner = chess::Square{.x = min_col, .y = min_row},
+      .max_corner = chess::Square{.x = max_col, .y = max_row},
+  };
 }
 
 }  // namespace rbc

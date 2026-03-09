@@ -213,27 +213,106 @@ std::array<std::string, kNumSuits> FormatHand(
 }
 
 std::unique_ptr<State> BridgeState::ResampleFromInfostate(
-      int player_id, std::function<double()> rng) const {
-  // Only works in the auction phase for now.
-  SPIEL_CHECK_TRUE(phase_ == Phase::kAuction);
-  std::vector<int> our_cards;
-  std::vector<int> other_cards;
-  for (int i = 0; i < kNumCards; ++i) {
-    if (holder_[i] == player_id) our_cards.push_back(i);
-    else if (holder_[i].has_value()) other_cards.push_back(i);
+    int player_id, std::function<double()> rng) const {
+  SPIEL_CHECK_TRUE(phase_ == Phase::kAuction || phase_ == Phase::kPlay);
+  auto original_deal = OriginalDeal();
+
+  Player dummy = kInvalidPlayer;
+  bool dummy_visible = (phase_ == Phase::kPlay && num_cards_played_ > 0);
+  if (dummy_visible) {
+    dummy = contract_.declarer ^ 2;
   }
-  std::unique_ptr<State> new_state = GetGame()->NewInitialState();
-  for (int i = 0; i < kNumCards; ++i) {
-    if (i % kNumPlayers == player_id) {
-      new_state->ApplyAction(our_cards.back());
-      our_cards.pop_back();
+
+  std::array<std::vector<int>, kNumPlayers> player_cards;
+  std::vector<int> shuffleable;
+  for (int card = 0; card < kNumCards; ++card) {
+    Player orig = original_deal[card].value();
+    if (orig == player_id) {
+      player_cards[player_id].push_back(card);
+    } else if (dummy_visible && orig == dummy && player_id != dummy) {
+      player_cards[dummy].push_back(card);
+    } else if (!holder_[card].has_value()) {
+      player_cards[orig].push_back(card);
     } else {
-      const int k = static_cast<int>(rng() * other_cards.size());
-      new_state->ApplyAction(other_cards[k]);
-      other_cards[k] = other_cards.back();
-      other_cards.pop_back();
+      shuffleable.push_back(card);
     }
   }
+
+  std::array<std::array<bool, kNumSuits>, kNumPlayers> void_in{};
+  if (num_cards_played_ > 0) {
+    int play_start = history_.size() - num_cards_played_;
+    int num_complete_tricks = num_cards_played_ / kNumPlayers;
+    int cards_in_partial = num_cards_played_ % kNumPlayers;
+    int num_tricks_to_scan =
+        num_complete_tricks + (cards_in_partial > 0 ? 1 : 0);
+    for (int t = 0; t < num_tricks_to_scan; ++t) {
+      int trick_size =
+          (t < num_complete_tricks) ? kNumPlayers : cards_in_partial;
+      Player leader = tricks_[t].Leader();
+      int first_card = history_[play_start + t * kNumPlayers].action;
+      Suit led_suit = CardSuit(first_card);
+      Player player = leader;
+      for (int j = 1; j < trick_size; ++j) {
+        player = (player + 1) % kNumPlayers;
+        int card = history_[play_start + t * kNumPlayers + j].action;
+        if (CardSuit(card) != led_suit) {
+          void_in[player][static_cast<int>(led_suit)] = true;
+        }
+      }
+    }
+  }
+
+  std::array<int, kNumPlayers> cards_needed{};
+  std::vector<Player> hidden_players;
+  for (int p = 0; p < kNumPlayers; ++p) {
+    if (p == player_id) continue;
+    if (dummy_visible && p == dummy && player_id != dummy) continue;
+    hidden_players.push_back(p);
+    cards_needed[p] =
+        kNumCardsPerHand - static_cast<int>(player_cards[p].size());
+  }
+
+  std::mt19937 shuffle_rng(rng() * std::mt19937::max());
+
+  if (hidden_players.size() == 2) {
+    Player a = hidden_players[0];
+    Player b = hidden_players[1];
+    std::vector<int> only_a, only_b, either;
+    for (int card : shuffleable) {
+      int suit = static_cast<int>(CardSuit(card));
+      bool a_ok = !void_in[a][suit];
+      bool b_ok = !void_in[b][suit];
+      if (a_ok && !b_ok)
+        only_a.push_back(card);
+      else if (b_ok && !a_ok)
+        only_b.push_back(card);
+      else
+        either.push_back(card);
+    }
+    std::shuffle(either.begin(), either.end(), shuffle_rng);
+    for (int card : only_a) player_cards[a].push_back(card);
+    for (int card : only_b) player_cards[b].push_back(card);
+    int a_need = cards_needed[a] - static_cast<int>(only_a.size());
+    for (int i = 0; i < a_need; ++i) player_cards[a].push_back(either[i]);
+    for (int i = a_need; i < static_cast<int>(either.size()); ++i)
+      player_cards[b].push_back(either[i]);
+  } else {
+    std::shuffle(shuffleable.begin(), shuffleable.end(), shuffle_rng);
+    int shuffle_idx = 0;
+    for (Player p : hidden_players) {
+      for (int j = 0; j < cards_needed[p]; ++j) {
+        player_cards[p].push_back(shuffleable[shuffle_idx++]);
+      }
+    }
+  }
+
+  std::unique_ptr<State> new_state = GetGame()->NewInitialState();
+  for (int i = 0; i < kNumCards; ++i) {
+    int target = i % kNumPlayers;
+    new_state->ApplyAction(player_cards[target].back());
+    player_cards[target].pop_back();
+  }
+
   for (int i = kNumCards; i < history_.size(); ++i) {
     new_state->ApplyAction(history_[i].action);
   }

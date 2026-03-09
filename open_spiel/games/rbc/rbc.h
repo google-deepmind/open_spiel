@@ -16,20 +16,26 @@
 #define OPEN_SPIEL_GAMES_RBC_H_
 
 #include <array>
+#include <cstdint>
 #include <cstring>
-#include <map>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
-// Reconnaisance Blind Chess - imperfect information version of chess, where
+// Reconnaissance Blind Chess - imperfect information version of chess, where
 // players do not see the full board, but they can make explicit "sensing" moves
 // to reveal specific parts of the board.
 //
@@ -69,23 +75,21 @@
 // (kNumReversibleMovesToDraw). This is to make sure that random play
 // in the game would stop after a limited number of steps.
 //
-// > "Turn phase: [..] if the opponent captured a piece on their turn,
+// > "Turn start phase: [..] if the opponent captured a piece on their turn,
 // >  the current player is given the capture square"
 //
-// Turn phase is eliminated: all the capture information can be deduced as the
-// difference of player's pieces observations in the sensing phase.
+// Turn start phase is eliminated: all the capture information can be deduced as
+// the difference of player's pieces observations in the sensing phase.
 //
 // > "Sense phase: the player chooses any square on the chessboard to target
 // >  their sensor. Then, the true state of the game board in a three square by
 // >  three square window centered at the chosen square is revealed to the
 // >  sensing player."
 //
-// Sensing is done as picking a sensing window that fully fits within the
-// chessboard and is not centered on an underlying square. The centering can
-// make the sensing window smaller (as a rectangle near the border of the
-// chessboard) which gives strictly less information than a better placed window
-// (that remains a full square). This modification eliminates strategically
-// useless sensing actions.
+// When sense_border is false, sensing is done as picking a sensing window that
+// fully fits within the chessboard. This setting eliminates strategically
+// suboptimal sensing actions. When sense_centered is false, the window is not
+// centered on an underlying square.
 //
 // > "If the move was modified [..] then the modified move is made, and
 // >  the current player is notified of the modified move in the move results."
@@ -97,12 +101,16 @@
 // [2] https://reconchess.readthedocs.io/en/latest/rules.html
 //
 // Parameters:
-//   "board_size"  int     Number of squares in each row and column (default: 8)
-//   "sense_size"  int     Size of the sensing square.
-//   "fen"         string  String describing the chess board position in
-//                         Forsyth-Edwards Notation. The FEN has to match
-//                         the board size. Default values are available for
-//                         board sizes 4 and 8.
+//   "board_size"     int     Number of squares in each row and column
+//                            (default: 8)
+//   "sense_size"     int     Size of the sensing square.
+//   "sense_centered" bool    Whether to center the sensing window.
+//   "sense_border"   bool    Whether to include the borders in the legal
+//                            sensing actions.
+//   "fen"            string  String describing the chess board position in
+//                            Forsyth-Edwards Notation. The FEN has to match
+//                            the board size. Default values are available for
+//                            board sizes 4 and 8.
 
 namespace open_spiel {
 namespace rbc {
@@ -127,9 +135,31 @@ enum class MovePhase {
   kSensing,  // First sense.
   kMoving,   // Then make a regular move.
 };
+
+struct SenseWindow {
+  bool operator==(const SenseWindow& other) const {
+    return min_corner == other.min_corner && max_corner == other.max_corner;
+  }
+
+  std::string ToString() const {
+    return chess::SquareToString(min_corner) + ":" +
+           chess::SquareToString(max_corner);
+  }
+
+  chess::Square min_corner;
+  chess::Square max_corner;
+};
+
+inline std::ostream& operator<<(std::ostream& stream, const SenseWindow& sb) {
+  return stream << sb.ToString();
+}
+
 // Special value if sense location is not specified (beginning of the game,
 // or if we want to hide the sensing results when opponent is moving).
 constexpr int kSenseLocationNonSpecified = -1;
+
+constexpr SenseWindow kSenseWindowOffBoard = {.min_corner = {-1, -1},
+                                              .max_corner = {-1, -1}};
 
 // State of an in-play game.
 class RbcState : public State {
@@ -198,6 +228,8 @@ class RbcState : public State {
 
   absl::optional<std::vector<double>> MaybeFinalReturns() const;
 
+  SenseWindow GetSenseWindow(Player player) const;
+
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.
   std::vector<chess::Move> moves_history_;
@@ -250,7 +282,7 @@ class RbcGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
     std::vector<int> shape{
-        17 * 2     // public: Num of pieces for both sides
+        17 * 2     // public: Number of pieces for both sides
         + 2        // public: Phase
         + 2        // public: Illegal move
         + 2        // public: Capture
@@ -264,20 +296,30 @@ class RbcGame : public Game {
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const;
+  SenseWindow ActionToSenseWindow(Action sense_action) const;
 
   std::shared_ptr<RbcObserver> default_observer_;
 
   int board_size() const { return board_size_; }
   int sense_size() const { return sense_size_; }
-  // Sensing is done only within the board, as it makes no sense for
-  // any player to do non-efficient sensing that goes outside of the board.
-  // The sense location is encoded as coordinates within this smaller
+  bool sense_centered() const { return sense_centered_; }
+  bool sense_border() const { return sense_border_; }
+  // When sense_border is false, sensing is done only within the board, as it
+  // makes no sense for any player to do non-efficient sensing that goes outside
+  // of the board. The sense location is encoded as coordinates within this
   // inner square.
-  int inner_size() const { return board_size_ - sense_size_ + 1; }
+  int inner_size() const {
+    if (sense_border_) {
+      return board_size_;
+    }
+    return board_size_ - sense_size_ + 1;
+  }
 
  private:
   const int board_size_;
   const int sense_size_;
+  const bool sense_centered_;
+  const bool sense_border_;
   const std::string fen_;
 };
 

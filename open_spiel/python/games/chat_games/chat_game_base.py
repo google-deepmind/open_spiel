@@ -118,9 +118,9 @@ class InitialStateConfiguration:
 class ChatGameState(pyspiel.State):
   """Chat game state."""
 
-  def __init__(self,
-               game: ...,
-               init_state_configs: Tuple[InitialStateConfiguration, ...]):
+  def __init__(
+      self, game, init_state_configs: Tuple[InitialStateConfiguration, ...]
+  ):
     """Constructor.
 
     Args:
@@ -601,7 +601,7 @@ class ChatGameState(pyspiel.State):
     return self.get_game().header
 
   @property
-  def vectorize(self) -> ...:
+  def vectorize(self):
     return self.get_game().vectorize
 
   @property
@@ -877,34 +877,29 @@ class BaseChatGame(pyspiel.Game):
         max_utility=self._max_utility,
         max_game_length=self._max_game_length)
 
-  def _load_chat_game(self,
-                      observations: List[observation_utils.Observation],
-                      vectorize: ...,
-                      header: header_utils.Header,
-                      payoffs: List[payoff_utils.Payoff],
-                      aggregate_payoffs: Callable[[List[int]], float] = np.mean,
-                      given_names: Union[List[str], None] = None,
-                      given_llm_seeds: Union[List[int], None] = None,
-                      given_prompt_actions: Union[OrderedDict[str, List[str]],
-                                                  None] = None,
-                      given_private_info: Union[OrderedDict[str, List[str]],
-                                                None] = None,
-                      initial_scenario: Union[Any, None] = None,
-                      num_names: int = 2,
-                      num_prompt_actions: Tuple[int, ...] = (4,),
-                      num_private_info: Tuple[int, ...] = (4,),
-                      examples_names: Union[List[str], None] = None,
-                      examples_prompt_actions: Union[OrderedDict[str,
-                                                                 List[str]],
-                                                     None] = None,
-                      examples_private_info: Union[OrderedDict[str, List[str]],
-                                                   None] = None,
-                      examples_scenarios: Union[List[Any], None] = None,
-                      llm_list_suffix: str = 'Continue the list from here.',
-                      llm_termination_prompt: Union[term_utils.Termination,
-                                                    None] = None,
-                      seed: Union[int, None] = None
-                      ):
+  def _load_chat_game(
+      self,
+      observations: List[observation_utils.Observation],
+      vectorize,
+      header: header_utils.Header,
+      payoffs: List[payoff_utils.Payoff],
+      aggregate_payoffs: Callable[[List[int]], float] = np.mean,
+      given_names: Union[List[str], None] = None,
+      given_llm_seeds: Union[List[int], None] = None,
+      given_prompt_actions: Union[OrderedDict[str, List[str]], None] = None,
+      given_private_info: Union[OrderedDict[str, List[str]], None] = None,
+      initial_scenario: Union[Any, None] = None,
+      num_names: int = 2,
+      num_prompt_actions: Tuple[int, ...] = (4,),
+      num_private_info: Tuple[int, ...] = (4,),
+      examples_names: Union[List[str], None] = None,
+      examples_prompt_actions: Union[OrderedDict[str, List[str]], None] = None,
+      examples_private_info: Union[OrderedDict[str, List[str]], None] = None,
+      examples_scenarios: Union[List[Any], None] = None,
+      llm_list_suffix: str = 'Continue the list from here.',
+      llm_termination_prompt: Union[term_utils.Termination, None] = None,
+      seed: Union[int, None] = None,
+  ):
     """Constructor.
 
     Args:

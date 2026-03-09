@@ -87,34 +87,30 @@ class ChatGame(chat_game_base.BaseChatGame):
     super(chat_game_base.BaseChatGame, self).__init__(
         GAME_TYPE, self.game_info, params or dict())
 
-  def load_chat_game(self,
-                     llm_type: chat_test_utils.TestLLM,
-                     observations: List[observation_utils.Observation],
-                     vectorize: ...,
-                     header: header_utils.Header,
-                     payoffs: List[payoff_utils.Payoff],
-                     aggregate_payoffs: Callable[[List[int]], float] = np.mean,
-                     given_names: Union[List[str], None] = None,
-                     given_llm_seeds: Union[List[int], None] = None,
-                     given_prompt_actions: Union[OrderedDict[str, List[str]],
-                                                 None] = None,
-                     given_private_info: Union[OrderedDict[str, List[str]],
-                                               None] = None,
-                     initial_scenario: Union[Any, None] = None,
-                     num_names: int = 2,
-                     num_prompt_actions: Tuple[int, ...] = (4,),
-                     num_private_info: Tuple[int, ...] = (4,),
-                     examples_names: Union[List[str], None] = None,
-                     examples_prompt_actions: Union[OrderedDict[str, List[str]],
-                                                    None] = None,
-                     examples_private_info: Union[OrderedDict[str, List[str]],
-                                                  None] = None,
-                     examples_scenarios: Union[List[Any], None] = None,
-                     llm_list_suffix: str = 'Continue the list from here.',
-                     llm_termination_prompt: Union[term_utils.Termination,
-                                                   None] = None,
-                     seed: Union[int, None] = None
-                     ):
+  def load_chat_game(
+      self,
+      llm_type: chat_test_utils.TestLLM,
+      observations: List[observation_utils.Observation],
+      vectorize,
+      header: header_utils.Header,
+      payoffs: List[payoff_utils.Payoff],
+      aggregate_payoffs: Callable[[List[int]], float] = np.mean,
+      given_names: Union[List[str], None] = None,
+      given_llm_seeds: Union[List[int], None] = None,
+      given_prompt_actions: Union[OrderedDict[str, List[str]], None] = None,
+      given_private_info: Union[OrderedDict[str, List[str]], None] = None,
+      initial_scenario: Union[Any, None] = None,
+      num_names: int = 2,
+      num_prompt_actions: Tuple[int, ...] = (4,),
+      num_private_info: Tuple[int, ...] = (4,),
+      examples_names: Union[List[str], None] = None,
+      examples_prompt_actions: Union[OrderedDict[str, List[str]], None] = None,
+      examples_private_info: Union[OrderedDict[str, List[str]], None] = None,
+      examples_scenarios: Union[List[Any], None] = None,
+      llm_list_suffix: str = 'Continue the list from here.',
+      llm_termination_prompt: Union[term_utils.Termination, None] = None,
+      seed: Union[int, None] = None,
+  ):
     """Constructor.
 
     Args:

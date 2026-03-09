@@ -13,11 +13,13 @@
 // limitations under the License.
 
 #include <string>
+#include <vector>
 
 #include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/status.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -75,15 +77,26 @@ void TestActionStruct() {
 
   // Test ApplyActionStruct.
   auto state2 = game->NewInitialState();
-  state2->ApplyActionStruct(*action_struct);
+  Status status = state2->ApplyActionStruct(*action_struct);
+  SPIEL_CHECK_TRUE(status.ok());
   SPIEL_CHECK_EQ(state2->ToString(), "...\n.x.\n...");
+
+  // Test ValidateActionStruct with valid action.
+  auto state3 = game->NewInitialState();
+  SPIEL_CHECK_TRUE(state3->ValidateActionStruct(*action_struct).ok());
+
+  // Test ValidateActionStruct with invalid action (cell already occupied).
+  state3->ApplyAction(4);  // Play in center
+  Status validation_status = state3->ValidateActionStruct(*action_struct);
+  SPIEL_CHECK_FALSE(validation_status.ok());
 
   // Test JSON parsing.
   SPIEL_CHECK_EQ(nlohmann::json::parse(action_json).dump(),
                  TicTacToeActionStruct(action_json).ToJson());
 
-  // Test StructToAction.
-  SPIEL_CHECK_EQ(action_id, ttt_state->StructToAction(*action_struct));
+  // Test StructToActions.
+  std::vector<Action> expected_actions = {action_id};
+  SPIEL_CHECK_EQ(expected_actions, ttt_state->StructToActions(*action_struct));
 }
 
 }  // namespace

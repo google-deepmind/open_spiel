@@ -14,6 +14,7 @@
 
 #include "open_spiel/python/pybind11/games_chess.h"
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
@@ -63,6 +64,7 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
 
   py::class_<Square>(chess, "Square")
       .def(py::init<>())
+      .def(py::init<int8_t, int8_t>())
       .def_readonly("x", &Square::x)
       .def_readonly("y", &Square::y);
 
@@ -79,6 +81,7 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
            py::arg("board") = nullptr);
 
   py::classh<ChessBoard>(chess, "ChessBoard")
+      .def("at", &ChessBoard::at)
       .def("has_legal_moves", &ChessBoard::HasLegalMoves)
       .def("debug_string", &ChessBoard::DebugString,
            py::arg("shredder_fen") = false)

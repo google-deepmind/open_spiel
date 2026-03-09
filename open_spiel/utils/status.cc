@@ -12,14 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
-#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
+#include "open_spiel/utils/status.h"
 
-#include "open_spiel/python/pybind11/pybind11.h"
+#include <iostream>
+#include <string>
 
-// Initialize the Python interface for chess.
 namespace open_spiel {
-void init_pyspiel_games_chess(::pybind11::module &m);
+
+Status OkStatus() {
+  return Status(StatusValue::kOk, "");
 }
 
-#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
+Status ErrorStatus(const std::string& message) {
+  return Status(StatusValue::kError, message);
+}
+
+std::string Status::ToString() const {
+  switch (status_value_) {
+    case StatusValue::kOk:
+      return "OkStatus";
+    case StatusValue::kError:
+      return "ErrorStatus: " + message_;
+  }
+}
+
+std::ostream& operator<<(std::ostream& os, const Status& status) {
+  os << status.ToString();
+  return os;
+}
+
+}  // namespace open_spiel
