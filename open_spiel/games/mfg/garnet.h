@@ -16,7 +16,7 @@
 //
 // This game corresponds to a garnet defined in section 5.1 of
 // "Scaling up Mean Field Games with Online Mirror Descent", Perolat & al. 2021
-// (https://arxiv.org/pdf/2103.00623.pdf)
+// (https://arxiv.org/abs/2103.00623)
 //
 // A garnet is a parametrized family of randomly generated Mean Field Game. One
 // can control the number of action, the number of chance actions and the
@@ -25,7 +25,7 @@
 // the chance actions and the next state is selected uniformly over the state
 // space.
 // - The reward is parametrized by eta as r(x,a) - eta * log(mu(x)) where r(x,a)
-// is sampled uniformly over [0,1] only with probability the sparsity and 0.0
+// is sampled uniformly over [0,1] only with probability of the sparsity and 0.
 // otherwise.
 
 #ifndef OPEN_SPIEL_GAMES_MFG_GARNET_H_

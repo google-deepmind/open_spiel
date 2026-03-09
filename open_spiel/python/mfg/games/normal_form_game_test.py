@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for Python Crowd Modelling game."""
+"""Tests for Python Normal form game Modelling."""
 
 from absl.testing import absltest
 from open_spiel.python.mfg.games import normal_form_game
