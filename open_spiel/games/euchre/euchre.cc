@@ -33,25 +33,24 @@ namespace open_spiel {
 namespace euchre {
 namespace {
 
-const GameType kGameType{
-    /*short_name=*/"euchre",
-    /*long_name=*/"Euchre",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/kNumPlayers,
-    /*min_num_players=*/kNumPlayers,
-    /*provides_information_state_string=*/false,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
-    /*parameter_specification=*/
-    {
-        {"allow_lone_defender", GameParameter(false)},
-        {"stick_the_dealer", GameParameter(true)},
-    }};
+const GameType kGameType{/*short_name=*/"euchre",
+                         /*long_name=*/"Euchre",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/kNumPlayers,
+                         /*min_num_players=*/kNumPlayers,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/false,
+                         /*parameter_specification=*/
+                         {
+                             {"allow_lone_defender", GameParameter(false)},
+                             {"stick_the_dealer", GameParameter(true)},
+                         }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new EuchreGame(params));
@@ -236,6 +235,37 @@ std::string EuchreState::FormatPoints() const {
   for (int i = 0; i < kNumPlayers; ++i)
     absl::StrAppend(&rv, "\n", DirString(i), ": ", points_[i]);
   return rv;
+}
+
+std::string EuchreState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  if (IsTerminal()) return ToString();
+  std::string rv = "Dealer: ";
+  absl::StrAppend(&rv, DirString(dealer_), "\n");
+  if (upcard_ != kInvalidAction)
+    absl::StrAppend(&rv, "Upcard: ", CardString(upcard_), "\n");
+  absl::StrAppend(&rv, "Hand:\n");
+  auto cards = FormatHand(player, /*mark_voids=*/true);
+  for (int suit = kNumSuits - 1; suit >= 0; --suit)
+    absl::StrAppend(&rv, cards[suit], "\n");
+  if (history_.size() > kFirstBiddingActionInHistory)
+    absl::StrAppend(&rv, FormatBidding());
+  if (declarer_go_alone_.has_value()) {
+    absl::StrAppend(&rv, "Declarer go alone: ",
+                    declarer_go_alone_.value() ? "true" : "false", "\n");
+    if (allow_lone_defender_) {
+      absl::StrAppend(&rv, "Defender go alone: ",
+                      lone_defender_ != kInvalidPlayer ? "true" : "false",
+                      "\n");
+    }
+  }
+  if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay(), FormatPoints());
+  return rv;
+}
+
+std::string EuchreState::ObservationString(Player player) const {
+  return InformationStateString(player);
 }
 
 void EuchreState::InformationStateTensor(Player player,

@@ -54,6 +54,8 @@ void ResampleFromInfostateTest() {
               state->ResampleFromInfostate(p, sampler);
           SPIEL_CHECK_EQ(state->InformationStateTensor(p),
                          resampled->InformationStateTensor(p));
+          SPIEL_CHECK_EQ(state->InformationStateString(p),
+                         resampled->InformationStateString(p));
           SPIEL_CHECK_EQ(state->CurrentPlayer(), resampled->CurrentPlayer());
         }
       }

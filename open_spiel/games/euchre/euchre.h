@@ -140,6 +140,8 @@ class EuchreState : public State {
   }
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
