@@ -27,6 +27,7 @@ enum class StatusValue {
 
 class Status {
  public:
+  explicit Status() : status_value_(StatusValue::kOk) {}
   Status(StatusValue status_value, const std::string& message)
       : status_value_(status_value), message_(message) {}
   bool ok() const { return status_value_ == StatusValue::kOk; }
@@ -36,6 +37,21 @@ class Status {
  private:
   StatusValue status_value_;
   std::string message_;
+};
+
+template <typename T>
+class StatusWithValue : public Status {
+ public:
+  explicit StatusWithValue() : Status() {}
+
+  StatusWithValue(StatusValue status_value,
+                  const std::string& message,
+                  T value)
+      : Status(status_value, message), value_(value) {}
+  T value() const { return value_; }
+
+ private:
+  T value_;
 };
 
 Status OkStatus();

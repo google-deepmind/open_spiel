@@ -286,6 +286,11 @@ bool StrContainsIgnoreCase(const std::string& haystack,
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
       __FILE__, ":", __LINE__, " CHECK_TRUE(", #x, ")"))
 
+#define SPIEL_CHECK_OK(x)                                        \
+  while (!(x).ok())                                              \
+  open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
+      __FILE__, ":", __LINE__, " CHECK_OK(", #x, "): ", (x).message()))
+
 // A verbose checker that will print state info:
 // Use as SPIEL_CHECK_TRUE_WSI(bool cond, const std::string& error_message,
 //                             const Game& game_ref, const State& state_ref)
