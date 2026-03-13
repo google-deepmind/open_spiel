@@ -582,8 +582,9 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize, bool verbose,
 
 // Cleaner version of the above with all the defaults set.
 void RandomSimTestWithSpecificInitialState(const Game& game, int num_sims,
-                                           const State* initial_state) {
-  RandomSimTest(game, num_sims, /*serialize=*/true, /*verbose=*/true,
+                                           const State* initial_state,
+                                           bool serialize) {
+  RandomSimTest(game, num_sims, /*serialize=*/serialize, /*verbose=*/true,
                 /*mask_test=*/true, /*state_checker_fn=*/&DefaultStateChecker,
                 /*mean_field_population=*/-1, /*observer=*/nullptr,
                 initial_state);

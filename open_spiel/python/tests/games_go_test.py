@@ -17,7 +17,6 @@
 import json
 
 from absl.testing import absltest
-import numpy as np
 
 import pyspiel
 
@@ -87,30 +86,24 @@ class GamesGoTest(absltest.TestCase):
   def test_games_load_from_sgf_string(self):
     games_and_states = go.load_games_from_sgf_string(EXAMPLE_SGF_STRING)
     self.assertLen(games_and_states, 1)
+    pyspiel.random_sim_test_with_specific_initial_state(
+        games_and_states[0][0], 1, games_and_states[0][1], serialize=True
+    )
+
     games_and_states = go.load_games_from_sgf_string(EXAMPLE_SGF_STRING_2)
     self.assertLen(games_and_states, 2)
+    pyspiel.random_sim_test_with_specific_initial_state(
+        games_and_states[0][0], 1, games_and_states[0][1], serialize=True
+    )
+    pyspiel.random_sim_test_with_specific_initial_state(
+        games_and_states[1][0], 1, games_and_states[1][1], serialize=False
+    )
+
     games_and_states = go.load_games_from_sgf_string(EXAMPLE_SGF_STRING_3)
     self.assertLen(games_and_states, 1)
-
-  def random_sim(self, state):
-    while not state.is_terminal():
-      state.apply_action(np.random.choice(state.legal_actions()))
-
-  def test_games_simulate_from_sgf_string(self):
-    game = pyspiel.load_game("go(board_size=19,komi=5.5)")
-    state = game.new_initial_state(EXAMPLE_SGF_STRING)
-    self.random_sim(state.clone())
-    pyspiel.random_sim_test_with_specific_initial_state(game, 1, state)
-
-    game = pyspiel.load_game("go(board_size=9)")
-    state = game.new_initial_state(EXAMPLE_SGF_STRING_2)
-    self.random_sim(state.clone())
-    pyspiel.random_sim_test_with_specific_initial_state(game, 1, state)
-
-    game = pyspiel.load_game("go(board_size=13)")
-    state = game.new_initial_state(EXAMPLE_SGF_STRING_3)
-    self.random_sim(state.clone())
-    pyspiel.random_sim_test_with_specific_initial_state(game, 1, state)
+    pyspiel.random_sim_test_with_specific_initial_state(
+        games_and_states[0][0], 1, games_and_states[0][1], serialize=False
+    )
 
 
 if __name__ == "__main__":

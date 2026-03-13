@@ -557,7 +557,7 @@ VirtualPoint GoBoard::Chain::single_liberty() const {
   return static_cast<VirtualPoint>(liberty_vertex_sum / num_pseudo_liberties);
 }
 
-std::string GoBoard::ToString() {
+std::string GoBoard::ToString() const {
   std::ostringstream stream;
   stream << *this;
   return stream.str();

@@ -19,7 +19,7 @@
 #include <utility>
 
 #include "open_spiel/games/go/go.h"
-#include "open_spiel/games/go/sgf_reader.h"
+#include "open_spiel/games/go/sgf_game_loader.h"
 #include "open_spiel/spiel.h"
 
 namespace py = ::pybind11;

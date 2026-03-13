@@ -53,7 +53,8 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize = true,
 
 // Cleaner version of the above with all the defaults set.
 void RandomSimTestWithSpecificInitialState(const Game& game, int num_sims,
-                                           const State* initial_state);
+                                           const State* initial_state,
+                                           bool serialize = true);
 
 // Perform num_sims random simulations of the specified game. Also tests the
 // Undo function. Note: for every step in the simulation, the entire simulation

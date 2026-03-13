@@ -788,6 +788,7 @@ PYBIND11_MODULE(pyspiel, m) {
   m.def("random_sim_test_with_specific_initial_state",
         testing::RandomSimTestWithSpecificInitialState, py::arg("game"),
         py::arg("num_sims"), py::arg("specific_initial_state"),
+        py::arg("serialize") = true,
         "Run the C++ tests on a game with a specific initial state.");
 
   m.def("build_state_from_history_string", BuildStateFromHistoryString,
