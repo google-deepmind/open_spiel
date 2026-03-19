@@ -107,6 +107,9 @@ Otherwise, happy hacking!
 
 -   **Visualizations of games**. There exists an interactive viewer for
     OpenSpiel games called [SpielViz](https://github.com/michalsustr/spielviz).
+    A standalone visualization library called [spielviz](https://github.com/kvr06-ai/spielviz)
+    (`pip install spielviz`) is also available for rendering game trees, information sets,
+    and strategy profiles.
     Contributions to this project, and more visualization tools with OpenSpiel,
     are very welcome as they could help immensely with debugging and testing
     the AI beyond the console.
