@@ -1,6 +1,6 @@
 # Builds and tests the OpenSpiel wheels using cibuildwheel.
 #
-# Each wheel is built via the manylinux2014 pypa Docker image on Linux,
+# Each wheel is built via the manylinux_2_28 pypa Docker image on Linux,
 # standard MacOS X, and Windows using MSVC. Each binary wheel is built for
 # x86_64 (and arm64 where supported). Basic API tests are run within the build
 # environment. Full tests (tests that use extra dependencies such as PyTorch,
@@ -37,17 +37,16 @@ jobs:
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64 cp314-manylinux_x86_64
-        # Temporarily disabled due to scipy compatibility issues
-        # - os: ubuntu-24.04-arm
-        #   NAME: "Linux_arm64"
-        #   OS_TYPE: "Linux"
-        #   CI_PYBIN: python3.12
-        #   OS_PYTHON_VERSION: 3.12
-        #   OPEN_SPIEL_ABSL_VERSION: "20250814.1"
-        #   CIBW_VERSION: 3.2.1
-        #   CIBW_ENABLE: all
-        #   CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-        #   CIBW_BUILD: cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
+        - os: ubuntu-24.04-arm
+          NAME: "Linux_arm64"
+          OS_TYPE: "Linux"
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          CIBW_VERSION: 3.2.1
+          CIBW_ENABLE: all
+          CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
         - os: macos-14
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.12
@@ -207,6 +206,8 @@ jobs:
           python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
         shell: pwsh
 
+      # Note: Windows tests are currently less thorough than Linux/macOS tests.
+      # TODO: Improve Windows test coverage in future iterations.
       - name: Run basic tests
         run: |
           python -c "import pyspiel; print('Registered games:', len(pyspiel.registered_names()))"
