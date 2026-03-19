@@ -46,3 +46,7 @@ There is a basic visualizer based on graphviz, see
 
 There is an interactive viewer for OpenSpiel games called
 [SpielViz](https://github.com/michalsustr/spielviz).
+
+There is also [spielviz](https://github.com/kvr06-ai/spielviz), a standalone Python
+library (`pip install spielviz`) that renders game trees, information sets, and
+strategy profiles using matplotlib.
