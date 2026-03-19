@@ -62,44 +62,24 @@ struct TicTacToeStructContents {
                                  board);
 };
 
-struct TicTacToeStateStruct : public StateStruct,
-                               public TicTacToeStructContents {
-  TicTacToeStateStruct() = default;
-  explicit TicTacToeStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
+// State and Observation structs using SPIEL_DEFINE_STRUCT macro
+SPIEL_DEFINE_STRUCT(TicTacToeStateStruct, StateStruct, TicTacToeStructContents);
+SPIEL_DEFINE_STRUCT(TicTacToeObservationStruct, ObservationStruct,
+                    TicTacToeStructContents);
 
-  nlohmann::json to_json_base() const override { return *this; }
-};
-
-struct TicTacToeObservationStruct : public ObservationStruct,
-                                     public TicTacToeStructContents {
-  TicTacToeObservationStruct() = default;
-  explicit TicTacToeObservationStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override { return *this; }
-};
-
+// Action struct using SPIEL_STRUCT_BOILERPLATE macro
 struct TicTacToeActionStruct : public ActionStruct {
   int row;
   int col;
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(TicTacToeActionStruct, row, col);
-
-  TicTacToeActionStruct() = default;
-  explicit TicTacToeActionStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override { return *this; }
+  SPIEL_STRUCT_BOILERPLATE(TicTacToeActionStruct, row, col);
 };
 
 // State of an in-play game.
 class TicTacToeState : public State {
  public:
   TicTacToeState(std::shared_ptr<const Game> game);
-  TicTacToeState(std::shared_ptr<const Game> game, const nlohmann::json& json);
+  TicTacToeState(std::shared_ptr<const Game> game,
+                 const TicTacToeStateStruct& state_struct);
 
   TicTacToeState(const TicTacToeState&) = default;
   TicTacToeState& operator=(const TicTacToeState&) = default;
@@ -134,7 +114,8 @@ class TicTacToeState : public State {
       Player player) const override;
   std::unique_ptr<ActionStruct> ActionToStruct(
       Player player, Action action_id) const override;
-  Action StructToAction(const ActionStruct& action_struct) const override;
+  std::vector<Action> StructToActions(
+      const ActionStruct& action_struct) const override;
 
  protected:
   std::array<CellState, kNumCells> board_;
@@ -153,12 +134,18 @@ class TicTacToeGame : public Game {
  public:
   explicit TicTacToeGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumCells; }
+  using Game::NewInitialState;
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new TicTacToeState(shared_from_this()));
   }
   std::unique_ptr<State> NewInitialState(
-      const nlohmann::json& json) const {
-    return std::unique_ptr<State>(new TicTacToeState(shared_from_this(), json));
+      const TicTacToeStateStruct& state_struct) const {
+    return std::unique_ptr<State>(
+        new TicTacToeState(shared_from_this(), state_struct));
+  }
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const override {
+    return NewInitialState(TicTacToeStateStruct(json));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }

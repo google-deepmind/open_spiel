@@ -14,7 +14,16 @@
 
 #include "open_spiel/games/go/go_board.h"
 
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <cstdint>
 #include <iomanip>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
@@ -548,7 +557,7 @@ VirtualPoint GoBoard::Chain::single_liberty() const {
   return static_cast<VirtualPoint>(liberty_vertex_sum / num_pseudo_liberties);
 }
 
-std::string GoBoard::ToString() {
+std::string GoBoard::ToString() const {
   std::ostringstream stream;
   stream << *this;
   return stream.str();

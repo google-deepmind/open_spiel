@@ -26,7 +26,7 @@ from open_spiel.python.algorithms.projected_replicator_dynamics import _simplex_
 from open_spiel.python.egt.utils import game_payoffs_array
 
 
-def mip_nash(game, objective, solver='GLPK_MI'):
+def mip_nash(game, objective, solver=None):
   """Solves for the optimal Nash for two-player general-sum games.
 
     Using mixed-integer programming:

@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // Catch is a single player game, often used for unit testing RL algorithms.
 //
@@ -49,6 +50,11 @@ inline constexpr int kNumActions = 3;
 inline constexpr int kDefaultRows = 10;
 inline constexpr int kDefaultColumns = 5;
 
+// Actions.
+inline constexpr Action kLeft = 0;
+inline constexpr Action kStay = 1;
+inline constexpr Action kRight = 2;
+
 // State of a cell.
 enum class CellState {
   kEmpty,
@@ -76,6 +82,10 @@ class CatchState : public State {
   std::vector<Action> LegalActions() const override;
   ActionsAndProbs ChanceOutcomes() const override;
   CellState BoardAt(int row, int column) const;
+
+  int ball_row() const { return ball_row_; }
+  int ball_col() const { return ball_col_; }
+  int paddle_col() const { return paddle_col_; }
 
  protected:
   void DoApplyAction(Action move) override;

@@ -17,6 +17,8 @@ add_library (utils OBJECT
   random.cc
   serializable_circular_buffer.h
   serialization.h
+  sgf_reader.h
+  sgf_reader.cc
   stats.h
   tensor_view.h
   thread.h
@@ -67,6 +69,10 @@ if (OPEN_SPIEL_BUILD_WITH_LIBNOP)
                  $<TARGET_OBJECTS:tests>)
   add_test(serializable_circular_buffer_test serializable_circular_buffer_test)
 endif()
+
+add_executable(sgf_reader_test sgf_reader_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(sgf_reader_test sgf_reader_test)
 
 add_executable(stats_test stats_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

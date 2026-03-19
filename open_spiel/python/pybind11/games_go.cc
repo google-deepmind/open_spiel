@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "open_spiel/games/go/go.h"
+#include "open_spiel/games/go/sgf_game_loader.h"
 #include "open_spiel/spiel.h"
 
 namespace py = ::pybind11;
@@ -55,4 +56,12 @@ void open_spiel::init_pyspiel_games_go(py::module& m) {
             return dynamic_cast<GoState*>(
                 game_and_state.second.release());
           }));
+
+  // Args: sgf_filename (string). Returns a vector of (game, state) tuples.
+  go.def("load_games_from_sgf_file", &open_spiel::go::LoadGamesFromSGFFile,
+         "Load games from an SGF file.");
+
+  // Args: sgf_string (string). Returns a vector of (game, state) tuples.
+  go.def("load_games_from_sgf_string", &open_spiel::go::LoadGamesFromSGFString,
+         "Load games from an SGF string.");
 }

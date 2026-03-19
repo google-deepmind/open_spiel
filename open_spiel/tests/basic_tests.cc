@@ -302,11 +302,28 @@ std::vector<double> RandomDistribution(int num_states, std::mt19937* rng) {
   return distrib;
 }
 
+std::vector<HistoryItem> GetInitialHistory(const State* initial_state) {
+  if (initial_state->History().empty()) {
+    return {};
+  } else {
+    std::unique_ptr<State> state = initial_state->GetGame()->NewInitialState();
+    std::vector<HistoryItem> history;
+    for (const auto& action : initial_state->History()) {
+      // Simultaneous move games not supported.
+      SPIEL_CHECK_FALSE(state->IsSimultaneousNode());
+      history.emplace_back(state->Clone(), state->CurrentPlayer(), action);
+      state->ApplyAction(action);
+    }
+    return history;
+  }
+}
+
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
                       bool serialize, bool verbose, bool mask_test,
                       std::shared_ptr<Observer> observer,  // Can be nullptr
                       std::function<void(const State&)> state_checker_fn,
-                      int mean_field_population = -1) {
+                      int mean_field_population = -1,
+                      const State* initial_state = nullptr) {
   std::unique_ptr<Observation> observation =
       observer == nullptr ? nullptr
                           : std::make_unique<Observation>(game, observer);
@@ -336,11 +353,19 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
     std::cout << "Starting new game.." << std::endl;
   }
+
+  // Create the initial state, or use the one provided.
   std::unique_ptr<open_spiel::State> state;
+
   if (mean_field_population == -1) {
     state = game.NewInitialState();
   } else {
     state = game.NewInitialStateForPopulation(mean_field_population);
+  }
+
+  if (initial_state != nullptr) {
+    state = initial_state->Clone();
+    history = GetInitialHistory(state.get());
   }
 
   if (verbose) {
@@ -541,7 +566,8 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize, bool verbose,
                    bool mask_test,
                    const std::function<void(const State&)>& state_checker_fn,
                    int mean_field_population,
-                   std::shared_ptr<Observer> observer) {
+                   std::shared_ptr<Observer> observer,
+                   const State* initial_state) {
   std::mt19937 rng;
   if (verbose) {
     std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
@@ -550,8 +576,18 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize, bool verbose,
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
                      verbose, mask_test, observer, state_checker_fn,
-                     mean_field_population);
+                     mean_field_population, initial_state);
   }
+}
+
+// Cleaner version of the above with all the defaults set.
+void RandomSimTestWithSpecificInitialState(const Game& game, int num_sims,
+                                           const State* initial_state,
+                                           bool serialize) {
+  RandomSimTest(game, num_sims, /*serialize=*/serialize, /*verbose=*/true,
+                /*mask_test=*/true, /*state_checker_fn=*/&DefaultStateChecker,
+                /*mean_field_population=*/-1, /*observer=*/nullptr,
+                initial_state);
 }
 
 void RandomSimTestWithUndo(const Game& game, int num_sims) {

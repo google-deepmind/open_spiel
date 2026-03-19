@@ -37,20 +37,15 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/status.h"
 #include "open_spiel/utils/usage_logging.h"
 
 namespace open_spiel {
 namespace {
-
-constexpr const int kSerializationVersion = 1;
-constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
-constexpr const char* kSerializeGameSectionHeader = "[Game]";
-constexpr const char* kSerializeGameRNGStateSectionHeader = "[GameRNGState]";
-constexpr const char* kSerializeStateSectionHeader = "[State]";
-constexpr const char* kSerializeStartingState = "starting_state=";
 
 // Returns the available parameter keys, to be used as a utility function.
 std::string ListValidParameters(
@@ -189,7 +184,7 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
 }
 
 std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
-  return {"quoridor", "rbc"};
+  return {"quoridor"};
 }
 
 std::vector<GameType> GameRegisterer::RegisteredGames() {
@@ -299,6 +294,62 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
   }
   LogUsage();
   return result;
+}
+
+std::shared_ptr<const Game> LoadGame(
+    const GameParametersStruct& params_struct) {
+  nlohmann::json json = params_struct.to_json_base();
+  if (!json.contains("game_name") ||
+      json["game_name"].get<std::string>().empty()) {
+    SpielFatalError("GameParametersStruct must have a non-empty game_name.");
+  }
+  GameParameters params;
+  params["name"] = GameParameter(json["game_name"].get<std::string>());
+  for (auto& [key, value] : json.items()) {
+    if (key == "game_name") continue;
+    if (value.is_boolean()) {
+      params[key] = GameParameter(value.get<bool>());
+    } else if (value.is_number_integer()) {
+      params[key] = GameParameter(value.get<int>());
+    } else if (value.is_number_float()) {
+      params[key] = GameParameter(value.get<double>());
+    } else if (value.is_string()) {
+      params[key] = GameParameter(value.get<std::string>());
+    } else {
+      SpielFatalError(
+          absl::StrCat("Unsupported JSON value type for key: ", key));
+    }
+  }
+  return LoadGame(params);
+}
+
+std::shared_ptr<const Game> LoadGameFromJson(const std::string& json_string) {
+  nlohmann::json json = nlohmann::json::parse(json_string);
+  if (!json.contains("game_name")) {
+    SpielFatalError("JSON game params must contain 'game_name' key.");
+  }
+  std::string game_name = json.at("game_name").get<std::string>();
+  if (game_name.empty()) {
+    SpielFatalError("JSON game params 'game_name' must not be empty.");
+  }
+  GameParameters params;
+  params["name"] = GameParameter(game_name);
+  for (auto& [key, value] : json.items()) {
+    if (key == "game_name") continue;
+    if (value.is_boolean()) {
+      params[key] = GameParameter(value.get<bool>());
+    } else if (value.is_number_integer()) {
+      params[key] = GameParameter(value.get<int>());
+    } else if (value.is_number_float()) {
+      params[key] = GameParameter(value.get<double>());
+    } else if (value.is_string()) {
+      params[key] = GameParameter(value.get<std::string>());
+    } else {
+      SpielFatalError(
+          absl::StrCat("Unsupported JSON value type for key: ", key));
+    }
+  }
+  return LoadGame(params);
 }
 
 State::State(std::shared_ptr<const Game> game)
@@ -437,8 +488,30 @@ void State::ApplyActionsWithLegalityChecks(const std::vector<Action>& actions) {
   ApplyActions(actions);
 }
 
-void State::ApplyActionStruct(const ActionStruct& action_struct) {
-  ApplyAction(StructToAction(action_struct));
+Status State::ValidateActionStruct(
+    const ActionStruct& action_struct) const {
+  std::vector<Action> actions = StructToActions(action_struct);
+  std::vector<Action> legal = LegalActions();
+  for (Action action : actions) {
+    if (absl::c_find(legal, action) == legal.end()) {
+      return ErrorStatus(absl::StrCat(
+          "Illegal action: ", action_struct.ToJson(),
+          " (action ", action, " = '", ActionToString(action),
+          "' is not legal)"));
+    }
+  }
+  return OkStatus();
+}
+
+Status State::ApplyActionStruct(const ActionStruct& action_struct) {
+  Status status = ValidateActionStruct(action_struct);
+  if (!status.ok()) {
+    return status;
+  }
+  for (Action action : StructToActions(action_struct)) {
+    ApplyAction(action);
+  }
+  return OkStatus();
 }
 
 std::vector<int> State::LegalActionsMask(Player player) const {

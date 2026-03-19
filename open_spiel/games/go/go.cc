@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -51,9 +52,9 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"komi", GameParameter(7.5)},
-     {"board_size", GameParameter(19)},
-     {"handicap", GameParameter(0)},
+    {{"komi", GameParameter(kDefaultKomi)},
+     {"board_size", GameParameter(kDefaultBoardSize)},
+     {"handicap", GameParameter(kDefaultHandicap)},
      // After the maximum game length, the game will end arbitrarily and the
      // score is computed as usual (i.e. number of stones + komi).
      // It's advised to only use shorter games to compute win-rates.

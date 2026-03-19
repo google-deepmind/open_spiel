@@ -18,6 +18,8 @@
 #include <array>
 #include <cstdint>
 #include <ostream>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"
@@ -173,7 +175,7 @@ class GoBoard {
   // Number of stones in a chain.
   inline int ChainSize(VirtualPoint p) const { return chain(p).num_stones; }
 
-  std::string ToString();
+  std::string ToString() const;
 
   class GroupIter {
    public:

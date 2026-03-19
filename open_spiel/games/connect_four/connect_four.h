@@ -69,25 +69,41 @@ enum class CellState {
   kCross,
 };
 
-
-struct ConnectFourStateStruct : StateStruct {
+struct ConnectFourStructContents {
   std::vector<std::vector<std::string>> board;
   std::string current_player;
   bool is_terminal;
   std::string winner;
-
-  ConnectFourStateStruct() = default;
-  explicit ConnectFourStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override {
-    return *this;
-  }
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConnectFourStateStruct, board, current_player,
-                                 is_terminal, winner);
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConnectFourStructContents, board,
+                                 current_player, is_terminal, winner);
 };
 
+SPIEL_DEFINE_STRUCT(ConnectFourStateStruct, StateStruct,
+                    ConnectFourStructContents);
+SPIEL_DEFINE_STRUCT(ConnectFourObservationStruct, ObservationStruct,
+                    ConnectFourStructContents);
+
+struct ConnectFourActionStruct : public ActionStruct {
+  int column;
+  SPIEL_STRUCT_BOILERPLATE(ConnectFourActionStruct, column);
+};
+
+struct ConnectFourGameParams : public GameParametersStruct {
+  int rows = kDefaultNumRows;
+  int columns = kDefaultNumCols;
+  int x_in_row = kDefaultXInRow;
+  bool egocentric_obs_tensor = kDefaultEgocentricObsTensor;
+
+  ConnectFourGameParams() { game_name = "connect_four"; }
+
+  nlohmann::json to_json_base() const override {
+    return nlohmann::json{{"game_name", game_name},
+                          {"rows", rows},
+                          {"columns", columns},
+                          {"x_in_row", x_in_row},
+                          {"egocentric_obs_tensor", egocentric_obs_tensor}};
+  }
+};
 
 // State of an in-play game.
 class ConnectFourState : public State {
@@ -95,6 +111,14 @@ class ConnectFourState : public State {
   ConnectFourState(std::shared_ptr<const Game>);
   explicit ConnectFourState(std::shared_ptr<const Game> game,
                             const std::string& str);
+  // Construct from struct. If strict_validation is true (default), validates
+  // piece count balance (xs == os or xs == os + 1). If false, allows
+  // unreachable positions with imbalanced piece counts.
+  // All other validation (no gaps, valid cells, terminal consistency) is
+  // always performed regardless of strict_validation.
+  ConnectFourState(std::shared_ptr<const Game> game,
+                   const ConnectFourStateStruct& state_struct,
+                   bool strict_validation = true);
   ConnectFourState(const ConnectFourState& other) = default;
 
   Player CurrentPlayer() const override;
@@ -102,6 +126,12 @@ class ConnectFourState : public State {
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   std::unique_ptr<StateStruct> ToStruct() const override;
+  std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const override;
+  std::unique_ptr<ActionStruct> ActionToStruct(Player player,
+                                               Action action_id) const override;
+  std::vector<Action> StructToActions(
+      const ActionStruct& action_struct) const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
@@ -141,6 +171,16 @@ class ConnectFourGame : public Game {
   int NumDistinctActions() const override { return cols_; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ConnectFourState(shared_from_this()));
+  }
+  std::unique_ptr<State> NewInitialState(
+      const ConnectFourStateStruct& state_struct,
+      bool strict_validation = true) const {
+    return std::unique_ptr<State>(new ConnectFourState(
+        shared_from_this(), state_struct, strict_validation));
+  }
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const override {
+    return NewInitialState(ConnectFourStateStruct(json));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }

@@ -15,13 +15,13 @@
 #ifndef OPEN_SPIEL_SPIEL_UTILS_H_
 #define OPEN_SPIEL_SPIEL_UTILS_H_
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <ostream>
 #include <random>
 #include <sstream>
 #include <string>
@@ -35,6 +35,7 @@
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 
 // Code that is not part of the API, but is widely useful in implementations.
 
@@ -285,6 +286,11 @@ bool StrContainsIgnoreCase(const std::string& haystack,
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
       __FILE__, ":", __LINE__, " CHECK_TRUE(", #x, ")"))
 
+#define SPIEL_CHECK_OK(x)                                        \
+  while (!(x).ok())                                              \
+  open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
+      __FILE__, ":", __LINE__, " CHECK_OK(", #x, "): ", (x).message()))
+
 // A verbose checker that will print state info:
 // Use as SPIEL_CHECK_TRUE_WSI(bool cond, const std::string& error_message,
 //                             const Game& game_ref, const State& state_ref)
@@ -439,5 +445,104 @@ class SamplerFromRng {
 };
 
 }  // namespace open_spiel
+
+// =============================================================================
+// Struct Macros
+// =============================================================================
+// These macros reduce boilerplate when defining game-specific structs.
+// They are placed outside the namespace as they define new types.
+// See docs/STRUCT_DESIGN.md for detailed documentation.
+
+// SPIEL_DEFINE_STRUCT: Generates a complete struct definition for structs that
+// inherit from a shared Contents class (typically used for StateStruct and
+// ObservationStruct where the same fields are shared).
+//
+// Usage:
+//   SPIEL_DEFINE_STRUCT(TicTacToeStateStruct, StateStruct,
+//   TicTacToeStructContents);
+//
+// Generates:
+//   struct TicTacToeStateStruct : public StateStruct, public
+//   TicTacToeStructContents {
+//     TicTacToeStateStruct() = default;
+//     explicit TicTacToeStateStruct(const std::string& json_str) { ... }
+//     nlohmann::json to_json_base() const override { return *this; }
+//   };
+#define SPIEL_DEFINE_STRUCT(StructName, BaseType, ContentsType)             \
+  struct StructName : public BaseType, public ContentsType {                \
+    StructName() = default;                                                 \
+    explicit StructName(const std::string& json_str) {                      \
+      nlohmann::json::parse(json_str).get_to(*this);                        \
+    }                                                                       \
+    explicit StructName(const nlohmann::json& json) { json.get_to(*this); } \
+    nlohmann::json to_json_base() const override { return *this; }          \
+  }
+
+// SPIEL_STRUCT_BOILERPLATE: Generates boilerplate for structs with inline
+// fields (typically used for ActionStruct where fields are defined directly).
+// Must be placed inside a struct definition after field declarations.
+//
+// Usage:
+//   struct TicTacToeActionStruct : public ActionStruct {
+//     int row;
+//     int col;
+//     SPIEL_STRUCT_BOILERPLATE(TicTacToeActionStruct, row, col);
+//   };
+//
+// Generates:
+//   - NLOHMANN_DEFINE_TYPE_INTRUSIVE for JSON serialization
+//   - Default constructor
+//   - JSON string constructor
+//   - to_json_base() override
+#define SPIEL_STRUCT_BOILERPLATE(StructName, ...)                         \
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(StructName, __VA_ARGS__)                 \
+  StructName() = default;                                                 \
+  explicit StructName(const std::string& json_str) {                      \
+    nlohmann::json::parse(json_str).get_to(*this);                        \
+  }                                                                       \
+  explicit StructName(const nlohmann::json& json) { json.get_to(*this); } \
+  nlohmann::json to_json_base() const override { return *this; }
+
+// SPIEL_DEFINE_STRUCT_WITH_EXTRAS: Combine Contents + Extras into one struct.
+// For structs that need fields from two sources (Contents + Extras).
+// Common use case: ObservationStruct with shared Contents plus observation-
+// specific fields like observing_player.
+//
+// Usage:
+//   // First, define the extras struct:
+//   struct GinRummyObservationExtras {
+//     int observing_player = -1;
+//     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
+//         GinRummyObservationExtras, observing_player);
+//   };
+//
+//   // Then use this macro:
+//   SPIEL_DEFINE_STRUCT_WITH_EXTRAS(
+//       GinRummyObservationStruct,
+//       ObservationStruct,
+//       GinRummyStructContents,
+//       GinRummyObservationExtras);
+#define SPIEL_DEFINE_STRUCT_WITH_EXTRAS(StructName, BaseType, ContentsType, \
+                                        ExtrasType)                         \
+  struct StructName : public BaseType,                                      \
+                      public ContentsType,                                  \
+                      public ExtrasType {                                   \
+    StructName() = default;                                                 \
+    explicit StructName(const std::string& json_str) {                      \
+      nlohmann::json data = nlohmann::json::parse(json_str);                \
+      data.get_to(static_cast<ContentsType&>(*this));                       \
+      data.get_to(static_cast<ExtrasType&>(*this));                         \
+    }                                                                       \
+    explicit StructName(const nlohmann::json& json) {                       \
+      json.get_to(static_cast<ContentsType&>(*this));                       \
+      json.get_to(static_cast<ExtrasType&>(*this));                         \
+    }                                                                       \
+    nlohmann::json to_json_base() const override {                          \
+      nlohmann::json j = static_cast<const ContentsType&>(*this);           \
+      nlohmann::json extras = static_cast<const ExtrasType&>(*this);        \
+      j.merge_patch(extras);                                                \
+      return j;                                                             \
+    }                                                                       \
+  }
 
 #endif  // OPEN_SPIEL_SPIEL_UTILS_H_

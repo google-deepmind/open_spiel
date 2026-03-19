@@ -6,9 +6,8 @@ helpful reminder of how to use the main functionality of OpenSpiel.
 Most of the functions are described and illustrated via Python syntax and
 examples, and there are pointers to the corresponding C++ functions.
 
-<b><u>Disclaimer</u></b>: This is meant as a guide to facilitate OpenSpiel development
-in Python. However,
-[spiel.h](https://github.com/deepmind/open_spiel/blob/master/open_spiel/spiel.h)
+**Disclaimer**: This is meant as a guide to facilitate OpenSpiel development in
+Python. However, [spiel.h](https://github.com/deepmind/open_spiel/blob/master/open_spiel/spiel.h)
 remains the single source of truth for documentation on the core API.
 
 ### Core Functions
@@ -50,16 +49,16 @@ Method                                       | Python                           
 
 ### Game methods
 
-Method                                       | Python                                                                | C++                                                                                                                   | Description
--------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -----------
+Method                                       | Python                                                              | C++                                                                                                                 | Description
+-------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | -----------
 `action_to_string(player: int, action: int)` | [Python](api_reference/game_action_to_string.md)                    | [C++](https://github.com/deepmind/open_spiel/blob/c6fafb92021a8a3aa5f9746cdb79e74917ed26a5/open_spiel/spiel.h#L946) | Returns a (state-independent) string representation of the specified player's action.
 `deserialize_state(serialized_data: str)`    | [Python](api_reference/game_deserialize_state.md)                   | [C++](https://github.com/deepmind/open_spiel/blob/89ba2264a66d9db299108fbd2de4a27b71973f54/open_spiel/spiel.h#L863) | Reconstructs the state from the serialized state string.
 `information_state_tensor_shape()`           | [Python](api_reference/game_information_state_tensor_shape_size.md) | [C++](https://github.com/deepmind/open_spiel/blob/89ba2264a66d9db299108fbd2de4a27b71973f54/open_spiel/spiel.h#L815) | Shape that the information state tensor should be perceived as.
 `information_state_tensor_size()`            | [Python](api_reference/game_information_state_tensor_shape_size.md) | [C++](https://github.com/deepmind/open_spiel/blob/89ba2264a66d9db299108fbd2de4a27b71973f54/open_spiel/spiel.h#L827) | Size of the list (number of values) returned by the state's information state tensor function.
 `max_chance_outcomes()`                      | [Python](api_reference/game_max_chance_outcomes.md)                 | [C++](https://github.com/deepmind/open_spiel/blob/c6fafb92021a8a3aa5f9746cdb79e74917ed26a5/open_spiel/spiel.h#L778) | The maximum number of distinct chance outcomes for chance nodes in the game.
 `max_game_length()`                          | [Python](api_reference/game_max_game_length.md)                     | [C++](https://github.com/deepmind/open_spiel/blob/89ba2264a66d9db299108fbd2de4a27b71973f54/open_spiel/spiel.h#L873) | The maximum length of any one game (in terms of number of decision nodes visited in the game tree).
-`max_utility()`                              | [Python](api_reference/game_max_min_utility.md)                     | [C++](https://github.com/deepmind/open_spiel/blob/89ba2264a66d9db299108fbd2de4a27b71973f54/open_spiel/spiel.h#L795) | The maximum achievable utility (return) in over any playing (episode) of the game.
-`min_utility()`                              | [Python](api_reference/game_max_min_utility.md)                     | [C++](https://github.com/deepmind/open_spiel/blob/c6fafb92021a8a3aa5f9746cdb79e74917ed26a5/open_spiel/spiel.h#L795) | The minimum achievable utility (return) in over any playing (episode) of the game.
+`max_utility()`                              | [Python](api_reference/game_max_min_utility.md)                     | [C++](https://github.com/deepmind/open_spiel/blob/89ba2264a66d9db299108fbd2de4a27b71973f54/open_spiel/spiel.h#L795) | The maximum achievable utility (return) from any episode of the game.
+`min_utility()`                              | [Python](api_reference/game_max_min_utility.md)                     | [C++](https://github.com/deepmind/open_spiel/blob/c6fafb92021a8a3aa5f9746cdb79e74917ed26a5/open_spiel/spiel.h#L795) | The minimum achievable utility (return) from any episode of the game.
 `new_initial_state()`                        | [Python](api_reference/game_new_initial_state.md)                   | [C++](https://github.com/deepmind/open_spiel/blob/c6fafb92021a8a3aa5f9746cdb79e74917ed26a5/open_spiel/spiel.h#L764) | Returns a new initial state of the game (note: which might be a chance node).
 `num_distinct_actions()`                     | [Python](api_reference/game_num_distinct_actions.md)                | [C++](https://github.com/deepmind/open_spiel/blob/c6fafb92021a8a3aa5f9746cdb79e74917ed26a5/open_spiel/spiel.h#L752) | Returns the number of (state-independent) distinct actions in the game.
 `observation_tensor_shape()`                 | [Python](api_reference/game_observation_tensor_shape_size.md)       | [C++](https://github.com/deepmind/open_spiel/blob/89ba2264a66d9db299108fbd2de4a27b71973f54/open_spiel/spiel.h#L835) | Shape that the observation tensor should be perceived as.

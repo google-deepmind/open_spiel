@@ -44,6 +44,10 @@ namespace open_spiel {
 namespace go {
 
 // Constants.
+constexpr float kDefaultKomi = 7.5;
+constexpr int kDefaultBoardSize = 19;
+constexpr int kDefaultHandicap = 0;
+
 inline constexpr int NumPlayers() { return 2; }
 inline constexpr double LossUtility() { return -1; }
 inline constexpr double WinUtility() { return 1; }
@@ -99,6 +103,8 @@ struct GoStateStruct : StateStruct {
 // The pass action is board_size * board_size.
 class GoState : public State {
  public:
+  friend class GoGame;
+
   // Constructs a Go state for the empty board.
   GoState(std::shared_ptr<const Game> game, int board_size, float komi,
           int handicap);
@@ -126,6 +132,12 @@ class GoState : public State {
   void UndoAction(Player player, Action action) override;
 
   const GoBoard& board() const { return board_; }
+
+  // Use with care. Modifying the board directly can lead to undefined behavior.
+  // The history is not maintained properly when using this method. This method
+  // is mainly used by the SGF game loader to create arbitrary boards from SGF
+  // files via the AB[] and AW[] properties.
+  GoBoard* mutable_board() { return &board_; }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -187,6 +199,8 @@ class GoGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
 
   int MaxGameLength() const override { return max_game_length_; }
+
+  Action PassAction() const { return board_size_ * board_size_; }
 
  private:
   const float komi_;
