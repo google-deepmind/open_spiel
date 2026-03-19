@@ -174,7 +174,7 @@ class Allocator {
 class ContiguousAllocator : public Allocator {
  public:
   ContiguousAllocator(absl::Span<float> data) : data_(data), offset_(0) {
-    absl::c_fill(data, 0);
+    absl::c_fill(data, 0.0f);
   }
   SpanTensor Get(absl::string_view name,
                  const absl::InlinedVector<int, 4>& shape) override;

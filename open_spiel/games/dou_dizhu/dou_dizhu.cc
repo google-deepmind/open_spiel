@@ -216,7 +216,7 @@ void DouDizhuState::WriteObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  absl::c_fill(values, 0.);
+  absl::c_fill(values, 0.0f);
   if (phase_ == Phase::kDeal) return;
   auto values_iterator = values.begin();
   const int played_deck_base = (kNumRanks - 2) * (kNumSuits + 1) + 2 * 2;
