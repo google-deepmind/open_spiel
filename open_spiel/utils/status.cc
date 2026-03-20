@@ -33,8 +33,11 @@ std::string Status::ToString() const {
       return "OkStatus";
     case StatusValue::kError:
       return "ErrorStatus: " + message_;
+    default:
+      return "UnknownStatus";
   }
 }
+
 
 std::ostream& operator<<(std::ostream& os, const Status& status) {
   os << status.ToString();

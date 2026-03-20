@@ -315,7 +315,7 @@ void CrazyEightsState::WriteObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  absl::c_fill(values, 0.);
+  absl::c_fill(values, 0.0f);
   if (phase_ == Phase::kDeal) return;
 
   for (int card = 0; card < kNumCards; ++card) {
