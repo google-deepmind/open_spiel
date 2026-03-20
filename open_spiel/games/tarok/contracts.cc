@@ -79,6 +79,7 @@ std::string ContractNameToString(const ContractName& contract_name) {
     case ContractName::kNotSelected:
       return "Not selected";
   }
+  SpielFatalError("Unknown contract name");
 }
 
 }  // namespace tarok

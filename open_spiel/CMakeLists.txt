@@ -206,7 +206,7 @@ include_directories (pybind11_json/include)
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
 target_include_directories (
   open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
-link_libraries(open_spiel_core
+target_link_libraries(open_spiel_core
   absl::algorithm
   absl::flags
   absl::flags_parse
@@ -217,6 +217,7 @@ link_libraries(open_spiel_core
   absl::strings
   absl::time
 )
+
 
 # Just the minimal base library: no games.
 set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)
