@@ -1,0 +1,13 @@
+EFG 2 R "Guess the Ace (Miltersen & Sørensen SODA 2006)" { "Player 1" "Player 2" }
+""
+c "Nature" 1 { "AS_on_top" 1/52 "Other_on_top" 51/52 } 0
+  p "P1" 1 1 { "0" "1" } 0
+    t "" 1 "Stop_AS_Payoff" { 0, 0 }
+    p "P2_Infoset" 2 1 { "0" "1" } 0
+      t "" 2 "P2_Guesses_AS_Correctly" { -1000, 1000 }
+      t "" 3 "P2_Guesses_Other_Incorrectly" { 0, 0 }
+  p "P1_Other" 1 2 { "0" "1" } 0
+    t "" 4 "Stop_Other_Payoff" { 0, 0 }
+    p "P2_Infoset" 2 1 { "0" "1" } 0
+      t "" 5 "P2_Guesses_AS_Incorrectly" { 0, 0 }
+      t "" 6 "P2_Guesses_Other_Correctly" { -1000, 1000 }
