@@ -17,7 +17,6 @@
 #include <sys/types.h>
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <functional>
@@ -376,7 +375,7 @@ std::string UniversalPokerState::ActionToString(Player player,
 
 bool UniversalPokerState::IsTerminal() const {
   bool finished = cur_player_ == kTerminalPlayerId;
-  assert(acpc_state_.IsFinished() || !finished);
+  SPIEL_CHECK_TRUE(acpc_state_.IsFinished() || !finished);
   return finished;
 }
 
