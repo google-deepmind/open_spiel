@@ -562,7 +562,7 @@ class DeepCFRSolver(policy.Policy):
         samples = self._advantage_memories[player].experience
 
       # Ensure some samples have been gathered.
-      if len(samples.info_state == 0):
+      if len(samples.info_state) == 0:
         return None
 
       self._optimizer_advantages[player].zero_grad()
