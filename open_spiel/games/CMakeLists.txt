@@ -192,6 +192,8 @@ set(GAME_SOURCES
   rbc/rbc.h
   sheriff/sheriff.cc
   sheriff/sheriff.h
+  shogi/shogi.cc
+  shogi/shogi.h
   skat/skat.cc
   skat/skat.h
   solitaire/solitaire.cc
@@ -672,6 +674,10 @@ add_test(repeated_leduc_poker_test repeated_leduc_poker_test)
 add_executable(sheriff_test sheriff/sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(sheriff_test sheriff_test)
+
+add_executable(shogi_test shogi/shogi_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(shogi_test shogi_test)
 
 add_executable(skat_test skat/skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
