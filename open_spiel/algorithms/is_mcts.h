@@ -49,7 +49,16 @@ enum class ISMCTSFinalPolicyType {
 struct ChildInfo {
   int visits;
   double return_sum;
+  double return_sq_sum; // Accumulates squared returns so variance can be estimated later.
   double value() const { return return_sum / visits; }
+
+  // Returns the estimated return variance for this action.
+  double variance() const {
+    if (visits < 2) return 0.0;
+    double mean = return_sum / visits;
+    double var = (return_sq_sum / visits) - (mean * mean);
+    return var > 0.0 ? var : 0.0;
+  }
 };
 
 struct ISMCTSNode {
@@ -77,14 +86,14 @@ class ISMCTSBot : public Bot {
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
             int max_simulations, int max_world_samples,
             ISMCTSFinalPolicyType final_policy_type,
-            bool use_observation_string, bool allow_inconsistent_action_sets);
+            bool use_observation_string, bool allow_inconsistent_action_sets, double risk_lambda);
 
   // An IS-MCTS with sensible defaults.
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
             int max_simulations)
       : ISMCTSBot(seed, evaluator, uct_c, max_simulations,
                   kUnlimitedNumWorldSamples,
-                  ISMCTSFinalPolicyType::kNormalizedVisitCount, false, false) {}
+                  ISMCTSFinalPolicyType::kNormalizedVisitCount, false, false, 0.0) {}
 
   Action Step(const State& state) override;
 
@@ -148,6 +157,8 @@ class ISMCTSBot : public Bot {
   const ISMCTSFinalPolicyType final_policy_type_;
   const bool use_observation_string_;
   const bool allow_inconsistent_action_sets_;
+  // Risk penalty weight used in tree policy selection. - Its defaulted to 0, you can increase it for different behaviours, try 1.0
+  double risk_lambda_;
   ISMCTSNode* root_node_;
   InfostateResampler resampler_cb_;
 };
