@@ -86,7 +86,7 @@ class ISMCTSBot : public Bot {
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
             int max_simulations, int max_world_samples,
             ISMCTSFinalPolicyType final_policy_type,
-            bool use_observation_string, bool allow_inconsistent_action_sets, double risk_lambda);
+            bool use_observation_string, bool allow_inconsistent_action_sets, double risk_lambda=0.0);
 
   // An IS-MCTS with sensible defaults.
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
