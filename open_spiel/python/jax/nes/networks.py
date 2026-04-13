@@ -205,6 +205,11 @@ class PayoffsToDuals(nn.Module):
   def _marginalise_payoffs(self, alpha: chex.Array) -> chex.Array:
     """Helper for marginalisation: [C_dual, N, A1, ..., AN] → [C_dual, N, A]"""
 
+    # Detect if this is a cubic game (all players have the same number of actions)
+    A_sizes = tuple(alpha.shape[2:])
+    is_cubic = len(set(A_sizes)) == 1
+    max_A = max(A_sizes)
+
     m_duals = []
     for p in range(alpha.shape[1]):
       # Slice for this player → [C_dual, A1, A2, ..., AN]
@@ -217,9 +222,15 @@ class PayoffsToDuals(nn.Module):
       )
       #  [C_dual, A_p]
       alpha_p = jnp.mean(alpha_p_slice, axis=reduce_axes, keepdims=False)
-
-      m_duals.append(alpha_p)
-
+      if is_cubic:
+        m_duals.append(alpha_p)
+      else:
+        # Pad to max_A for non-cubic games
+        if alpha_p.shape[-1] < max_A:
+          pad_width = [(0, 0)] * (alpha_p.ndim - 1) + [(0, max_A - alpha_p.shape[-1])]
+          alpha_p = jnp.pad(alpha_p, pad_width, mode='constant')
+        m_duals.append(alpha_p)
+      
     # Stack along the player dimension -> [C, N, max_A]
     return jnp.stack(m_duals, axis=1)
 
@@ -393,7 +404,6 @@ class NeuralEquilibriumModel(nn.Module):
   def __init__(
     self,
     num_players: int,
-    num_actions: int,
     dual_channels: int,
     mode: Mode,
     payoff_channel_list: list[int] = [64, 128, 256, 128],
@@ -477,7 +487,7 @@ class NeuralEquilibriumModel(nn.Module):
       # Move channels to end for conv, then back
       alpha = jnp.moveaxis(alpha, 0, -1)
       # Ensure that the values stay positive 
-      # even if we take the projection 
+      # Even if we take the projection 
       alpha = nn.softplus(self.final_proj(alpha))
       alpha = jnp.moveaxis(alpha, -1, 0)
 
