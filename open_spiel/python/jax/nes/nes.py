@@ -125,6 +125,7 @@ class NESSolver:
       rngs=nn.Rngs(seed),
     )
 
+    params = nn.state(self._network, nn.Param)
     def mask_fn(path, _):
       # path is a tuple of segments, e.g., ('linear1', 'bias')
       names = [
@@ -134,16 +135,16 @@ class NESSolver:
       # Return True to APPLY decay, False to MASK it
       return ("bias" not in names) and ("bn" not in names)
 
-    params = nn.state(self._network, nn.Param)
     mask = jax.tree.map_with_path(mask_fn, params)
 
     optimiser = optax.adamw(
-      learning_rate=learning_rate, weight_decay=weight_decay, mask=mask
+      learning_rate=learning_rate, weight_decay=weight_decay,
     )
 
     if gradient_clipping:
       optimiser = optax.chain(
-        optimiser, optax.clip_by_global_norm(gradient_clipping)
+        optax.clip_by_global_norm(gradient_clipping),  # 1. Clip the raw gradients first
+        optimiser                                      # 2. Then apply AdamW
       )
 
     self._optimizer = nn.Optimizer(self._network, optimiser, wrt=nn.Param)
@@ -151,17 +152,20 @@ class NESSolver:
     self._graphdef_network_opt = nn.graphdef((self._network, self._optimizer))
     self._graphdef_network = nn.graphdef(self._network)
     self._batch_stats = nn.BatchStat(self._network)
+    self.broadcast_fn = jax.vmap(samplers.broadcast)
 
     self._update_fn = self._get_jitted_update()
 
   def _get_jitted_update(self) -> Callable:
+    
 
     def _dual_loss(
       network: nn.Module,
       data: Data,
     ) -> chex.Array:
       """Loss function for the Q-network."""
-      alpha = utils.batched_call(network, data.stack())
+      network.train()
+      alpha = utils.batched_call(network, samplers.stack(self.broadcast_fn(data), axis=1))
 
       # Recovering primal variables
       logits, sigma, epsilon, sum_alphas, log_sum_exp = recover_primals(
@@ -185,23 +189,21 @@ class NESSolver:
     @jax.jit
     def update(
         network_opt_state: nn.State,
-        batch_stats: nn.BatchStat,
         data: Data,
     ) -> tuple[chex.Array, nn.State, nn.State]:
       
       # 1. Merge the graphdef with your incoming functional states
       policy_model, optimiser = nn.merge(
           self._graphdef_network_opt, network_opt_state
-      ) # TODO: bug fix!
+      )
       
       (main_loss, aux), grads = nn.value_and_grad(_dual_loss, has_aux=True)(policy_model, data)
-      
-      optimiser.update(policy_model, grads)
-      
-      new_network_opt_state = nn.state((policy_model, optimiser))
-      new_batch_stats = nn.state(policy_model, nn.BatchStat)
 
-      return main_loss, (new_network_opt_state, new_batch_stats, aux)
+      optimiser.update(policy_model, grads)
+
+      new_network_opt_state = nn.state((policy_model, optimiser))
+
+      return main_loss, (new_network_opt_state, aux)
 
     return update
 
@@ -223,17 +225,16 @@ class NESSolver:
     for i_seed in range(self._network_train_steps):
       batch = self._sampler.sample_random(self._batch_size, jax.random.key(i_seed), None)
       loss_val, new_state = self._update_fn(
-        network_state, self._batch_stats, batch
+        network_state, batch
       )
       nn.update((self._network, self._optimizer), new_state[0])
-      self._batch_stats = new_state[1]
-      aux = new_state[2]
+      aux = new_state[1]
       self._iteration += 1
-      print("LOSS", loss_val)
-      if self._mode == networks.Mode.CCE:
-        print("GAP", eu.compute_cce_gap(batch.reward, aux["sigma"], aux["epsilon"]))
-      elif self._mode == networks.Mode.CE:
-        print("GAP", eu.compute_ce_gap(batch.reward, aux["sigma"], aux["epsilon"]))
+
+    if self._mode == networks.Mode.CCE:
+      print("GAP", jax.vmap(eu.compute_cce_gap)(batch.reward, aux["sigma"], aux["epsilon"]).mean() )
+    elif self._mode == networks.Mode.CE:
+      print("GAP", jax.vmap(eu.compute_ce_gap)(batch.reward, aux["sigma"], aux["epsilon"]).mean() )
 
     return {}
     # TODO: Final Forward Pass to get optimized outputs

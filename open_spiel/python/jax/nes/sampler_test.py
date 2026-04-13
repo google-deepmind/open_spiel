@@ -35,7 +35,7 @@ class SamplerTest(parameterized.TestCase):
     )
     batch = sampler.sample_random(batch_size=5, rng=jax.random.key(0))
     self.assertTrue(
-      batch.stack().shape, (batch_size, 4, *sampler.payoff_tensor.shape)
+      samplers.stack(jax.vmap(samplers.broadcast)(batch)).shape, (batch_size, 4, *sampler.payoff_tensor.shape)
     )
 
     action_sizes = tuple(
@@ -48,7 +48,7 @@ class SamplerTest(parameterized.TestCase):
     )
     batch_normalised = sampler.normalise_batch(batch2)
     self.assertTrue(
-      batch_normalised.stack().shape,
+      samplers.stack(jax.vmap(samplers.broadcast)(batch_normalised)).shape,
       (batch_size, 4, *sampler.payoff_tensor.shape),
     )
 

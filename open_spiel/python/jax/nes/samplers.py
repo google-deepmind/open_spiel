@@ -20,29 +20,30 @@ class Data(NamedTuple):
   epsilon_hat: chex.Array  # [B, N] or [N]
   welfare: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
 
-  def _broadcast(self) -> "Data":
-    base_shape = self.reward.shape
-    A = tuple(range(1, self.reward.ndim))
-    # ε̂: [N] → [N, *A] (per-player constant across actions)
-    epsilon_broadcast = jnp.broadcast_to(
-      jnp.expand_dims(self.epsilon_hat, axis=A),  # Add action dims
-      base_shape,
-    )
-    sigma_broadcast = jnp.broadcast_to(self.sigma_hat, base_shape)
+def broadcast(data: Data) -> Data:
+  base_shape = data.reward.shape
+  A = tuple(range(1, data.reward.ndim))
+  # ε̂: [N] → [N, *A] (per-player constant across actions)
+  epsilon_broadcast = jnp.broadcast_to(
+    jnp.expand_dims(data.epsilon_hat, axis=A),  # Add action dims
+    base_shape,
+  )
+  sigma_broadcast = jnp.broadcast_to(data.sigma_hat, base_shape)
 
-    # W: [*A] → [N, *A] (same for all players)
-    welfare_broadcast = jnp.broadcast_to(self.welfare, base_shape)
+  # W: [*A] → [N, *A] (same for all players)
+  welfare_broadcast = jnp.broadcast_to(data.welfare, base_shape)
 
-    return Data(
-      self.reward, sigma_broadcast, epsilon_broadcast, welfare_broadcast
-    )
+  return Data(
+    data.reward, sigma_broadcast, epsilon_broadcast, welfare_broadcast
+  )
 
-  def stack(self) -> chex.Array:
-    """Constructs [B, C=4, N, A1, ..., AN] tensor."""
-    # Stack along channel dim 0: [B, 4, N, A1, ..., AN]
-    return jnp.stack(
-      [self.reward, self.epsilon_hat, self.sigma_hat, self.welfare], axis=1
-    )
+
+def stack(data: Data, axis=1) -> chex.Array:
+  """Constructs [B, C=4, N, A1, ..., AN] tensor."""
+  # Stack along channel dim 0: [B, 4, N, A1, ..., AN]
+  return jnp.stack(
+    [data.reward, data.epsilon_hat, data.sigma_hat, data.welfare], axis=axis
+  )
 
 
 class Objective(enum.IntEnum):
@@ -167,7 +168,7 @@ class GameSampler:
         sigma_hat=sig_scaled,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
-      )._broadcast()
+      )
 
     return jax.vmap(_normalise_single_item)(data)
 
@@ -219,7 +220,7 @@ class OpenSpielGameSampler(GameSampler):
         sigma_hat=sig_scaled,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
-      )._broadcast()
+      )
 
     return jax.vmap(_generate_single_item_random)(batch_keys)
 
