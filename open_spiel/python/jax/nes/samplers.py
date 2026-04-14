@@ -10,6 +10,7 @@ import pyspiel
 
 from open_spiel.python.egt.utils import game_payoffs_array
 from open_spiel.python.jax.nes import utils
+from open_spiel.python.jax.nes import games
 
 
 class Data(NamedTuple):
@@ -174,7 +175,7 @@ class GameSampler:
 
 
 class OpenSpielGameSampler(GameSampler):
-  def __init__(self, game: pyspiel.Game, obj, m, z_m=None):
+  def __init__(self, game: pyspiel.Game, obj, m, z_m=None) -> None:
     super().__init__(obj, m, z_m)
     self.game = game
     # Extract payoff tensor G_p(a)  [N, A1, ..., AN]
@@ -225,29 +226,66 @@ class OpenSpielGameSampler(GameSampler):
     return jax.vmap(_generate_single_item_random)(batch_keys)
 
 
-class GamutGameSampler(GameSampler):
-  """
-  # 1. Random Game (most common baseline)
-  java -jar gamut.jar --game-type random_game --num-players 2 --num-actions 3 --output-format nfg --output-file random_2p_3a.nfg
+class GAMUTGameSampler(GameSampler):
+  def __init__(self, game: games.Game, num_players: int, game_settings: dict, obj, m, z_m = None) -> None:
+    super().__init__(obj, m, z_m)
+    self.game = game
+    self.num_players = num_players
+    self.settings = game_settings
+    self.payoff_tensor_fn = None
 
-  # 2. Zero-Sum Game
-  java -jar gamut.jar --game-type zero_sum_game --num-players 2 --num-actions 4 --output-format nfg --output-file zerosum_2p_4a.nfg
+  def init_payoffs(self, batch_size: int) -> None:
+    self.payoff_tensor_fn = games.generate_payoffs(
+      self.game,
+      self.settings,
+      self.num_players,
+      batch_size
+    )
+    _, *A = self.payoff_tensor.shape
+    joint_A = utils.compute_joint_action_size(A)
+    if self.z_m is None:
+      self.z_m = jnp.array(joint_A) ** (1.0 / self.m)
 
-  # 3. Covariance Game (highly structured, common in NES experiments)
-  java -jar gamut.jar --game-type covariance_game --num-players 2 --num-actions 5 --output-format nfg --output-file covariance_2p_5a.nfg
+  def sample_random(
+    self,
+    batch_size: int,
+    rng: chex.Array,
+    target_sigma_hat: chex.Array = None,
+  ) -> Data:
+    """Convert any OpenSpiel normal-form / matrix game → full NES input dict."""
 
-  # 4. Graphical Game (sparse payoffs)
-  java -jar gamut.jar --game-type graphical_game --num-players 3 --num-actions 3 --output-format nfg --output-file graphical_3p_3a.nfg
+    payoff_rng, rng = jax.random.split(rng)
+    if self.payoff_tensor_fn is None:
+      self.init_payoffs(batch_size)
+    G = self.payoff_tensor_fn(payoff_rng)
+    # Vectorise over the batch size with unique random keys
+    batch_keys = jax.random.split(rng, batch_size)
 
-  # 5. Polymatrix Game (common for N>2)
-  java -jar gamut.jar --game-type polymatrix_game --num-players 4 --num-actions 2 --output-format nfg --output-file polymatrix_4p_2a.nfg
+    def _generate_single_item_random(rng: jax.Array) -> Data:
+      eps_rng, sigma_rng = jax.random.split(rng, 2)
+      # Payoffs
+      G_hat, stats = self._compute_payoff_stats(G)
 
-  # 6. 3-player non-cubic example (different action sizes)
-  java -jar gamut.jar --game-type random_game --num-players 3 --num-actions 2,3,4 --output-format nfg --output-file random_3p_non_cubic.nfg
-  """
+      # Epsilon
+      epsilon_hat = self._initialise_epsilon(G, eps_rng)
+      eps_scaled = self._scale_epsilon(epsilon_hat, stats["norm_raw"])
 
-  pass
+      # Sigma
+      sigma_hat = self._initialise_sigma(G, sigma_rng, target_sigma_hat)
+      sig_scaled = self._scale_sigma(sigma_hat)
 
+      # Welfare
+      W = self._initialise_welfare(G_hat)
+      W_scaled = self._scale_welfare(W)
+
+      return Data(
+        reward=G_hat,
+        sigma_hat=sig_scaled,
+        epsilon_hat=eps_scaled,
+        welfare=W_scaled,
+      )
+
+    return jax.vmap(_generate_single_item_random)(batch_keys)
 
 class CurriculumGameSampler(GameSampler):
   pass

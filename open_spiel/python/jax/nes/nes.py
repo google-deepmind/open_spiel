@@ -126,6 +126,7 @@ class NESSolver:
     )
 
     params = nn.state(self._network, nn.Param)
+
     def mask_fn(path, _):
       # path is a tuple of segments, e.g., ('linear1', 'bias')
       names = [
@@ -135,6 +136,7 @@ class NESSolver:
       # Return True to APPLY decay, False to MASK it
       return ("bias" not in names) and ("bn" not in names)
 
+    # TODO: add batchnorm masking
     mask = jax.tree.map_with_path(mask_fn, params)
 
     optimiser = optax.adamw(
@@ -192,7 +194,7 @@ class NESSolver:
         data: Data,
     ) -> tuple[chex.Array, nn.State, nn.State]:
       
-      # 1. Merge the graphdef with your incoming functional states
+      # TODO: Check how `BatchStats` are handled
       policy_model, optimiser = nn.merge(
           self._graphdef_network_opt, network_opt_state
       )
@@ -231,10 +233,11 @@ class NESSolver:
       aux = new_state[1]
       self._iteration += 1
 
+    print(f"{samplers.Objective} SOLVER GAP", eu.mwme_lp_solver_gap(batch.reward[0], batch.sigma_hat[0], self._mu, self._rho))
     if self._mode == networks.Mode.CCE:
-      print("GAP", jax.vmap(eu.compute_cce_gap)(batch.reward, aux["sigma"], aux["epsilon"]).mean() )
+      print("CCE GAP", jax.vmap(eu.compute_cce_gap)(batch.reward, aux["sigma"], aux["epsilon"]).mean() )
     elif self._mode == networks.Mode.CE:
-      print("GAP", jax.vmap(eu.compute_ce_gap)(batch.reward, aux["sigma"], aux["epsilon"]).mean() )
+      print("CE GAP", jax.vmap(eu.compute_ce_gap)(batch.reward, aux["sigma"], aux["epsilon"]).mean() )
 
     return {}
     # TODO: Final Forward Pass to get optimized outputs

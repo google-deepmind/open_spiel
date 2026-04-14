@@ -76,16 +76,17 @@ def compute_cce_gap(
     # 1. Equilibrium payoff for player p under σ
     eq_pay = jnp.sum(sigma * payoffs[p])
 
-    # 2. Best unilateral deviation payoff
+    # Best unilateral deviation payoff
     # marginal_opp = sum of σ over player p's action
     marginal_opp = jnp.sum(sigma, axis=p, keepdims=True)
     axes_to_reduce = tuple(i for i in range(N) if i != p)
     dev_payoffs = jnp.sum(marginal_opp * payoffs[p], axis=axes_to_reduce)
-
+    
     best_dev = jnp.max(dev_payoffs)
 
-    # 3. Positive slack for this player
+    # Positive slack for this player
     slack = best_dev - eq_pay - epsilon[p]
+    # No deviation can improve my payoff by more than ϵ_p
     gap = gap + jnp.maximum(slack, 0.0)
 
   return gap
@@ -101,200 +102,44 @@ def compute_ce_gap(
   total_gap = jnp.array(0.0, dtype=payoffs.dtype)
 
   for p in range(N):
-    Ap = payoffs.shape[p + 1]  # true action size for player p
 
-    # Marginal probability of recommended action curr for player p
-    marginal_curr = jnp.sum(
-      sigma, axis=p, keepdims=True
-    )  # [1, ..., 1, Ap, 1, ...]
-
-    # For every possible curr and dev, compute conditional gain
-    player_gap = jnp.array(0.0, dtype=payoffs.dtype)
-
-    for curr in range(Ap):
-      # Indicator for actions where a_p == curr
-      indicator_curr = jnp.zeros_like(sigma)
-      # Set 1 where player p's action == curr
-      idx = list(range(N))
-      idx[p] = curr
-      indicator_curr = indicator_curr.at[tuple(idx)].set(
-        1.0
-      )  # this is slow, better way below
-
-      # More efficient: use broadcasting
-      # Conditional expected payoff for curr
-      eq_pay_curr = jnp.sum(
-        payoffs[p] * (sigma * (jnp.arange(Ap) == curr)[None, ...])
-      )
-
-      # Best deviation payoff when recommended curr
-      best_dev_pay = -jnp.inf
-      for dev in range(Ap):
-        if curr == dev:
-          continue
-        # Deviation payoff when a_p = curr but deviates to dev
-        dev_pay = (
-          payoffs[p]
-          .at[curr]
-          .set(
-            payoffs[p][
-              tuple([dev if i == p else slice(None) for i in range(N)])
-            ]
-          )
-        )
-        cond_dev_pay = jnp.sum(dev_pay * sigma) / (marginal_curr + 1e-12)
-        best_dev_pay = jnp.maximum(best_dev_pay, cond_dev_pay)
-
-      slack = best_dev_pay - eq_pay_curr - epsilon[p]
-      player_gap += jnp.maximum(slack, 0.0) * marginal_curr.squeeze()
+    G_p = payoffs[p]
+    # Marginal probability of each recommendation P(a_p = rec)
+    marginal_rec = jnp.sum(sigma, axis=tuple(i for i in range(sigma.ndim) if i != p))
+    
+    # Move player axis to front: [Ap, A_{-p}]
+    sigma_moved = jnp.moveaxis(sigma, p, 0)
+    G_moved = jnp.moveaxis(G_p, p, 0)
+    
+    # Conditional expected payoff: E[G_p | a_p = rec]
+    # = sum_{a_{-p}} sigma(rec, a_{-p}) * G_p(rec, a_{-p}) / marginal_rec[rec]
+    eq_pay_numerator = jnp.sum(sigma_moved * G_moved, axis=tuple(range(1, sigma_moved.ndim)))
+    eq_pay_cond = eq_pay_numerator / (marginal_rec + 1e-12)
+    
+    # Deviation payoff matrix: [Ap_dev, Ap_rec]
+    # dev_payoffs[dev, rec] = E[G_p(dev, a_{-p}) | a_p = rec]
+    dev_numerator = jnp.sum(
+        sigma_moved[None, ...] * G_moved[:, None, :],
+        axis=-1
+    )
+    dev_payoffs_cond = dev_numerator / (marginal_rec[None, :] + 1e-12)
+    
+    # Best deviation for each recommendation
+    best_dev_cond = jnp.max(dev_payoffs_cond, axis=0)
+    
+    # Gain for each rec: best_dev - current_payoff - epsilon
+    gain_per_rec = best_dev_cond - eq_pay_cond - epsilon[p]
+    
+    # Weight by marginal probability and add to total
+    player_gap = jnp.sum(marginal_rec * jnp.maximum(gain_per_rec, 0.0))
+    total_gap = total_gap + player_gap
 
     total_gap += player_gap
 
   return total_gap
 
 
-def _remove_dominated_strategies(payoffs: chex.Array) -> tuple:
-  N = payoffs.shape[0]
-  action_sizes = list(payoffs.shape[1:])
-  kept = [np.arange(s) for s in action_sizes]
-
-  for p in range(N):
-    Ap = action_sizes[p]
-    dominated = []
-    for a in range(Ap):
-      payoff_a = payoffs[p][
-        tuple(slice(None) if i != p else a for i in range(N))
-      ]
-      is_dominated = False
-      for b in range(Ap):
-        if a == b:
-          continue
-        payoff_b = payoffs[p][
-          tuple(slice(None) if i != p else b for i in range(N))
-        ]
-        # Strict dominance check (with tolerance)
-        if np.all(payoff_b >= payoff_a + 1e-8) and np.any(
-          payoff_b > payoff_a + 1e-8
-        ):
-          is_dominated = True
-          break
-        if is_dominated:
-          dominated.append(a)
-    kept[p] = np.delete(kept[p], dominated)
-    action_sizes[p] = len(kept[p])
-
-  # Actually reduce the payoffs array
-  reduced_payoffs = payoffs[np.ix_(range(N), *kept)]
-  return reduced_payoffs, kept
-
-
-def solve_cce_lp(
-  payoffs: chex.Array,
-  eps: float = 1e-8,
-  verbose: bool = False,
-) -> dict:
-  """Exact CCE as LP (hybrid: simple + dominated elimination + ECOS)."""
-  # payoffs, _ = _remove_dominated_strategies(payoffs)
-  N = payoffs.shape[0]
-  action_sizes = payoffs.shape[1:]
-  joint_size = int(np.prod(action_sizes))
-
-  sigma = cp.Variable(joint_size, nonneg=True)
-  flat_payoffs = payoffs.reshape((N, joint_size))
-
-  constraints = [cp.sum(sigma) == 1]
-
-  for p in range(N):
-    Ap = action_sizes[p]
-    for dev in range(Ap):
-      dev_payoffs = np.zeros(joint_size)
-      idx = 0
-      for a in np.ndindex(*action_sizes):
-        dev_a = list(a)
-        dev_a[p] = dev
-        dev_idx = np.ravel_multi_index(tuple(dev_a), action_sizes)
-        dev_payoffs[idx] = flat_payoffs[p, dev_idx]
-        idx += 1
-      gain = dev_payoffs - flat_payoffs[p]
-      constraints.append(gain @ sigma <= eps)
-
-  prob = cp.Problem(cp.Minimize(0), constraints)
-  prob.solve(
-    solver=cp.ECOS, verbose=verbose, abstol=1e-9, reltol=1e-9, max_iters=10000
-  )
-
-  if sigma.value is None:
-    return {"sigma": None, "status": prob.status, "error": "Solver failed"}
-
-  return {
-    "sigma": sigma.value.reshape(action_sizes),
-    "status": prob.status,
-    "value": prob.value,
-  }
-
-
-def solve_ce_lp(
-  payoffs: chex.Array,
-  eps: float = 1e-8,
-  verbose: bool = False,
-) -> dict:
-  """Exact CE as LP (pairwise per-player constraints)."""
-  # payoffs, _ = _remove_dominated_strategies(payoffs)
-  N = payoffs.shape[0]
-  action_sizes = payoffs.shape[1:]
-  joint_size = int(np.prod(action_sizes))
-
-  sigma = cp.Variable(joint_size, nonneg=True)
-  flat_payoffs = payoffs.reshape((N, joint_size))
-
-  constraints = [cp.sum(sigma) == 1]
-
-  for p in range(N):
-    Ap = action_sizes[p]
-    for curr in range(Ap):
-      # Indicator for actions where player p plays "curr"
-      indicator_curr = np.zeros(joint_size)
-      idx = 0
-      for a in np.ndindex(*action_sizes):
-        if a[p] == curr:
-          indicator_curr[idx] = 1.0
-        idx += 1
-
-      for dev in range(Ap):
-        if curr == dev:
-          continue
-        # Deviation payoff when conditioning on curr
-        dev_payoffs = np.zeros(joint_size)
-        idx = 0
-        for a in np.ndindex(*action_sizes):
-          if a[p] == curr:
-            dev_a = list(a)
-            dev_a[p] = dev
-            dev_idx = np.ravel_multi_index(tuple(dev_a), action_sizes)
-            dev_payoffs[idx] = flat_payoffs[p, dev_idx]
-          idx += 1
-
-        # Linearized CE constraint:
-        # sum_{a: a_p=curr} sigma(a) * (G(dev) - G(curr)) <= eps * sum_{a: a_p=curr} sigma(a)
-        gain = dev_payoffs - flat_payoffs[p] * indicator_curr
-        constraints.append(gain @ sigma <= eps * (indicator_curr @ sigma))
-
-  prob = cp.Problem(cp.Minimize(0), constraints)
-  prob.solve(
-    solver=cp.ECOS, verbose=verbose, abstol=1e-9, reltol=1e-9, max_iters=10000
-  )
-
-  if sigma.value is None:
-    return {"sigma": None, "status": prob.status, "error": "Solver failed"}
-
-  return {
-    "sigma": sigma.value.reshape(action_sizes),
-    "status": prob.status,
-    "value": prob.value,
-  }
-
-
-def solve_mwme_lp(
+def mwme_lp_solver_gap(
   payoffs: chex.Array,
   hat_sigma: chex.Array,
   mu: float = 1.0,
@@ -304,7 +149,6 @@ def solve_mwme_lp(
   enforce_equilibrium: bool = True,
 ) -> dict:
   """MWME: Maximize μ·Welfare − ρ·KL(σ || ˆσ)  [hybrid etalon version]"""
-  # payoffs, _ = _remove_dominated_strategies(payoffs)
 
   N = payoffs.shape[0]
   action_sizes = payoffs.shape[1:]
@@ -316,7 +160,11 @@ def solve_mwme_lp(
   flat_hat = np.clip(hat_sigma.flatten(), 1e-12, None)
 
   # Entropy-based KL (stable formulation)
-  kl_term = cp.sum(cp.multiply(sigma, cp.log(sigma + 1e-12) - np.log(flat_hat)))
+  # kl_term = cp.sum(cp.multiply(sigma, cp.log(sigma + 1e-12) - np.log(flat_hat)))
+  # KL(sigma || hat) = sum(sigma * log(sigma/hat))
+  #                 = sum(sigma * log(sigma)) - sum (sigma * log(hat))
+  #                 = -entr(sigma) - sigma @ log(hat)
+  kl_term = -cp.sum(cp.entr(sigma)) - sigma @ np.log(flat_hat)
 
   objective = mu * (welfare @ sigma) - rho * kl_term
 
