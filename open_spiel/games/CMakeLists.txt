@@ -100,6 +100,8 @@ set(GAME_SOURCES
   go/go_board.h
   go/sgf_game_loader.cc
   go/sgf_game_loader.h
+  go_fish/go_fish.cc
+  go_fish/go_fish.h
   gomoku/gomoku.cc
   gomoku/gomoku.h
   gomoku/gomoku_grid.h
@@ -510,6 +512,10 @@ add_test(sgf_game_loader_test sgf_game_loader_test)
 add_executable(phantom_go_test phantom_go/phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(phantom_go_test phantom_go_test)
+
+add_executable(go_fish_test go_fish/go_fish_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(go_fish_test go_fish_test)
 
 add_executable(gomoku_test gomoku/gomoku_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
