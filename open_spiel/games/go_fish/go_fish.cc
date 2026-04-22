@@ -84,14 +84,16 @@ GoFishState::GoFishState(std::shared_ptr<const Game> game,
     num_players_(static_cast<const GoFishGame*>(game.get())->NumPlayers()) {
 	// TODO handle specified start
 	// initialize all the vectors
-	player_cards_.resize(num_players_, std::vector<int>(ranks_, 0));
-	pool_.resize(ranks_, suits_);
-	booked_.resize(ranks_, 0);
-	player_books_.resize(num_players_, 0);
-	player_did_ask_.resize(num_players_, std::vector<int>(ranks_, 0));
-	player_was_asked_.resize(num_players_, std::vector<bool>(ranks_, false));
-	drawn_since_was_asked_.resize(num_players_, std::vector<int>(ranks_, 0));
-	player_min_.resize(num_players_, std::vector<int>(ranks_, 0));
+	player_cards_.assign(num_players_, std::vector<int>(ranks_, 0));
+	pool_.assign(ranks_, suits_);
+	booked_.assign(ranks_, false);
+	player_books_.assign(num_players_, 0);
+	player_did_ask_.assign(num_players_, std::vector<int>(ranks_, 0));
+	player_was_asked_.assign(num_players_, std::vector<bool>(ranks_, false));
+	drawn_since_was_asked_.assign(num_players_, std::vector<int>(ranks_, 0));
+	player_min_.assign(num_players_, std::vector<int>(ranks_, 0));
+	current_player_ = 0;
+	first_out_ = -1;
 	int parent_initial = static_cast<const GoFishGame*>(game.get())->InitialCards();
 	// TODO add some sanity checks
 	if (parent_initial == -1) {
@@ -166,6 +168,7 @@ void GoFishState::DoApplyAction(Action move_id) {
 				CheckBook(pid, rank0);
 			}
 		}
+		return;
 	}
 	if (phase_ == kAsk) {
 		int event_player = current_player_;
@@ -187,18 +190,27 @@ void GoFishState::DoApplyAction(Action move_id) {
 			player_min_[current_player_][rank] += received;
 			player_cards_[target][rank] = 0;
 			made_book = CheckBook(current_player_, rank);
+			if (phase_ != kTerminal && made_book) { 
+				if (PlayerCounts(current_player_) == 0) {
+				  AdvancePlayer();
+				}
+			}
 		} else { // go fish
 			if (PoolSize() > 0) {
 				phase_ = kFish;
 				last_ask_ = rank;
-				current_player_ = kChancePlayerId;
 			} else { // pool empty, play pases to next player with cards.
-				AdvancePlayer();
+				  AdvancePlayer();
 			}
 		}
+		if (phase_ == kAsk) {
+			CheckPhase();
+		}
+		if (current_player_ != event_player) last_ask_ = -1;
 		int booked = made_book ? rank : -1; 
 		Event event(event_player, target, rank, received, booked);
 		events_.push_back(event);
+		return;
 	}
 	if (phase_ == kFish) {
 		int rank = Draw(move_id);
@@ -220,6 +232,23 @@ void GoFishState::DoApplyAction(Action move_id) {
 			}
 	  }
 	}
+	CheckPhase();
+	last_ask_ = -1;
+}
+
+// special cases: If a player would be asking,
+// but he either has no cards left or is the only player with cards left
+// he must fish.
+void GoFishState::CheckPhase() {
+	if (PlayerCounts(current_player_) == 0) {
+			phase_ = kFish;
+			return;
+	}
+	for (int pid = 0; pid < num_players_; ++pid) {
+    if (pid == current_player_) continue;
+		if (PlayerCounts(pid) > 0) return;
+	}
+	phase_ = kFish;
 }
 
 std::string GoFishState::ActionToString(Player player, Action action_id) const {
@@ -240,7 +269,7 @@ Player GoFishState::CurrentPlayer() const {
 }
 
 bool GoFishState::CheckBook(int player_id, int rank) {
-	if (player_books_[player_id] < suits_) return false;
+	if (player_cards_[player_id][rank] < suits_) return false;
 	player_books_[player_id] += 1;
 	player_cards_[player_id][rank] = 0;
 	player_min_[player_id][rank] = 0;
@@ -254,16 +283,14 @@ bool GoFishState::CheckBook(int player_id, int rank) {
 		}
 	}
 	if ( PoolSize() > 0) return true;
-	bool all_empty = true;
+	// if any player still has cards we continue
 	for (int check_player = 0; check_player < num_players_; ++check_player) {
 		if (PlayerCounts(check_player) > 0 ) {
-			all_empty = false;
-			break;
+			return true;
 		}
 	}
-	if (all_empty) {
-		phase_ =  kTerminal;
-	}
+	// If we got here there are no cards left
+	phase_ =  kTerminal;
   return true;
 }
 
@@ -288,13 +315,13 @@ std::vector<double> GoFishState::Returns() const {
     return std::vector<double>(num_players_, 0.0);
   }
 	// TODO cache
-	std::vector<double> result;
+	std::vector<double> result(num_players_);
 	if (!most_books_wins_) {
 		for (int ii = 0; ii < num_players_; ++ii) {
 			if (ii == first_out_) { 
-				result.push_back(1.0);
+				result[ii] = (1.0);
 			} else {
-				result.push_back(-1.0 / (num_players_ - 1));
+				result[ii] = (-1.0 / (num_players_ - 1));
 			}	
 		}
 		return result;
@@ -304,15 +331,15 @@ std::vector<double> GoFishState::Returns() const {
 		if (num_winners == num_players_) { // all way tie
 		  return std::vector<double>(num_players_, 0.0);
 		}
-		std::vector<double> returns(num_players_);
 		for (int p = 0; p < num_players_; ++p) {
 			if (player_books_[p] == max_score) {
-				returns[p] = 1.0/ num_winners;
+				result[p] = 1.0/ num_winners;
 			} else {
-				returns[p] = -1.0 / (num_players_ - num_winners);
+				result[p] = -1.0 / (num_players_ - num_winners);
 			}
 		}
 	}
+	return result;
 }
 
 std::vector<Action> GoFishState::GenerateAsks(int player_id) const {
@@ -359,9 +386,9 @@ std::string  GoFishState::ToString() const {
 			if (player_cards_[pid][rank] > 0) {
 	       absl::StrAppend(&result, RankString(rank), player_cards_[pid][rank]);
 			}
-			absl::StrAppend(&result, ":");
-			absl::StrAppend(&result, player_books_[pid], "\n");
 		}
+		absl::StrAppend(&result, ":");
+		absl::StrAppend(&result, player_books_[pid], "\n");
 	}
 	for (int rank = 0; rank < ranks_; ++rank) {
      if (pool_[rank] > 0) {
@@ -369,6 +396,7 @@ std::string  GoFishState::ToString() const {
 		 }
 	}
 	// no terminal new line :-)
+	return result;
 }
 
 void GoFishState::ObservationTensor(Player player,
@@ -426,6 +454,7 @@ std::string GoFishState::ObservationString(Player player) const {
 				" books ", player_books_[pid], "\n");
 	}
 	// history going back in time to last move by player
+	if (events_.size() == 0) return result;
 	int index = events_.size() - 1;
 	while (index >=0 && events_[index].player_id != player) {
 		 absl::StrAppend(&result, events_[index].ToString(), "\n");

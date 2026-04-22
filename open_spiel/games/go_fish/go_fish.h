@@ -88,7 +88,7 @@ class GoFishState: public State {
 	Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
-  bool IsTerminal() const override { return terminal_; }
+  bool IsTerminal() const override { return phase_ == kTerminal; }
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
@@ -104,7 +104,7 @@ class GoFishState: public State {
   void DoApplyAction(Action move) override;
  private:
 	Phase phase_;
-  Player current_player_ = 0;  // Player zero goes first by default
+  Player current_player_;  // Player zero goes first by default
 	int initial_cards_;
 	// secret info
   std::vector<std::vector<int>> player_cards_;
@@ -123,6 +123,7 @@ class GoFishState: public State {
 	// has this rank been booked already?
 	std::vector<int> booked_;
 	bool CheckBook(int player_id, int rank);
+	void CheckPhase();
 	void AdvancePlayer();
 	std::vector<Action> GenerateAsks(int player_id) const;
 	std::vector<Action> GenerateDraws() const; // draw from deck
@@ -134,10 +135,9 @@ class GoFishState: public State {
 	int ranks_;
 	int suits_;
 	int last_ask_;
-	int first_out_ = -1;
+	int first_out_;
 	bool most_books_wins_;
 	bool end_on_first_out_;
-	bool terminal_ = false;
 };
 
 class GoFishGame : public Game {
