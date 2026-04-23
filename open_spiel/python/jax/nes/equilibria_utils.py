@@ -6,11 +6,47 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
+from open_spiel.python.jax.nes import utils
+
+
+def mask_alpha_cce(
+  alpha: chex.Array,
+  action_sizes: chex.Shape,
+) -> chex.Array:
+  """
+  Zero out padded entries in dual variables.
+  alpha [N, max_A] -> valid only up to A_p for each player p
+  """
+  N = len(action_sizes)
+  max_A = alpha.shape[1]
+  valid = jnp.stack([jnp.arange(max_A) <= action_sizes[p] for p in range(N)])
+  return jnp.where(valid, alpha, 0.0)
+
+
+def mask_alpha_ce(
+  alpha: chex.Array,
+  action_sizes: chex.Shape,
+) -> chex.Array:
+  """
+  Zero out padded entries in dual variables.
+  alpha [N, max_A, max_A] -> valid only in Ap x Ap block per player
+  """
+  N = len(action_sizes)
+  max_A = alpha.shape[1]
+  # [N, max_A, max_A] mask: dev_valid & rec_valid
+  dev_valid = jnp.stack(
+    [jnp.arange(max_A) <= action_sizes[p] for p in range(N)]
+  )
+  rec_valid = dev_valid[:, None, :]  # [N, 1, max_A]
+  dev_valid = dev_valid[:, :, None]  # [N, max_A, 1]
+  valid = dev_valid & rec_valid  # [N, max_A, max_A]
+  return jnp.where(valid, alpha, 0.0)
+
 
 @functools.partial(jax.jit, static_argnames=("player",))
 def player_contribution_cce(
   alpha_p: chex.Array,  # [A_p]
-  G_p: chex.Array,  # [A1, ..., AN]
+  G_p: chex.Array,  # [A1, ..., AN],
   player: int,  # p
 ) -> tuple[chex.Array, float]:
   """
@@ -38,7 +74,7 @@ def player_contribution_cce(
 @functools.partial(jax.jit, static_argnames=("player",))
 def player_contribution_ce(
   alpha_p: chex.Array,  # [A_p, A_p] - axis 0: dev, axis 1: rec
-  G_p: chex.Array,  # [A1, ..., AN]
+  G_p: chex.Array,  # [A1, ..., AN],
   player: int,  # p
 ) -> tuple[chex.Array, float]:
   """
@@ -67,6 +103,7 @@ def compute_cce_gap(
   payoffs: chex.Array,  # [N, A1, ..., AN]
   sigma: chex.Array,  # [A1, ..., AN]  (your recovered joint strategy)
   epsilon: chex.Array,  # [N]            (ˆε_p vector)
+  joint_mask: chex.Array = None,
 ) -> chex.Array:
   N = payoffs.shape[0]
 
@@ -78,10 +115,12 @@ def compute_cce_gap(
 
     # Best unilateral deviation payoff
     # marginal_opp = sum of σ over player p's action
-    marginal_opp = jnp.sum(sigma, axis=p, keepdims=True)
+    marginal_opp = jnp.sum(sigma, axis=p, keepdims=True, where=joint_mask)
     axes_to_reduce = tuple(i for i in range(N) if i != p)
-    dev_payoffs = jnp.sum(marginal_opp * payoffs[p], axis=axes_to_reduce)
-    
+    dev_payoffs = jnp.sum(
+      marginal_opp * payoffs[p], axis=axes_to_reduce, where=joint_mask
+    )
+
     best_dev = jnp.max(dev_payoffs)
 
     # Positive slack for this player
@@ -96,45 +135,52 @@ def compute_ce_gap(
   payoffs: chex.Array,  # [N, A1, ..., AN]
   sigma: chex.Array,  # [A1, ..., AN]  recovered joint strategy
   epsilon: chex.Array,  # [N]           ˆε_p vector
+  joint_mask: chex.Array = None,
 ) -> chex.Array:
   """CE Gap"""
   N = payoffs.shape[0]
   total_gap = jnp.array(0.0, dtype=payoffs.dtype)
 
   for p in range(N):
-
     G_p = payoffs[p]
     # Marginal probability of each recommendation P(a_p = rec)
-    marginal_rec = jnp.sum(sigma, axis=tuple(i for i in range(sigma.ndim) if i != p))
-    
+    marginal_rec = jnp.sum(
+      sigma,
+      axis=tuple(i for i in range(sigma.ndim) if i != p),
+      where=joint_mask,
+    )
+
     # Move player axis to front: [Ap, A_{-p}]
     sigma_moved = jnp.moveaxis(sigma, p, 0)
     G_moved = jnp.moveaxis(G_p, p, 0)
-    
+
     # Conditional expected payoff: E[G_p | a_p = rec]
     # = sum_{a_{-p}} sigma(rec, a_{-p}) * G_p(rec, a_{-p}) / marginal_rec[rec]
-    eq_pay_numerator = jnp.sum(sigma_moved * G_moved, axis=tuple(range(1, sigma_moved.ndim)))
-    eq_pay_cond = eq_pay_numerator / (marginal_rec + 1e-12)
-    
+    eq_pay_numerator = jnp.sum(
+      sigma_moved * G_moved,
+      axis=tuple(range(1, sigma_moved.ndim)),
+      where=joint_mask,
+    )
+    eq_pay_cond = eq_pay_numerator / (marginal_rec + utils.SMALL_NUMBER)
+
     # Deviation payoff matrix: [Ap_dev, Ap_rec]
     # dev_payoffs[dev, rec] = E[G_p(dev, a_{-p}) | a_p = rec]
     dev_numerator = jnp.sum(
-        sigma_moved[None, ...] * G_moved[:, None, :],
-        axis=-1
+      sigma_moved[None, ...] * G_moved[:, None, :], where=joint_mask, axis=-1
     )
-    dev_payoffs_cond = dev_numerator / (marginal_rec[None, :] + 1e-12)
-    
+    dev_payoffs_cond = dev_numerator / (
+      marginal_rec[None, :] + utils.SMALL_NUMBER
+    )
+
     # Best deviation for each recommendation
     best_dev_cond = jnp.max(dev_payoffs_cond, axis=0)
-    
+
     # Gain for each rec: best_dev - current_payoff - epsilon
     gain_per_rec = best_dev_cond - eq_pay_cond - epsilon[p]
-    
+
     # Weight by marginal probability and add to total
     player_gap = jnp.sum(marginal_rec * jnp.maximum(gain_per_rec, 0.0))
     total_gap = total_gap + player_gap
-
-    total_gap += player_gap
 
   return total_gap
 
@@ -196,7 +242,11 @@ def mwme_lp_solver_gap(
   sigma_star = sigma.value.reshape(action_sizes)
   actual_welfare = np.sum(sigma_star * payoffs.sum(axis=0))
   actual_kl = np.sum(
-    sigma_star * (np.log(sigma_star + 1e-12) - np.log(hat_sigma + 1e-12))
+    sigma_star
+    * (
+      jnp.log(sigma_star + utils.SMALL_NUMBER)
+      - jnp.log(hat_sigma + utils.SMALL_NUMBER)
+    )
   )
 
   return {
@@ -205,4 +255,22 @@ def mwme_lp_solver_gap(
     "objective_value": prob.value,
     "welfare": float(actual_welfare),
     "kl_to_hat": float(actual_kl),
+  }
+
+
+def compute_entropy_metrics(
+  sigma: chex.Array, hat_sigma: chex.Array
+) -> dict[str, float]:
+  """Minimum Relative Entropy (MRE) metrics."""
+  # Shannon entropy
+  H = -jnp.sum(sigma * jnp.log(sigma + 1e-12))
+  H_max = jnp.log(jnp.prod(jnp.array(sigma.shape)))
+
+  # KL divergence from target (MRE objective)
+  kl_target = jnp.sum(sigma * jnp.log((sigma + 1e-12) / (hat_sigma + 1e-12)))
+
+  return {
+    "entropy_normalized": float(H / H_max),  # 0-1 scale
+    "kl_from_target": float(kl_target),
+    "max_entropy": float(H_max),
   }

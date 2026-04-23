@@ -20,6 +20,8 @@ class Data(NamedTuple):
   sigma_hat: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
   epsilon_hat: chex.Array  # [B, N] or [N]
   welfare: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
+  mask: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
+
 
 def broadcast(data: Data) -> Data:
   base_shape = data.reward.shape
@@ -35,7 +37,11 @@ def broadcast(data: Data) -> Data:
   welfare_broadcast = jnp.broadcast_to(data.welfare, base_shape)
 
   return Data(
-    data.reward, sigma_broadcast, epsilon_broadcast, welfare_broadcast
+    data.reward,
+    sigma_broadcast,
+    epsilon_broadcast,
+    welfare_broadcast,
+    data.mask,
   )
 
 
@@ -57,6 +63,7 @@ class Objective(enum.IntEnum):
   EPS_ME = 6
   EPS_MWME = 7
   EPS_MRE = 8
+  EPS_MWMRE = 9
 
 
 class GameSampler:
@@ -65,6 +72,9 @@ class GameSampler:
   def __init__(self, obj: Objective, m: int, z_m: float | None = None) -> None:
     self.m = m
     self.z_m = z_m
+    assert obj == Objective.EPS_MWMRE, (
+      f"Currently only {Objective.EPS_MWMRE} objective is supported"
+    )
     self.obj = obj
 
   @functools.partial(jax.jit, static_argnums=(0,))
@@ -81,7 +91,7 @@ class GameSampler:
     norm_payoffs = utils.compute_L_m_norm(centred_payoffs, self.m, action_axes)
 
     # Ĝ_p(a) = G̃_p(a) · (Z_m / ||G̃_p||_m)
-    scale = self.z_m / (norm_payoffs + 1e-12)
+    scale = self.z_m / (norm_payoffs + utils.SMALL_NUMBER)
 
     stats = {
       "mean": mean_payoffs.squeeze(action_axes),
@@ -96,7 +106,12 @@ class GameSampler:
     num_players = G.shape[0]
     if self.obj == Objective.MS:
       return jnp.full((num_players,), self.z_m)
-    if self.obj in [Objective.EPS_ME, Objective.EPS_MRE, Objective.EPS_MWME]:
+    if self.obj in [
+      Objective.EPS_ME,
+      Objective.EPS_MRE,
+      Objective.EPS_MWME,
+      Objective.EPS_MWMRE,
+    ]:
       return jax.random.uniform(
         rng, (num_players,), jnp.float32, -self.z_m, self.z_m
       )
@@ -109,7 +124,7 @@ class GameSampler:
     Returns \hat{ε}^{L_m}_p clipped to [-Z_m, Z_m]
     """
     # Scale target epsilon by the norm
-    scaled_eps = hat_epsilon / (norm_payoffs + 1e-12)
+    scaled_eps = hat_epsilon / (norm_payoffs + utils.SMALL_NUMBER)
 
     # Clip to [-Z_m, +Z_m] (broadcast Z_m)
     return jnp.clip(scaled_eps, -self.z_m, self.z_m)
@@ -120,7 +135,7 @@ class GameSampler:
     """Returns hat_sigma(a) of shape [A1, A2, ..., AN]"""
     _, *A = G.shape
     joint_A = math.prod(A)
-    if self.obj in [Objective.MRE, Objective.EPS_MRE]:
+    if self.obj in [Objective.MRE, Objective.EPS_MRE, Objective.EPS_MWMRE]:
       return jax.random.dirichlet(rng, alpha=jnp.ones(joint_A)).reshape(A)
     if self.obj == Objective.MT:
       return tgt_sigma
@@ -140,7 +155,7 @@ class GameSampler:
     _, *A = G.shape
     if self.obj == Objective.MU:
       return jnp.sum(G, axis=0)  # sum over p
-    if self.obj == Objective.EPS_MWME:
+    if self.obj in [Objective.EPS_MWME, Objective.EPS_MWMRE]:
       return jnp.sum(G, axis=0)
     return jnp.zeros(A)
 
@@ -151,7 +166,7 @@ class GameSampler:
     centered = W - mean
     norm = utils.compute_L_m_norm(centered, self.m, tuple(range(W.ndim)))
 
-    return centered / (norm + 1e-12)
+    return centered / (norm + utils.SMALL_NUMBER)
 
   def normalise_batch(self, data: Data) -> Data:
     def _normalise_single_item(item: Data):
@@ -169,13 +184,18 @@ class GameSampler:
         sigma_hat=sig_scaled,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
+        mask=data.mask,  # stays unchanged
       )
 
     return jax.vmap(_normalise_single_item)(data)
 
 
 class OpenSpielGameSampler(GameSampler):
-  def __init__(self, game: pyspiel.Game, obj, m, z_m=None) -> None:
+  """A simple sampler for NFGs in OpenSpiel."""
+
+  def __init__(
+    self, game: pyspiel.Game, obj: Objective, m: int, z_m: float = None
+  ) -> None:
     super().__init__(obj, m, z_m)
     self.game = game
     # Extract payoff tensor G_p(a)  [N, A1, ..., AN]
@@ -183,6 +203,8 @@ class OpenSpielGameSampler(GameSampler):
       game_payoffs_array(self.game), dtype=jnp.float32
     )
     _, *A = self.payoff_tensor.shape
+    # For these types of games, mask is always identity
+    self.mask = jnp.ones(A, dtype=jnp.bool)
     joint_A = math.prod(A)
     if self.z_m is None:
       self.z_m = jnp.array(joint_A) ** (1.0 / self.m)
@@ -190,15 +212,16 @@ class OpenSpielGameSampler(GameSampler):
   def sample_random(
     self,
     batch_size: int,
-    rng: jax.make_array_from_single_device_arrays,
+    rng: chex.PRNGKey,
     target_sigma_hat: chex.Array = None,
   ) -> Data:
-    """Convert any OpenSpiel normal-form / matrix game → full NES input dict."""
+    """Convert any OpenSpiel normal-form / matrix game → NES input Data."""
 
     G = self.payoff_tensor
     # Vectorise over the batch size with unique random keys
     batch_keys = jax.random.split(rng, batch_size)
 
+    @jax.jit
     def _generate_single_item_random(key: jax.Array) -> Data:
       eps_key, sigma_key = jax.random.split(key, 2)
       # Payoffs
@@ -210,38 +233,41 @@ class OpenSpielGameSampler(GameSampler):
 
       # Sigma
       sigma_hat = self._initialise_sigma(G, sigma_key, target_sigma_hat)
-      sig_scaled = self._scale_sigma(sigma_hat)
+      # sigma_scaled = self._scale_sigma(sigma_hat)
 
       # Welfare
-      W = self._initialise_welfare(G_hat)
+      W = self._initialise_welfare(G)
       W_scaled = self._scale_welfare(W)
 
       return Data(
         reward=G_hat,
-        sigma_hat=sig_scaled,
+        sigma_hat=sigma_hat,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
+        mask=self.mask,
       )
 
     return jax.vmap(_generate_single_item_random)(batch_keys)
 
 
-class GAMUTGameSampler(GameSampler):
-  def __init__(self, game: games.Game, num_players: int, game_settings: dict, obj, m, z_m = None) -> None:
+class RandomGameSampler(GameSampler):
+  def __init__(
+    self,
+    game: games.Game,
+    num_strategies: int,
+    game_settings: dict,
+    obj: Objective,
+    m: int,
+    z_m: float = None,
+  ) -> None:
     super().__init__(obj, m, z_m)
     self.game = game
-    self.num_players = num_players
-    self.settings = game_settings
-    self.payoff_tensor_fn = None
-
-  def init_payoffs(self, batch_size: int) -> None:
     self.payoff_tensor_fn = games.generate_payoffs(
-      self.game,
-      self.settings,
-      self.num_players,
-      batch_size
+      self.game, game_settings, num_strategies
     )
-    _, *A = self.payoff_tensor.shape
+    sample_key = jax.random.key(0)
+    sample_tensor, mask = self.payoff_tensor_fn(sample_key)
+    _, *A = sample_tensor.shape
     joint_A = utils.compute_joint_action_size(A)
     if self.z_m is None:
       self.z_m = jnp.array(joint_A) ** (1.0 / self.m)
@@ -253,17 +279,14 @@ class GAMUTGameSampler(GameSampler):
     target_sigma_hat: chex.Array = None,
   ) -> Data:
     """Convert any OpenSpiel normal-form / matrix game → full NES input dict."""
-
-    payoff_rng, rng = jax.random.split(rng)
-    if self.payoff_tensor_fn is None:
-      self.init_payoffs(batch_size)
-    G = self.payoff_tensor_fn(payoff_rng)
     # Vectorise over the batch size with unique random keys
     batch_keys = jax.random.split(rng, batch_size)
 
+    @jax.jit
     def _generate_single_item_random(rng: jax.Array) -> Data:
-      eps_rng, sigma_rng = jax.random.split(rng, 2)
+      payoff_rng, eps_rng, sigma_rng = jax.random.split(rng, 3)
       # Payoffs
+      G, mask = self.payoff_tensor_fn(payoff_rng)
       G_hat, stats = self._compute_payoff_stats(G)
 
       # Epsilon
@@ -272,7 +295,7 @@ class GAMUTGameSampler(GameSampler):
 
       # Sigma
       sigma_hat = self._initialise_sigma(G, sigma_rng, target_sigma_hat)
-      sig_scaled = self._scale_sigma(sigma_hat)
+      # sig_scaled = self._scale_sigma(sigma_hat)
 
       # Welfare
       W = self._initialise_welfare(G_hat)
@@ -280,12 +303,14 @@ class GAMUTGameSampler(GameSampler):
 
       return Data(
         reward=G_hat,
-        sigma_hat=sig_scaled,
+        sigma_hat=sigma_hat,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
+        mask=mask,
       )
 
     return jax.vmap(_generate_single_item_random)(batch_keys)
 
-class CurriculumGameSampler(GameSampler):
+
+class MixedGameSampler(GameSampler):
   pass

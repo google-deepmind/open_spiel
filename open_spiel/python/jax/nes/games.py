@@ -14,24 +14,23 @@
 # ==============================================================================
 
 """Utilities to generate classes of normal-form game payoff tensors.
-  Copied from
-  https://github.com/google-deepmind/nfg_transformer/blob/main/nfg_transformer/games.py
+Copied from
+https://github.com/google-deepmind/nfg_transformer/blob/main/nfg_transformer/games.py
 """
 
 import enum
-from typing import Any, Mapping, Optional, Sequence, Tuple
-from absl import logging
+from typing import Any, Mapping, Optional, Sequence, Tuple, Callable
 import jax
-from jax.experimental import mesh_utils
 import jax.numpy as jnp
+import chex
 
 
 _MIN_SCALE = 1e-12
 
 
 def _center(
-    payoff: jnp.ndarray, player: int, joint_mask: Optional[jnp.ndarray] = None
-) -> jnp.ndarray:
+  payoff: chex.Array, player: int, joint_mask: Optional[chex.Array] = None
+) -> chex.Array:
   """Returns centered zero mean payoffs."""
   if joint_mask is not None:
     count = jnp.clip(jnp.sum(joint_mask, axis=player), a_min=1.0)
@@ -46,10 +45,10 @@ def _center(
 
 
 def _l2_norm(
-    tensor: jnp.ndarray,
-    mask: Optional[jnp.ndarray] = None,
-    unit_variance: bool = False,
-) -> jnp.ndarray:
+  tensor: chex.Array,
+  mask: Optional[chex.Array] = None,
+  unit_variance: bool = False,
+) -> chex.Array:
   """Returns L2 norm.
 
   Also called the Euclidean norm or square norm.
@@ -67,7 +66,7 @@ def _l2_norm(
   """
   # Note: jnp.linalg.norm is only implemented for 2D arrays.
   scale = jnp.clip(
-      jnp.sqrt(jnp.sum(jnp.square(tensor), where=mask)), a_min=_MIN_SCALE
+    jnp.sqrt(jnp.sum(jnp.square(tensor), where=mask)), a_min=_MIN_SCALE
   )
   if unit_variance:
     size = jnp.sum(mask) if mask is not None else tensor.size
@@ -76,11 +75,11 @@ def _l2_norm(
 
 
 def _l2_scale(
-    tensor: jnp.ndarray,
-    mask: Optional[jnp.ndarray] = None,
-    min_denominator: Optional[float] = 1e-12,
-    unit_variance: bool = False,
-) -> jnp.ndarray:
+  tensor: chex.Array,
+  mask: Optional[chex.Array] = None,
+  min_denominator: Optional[float] = 1e-12,
+  unit_variance: bool = False,
+) -> chex.Array:
   """Returns L2 normalized tensor.
 
   Also called the Euclidean norm or square norm.
@@ -104,6 +103,38 @@ def _l2_scale(
   return tensor / jnp.clip(scale, a_min=min_denominator)
 
 
+def _l1_scale(
+  tensor: chex.Array,
+  mask: Optional[chex.Array] = None,
+  min_denominator: Optional[float] = 1e-12,
+  unit_variance: bool = False,
+) -> chex.Array:
+  """L1 normalisation: scaling by sum of absolute values."""
+  scale = jnp.sum(jnp.abs(tensor), where=mask)
+  scale = jnp.clip(scale, a_min=min_denominator)
+
+  if unit_variance:
+    size = jnp.sum(mask) if mask is not None else tensor.size
+    scale /= jnp.sqrt(size)
+  return tensor / scale
+
+
+def _linf_scale(
+  tensor: chex.Array,
+  mask: Optional[chex.Array] = None,
+  min_denominator: Optional[float] = 1e-12,
+  unit_variance: bool = False,
+) -> chex.Array:
+  """L-infinity normalisation: scaling by max absolute value."""
+  scale = jnp.max(jnp.abs(tensor), initial=0.0, where=mask)
+  scale = jnp.clip(scale, a_min=min_denominator)
+
+  if unit_variance:
+    size = jnp.sum(mask) if mask is not None else tensor.size
+    scale /= jnp.sqrt(size)
+  return tensor / scale
+
+
 def _empirical_disc_game(key, num_strategies, latent_size: int = 1):
   """Returns an instance of the empirical disc game from underlying latents."""
   assert len(num_strategies) == 2
@@ -113,7 +144,7 @@ def _empirical_disc_game(key, num_strategies, latent_size: int = 1):
   v = jax.random.normal(k_v, (num_strategies[1], latent_size))
   u += jax.random.uniform(k_bu, (), minval=-1.0, maxval=1.0)
   v += jax.random.uniform(k_bv, (), minval=-1.0, maxval=1.0)
-  logit = jnp.einsum('id,jd->ij', u, v) - jnp.einsum('jd,id->ij', u, v)
+  logit = jnp.einsum("id,jd->ij", u, v) - jnp.einsum("jd,id->ij", u, v)
   win_rate = jax.nn.sigmoid(logit)
   return jnp.stack([win_rate, 1.0 - win_rate], axis=0)
 
@@ -134,36 +165,38 @@ def _random_joint_mask(key, num_strategies, p: Optional[float] = None):
   return mask
 
 
-def _l2_disc(
-    payoffs: jnp.ndarray, joint_mask: Optional[jnp.ndarray] = None
-) -> jnp.ndarray:
+def _l_disc(
+  payoffs: chex.Array,
+  scale_fn: Callable,
+  joint_mask: Optional[chex.Array] = None,
+) -> chex.Array:
   """Returns centered and L2 normalised payoffs."""
   num_players = len(payoffs)
   payoffs_per_player = []
   for player in range(num_players):
     centered = _center(payoffs[player], player, joint_mask=joint_mask)
-    scaled = _l2_scale(centered, mask=joint_mask, unit_variance=True)
+    scaled = scale_fn(centered, mask=joint_mask, unit_variance=True)
     payoffs_per_player.append(scaled)
   return jnp.stack(payoffs_per_player)
 
 
-def l2_invariant(
-    key: jnp.ndarray, num_strategies: Sequence[int]
-) -> Tuple[jnp.ndarray, jnp.ndarray]:
-  """Returns a sampled l2-invariant payoff tensor."""
+def l_invariant(
+  key: chex.Array, scale_fn: Callable, num_strategies: Sequence[int]
+) -> Tuple[chex.Array, chex.Array]:
+  """Returns a sampled l1-invariant payoff tensor."""
   num_players = len(num_strategies)
   payoffs = jax.random.normal(key, shape=(num_players, *num_strategies))
-  payoffs = _l2_disc(payoffs)
+  payoffs = _l_disc(payoffs, scale_fn)
   joint_mask = jnp.ones(num_strategies)
   return payoffs, joint_mask
 
 
 def empirical_disc_game(
-    key: jnp.ndarray,
-    num_strategies: Sequence[int],
-    joint_action_keep_prob: Optional[float] = None,
-    latent_size: int = 1,
-) -> Tuple[jnp.ndarray, jnp.ndarray]:
+  key: chex.Array,
+  num_strategies: Sequence[int],
+  joint_action_keep_prob: Optional[float] = None,
+  latent_size: int = 1,
+) -> Tuple[chex.Array, chex.Array]:
   """Returns a sampled, optionally masked empirical disc game payoff tensor.
 
   Args:
@@ -187,46 +220,37 @@ def empirical_disc_game(
 
 
 class Game(enum.Enum):
-  L2_INVARIANT = 0
-  EMPIRICAL_DISC_GAME = 1
+  EMPIRICAL_DISC_GAME = 0
+  L1_INVARIANT = 1
+  L2_INVARIANT = 2
+  LINF_INVARIANT = 3
 
 
 def generate_payoffs(
-    game: Game,
-    game_settings: Mapping[str, Any],
-    num_strategies: Sequence[int],
-    batch_size: int,
+  game: Game,
+  game_settings: Mapping[str, Any],
+  num_strategies: Sequence[int],
 ):
-  """Returns a function that generates (batches of) payoff tensors."""
+  """Returns a function that generates a payoff tensor."""
 
   @jax.jit
   def _generate_payoff(key):
-    if game == Game.L2_INVARIANT:
-      payoffs, mask = l2_invariant(key, num_strategies, **game_settings)
+    if game == Game.L1_INVARIANT:
+      payoffs, mask = l_invariant(
+        key, _l1_scale, num_strategies, **game_settings
+      )
+    elif game == Game.L2_INVARIANT:
+      payoffs, mask = l_invariant(
+        key, _l2_scale, num_strategies, **game_settings
+      )
+    elif game == Game.LINF_INVARIANT:
+      payoffs, mask = l_invariant(
+        key, _linf_scale, num_strategies, **game_settings
+      )
     elif game == Game.EMPIRICAL_DISC_GAME:
       payoffs, mask = empirical_disc_game(key, num_strategies, **game_settings)
     else:
-      raise ValueError(f'Unrecognised game type: {game}.')
+      raise ValueError(f"Unrecognised game type: {game}.")
     return payoffs, mask
 
-  num_devices = len(jax.local_devices())
-  devices = mesh_utils.create_device_mesh((num_devices, 1))
-  sharding = jax.sharding.PositionalSharding(devices)
-  logging.info('Mesh: %s\nSharding: %s %s', devices, sharding, sharding.shape)
-
-  @jax.jit
-  def _generate_payoffs(key):
-    key, next_key = jax.random.split(key)
-    keys = jax.random.split(key, batch_size)
-    keys = jax.lax.with_sharding_constraint(keys, sharding)
-    payoffs, masks = jax.jit(jax.vmap(_generate_payoff))(keys)
-    payoffs, masks = jax.lax.with_sharding_constraint(
-        (payoffs, masks),
-        (
-            sharding.reshape((num_devices, 1) + (1,) * len(num_strategies)),
-            sharding.reshape((num_devices,) + (1,) * len(num_strategies)),
-        ),
-    )
-    return (payoffs, masks), next_key
-
-  return _generate_payoffs
+  return _generate_payoff
