@@ -21,8 +21,15 @@ players by reading the current player from each time_step. Per-player
 trajectories are tracked internally and GAE (Generalized Advantage Estimation)
 is computed per-player at episode boundaries.
 
-Supported games include any OpenSpiel sequential game accessible through
-rl_environment.Environment, e.g. kuhn_poker and leduc_poker.
+Key design choices:
+  - Vectorized GAE via jax.lax.scan (see ppo_utils.compute_gae).
+  - All randomness uses jax.random with explicit PRNG key threading.
+  - The PPO loss function is JIT-compiled via the Flax NNX graphdef/merge
+    pattern (same approach as open_spiel/python/jax/dqn.py).
+  - Simultaneous-move games are supported via the player_id parameter in step().
+
+Supported games include any OpenSpiel sequential or simultaneous game accessible
+through rl_environment.Environment, e.g. kuhn_poker, leduc_poker, matrix_pd.
 
 Note: PPO is a single-policy gradient method and does not have convergence
 guarantees in imperfect-information games. For such games, algorithms like CFR
@@ -43,6 +50,7 @@ import numpy as np
 import optax
 
 from open_spiel.python import rl_agent
+from open_spiel.python.jax import ppo_utils
 
 ILLEGAL_ACTION_LOGITS_PENALTY = jnp.finfo(jnp.float32).min
 
@@ -54,6 +62,8 @@ class ActorCriticNetwork(nn.Module):
     trunk:  [Linear(hidden) -> tanh] * len(hidden_sizes)
     policy: Linear(num_actions), orthogonal init std=0.01
     value:  Linear(1), orthogonal init std=1.0
+
+  Handles both single observations (unbatched) and batched inputs.
   """
 
   def __init__(
@@ -134,49 +144,18 @@ class RolloutBuffer:
     }
 
 
-def compute_gae(transitions, gamma, gae_lambda):
-  """Compute GAE advantages and returns for a single-player trajectory.
-
-  Each player's sequence of decisions within one episode forms a trajectory.
-  The last transition is terminal (bootstrapped value = 0).
-
-  Args:
-    transitions: list of dicts with keys 'value' and 'reward'.
-    gamma: discount factor.
-    gae_lambda: GAE lambda parameter.
-
-  Returns:
-    Tuple of (advantages, returns), each np.ndarray of shape (n,).
-  """
-  n = len(transitions)
-  advantages = np.zeros(n, dtype=np.float32)
-  last_gae = 0.0
-  for t in reversed(range(n)):
-    if t == n - 1:
-      next_value = 0.0
-      non_terminal = 0.0
-    else:
-      next_value = transitions[t + 1]["value"]
-      non_terminal = 1.0
-    delta = (transitions[t]["reward"]
-             + gamma * next_value * non_terminal
-             - transitions[t]["value"])
-    last_gae = delta + gamma * gae_lambda * non_terminal * last_gae
-    advantages[t] = last_gae
-  values = np.array([t["value"] for t in transitions], dtype=np.float32)
-  returns = advantages + values
-  return advantages, returns
-
-
 class PPO(rl_agent.AbstractAgent):
   """PPO Agent implemented in JAX with Flax NNX.
 
   Supports self-play: a single agent instance controls all players in a
   turn-based game by reading the current player from each time_step.
   Per-player trajectories are tracked internally and GAE is computed
-  per-player at episode boundaries.
+  per-player at episode boundaries using jax.lax.scan.
 
-  Typical usage (self-play):
+  For simultaneous-move games (e.g. matrix_pd), pass player_id explicitly
+  to step() for each player.
+
+  Typical usage (self-play, sequential game):
 
     agent = PPO(player_id=0, info_state_size=11, num_actions=4)
     for _ in range(num_iterations):
@@ -268,15 +247,21 @@ class PPO(rl_agent.AbstractAgent):
     self._rng, subkey = jax.random.split(self._rng)
     return subkey
 
-  def step(self, time_step, is_evaluation=False) -> rl_agent.StepOutput:
+  def step(self, time_step, player_id=None,
+           is_evaluation=False) -> rl_agent.StepOutput:
     """Select an action given a time_step.
 
     Reads the current player from the time_step so a single agent can handle
     all players (self-play). At terminal states, processes the completed
     episode and returns a None action.
 
+    For simultaneous-move games, pass player_id explicitly since
+    time_step.current_player() returns the SIMULTANEOUS sentinel.
+
     Args:
       time_step: an instance of rl_environment.TimeStep.
+      player_id: override for the acting player (required for simultaneous
+        games, optional for sequential games).
       is_evaluation: if True, skips data collection.
 
     Returns:
@@ -287,17 +272,17 @@ class PPO(rl_agent.AbstractAgent):
         self._process_episode_end()
       return rl_agent.StepOutput(action=None, probs=[])
 
-    current_player = time_step.current_player()
-    obs = np.array(
-        time_step.observations["info_state"][current_player], dtype=np.float32)
+    current_player = (player_id if player_id is not None
+                      else time_step.current_player())
+    obs = jnp.array(
+        time_step.observations["info_state"][current_player], dtype=jnp.float32)
     legal_actions = time_step.observations["legal_actions"][current_player]
 
-    legal_mask = np.zeros(self._num_actions, dtype=np.bool_)
-    legal_mask[legal_actions] = True
+    legal_mask = jnp.zeros(self._num_actions, dtype=jnp.bool_)
+    legal_mask = legal_mask.at[jnp.array(legal_actions)].set(True)
 
-    logits, value = self._network(jnp.array(obs))
-    masked_logits = jnp.where(
-        jnp.array(legal_mask), logits, ILLEGAL_ACTION_LOGITS_PENALTY)
+    logits, value = self._network(obs)
+    masked_logits = jnp.where(legal_mask, logits, ILLEGAL_ACTION_LOGITS_PENALTY)
     probs = jax.nn.softmax(masked_logits)
     log_probs_all = jax.nn.log_softmax(masked_logits)
 
@@ -305,16 +290,16 @@ class PPO(rl_agent.AbstractAgent):
 
     if not is_evaluation:
       self._episode_data[current_player].append({
-          "obs": obs,
+          "obs": np.asarray(obs),
           "action": action,
           "log_prob": float(log_probs_all[action]),
           "value": float(value),
-          "legal_mask": legal_mask,
+          "legal_mask": np.asarray(legal_mask),
           "reward": self._pending_rewards[current_player],
       })
       self._pending_rewards[current_player] = 0.0
 
-    return rl_agent.StepOutput(action=action, probs=np.array(probs))
+    return rl_agent.StepOutput(action=action, probs=np.asarray(probs))
 
   def post_step(self, time_step):
     """Record per-player rewards after an environment step.
@@ -329,14 +314,19 @@ class PPO(rl_agent.AbstractAgent):
         self._pending_rewards[pid] += time_step.rewards[pid]
 
   def _process_episode_end(self):
-    """Compute per-player GAE and flush episode data into the buffer."""
+    """Compute per-player GAE via jax.lax.scan and flush into the buffer."""
     for pid, transitions in self._episode_data.items():
       if not transitions:
         continue
       transitions[-1]["reward"] += self._pending_rewards.get(pid, 0.0)
 
-      advantages, returns = compute_gae(
-          transitions, self._gamma, self._gae_lambda)
+      n = len(transitions)
+      rewards = jnp.array([t["reward"] for t in transitions], dtype=jnp.float32)
+      values = jnp.array([t["value"] for t in transitions], dtype=jnp.float32)
+      dones = jnp.zeros(n, dtype=jnp.float32).at[n - 1].set(1.0)
+
+      advantages, returns = ppo_utils.compute_gae(
+          rewards, values, dones, self._gamma, self._gae_lambda)
 
       for t, trans in enumerate(transitions):
         self._buffer.add(
@@ -355,9 +345,12 @@ class PPO(rl_agent.AbstractAgent):
   def learn(self) -> dict[str, float]:
     """Perform PPO clipped update on collected rollout data.
 
+    All randomness (minibatch shuffling) uses jax.random with explicit key
+    splitting from the agent's PRNG state.
+
     Returns:
       Dictionary of average training metrics (policy_loss, value_loss,
-      entropy) over all minibatch updates.
+      entropy, approx_kl) over all minibatch updates.
     """
     if self._buffer.size == 0:
       return {}
@@ -371,30 +364,33 @@ class PPO(rl_agent.AbstractAgent):
     total_pg_loss = 0.0
     total_v_loss = 0.0
     total_ent_loss = 0.0
+    total_kl = 0.0
     num_updates = 0
 
     for _ in range(self._update_epochs):
-      perm = np.random.permutation(batch_size)
+      perm = jax.random.permutation(self._next_rng(), batch_size)
       for start in range(0, batch_size - minibatch_size + 1, minibatch_size):
-        mb_idx = jnp.array(perm[start:start + minibatch_size])
+        mb_idx = perm[start:start + minibatch_size]
 
         mb_adv = data["advantages"][mb_idx]
         if self._normalize_advantages:
           mb_adv = (mb_adv - mb_adv.mean()) / (mb_adv.std() + 1e-8)
 
-        loss, (pg_loss, v_loss, ent_loss), state = self._jit_update(
-            state,
-            data["observations"][mb_idx],
-            data["actions"][mb_idx],
-            data["log_probs"][mb_idx],
-            mb_adv,
-            data["returns"][mb_idx],
-            data["legal_masks"][mb_idx],
-        )
+        loss, (pg_loss, v_loss, ent_loss, approx_kl), state = (
+            self._jit_update(
+                state,
+                data["observations"][mb_idx],
+                data["actions"][mb_idx],
+                data["log_probs"][mb_idx],
+                mb_adv,
+                data["returns"][mb_idx],
+                data["legal_masks"][mb_idx],
+            ))
 
         total_pg_loss += float(pg_loss)
         total_v_loss += float(v_loss)
         total_ent_loss += float(ent_loss)
+        total_kl += float(approx_kl)
         num_updates += 1
 
     nn.update((self._network, self._optimizer), state)
@@ -405,10 +401,16 @@ class PPO(rl_agent.AbstractAgent):
         "policy_loss": total_pg_loss / n,
         "value_loss": total_v_loss / n,
         "entropy": total_ent_loss / n,
+        "approx_kl": total_kl / n,
     }
 
   def _build_jit_update(self):
-    """Build JIT-compiled PPO minibatch update function."""
+    """Build JIT-compiled PPO minibatch update function.
+
+    Captures hyperparameters and the network graphdef as closure constants.
+    The returned function takes pure state + data arrays and returns updated
+    state + loss metrics, making it safe for jax.jit.
+    """
     graphdef = self._graphdef
     clip_coef = self._clip_coef
     value_coef = self._value_coef
@@ -427,6 +429,8 @@ class PPO(rl_agent.AbstractAgent):
           jnp.where(legal_masks, probs * log_probs_all, 0.0), axis=-1)
 
       ratio = jnp.exp(new_log_probs - old_log_probs)
+      approx_kl = jnp.mean((ratio - 1.0) - jnp.log(ratio + 1e-8))
+
       pg_loss1 = -advantages * ratio
       pg_loss2 = -advantages * jnp.clip(
           ratio, 1.0 - clip_coef, 1.0 + clip_coef)
@@ -436,7 +440,7 @@ class PPO(rl_agent.AbstractAgent):
       ent_loss = entropy.mean()
 
       total_loss = pg_loss + value_coef * v_loss - entropy_coef * ent_loss
-      return total_loss, (pg_loss, v_loss, ent_loss)
+      return total_loss, (pg_loss, v_loss, ent_loss, approx_kl)
 
     @jax.jit
     def update(state, obs, actions, old_log_probs, advantages, returns,

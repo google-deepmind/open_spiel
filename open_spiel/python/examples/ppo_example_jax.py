@@ -15,11 +15,14 @@
 """Self-play PPO training on OpenSpiel games using JAX.
 
 A single PPO agent controls all players, learning a strategy via self-play.
-Periodically evaluates exploitability as a convergence measure.
+Supports both sequential (e.g. kuhn_poker) and simultaneous-move games
+(e.g. matrix_pd). Periodically evaluates exploitability as a convergence
+measure and stores metrics for plotting.
 
 Example usage:
     python open_spiel/python/examples/ppo_example_jax.py --game=kuhn_poker
     python open_spiel/python/examples/ppo_example_jax.py --game=leduc_poker
+    python open_spiel/python/examples/ppo_example_jax.py --game=matrix_pd
 """
 
 from absl import app
@@ -30,6 +33,7 @@ import numpy as np
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.jax import ppo
+from open_spiel.python.jax import ppo_utils
 from open_spiel.python.rl_agent_policy import JointRLAgentPolicy
 
 FLAGS = flags.FLAGS
@@ -59,25 +63,51 @@ flags.DEFINE_integer("num_minibatches", 4,
 flags.DEFINE_list("hidden_sizes", ["64", "64"],
                   "Hidden layer sizes for the actor-critic network.")
 flags.DEFINE_integer("seed", 42, "Random seed.")
+flags.DEFINE_string("plot_path", None,
+                    "If set, save training curve plot to this file path.")
 
 
-def evaluate_returns(env, agent, num_episodes):
+def run_episode(env, agent, num_players, is_evaluation=False):
+  """Run a single self-play episode, handling both sequential and simultaneous.
+
+  Args:
+    env: the OpenSpiel rl_environment.Environment.
+    agent: the PPO agent.
+    num_players: number of players in the game.
+    is_evaluation: if True, no data is collected.
+
+  Returns:
+    Per-player rewards as a list.
+  """
+  time_step = env.reset()
+  while not time_step.last():
+    if time_step.is_simultaneous_move():
+      actions = []
+      for pid in range(num_players):
+        output = agent.step(time_step, player_id=pid,
+                            is_evaluation=is_evaluation)
+        actions.append(output.action)
+      time_step = env.step(actions)
+    else:
+      output = agent.step(time_step, is_evaluation=is_evaluation)
+      time_step = env.step([output.action])
+    if not is_evaluation:
+      agent.post_step(time_step)
+  agent.step(time_step, is_evaluation=is_evaluation)
+  return list(time_step.rewards)
+
+
+def evaluate_returns(env, agent, num_episodes, num_players):
   """Run evaluation episodes and return per-player average returns."""
-  num_players = env.num_players
   total_returns = np.zeros(num_players)
   for _ in range(num_episodes):
-    time_step = env.reset()
-    while not time_step.last():
-      output = agent.step(time_step, is_evaluation=True)
-      time_step = env.step([output.action])
+    rewards = run_episode(env, agent, num_players, is_evaluation=True)
     for pid in range(num_players):
-      total_returns[pid] += time_step.rewards[pid]
+      total_returns[pid] += rewards[pid]
   return total_returns / num_episodes
 
 
 def main(_):
-  np.random.seed(FLAGS.seed)
-
   env = rl_environment.Environment(FLAGS.game)
   info_state_size = env.observation_spec()["info_state"][0]
   num_actions = env.action_spec()["num_actions"]
@@ -112,34 +142,40 @@ def main(_):
       use_observation=env.use_observation,
   )
 
+  tracker = ppo_utils.TrainingMetrics()
+
   for iteration in range(1, FLAGS.num_iterations + 1):
     for _ in range(FLAGS.episodes_per_batch):
-      time_step = env.reset()
-      while not time_step.last():
-        output = agent.step(time_step)
-        time_step = env.step([output.action])
-        agent.post_step(time_step)
-      agent.step(time_step)
+      run_episode(env, agent, num_players)
 
     batch_steps = agent.buffer_size
     metrics = agent.learn()
+    tracker.record_train(iteration, metrics)
 
     if iteration % FLAGS.eval_every == 0:
-      avg_returns = evaluate_returns(env, agent, FLAGS.num_eval_episodes)
+      avg_returns = evaluate_returns(
+          env, agent, FLAGS.num_eval_episodes, num_players)
       expl = exploitability.exploitability(env.game, joint_policy)
+      tracker.record_eval(iteration, expl, avg_returns)
 
       logging.info("-" * 60)
       logging.info("Iteration %d  |  batch_steps=%d", iteration, batch_steps)
-      logging.info("  policy_loss=%.6f  value_loss=%.6f  entropy=%.6f",
-                   metrics.get("policy_loss", 0),
-                   metrics.get("value_loss", 0),
-                   metrics.get("entropy", 0))
+      logging.info(
+          "  policy_loss=%.6f  value_loss=%.6f  entropy=%.6f  approx_kl=%.6f",
+          metrics.get("policy_loss", 0),
+          metrics.get("value_loss", 0),
+          metrics.get("entropy", 0),
+          metrics.get("approx_kl", 0))
       returns_str = "  ".join(
           f"player_{p}={avg_returns[p]:.4f}" for p in range(num_players))
       logging.info("  Avg returns: %s", returns_str)
       logging.info("  Exploitability: %.6f", expl)
 
   logging.info("Training complete.")
+
+  if FLAGS.plot_path:
+    ppo_utils.plot_training_curves(tracker, FLAGS.game, FLAGS.plot_path)
+    logging.info("Plot saved to %s", FLAGS.plot_path)
 
 
 if __name__ == "__main__":
