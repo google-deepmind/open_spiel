@@ -18,6 +18,7 @@ class Data(NamedTuple):
 
   reward: chex.Array  # [B, N, A1, ..., AN] or [N, A1, ..., AN]
   sigma_hat: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
+  sigma_norm: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
   epsilon_hat: chex.Array  # [B, N] or [N]
   welfare: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
   mask: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
@@ -31,14 +32,16 @@ def broadcast(data: Data) -> Data:
     jnp.expand_dims(data.epsilon_hat, axis=A),  # Add action dims
     base_shape,
   )
-  sigma_broadcast = jnp.broadcast_to(data.sigma_hat, base_shape)
+  sigma_hat_broadcast = jnp.broadcast_to(data.sigma_hat, base_shape)
+  sigma_norm_broadcast = jnp.broadcast_to(data.sigma_hat, base_shape)
 
   # W: [*A] → [N, *A] (same for all players)
   welfare_broadcast = jnp.broadcast_to(data.welfare, base_shape)
 
   return Data(
     data.reward,
-    sigma_broadcast,
+    sigma_hat_broadcast,
+    sigma_norm_broadcast,
     epsilon_broadcast,
     welfare_broadcast,
     data.mask,
@@ -49,7 +52,7 @@ def stack(data: Data, axis=1) -> chex.Array:
   """Constructs [B, C=4, N, A1, ..., AN] tensor."""
   # Stack along channel dim 0: [B, 4, N, A1, ..., AN]
   return jnp.stack(
-    [data.reward, data.epsilon_hat, data.sigma_hat, data.welfare], axis=axis
+    [data.reward, data.epsilon_hat, data.sigma_norm, data.welfare], axis=axis
   )
 
 
@@ -124,7 +127,8 @@ class GameSampler:
     Returns \hat{ε}^{L_m}_p clipped to [-Z_m, Z_m]
     """
     # Scale target epsilon by the norm
-    scaled_eps = hat_epsilon / (norm_payoffs + utils.SMALL_NUMBER)
+    safe_norm = jnp.maximum(norm_payoffs, 1e-3)
+    scaled_eps = hat_epsilon / (safe_norm + utils.SMALL_NUMBER)
 
     # Clip to [-Z_m, +Z_m] (broadcast Z_m)
     return jnp.clip(scaled_eps, -self.z_m, self.z_m)
@@ -175,13 +179,14 @@ class GameSampler:
       # Epsilon
       eps_scaled = self._scale_epsilon(item.epsilon_hat, stats["norm_raw"])
       # Sigma
-      sig_scaled = self._scale_sigma(item.sigma_hat)
+      sigma_scaled = self._scale_sigma(item.sigma_hat)
       # Welfare
       W_scaled = self._scale_welfare(item.welfare)
 
       return Data(
         reward=G_hat,
-        sigma_hat=sig_scaled,
+        sigma_hat=item.epsilon_hat,
+        sigma_norm=sigma_scaled,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
         mask=data.mask,  # stays unchanged
@@ -233,7 +238,7 @@ class OpenSpielGameSampler(GameSampler):
 
       # Sigma
       sigma_hat = self._initialise_sigma(G, sigma_key, target_sigma_hat)
-      # sigma_scaled = self._scale_sigma(sigma_hat)
+      sigma_scaled = self._scale_sigma(sigma_hat)
 
       # Welfare
       W = self._initialise_welfare(G)
@@ -242,6 +247,7 @@ class OpenSpielGameSampler(GameSampler):
       return Data(
         reward=G_hat,
         sigma_hat=sigma_hat,
+        sigma_norm=sigma_scaled,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
         mask=self.mask,
@@ -295,7 +301,7 @@ class RandomGameSampler(GameSampler):
 
       # Sigma
       sigma_hat = self._initialise_sigma(G, sigma_rng, target_sigma_hat)
-      # sig_scaled = self._scale_sigma(sigma_hat)
+      sigma_scaled = self._scale_sigma(sigma_hat)
 
       # Welfare
       W = self._initialise_welfare(G_hat)
@@ -304,6 +310,7 @@ class RandomGameSampler(GameSampler):
       return Data(
         reward=G_hat,
         sigma_hat=sigma_hat,
+        sigma_norm=sigma_scaled,
         epsilon_hat=eps_scaled,
         welfare=W_scaled,
         mask=mask,

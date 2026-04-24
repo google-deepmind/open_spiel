@@ -174,18 +174,27 @@ class EquilibriaTest(absltest.TestCase):
 
   def test_ce_vs_cce_gap_comparison(self):
     """CE gap should be >= CCE gap (CE is stricter)."""
-    coordination_game = _coordination_game()
-    G = coordination_game["payoffs"]
-    sigma = coordination_game["sigma_mixed"]
+    G = jnp.array([
+        [[2, 0], [0, 1]],   # player 0 (row)
+        [[1, 0], [0, 2]],   # player 1 (col) — not used for this check
+    ], dtype=jnp.float32)
 
-    epsilon = jnp.array([0.1, 0.1])
+    # Anti-diagonal correlation: always miscoordinate
+    sigma = jnp.zeros((2, 2))
+    sigma = sigma.at[0, 1].set(0.5)
+    sigma = sigma.at[1, 0].set(0.5)
+
+    epsilon = jnp.array([0.0, 0.0])
 
     cce_gap = eu.compute_cce_gap(G, sigma, epsilon)
     ce_gap = eu.compute_ce_gap(G, sigma, epsilon)
 
-    # Every CE is a CCE, so CE constraints are tighter
-    # Therefore CE gap >= CCE gap
-    self.assertTrue(jnp.all(cce_gap >= ce_gap))
+    # For player 0:
+    # CCE: eq=0, best dev=row0 (payoff 1), gap=1
+    # CE:  rec=0 → opp plays 1 → eq=0, best dev=row1 (payoff 1), gain=1
+    #      rec=1 → opp plays 0 → eq=0, best dev=row0 (payoff 2), gain=2
+    #      CE gap = 0.5*1 + 0.5*2 = 1.5
+    self.assertTrue(jnp.all(ce_gap > cce_gap))
 
   def test_cce_gap_non_cubic(self):
     """Test with 2x3 game (non-cubic)."""

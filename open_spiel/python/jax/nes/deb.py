@@ -6,7 +6,7 @@ import chex
 
 def mechanism_loss(
     generator: networks.MechanismGenerator,
-    deb: nes.DifferentiableEquilibriumBlock,   # your frozen NES
+    deb: nes.DifferentiableEquilibriumBlock,   # frozen NES
     batch: dict,                           # contains "omega" and "target_sigma"
     mu: float = 1.0,
     rho: float = 0.1,                      # KL weight

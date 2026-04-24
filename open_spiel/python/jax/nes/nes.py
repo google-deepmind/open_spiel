@@ -49,14 +49,14 @@ def recover_primals(
     alpha = alpha.squeeze(0)  # [N, A] or [N, A, A]
 
   if mode == networks.Mode.CCE.value:
-    get_alpha_p = lambda p: eu.mask_alpha_cce(alpha, action_sizes)[
+    get_alpha_p = lambda p: eu.mask_alpha_cce(alpha, action_sizes)[ # noqa: E731
       p, : action_sizes[p]
     ]  # noqa: E731
     contrib_fn = eu.player_contribution_cce
-  else:
-    get_alpha_p = lambda p: eu.mask_alpha_ce(alpha, action_sizes)[
+  else: # noqa: E731
+    get_alpha_p = lambda p: eu.mask_alpha_ce(alpha, action_sizes)[ # noqa: E731
       p, : action_sizes[p], : action_sizes[p]
-    ]  # noqa: E731
+    ]  
     contrib_fn = eu.player_contribution_ce
 
   deviations = []
@@ -381,7 +381,6 @@ class NESolver:
     )
     if isinstance(checkpoint_dir, str):
       checkpoint_dir = etils.epath.Path(checkpoint_dir)
-    checkpoint_dir = etils.epath.Path(checkpoint_dir)
 
     if load_optimiser:
       state_restored = self._checkpointer.restore(
@@ -392,9 +391,9 @@ class NESolver:
 
     else:
       state_restored = self._checkpointer.restore(
-        checkpoint_dir / "state", nn.state(self._q_network)
+        checkpoint_dir / "state", nn.state(self._network)
       )
-      nn.update(self._q_network, state_restored)
+      nn.update(self._network, state_restored)
     self._checkpointer.wait_until_finished()
 
   def _logging_callback(
@@ -411,7 +410,7 @@ class NESolver:
 
     solver_gap = {}
     if solve:
-      solver_gap = eu.mwme_lp_solver_gap(
+      solver_gap = eu.mwmre_lp_solver_gap(
         reward[0], sigma[0], self._mu, self._rho
       )
       solver_gap["solver_gap"] = jnp.abs(solver_gap["sigma"] - sigma).mean()

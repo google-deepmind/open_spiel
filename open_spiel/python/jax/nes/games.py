@@ -27,6 +27,13 @@ import chex
 
 _MIN_SCALE = 1e-12
 
+CE_COUNTER_EXAMPLE = jnp.array([
+
+])
+
+CCE_COUNTER_EXAMPLE = jnp.array([
+
+])
 
 def _center(
   payoff: chex.Array, player: int, joint_mask: Optional[chex.Array] = None

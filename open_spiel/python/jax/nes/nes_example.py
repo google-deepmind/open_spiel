@@ -7,7 +7,7 @@ from open_spiel.python.jax.nes import nes
 from open_spiel.python.jax.nes import networks
 from open_spiel.python.jax.nes import games
 
-
+logger = logging.getLogger(__name__)
 FLAGS = flags.FLAGS
 
 # Training parameters

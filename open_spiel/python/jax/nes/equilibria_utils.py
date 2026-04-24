@@ -101,8 +101,8 @@ def player_contribution_ce(
 
 def compute_cce_gap(
   payoffs: chex.Array,  # [N, A1, ..., AN]
-  sigma: chex.Array,  # [A1, ..., AN]  (your recovered joint strategy)
-  epsilon: chex.Array,  # [N]            (ˆε_p vector)
+  sigma: chex.Array,  # [A1, ..., AN]  (recovered joint strategy)
+  epsilon: chex.Array,  # [N]          
   joint_mask: chex.Array = None,
 ) -> chex.Array:
   N = payoffs.shape[0]
@@ -185,7 +185,7 @@ def compute_ce_gap(
   return total_gap
 
 
-def mwme_lp_solver_gap(
+def mwmre_lp_solver_gap(
   payoffs: chex.Array,
   hat_sigma: chex.Array,
   mu: float = 1.0,
@@ -194,7 +194,21 @@ def mwme_lp_solver_gap(
   verbose: bool = False,
   enforce_equilibrium: bool = True,
 ) -> dict:
-  """MWME: Maximize μ·Welfare − ρ·KL(σ || ˆσ)  [hybrid etalon version]"""
+  """MWMRE: Maximize μ·Welfare − ρ·KL(σ || ˆσ)  [hybrid etalon version]
+    Solve exact MW-MRE (Maximum Welfare Minimum Relative Entropy) via convex optimization.
+    
+    Primal:
+        max_{σ ≥ 0}  μ·Σ_a σ(a)·W(a)  −  ρ·KL(σ || σ̂)
+        s.t. Σ_a σ(a) = 1
+        and (C)CE incentive constraints
+    
+    KL(σ || σ̂) = Σ_a σ(a)·log(σ(a)/σ̂(a))
+               = Σ_a σ(a)·log σ(a)  −  Σ_a σ(a)·log σ̂(a)
+               = −cp.entr(σ) − σ^T·log(σ̂)
+    
+    Therefore objective:
+        μ·welfare^T σ  +  ρ·cp.sum(cp.entr(σ))  +  ρ·σ^T·log(σ̂)
+  """
 
   N = payoffs.shape[0]
   action_sizes = payoffs.shape[1:]
@@ -206,7 +220,6 @@ def mwme_lp_solver_gap(
   flat_hat = np.clip(hat_sigma.flatten(), 1e-12, None)
 
   # Entropy-based KL (stable formulation)
-  # kl_term = cp.sum(cp.multiply(sigma, cp.log(sigma + 1e-12) - np.log(flat_hat)))
   # KL(sigma || hat) = sum(sigma * log(sigma/hat))
   #                 = sum(sigma * log(sigma)) - sum (sigma * log(hat))
   #                 = -entr(sigma) - sigma @ log(hat)

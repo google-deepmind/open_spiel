@@ -57,6 +57,7 @@ def dummy_nes_batch(
   return {
     "reward": jnp.zeros((batch_size, n_players, *A)),
     "sigma_hat": jnp.ones(joint_shape) / jnp.prod(A),
+    "sigma_norm": jnp.ones(joint_shape) / jnp.prod(A),
     "epsilon_hat": jnp.zeros((batch_size, n_players)),
     "welfare": jnp.zeros(joint_shape),
     "mask": jnp.zeros((batch_size, *A)),
