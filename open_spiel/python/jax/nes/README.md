@@ -1,5 +1,12 @@
 # Neural Equilibrium solvers for game theory
 
+## TODOs:
+
+- [ ] Better logging utility, parallel LP solvers(?)
+- [ ] Sharding and data/pipeline parallelisation for the architecture
+- [ ] DID implementation
+
+
 This section implements two papers covering efficient solving Normal-Form Games (NFG) with neural networks.
 
 1. Turbocharging Solution Concepts: Solving NEs, CEs and CCEs with Neural Equilibrium Solvers (arXiv:2210.09257)
