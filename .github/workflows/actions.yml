@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: ubuntu-26.04
+        - os: ubuntu-26.04-beta
           OS_PYTHON_VERSION: "3.14"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
