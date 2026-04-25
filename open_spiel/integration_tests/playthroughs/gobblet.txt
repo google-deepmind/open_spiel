@@ -1,0 +1,280 @@
+game: gobblet
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "gobblet, a capturing variant of tic-tac-toe"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["egocentric_obs_tensor"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "gobblet"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 108
+PolicyTensorShape() = [108]
+MaxChanceOutcomes() = 0
+GetParameters() = {egocentric_obs_tensor=False}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = player: [1], board: [3, 3, 3, 2]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 55
+MaxGameLength() = 1000
+ToString() = "gobblet(egocentric_obs_tensor=False)"
+
+# State 0
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   |  |
+#   |  |
+#   |  |
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = "reserves:\n[[2 2 2]\n [2 2 2]]\nboard:\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  "
+ObservationString(1) = "reserves:\n[[2 2 2]\n [2 2 2]]\nboard:\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  "
+ObservationTensor(0).player: ◯
+ObservationTensor(0).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+ObservationTensor(1).player: ◯
+ObservationTensor(1).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+StringLegalActions() = ["reserves 0 src (-1, -1) dst (0, 0)", "reserves 0 src (-1, -1) dst (0, 1)", "reserves 0 src (-1, -1) dst (0, 2)", "reserves 0 src (-1, -1) dst (1, 0)", "reserves 0 src (-1, -1) dst (1, 1)", "reserves 0 src (-1, -1) dst (1, 2)", "reserves 0 src (-1, -1) dst (2, 0)", "reserves 0 src (-1, -1) dst (2, 1)", "reserves 0 src (-1, -1) dst (2, 2)", "reserves 1 src (-1, -1) dst (0, 0)", "reserves 1 src (-1, -1) dst (0, 1)", "reserves 1 src (-1, -1) dst (0, 2)", "reserves 1 src (-1, -1) dst (1, 0)", "reserves 1 src (-1, -1) dst (1, 1)", "reserves 1 src (-1, -1) dst (1, 2)", "reserves 1 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (2, 1)", "reserves 1 src (-1, -1) dst (2, 2)", "reserves 2 src (-1, -1) dst (0, 0)", "reserves 2 src (-1, -1) dst (0, 1)", "reserves 2 src (-1, -1) dst (0, 2)", "reserves 2 src (-1, -1) dst (1, 0)", "reserves 2 src (-1, -1) dst (1, 1)", "reserves 2 src (-1, -1) dst (1, 2)", "reserves 2 src (-1, -1) dst (2, 0)", "reserves 2 src (-1, -1) dst (2, 1)", "reserves 2 src (-1, -1) dst (2, 2)"]
+
+# Apply action "reserves 0 src (-1, -1) dst (2, 2)"
+action: 8
+
+# State 1
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   |  |x
+#   |  |
+#   |  |
+IsTerminal() = False
+History() = [8]
+HistoryString() = "8"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "8"
+InformationStateString(1) = "8"
+ObservationString(0) = "reserves:\n[[1 2 2]\n [2 2 2]]\nboard:\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |x \n  |  |  \n  |  |  "
+ObservationString(1) = "reserves:\n[[1 2 2]\n [2 2 2]]\nboard:\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |x \n  |  |  \n  |  |  "
+ObservationTensor(0).player: ◉
+ObservationTensor(0).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+ObservationTensor(1).player: ◉
+ObservationTensor(1).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+StringLegalActions() = ["reserves 0 src (-1, -1) dst (0, 0)", "reserves 0 src (-1, -1) dst (0, 1)", "reserves 0 src (-1, -1) dst (0, 2)", "reserves 0 src (-1, -1) dst (1, 0)", "reserves 0 src (-1, -1) dst (1, 1)", "reserves 0 src (-1, -1) dst (1, 2)", "reserves 0 src (-1, -1) dst (2, 0)", "reserves 0 src (-1, -1) dst (2, 1)", "reserves 1 src (-1, -1) dst (0, 0)", "reserves 1 src (-1, -1) dst (0, 1)", "reserves 1 src (-1, -1) dst (0, 2)", "reserves 1 src (-1, -1) dst (1, 0)", "reserves 1 src (-1, -1) dst (1, 1)", "reserves 1 src (-1, -1) dst (1, 2)", "reserves 1 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (2, 1)", "reserves 1 src (-1, -1) dst (2, 2)", "reserves 2 src (-1, -1) dst (0, 0)", "reserves 2 src (-1, -1) dst (0, 1)", "reserves 2 src (-1, -1) dst (0, 2)", "reserves 2 src (-1, -1) dst (1, 0)", "reserves 2 src (-1, -1) dst (1, 1)", "reserves 2 src (-1, -1) dst (1, 2)", "reserves 2 src (-1, -1) dst (2, 0)", "reserves 2 src (-1, -1) dst (2, 1)", "reserves 2 src (-1, -1) dst (2, 2)"]
+
+# Apply action "reserves 0 src (-1, -1) dst (2, 1)"
+action: 7
+
+# State 2
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   | o|x
+#   |  |
+#   |  |
+IsTerminal() = False
+History() = [8, 7]
+HistoryString() = "8, 7"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "8, 7"
+InformationStateString(1) = "8, 7"
+ObservationString(0) = "reserves:\n[[1 2 2]\n [1 2 2]]\nboard:\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationString(1) = "reserves:\n[[1 2 2]\n [1 2 2]]\nboard:\n  |  |  \n  |  |  \n  |  |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationTensor(0).player: ◯
+ObservationTensor(0).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+ObservationTensor(1).player: ◯
+ObservationTensor(1).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 99, 100, 101, 102, 103, 104, 105]
+StringLegalActions() = ["reserves 0 src (-1, -1) dst (0, 0)", "reserves 0 src (-1, -1) dst (0, 1)", "reserves 0 src (-1, -1) dst (0, 2)", "reserves 0 src (-1, -1) dst (1, 0)", "reserves 0 src (-1, -1) dst (1, 1)", "reserves 0 src (-1, -1) dst (1, 2)", "reserves 0 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (0, 0)", "reserves 1 src (-1, -1) dst (0, 1)", "reserves 1 src (-1, -1) dst (0, 2)", "reserves 1 src (-1, -1) dst (1, 0)", "reserves 1 src (-1, -1) dst (1, 1)", "reserves 1 src (-1, -1) dst (1, 2)", "reserves 1 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (2, 1)", "reserves 2 src (-1, -1) dst (0, 0)", "reserves 2 src (-1, -1) dst (0, 1)", "reserves 2 src (-1, -1) dst (0, 2)", "reserves 2 src (-1, -1) dst (1, 0)", "reserves 2 src (-1, -1) dst (1, 1)", "reserves 2 src (-1, -1) dst (1, 2)", "reserves 2 src (-1, -1) dst (2, 0)", "reserves 2 src (-1, -1) dst (2, 1)", "reserves -1 src (2, 2) dst (0, 0)", "reserves -1 src (2, 2) dst (0, 1)", "reserves -1 src (2, 2) dst (0, 2)", "reserves -1 src (2, 2) dst (1, 0)", "reserves -1 src (2, 2) dst (1, 1)", "reserves -1 src (2, 2) dst (1, 2)", "reserves -1 src (2, 2) dst (2, 0)"]
+
+# Apply action "reserves 2 src (-1, -1) dst (0, 1)"
+action: 19
+
+# State 3
+#   |  |
+#   |  |
+#   |x |
+# --------
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   | o|x
+#   |  |
+#   |  |
+IsTerminal() = False
+History() = [8, 7, 19]
+HistoryString() = "8, 7, 19"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "8, 7, 19"
+InformationStateString(1) = "8, 7, 19"
+ObservationString(0) = "reserves:\n[[1 2 1]\n [1 2 2]]\nboard:\n  |  |  \n  |  |  \n  |x |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationString(1) = "reserves:\n[[1 2 1]\n [1 2 2]]\nboard:\n  |  |  \n  |  |  \n  |x |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationTensor(0).player: ◉
+ObservationTensor(0).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+ObservationTensor(1).player: ◉
+ObservationTensor(1).board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
+LegalActions() = [0, 2, 3, 4, 5, 6, 9, 11, 12, 13, 14, 15, 17, 18, 20, 21, 22, 23, 24, 26, 90, 92, 93, 94, 95, 96]
+StringLegalActions() = ["reserves 0 src (-1, -1) dst (0, 0)", "reserves 0 src (-1, -1) dst (0, 2)", "reserves 0 src (-1, -1) dst (1, 0)", "reserves 0 src (-1, -1) dst (1, 1)", "reserves 0 src (-1, -1) dst (1, 2)", "reserves 0 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (0, 0)", "reserves 1 src (-1, -1) dst (0, 2)", "reserves 1 src (-1, -1) dst (1, 0)", "reserves 1 src (-1, -1) dst (1, 1)", "reserves 1 src (-1, -1) dst (1, 2)", "reserves 1 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (2, 2)", "reserves 2 src (-1, -1) dst (0, 0)", "reserves 2 src (-1, -1) dst (0, 2)", "reserves 2 src (-1, -1) dst (1, 0)", "reserves 2 src (-1, -1) dst (1, 1)", "reserves 2 src (-1, -1) dst (1, 2)", "reserves 2 src (-1, -1) dst (2, 0)", "reserves 2 src (-1, -1) dst (2, 2)", "reserves -1 src (2, 1) dst (0, 0)", "reserves -1 src (2, 1) dst (0, 2)", "reserves -1 src (2, 1) dst (1, 0)", "reserves -1 src (2, 1) dst (1, 1)", "reserves -1 src (2, 1) dst (1, 2)", "reserves -1 src (2, 1) dst (2, 0)"]
+
+# Apply action "reserves 1 src (-1, -1) dst (0, 0)"
+action: 9
+
+# State 4
+#   |  |
+#  o|  |
+#   |x |
+# --------
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   | o|x
+#   |  |
+#   |  |
+IsTerminal() = False
+History() = [8, 7, 19, 9]
+HistoryString() = "8, 7, 19, 9"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "8, 7, 19, 9"
+InformationStateString(1) = "8, 7, 19, 9"
+ObservationString(0) = "reserves:\n[[1 2 1]\n [1 1 2]]\nboard:\n  |  |  \n o|  |  \n  |x |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationString(1) = "reserves:\n[[1 2 1]\n [1 1 2]]\nboard:\n  |  |  \n o|  |  \n  |x |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationTensor(0).player: ◯
+ObservationTensor(0).board = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+ObservationTensor(1).player: ◯
+ObservationTensor(1).board = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
+LegalActions() = [2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 18, 20, 21, 22, 23, 24, 25, 36, 38, 39, 40, 41, 42, 43, 101, 102, 103, 104, 105]
+StringLegalActions() = ["reserves 0 src (-1, -1) dst (0, 2)", "reserves 0 src (-1, -1) dst (1, 0)", "reserves 0 src (-1, -1) dst (1, 1)", "reserves 0 src (-1, -1) dst (1, 2)", "reserves 0 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (0, 2)", "reserves 1 src (-1, -1) dst (1, 0)", "reserves 1 src (-1, -1) dst (1, 1)", "reserves 1 src (-1, -1) dst (1, 2)", "reserves 1 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (2, 1)", "reserves 2 src (-1, -1) dst (0, 0)", "reserves 2 src (-1, -1) dst (0, 2)", "reserves 2 src (-1, -1) dst (1, 0)", "reserves 2 src (-1, -1) dst (1, 1)", "reserves 2 src (-1, -1) dst (1, 2)", "reserves 2 src (-1, -1) dst (2, 0)", "reserves 2 src (-1, -1) dst (2, 1)", "reserves -1 src (0, 1) dst (0, 0)", "reserves -1 src (0, 1) dst (0, 2)", "reserves -1 src (0, 1) dst (1, 0)", "reserves -1 src (0, 1) dst (1, 1)", "reserves -1 src (0, 1) dst (1, 2)", "reserves -1 src (0, 1) dst (2, 0)", "reserves -1 src (0, 1) dst (2, 1)", "reserves -1 src (2, 2) dst (0, 2)", "reserves -1 src (2, 2) dst (1, 0)", "reserves -1 src (2, 2) dst (1, 1)", "reserves -1 src (2, 2) dst (1, 2)", "reserves -1 src (2, 2) dst (2, 0)"]
+
+# Apply action "reserves 1 src (-1, -1) dst (0, 2)"
+action: 11
+
+# State 5
+#   |  |
+#  o|  |x
+#   |x |
+# --------
+#   |  |
+#   |  |
+#   |  |
+# --------
+#   | o|x
+#   |  |
+#   |  |
+IsTerminal() = False
+History() = [8, 7, 19, 9, 11]
+HistoryString() = "8, 7, 19, 9, 11"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "8, 7, 19, 9, 11"
+InformationStateString(1) = "8, 7, 19, 9, 11"
+ObservationString(0) = "reserves:\n[[1 1 1]\n [1 1 2]]\nboard:\n  |  |  \n o|  |x \n  |x |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationString(1) = "reserves:\n[[1 1 1]\n [1 1 2]]\nboard:\n  |  |  \n o|  |x \n  |x |  \n--------\n  |  |  \n  |  |  \n  |  |  \n--------\n  | o|x \n  |  |  \n  |  |  "
+ObservationTensor(0).player: ◉
+ObservationTensor(0).board = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+ObservationTensor(1).player: ◉
+ObservationTensor(1).board = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
+LegalActions() = [3, 4, 5, 6, 12, 13, 14, 15, 17, 20, 21, 22, 23, 24, 26, 30, 31, 32, 33, 35, 93, 94, 95, 96]
+StringLegalActions() = ["reserves 0 src (-1, -1) dst (1, 0)", "reserves 0 src (-1, -1) dst (1, 1)", "reserves 0 src (-1, -1) dst (1, 2)", "reserves 0 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (1, 0)", "reserves 1 src (-1, -1) dst (1, 1)", "reserves 1 src (-1, -1) dst (1, 2)", "reserves 1 src (-1, -1) dst (2, 0)", "reserves 1 src (-1, -1) dst (2, 2)", "reserves 2 src (-1, -1) dst (0, 2)", "reserves 2 src (-1, -1) dst (1, 0)", "reserves 2 src (-1, -1) dst (1, 1)", "reserves 2 src (-1, -1) dst (1, 2)", "reserves 2 src (-1, -1) dst (2, 0)", "reserves 2 src (-1, -1) dst (2, 2)", "reserves -1 src (0, 0) dst (1, 0)", "reserves -1 src (0, 0) dst (1, 1)", "reserves -1 src (0, 0) dst (1, 2)", "reserves -1 src (0, 0) dst (2, 0)", "reserves -1 src (0, 0) dst (2, 2)", "reserves -1 src (2, 1) dst (1, 0)", "reserves -1 src (2, 1) dst (1, 1)", "reserves -1 src (2, 1) dst (1, 2)", "reserves -1 src (2, 1) dst (2, 0)"]
+
+# Apply action "reserves 2 src (-1, -1) dst (0, 2)"
+action: 20
+
+# State 6
+# Apply action "reserves 1 src (-1, -1) dst (1, 2)"
+action: 14
+
+# State 7
+# Apply action "reserves 2 src (-1, -1) dst (1, 0)"
+action: 21
+
+# State 8
+# Apply action "reserves -1 src (2, 2) dst (1, 1)"
+action: 103
+
+# State 9
+# Apply action "reserves -1 src (2, 1) dst (2, 0)"
+action: 96
+
+# State 10
+#   |  |
+#  o|  |x
+#   |x | o
+# --------
+#   |x |
+#   |  |x
+#  o|  |
+# --------
+#  o|  |
+#   |  |
+#   |  |
+IsTerminal() = True
+History() = [8, 7, 19, 9, 11, 20, 14, 21, 103, 96]
+HistoryString() = "8, 7, 19, 9, 11, 20, 14, 21, 103, 96"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "8, 7, 19, 9, 11, 20, 14, 21, 103, 96"
+InformationStateString(1) = "8, 7, 19, 9, 11, 20, 14, 21, 103, 96"
+ObservationString(0) = "reserves:\n[[1 0 1]\n [1 1 0]]\nboard:\n  |  |  \n o|  |x \n  |x | o\n--------\n  |x |  \n  |  |x \n o|  |  \n--------\n o|  |  \n  |  |  \n  |  |  "
+ObservationString(1) = "reserves:\n[[1 0 1]\n [1 1 0]]\nboard:\n  |  |  \n o|  |x \n  |x | o\n--------\n  |x |  \n  |  |x \n o|  |  \n--------\n o|  |  \n  |  |  \n  |  |  "
+ObservationTensor(0).player = [-4]
+ObservationTensor(0).board = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+ObservationTensor(1).player = [-4]
+ObservationTensor(1).board = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Rewards() = [-1, 1]
+Returns() = [-1, 1]
