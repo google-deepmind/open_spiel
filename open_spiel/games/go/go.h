@@ -202,6 +202,10 @@ class GoGame : public Game {
 
   Action PassAction() const { return board_size_ * board_size_; }
 
+  float komi() const { return komi_; }
+  int board_size() const { return board_size_; }
+  int handicap() const { return handicap_; }
+
  private:
   const float komi_;
   const int board_size_;

@@ -14,9 +14,8 @@
 
 #include "open_spiel/python/pybind11/algorithms_infostate_tree.h"
 
-#include <algorithm>
 #include <cstddef>
-#include <iterator>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -33,7 +32,6 @@
 namespace py = ::pybind11;
 
 namespace open_spiel {
-
 using algorithms::InfostateNode;
 using algorithms::InfostateNodeType;
 using algorithms::InfostateTree;
@@ -45,26 +43,75 @@ using algorithms::MakeInfostateTree;
 using algorithms::SequenceId;
 using algorithms::VecWithUniquePtrsIterator;
 
-// Hold nodes with an *aliasing shared_ptr* that shares ownership with the tree.
-// In short, the member (a node) shares the ownership of its parent object
-// (the Tree), guaranteeing that any Python-held node keeps the owning tree (and
-// therefore the node storage) alive.
-std::shared_ptr<InfostateNode> make_aliasing_node_ptr(InfostateNode* node) {
-  return {/*owner=*/node->tree().shared_ptr(), /*pointed_to=*/node};
+// Python-facing view type for InfostateNode, keeping tree owner alive.
+struct InfostateNodeView {
+  std::shared_ptr<InfostateTree> owner;
+  const InfostateNode* node;
+};
+
+InfostateNodeView make_node_view(std::shared_ptr<InfostateTree> owner,
+                                 const InfostateNode* node) {
+  SPIEL_CHECK_TRUE(owner != nullptr);
+  SPIEL_CHECK_TRUE(node != nullptr);
+  return {std::move(owner), node};
 }
 
-std::shared_ptr<const InfostateNode> make_aliasing_node_ptr(
-    const InfostateNode* node) {
-  return {/*owner=*/node->tree().shared_ptr(), /*pointed_to=*/node};
+InfostateNodeView make_node_view(const InfostateNode* node) {
+  SPIEL_CHECK_TRUE(node != nullptr);
+  return {std::const_pointer_cast<InfostateTree>(node->tree().shared_ptr()),
+          node};
+}
+
+py::object maybe_node_view(std::shared_ptr<InfostateTree> owner,
+                           const InfostateNode* node) {
+  if (node == nullptr) {
+    return py::none();
+  }
+  return py::cast(make_node_view(std::move(owner), node));
+}
+
+py::object maybe_node_view(const InfostateNode* node) {
+  if (node == nullptr) {
+    return py::none();
+  }
+  return py::cast(make_node_view(node));
+}
+
+template <typename NodePtr>
+py::list node_view_list(std::shared_ptr<InfostateTree> owner,
+                        const std::vector<NodePtr>& nodes) {
+  py::list out;
+  for (NodePtr node : nodes) {
+    out.append(py::cast(make_node_view(owner, node)));
+  }
+  return out;
+}
+
+template <typename NodePtr>
+py::list node_view_list_2d(
+    std::shared_ptr<InfostateTree> owner,
+    const std::vector<std::vector<NodePtr>>& nested_nodes) {
+  py::list out;
+  for (const auto& nodes : nested_nodes) {
+    out.append(node_view_list(owner, nodes));
+  }
+  return out;
+}
+
+std::ostream& operator<<(std::ostream& os, const InfostateNodeView& view) {
+  os << view.node;
+  return os;
 }
 
 class InfostateNodeChildIterator {
   using iter_type = VecWithUniquePtrsIterator<InfostateNode>;
 
+  std::shared_ptr<InfostateTree> owner_;
   iter_type iter_;
 
  public:
-  explicit InfostateNodeChildIterator(iter_type it) : iter_(it) {}
+  InfostateNodeChildIterator(std::shared_ptr<InfostateTree> owner, iter_type it)
+      : owner_(std::move(owner)), iter_(it) {}
 
   InfostateNodeChildIterator& operator++() {
     ++iter_;
@@ -74,83 +121,168 @@ class InfostateNodeChildIterator {
   bool operator==(const InfostateNodeChildIterator& other) const {
     return iter_ == other.iter_;
   }
+
   bool operator!=(const InfostateNodeChildIterator& other) const {
     return !(*this == other);
   }
 
-  // each yielded element must keep the tree alive.
-  auto operator*() { return make_aliasing_node_ptr(*iter_); }
+  auto operator*() { return make_node_view(owner_, *iter_); }
 
-  auto begin() const { return InfostateNodeChildIterator{iter_.begin()}; }
-  auto end() const { return InfostateNodeChildIterator{iter_.end()}; }
+  auto begin() const {
+    return InfostateNodeChildIterator{owner_, iter_.begin()};
+  }
+  auto end() const { return InfostateNodeChildIterator{owner_, iter_.end()}; }
 };
 
 void init_pyspiel_infostate_node(::pybind11::module& m) {
-  py::class_<InfostateNode, std::shared_ptr<InfostateNode>>(m, "InfostateNode",
-                                                            py::is_final())
-      .def("tree",
-           [](const InfostateNode& node) { return node.tree().shared_ptr(); })
-      .def("parent",
-           [](const InfostateNode& node) {
-             return make_aliasing_node_ptr(node.parent());
+  py::class_<InfostateNodeView>(m, "InfostateNode", py::is_final())
+      .def("tree", [](const InfostateNodeView& view) { return view.owner; })
+      .def(
+          "__eq__",
+          [](const InfostateNodeView& lhs, const InfostateNodeView& rhs) {
+            return lhs.node == rhs.node && lhs.owner.get() == rhs.owner.get();
+          },
+          py::is_operator())
+      .def(
+          "__ne__",
+          [](const InfostateNodeView& lhs, const InfostateNodeView& rhs) {
+            return !(lhs.node == rhs.node &&
+                     lhs.owner.get() == rhs.owner.get());
+          },
+          py::is_operator())
+      .def("__hash__",
+           [](const InfostateNodeView& view) {
+             return std::hash<const InfostateNode*>{}(view.node);
            })
-      .def("incoming_index", &InfostateNode::incoming_index)
-      .def("type", &InfostateNode::type)
-      .def("depth", &InfostateNode::depth)
-      .def("is_root_node", &InfostateNode::is_root_node)
-      .def("is_filler_node", &InfostateNode::is_filler_node)
-      .def("has_infostate_string", &InfostateNode::has_infostate_string)
-      .def("infostate_string", &InfostateNode::infostate_string)
-      .def("num_children", &InfostateNode::num_children)
-      .def("terminal_history", &InfostateNode::TerminalHistory,
-           py::return_value_policy::reference_internal)
-      .def("sequence_id", &InfostateNode::sequence_id)
-      .def("start_sequence_id", &InfostateNode::start_sequence_id)
-      .def("end_sequence_id", &InfostateNode::end_sequence_id)
-      .def("all_sequence_ids", &InfostateNode::AllSequenceIds)
-      .def("decision_id", &InfostateNode::decision_id)
-      .def("legal_actions", &InfostateNode::legal_actions,
-           py::return_value_policy::reference_internal)
-      .def("is_leaf_node", &InfostateNode::is_leaf_node)
-      .def("terminal_utility", &InfostateNode::terminal_utility)
+      .def("parent",
+           [](const InfostateNodeView& view) {
+             return maybe_node_view(view.owner, view.node->parent());
+           })
+      .def("incoming_index",
+           [](const InfostateNodeView& view) {
+             return view.node->incoming_index();
+           })
+      .def("type",
+           [](const InfostateNodeView& view) { return view.node->type(); })
+      .def("depth",
+           [](const InfostateNodeView& view) { return view.node->depth(); })
+      .def("is_root_node",
+           [](const InfostateNodeView& view) {
+             return view.node->is_root_node();
+           })
+      .def("is_filler_node",
+           [](const InfostateNodeView& view) {
+             return view.node->is_filler_node();
+           })
+      .def("has_infostate_string",
+           [](const InfostateNodeView& view) {
+             return view.node->has_infostate_string();
+           })
+      .def("infostate_string",
+           [](const InfostateNodeView& view) {
+             return view.node->infostate_string();
+           })
+      .def("num_children",
+           [](const InfostateNodeView& view) {
+             return view.node->num_children();
+           })
+      .def(
+          "terminal_history",
+          [](const InfostateNodeView& view) -> const std::vector<Action>& {
+            return view.node->TerminalHistory();
+          },
+          py::return_value_policy::reference_internal)
+      .def("sequence_id",
+           [](const InfostateNodeView& view) {
+             return view.node->sequence_id();
+           })
+      .def("start_sequence_id",
+           [](const InfostateNodeView& view) {
+             return view.node->start_sequence_id();
+           })
+      .def("end_sequence_id",
+           [](const InfostateNodeView& view) {
+             return view.node->end_sequence_id();
+           })
+      .def("all_sequence_ids",
+           [](const InfostateNodeView& view) {
+             return view.node->AllSequenceIds();
+           })
+      .def("decision_id",
+           [](const InfostateNodeView& view) {
+             return view.node->decision_id();
+           })
+      .def(
+          "legal_actions",
+          [](const InfostateNodeView& view) -> const std::vector<Action>& {
+            return view.node->legal_actions();
+          },
+          py::return_value_policy::reference_internal)
+      .def("is_leaf_node",
+           [](const InfostateNodeView& view) {
+             return view.node->is_leaf_node();
+           })
+      .def("terminal_utility",
+           [](const InfostateNodeView& view) {
+             return view.node->terminal_utility();
+           })
       .def("terminal_chance_reach_prob",
-           &InfostateNode::terminal_chance_reach_prob)
+           [](const InfostateNodeView& view) {
+             return view.node->terminal_chance_reach_prob();
+           })
       .def("corresponding_states_size",
-           &InfostateNode::corresponding_states_size)
-      .def("corresponding_states", &InfostateNode::corresponding_states,
-           py::return_value_policy::reference_internal)
-      .def("corresponding_chance_reach_probs",
-           &InfostateNode::corresponding_chance_reach_probs,
-           py::return_value_policy::reference_internal)
+           [](const InfostateNodeView& view) {
+             return view.node->corresponding_states_size();
+           })
+      .def(
+          "corresponding_states",
+          [](const InfostateNodeView& view)
+              -> const std::vector<std::shared_ptr<const State>>& {
+            return view.node->corresponding_states();
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "corresponding_chance_reach_probs",
+          [](const InfostateNodeView& view) -> const std::vector<double>& {
+            return view.node->corresponding_chance_reach_probs();
+          },
+          py::return_value_policy::reference_internal)
       .def(
           "child_at",
-          [](const InfostateNode& node, int index) {
-            return make_aliasing_node_ptr(node.child_at(index));
+          [](const InfostateNodeView& view, int index) {
+            return make_node_view(view.owner, view.node->child_at(index));
           },
           py::arg("index"))
-      .def("make_certificate", &InfostateNode::MakeCertificate)
+      .def("make_certificate",
+           [](const InfostateNodeView& view) {
+             return view.node->MakeCertificate();
+           })
       .def("address_str",
-           [](const InfostateNode& node) {
+           [](const InfostateNodeView& view) {
              std::stringstream ss;
-             ss << &node;
+             ss << view.node;
              return ss.str();
            })
-      .def("__iter__",
-           [](const InfostateNode& node) {
-             return py::make_iterator(
-                 InfostateNodeChildIterator{node.child_iterator().begin()},
-                 InfostateNodeChildIterator{node.child_iterator().end()});
-           })
+      .def(
+          "__iter__",
+          [](const InfostateNodeView& view) {
+            return py::make_iterator(
+                InfostateNodeChildIterator{view.owner,
+                                           view.node->child_iterator().begin()},
+                InfostateNodeChildIterator{view.owner,
+                                           view.node->child_iterator().end()});
+          },
+          py::keep_alive<0, 1>())
       .def("__copy__",
-           [](const InfostateNode&) {
+           [](const InfostateNodeView&) {
              throw ForbiddenException(
                  "InfostateNode cannot be copied or deep-copied. It is an "
                  "immutable view onto node storage owned by an InfostateTree.");
            })
-      .def("__deepcopy__", [](const InfostateNode&) {
+      .def("__deepcopy__", [](const InfostateNodeView&, py::dict) {
         throw ForbiddenException(
-            "InfostateNode cannot be copied or deep-copied. It is an immutable "
-            "view onto node storage owned by an InfostateTree.");
+            "InfostateNode cannot be copied or deep-copied. It is an "
+            "immutable view onto node storage owned by an InfostateTree.");
       });
 
   py::enum_<InfostateNodeType>(m, "InfostateNodeType")
@@ -158,26 +290,6 @@ void init_pyspiel_infostate_node(::pybind11::module& m) {
       .value("observation", InfostateNodeType::kObservationInfostateNode)
       .value("terminal", InfostateNodeType::kTerminalInfostateNode)
       .export_values();
-}
-
-struct ToHolderPtrFunctor {
-  auto operator()(InfostateNode* ptr) const noexcept {
-    return make_aliasing_node_ptr(ptr);
-  }
-  auto operator()(const InfostateNode* ptr) const noexcept {
-    return make_aliasing_node_ptr(ptr);
-  }
-};
-
-template <typename ContainerOut, typename TransformFunctor = ToHolderPtrFunctor,
-          template <class...> class Container = std::vector, typename... RestTs>
-auto to(const Container<RestTs...>& node_container,
-        TransformFunctor transformer) {
-  ContainerOut internal_vec{};
-  internal_vec.reserve(node_container.size());
-  std::transform(node_container.begin(), node_container.end(),
-                 std::back_inserter(internal_vec), transformer);
-  return internal_vec;
 }
 
 void init_pyspiel_infostate_tree(::pybind11::module& m) {
@@ -206,7 +318,8 @@ void init_pyspiel_infostate_tree(::pybind11::module& m) {
 
   m.def("is_valid_sf_strategy", &IsValidSfStrategy);
 
-  py::bind_vector<std::vector<std::vector<std::shared_ptr<InfostateNode>>>>(
+  py::bind_vector<std::vector<InfostateNodeView>>(m, "InfostateNodeVector");
+  py::bind_vector<std::vector<std::vector<InfostateNodeView>>>(
       m, "InfostateNodeVector2D");
 
   py::class_<InfostateTree, std::shared_ptr<InfostateTree>>(m, "InfostateTree",
@@ -233,17 +346,22 @@ void init_pyspiel_infostate_tree(::pybind11::module& m) {
            py::arg("infostate_observer"), py::arg("acting_player"),
            py::kw_only(), py::arg("store_world_states") = false,
            py::arg("max_move_limit") = 1000)
-      .def(py::init([](const std::vector<const InfostateNode*>& start_nodes,
+      .def(py::init([](const std::vector<InfostateNodeView>& start_nodes,
                        bool store_world_states, int max_move_ahead_limit) {
-             return MakeInfostateTree(start_nodes, store_world_states,
+             std::vector<const InfostateNode*> raw_start_nodes;
+             raw_start_nodes.reserve(start_nodes.size());
+             for (const auto& start_node : start_nodes) {
+               raw_start_nodes.push_back(start_node.node);
+             }
+             return MakeInfostateTree(raw_start_nodes, store_world_states,
                                       max_move_ahead_limit);
            }),
            py::arg("start_nodes"), py::kw_only(),
            py::arg("store_world_states") = false,
            py::arg("max_move_limit") = 1000)
       .def("root",
-           [](InfostateTree& tree) {
-             return make_aliasing_node_ptr(tree.mutable_root());
+           [](const std::shared_ptr<InfostateTree>& tree) {
+             return make_node_view(tree, tree->mutable_root());
            })
       .def("root_branching_factor", &InfostateTree::root_branching_factor)
       .def("acting_player", &InfostateTree::acting_player)
@@ -255,8 +373,8 @@ void init_pyspiel_infostate_tree(::pybind11::module& m) {
       .def("stores_all_world_states", &InfostateTree::stores_all_world_states)
       .def(
           "observation_infostate",
-          [](const InfostateTree& tree, const SequenceId& id) {
-            return make_aliasing_node_ptr(tree.observation_infostate(id));
+          [](const std::shared_ptr<InfostateTree>& tree, const SequenceId& id) {
+            return make_node_view(tree, tree->observation_infostate(id));
           },
           py::arg("sequence_id"))
       .def("all_sequence_ids", &InfostateTree::AllSequenceIds)
@@ -266,61 +384,52 @@ void init_pyspiel_infostate_tree(::pybind11::module& m) {
            py::arg("sequence_id"))
       .def(
           "decision_for_sequence",
-          [](InfostateTree& tree,
-             const SequenceId& id) -> std::shared_ptr<const InfostateNode> {
-            auto node_opt = tree.DecisionForSequence(id);
+          [](const std::shared_ptr<InfostateTree>& tree,
+             const SequenceId& id) -> py::object {
+            auto node_opt = tree->DecisionForSequence(id);
             if (!node_opt.has_value()) {
-              return {};
+              return py::none();
             }
-            return {make_aliasing_node_ptr(*node_opt)};
+            return py::cast(make_node_view(tree, *node_opt));
           },
           py::arg("sequence_id"))
       .def("is_leaf_sequence", &InfostateTree::IsLeafSequence)
       .def(
           "decision_infostate",
-          [](const InfostateTree& tree, const DecisionId& id) {
-            return make_aliasing_node_ptr(tree.decision_infostate(id));
+          [](const std::shared_ptr<InfostateTree>& tree, const DecisionId& id) {
+            return make_node_view(tree, tree->decision_infostate(id));
           },
           py::arg("decision_id"))
       .def("all_decision_infostates",
-           [](const InfostateTree& tree) {
-             return to<std::vector<std::shared_ptr<const InfostateNode>>>(
-                 tree.AllDecisionInfostates(), ToHolderPtrFunctor{});
+           [](const std::shared_ptr<InfostateTree>& tree) {
+             return node_view_list(tree, tree->AllDecisionInfostates());
            })
       .def("all_decision_ids", &InfostateTree::AllDecisionIds)
       .def("decision_id_from_infostate_string",
            &InfostateTree::DecisionIdFromInfostateString,
            py::arg("infostate_string"))
       .def("leaf_nodes",
-           [](const InfostateTree& tree) {
-             return to<std::vector<std::shared_ptr<const InfostateNode>>>(
-                 tree.leaf_nodes(), ToHolderPtrFunctor{});
+           [](const std::shared_ptr<InfostateTree>& tree) {
+             return node_view_list(tree, tree->leaf_nodes());
            })
       .def(
           "leaf_node",
-          [](const InfostateTree& tree, const LeafId& id) {
-            return make_aliasing_node_ptr(tree.leaf_node(id));
+          [](const std::shared_ptr<InfostateTree>& tree, const LeafId& id) {
+            return make_node_view(tree, tree->leaf_node(id));
           },
           py::arg("leaf_id"))
-      .def(
-          "nodes_at_depths",
-          [](const InfostateTree& tree) {
-            return to<
-                std::vector<std::vector<std::shared_ptr<const InfostateNode>>>>(
-                tree.nodes_at_depths(), [](const auto& internal_vec) {
-                  return to<std::vector<std::shared_ptr<const InfostateNode>>>(
-                      internal_vec, ToHolderPtrFunctor{});
-                });
-          })
+      .def("nodes_at_depths",
+           [](const std::shared_ptr<InfostateTree>& tree) {
+             return node_view_list_2d(tree, tree->nodes_at_depths());
+           })
       .def(
           "nodes_at_depth",
-          [](const InfostateTree& tree, int depth) {
+          [](const std::shared_ptr<InfostateTree>& tree, int depth) {
             if (depth < 0) {
               throw std::invalid_argument("'depth' must be non-negative.");
             }
-            return to<std::vector<std::shared_ptr<const InfostateNode>>>(
-                tree.nodes_at_depth(static_cast<size_t>(depth)),
-                ToHolderPtrFunctor{});
+            return node_view_list(
+                tree, tree->nodes_at_depth(static_cast<size_t>(depth)));
           },
           py::arg("depth"))
       .def("best_response", &InfostateTree::BestResponse, py::arg("gradient"))

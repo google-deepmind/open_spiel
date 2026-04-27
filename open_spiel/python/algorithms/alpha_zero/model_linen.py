@@ -488,8 +488,14 @@ class Model:
     if device is None:
       device = jax.local_devices()[0]
 
+    make_single_device_sharding = getattr(
+        jax.sharding,
+        "make_single_device_sharding",
+        jax.sharding.SingleDeviceSharding,
+    )
+
     sharded_state = jax.tree_util.tree_map(
-        lambda x: jax.device_put(x, jax.sharding.SingleDeviceSharding(device)),
+        lambda x: jax.device_put(x, make_single_device_sharding(device)),
         self._state,
     )
     if self._checkpointer:
@@ -509,7 +515,12 @@ class Model:
     if device is None:
       device = jax.local_devices()[0]
 
-    sharding = jax.sharding.SingleDeviceSharding(device)
+    make_single_device_sharding = getattr(
+        jax.sharding,
+        "make_single_device_sharding",
+        jax.sharding.SingleDeviceSharding,
+    )
+    sharding = make_single_device_sharding(device)
 
     restore_args_tree = jax.tree.map(
         lambda _: orbax.checkpoint.type_handlers.ArrayRestoreArgs(

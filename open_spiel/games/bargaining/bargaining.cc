@@ -218,7 +218,7 @@ void BargainingState::ObservationTensor(Player player,
   offset += 1;
 
   // How many trade offers have happened?
-  values[offers_.size()] = 1;
+  values[offset + offers_.size()] = 1;
   offset += parent_game_->max_turns() + 1;
 
   // Pool
@@ -273,7 +273,7 @@ void BargainingState::InformationStateTensor(Player player,
   offset += 1;
 
   // How many trade offers have happened?
-  values[offers_.size()] = 1;
+  values[offset + offers_.size()] = 1;
   offset += parent_game_->max_turns() + 1;
 
   // Pool

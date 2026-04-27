@@ -34,20 +34,18 @@
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
-#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 #include "open_spiel/python/pybind11/algorithms_corr_dist.h"
-// Disabled while tests aren't passing. See GitHub issue #1502.
-// #include "open_spiel/python/pybind11/algorithms_infostate_tree.h"
+#include "open_spiel/python/pybind11/algorithms_infostate_tree.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/evaluation_elo.h"
 #include "open_spiel/python/pybind11/evaluation_sco.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
-#include "open_spiel/python/pybind11/games_catch.h"
 #include "open_spiel/python/pybind11/games_backgammon.h"
 #include "open_spiel/python/pybind11/games_bargaining.h"
 #include "open_spiel/python/pybind11/games_blackjack.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
+#include "open_spiel/python/pybind11/games_catch.h"
 #include "open_spiel/python/pybind11/games_chess.h"
 #include "open_spiel/python/pybind11/games_colored_trails.h"
 #include "open_spiel/python/pybind11/games_connect_four.h"
@@ -64,6 +62,7 @@
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
 #include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
+#include "open_spiel/python/pybind11/games_shogi.h"
 #include "open_spiel/python/pybind11/games_spades.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
 #include "open_spiel/python/pybind11/games_tic_tac_toe.h"
@@ -77,9 +76,10 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/utils/status.h"
 #include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/utils/status.h"
+#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 // Includes needed for absl::optional.
 #include "pybind11/include/pybind11/detail/common.h"
@@ -786,6 +786,13 @@ PYBIND11_MODULE(pyspiel, m) {
         py::arg("specific_initial_state") = nullptr,
         "Run the C++ tests on a game");
 
+  // Returns a tuple of (action, probability)
+  m.def("sample_action",
+        [](const ActionsAndProbs& actions_and_probs, double z) {
+          return open_spiel::SampleAction(actions_and_probs, z);
+        },
+        "Samples an action given a random number z in [0, 1).");
+
   m.def("random_sim_test_with_specific_initial_state",
         testing::RandomSimTestWithSpecificInitialState, py::arg("game"),
         py::arg("num_sims"), py::arg("specific_initial_state"),
@@ -807,10 +814,9 @@ PYBIND11_MODULE(pyspiel, m) {
     throw SpielException(string);
   });
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
-  // Disabled while tests aren't passing. See GitHub issue #1502.
   // This exception is part of the infoset_tree bindings.
-  // py::register_exception<ForbiddenException>(m, "ForbiddenError",
-  //                                           PyExc_RuntimeError);
+  py::register_exception<ForbiddenException>(m, "ForbiddenError",
+                                             PyExc_RuntimeError);
 
   // Register other bits of the API.
   init_pyspiel_bots(m);                     // Bots and bot-related algorithms.
@@ -840,6 +846,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_kuhn_poker(m);
   init_pyspiel_games_leduc_poker(m);
   init_pyspiel_games_negotiation(m);
+  init_pyspiel_games_shogi(m);
   init_pyspiel_games_spades(m);
   init_pyspiel_games_tarok(m);
   init_pyspiel_games_tic_tac_toe(m);
@@ -849,9 +856,8 @@ PYBIND11_MODULE(pyspiel, m) {
   bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
-  // Disabled while tests aren't passing. See GitHub issue #1502.
-  // init_pyspiel_infostate_tree(
-  //     m);  // Infostate-Tree and associated classes (Id etc.)
+  init_pyspiel_infostate_tree(
+      m);  // Infostate-Tree and associated classes (Id etc.)
 
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT

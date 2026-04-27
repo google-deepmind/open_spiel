@@ -20,7 +20,9 @@ MacOS or for other shells.
 
 The dependencies of OpenSpiel need to be installed before it can be used as a
 library. On MacOS and Debian/Ubuntu Linux, this is often simply just running
-`./install.sh`. Please see the [installation from source instructions](https://github.com/deepmind/open_spiel/blob/master/docs/install.md#installation-from-source) for more details.
+`./install.sh`. Please see the
+[installation from source instructions](https://github.com/deepmind/open_spiel/blob/master/docs/install.md#installation-from-source)
+for more details.
 
 ## Compiling OpenSpiel as a Shared Library
 
@@ -55,7 +57,7 @@ do it every time you load the library. Of course, if you are already using
 ```
 cd ../open_spiel/examples
 clang++ -I${HOME}/open_spiel -I${HOME}/open_spiel/open_spiel/abseil-cpp \
-        -std=c++17 -o shared_library_example shared_library_example.cc \
+        -std=c++20 -o shared_library_example shared_library_example.cc \
         -L${HOME}/open_spiel/build  -lopen_spiel
 ```
 

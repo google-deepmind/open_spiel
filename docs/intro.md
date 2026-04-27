@@ -19,7 +19,7 @@ extensions.
 
 **Multi-language support**
 
-*   C++17
+*   C++20
 *   Python 3
 
 The games and utility functions (e.g. exploitability computation) are written in

@@ -72,7 +72,6 @@ class BreakthroughState : public State {
   int rows() const { return rows_; }
   int cols() const { return cols_; }
   std::vector<Action> LegalActions() const override;
-  std::string Serialize() const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -120,8 +119,6 @@ class BreakthroughGame : public Game {
     return (2 * (2 * rows_ - 3) * cols_) + 1;
   }
 
-  std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
 
  private:
   int rows_ = -1;

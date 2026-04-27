@@ -389,58 +389,6 @@ int BreakthroughGame::NumDistinctActions() const {
   return rows_ * cols_ * kNumDirections * 2;
 }
 
-std::string BreakthroughState::Serialize() const {
-  std::string str = "";
-  // Serialize the board state.
-  for (int r = 0; r < rows_; r++) {
-    for (int c = 0; c < cols_; c++) {
-      absl::StrAppend(&str, CellToString(board(r, c)));
-    }
-  }
-  // Append current player information.
-  absl::StrAppend(&str, std::to_string(cur_player_));
-  return str;
-}
-
-std::unique_ptr<State> BreakthroughGame::DeserializeState(
-    const std::string& str) const {
-  std::unique_ptr<State> state = NewInitialState();
-
-  if (str.length() != rows_ * cols_ + 1) {
-    SpielFatalError("Incorrect number of characters in string.");
-    return std::unique_ptr<State>();
-  }
-
-  BreakthroughState* bstate = dynamic_cast<BreakthroughState*>(state.get());
-
-  bstate->SetPieces(0, 0);
-  bstate->SetPieces(1, 0);
-  int i = 0;
-  for (int r = 0; r < rows_; r++) {
-    for (int c = 0; c < cols_; c++) {
-      if (str.at(i) == 'b') {
-        bstate->SetPieces(0, bstate->pieces(0) + 1);
-        bstate->SetBoard(r, c, CellState::kBlack);
-      } else if (str.at(i) == 'w') {
-        bstate->SetPieces(1, bstate->pieces(1) + 1);
-        bstate->SetBoard(r, c, CellState::kWhite);
-      } else if (str.at(i) == '.') {
-        bstate->SetBoard(r, c, CellState::kEmpty);
-      } else {
-        std::string error = "Invalid character in std::string: ";
-        error += str.at(i);
-        SpielFatalError(error);
-        return std::unique_ptr<State>();
-      }
-
-      i++;
-    }
-  }
-
-  // -'0' to get the int value.
-  bstate->Set_cur_player(str.at(i) - '0');
-  return state;
-}
 
 }  // namespace breakthrough
 }  // namespace open_spiel

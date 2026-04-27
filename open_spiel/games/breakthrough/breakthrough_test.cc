@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/breakthrough/breakthrough.h"
+#include <memory>
+#include <vector>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -30,6 +32,20 @@ void BasicSerializationTest() {
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 
+void TerminalSerializationTest() {
+  std::shared_ptr<const Game> game = LoadGame("breakthrough");
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (!state->IsTerminal()) {
+    std::vector<Action> actions = state->LegalActions();
+    state->ApplyAction(actions[0]);
+  }
+  std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
+  SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
+  SPIEL_CHECK_TRUE(state2->IsTerminal());
+  SPIEL_CHECK_EQ(state->Returns()[0], state2->Returns()[0]);
+  SPIEL_CHECK_EQ(state->Returns()[1], state2->Returns()[1]);
+}
+
 void BasicBreakthroughTests() {
   testing::LoadGameTest("breakthrough");
   testing::NoChanceOutcomesTest(*LoadGame("breakthrough"));
@@ -43,5 +59,6 @@ void BasicBreakthroughTests() {
 
 int main(int argc, char** argv) {
   open_spiel::breakthrough::BasicSerializationTest();
+  open_spiel::breakthrough::TerminalSerializationTest();
   open_spiel::breakthrough::BasicBreakthroughTests();
 }

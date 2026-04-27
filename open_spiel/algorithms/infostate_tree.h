@@ -285,7 +285,7 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<const InfostateNode*>& start_nodes,
     bool store_world_states = false, int max_move_ahead_limit = 1000);
 
-// C++17 does not allow implicit conversion of non-const pointers to const
+// C++ does not allow implicit conversion of non-const pointers to const
 // pointers within a vector - explanation: https://stackoverflow.com/a/2102415
 // This just adds const to the pointers and calls the other MakeInfostateTree.
 std::shared_ptr<InfostateTree> MakeInfostateTree(

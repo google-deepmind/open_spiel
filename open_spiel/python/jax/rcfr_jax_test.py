@@ -425,7 +425,12 @@ class RcfrTest(parameterized.TestCase, absltest.TestCase):
         # Sequences 10 and 11 (sums to 21)
         "0b": [(0, 0.47619047619047616), (1, 0.52380952380952384)],
     }
-    self.assertAlmostEqual(profile, expected_profile, delta=1e-06)
+    self.assertEqual(profile.keys(), expected_profile.keys())
+    for key in expected_profile:
+      self.assertEqual(len(profile[key]), len(expected_profile[key]))
+      for (a1, p1), (a2, p2) in zip(profile[key], expected_profile[key]):
+        self.assertEqual(a1, a2)
+        self.assertAlmostEqual(p1, p2, delta=1e-06)
 
   def test_cfr(self):
     root = rcfr.RootStateWrapper(_GAME.new_initial_state(), _GAME)

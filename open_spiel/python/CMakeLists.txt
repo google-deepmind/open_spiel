@@ -26,11 +26,9 @@ endif()
 # List of all Python bindings to add to pyspiel.
 include_directories (../pybind11_abseil ../../pybind11/include)
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
-  # Disabled while tests are failing. See #1502
-  # https://github.com/google-deepmind/open_spiel/issues/1502
-  # pybind11/algorithms_infostate_tree.cc
-  # pybind11/algorithms_infostate_tree_templates.h
-  # pybind11/algorithms_infostate_tree.h
+  pybind11/algorithms_infostate_tree.cc
+  pybind11/algorithms_infostate_tree_templates.h
+  pybind11/algorithms_infostate_tree.h
   pybind11/algorithms_corr_dist.cc
   pybind11/algorithms_corr_dist.h
   pybind11/algorithms_trajectories.cc
@@ -83,6 +81,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_pokerkit_wrapper.h
   pybind11/games_repeated_pokerkit.cc
   pybind11/games_repeated_pokerkit.h
+  pybind11/games_shogi.cc
+  pybind11/games_shogi.h
   pybind11/games_spades.cc
   pybind11/games_spades.h
   pybind11/games_tarok.cc
@@ -207,9 +207,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
   algorithms/ismcts_agent_test.py
-  # Disabled while tests are failing. See #1502
-  # https://github.com/google-deepmind/open_spiel/issues/1502
-  # algorithms/infostate_tree_test.py
+  algorithms/infostate_tree_test.py
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_solver_test.py

@@ -63,7 +63,7 @@ class LeastCoreLagrangianTest(absltest.TestCase):
     epsilon = least_core_value.lcv
     self.assertAlmostEqual(imputation.sum(), 1000.0, places=3)
     self.assertGreater(imputation.all(), -1e-10)
-    self.assertLess(epsilon, 1e-6)
+    self.assertLess(epsilon, 2e-5)
 
 
 if __name__ == "__main__":

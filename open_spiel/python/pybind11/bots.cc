@@ -142,7 +142,8 @@ void init_pyspiel_bots(py::module& m) {
           py::arg("solve"), py::arg("seed"), py::arg("verbose"),
           py::arg("child_selection_policy") =
               algorithms::ChildSelectionPolicy::UCT)
-      .def("step", &algorithms::MCTSBot::Step)
+      .def("step", &algorithms::MCTSBot::Step,
+           py::call_guard<py::gil_scoped_release>())
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
 
   py::enum_<algorithms::ISMCTSFinalPolicyType>(m, "ISMCTSFinalPolicyType")
@@ -162,7 +163,8 @@ void init_pyspiel_bots(py::module& m) {
                algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount,
            py::arg("use_observation_string") = false,
            py::arg("allow_inconsistent_action_sets") = false)
-      .def("step", &algorithms::ISMCTSBot::Step)
+      .def("step", &algorithms::ISMCTSBot::Step,
+           py::call_guard<py::gil_scoped_release>())
       .def("provides_policy", &algorithms::MCTSBot::ProvidesPolicy)
       .def("get_policy", &algorithms::ISMCTSBot::GetPolicy)
       .def("step_with_policy", &algorithms::ISMCTSBot::StepWithPolicy)

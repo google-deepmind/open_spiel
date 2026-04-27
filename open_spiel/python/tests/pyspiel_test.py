@@ -51,6 +51,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "chat_game",  # python game locating in python/games/chat_games/
     "checkers",
     "chess",
+    "chinese_checkers",
     "cliff_walking",
     "clobber",
     "coin_game",
@@ -148,6 +149,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "rbc",
     "restricted_nash_response",
     "sheriff",
+    "shogi",
     "skat",
     "start_at",
     "solitaire",
@@ -162,6 +164,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "turn_based_simultaneous_game",
     "twixt",
     "ultimate_tic_tac_toe",
+    "xiangqi",
     "y",
     "yacht",
     "zerosum",

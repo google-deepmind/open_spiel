@@ -55,7 +55,9 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
+    /*parameter_specification=*/
+    {{"max_game_length",
+      GameParameter(kDefaultMaxGameLength)}}  // configurable max game length
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -340,7 +342,7 @@ void LinesOfActionState::DoApplyAction(Action move) {
   CheckTerminalState();
 
   // Check for draws first.
-  if (move_number_ + 1 >= kMaxGameLength) {
+  if (move_number_ + 1 >= game_->MaxGameLength()) {
     winner_ = 2;  // Draw
     cached_legal_actions_ = {};
     current_player_ = kTerminalPlayerId;
@@ -442,7 +444,8 @@ std::string LinesOfActionGame::ActionToString(Player player,
 }
 
 LinesOfActionGame::LinesOfActionGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      max_game_length_(ParameterValue<int>("max_game_length")) {}
 
 }  // namespace lines_of_action
 }  // namespace open_spiel

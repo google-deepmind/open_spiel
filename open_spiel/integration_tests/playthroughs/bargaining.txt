@@ -4054,212 +4054,233 @@ P1 vals: Book: 4, Hat: 0, Basketball: 6
 "]
 
 # Apply action "Sample game instance:
-Pool:    Book: 1, Hat: 3, Basketball: 1
-P0 vals: Book: 6, Hat: 1, Basketball: 1
-P1 vals: Book: 4, Hat: 1, Basketball: 3
+Pool:    Book: 1, Hat: 1, Basketball: 5
+P0 vals: Book: 1, Hat: 4, Basketball: 1
+P1 vals: Book: 4, Hat: 1, Basketball: 1
 "
-action: 19
+action: 99
 
 # State 1
-# Pool:    Book: 1, Hat: 3, Basketball: 1
-# P0 vals: Book: 6, Hat: 1, Basketball: 1
-# P1 vals: Book: 4, Hat: 1, Basketball: 3
+# Pool:    Book: 1, Hat: 1, Basketball: 5
+# P0 vals: Book: 1, Hat: 4, Basketball: 1
+# P1 vals: Book: 4, Hat: 1, Basketball: 1
 # Agreement reached? 0
 IsTerminal() = False
-History() = [19]
-HistoryString() = "19"
+History() = [99]
+HistoryString() = "99"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\n"
-InformationStateString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\n"
-InformationStateTensor(0): binvec(309, 0x100181e181fc300600000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(309, 0x100181e181f0300780000000000000000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 0\n"
-ObservationString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nNumber of offers: 0\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\n"
+InformationStateString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\n"
+InformationStateTensor(0): binvec(309, 0x8018181f9803e0600000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x8018181f9f0300600000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nNumber of offers: 0\n"
+ObservationString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 0\n"
+ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55]
-StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 2, Basketball: 0", "Offer: Book: 1, Hat: 2, Basketball: 0", "Offer: Book: 0, Hat: 3, Basketball: 0", "Offer: Book: 1, Hat: 3, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 2, Basketball: 1", "Offer: Book: 1, Hat: 2, Basketball: 1", "Offer: Book: 0, Hat: 3, Basketball: 1", "Offer: Book: 1, Hat: 3, Basketball: 1"]
+LegalActions() = [0, 1, 8, 9, 36, 37, 43, 44, 64, 65, 70, 71, 85, 86, 90, 91, 100, 101, 104, 105, 110, 111, 113, 114]
+StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 0, Basketball: 2", "Offer: Book: 1, Hat: 0, Basketball: 2", "Offer: Book: 0, Hat: 1, Basketball: 2", "Offer: Book: 1, Hat: 1, Basketball: 2", "Offer: Book: 0, Hat: 0, Basketball: 3", "Offer: Book: 1, Hat: 0, Basketball: 3", "Offer: Book: 0, Hat: 1, Basketball: 3", "Offer: Book: 1, Hat: 1, Basketball: 3", "Offer: Book: 0, Hat: 0, Basketball: 4", "Offer: Book: 1, Hat: 0, Basketball: 4", "Offer: Book: 0, Hat: 1, Basketball: 4", "Offer: Book: 1, Hat: 1, Basketball: 4", "Offer: Book: 0, Hat: 0, Basketball: 5", "Offer: Book: 1, Hat: 0, Basketball: 5", "Offer: Book: 0, Hat: 1, Basketball: 5", "Offer: Book: 1, Hat: 1, Basketball: 5"]
 
-# Apply action "Offer: Book: 0, Hat: 0, Basketball: 1"
-action: 36
+# Apply action "Offer: Book: 0, Hat: 0, Basketball: 0"
+action: 0
 
 # State 2
-# Pool:    Book: 1, Hat: 3, Basketball: 1
-# P0 vals: Book: 6, Hat: 1, Basketball: 1
-# P1 vals: Book: 4, Hat: 1, Basketball: 3
+# Pool:    Book: 1, Hat: 1, Basketball: 5
+# P0 vals: Book: 1, Hat: 4, Basketball: 1
+# P1 vals: Book: 4, Hat: 1, Basketball: 1
 # Agreement reached? 0
-# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 1
+# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 0
 IsTerminal() = False
-History() = [19, 36]
-HistoryString() = "19, 36"
+History() = [99, 0]
+HistoryString() = "99, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\n"
-InformationStateString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\n"
-InformationStateTensor(0): binvec(309, 0x80181e181fc3006008080c0000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(309, 0x80181e181f03007808080c0000000000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 1\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\n"
-ObservationString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nNumber of offers: 1\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\n"
-ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
-ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
+InformationStateString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\n"
+InformationStateString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\n"
+InformationStateTensor(0): binvec(309, 0x4018181f9803e0600808080000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x4018181f9f0300600808080000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nNumber of offers: 1\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\n"
+ObservationString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 1\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\n"
+ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
-StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 2, Basketball: 0", "Offer: Book: 1, Hat: 2, Basketball: 0", "Offer: Book: 0, Hat: 3, Basketball: 0", "Offer: Book: 1, Hat: 3, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 2, Basketball: 1", "Offer: Book: 1, Hat: 2, Basketball: 1", "Offer: Book: 0, Hat: 3, Basketball: 1", "Offer: Book: 1, Hat: 3, Basketball: 1", "Agree"]
+LegalActions() = [0, 1, 8, 9, 36, 37, 43, 44, 64, 65, 70, 71, 85, 86, 90, 91, 100, 101, 104, 105, 110, 111, 113, 114, 120]
+StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 0, Basketball: 2", "Offer: Book: 1, Hat: 0, Basketball: 2", "Offer: Book: 0, Hat: 1, Basketball: 2", "Offer: Book: 1, Hat: 1, Basketball: 2", "Offer: Book: 0, Hat: 0, Basketball: 3", "Offer: Book: 1, Hat: 0, Basketball: 3", "Offer: Book: 0, Hat: 1, Basketball: 3", "Offer: Book: 1, Hat: 1, Basketball: 3", "Offer: Book: 0, Hat: 0, Basketball: 4", "Offer: Book: 1, Hat: 0, Basketball: 4", "Offer: Book: 0, Hat: 1, Basketball: 4", "Offer: Book: 1, Hat: 1, Basketball: 4", "Offer: Book: 0, Hat: 0, Basketball: 5", "Offer: Book: 1, Hat: 0, Basketball: 5", "Offer: Book: 0, Hat: 1, Basketball: 5", "Offer: Book: 1, Hat: 1, Basketball: 5", "Agree"]
 
-# Apply action "Offer: Book: 0, Hat: 2, Basketball: 1"
-action: 49
+# Apply action "Offer: Book: 0, Hat: 1, Basketball: 3"
+action: 90
 
 # State 3
-# Pool:    Book: 1, Hat: 3, Basketball: 1
-# P0 vals: Book: 6, Hat: 1, Basketball: 1
-# P1 vals: Book: 4, Hat: 1, Basketball: 3
+# Pool:    Book: 1, Hat: 1, Basketball: 5
+# P0 vals: Book: 1, Hat: 4, Basketball: 1
+# P1 vals: Book: 4, Hat: 1, Basketball: 1
 # Agreement reached? 0
-# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 1
-# P1 offers: Offer: Book: 0, Hat: 2, Basketball: 1
+# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 0
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
 IsTerminal() = False
-History() = [19, 36, 49]
-HistoryString() = "19, 36, 49"
+History() = [99, 0, 90]
+HistoryString() = "99, 0, 90"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-InformationStateString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-InformationStateTensor(0): binvec(309, 0x40181e181fc3006008080c080e0c0000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(309, 0x40181e181f03007808080c080e0c0000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 2\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-ObservationString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nNumber of offers: 2\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◯◯◯◯◯
+InformationStateString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+InformationStateString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+InformationStateTensor(0): binvec(309, 0x2018181f9803e060080808080c0f0000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x2018181f9f030060080808080c0f0000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nNumber of offers: 2\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+ObservationString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 2\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
-StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 2, Basketball: 0", "Offer: Book: 1, Hat: 2, Basketball: 0", "Offer: Book: 0, Hat: 3, Basketball: 0", "Offer: Book: 1, Hat: 3, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 2, Basketball: 1", "Offer: Book: 1, Hat: 2, Basketball: 1", "Offer: Book: 0, Hat: 3, Basketball: 1", "Offer: Book: 1, Hat: 3, Basketball: 1", "Agree"]
+LegalActions() = [0, 1, 8, 9, 36, 37, 43, 44, 64, 65, 70, 71, 85, 86, 90, 91, 100, 101, 104, 105, 110, 111, 113, 114, 120]
+StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 0, Basketball: 2", "Offer: Book: 1, Hat: 0, Basketball: 2", "Offer: Book: 0, Hat: 1, Basketball: 2", "Offer: Book: 1, Hat: 1, Basketball: 2", "Offer: Book: 0, Hat: 0, Basketball: 3", "Offer: Book: 1, Hat: 0, Basketball: 3", "Offer: Book: 0, Hat: 1, Basketball: 3", "Offer: Book: 1, Hat: 1, Basketball: 3", "Offer: Book: 0, Hat: 0, Basketball: 4", "Offer: Book: 1, Hat: 0, Basketball: 4", "Offer: Book: 0, Hat: 1, Basketball: 4", "Offer: Book: 1, Hat: 1, Basketball: 4", "Offer: Book: 0, Hat: 0, Basketball: 5", "Offer: Book: 1, Hat: 0, Basketball: 5", "Offer: Book: 0, Hat: 1, Basketball: 5", "Offer: Book: 1, Hat: 1, Basketball: 5", "Agree"]
 
-# Apply action "Offer: Book: 0, Hat: 2, Basketball: 1"
-action: 49
+# Apply action "Offer: Book: 1, Hat: 0, Basketball: 4"
+action: 101
 
 # State 4
-# Pool:    Book: 1, Hat: 3, Basketball: 1
-# P0 vals: Book: 6, Hat: 1, Basketball: 1
-# P1 vals: Book: 4, Hat: 1, Basketball: 3
+# Pool:    Book: 1, Hat: 1, Basketball: 5
+# P0 vals: Book: 1, Hat: 4, Basketball: 1
+# P1 vals: Book: 4, Hat: 1, Basketball: 1
 # Agreement reached? 0
-# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 1
-# P1 offers: Offer: Book: 0, Hat: 2, Basketball: 1
-# P0 offers: Offer: Book: 0, Hat: 2, Basketball: 1
+# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 0
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+# P0 offers: Offer: Book: 1, Hat: 0, Basketball: 4
 IsTerminal() = False
-History() = [19, 36, 49, 49]
-HistoryString() = "19, 36, 49, 49"
+History() = [99, 0, 90, 101]
+HistoryString() = "99, 0, 90, 101"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-InformationStateString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-InformationStateTensor(0): binvec(309, 0x20181e181fc3006008080c080e0c080e0c0000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(309, 0x20181e181f03007808080c080e0c080e0c0000000000000000000000000000000000000000000)
-ObservationString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 3\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-ObservationString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nNumber of offers: 3\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\n"
-ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◯◯◯◯◯
+InformationStateString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\n"
+InformationStateString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\n"
+InformationStateTensor(0): binvec(309, 0x1018181f9803e060080808080c0f0c080f8000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x1018181f9f030060080808080c0f0c080f8000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nNumber of offers: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\n"
+ObservationString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\n"
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
-StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 2, Basketball: 0", "Offer: Book: 1, Hat: 2, Basketball: 0", "Offer: Book: 0, Hat: 3, Basketball: 0", "Offer: Book: 1, Hat: 3, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 2, Basketball: 1", "Offer: Book: 1, Hat: 2, Basketball: 1", "Offer: Book: 0, Hat: 3, Basketball: 1", "Offer: Book: 1, Hat: 3, Basketball: 1", "Agree"]
+LegalActions() = [0, 1, 8, 9, 36, 37, 43, 44, 64, 65, 70, 71, 85, 86, 90, 91, 100, 101, 104, 105, 110, 111, 113, 114, 120]
+StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 0, Basketball: 2", "Offer: Book: 1, Hat: 0, Basketball: 2", "Offer: Book: 0, Hat: 1, Basketball: 2", "Offer: Book: 1, Hat: 1, Basketball: 2", "Offer: Book: 0, Hat: 0, Basketball: 3", "Offer: Book: 1, Hat: 0, Basketball: 3", "Offer: Book: 0, Hat: 1, Basketball: 3", "Offer: Book: 1, Hat: 1, Basketball: 3", "Offer: Book: 0, Hat: 0, Basketball: 4", "Offer: Book: 1, Hat: 0, Basketball: 4", "Offer: Book: 0, Hat: 1, Basketball: 4", "Offer: Book: 1, Hat: 1, Basketball: 4", "Offer: Book: 0, Hat: 0, Basketball: 5", "Offer: Book: 1, Hat: 0, Basketball: 5", "Offer: Book: 0, Hat: 1, Basketball: 5", "Offer: Book: 1, Hat: 1, Basketball: 5", "Agree"]
 
-# Apply action "Offer: Book: 1, Hat: 2, Basketball: 0"
-action: 16
+# Apply action "Offer: Book: 0, Hat: 1, Basketball: 3"
+action: 90
 
 # State 5
-# Pool:    Book: 1, Hat: 3, Basketball: 1
-# P0 vals: Book: 6, Hat: 1, Basketball: 1
-# P1 vals: Book: 4, Hat: 1, Basketball: 3
+# Pool:    Book: 1, Hat: 1, Basketball: 5
+# P0 vals: Book: 1, Hat: 4, Basketball: 1
+# P1 vals: Book: 4, Hat: 1, Basketball: 1
 # Agreement reached? 0
-# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 1
-# P1 offers: Offer: Book: 0, Hat: 2, Basketball: 1
-# P0 offers: Offer: Book: 0, Hat: 2, Basketball: 1
-# P1 offers: Offer: Book: 1, Hat: 2, Basketball: 0
+# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 0
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+# P0 offers: Offer: Book: 1, Hat: 0, Basketball: 4
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
 IsTerminal() = False
-History() = [19, 36, 49, 49, 16]
-HistoryString() = "19, 36, 49, 49, 16"
+History() = [99, 0, 90, 101, 90]
+HistoryString() = "99, 0, 90, 101, 90"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\n"
-InformationStateString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\n"
-InformationStateTensor(0): binvec(309, 0x10181e181fc3006008080c080e0c080e0c0c0e080000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(309, 0x10181e181f03007808080c080e0c080e0c0c0e080000000000000000000000000000000000000)
-ObservationString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 4\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\n"
-ObservationString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nNumber of offers: 4\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\n"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯
+InformationStateString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+InformationStateString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+InformationStateTensor(0): binvec(309, 0x818181f9803e060080808080c0f0c080f880c0f0000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x818181f9f030060080808080c0f0c080f880c0f0000000000000000000000000000000000000)
+ObservationString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nNumber of offers: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+ObservationString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
-StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 2, Basketball: 0", "Offer: Book: 1, Hat: 2, Basketball: 0", "Offer: Book: 0, Hat: 3, Basketball: 0", "Offer: Book: 1, Hat: 3, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 2, Basketball: 1", "Offer: Book: 1, Hat: 2, Basketball: 1", "Offer: Book: 0, Hat: 3, Basketball: 1", "Offer: Book: 1, Hat: 3, Basketball: 1", "Agree"]
+LegalActions() = [0, 1, 8, 9, 36, 37, 43, 44, 64, 65, 70, 71, 85, 86, 90, 91, 100, 101, 104, 105, 110, 111, 113, 114, 120]
+StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 0, Basketball: 2", "Offer: Book: 1, Hat: 0, Basketball: 2", "Offer: Book: 0, Hat: 1, Basketball: 2", "Offer: Book: 1, Hat: 1, Basketball: 2", "Offer: Book: 0, Hat: 0, Basketball: 3", "Offer: Book: 1, Hat: 0, Basketball: 3", "Offer: Book: 0, Hat: 1, Basketball: 3", "Offer: Book: 1, Hat: 1, Basketball: 3", "Offer: Book: 0, Hat: 0, Basketball: 4", "Offer: Book: 1, Hat: 0, Basketball: 4", "Offer: Book: 0, Hat: 1, Basketball: 4", "Offer: Book: 1, Hat: 1, Basketball: 4", "Offer: Book: 0, Hat: 0, Basketball: 5", "Offer: Book: 1, Hat: 0, Basketball: 5", "Offer: Book: 0, Hat: 1, Basketball: 5", "Offer: Book: 1, Hat: 1, Basketball: 5", "Agree"]
+
+# Apply action "Offer: Book: 0, Hat: 1, Basketball: 3"
+action: 90
+
+# State 6
+# Pool:    Book: 1, Hat: 1, Basketball: 5
+# P0 vals: Book: 1, Hat: 4, Basketball: 1
+# P1 vals: Book: 4, Hat: 1, Basketball: 1
+# Agreement reached? 0
+# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 0
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+# P0 offers: Offer: Book: 1, Hat: 0, Basketball: 4
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+# P0 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+IsTerminal() = False
+History() = [99, 0, 90, 101, 90, 90]
+HistoryString() = "99, 0, 90, 101, 90, 90"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+InformationStateString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+InformationStateTensor(0): binvec(309, 0x418181f9803e060080808080c0f0c080f880c0f080c0f0000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x418181f9f030060080808080c0f0c080f880c0f080c0f0000000000000000000000000000000)
+ObservationString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nNumber of offers: 5\nP0 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+ObservationString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 5\nP0 offers: Offer: Book: 0, Hat: 1, Basketball: 3\n"
+ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 8, 9, 36, 37, 43, 44, 64, 65, 70, 71, 85, 86, 90, 91, 100, 101, 104, 105, 110, 111, 113, 114, 120]
+StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 0, Basketball: 2", "Offer: Book: 1, Hat: 0, Basketball: 2", "Offer: Book: 0, Hat: 1, Basketball: 2", "Offer: Book: 1, Hat: 1, Basketball: 2", "Offer: Book: 0, Hat: 0, Basketball: 3", "Offer: Book: 1, Hat: 0, Basketball: 3", "Offer: Book: 0, Hat: 1, Basketball: 3", "Offer: Book: 1, Hat: 1, Basketball: 3", "Offer: Book: 0, Hat: 0, Basketball: 4", "Offer: Book: 1, Hat: 0, Basketball: 4", "Offer: Book: 0, Hat: 1, Basketball: 4", "Offer: Book: 1, Hat: 1, Basketball: 4", "Offer: Book: 0, Hat: 0, Basketball: 5", "Offer: Book: 1, Hat: 0, Basketball: 5", "Offer: Book: 0, Hat: 1, Basketball: 5", "Offer: Book: 1, Hat: 1, Basketball: 5", "Agree"]
 
 # Apply action "Offer: Book: 1, Hat: 0, Basketball: 1"
 action: 37
 
-# State 6
-# Pool:    Book: 1, Hat: 3, Basketball: 1
-# P0 vals: Book: 6, Hat: 1, Basketball: 1
-# P1 vals: Book: 4, Hat: 1, Basketball: 3
-# Agreement reached? 0
-# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 1
-# P1 offers: Offer: Book: 0, Hat: 2, Basketball: 1
-# P0 offers: Offer: Book: 0, Hat: 2, Basketball: 1
-# P1 offers: Offer: Book: 1, Hat: 2, Basketball: 0
-# P0 offers: Offer: Book: 1, Hat: 0, Basketball: 1
-IsTerminal() = False
-History() = [19, 36, 49, 49, 16, 37]
-HistoryString() = "19, 36, 49, 49, 16, 37"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-InformationStateString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-InformationStateTensor(0): binvec(309, 0x8181e181fc3006008080c080e0c080e0c0c0e080c080c0000000000000000000000000000000)
-InformationStateTensor(1): binvec(309, 0x8181e181f03007808080c080e0c080e0c0c0e080c080c0000000000000000000000000000000)
-ObservationString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 5\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-ObservationString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 0\nNumber of offers: 5\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
-StringLegalActions() = ["Offer: Book: 0, Hat: 0, Basketball: 0", "Offer: Book: 1, Hat: 0, Basketball: 0", "Offer: Book: 0, Hat: 1, Basketball: 0", "Offer: Book: 1, Hat: 1, Basketball: 0", "Offer: Book: 0, Hat: 2, Basketball: 0", "Offer: Book: 1, Hat: 2, Basketball: 0", "Offer: Book: 0, Hat: 3, Basketball: 0", "Offer: Book: 1, Hat: 3, Basketball: 0", "Offer: Book: 0, Hat: 0, Basketball: 1", "Offer: Book: 1, Hat: 0, Basketball: 1", "Offer: Book: 0, Hat: 1, Basketball: 1", "Offer: Book: 1, Hat: 1, Basketball: 1", "Offer: Book: 0, Hat: 2, Basketball: 1", "Offer: Book: 1, Hat: 2, Basketball: 1", "Offer: Book: 0, Hat: 3, Basketball: 1", "Offer: Book: 1, Hat: 3, Basketball: 1", "Agree"]
-
-# Apply action "Agree"
-action: 120
-
 # State 7
-# Pool:    Book: 1, Hat: 3, Basketball: 1
-# P0 vals: Book: 6, Hat: 1, Basketball: 1
-# P1 vals: Book: 4, Hat: 1, Basketball: 3
-# Agreement reached? 1
-# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 1
-# P1 offers: Offer: Book: 0, Hat: 2, Basketball: 1
-# P0 offers: Offer: Book: 0, Hat: 2, Basketball: 1
-# P1 offers: Offer: Book: 1, Hat: 2, Basketball: 0
-# P0 offers: Offer: Book: 1, Hat: 0, Basketball: 1
+# Apply action "Offer: Book: 1, Hat: 0, Basketball: 3"
+action: 86
+
+# State 8
+# Apply action "Offer: Book: 0, Hat: 0, Basketball: 2"
+action: 64
+
+# State 9
+# Apply action "Offer: Book: 0, Hat: 0, Basketball: 3"
+action: 85
+
+# State 10
+# Apply action "Offer: Book: 0, Hat: 0, Basketball: 5"
+action: 110
+
+# State 11
+# Pool:    Book: 1, Hat: 1, Basketball: 5
+# P0 vals: Book: 1, Hat: 4, Basketball: 1
+# P1 vals: Book: 4, Hat: 1, Basketball: 1
+# Agreement reached? 0
+# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 0
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+# P0 offers: Offer: Book: 1, Hat: 0, Basketball: 4
+# P1 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+# P0 offers: Offer: Book: 0, Hat: 1, Basketball: 3
+# P1 offers: Offer: Book: 1, Hat: 0, Basketball: 1
+# P0 offers: Offer: Book: 1, Hat: 0, Basketball: 3
+# P1 offers: Offer: Book: 0, Hat: 0, Basketball: 2
+# P0 offers: Offer: Book: 0, Hat: 0, Basketball: 3
+# P1 offers: Offer: Book: 0, Hat: 0, Basketball: 5
 IsTerminal() = True
-History() = [19, 36, 49, 49, 16, 37, 120]
-HistoryString() = "19, 36, 49, 49, 16, 37, 120"
+History() = [99, 0, 90, 101, 90, 90, 37, 86, 64, 85, 110]
+HistoryString() = "99, 0, 90, 101, 90, 90, 37, 86, 64, 85, 110"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 1\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-InformationStateString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 1\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 1\nP1 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP0 offers: Offer: Book: 0, Hat: 2, Basketball: 1\nP1 offers: Offer: Book: 1, Hat: 2, Basketball: 0\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-InformationStateTensor(0): binvec(309, 0x108181e181fc3006008080c080e0c080e0c0c0e080c080c0000000000000000000000000000000)
-InformationStateTensor(1): binvec(309, 0x108181e181f03007808080c080e0c080e0c0c0e080c080c0000000000000000000000000000000)
-ObservationString(0) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 6, Hat: 1, Basketball: 1\nAgreement reached? 1\nNumber of offers: 5\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-ObservationString(1) = "Pool: Book: 1, Hat: 3, Basketball: 1\nMy values: Book: 4, Hat: 1, Basketball: 3\nAgreement reached? 1\nNumber of offers: 5\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 1\n"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
-Rewards() = [7, 3]
-Returns() = [7, 3]
+InformationStateString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP1 offers: Offer: Book: 1, Hat: 0, Basketball: 1\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 3\nP1 offers: Offer: Book: 0, Hat: 0, Basketball: 2\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 3\nP1 offers: Offer: Book: 0, Hat: 0, Basketball: 5\n"
+InformationStateString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 0\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 4\nP1 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP0 offers: Offer: Book: 0, Hat: 1, Basketball: 3\nP1 offers: Offer: Book: 1, Hat: 0, Basketball: 1\nP0 offers: Offer: Book: 1, Hat: 0, Basketball: 3\nP1 offers: Offer: Book: 0, Hat: 0, Basketball: 2\nP0 offers: Offer: Book: 0, Hat: 0, Basketball: 3\nP1 offers: Offer: Book: 0, Hat: 0, Basketball: 5\n"
+InformationStateTensor(0): binvec(309, 0x38181f9803e060080808080c0f0c080f880c0f080c0f0c080c0c080f08080e08080f08080fc)
+InformationStateTensor(1): binvec(309, 0x38181f9f030060080808080c0f0c080f880c0f080c0f0c080c0c080f08080e08080f08080fc)
+ObservationString(0) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 1, Hat: 4, Basketball: 1\nAgreement reached? 0\nNumber of offers: 10\nP1 offers: Offer: Book: 0, Hat: 0, Basketball: 5\n"
+ObservationString(1) = "Pool: Book: 1, Hat: 1, Basketball: 5\nMy values: Book: 4, Hat: 1, Basketball: 1\nAgreement reached? 0\nNumber of offers: 10\nP1 offers: Offer: Book: 0, Hat: 0, Basketball: 5\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]

@@ -652,8 +652,6 @@ Square CrazyhouseBoard::find(const Piece& piece) const {
 
 void CrazyhouseBoard::GenerateLegalMoves(const MoveYieldFn& yield,
                                          Color color) const {
-  // We do not need to filter moves that would result for King to move / stay
-  // in check, so we can yield all pseudo legal moves
   if (king_in_check_allowed_) {
     GeneratePseudoLegalMoves(yield, color);
   } else {

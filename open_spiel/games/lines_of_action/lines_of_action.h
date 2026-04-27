@@ -54,7 +54,7 @@ inline constexpr int kCellStates = 3;
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kBlackPlayer = 0;
 inline constexpr int kWhitePlayer = 1;
-inline constexpr int kMaxGameLength = 1000;
+inline constexpr int kDefaultMaxGameLength = 1000;
 
 // State of a cell.
 enum class CellState {
@@ -154,7 +154,7 @@ class LinesOfActionGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kNumRows, kNumCols};
   }
-  int MaxGameLength() const override { return kMaxGameLength; }
+  int MaxGameLength() const override { return max_game_length_; }
   std::string ActionToString(Player player, Action action_id) const override;
 
   const std::vector<int>& ActionBases() const { return kActionBases; }
@@ -163,6 +163,7 @@ class LinesOfActionGame : public Game {
   // Used for mapping actions to integers and back.
   // From square, to square, and boolean capture vs. no capture.
   const std::vector<int> kActionBases = {8, 8, 8, 8, 2};
+  const int max_game_length_;
 };
 
 }  // namespace lines_of_action

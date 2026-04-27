@@ -30,6 +30,8 @@ set(GAME_SOURCES
   catch/catch.h
   checkers/checkers.cc
   checkers/checkers.h
+  chinese_checkers/chinese_checkers.cc
+  chinese_checkers/chinese_checkers.h
   chess/chess.cc
   chess/chess.h
   chess/chess_board.cc
@@ -194,6 +196,10 @@ set(GAME_SOURCES
   rbc/rbc.h
   sheriff/sheriff.cc
   sheriff/sheriff.h
+  shogi/shogi.cc
+  shogi/shogi.h
+  shogi/shogi_board.cc
+  shogi/shogi_board.h
   skat/skat.cc
   skat/skat.h
   solitaire/solitaire.cc
@@ -229,6 +235,8 @@ set(GAME_SOURCES
   ultimate_tic_tac_toe/ultimate_tic_tac_toe.cc
   y/y.cc
   y/y.h
+  xiangqi/xiangqi.cc
+  xiangqi/xiangqi.h
   yacht/yacht.cc
   yacht/yacht.h
 )
@@ -374,6 +382,10 @@ add_test(catch_test catch_test)
 add_executable(checkers_test checkers/checkers_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(checkers_test checkers_test)
+
+add_executable(chinese_checkers_test chinese_checkers/chinese_checkers_test.cc
+               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
+add_test(chinese_checkers_test chinese_checkers_test)
 
 add_executable(chess_test chess/chess_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -679,6 +691,10 @@ add_executable(sheriff_test sheriff/sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(sheriff_test sheriff_test)
 
+add_executable(shogi_test shogi/shogi_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(shogi_test shogi_test)
+
 add_executable(skat_test skat/skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(skat_test skat_test)
@@ -745,6 +761,10 @@ endif()
 add_executable(y_test y/y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(y_test y_test)
+
+add_executable(xiangqi_test xiangqi/xiangqi_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(xiangqi_test xiangqi_test)
 
 add_executable(yacht_test yacht/yacht_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
