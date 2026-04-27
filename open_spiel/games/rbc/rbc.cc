@@ -141,7 +141,7 @@ class RbcObserver : public Observer {
       WritePrivateInfoTensor(state, player, prefix, allocator);
     } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
       for (int i = 0; i < chess::NumPlayers(); ++i) {
-        chess::Color color = chess::PlayerToColor(player);
+        chess::Color color = chess::PlayerToColor(i);
         std::string prefix = chess::ColorToString(color);
         WritePrivateInfoTensor(state, i, prefix, allocator);
       }
