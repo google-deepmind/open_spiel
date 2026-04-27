@@ -122,7 +122,7 @@ class KriegspielObserver : public Observer {
       WritePrivateInfoTensor(state, player, prefix, allocator);
     } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
       for (int i = 0; i < chess::NumPlayers(); ++i) {
-        std::string prefix = chess::ColorToString(color);
+        std::string prefix = chess::ColorToString(chess::PlayerToColor(i));
         WritePrivateInfoTensor(state, i, prefix, allocator);
       }
     }
