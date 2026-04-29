@@ -131,6 +131,10 @@ def safe_masked_mean(
   x: chex.Array, where: chex.Array, axis: tuple | int, keepdims=True
 ) -> chex.Array:
   """Masked mean that returns 0 when all entries are masked."""
+  if where is None:
+    # Fallback to the traditional mean
+    return jnp.mean(x, axis=axis, keepdims=keepdims)
+  
   mask_bc = jnp.broadcast_to(where, x.shape)
 
   x_masked = jnp.where(mask_bc, x, 0.0)
@@ -139,3 +143,15 @@ def safe_masked_mean(
 
   # Avoid division by zero
   return jnp.where(count_valid > 0, sum_valid / count_valid, 0.0)
+
+
+def meanvar(
+  x: chex.Array, axis: tuple | int, keepdims=True, where: chex.Array = None
+) -> chex.Array:
+  """Meanvar aggregation function."""
+  n = jnp.sum(
+    jnp.ones_like(x, dtype=jnp.int32), axis=axis, keepdims=keepdims, where=where
+  )
+  return jnp.sum(x, axis=axis, keepdims=keepdims, where=where) / jnp.sqrt(
+    jnp.maximum(n, 1)
+  )

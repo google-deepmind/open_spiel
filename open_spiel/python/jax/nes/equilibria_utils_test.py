@@ -189,12 +189,19 @@ class EquilibriaTest(absltest.TestCase):
     cce_gap = eu.compute_cce_gap(G, sigma, epsilon)
     ce_gap = eu.compute_ce_gap(G, sigma, epsilon)
 
-    # For player 0:
-    # CCE: eq=0, best dev=row0 (payoff 1), gap=1
-    # CE:  rec=0 → opp plays 1 → eq=0, best dev=row1 (payoff 1), gain=1
-    #      rec=1 → opp plays 0 → eq=0, best dev=row0 (payoff 2), gain=2
-    #      CE gap = 0.5*1 + 0.5*2 = 1.5
     self.assertTrue(jnp.all(ce_gap > cce_gap))
+
+  def test_ce_vs_cce_gap_matching_pennies(self):
+    """CE gap should be >= CCE gap (CE is stricter)."""
+    matching_pennies = _matching_pennies()
+    G = matching_pennies["payoffs"]
+    sigma = matching_pennies["sigma_uniform"]
+    epsilon = jnp.array([0.1, 0.1])
+
+    cce_gap = eu.compute_cce_gap(G, sigma, epsilon)
+    ce_gap = eu.compute_ce_gap(G, sigma, epsilon)
+
+    self.assertTrue(jnp.all(ce_gap >= cce_gap))
 
   def test_cce_gap_non_cubic(self):
     """Test with 2x3 game (non-cubic)."""

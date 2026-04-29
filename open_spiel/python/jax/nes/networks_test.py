@@ -50,12 +50,12 @@ class NESModelTest(parameterized.TestCase):
       (2, 5),
     )
   )
-  def test_dummy_cubic_model(self, mode, num_players):
+  def test_dummy_noncubic_model(self, mode, num_players):
     # Testing for (C)CE
     action_sizes = [2, 3, 1, 2, 5, 1][:num_players]
     max_size = max(action_sizes)
     batch = jnp.zeros((1, 4, num_players, *action_sizes))
-    mask = jnp.ones((1, *action_sizes), dtype=jnp.bool)
+    mask = None
     _model = networks.NeuralEquilibriumModel(
       num_players,
       # action_sizes,
@@ -109,7 +109,6 @@ class NESModelTest(parameterized.TestCase):
     if mode == networks.Mode.CE:
       self.assertEqual(alpha.shape, (1, 1, num_players, max_size, max_size))
 
-    # Should it be the case?
     self.assertTrue((alpha >= 0).all())
 
 

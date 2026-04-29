@@ -1,4 +1,5 @@
 import enum
+from typing import Callable
 
 import chex
 import flax.nnx as nn
@@ -22,52 +23,66 @@ BASE_KERNEL_INIT = init.variance_scaling(
   1.0, mode="fan_in", distribution="normal"
 ) #unit variance based on the number of inputs
 
+class EquivariantPooling(nn.Module):
+  """Base class for all equivariant poolings."""
+  def __init__(self, pool_fns: list[Callable]) -> None  :
+    self.pools = pool_fns
+    self.num_pools = len(pool_fns)
 
-class EquivariantPayoffPooling(nn.Module):
-  """Payoff-to-Payoff pooling — exactly Appendix C (18a)-(18l).
-  All pools are broadcast back to the original input shape [C, N, A1, ..., AN].
-  """
+  def __call__(self, x: chex.Array, mask: chex.Array) -> chex.Array:
+    """x shape: [C, N, A1, ..., AN]"""
+    original_shape = x.shape
 
-  def __init__(self, num_players: int):
-    self.num_players = num_players
+    def broadcast(y: chex.Array) -> chex.Array:
+      """Helper to maintained the fixed tensor size."""
+      return jnp.broadcast_to(y, original_shape)
+
+    pooled_list = [broadcast(pool(x, mask)) for pool in self.pools]
+
+    return jnp.concatenate(pooled_list, axis=0)  # [C * num_pools, N, *A]
+
+class EquivariantPayoffPooling(EquivariantPooling):
+  """Payoff-to-Payoff poolings from Appendix C (18a)-(18l)."""
+
+  def __init__(self, num_players: int) -> None:
 
     # We build the list of pooling functions once in __init__
-    self.pools = []
+    pools = []
 
     # (18a) identity
-    self.pools.append(lambda x, m: x)
+    pools.append(lambda x, m: x)
 
     # (18b) per-player mean (joint-action mean)
-    self.pools.append(
+    pools.append(
       lambda x, m: utils.safe_masked_mean(x, axis=tuple(range(2, x.ndim)), keepdims=True, where=m)
     )
 
     # (18c) player + joint-action mean
-    self.pools.append(
+    pools.append(
       lambda x, m: utils.safe_masked_mean(x, axis=(1,) + tuple(range(2, x.ndim)), keepdims=True, where=m)
     )
 
     # (18d) own-action mean for each player p
-    self.pools.append(lambda x, m: utils.safe_masked_mean(x, axis=1, keepdims=True, where=m))
+    pools.append(lambda x, m: utils.safe_masked_mean(x, axis=1, keepdims=True, where=m))
 
     # (18e)–(18h) opponent-specific
     for q in range(num_players):
       q_act_axis = 2 + q  # Actions start at axis 2: AAAA!
 
       # (18e) Depends on p and a_q.
-      self.pools.append(
+      pools.append(
         lambda x, m, qa=q_act_axis: utils.safe_masked_mean(
           x, axis=tuple(i for i in range(2, x.ndim) if i != qa), keepdims=True, where=m
         )
       )
 
       # (18f) Depends on p and a_{-q}.
-      self.pools.append(
+      pools.append(
         lambda x, m, qa=q_act_axis: utils.safe_masked_mean(x, axis=qa, keepdims=True, where=m)
       )
 
       # (18g) Depends on a_q only.
-      self.pools.append(
+      pools.append(
         lambda x, m, qa=q_act_axis: utils.safe_masked_mean(
           x,
           axis=(1,) + tuple(i for i in range(2, x.ndim) if i != qa),
@@ -77,7 +92,7 @@ class EquivariantPayoffPooling(nn.Module):
       )
 
       # (18h) Depends on a_{-q} only. REDUCE player (axis 1) and a_q.
-      self.pools.append(
+      pools.append(
         lambda x, m, qa=q_act_axis: utils.safe_masked_mean(x, axis=(1, qa), keepdims=True, where=m)
       )
 
@@ -87,9 +102,9 @@ class EquivariantPayoffPooling(nn.Module):
         if p == q:
           continue
         # Use a helper factory to strictly bind p and q without closure issues
-        self.pools.extend(self._build_cross_player_pools(p, q))
+        pools.extend(self._build_cross_player_pools(p, q))
 
-    self.num_pools = len(self.pools)
+    super().__init__(pools)
 
   def _build_cross_player_pools(self, p: int, q: int) -> list[chex.Array]:
     """Helper to build 18i-18l for a specific (p, q) pair."""
@@ -121,18 +136,6 @@ class EquivariantPayoffPooling(nn.Module):
       return slice_and_broadcast(x, mask, reduce_axes=all_actions)
 
     return [pool_18i, pool_18j, pool_18k, pool_18l]
-
-  def __call__(self, x: chex.Array, mask: chex.Array) -> chex.Array:
-    """x shape: [C, N, A1, ..., AN]"""
-    original_shape = x.shape
-    
-    def broadcast(y: chex.Array) -> chex.Array:
-      """Helper to maintained the fixed tensor size."""
-      return jnp.broadcast_to(y, original_shape)
-
-    pooled_list = [broadcast(pool(x, mask)) for pool in self.pools]
-
-    return jnp.concatenate(pooled_list, axis=0)  # [C * num_pools, N, *A]
 
 
 class EquivariantPayoffToPayoff(nn.Module):
@@ -347,9 +350,9 @@ class EquivariantDualToDual(nn.Module):
 
     if last_activation:
       self.act = (
-        lambda x: nn.softplus(utils.mask_diagonal(x))
+        lambda x: utils.mask_diagonal(x)
         if mode == Mode.CE
-        else nn.softplus(x)
+        else x
       )
     else:
       self.act = (
@@ -409,7 +412,10 @@ class NeuralEquilibriumModel(nn.Module):
     dual_channel_list: list[int] = [32, 32],
     *,
     rngs: nn.Rngs,
-  ):
+  ) -> None:
+    
+    self._mode = mode
+
     # Payoff-to-payoff layers (5 layers in paper)
     payoff_layers = []
     in_ch = 4  # [payoffs, target_joint, target_epsilon, welfare]
@@ -437,6 +443,9 @@ class NeuralEquilibriumModel(nn.Module):
     dual_layers = []
     in_ch = dual_channels
 
+    if dual_channel_list[-1] != 1:
+      dual_channel_list += [1]
+
     for i, out_ch in enumerate(dual_channel_list):
       is_last = i == len(dual_channel_list) - 1
       dual_layers.append(
@@ -450,12 +459,40 @@ class NeuralEquilibriumModel(nn.Module):
 
     # Final projection to single channel (if needed)
     self.final_proj = (
-      nn.Conv(
-        dual_channel_list[-1], 1, kernel_size=(1,), padding="SAME", rngs=rngs
+      nn.Linear(
+        dual_channel_list[-1], 1, rngs=rngs, kernel_init=BASE_KERNEL_INIT
       )
       if dual_channel_list[-1] != 1
       else lambda x: x
     )
+  
+  def _mask_alpha(self, alpha: chex.Array, mask: chex.Array) -> chex.Array:
+    """Zero out alphas for padded actions using the joint mask."""
+    N = alpha.shape[1]
+    alpha_mask = []
+    
+    if self._mode == Mode.CCE:
+      # alpha: [C, N, A]; mask: [A1, ..., AN]
+      # Per-player valid actions: does any valid joint action use this a_p?
+      for p in range(N):
+        axes = tuple(i for i in range(mask.ndim) if i != p)
+        valid = jnp.any(mask, axis=axes)  # [A_p]
+        alpha_mask.append(valid)
+    else:  # CE
+      # alpha: [C, N, A, A]; mask: [A1, ..., AN]
+      for p in range(N):
+        axes = tuple(i for i in range(mask.ndim) if i != p)
+        valid = jnp.any(mask, axis=axes)  # [A_p]
+        # Outer product for (dev, rec)
+        ce_valid = jnp.logical_and(valid[:, None], valid[None, :])  # [A, A]
+        diag = jnp.arange(ce_valid.shape[0])
+        ce_valid = ce_valid.at[diag, diag].set(False)
+        alpha_mask.append(ce_valid)
+
+    alpha_mask = jnp.stack(alpha_mask) 
+    alpha_mask = jnp.broadcast_to(alpha_mask, alpha.shape)
+    return jnp.where(alpha_mask, alpha, 0.0)
+
 
   def __call__(self, game_tensor: chex.Array, mask: chex.Array) -> chex.Array:
     """NES forward pass.
@@ -481,40 +518,14 @@ class NeuralEquilibriumModel(nn.Module):
 
     # Dual processing
     alpha = self.dual_layers(x)
-
-    # Final projection if needed
-    if x.shape[0] != 1:
-      # Move channels to end for conv, then back
-      alpha = jnp.moveaxis(alpha, 0, -1)
-      # Ensure that the values stay positive 
-      # Even if we take the projection 
-      alpha = nn.softplus(self.final_proj(alpha))
-      alpha = jnp.moveaxis(alpha, -1, 0)
-
+    alpha = nn.softplus(alpha)
+    
     # Returning
     # For CCE: [1, N, A]
     # For CE: [1, N, A, A]
+
+    # Mask padded duals
+    if mask is not None:
+      alpha = self._mask_alpha(alpha, mask)
+
     return alpha
-
-class MechanismGenerator(nn.Module):
-  """Mechanism Generator θ(ω) → induced game G(θ; ω)
-  
-  Takes a context ω (e.g. principal payoffs, target strategy, agent types)
-  and outputs a payoff tensor [N, A1, ..., AN].
-  """
-
-  def __init__(
-      self,
-      context_dim: int,
-      num_players: int,
-      max_actions: int,            
-      payoff_channel_list: list[int],
-      rngs: nn.Rngs,
-  ) -> None:
-    self.num_players = num_players
-    self.max_actions = max_actions
-
-  def __call__(self, omega: chex.Array) -> chex.Array:
-    """omega: [B, context_dim]
-    Returns: induced payoffs G [B, N, A1, ..., AN]
-    """

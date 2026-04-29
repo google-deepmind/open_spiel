@@ -1,7 +1,6 @@
 import itertools
 
 import flax.nnx as nn
-import pyspiel
 import jax
 import jax.numpy as jnp
 from absl.testing import absltest, parameterized
@@ -10,6 +9,9 @@ from open_spiel.python.jax.nes import nes
 from open_spiel.python.jax.nes import networks
 from open_spiel.python.jax.nes import samplers
 from open_spiel.python.jax.nes import utils
+
+"""Tests for open_spiel.python.jax.nes.nes.py"""
+
 
 
 class NESTest(parameterized.TestCase):
@@ -147,7 +149,7 @@ class NESTest(parameterized.TestCase):
 
   @parameterized.parameters(networks.Mode.CCE, networks.Mode.CE)
   def test_it_runs(self, mode):
-    game = pyspiel.load_game("matrix_rps")
+    game = "matrix_rps"
     network_config = dict(
       dual_channels=32,
       payoff_channel_list=[128, 64, 128],

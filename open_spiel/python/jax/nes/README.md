@@ -28,7 +28,7 @@ solver = NESolver(
     batch_size=32,
     network_train_steps=100,
 )
-result = solver.solve()  # → {"duals": α, "policy": σ}
+result = solver.solve()  # → Frozen Differentiable Block
 ```
 
 ### Motivation
@@ -60,7 +60,7 @@ Output: α — [B, 1, N, A] for CCE, [B, 1, N, A, A] for CE
 
 Given duals α, the closed-form primal recovery implements Equation (7) from the paper [1]:
 1. Compute deviation contributions per player (`gain_p`)
-2. Form logits: `l(a) = μ·W(a) − (1/ρ)·Σ_p gain_p(a)`
+2. Form logits: `l(a) = μ·W(a) − ·Σ_p gain_p(a)`
 3. Recover `σ(a) ∝ σ̂(a) · exp(l(a))`
 4. Recover `ε_p = (ε̂_p − ε⁺) · exp(−Σα_p / ρ) + ε⁺`
 
@@ -69,6 +69,20 @@ The dual loss minimized by `AdamW`:
 ```
 L_dual = log_sum_exp + ε⁺ · Σ_p Σ_a α_p(a) − ρ · Σ_p ε_p
 ```
+
+## Reproduction plan
+
+| # | Test                                 | What It Proves                                   |
+| - | ------------------------------------ | ------------------------------------------------ |
+| 1 | Training convergence on `8×8`        | The unsupervised loss works                      |
+| 2 | In-distribution accuracy (`8×8`)     | NES matches iterative solvers                    |
+| 3 | Zero-shot on `4×4`, `16×16`, `32×32` | Shape-independent generalization                 |
+| 4 | MWME vs. MRE vs. ε variants          | Flexible selection framework                     |
+| 5 | CCE vs. CE duals                     | Both solution concepts are learnable             |
+| 6 | 2×2 canonical games                  | Qualitative correctness & polytope visualization |
+
+
+
 
 ## DID (Deep Incentive Design with Deep Equilibrium blocks)
 

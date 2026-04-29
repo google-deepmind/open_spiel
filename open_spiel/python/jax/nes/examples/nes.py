@@ -7,7 +7,9 @@ from open_spiel.python.jax.nes import nes
 from open_spiel.python.jax.nes import networks
 from open_spiel.python.jax.nes import games
 
-logger = logging.getLogger(__name__)
+import pyspiel
+
+logger = logging
 FLAGS = flags.FLAGS
 
 # Training parameters
@@ -20,16 +22,16 @@ flags.DEFINE_integer(
   "Episode frequency at which the the solver's weights are saved.",
 )
 flags.DEFINE_integer(
-  "num_train_episodes", int(1e6), "Number of training episodes."
+  "iterations", int(1e6), "Number of training episodes."
 )
 flags.DEFINE_integer(
-  "eval_every", 1000, "Episode frequency at which the NESolver is evaluated."
+  "log_every", 1000, "Episode frequency at which the NESolver is evaluated."
 )
 
 # DQN model hyper-parameters
 flags.DEFINE_list(
   "payoff_channel_list",
-  [32, 32, 32, 32],
+  [32, 32, 32],
   "Number of hidden units in the payoff-to-payoff MLP",
 )
 flags.DEFINE_list(
@@ -38,20 +40,30 @@ flags.DEFINE_list(
   "Number of hidden units in the dual-to-dual MLP",
 )
 flags.DEFINE_integer(
-  "dual_channels", 32, "Number of hidden units in the payoff-to-dual layer"
+  "dual_channels", 64, "Number of hidden units in the payoff-to-dual layer"
 )
-flags.DEFINE_enum(
-  "game",
-  "L2_INVARIANT",
-  [m.name for m in games.Game],
-  "What type of game should be used?",
+
+flags.DEFINE_multi_enum(
+    "random_games",
+    [],  # default list
+    [m.name for m in games.Game],
+    "Random game types to sample from. Can specify multiple times.",
 )
+
+flags.DEFINE_multi_enum(
+    "openspiel_games",
+    [],  # default list
+    list(pyspiel.registered_names()),
+    "OpenSpiel games to sample from. Can specify multiple times.",
+)
+
 flags.DEFINE_enum(
   "mode",
   "CCE",
   [m.name for m in networks.Mode],
   "What equilibrium, CE or CCE do we look for?",
 )
+
 flags.DEFINE_list(
   "num_strategies",
   default=None,
@@ -59,11 +71,14 @@ flags.DEFINE_list(
   help="A tuple defining number of the players' actions (A1, ..., AN)",
 )
 
-flags.DEFINE_integer("iterations", 10, "Number of solver iterations.")
+flags.DEFINE_integer(
+  "max_actions", None, "Number of maximum actions for all games."
+)
+
 flags.DEFINE_float("max_grad_norm", None, "Max allowed gradient norm.")
 flags.DEFINE_float("decay", 1e-7, "Weight decay of the optimiser.")
 flags.DEFINE_float(
-  "learning_rate", 1e-3, "Learning rate of the solver's updates."
+  "learning_rate", 4e-4, "Learning rate of the solver's updates."
 )
 
 flags.DEFINE_float(
@@ -72,6 +87,10 @@ flags.DEFINE_float(
 flags.DEFINE_float(
   "rho", 1.0, "Minimum Relative Entropy coefficient of the loss function."
 )
+flags.DEFINE_float(
+  "epslion_plus", None, "Epsilon plus coefficient of the loss function."
+)
+
 flags.DEFINE_integer("norm", 2, "Norm of the payoff tensor.")
 flags.DEFINE_integer("seed", 42, "A random seed.")
 
@@ -81,26 +100,36 @@ flags.DEFINE_integer(
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
 
 
-def main(unused) -> None:
+def main(_) -> None:
   network_config = dict(
     dual_channels=FLAGS.dual_channels,
     payoff_channel_list=FLAGS.payoff_channel_list,
     dual_channel_list=FLAGS.dual_channel_list,
   )
+
+  random_games = [games.Game[game] for game in FLAGS.random_games]
+  openspiel_names = FLAGS.openspiel_games  
+  assert len(openspiel_names) + len(random_games) > 0, "Any games should be specified"
+
   solver = nes.NESolver(
-    games.Game[FLAGS.game],
+    random_games + openspiel_names,
     networks.Mode[FLAGS.mode],
     network_config,
     rho=FLAGS.rho,
     mu=FLAGS.mu,
-    norm=FLAGS.norm,
+    epsilon_plus=FLAGS.epslion_plus,
+    norm=FLAGS.norm,  
     batch_size=FLAGS.batch_size,
     learning_rate=FLAGS.learning_rate,
     weight_decay=FLAGS.decay,
     network_train_steps=FLAGS.iterations,
     gradient_clipping=FLAGS.max_grad_norm,
+    log_every=FLAGS.log_every,
     seed=FLAGS.seed,
-    game_kwargs={"num_strategies": tuple(int(_) for _ in FLAGS.num_strategies)},
+    game_kwargs={
+      "num_strategies": tuple(int(_) for _ in FLAGS.num_strategies),
+      "max_actions": FLAGS.max_actions
+    },
     allow_checkpointing=FLAGS.use_checkpoints,
   )
   solver.solve()

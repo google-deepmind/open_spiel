@@ -9,40 +9,6 @@ import numpy as np
 from open_spiel.python.jax.nes import utils
 
 
-def mask_alpha_cce(
-  alpha: chex.Array,
-  action_sizes: chex.Shape,
-) -> chex.Array:
-  """
-  Zero out padded entries in dual variables.
-  alpha [N, max_A] -> valid only up to A_p for each player p
-  """
-  N = len(action_sizes)
-  max_A = alpha.shape[1]
-  valid = jnp.stack([jnp.arange(max_A) <= action_sizes[p] for p in range(N)])
-  return jnp.where(valid, alpha, 0.0)
-
-
-def mask_alpha_ce(
-  alpha: chex.Array,
-  action_sizes: chex.Shape,
-) -> chex.Array:
-  """
-  Zero out padded entries in dual variables.
-  alpha [N, max_A, max_A] -> valid only in Ap x Ap block per player
-  """
-  N = len(action_sizes)
-  max_A = alpha.shape[1]
-  # [N, max_A, max_A] mask: dev_valid & rec_valid
-  dev_valid = jnp.stack(
-    [jnp.arange(max_A) <= action_sizes[p] for p in range(N)]
-  )
-  rec_valid = dev_valid[:, None, :]  # [N, 1, max_A]
-  dev_valid = dev_valid[:, :, None]  # [N, max_A, 1]
-  valid = dev_valid & rec_valid  # [N, max_A, max_A]
-  return jnp.where(valid, alpha, 0.0)
-
-
 @functools.partial(jax.jit, static_argnames=("player",))
 def player_contribution_cce(
   alpha_p: chex.Array,  # [A_p]
@@ -52,9 +18,6 @@ def player_contribution_cce(
   """
   CCE: Σ_{dev} α_p(dev) * [G_p(dev, a_{-p}) - G_p(a_p, a_{-p})]
 
-  Returns:
-      contribution: [A1, ..., AN] - adds to logits l(a)
-      sum_alpha: scalar - for epsilon computation
   """
   # Contract alpha[dev] with G_p[dev, ...] -> [A_{-p}]
   weighted_dev = jnp.tensordot(alpha_p, G_p, axes=(0, player))
@@ -101,29 +64,49 @@ def player_contribution_ce(
 
 def compute_cce_gap(
   payoffs: chex.Array,  # [N, A1, ..., AN]
-  sigma: chex.Array,  # [A1, ..., AN]  (recovered joint strategy)
-  epsilon: chex.Array,  # [N]          
-  joint_mask: chex.Array = None,
+  sigma: chex.Array,  # [A1, ..., AN]
+  epsilon: chex.Array,  # [N]
+  joint_mask: chex.Array = None,  # [A1, ..., AN]
 ) -> chex.Array:
+  """
+  CCE Gap: sum_p [max_{a_p'} (dev_payoff(a_p') - eq_pay - epsilon_p)]^+
+  Where dev_payoff(a_p') = sum_{a_{-p}} sigma_{-p}(a_{-p}) * G_p(a_p', a_{-p})
+  """
   N = payoffs.shape[0]
-
   gap = jnp.array(0.0, dtype=payoffs.dtype)
 
   for p in range(N):
-    # 1. Equilibrium payoff for player p under σ
-    eq_pay = jnp.sum(sigma * payoffs[p])
+    # Equilibrium payoff for player p
+    eq_pay = jnp.sum(sigma * payoffs[p], where=joint_mask)
+    # Marginal over opponents: sum over player p's action dimension
+    marginal_opp = jnp.sum(sigma, axis=p, keepdims=False, where=joint_mask)
+
+    # Move player p axis to front for payoffs
+    payoffs_moved = jnp.moveaxis(payoffs[p], p, 0)  # [Ap, A_{-p}...]
 
     # Best unilateral deviation payoff
     # marginal_opp = sum of σ over player p's action
-    marginal_opp = jnp.sum(sigma, axis=p, keepdims=True, where=joint_mask)
-    axes_to_reduce = tuple(i for i in range(N) if i != p)
-    dev_payoffs = jnp.sum(
-      marginal_opp * payoffs[p], axis=axes_to_reduce, where=joint_mask
-    )
 
+    # Flatten a_{-p} dimensions
+    payoffs_flat = payoffs_moved.reshape(
+      payoffs_moved.shape[0], -1
+    )  # [Ap, prod(A_{-p})]
+    marginal_flat = marginal_opp.reshape(-1)  # [prod(A_{-p})]
+
+    if joint_mask is not None:
+      mask_moved = jnp.moveaxis(joint_mask, p, 0)
+      # Zero out invalid entries
+      payoffs_flat = jnp.where(
+        mask_moved.reshape(payoffs_moved.shape[0], -1), payoffs_flat, 0.0
+      )
+
+    # Deviation payoffs: dot product for each a_p'
+    dev_payoffs = payoffs_flat @ marginal_flat  # [Ap]
+
+    # Best deviation
     best_dev = jnp.max(dev_payoffs)
 
-    # Positive slack for this player
+    # Slack ϵ_p
     slack = best_dev - eq_pay - epsilon[p]
     # No deviation can improve my payoff by more than ϵ_p
     gap = gap + jnp.maximum(slack, 0.0)
@@ -133,157 +116,258 @@ def compute_cce_gap(
 
 def compute_ce_gap(
   payoffs: chex.Array,  # [N, A1, ..., AN]
-  sigma: chex.Array,  # [A1, ..., AN]  recovered joint strategy
-  epsilon: chex.Array,  # [N]           ˆε_p vector
-  joint_mask: chex.Array = None,
+  sigma: chex.Array,  # [A1, ..., AN]
+  epsilon: chex.Array,  # [N]
+  joint_mask: chex.Array = None,  # [A1, ..., AN]
 ) -> chex.Array:
-  """CE Gap"""
+  """
+  CE Gap:
+
+  For each player p and each deviation pair (a_p', a_p''):
+    A_p = sum_{a: a_p = a_p''} sigma(a) * [G_p(a_p', a_{-p}) - G_p(a_p'', a_{-p})]
+
+  CE Gap = sum_p [max_{a_p', a_p''} A_p(a_p', a_p'') - epsilon_p]^+
+  """
   N = payoffs.shape[0]
-  total_gap = jnp.array(0.0, dtype=payoffs.dtype)
+  gap = jnp.array(0.0, dtype=payoffs.dtype)
 
   for p in range(N):
-    G_p = payoffs[p]
-    # Marginal probability of each recommendation P(a_p = rec)
+    
     marginal_rec = jnp.sum(
       sigma,
       axis=tuple(i for i in range(sigma.ndim) if i != p),
       where=joint_mask,
-    )
-
-    # Move player axis to front: [Ap, A_{-p}]
+    )  
+    
+    # Move player p axis to front: [Ap, A_{-p}...]
+    payoffs_moved = jnp.moveaxis(payoffs[p], p, 0)
     sigma_moved = jnp.moveaxis(sigma, p, 0)
-    G_moved = jnp.moveaxis(G_p, p, 0)
-
-    # Conditional expected payoff: E[G_p | a_p = rec]
-    # = sum_{a_{-p}} sigma(rec, a_{-p}) * G_p(rec, a_{-p}) / marginal_rec[rec]
-    eq_pay_numerator = jnp.sum(
-      sigma_moved * G_moved,
-      axis=tuple(range(1, sigma_moved.ndim)),
-      where=joint_mask,
-    )
-    eq_pay_cond = eq_pay_numerator / (marginal_rec + utils.SMALL_NUMBER)
-
-    # Deviation payoff matrix: [Ap_dev, Ap_rec]
-    # dev_payoffs[dev, rec] = E[G_p(dev, a_{-p}) | a_p = rec]
-    dev_numerator = jnp.sum(
-      sigma_moved[None, ...] * G_moved[:, None, :], where=joint_mask, axis=-1
-    )
-    dev_payoffs_cond = dev_numerator / (
-      marginal_rec[None, :] + utils.SMALL_NUMBER
-    )
-
-    # Best deviation for each recommendation
-    best_dev_cond = jnp.max(dev_payoffs_cond, axis=0)
-
-    # Gain for each rec: best_dev - current_payoff - epsilon
-    gain_per_rec = best_dev_cond - eq_pay_cond - epsilon[p]
-
-    # Weight by marginal probability and add to total
-    player_gap = jnp.sum(marginal_rec * jnp.maximum(gain_per_rec, 0.0))
-    total_gap = total_gap + player_gap
-
-  return total_gap
-
-
-def mwmre_lp_solver_gap(
-  payoffs: chex.Array,
-  hat_sigma: chex.Array,
-  mu: float = 1.0,
-  rho: float = 1.0,
-  eps: float = 1e-8,
-  verbose: bool = False,
-  enforce_equilibrium: bool = True,
-) -> dict:
-  """MWMRE: Maximize μ·Welfare − ρ·KL(σ || ˆσ)  [hybrid etalon version]
-    Solve exact MW-MRE (Maximum Welfare Minimum Relative Entropy) via convex optimization.
     
-    Primal:
-        max_{σ ≥ 0}  μ·Σ_a σ(a)·W(a)  −  ρ·KL(σ || σ̂)
-        s.t. Σ_a σ(a) = 1
-        and (C)CE incentive constraints
-    
-    KL(σ || σ̂) = Σ_a σ(a)·log(σ(a)/σ̂(a))
-               = Σ_a σ(a)·log σ(a)  −  Σ_a σ(a)·log σ̂(a)
-               = −cp.entr(σ) − σ^T·log(σ̂)
-    
-    Therefore objective:
-        μ·welfare^T σ  +  ρ·cp.sum(cp.entr(σ))  +  ρ·σ^T·log(σ̂)
-  """
+    mask_moved = None
+    if joint_mask is not None:
+      mask_moved = jnp.moveaxis(joint_mask, p, 0)
 
+    # Flatten a_{-p} dimensions, [Ap, prod(A_{-p})]
+    A_p = payoffs_moved.shape[0]
+
+    # Conditional expected payoff: E[U_p(a) | a_p = rec]
+    eq_num = jnp.sum(
+        sigma_moved * payoffs_moved,
+        axis=tuple(range(1, sigma_moved.ndim)),
+        where=mask_moved,
+    )  # [Ap]
+    eq_cond = eq_num / (marginal_rec + utils.SMALL_NUMBER)  # [Ap]
+
+    sigma_flat = sigma_moved.reshape(A_p, -1)
+    payoffs_flat = payoffs_moved.reshape(A_p, -1)
+
+    mask_flat = None
+    if mask_moved is not None:
+      mask_flat = mask_moved.reshape(A_p, -1)
+      sigma_flat = jnp.where(mask_flat, sigma_flat, 0.0)
+      payoffs_flat = jnp.where(mask_flat, payoffs_flat, 0.0)
+
+    # Conditional deviation payoff: E[U_p(dev, a_{-p}) | a_p = rec]
+    # = sum_{a_{-p}} sigma(rec, a_{-p}) * U_p(dev, a_{-p}) / marginal_rec[rec]
+    dev_num = jnp.sum(
+        sigma_flat[None, ...] * payoffs_flat[:, None, ...],
+        axis=-1,  # Sum over ALL a_{-p} dims
+        where=mask_flat[None, ...] if mask_flat is not None else None,
+    )
+
+    dev_cond = dev_num / (marginal_rec[None, :] + utils.SMALL_NUMBER)  # [Ap_dev, Ap_rec]
+    
+    # Best conditional deviation gain for each recommendation
+    gain_per_rec = jnp.max(dev_cond, axis=0) - eq_cond - epsilon[p]  # [Ap]
+    
+    # Weight by marginal probability and sum
+    gap += jnp.sum(marginal_rec * jnp.maximum(gain_per_rec, 0.0))
+
+    # Another version, doesn't seem to work
+    # A[dev, rec] = sum_{a_{-p}} sigma(rec, a_{-p}) * G_moved[dev, a_{-p}]
+    #               - sum_{a_{-p}} sigma(rec, a_{-p}) * G_moved[rec, a_{-p}]
+
+
+    # term1 = jnp.sum(sigma_flat[None, :, :] * payoffs_flat[:, None, :], axis=-1)
+    # term2 = jnp.sum(sigma_flat * payoffs_flat, axis=-1)
+    # dev_payoffs = term1 - term2[None, :]  # [Ap_dev, Ap_rec]
+
+    # best_dev = jnp.max(dev_payoffs)
+
+    # # Slack
+    # slack = best_dev - epsilon[p]
+    # gap = gap + jnp.maximum(slack, 0.0)
+
+  return gap
+
+
+def _build_cce_gains(payoffs: chex.Array, valid_idx: chex.Array) -> list[chex.Array]:
+  """Vectorised CCE deviation gains. Returns list of (Ap, n_valid) arrays."""
   N = payoffs.shape[0]
-  action_sizes = payoffs.shape[1:]
-  joint_size = int(np.prod(action_sizes))
+  action_shape = payoffs.shape[1:]
+  joint_size = int(np.prod(action_shape))
+  flat = payoffs.reshape(N, joint_size)
+  grid = np.array(np.unravel_index(np.arange(joint_size), action_shape))
+  gains = []
 
-  sigma = cp.Variable(joint_size, nonneg=True)
-  flat_payoffs = payoffs.reshape((N, joint_size))
-  welfare = flat_payoffs.sum(axis=0)
-  flat_hat = np.clip(hat_sigma.flatten(), 1e-12, None)
+  for p in range(N):
+    Ap = action_shape[p]
+    # All deviated indices for player p: shape (Ap, joint_size)
+    dev_grid = np.broadcast_to(grid, (Ap, N, joint_size)).copy()
+    dev_grid[:, p, :] = np.arange(Ap)[:, None]
+    dev_flat = np.ravel_multi_index(tuple(dev_grid.transpose(1, 0, 2)), action_shape)
+    # Gain: G_p(dev, a_{-p}) - G_p(a), then mask to valid
+    gain_p = flat[p, dev_flat] - flat[p][None, :]
+    gains.append(gain_p[:, valid_idx])
 
-  # Entropy-based KL (stable formulation)
-  # KL(sigma || hat) = sum(sigma * log(sigma/hat))
-  #                 = sum(sigma * log(sigma)) - sum (sigma * log(hat))
-  #                 = -entr(sigma) - sigma @ log(hat)
-  kl_term = -cp.sum(cp.entr(sigma)) - sigma @ np.log(flat_hat)
+  return gains
 
-  objective = mu * (welfare @ sigma) - rho * kl_term
 
-  constraints = [cp.sum(sigma) == 1]
 
-  if enforce_equilibrium:
+def _build_ce_gains(payoffs: chex.Array, valid_idx: chex.Array) -> list[chex.Array]:
+  """Vectorised CE deviation gains. Returns list of (Ap, Ap, n_valid) arrays."""
+  N = payoffs.shape[0]
+  action_shape = payoffs.shape[1:]
+  joint_size = int(np.prod(action_shape))
+  flat = payoffs.reshape(N, joint_size)
+  grid = np.array(np.unravel_index(np.arange(joint_size), action_shape))
+  gains = []
+
+  for p in range(N):
+    Ap = action_shape[p]
+    dev_grid = np.broadcast_to(grid[None, :, :], (Ap, N, joint_size)).copy()
+    dev_grid[:, p, :] = np.arange(Ap)[:, None]
+    dev_flat = np.ravel_multi_index(tuple(dev_grid.transpose(1, 0, 2)), action_shape)
+    dev_payoffs = flat[p, dev_flat]
+
+    mask = (grid[p][None, :] == np.arange(Ap)[:, None]).astype(float)
+    diff = dev_payoffs[:, None, :] - dev_payoffs[None, :, :]
+    gain_p = diff * mask[None, :, :]
+    gain_p = gain_p * (1.0 - np.eye(Ap)[:, :, None])
+    gains.append(gain_p[:, :, valid_idx])
+
+  return gains
+
+
+def mwmre_solver(
+    payoffs: chex.Array,
+    hat_sigma: chex.Array,
+    eps_hat: chex.Array,
+    joint_mask: chex.Array = None,
+    mu: float = 1.0,
+    rho: float = 1.0,
+    eps_plus: float | chex.Array = None,
+    mode: str = "CE",
+    verbose: bool = False,
+) -> dict:
+    """Solve exact ε-MWMRE CE or CCE via convex optimization.
+      Primal objective:
+          max_{σ ≥ 0}  μ·Σ_a σ(a)·W(a)  -  ρ·KL(σ || σ̂)
+          s.t. Σ_a σ(a) = 1
+          and (C)CE incentive constraints
+          KL(σ || σ̂) = Σ_a σ(a)·log(σ(a)/σ̂(a))
+                    = Σ_a σ(a)·log σ(a) - Σ_a σ(a)·log σ̂(a)
+                    = -cp.entr(σ) - σ^T·log(σ̂)
+
+      Therefore, network adopts the dual objective:
+        μ · welfare^T σ
+        +  ρ·cp.sum(cp.entr(σ))
+        +  ρ·σ^T·log(σ̂)
+        - ρ ∑_p(ε_p^+ - ε_p)ln( 1/e (ε_p^+ - ε_p) / (ε_p^+ - ε_p)) 
+    """
+
+    N, *A = payoffs.shape
+
+    joint_size = int(np.prod(A))
+
+    # --- Defaults and flattening ---
+    payoffs_flat = np.asarray(payoffs).reshape((N, joint_size))
+    target_flat = np.asarray(hat_sigma).flatten()
+
+    if joint_mask is None:
+        joint_mask = np.ones(A, dtype=bool)
+    mask_flat = np.asarray(joint_mask).flatten()
+    valid_idx = np.where(mask_flat)[0]
+    n_valid = len(valid_idx)
+
+    # Ensure eps_hat doesn't exceed eps_plus (avoids log(negative))
+    eps_hat = np.minimum(eps_hat, eps_plus - utils.SMALL_NUMBER)
+
+    # --- Variables: only over valid joints ---
+    sigma_valid = cp.Variable(n_valid, nonneg=True)
+    epsilon = cp.Variable(N, nonneg=True)
+
+    constraints = [cp.sum(sigma_valid) == 1]
+
     for p in range(N):
-      Ap = action_sizes[p]
-      for dev in range(Ap):
-        dev_payoffs = np.zeros(joint_size)
-        idx = 0
-        for a in np.ndindex(*action_sizes):
-          dev_a = list(a)
-          dev_a[p] = dev
-          dev_idx = np.ravel_multi_index(tuple(dev_a), action_sizes)
-          dev_payoffs[idx] = flat_payoffs[p, dev_idx]
-          idx += 1
-        gain = dev_payoffs - flat_payoffs[p]
-        constraints.append(gain @ sigma <= eps)
+      constraints.append(epsilon[p] <= eps_plus)
 
-  prob = cp.Problem(cp.Maximize(objective), constraints)
-  prob.solve(
-    solver=cp.ECOS, verbose=verbose, abstol=1e-9, reltol=1e-9, max_iters=10000
-  )
+    # --- Equilibrium constraints ---
+    if mode == "CCE":
+      gains = _build_cce_gains(np.asarray(payoffs), valid_idx)
+      for p, gain_p in enumerate(gains):
+        # gain_p shape: (Ap, n_valid)
+        constraints.append(gain_p @ sigma_valid <= epsilon[p])
+    else:
+      gains = _build_ce_gains(np.asarray(payoffs), valid_idx)
+      for p, gain_p in enumerate(gains):
+        # gain_p shape: (Ap, Ap, n_valid) -> flatten first two dims
+        constraints.append(gain_p.reshape(-1, n_valid) @ sigma_valid <= epsilon[p])
 
-  if sigma.value is None:
-    return {"sigma": None, "status": prob.status, "error": "Solver failed"}
+    # --- Objective ---
+    welfare = payoffs_flat.sum(axis=0)[valid_idx]
+    welfare_term = mu * (welfare @ sigma_valid)
 
-  sigma_star = sigma.value.reshape(action_sizes)
-  actual_welfare = np.sum(sigma_star * payoffs.sum(axis=0))
-  actual_kl = np.sum(
-    sigma_star
-    * (
-      jnp.log(sigma_star + utils.SMALL_NUMBER)
-      - jnp.log(hat_sigma + utils.SMALL_NUMBER)
-    )
-  )
+    target_valid = np.clip(target_flat[valid_idx], utils.SMALL_NUMBER, 1.0)
+    target_valid = target_valid / target_valid.sum()
 
-  return {
-    "sigma": sigma_star,
-    "status": prob.status,
-    "objective_value": prob.value,
-    "welfare": float(actual_welfare),
-    "kl_to_hat": float(actual_kl),
-  }
+    # KL(sigma || target) over valid entries
+    kl_term = -cp.sum(cp.entr(sigma_valid)) - sigma_valid @ np.log(target_valid)
+
+    # Epsilon penalty: rho * sum_p [ entr(diff) + diff + diff*log(target_diff) ]
+    eps_term = 0
+    for p in range(N):
+      diff = eps_plus - epsilon[p]
+      target_diff = eps_plus - eps_hat[p]
+      eps_term += rho * (
+          cp.entr(diff + utils.SMALL_NUMBER)                       # -diff*log(diff), concave
+          + diff                              # linear
+          + diff * np.log(target_diff + utils.SMALL_NUMBER)        # linear (constant coeff)
+      )
+
+    objective = welfare_term - kl_term + eps_term
+
+    # --- Solve ---
+    prob = cp.Problem(cp.Maximize(objective), constraints)
+    prob.solve(solver=cp.ECOS, verbose=verbose, abstol=1e-6, reltol=1e-6)
+
+    if sigma_valid.value is None:
+      return {"sigma": None, "status": prob.status, "error": "Solver failed"}
+
+    # --- Reconstruct full sigma ---
+    sigma_full = np.zeros(joint_size)
+    sigma_full[valid_idx] = sigma_valid.value
+    sigma_star = sigma_full.reshape(A)
+
+    # --- Metrics ---
+    actual_welfare = float(np.sum(sigma_star * payoffs.sum(axis=0)))
+    actual_kl = float(np.sum(
+        sigma_star * (np.log(sigma_star + 1e-12) - np.log(hat_sigma + 1e-12))
+    ))
+
+    solver_gap = 0.5 * jnp.abs(sigma_star - hat_sigma).sum()
+    welfare_gap = jnp.sum((sigma_star - hat_sigma) * payoffs.sum(axis=0))
+    eps_gap = jnp.max(jnp.abs(eps_hat - epsilon.value))
+
+    return {
+        "solver_gap": solver_gap,
+        "welfare_gap": welfare_gap,
+        "eps_gap": eps_gap,
+        "sigma": sigma_star,
+        "status": prob.status,
+        "objective_value": float(prob.value),
+        "welfare": actual_welfare,
+        "kl_to_hat": actual_kl,
+    }
 
 
-def compute_entropy_metrics(
-  sigma: chex.Array, hat_sigma: chex.Array
-) -> dict[str, float]:
-  """Minimum Relative Entropy (MRE) metrics."""
-  # Shannon entropy
-  H = -jnp.sum(sigma * jnp.log(sigma + 1e-12))
-  H_max = jnp.log(jnp.prod(jnp.array(sigma.shape)))
-
-  # KL divergence from target (MRE objective)
-  kl_target = jnp.sum(sigma * jnp.log((sigma + 1e-12) / (hat_sigma + 1e-12)))
-
-  return {
-    "entropy_normalized": float(H / H_max),  # 0-1 scale
-    "kl_from_target": float(kl_target),
-    "max_entropy": float(H_max),
-  }
