@@ -41,7 +41,7 @@ def recover_primals(
   N = G.shape[0]
 
   hat_sigma = data.sigma_hat  # [A1, ..., AN]
-  hat_epsilon = data.epsilon_hat # [N]
+  hat_epsilon = data.epsilon_hat  # [N]
   W = data.welfare  # [A1, ..., AN]
 
   if mode == networks.Mode.CCE.value:
@@ -64,18 +64,16 @@ def recover_primals(
 
   W_masked = jnp.where(data.mask, W, 0.0)
 
-  logits = mu * W_masked -  deviation_term
+  logits = mu * W_masked - deviation_term
 
   log_hat_sigma = jnp.log(hat_sigma + utils.SMALL_NUMBER)
 
   log_sum_exp = jax.nn.logsumexp(log_hat_sigma + logits, where=data.mask)
   sigma = jnp.where(data.mask, hat_sigma * jnp.exp(logits - log_sum_exp), 0.0)
-  sigma = sigma / (sigma.sum() + utils.SMALL_NUMBER)
 
   epsilon = (hat_epsilon - epsilon_plus) * jnp.exp(
     -sum_alphas / rho
   ) + epsilon_plus
-
 
   return logits, sigma, epsilon, sum_alphas, log_sum_exp
 
@@ -100,11 +98,33 @@ class DifferentiableEquilibriumBlock(nn.Module):
   def __call__(self, data: Data) -> chex.Array:
     alpha = self._network(
       samplers.stack(samplers.broadcastn(data), axis=1), data.mask
-    ).squeeze(1)
+    )
     _, sigma, _, _, _ = recover_primals(
       alpha, data, self._mu, self._rho, self._eps_plus, self._mode.value
     )
     return sigma
+
+
+def lr_schedule(base_learning_rate: float = 1e-4):
+  """Joint learning schedule from the NES paper."""
+
+  boundaries = [
+    100_000,
+    1_000_000,
+    4_000_000,
+    7_000_000,
+    10_000_000,
+    100_000_000,
+  ]
+  factors = [1.0, 0.6, 0.3, 0.1, 0.06, 0.03]
+
+  schedules = []
+  for i, (start, factor) in enumerate(zip([0] + boundaries[:-1], factors)):
+    end = boundaries[i] if i < len(boundaries) else None
+    # Constant schedule for this segment
+    schedules.append(optax.constant_schedule(base_learning_rate * factor))
+
+  return optax.join_schedules(schedules=schedules, boundaries=boundaries[:-1])
 
 
 def objective_from_coefficients(
@@ -237,11 +257,13 @@ class NESolver:
 
     else:
       raise ValueError("Unsupported game type!")
-    
+
     self._rngkey, init_key = jax.random.split(jax.random.key(seed), 2)
     self._last_data = self._sampler.sample_random(self._batch_size, init_key)
 
-    self._eps_plus = epsilon_plus if epsilon_plus is not None else self._sampler.z_m
+    self._eps_plus = (
+      epsilon_plus if epsilon_plus is not None else self._sampler.z_m
+    )
 
     self._iteration = 0
     self._learning_rate = learning_rate
@@ -297,7 +319,7 @@ class NESolver:
 
       alpha = utils.batched_call(
         network, samplers.stack(self.broadcast_fn(data), axis=1), data.mask
-      ).squeeze(1)
+      )
       # Recovering primal variables
       logits, sigma, epsilon, sum_alphas, log_sum_exp = jax.vmap(
         recover_primals, in_axes=(0, 0, None, None, None, None)
@@ -313,8 +335,8 @@ class NESolver:
       # Total loss: Equation (7)
       loss = (
         log_sum_exp
-        + self._eps_plus * jnp.sum(sum_alphas)
-        - self._rho * jnp.sum(epsilon)
+        + self._eps_plus * jnp.sum(sum_alphas, axis=-1)
+        - self._rho * jnp.sum(epsilon, axis=-1)
       )
 
       primals = {
@@ -334,7 +356,6 @@ class NESolver:
       network_state: nn.State,
       data: Data,
     ) -> tuple[chex.Array, nn.State, nn.State]:
-
       policy_model = nn.merge(self._graphdef_network, network_state)
       policy_model.eval()
 
@@ -352,7 +373,8 @@ class NESolver:
       data: Data,
     ) -> tuple[chex.Array, nn.State, nn.State]:
       policy_model, optimiser = nn.merge(
-        self._graphdef_network_opt, network_opt_state,
+        self._graphdef_network_opt,
+        network_opt_state,
       )
       policy_model.train()
       (loss, (primals, _)), grads = nn.value_and_grad(
@@ -427,38 +449,36 @@ class NESolver:
       nn.update(self._network, state_restored)
     self._checkpointer.wait_until_finished()
 
-  def _logging_callback(
-    self,
-    reward: chex.Array,
-    sigma: chex.Array,
-    epsilon: chex.Array,
-    mask: chex.Array,
-  ) -> dict:
-    batch_size = reward.shape[0]
-
+  def _logging_callback(self, batch: Data, primals: dict) -> dict:
+    batch_size = batch.reward.shape[0]
     if self._mode == networks.Mode.CCE:
-      regret = jax.vmap(eu.compute_cce_gap)(reward, sigma, epsilon, mask)
+      regret = jax.vmap(eu.compute_cce_gap)(
+        batch.reward, primals["sigma"], batch.epsilon_hat, batch.mask
+      )
     else:  # CE gap
-      regret = jax.vmap(eu.compute_ce_gap)(reward, sigma, epsilon, mask)
+      regret = jax.vmap(eu.compute_ce_gap)(
+        batch.reward, primals["sigma"], batch.epsilon_hat, batch.mask
+      )
 
     data = []
     for i in range(batch_size):
-
       solver_data = eu.mwmre_solver(
-        reward[i],
-        sigma[i],
-        epsilon[i],
-        mask[i],
+        batch.reward[i],
+        primals["sigma"][i],
+        batch.epsilon_hat[i],
+        batch.mask[i],
         self._mu,
         self._rho,
         self._eps_plus,
         self._mode.name,
       )
-      data.append({
-        "solver_gap": solver_data["solver_gap"],
-        "welfare_gap": solver_data["welfare_gap"],
-        "eps_gap": solver_data["eps_gap"]
-      })
+      data.append(
+        {
+          "solver_gap": solver_data["solver_gap"],
+          "welfare_gap": solver_data["welfare_gap"],
+          "eps_gap": solver_data["eps_gap"],
+        }
+      )
 
     mean_batch_data = jax.tree.map(
       lambda *args: jnp.mean(jnp.stack(args), axis=0), *data
@@ -475,13 +495,11 @@ class NESolver:
       batch_size, jax.random.key(self._network_train_steps), None
     )
     primals, duals = self._infer_fn(nn.state(self._network), batch)
-    log = self._logging_callback(
-      batch.reward, primals["sigma"], batch.epsilon_hat, batch.mask
-    )
+    log = self._logging_callback(batch, primals)
     for k, v in log.items():
       print(f"\t{k}:\t{v}")
     print()
-    
+
     return log
 
   def solve(self, logger=None) -> dict:
@@ -495,7 +513,6 @@ class NESolver:
 
     # Optimisation Loop
     for i_seed in range(self._network_train_steps):
-      
       batch = self._sampler.sample_random(
         self._batch_size, jax.random.key(i_seed), None
       )

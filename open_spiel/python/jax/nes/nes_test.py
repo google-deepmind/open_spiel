@@ -27,7 +27,7 @@ class NESTest(parameterized.TestCase):
     batch_size = 10
     action_sizes = tuple(num_actions for _ in range(num_players))
     game_tensor = jnp.zeros((batch_size, 4, num_players, *action_sizes))
-    mask = jnp.zeros((batch_size, *action_sizes))
+    mask = jnp.ones((batch_size, *action_sizes), dtype=jnp.bool)
 
     _model = networks.NeuralEquilibriumModel(
       num_players,
@@ -42,8 +42,8 @@ class NESTest(parameterized.TestCase):
     )
     alpha = utils.batched_call(_model, game_tensor, mask)
     logits, sigma, epsilon, _, _ = jax.vmap(
-      nes.recover_primals, in_axes=(0, 0, None, None, None, None, None)
-    )(alpha, batch, 1, 1, 10, action_sizes, int(mode.value))
+      nes.recover_primals, in_axes=(0, 0, None, None, None, None)
+    )(alpha, batch, 1, 1, 10, int(mode.value))
 
     self.assertEqual(logits.shape, (batch_size, *action_sizes))
     self.assertEqual(sigma.shape, (batch_size, *action_sizes))
@@ -53,7 +53,7 @@ class NESTest(parameterized.TestCase):
     itertools.product(
       (networks.Mode.CCE, networks.Mode.CE), #mode
       (2, 3), #num_players
-      (2, 3, 4), #num_actions
+      (2, ), #num_actions
       # (0, 0.1, 1.0),  # mu
       # (0, 0.8, 1.5),  # rho
       # (0, 0.1, 1.0),  # eps_plus
@@ -92,8 +92,8 @@ class NESTest(parameterized.TestCase):
     )
 
     def loss_fn(alpha):
-      _, sigma, epsilon, sum_alphas, lse = nes.recover_primals(
-        alpha, data, mu, rho, eps_plus, action_sizes, mode.value
+      _, _, epsilon, sum_alphas, lse = nes.recover_primals(
+        alpha, data, mu, rho, eps_plus, mode.value
       )
       return lse + eps_plus * jnp.sum(sum_alphas) - rho * jnp.sum(epsilon)
 

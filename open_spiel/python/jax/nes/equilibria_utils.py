@@ -260,6 +260,7 @@ def mwmre_solver(
     mode: str = "CE",
     verbose: bool = False,
 ) -> dict:
+    
     """Solve exact ε-MWMRE CE or CCE via convex optimization.
       Primal objective:
           max_{σ ≥ 0}  μ·Σ_a σ(a)·W(a)  -  ρ·KL(σ || σ̂)
@@ -331,7 +332,7 @@ def mwmre_solver(
       target_diff = eps_plus - eps_hat[p]
       eps_term += rho * (
           cp.entr(diff + utils.SMALL_NUMBER)                       # -diff*log(diff), concave
-          + diff                              # linear
+          + diff                                                   # linear
           + diff * np.log(target_diff + utils.SMALL_NUMBER)        # linear (constant coeff)
       )
 
@@ -352,7 +353,7 @@ def mwmre_solver(
     # --- Metrics ---
     actual_welfare = float(np.sum(sigma_star * payoffs.sum(axis=0)))
     actual_kl = float(np.sum(
-        sigma_star * (np.log(sigma_star + 1e-12) - np.log(hat_sigma + 1e-12))
+        sigma_star * (np.log(sigma_star + utils.SMALL_NUMBER) - np.log(hat_sigma + utils.SMALL_NUMBER))
     ))
 
     solver_gap = 0.5 * jnp.abs(sigma_star - hat_sigma).sum()

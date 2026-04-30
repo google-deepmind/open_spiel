@@ -97,12 +97,13 @@ class EquivariantPayoffPooling(EquivariantPooling):
       )
 
     # (18i)-(18l) Cross-player pools
-    for q in range(num_players):
-      for p in range(num_players):
-        if p == q:
-          continue
-        # Use a helper factory to strictly bind p and q without closure issues
-        pools.extend(self._build_cross_player_pools(p, q))
+    # TODO: disiabled for now for debug purposes
+    # for q in range(num_players):
+    #   for p in range(num_players):
+    #     if p == q:
+    #       continue
+    #     # Use a helper factory to strictly bind p and q without closure issues
+    #     pools.extend(self._build_cross_player_pools(p, q))
 
     super().__init__(pools)
 
@@ -191,7 +192,6 @@ class PayoffsToDuals(nn.Module):
     self.linear = nn.Linear(
       payoff_channels,
       dual_channels,
-      use_bias=False,
       rngs=rngs,
       kernel_init=BASE_KERNEL_INIT,
     )
@@ -199,7 +199,6 @@ class PayoffsToDuals(nn.Module):
       self.linear_aux = nn.Linear(
         payoff_channels,
         dual_channels,
-        use_bias=False,
         rngs=rngs,
         kernel_init=BASE_KERNEL_INIT,
       )
@@ -350,13 +349,13 @@ class EquivariantDualToDual(nn.Module):
 
     if last_activation:
       self.act = (
-        lambda x: utils.mask_diagonal(x)
+        lambda x: utils.mask_diagonal(nn.softplus(x))
         if mode == Mode.CE
-        else x
+        else nn.softplus(x)
       )
     else:
       self.act = (
-        lambda x: base_act(utils.mask_diagonal(x))
+        lambda x: utils.mask_diagonal(base_act(x))
         if mode == Mode.CE
         else base_act(x)
       )
@@ -518,7 +517,6 @@ class NeuralEquilibriumModel(nn.Module):
 
     # Dual processing
     alpha = self.dual_layers(x)
-    alpha = nn.softplus(alpha)
     
     # Returning
     # For CCE: [1, N, A]
@@ -528,4 +526,4 @@ class NeuralEquilibriumModel(nn.Module):
     if mask is not None:
       alpha = self._mask_alpha(alpha, mask)
 
-    return alpha
+    return alpha.squeeze(0)

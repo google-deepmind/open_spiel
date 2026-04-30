@@ -34,11 +34,11 @@ class NESModelTest(parameterized.TestCase):
     alpha = utils.batched_call(_model, batch, mask)
 
     if mode == networks.Mode.CCE:
-      self.assertEqual(alpha.shape, (1, 1, num_players, action_sizes[0]))
+      self.assertEqual(alpha.shape, (1, num_players, action_sizes[0]))
 
     if mode == networks.Mode.CE:
       self.assertEqual(
-        alpha.shape, (1, 1, num_players, action_sizes[0], action_sizes[1])
+        alpha.shape, (1, num_players, action_sizes[0], action_sizes[1])
       )
 
     # Should it be the case?
@@ -66,10 +66,10 @@ class NESModelTest(parameterized.TestCase):
     alpha = utils.batched_call(_model, batch, mask)
 
     if mode == networks.Mode.CCE:
-      self.assertEqual(alpha.shape, (1, 1, num_players, max_size))
+      self.assertEqual(alpha.shape, (1, num_players, max_size))
 
     if mode == networks.Mode.CE:
-      self.assertEqual(alpha.shape, (1, 1, num_players, max_size, max_size))
+      self.assertEqual(alpha.shape, (1, num_players, max_size, max_size))
 
     # Should it be the case?
     self.assertTrue((alpha >= 0).all())
@@ -104,10 +104,10 @@ class NESModelTest(parameterized.TestCase):
     alpha = utils.batched_call(_model, batch_padded, mask)
 
     if mode == networks.Mode.CCE:
-      self.assertEqual(alpha.shape, (1, 1, num_players, max_size))
+      self.assertEqual(alpha.shape, (1, num_players, max_size))
 
     if mode == networks.Mode.CE:
-      self.assertEqual(alpha.shape, (1, 1, num_players, max_size, max_size))
+      self.assertEqual(alpha.shape, (1, num_players, max_size, max_size))
 
     self.assertTrue((alpha >= 0).all())
 

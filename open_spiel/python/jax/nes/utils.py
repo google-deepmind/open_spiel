@@ -60,7 +60,7 @@ def dummy_nes_batch(
     "sigma_norm": jnp.ones(joint_shape) / jnp.prod(A),
     "epsilon_hat": jnp.zeros((batch_size, n_players)),
     "welfare": jnp.zeros(joint_shape),
-    "mask": jnp.zeros((batch_size, *A)),
+    "mask": jnp.ones((batch_size, *A), dtype=jnp.bool),
   }
 
 
