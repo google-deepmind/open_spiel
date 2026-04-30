@@ -35,7 +35,7 @@ class TensorView {
                        const std::array<int, Rank>& shape, bool reset)
       : values_(values), shape_(shape) {
     SPIEL_CHECK_EQ(size(), values_.size());
-    if (reset) std::fill(values.begin(), values.end(), 0);
+    if (reset) std::fill(values.begin(), values.end(), 0.0f);
   }
 
   constexpr int size() const {
@@ -43,7 +43,7 @@ class TensorView {
                            std::multiplies<int>());
   }
 
-  void clear() { std::fill(values_.begin(), values_.end(), 0.0); }
+  void clear() { std::fill(values_.begin(), values_.end(), 0.0f); }
 
   constexpr int index(const std::array<int, Rank>& args) const {
     int ind = 0;

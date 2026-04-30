@@ -32,7 +32,8 @@ To try OpenSpiel in Google Colaboratory, please refer to `open_spiel/colabs` sub
 
 Please choose among the following options:
 
-*   [Installing OpenSpiel](docs/install.md)
+*   [Installing OpenSpiel](docs/install.md) (for Linux and MacOS; see separate
+    [Windows Installation](docs/windows.md) instructions.)
 *   [Introduction to OpenSpiel](docs/intro.md)
 *   [API Overview and First Example](docs/concepts.md)
 *   [API Reference](docs/api_reference.md)

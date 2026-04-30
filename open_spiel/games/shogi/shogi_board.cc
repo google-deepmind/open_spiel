@@ -217,7 +217,8 @@ std::string Move::ToString() const {
   return absl::StrCat(from.ToString(), to.ToString(), promotion);
 }
 
-ShogiBoard::ShogiBoard() : to_play_(Color::kBlack), move_number_(1) {
+ShogiBoard::ShogiBoard()
+  : board_(), to_play_(Color::kBlack), move_number_(1), zobrist_hash_(0) {
   board_.fill(kEmptyPiece);
 }
 
@@ -283,6 +284,10 @@ ShogiBoard::ShogiBoard() : to_play_(Color::kBlack), move_number_(1) {
       return absl::nullopt;
     }
   }
+
+  // Both players start with no pieces in the pockets.
+  board.InitializePocketsHashValues();
+
   if (hand_str != "-") {
     int count = 0;
     for (size_t i = 0; i < hand_str.size(); ++i) {
@@ -306,11 +311,8 @@ ShogiBoard::ShogiBoard() : to_play_(Color::kBlack), move_number_(1) {
       }
       Color color = std::isupper(c) ? Color::kBlack : Color::kWhite;
 
-      Pocket& pocket =
-          (color == Color::kBlack) ? board.black_pocket_ : board.white_pocket_;
-
       for (int j = 0; j < count; ++j) {
-        pocket.Increment(*piece_type);
+        board.AddToPocket(color, *piece_type);
       }
 
       count = 0;  // reset for next piece
@@ -1098,6 +1100,15 @@ static const ZobristTableU64<2, 7, kMaxPocketHashCount + 1> kPocketZobrist(
     /*seed=*/2825712);
 
 inline int HashCount(int n) { return std::min(n, kMaxPocketHashCount); }
+
+void ShogiBoard::InitializePocketsHashValues() {
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    for (PieceType piece : Pocket::PieceTypes()) {
+      zobrist_hash_ ^=
+          kPocketZobrist[ToInt(color)][Pocket::Index(piece)][0];
+    }
+  }
+}
 
 void ShogiBoard::AddToPocket(Color owner, PieceType piece) {
   Pocket& pocket = owner == Color::kWhite ? white_pocket_ : black_pocket_;

@@ -1,20 +1,91 @@
 
 <!-- disableFinding(LINE_OVER_80) -->
+<!-- disableFinding(HEADING_REPEAT_H1) -->
+<!-- disableFinding(LIST_NO_LINE) -->
 # OpenSpiel Installation on Windows
 
-OpenSpiel has limited support on Windows and is not being regularly tested,
-which means support could break at any time. This may change in the future, but
-for now please be aware that Windows support is experimental. Please report any
-bugs or problems you encounter.
+OpenSpiel now has official support for Windows with pre-built binary wheels
+available on PyPI. Windows wheels are built and tested automatically via GitHub
+Actions CI for Python 3.11, 3.12, and 3.13.
 
-OpenSpiel has limited support on Windows and is not being regularly tested,
-which means support could break at any time. This may change in the future
-(contributions are welcome), with Github Actions supporting
-[windows workers](https://docs.github.com/en/actions/using-github-hosted-runners/customizing-github-hosted-runners#installing-software-on-windows-runners!),
-but for now please be aware that Windows support is experimental. Please report
-any bugs or problems you encounter.
+> **Note:** Windows support is currently experimental. If you encounter any
+> issues, please [open an issue](https://github.com/deepmind/open_spiel/issues)
+> on GitHub so we can improve the Windows experience.
 
-## Option 1: Windows Installation using Visual Studio Community Edition
+## Option 1: Quick Installation using pip (Recommended)
+
+The easiest way to install OpenSpiel on Windows is using pip:
+
+```bash
+pip install open-spiel
+```
+
+### Optional dependencies
+
+For additional features like visualization and machine learning: `bash pip
+install open-spiel[full]`
+
+### Verification
+
+Test your installation: ```python import pyspiel
+
+# Create a simple game
+
+game = pyspiel.load_game("tic_tac_toe") state = game.new_initial_state()
+print("OpenSpiel is working!") ```
+
+### Building from Source
+
+If you need to build from source or contribute to the project:
+
+#### Prerequisites
+
+-   **Python 3.11+** (get from [python.org](https://python.org))
+-   **Git** (get from [git-scm.com](https://git-scm.com))
+-   **CMake 3.15+** (get from [cmake.org](https://cmake.org))
+-   **Visual Studio 2019 or later** with C++ development tools
+
+#### Build Steps
+
+1.  Clone the repository: `bash git clone
+    https://github.com/deepmind/open_spiel.git cd open_spiel`
+
+2.  Build the wheel: `bash python -m pip wheel . --no-deps -w dist`
+
+3.  Install the built wheel: `bash pip install dist/open_spiel-*.whl`
+
+### Troubleshooting
+
+**"CMake not found"** - Install CMake from [cmake.org](https://cmake.org) and
+add it to your PATH
+
+**"Git not found"** \
+- Install Git from [git-scm.com](https://git-scm.com) and add it to your PATH
+
+**"MSVC compiler not found"** - Install Visual Studio Community with C++
+development tools - Or install "Microsoft C++ Build Tools"
+
+**"Import pyspiel failed"** - Make sure you installed the package: `pip install
+open-spiel` - Try reinstalling: `pip uninstall open-spiel && pip install
+open-spiel`
+
+### Development Installation
+
+```bash
+git clone https://github.com/deepmind/open_spiel.git
+cd open_spiel
+pip install -e .
+```
+
+### Using with Conda
+
+```bash
+conda create -n openspiel python=3.11
+conda activate openspiel
+pip install open-spiel
+```
+
+## Option 2: Windows Installation using Visual Studio Community Edition
 
 This option will describe how to install and use OpenSpiel on Windows 11 via
 [Visual Studio Community Edition](https://visualstudio.microsoft.com/vs/community/).
@@ -87,7 +158,7 @@ pip install numpy
 For a complete list, depending on what you will use, see
 [python_extra_deps.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/python_extra_deps.sh).
 
-## Option 2: Windows Installation using Windows Subsystem for Linux (WSL2)
+## Option 3: Windows Installation using Windows Subsystem for Linux (WSL2)
 
 This section describes the installation steps to get OpenSpiel running in a
 Windows 10/11 environment using WSL2.

@@ -86,6 +86,7 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     and g.short_name != "python_repeated_pokerkit"
     and g.short_name != "scotland_yard"
     and g.short_name != "chinese_checkers"  # only supports 2, 3, 4, 6 players
+    and not (g.short_name == "snake" and p == 3)  # only supports 2 or 4 players
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST
