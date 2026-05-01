@@ -138,9 +138,12 @@ It may take substantial amount of time.
 pip install -e .
 ```
 
-If while installation you get `fatal error C1083: Cannot open include file: 'graphviz/cgraph.h': No such file or directory`, it is [recommended](https://stackoverflow.com/a/78664520) to separately download Graphviz and reinstall with the following command:
+If while installation you get `fatal error C1083: Cannot open include file: 'graphviz/cgraph.h': No such file or directory`, it is [recommended](https://stackoverflow.com/a/78664520) to separately download Graphviz and reinstall with the following command (or use [`Chocolatey`](https://pygraphviz.github.io/documentation/stable/install.html#id1)):
 ```Bash
-pip install ` --config-settings="--global-option=build_ext" --config-settings="--global-option=-IC:\Program Files\Graphviz\include" --config-settings="--global-option=-LC:\Program Files\Graphviz\lib"` -e[full] .
+python -m pip install --config-settings="--global-option=build_ext" `
+              --config-settings="--global-option=-IC:\Program Files\Graphviz\include" `
+              --config-settings="--global-option=-LC:\Program Files\Graphviz\lib" `
+              -e .[full]
 ```
 
 
