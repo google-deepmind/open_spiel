@@ -14,6 +14,9 @@
 
 """Export game in gambit .efg format."""
 
+import os
+import tempfile
+
 from absl import app
 from absl import flags
 from absl import logging
@@ -23,7 +26,7 @@ import pyspiel
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
-flags.DEFINE_string("out", "/tmp/gametree.efg", "Name of output file, e.g., "
+flags.DEFINE_string("out", os.path.join(tempfile.gettempdir(), "gametree.efg"), "Name of output file, e.g., "
                     "[*.efg].")
 flags.DEFINE_boolean("print", False, "Print the tree to stdout "
                      "instead of saving to file.")

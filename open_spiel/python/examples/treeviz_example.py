@@ -14,6 +14,9 @@
 
 """Game tree visualization example."""
 
+import os
+import tempfile
+
 from absl import app
 from absl import flags
 from absl import logging
@@ -23,7 +26,7 @@ from open_spiel.python.visualizations import treeviz
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
-flags.DEFINE_string("out", "/tmp/gametree.png", "Name of output file, e.g., "
+flags.DEFINE_string("out", os.path.join(tempfile.gettempdir(), "gametree.png"), "Name of output file, e.g., "
                     "[*.png|*.pdf].")
 flags.DEFINE_enum("prog", "dot", ["dot", "neato", "circo"], "Graphviz layout.")
 flags.DEFINE_boolean("group_infosets", False, "Whether to group infosets.")

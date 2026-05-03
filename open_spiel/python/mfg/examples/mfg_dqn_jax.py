@@ -13,6 +13,9 @@
 # limitations under the License.
 """DQN agents trained on an MFG against a crowd following a uniform policy."""
 
+import os
+import tempfile
+
 from absl import flags
 import jax
 
@@ -65,7 +68,7 @@ flags.DEFINE_integer("epsilon_decay_duration", int(20e6),
 flags.DEFINE_float("epsilon_start", 0.1, "Starting exploration parameter.")
 flags.DEFINE_float("epsilon_end", 0.1, "Final exploration parameter.")
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
-flags.DEFINE_string("checkpoint_dir", "/tmp/dqn_test",
+flags.DEFINE_string("checkpoint_dir", os.path.join(tempfile.gettempdir(), "dqn_test"),
                     "Directory to save/load the agent.")
 flags.DEFINE_string(
     "logdir", None,

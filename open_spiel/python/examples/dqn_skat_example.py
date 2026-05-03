@@ -14,7 +14,9 @@
 
 """DQN agents trained on Skat by independent Q-learning."""
 
+import os
 import random
+import tempfile
 
 from absl import app
 from absl import flags
@@ -29,7 +31,7 @@ FLAGS = flags.FLAGS
 
 # Training parameters
 flags.DEFINE_string(
-    "checkpoint_dir", "/tmp/skat_dqn/", "Directory to save/load the agent."
+    "checkpoint_dir", os.path.join(tempfile.gettempdir(), "skat_dqn"), "Directory to save/load the agent."
 )
 flags.DEFINE_integer("num_train_episodes", int(1e6),
                      "Number of training episodes.")

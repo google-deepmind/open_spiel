@@ -14,6 +14,7 @@
 """Run deep online mirror descent algorithm with Munchausen DQN agents."""
 
 import os
+import tempfile
 from typing import Sequence
 
 from absl import flags
@@ -108,7 +109,7 @@ _WITH_MUNCHAUSEN = flags.DEFINE_bool(
 # Logging options.
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
 _CHECKPOINT_DIR = flags.DEFINE_string(
-    "checkpoint_dir", "/tmp/dqn_test", "Directory to save/load the agent."
+    "checkpoint_dir", os.path.join(tempfile.gettempdir(), "dqn_test"), "Directory to save/load the agent."
 )
 _LOGDIR = flags.DEFINE_string(
     "logdir",

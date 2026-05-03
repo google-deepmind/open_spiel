@@ -14,8 +14,10 @@
 
 """Example use of the CFR algorithm on Kuhn Poker."""
 
+import os
 import pickle
 import sys
+import tempfile
 from absl import app
 from absl import flags
 
@@ -67,7 +69,7 @@ def main(_):
     print("Iteration {} exploitability: {:.6f}".format(
         i, pyspiel.exploitability(game, solver.average_policy())))
 
-  filename = "/tmp/{}_solver.pickle".format(FLAGS.solver)
+  filename = os.path.join(tempfile.gettempdir(), "{}_solver.pickle".format(FLAGS.solver))
   print("Persisting the model...")
   with open(filename, "wb") as file:
     pickle.dump(solver, file, pickle.HIGHEST_PROTOCOL)

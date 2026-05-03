@@ -14,6 +14,9 @@
 
 """NFSP agents trained on Leduc Poker."""
 
+import os
+import tempfile
+
 from absl import app
 from absl import flags
 from absl import logging
@@ -86,7 +89,7 @@ flags.DEFINE_string(
 )
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
 flags.DEFINE_string(
-    "checkpoint_dir", "/tmp/nfsp_test", "Directory to save/load the agent."
+    "checkpoint_dir", os.path.join(tempfile.gettempdir(), "nfsp_test"), "Directory to save/load the agent."
 )
 
 
