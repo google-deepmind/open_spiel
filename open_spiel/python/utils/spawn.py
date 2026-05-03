@@ -26,7 +26,7 @@ Empty = queue.Empty
 # https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods
 try:
   multiprocessing.set_start_method("fork")
-except RuntimeError:
+except (RuntimeError, ValueError):  # ValueError on Windows, RuntimeError if already set
   pass
 
 
