@@ -108,7 +108,6 @@ jobs:
           [[ "${OS_TYPE}" = "Darwin" ]] && python -m pip install pipx
           python -m pip install --upgrade setuptools
           python -m pip install --upgrade -e ."[dev]" -q
-          source ./open_spiel/scripts/python_extra_deps.sh python
           python -m pip install --no-cache-dir --upgrade -e ."[jax]"
           python -m pip install --no-cache-dir --upgrade -e ."[pytorch]" --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
           python -m pip install --no-cache-dir --upgrade -e ."[misc]"
