@@ -33,7 +33,7 @@ pip install --upgrade setuptools
 # Can use python and pip directly after here because we're in the virtual env
 
 python --version
-pip install --upgrade -r -e ."[dev]"
+pip install --upgrade -e ."[dev]"
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir --upgrade -e ."[jax]"
 [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade -e ."[pytorch]" --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
 [[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-cache-dir --upgrade  -e ."[misc]"
