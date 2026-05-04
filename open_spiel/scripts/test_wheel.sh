@@ -44,13 +44,12 @@ PYBIN=`which $PYBIN`
 $PYBIN -m pip install --upgrade setuptools
 
 # Install requirements differently based on mode
-$PYBIN -m pip install --upgrade -e .
+$PYBIN -m pip install --upgrade -e ."[dev]"
 
 
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."
-  source $PROJDIR/open_spiel/scripts/python_extra_deps.sh $PYBIN
-  $PYBIN -m pip install --upgrade -e ."[full]"
+  $PYBIN -m pip install --upgrade -e ."[dev,full]"
 fi
 
 if [[ "$MODE" = "full" ]]; then
