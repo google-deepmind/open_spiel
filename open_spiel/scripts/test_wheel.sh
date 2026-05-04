@@ -44,12 +44,12 @@ PYBIN=`which $PYBIN`
 $PYBIN -m pip install --upgrade setuptools
 
 # Install requirements differently based on mode
-$PYBIN -m pip install --upgrade -e ."[dev]"
+$PYBIN -m pip install --upgrade -e "${PROJDIR}[dev]"
 
 
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."
-  $PYBIN -m pip install --upgrade -e ."[dev,full]"
+  $PYBIN -m pip install --upgrade -e "${PROJDIR}[dev,full]"
 fi
 
 if [[ "$MODE" = "full" ]]; then
