@@ -11,48 +11,119 @@ build-backend = "setuptools.build_meta"
 name = "open-spiel"
 version = "1.6.13"
 description = "A Framework for Reinforcement Learning in Games"
-readme = "README.md"
 requires-python = ">=3.11"
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 authors = [ {name = "The OpenSpiel authors", email = "open_spiel@google.com"} ]
 keywords = ["reinforcement learning", "game theory", "artificial intelligence", "games"]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: POSIX :: Linux",
-    "Operating System :: MacOS",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: C++",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Games/Entertainment",
-    "Topic :: Software Development :: Libraries :: Python Modules",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: C++",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
 ]
 
+
+# The core OpenSpiel pip dependencies.
+#
+# Note that there are optional python packages used by some of the python
+# algorithms or tools in OpenSpiel that are purposely excluded (e.g.,
+# cvxpy, nashpy, matplotlib, etc.) This is because we want to keep only
+# the dependencies that are absolutely necessary to use the Python API.
+#
+# However, when testing using continuous integration like GitHub Actions,
+# we install several more packages to ensure the proper tests are
+# included. See open_spiel/scripts/python_extra_deps.sh for the extra
+# packages and their versions we use for testing purposes.
 dependencies = [
-    "absl-py>=0.10.0",
-    "attrs>=19.3.0",
-    "numpy>=1.21.5",
-    "scipy>=1.10.1",
-    "ml-collections>=0.1.1",
+  "pip >= 20.0.2",
+  "attrs >= 19.3.0",
+  "absl-py >= 0.10.0",
+  "numpy >= 1.21.5",
+  "scipy >= 1.10.1",
+  "ml-collections >= 0.1.1"
 ]
 
+# Optional dependency groups, corresponding to python_extra_deps.sh categories.
 [project.optional-dependencies]
-full = [
-    "matplotlib",
-    "nashpy",
-    "networkx",
-    "pillow",
-    "pygame",
-    "pygraphviz",
-    "scipy",
-    "tensorflow",
-    "torch",
+
+# PyTorch support (corresponds to OPEN_SPIEL_ENABLE_PYTORCH)
+pytorch = [
+  "torch>=2.9.1",
 ]
+
+# JAX ecosystem (corresponds to OPEN_SPIEL_ENABLE_JAX)
+jax = [
+  "jax>=0.8.1",
+  "jaxlib>=0.8.1",
+  "flax>=0.12.1",
+  "dm-haiku>=0.0.16",
+  "optax>=0.2.6",
+  "chex>=0.1.91",
+  "rlax>=0.1.8",
+  "distrax>=0.1.7",
+]
+
+# Miscellaneous extra packages used by various algorithms and tools
+# (corresponds to OPEN_SPIEL_ENABLE_PYTHON_MISC)
+misc = [
+  "IPython>=8.23.0",
+  "networkx>=3.3",
+  "matplotlib>=3.10.7",
+  "mock>=5.1.0",
+  "nashpy>=0.0.43",
+  "testresources>=2.0.1",
+  "cvxpy>=1.7.5",
+  "ecos>=2.0.14",
+  "osqp>=1.0.4",
+  "pokerkit>=0.6.3",
+]
+
+dev = [
+  "pre-commit>=4.6.0",
+  "pylint>=3.0",
+]
+
+# Full test/development environment (everything)
+full = [
+  "open-spiel[jax,misc,pytorch]",
+]
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.pyink]
+line-length = 80
+pyink-indentation = 2
+include = '\.pyi?$'
+exclude = '''
+/(
+\.eggs
+| \.git
+| \.hg
+| \.mypy_cache
+| \.nox
+| \.tox
+| \.venv
+| _build
+| buck-out
+| build
+| dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 80
+
+[tool.setuptools.dynamic]
+readme = { file = "README.md", content-type = "text/markdown"}
 
 [project.urls]
 Homepage = "https://github.com/deepmind/open_spiel"
@@ -64,5 +135,6 @@ Documentation = "https://openspiel.readthedocs.io/"
 where = ["."]
 include = ["open_spiel*"]
 
+
 [tool.setuptools.package-data]
-"*" = ["*.so", "*.pyd", "*.dll"]
+"open_spiel" = ["*.so", "*.pyd", "*.dll"]

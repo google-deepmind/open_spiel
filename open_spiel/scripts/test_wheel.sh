@@ -45,18 +45,18 @@ $PYBIN -m pip install --upgrade setuptools
 
 # Install requirements differently based on mode
 if [[ "$MODE" = "basic" ]]; then
-  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+  $PYBIN -m pip install --upgrade -e . -q
 else
   # Full mode installs all requirements
-  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
+  $PYBIN -m pip install --upgrade -e ."[dev]" -q
 fi
 
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."
   source $PROJDIR/open_spiel/scripts/python_extra_deps.sh $PYBIN
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+  $PYBIN -m pip install --upgrade -e ."[jax]"
+  $PYBIN -m pip install --upgrade -e ."[pytorch]"
+  $PYBIN -m pip install --upgrade -e ."[misc]"
 fi
 
 if [[ "$MODE" = "full" ]]; then

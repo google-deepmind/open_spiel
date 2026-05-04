@@ -51,7 +51,7 @@ RUN pip --no-cache-dir install matplotlib
 # install
 COPY . .
 RUN ./install.sh
-RUN pip install --no-cache-dir --upgrade -r requirements.txt 
+RUN pip install --no-cache-dir -e .
 
 # build and test
 RUN mkdir -p build
@@ -71,7 +71,7 @@ RUN mkdir repo
 WORKDIR /repo
 COPY --from=base /repo .
 
-RUN pip install --upgrade -r requirements.txt
+RUN pip install --no-cache-dir -e .
 RUN pip install matplotlib
 
 ENV PYTHONPATH=${PYTHONPATH}:/repo
