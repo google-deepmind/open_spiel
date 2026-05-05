@@ -106,9 +106,9 @@ jobs:
           python -m pip install --upgrade pip pip-tools
           python -m pip --version
           [[ "${OS_TYPE}" = "Darwin" ]] && python -m pip install pipx
-          pip-compile pyproject.toml --extra dev,full \
-            --extra-index-url https://download.pytorch.org/whl/cpu - \
+          pip-compile pyproject.toml --extra dev,full -o - \
             | sed '/^open-spiel/d' \
+            | sed '/^    # via open-spiel/d' \
             > requirements-full.txt
           pip install -r requirements-full.txt
           python -m pip install twine
