@@ -107,8 +107,9 @@ jobs:
           python -m pip --version
           [[ "${OS_TYPE}" = "Darwin" ]] && python -m pip install pipx
           pip-compile pyproject.toml --extra dev,full \
-            --extra-index-url https://download.pytorch.org/whl/cpu \
-            -o requirements-full.txt
+            --extra-index-url https://download.pytorch.org/whl/cpu - \
+            | sed '/^open-spiel/d' \
+            > requirements-full.txt
           pip install -r requirements-full.txt
           python -m pip install twine
           python -m pip install cibuildwheel==${CIBW_VERSION}
