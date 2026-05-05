@@ -87,7 +87,7 @@ misc = [
 
 dev = [
   "pre-commit>=4.6.0",
-  "pylint>=3.0",
+  "pylint",
 ]
 
 # Full test/development environment (everything)

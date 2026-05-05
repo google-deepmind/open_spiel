@@ -25,6 +25,15 @@ import setuptools
 from setuptools.command.build_ext import build_ext
 
 
+def _get_parallel_jobs() -> int:
+  env_jobs = os.environ.get("CMAKE_BUILD_PARALLEL_LEVEL")
+  if env_jobs:
+    return max(int(env_jobs), 1)
+
+  # Fallback: cpu_count, but cap to avoid thrashing
+  return min(os.cpu_count() or 1, 16)
+
+
 class CMakeExtension(setuptools.Extension):
   """An extension with no sources.
 
@@ -55,8 +64,9 @@ class BuildExt(build_ext):
     except OSError as e:
       ext_names = ", ".join(e.name for e in self.extensions)
       raise RuntimeError(
-          "CMake must be installed to build" +
-          f"the following extensions: {ext_names}") from e
+          "CMake must be installed to build"
+          + f"the following extensions: {ext_names}"
+      ) from e
     print("Found CMake")
 
     if not sys.platform.startswith("win"):
@@ -76,7 +86,8 @@ class BuildExt(build_ext):
 
   def build_extension(self, ext):
     extension_dir = os.path.abspath(
-        os.path.dirname(self.get_ext_fullpath(ext.name)))
+        os.path.dirname(self.get_ext_fullpath(ext.name))
+    )
 
     env = os.environ.copy()
     cmake_args = [
@@ -86,26 +97,30 @@ class BuildExt(build_ext):
         "-DOPEN_SPIEL_BUILDING_WHEEL=ON",
     ]
 
-    # Platform-specific configuration
+    jobs = _get_parallel_jobs()
+
     if sys.platform.startswith("win"):
-      # Windows-specific CMake arguments
       cmake_args += [
-          (
-              "-DCMAKE_CXX_FLAGS=/std:c++20 /utf-8 /bigobj /DWIN32 /D_WINDOWS"
-              " /GR /EHsc"
-          ),
+          "-DCMAKE_CXX_FLAGS=/std:c++20 /utf-8 /bigobj /DWIN32 /D_WINDOWS /GR /EHsc",
           f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={extension_dir}",
           "-A",
           "x64",
       ]
-    # Parallel build arguments
-    if sys.platform.startswith("win"):
-      build_args = ["--", "/m"]
+      try:
+        subprocess.run(["ninja", "--version"], capture_output=True, check=True)
+        cmake_args.append("-G Ninja")
+        build_args = ["--parallel", str(jobs)]
+      except (OSError, subprocess.CalledProcessError):
+        build_args = ["--", "/m"]
     else:
       cxx = os.environ.get("CXX", "clang++")
       cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
-      detected_jobs = os.cpu_count()
-      jobs = max(detected_jobs or 1, 1)
+      # Use Ninja if available (faster than Makefiles)
+      try:
+        subprocess.run(["ninja", "--version"], capture_output=True, check=True)
+        cmake_args.append("-G Ninja")
+      except (OSError, subprocess.CalledProcessError):
+        pass  # CMake will use Unix Makefiles
       build_args = ["--parallel", str(jobs)]
 
     if not os.path.exists(self.build_temp):
@@ -113,8 +128,8 @@ class BuildExt(build_ext):
 
     # Configure
     subprocess.check_call(
-        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp,
-        env=env)
+        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env
+    )
 
     # Build using cmake --build for better portability
     subprocess.check_call(
