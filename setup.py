@@ -110,11 +110,11 @@ class BuildExt(build_ext):
     else:
       cxx = os.environ.get("CXX", "clang++")
       cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
-      try:
-        subprocess.run(["ninja", "--version"], capture_output=True, check=True)
-        cmake_args.append("-G Ninja")
-      except (OSError, subprocess.CalledProcessError):
-        pass
+      # try:
+      #   subprocess.run(["ninja", "--version"], capture_output=True, check=True)
+      #   cmake_args.append("-G Ninja")
+      # except (OSError, subprocess.CalledProcessError):
+      #   pass
       build_args = ["--parallel", str(jobs)]
 
     if not os.path.exists(self.build_temp):
