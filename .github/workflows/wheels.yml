@@ -103,12 +103,13 @@ jobs:
           # These are necessary to install what is necessary for the build and for the full tests below.
           ${CI_PYBIN} -m venv ./venv
           source ./venv/bin/activate
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip pip-tools
           python -m pip --version
           [[ "${OS_TYPE}" = "Darwin" ]] && python -m pip install pipx
-          pip install ".[dev,jax,misc,pytorch]" \
-            --index-url https://download.pytorch.org/whl/cpu \
-            --extra-index-url https://pypi.org/simple
+          pip-compile pyproject.toml --extra dev,full \
+            --extra-index-url https://download.pytorch.org/whl/cpu \
+            -o requirements-full.txt
+          pip install -r requirements-full.txt
           python -m pip install twine
           python -m pip install cibuildwheel==${CIBW_VERSION}
       - name: Build sdist

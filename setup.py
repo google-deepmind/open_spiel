@@ -107,14 +107,14 @@ class BuildExt(build_ext):
           "x64",
       ]
       build_args = ["--", f"/m:{jobs}"]
-    elif sys.platform.startswith("linux"):
-      cxx = os.environ.get("CXX", "clang++")
-      cmake_args += [
-          f"-DCMAKE_CXX_COMPILER={cxx}",
-          "-G",
-          "Ninja",
-      ]
-      build_args = ["--parallel", str(jobs)]
+    # elif sys.platform.startswith("linux"):
+    #   cxx = os.environ.get("CXX", "clang++")
+    #   cmake_args += [
+    #       f"-DCMAKE_CXX_COMPILER={cxx}",
+    #       "-G",
+    #       "Ninja",
+    #   ]
+    #   build_args = ["--parallel", str(jobs)]
     else:
       cxx = os.environ.get("CXX", "clang++")
       cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
