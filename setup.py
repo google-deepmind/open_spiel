@@ -106,21 +106,15 @@ class BuildExt(build_ext):
           "-A",
           "x64",
       ]
-      try:
-        subprocess.run(["ninja", "--version"], capture_output=True, check=True)
-        cmake_args.append("-G Ninja")
-        build_args = ["--parallel", str(jobs)]
-      except (OSError, subprocess.CalledProcessError):
-        build_args = ["--", "/m"]
+      build_args = ["--", f"/m:{jobs}"]
     else:
       cxx = os.environ.get("CXX", "clang++")
       cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
-      # Use Ninja if available (faster than Makefiles)
       try:
         subprocess.run(["ninja", "--version"], capture_output=True, check=True)
         cmake_args.append("-G Ninja")
       except (OSError, subprocess.CalledProcessError):
-        pass  # CMake will use Unix Makefiles
+        pass
       build_args = ["--parallel", str(jobs)]
 
     if not os.path.exists(self.build_temp):
