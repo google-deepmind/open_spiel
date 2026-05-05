@@ -31,12 +31,11 @@ pip install --upgrade pip
 pip install --upgrade setuptools
 
 # Can use python and pip directly after here because we're in the virtual env
-
 python --version
-pip install --upgrade -e ."[dev]"
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir --upgrade -e ."[jax]"
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade -e ."[pytorch]" --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-cache-dir --upgrade  -e ."[misc]"
+pip install --upgrade ."[dev]"
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir --upgrade ."[jax]"
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade ."[pytorch]" --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-cache-dir --upgrade  ."[misc]"
 
 # We need PYBIN to be python on its own so that the build and run script
 # finds the one from the virtual environment.

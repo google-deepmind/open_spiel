@@ -106,10 +106,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip --version
           [[ "${OS_TYPE}" = "Darwin" ]] && python -m pip install pipx
-          python -m pip install --upgrade setuptools
-          python -m pip install --upgrade -e ."[dev]" 
-          python -m pip install --no-cache-dir --upgrade -e ."[jax,misc]"
-          python -m pip install --no-cache-dir --upgrade -e ."[pytorch]" --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+          pip install ".[dev,jax,misc,pytorch]" \
+            --index-url https://download.pytorch.org/whl/cpu \
+            --extra-index-url https://pypi.org/simple
           python -m pip install twine
           python -m pip install cibuildwheel==${CIBW_VERSION}
       - name: Build sdist
