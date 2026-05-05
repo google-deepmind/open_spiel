@@ -3,7 +3,7 @@ requires = [
     "setuptools>=45",
     "wheel",
     "cmake>=3.15",
-    "ninja; platform_system != 'Windows'",
+    "ninja; platform_system == 'Linux'",
 ]
 build-backend = "setuptools.build_meta"
 
