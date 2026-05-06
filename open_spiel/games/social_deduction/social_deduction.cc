@@ -151,10 +151,9 @@ Player SocialDeductionState::CurrentPlayer() const {
 
 std::vector<Action> SocialDeductionState::LegalActions() const {
   if (IsTerminal()) return {};
-  if (phase_ == Phase::kAssignRoles) {
-    return RoleAssignments(num_players_, parent_game_.NumImposters());
+  if (phase_ == Phase::kAssignRoles || phase_ == Phase::kObservation) {
+    return LegalChanceOutcomes();
   }
-  if (phase_ == Phase::kObservation) return ObservationSignals(alive_);
 
   std::vector<Action> actions;
   if (phase_ == Phase::kCommunication) {
