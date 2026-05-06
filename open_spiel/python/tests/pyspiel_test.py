@@ -151,6 +151,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "shogi",
     "skat",
     "snake",
+    "social_deduction",
     "start_at",
     "solitaire",
     "spades",
