@@ -88,7 +88,7 @@ def fetch_and_evaluate(gen_name):
     os.makedirs("audit_temp", exist_ok=True)
     
     types = ["Greedy", "MCTS"]
-    prefixes = [f"logs/diag_gen{gen_name}_no_mcts_", f"logs/diag_gen{gen_name}_mcts_"]
+    prefixes = [f"logs/game_diag_gen{gen_name}_no_mcts_", f"logs/game_diag_gen{gen_name}_mcts_"]
     
     all_game_rows = []
     summary_data = {}
