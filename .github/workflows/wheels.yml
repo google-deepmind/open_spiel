@@ -216,7 +216,7 @@ jobs:
       - name: Run basic tests
         shell: bash
         run: |
-          bash {project}/open_spiel/scripts/test_wheel.sh basic {project} python
+          bash open_spiel/scripts/test_wheel.sh basic "${{ github.workspace }}" python
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
