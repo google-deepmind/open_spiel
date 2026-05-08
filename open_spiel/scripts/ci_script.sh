@@ -35,11 +35,11 @@ python --version
 python ./open_spiel/python/extract_requirements.py
 
 pip install --upgrade -r ./requirements/requirements-base.txt
-pip install --upgrade -r ./requirements/requirements-base.txt
+pip install --upgrade --no-cache-dir  -r ./requirements/requirements-dev.txt
 
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir -r ./requirements/requirements-jax.txt
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade ./requirements/requirements-pytorch.txt --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-cache-dir --upgrade ./requirements/requirements-misc.txt
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade -r ./requirements/requirements-pytorch.txt --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-cache-dir --upgrade -r ./requirements/requirements-misc.txt
 
 # We need PYBIN to be python on its own so that the build and run script
 # finds the one from the virtual environment.
