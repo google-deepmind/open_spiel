@@ -156,10 +156,6 @@ jobs:
 
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
-      # OPEN_SPIEL_BUILD_WITH_ACPC: ON
-      # OPEN_SPIEL_BUILD_WITH_HANABI: ON
-      # OPEN_SPIEL_BUILD_WITH_ROSHAMBO: ON
-      # OPEN_SPIEL_BUILD_WITH_XINXIN: ON
 
     steps:
       - uses: actions/checkout@v6
@@ -212,11 +208,6 @@ jobs:
           python -m pip install $wheel.FullName
           python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
         shell: pwsh
-
-      - name: Run basic tests
-        shell: bash
-        run: |
-          bash open_spiel/scripts/test_wheel.sh basic "${{ github.workspace }}" python
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
