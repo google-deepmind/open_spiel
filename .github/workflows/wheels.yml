@@ -146,7 +146,7 @@ jobs:
 
   # Windows wheel builds - separate job due to different build process (no cibuildwheel)
   build_windows_wheels:
-    name: Build wheels on Windows Python ${{ matrix.python-version }}
+    name: Build wheels on Windows w/ Python ${{ matrix.python-version }}
     runs-on: windows-latest
     timeout-minutes: 90
     strategy:
@@ -156,6 +156,10 @@ jobs:
 
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
+      OPEN_SPIEL_BUILD_WITH_ACPC: ON
+      OPEN_SPIEL_BUILD_WITH_HANABI: ON
+      OPEN_SPIEL_BUILD_WITH_ROSHAMBO: ON
+      OPEN_SPIEL_BUILD_WITH_XINXIN: ON
 
     steps:
       - uses: actions/checkout@v6
@@ -166,6 +170,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Setup MSVC (Windows)
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install CMake
         run: |
@@ -206,14 +213,10 @@ jobs:
           python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
         shell: pwsh
 
-      # Note: Windows tests are currently less thorough than Linux/macOS tests.
-      # TODO: Improve Windows test coverage in future iterations.
       - name: Run basic tests
+        shell: bash
         run: |
-          python -c "import pyspiel; print('Registered games:', len(pyspiel.registered_names()))"
-          python -c "import pyspiel; g = pyspiel.load_game('kuhn_poker'); print('Kuhn poker loaded successfully')"
-          python -c "import pyspiel; g = pyspiel.load_game('leduc_poker'); print('Leduc poker loaded successfully')"
-        shell: pwsh
+          bash {project}/open_spiel/scripts/test_wheel.sh basic {project} python
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v6

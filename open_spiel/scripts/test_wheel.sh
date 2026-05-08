@@ -43,9 +43,6 @@ fi
 PYBIN=`which $PYBIN`
 $PYBIN -m pip install --upgrade setuptools
 
-# Install requirements differently based on mode
-# $PYBIN -m pip install --upgrade "${PROJDIR}[dev]"
-
 
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."
@@ -93,10 +90,18 @@ export OPEN_SPIEL_BUILD_WITH_ACPC="ON"
 rm -rf build && mkdir build && cd build
 cmake -DPython3_EXECUTABLE=${PYBIN} $PROJDIR/open_spiel
 
-NPROC="nproc"
-if [[ "$OS" == "darwin"* || "$OS" == "Darwin"* ]]; then
-  NPROC="sysctl -n hw.physicalcpu"
+# Cross-platform venv activation
+if [[ "$OS" == MINGW* || "$OS" == CYGWIN* || "$OS" == MSYS* ]]; then
+    if [ -f ./venv/Scripts/activate ]; then
+        source ./venv/Scripts/activate
+    fi
+    NPROC="echo $NUMBER_OF_PROCESSORS"
+elif [[[ "$OS" == "darwin"* || "$OS" == "Darwin"* ]]; then
+    NPROC="sysctl -n hw.physicalcpu"
+else
+    NPROC="nproc"
 fi
+
 
 MAKE_NUM_PROCS=$(${NPROC})
 let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}

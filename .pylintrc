@@ -26,7 +26,7 @@ ignore=third_party
 
 # Files or directories matching the regex patterns are skipped. The regex
 # matches against base names, not paths.
-ignore-patterns=
+ignore-patterns=.*_test.py,test_.*.py
 
 # Pickle collected data for later comparisons.
 persistent=no
@@ -68,13 +68,6 @@ disable=R,
         assignment-from-no-return,   # E1111
         no-value-for-parameter,      # E1120
         missing-kwoa,                # E1125
-        missing-module-docstring,       # C0114
-        consider-iterating-dictionary,  # C0201
-        consider-using-f-string,        # C0209
-        line-too-long,                  # C0301
-        import-outside-toplevel,        # C0415
-        protected-access,               # W0212
-        keyword-arg-before-vararg,      # W1113
         abstract-method,
         apply-builtin,
         arguments-differ,
@@ -260,12 +253,29 @@ ignored-modules=pyspiel,jax._src,flax._src
 # List of class names for which member attributes should not be checked (useful
 # for classes with dynamically set attributes). This supports the use of
 # qualified names.
-ignored-classes=optparse.Values,thread._local,_thread._local
+
+ignored-classes=optparse.Values,
+                thread._local,
+                _thread._local,
+                nn.Module,
+                flax.linen.Module,
+                flax.struct.PyTreeNode,
+                optax.GradientTransformation,
+                optax.InjectHyperparams
 
 # List of members which are set dynamically and missed by pylint inference
 # system, and so shouldn't trigger E1101 when accessed. Python regular
 # expressions are accepted.
-generated-members=
+generated-members=pyspiel.*,
+                  jax.*,
+                  jax.numpy.*,
+                  jax.random.*,
+                  flax.*,
+                  flax.linen.*,
+                  optax.*,
+                  chex.*,
+                  torch.*,
+                  numpy.*
 
 
 [FORMAT]
