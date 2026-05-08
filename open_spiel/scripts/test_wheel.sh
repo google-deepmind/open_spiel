@@ -96,7 +96,7 @@ if [[ "$OS" == MINGW* || "$OS" == CYGWIN* || "$OS" == MSYS* ]]; then
         source ./venv/Scripts/activate
     fi
     NPROC="echo $NUMBER_OF_PROCESSORS"
-elif [[[ "$OS" == "darwin"* || "$OS" == "Darwin"* ]]; then
+elif [[ "$OS" == "darwin"* || "$OS" == "Darwin"* ]]; then
     NPROC="sysctl -n hw.physicalcpu"
 else
     NPROC="nproc"
