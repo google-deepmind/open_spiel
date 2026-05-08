@@ -1,8 +1,8 @@
 [build-system]
 requires = [
-    "setuptools>=45",
+    "setuptools >= 45",
     "wheel",
-    "cmake>=3.15",
+    "cmake >= 3.15",
     "ninja; platform_system == 'Linux'",
 ]
 build-backend = "setuptools.build_meta"
@@ -20,6 +20,7 @@ classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -46,8 +47,8 @@ dependencies = [
   "attrs >= 19.3.0",
   "absl-py >= 0.10.0",
   "numpy >= 1.21.5",
-  "scipy >= 1.10.1",
-  "ml-collections >= 0.1.1"
+  "scipy>= 1.10.1",
+  "ml-collections>=0.1.1"
 ]
 
 # Optional dependency groups, corresponding to python_extra_deps.sh categories.
@@ -55,38 +56,38 @@ dependencies = [
 
 # PyTorch support (corresponds to OPEN_SPIEL_ENABLE_PYTORCH)
 pytorch = [
-  "torch>=2.9.1",
+  "torch >= 2.9.1"
 ]
 
 # JAX ecosystem (corresponds to OPEN_SPIEL_ENABLE_JAX)
 jax = [
-  "jax>=0.8.1",
-  "jaxlib>=0.8.1",
-  "flax>=0.12.1",
-  "dm-haiku>=0.0.16",
-  "optax>=0.2.6",
-  "chex>=0.1.91",
-  "rlax>=0.1.8",
-  "distrax>=0.1.7",
+  "jax >= 0.8.1",
+  "jaxlib >= 0.8.1",
+  "flax >= 0.12.1",
+  "dm-haiku >= 0.0.16",
+  "optax >= 0.2.6",
+  "chex >= 0.1.91",
+  "rlax >= 0.1.8",
+  "distrax >= 0.1.7",
 ]
 
 # Miscellaneous extra packages used by various algorithms and tools
 # (corresponds to OPEN_SPIEL_ENABLE_PYTHON_MISC)
 misc = [
-  "IPython>=8.23.0",
-  "networkx>=3.3",
-  "matplotlib>=3.10.7",
-  "mock>=5.1.0",
-  "nashpy>=0.0.43",
-  "testresources>=2.0.1",
-  "cvxpy>=1.7.5",
-  "ecos>=2.0.14",
-  "osqp>=1.0.4",
-  "pokerkit>=0.6.3",
+  "IPython >= 8.23.0",
+  "networkx >= 3.3",
+  "matplotlib >= 3.10.7",
+  "mock >= 5.1.0",
+  "nashpy >= 0.0.43",
+  "testresources >= 2.0.1",
+  "cvxpy >= 1.7.5",
+  "ecos >= 2.0.14",
+  "osqp >= 1.0.4",
+  "pokerkit >= 0.6.3",
 ]
 
 dev = [
-  "pre-commit>=4.6.0",
+  "pre-commit >= 4.6.0",
   "pylint",
 ]
 
