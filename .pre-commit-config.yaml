@@ -19,13 +19,13 @@ repos:
     rev: 24.10.1
     hooks:
       - id: pyink
-        args: [--line-length=80]  # Matches Google style
+        args: [--line-length=80]
 
   - repo: https://github.com/PyCQA/isort
     rev: 6.0.1
     hooks:
       - id: isort
-        args: ["--profile", "black"]  # pyink is black-compatible
+        args: ["--profile", "black"]
 
   - repo: local
     hooks:

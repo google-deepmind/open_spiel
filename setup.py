@@ -65,7 +65,7 @@ class BuildExt(build_ext):
       ext_names = ", ".join(e.name for e in self.extensions)
       raise RuntimeError(
           "CMake must be installed to build"
-          + f"the following extensions: {ext_names}"
+          f" the following extensions: {ext_names}"
       ) from e
 
     if not sys.platform.startswith("win"):
@@ -77,8 +77,9 @@ class BuildExt(build_ext):
       except OSError as e:
         ext_names = ", ".join(e.name for e in self.extensions)
         raise RuntimeError(
-            "A C++ compiler that supports c++20 must be installed to build the "
-            f"following extensions: {ext_names}. We recommend: Clang version >= 17.0.0."
+            "A C++ compiler that supports c++20 must be installed to build the"
+            f" following extensions: {ext_names}."
+            " We recommend: Clang version >= 17.0.0."
         ) from e
 
   def build_extension(self, ext):
