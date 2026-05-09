@@ -213,6 +213,7 @@ std::vector<Action> TarokState::LegalActions() const {
     case GamePhase::kFinished:
       return {};
   }
+  SpielFatalError("Unknown phase");
 }
 
 std::vector<Action> TarokState::LegalActionsInBidding() const {
@@ -442,6 +443,7 @@ std::string TarokState::ActionToString(Player player, Action action_id) const {
     case GamePhase::kFinished:
       return "";
   }
+  SpielFatalError("Unknown phase");
 }
 
 std::string TarokState::CardActionToString(Action action_id) const {
@@ -1032,6 +1034,7 @@ std::string GamePhaseToString(const GamePhase& game_phase) {
     case GamePhase::kFinished:
       return "Finished";
   }
+  SpielFatalError("Unknown phase");
 }
 
 }  // namespace tarok

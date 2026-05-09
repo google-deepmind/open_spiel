@@ -200,6 +200,8 @@ set(GAME_SOURCES
   shogi/shogi_board.h
   skat/skat.cc
   skat/skat.h
+  snake/snake.cc
+  snake/snake.h
   solitaire/solitaire.cc
   solitaire/solitaire.h
   spades/spades.cc
@@ -692,6 +694,10 @@ add_test(shogi_test shogi_test)
 add_executable(skat_test skat/skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(skat_test skat_test)
+
+add_executable(snake_test snake/snake_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(snake_test snake_test)
 
 add_executable(solitaire_test solitaire/solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

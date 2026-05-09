@@ -21,6 +21,7 @@
 #include <functional>
 #include <iostream>
 #include <ostream>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -317,6 +318,8 @@ class ShogiBoard {
   void SetToPlay(Color c);
 
   int32_t Movenumber() const { return move_number_; }
+
+  void InitializePocketsHashValues();
 
   void AddToPocket(Color owner, PieceType piece);
 

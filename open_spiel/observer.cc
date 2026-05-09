@@ -271,7 +271,7 @@ struct BinaryCompress {
   static void Decompress(absl::string_view compressed,
                          absl::Span<float> buffer) {
     const int num_bytes = (buffer.size() + kBitsPerByte - 1) / kBitsPerByte;
-    absl::c_fill(buffer, 0);
+    absl::c_fill(buffer, 0.0f);
     SPIEL_CHECK_EQ(compressed.size(), num_bytes + kNumHeaderBytes);
     for (int byte = 0; byte < num_bytes; ++byte) {
       for (int bit = 0; bit < kBitsPerByte; ++bit) {

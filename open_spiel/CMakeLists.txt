@@ -218,6 +218,7 @@ link_libraries(open_spiel_core
   absl::time
 )
 
+
 # Just the minimal base library: no games.
 set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)
 

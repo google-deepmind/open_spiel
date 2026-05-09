@@ -54,6 +54,12 @@ void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
                      &TicTacToeObservationStruct::current_player)
       .def_readwrite("board", &TicTacToeObservationStruct::board);
 
+  using open_spiel::tic_tac_toe::TicTacToeActionStruct;
+  bind_spiel_struct<TicTacToeActionStruct, open_spiel::ActionStruct>(
+      tic_tac_toe, "TicTacToeActionStruct")
+      .def_readwrite("row", &TicTacToeActionStruct::row)
+      .def_readwrite("col", &TicTacToeActionStruct::col);
+
   py::enum_<CellState>(tic_tac_toe, "CellState")
       .value("EMPTY", CellState::kEmpty)
       .value("NOUGHT", CellState::kNought)
