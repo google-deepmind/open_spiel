@@ -8,6 +8,15 @@ OpenSpiel now has official support for Windows with pre-built binary wheels
 available on PyPI. Windows wheels are built and tested automatically via GitHub
 Actions CI for Python 3.11, 3.12, and 3.13.
 
+This section assumes that you are into the isolated virtual environment. To create one:
+```PowerShell
+python -m venv .venv; .venv\Scripts\activate
+```
+If you need, activate the permissions:
+```PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 > [!WARNING]
 > Current API mostly functions under the assumption of a direct pip installation ([Option 1](#option-1-quick-installation-using-pip-recommended)).
 > Contributing [guidelines](../CONTRIBUTING.md) currently work with unix-based commits due the
@@ -138,12 +147,12 @@ It may take substantial amount of time.
 pip install -e .
 ```
 
-If while installation you get `fatal error C1083: Cannot open include file: 'graphviz/cgraph.h': No such file or directory`, it is [recommended](https://stackoverflow.com/a/78664520) to separately download Graphviz and reinstall with the following command (or use [`Chocolatey`](https://pygraphviz.github.io/documentation/stable/install.html#id1)):
+If during the installation you get `fatal error C1083: Cannot open include file: 'graphviz/cgraph.h': No such file or directory`, it is [recommended](https://stackoverflow.com/a/78664520) to separately download Graphviz and reinstall with the following command (or use [`Chocolatey`](https://pygraphviz.github.io/documentation/stable/install.html#id1)):
 ```Bash
 python -m pip install --config-settings="--global-option=build_ext" `
               --config-settings="--global-option=-IC:\Program Files\Graphviz\include" `
               --config-settings="--global-option=-LC:\Program Files\Graphviz\lib" `
-              -e .[full]
+              pygraphviz
 ```
 
 
@@ -217,7 +226,7 @@ variable for it. To check that python is working, you can run the example in
 
 OpenSpiel has various Python dependencies which may require installing. At a
 minimum, you will need the ones in
-[requirements.txt](https://github.com/deepmind/open_spiel/blob/master/requirements.txt).
+[pyproject](../pyproject.toml).
 
 ```Bash
 pip install absl-py
@@ -225,8 +234,8 @@ pip install attrs
 pip install numpy
 ```
 
-For a complete list, depending on what you will use, see
-[python_extra_deps.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/python_extra_deps.sh). To set a env variable in the current terminal you can use the command `set`([some help](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/set_1))
+For a complete list, depending on what you will use, see optinal dependencies of the
+[pyproject](../pyproject.toml). To set a env variable in the current terminal you can use the command `set`([some help](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/set_1))
 
 ## Option 3: Windows Installation using Windows Subsystem for Linux (WSL2)
 
