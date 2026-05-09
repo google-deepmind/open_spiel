@@ -209,6 +209,13 @@ jobs:
           python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
         shell: pwsh
 
+      - name: Run basic smoke tests
+        run: |
+          python -c "import pyspiel; print('Registered games:', len(pyspiel.registered_names()))"
+          python -c "import pyspiel; g = pyspiel.load_game('kuhn_poker'); print('Kuhn poker loaded successfully')"
+          python -c "import pyspiel; g = pyspiel.load_game('leduc_poker'); print('Leduc poker loaded successfully')"
+        shell: pwsh
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
         with:

@@ -291,23 +291,23 @@ There are some implemented algorithms that require additional depencides, like `
 
 For `jax`:
 ```bash
-pip install --upgrage ."[jax]"
+pip install --upgrade ."[jax]"
 ```
 
 For `torch`:
 ```bash
-pip install --upgrage ."[pytorch]"
+pip install --upgrade ."[pytorch]"
 ```
 
 For miscellaneous dependencies (`cvxpy`, `nashpy` and so on):
 For `torch`:
 ```bash
-pip install --upgrage ."[misc]"
+pip install --upgrade ."[misc]"
 ```
 
 You can also install all the combined deps with:
 ```bash
-pip install --upgrage ."[full]"
+pip install --upgrade ."[full]"
 ```
 
 
