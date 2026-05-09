@@ -65,6 +65,7 @@ confidence=
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 disable=R,
+        consider-using-f-string,
         assignment-from-no-return,   # E1111
         no-value-for-parameter,      # E1120
         missing-kwoa,                # E1125
@@ -105,7 +106,7 @@ disable=R,
         long-suffix,
         map-builtin-not-iterating,
         misplaced-comparison-constant,
-        missing-function-docstring,
+        ; missing-function-docstring,
         metaclass-assignment,
         next-method-called,
         next-method-defined,
@@ -135,7 +136,7 @@ disable=R,
         standarderror-builtin,
         suppressed-message,
         sys-max-int,
-        trailing-newlines,
+        ; trailing-newlines,
         unichr-builtin,
         unicode-builtin,
         unnecessary-pass,
@@ -156,7 +157,7 @@ disable=R,
 output-format=text
 
 # Tells whether to display a full report or only the messages
-reports=no
+reports=yes
 
 # Activate the evaluation score.
 score=no
