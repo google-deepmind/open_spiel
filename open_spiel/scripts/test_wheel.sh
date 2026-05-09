@@ -83,16 +83,9 @@ if [[ "$MODE" = "full" ]]; then
   ${PYBIN} -m pip install "$WHEEL_FILE"
 fi
 
-if [[ "$OS" == MINGW* || "$OS" == CYGWIN* || "$OS" == MSYS* ]]; then
-  # Currently staying as minimal as possible
-  export OPEN_SPIEL_BUILDING_WHEEL="ON"
-  export OPEN_SPIEL_BUILD_WITH_HANABI="OFF"
-  export OPEN_SPIEL_BUILD_WITH_ACPC="OFF"
-else
-  export OPEN_SPIEL_BUILDING_WHEEL="ON"
-  export OPEN_SPIEL_BUILD_WITH_HANABI="ON"
-  export OPEN_SPIEL_BUILD_WITH_ACPC="ON"
-fi
+export OPEN_SPIEL_BUILDING_WHEEL="ON"
+export OPEN_SPIEL_BUILD_WITH_HANABI="ON"
+export OPEN_SPIEL_BUILD_WITH_ACPC="ON"
 
 rm -rf build && mkdir build && cd build
 cmake -DPython3_EXECUTABLE=${PYBIN} $PROJDIR/open_spiel

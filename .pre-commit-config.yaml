@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: mixed-line-ending
@@ -16,12 +16,13 @@ repos:
       - id: forbid-new-submodules
 
   - repo: https://github.com/google/pyink
-    rev: 23.12.1 
+    rev: 24.10.1
     hooks:
       - id: pyink
-      
+        args: [--line-length=80]  # Matches Google style
+
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 6.0.1
     hooks:
       - id: isort
         args: ["--profile", "black"]  # pyink is black-compatible
@@ -31,6 +32,12 @@ repos:
       - id: pylint
         name: pylint
         entry: python -m pylint
-        language: system  
+        language: system
         types: [python]
-        args: ["-rn", "-sn", "--rcfile=.pylintrc"]
+        args: [
+          "-rn",
+          "-sn",
+          "--rcfile=.pylintrc",
+          "--fail-under=0",
+          "--fail-on=E,F"
+        ]

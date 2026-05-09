@@ -2,6 +2,11 @@
 checkpoints
 checkpoint*
 
+# Requirements are no more allowed.
+# NOTE: it's only for autoggenerated test cases,
+# you can still manually create your own files
+requirements
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

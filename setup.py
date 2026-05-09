@@ -67,7 +67,6 @@ class BuildExt(build_ext):
           "CMake must be installed to build"
           + f"the following extensions: {ext_names}"
       ) from e
-    print("Found CMake")
 
     if not sys.platform.startswith("win"):
       cxx = "clang++"
@@ -79,10 +78,8 @@ class BuildExt(build_ext):
         ext_names = ", ".join(e.name for e in self.extensions)
         raise RuntimeError(
             "A C++ compiler that supports c++20 must be installed to build the "
-            + "following extensions: {}".format(ext_names)
-            + ". We recommend: Clang version >= 17.0.0."
+            f"following extensions: {ext_names}. We recommend: Clang version >= 17.0.0."
         ) from e
-      print("Found C++ compiler: {}".format(cxx))
 
   def build_extension(self, ext):
     extension_dir = os.path.abspath(

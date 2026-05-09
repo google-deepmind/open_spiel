@@ -260,18 +260,18 @@ Install required dependencies (Python 3):
 # Ubuntu 22.04 and newer:
 python3 -m venv ./venv
 source venv/bin/activate
-python3 -m pip install -r requirements.txt
+python3 -m pip install -e .
 # Older than Ubuntu 22.04:
 virtualenv -p python3 venv
 source venv/bin/activate
-python3 -m pip install -r requirements.txt
+python3 -m pip install -e .
 ```
 
 Alternatively, although not recommended, you can install the Python dependencies
 system-wide with:
 
 ```bash
-python3 -m pip install --upgrade -r requirements.txt
+python3 -m pip install --upgrade -e .
 ```
 
 ##### Optional dependencies
@@ -286,6 +286,32 @@ python3 -m pip install --upgrade torch==x.xx.x jax==x.x.x
 
 where `x.xx.x` should be the desired version numbers (which can be found at the
 link above).
+
+There are some implemented algorithms that require additional depencides, like `jax`, `torch`, etc., you can install, if you feel like it.
+
+For `jax`:
+```bash
+pip install --upgrage ."[jax]"
+```
+
+For `torch`:
+```bash
+pip install --upgrage ."[pytorch]"
+```
+
+For miscellaneous dependencies (`cvxpy`, `nashpy` and so on):
+For `torch`:
+```bash
+pip install --upgrage ."[misc]"
+```
+
+You can also install all the combined deps with:
+```bash
+pip install --upgrage ."[full]"
+```
+
+
+
 
 ### Building and running tests
 
