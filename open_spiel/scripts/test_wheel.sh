@@ -43,20 +43,12 @@ fi
 PYBIN=`which $PYBIN`
 $PYBIN -m pip install --upgrade setuptools
 
-# Install requirements differently based on mode
-if [[ "$MODE" = "basic" ]]; then
-  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
-else
-  # Full mode installs all requirements
-  $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
-fi
 
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."
-  source $PROJDIR/open_spiel/scripts/python_extra_deps.sh $PYBIN
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+  $PYBIN -m pip install --upgrade "open-spiel[dev,jax,misc,pytorch]" \
+      --index-url https://download.pytorch.org/whl/cpu \
+      --extra-index-url https://pypi.org/simple
 fi
 
 if [[ "$MODE" = "full" ]]; then
@@ -98,10 +90,18 @@ export OPEN_SPIEL_BUILD_WITH_ACPC="ON"
 rm -rf build && mkdir build && cd build
 cmake -DPython3_EXECUTABLE=${PYBIN} $PROJDIR/open_spiel
 
-NPROC="nproc"
-if [[ "$OS" == "darwin"* || "$OS" == "Darwin"* ]]; then
-  NPROC="sysctl -n hw.physicalcpu"
+# Cross-platform venv activation
+if [[ "$OS" == MINGW* || "$OS" == CYGWIN* || "$OS" == MSYS* ]]; then
+    if [ -f ./venv/Scripts/activate ]; then
+        source ./venv/Scripts/activate
+    fi
+    NPROC="echo $NUMBER_OF_PROCESSORS"
+elif [[ "$OS" == "darwin"* || "$OS" == "Darwin"* ]]; then
+    NPROC="sysctl -n hw.physicalcpu"
+else
+    NPROC="nproc"
 fi
+
 
 MAKE_NUM_PROCS=$(${NPROC})
 let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}

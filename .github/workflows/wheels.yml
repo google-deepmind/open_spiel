@@ -106,12 +106,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip --version
           [[ "${OS_TYPE}" = "Darwin" ]] && python -m pip install pipx
-          python -m pip install --upgrade setuptools
-          python -m pip install --upgrade -r requirements.txt -q
-          source ./open_spiel/scripts/python_extra_deps.sh python
-          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
-          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+          python ./open_spiel/python/extract_requirements.py
+          pip install -r requirements/requirements-base.txt
+          pip install -r requirements/requirements-dev.txt
+          pip install -r requirements/requirements-jax.txt
+          pip install -r requirements/requirements-pytorch.txt
+          pip install -r requirements/requirements-misc.txt
           python -m pip install twine
           python -m pip install cibuildwheel==${CIBW_VERSION}
       - name: Build sdist
@@ -146,7 +146,7 @@ jobs:
 
   # Windows wheel builds - separate job due to different build process (no cibuildwheel)
   build_windows_wheels:
-    name: Build wheels on Windows Python ${{ matrix.python-version }}
+    name: Build wheels on Windows w/ Python ${{ matrix.python-version }}
     runs-on: windows-latest
     timeout-minutes: 90
     strategy:
@@ -166,6 +166,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Setup MSVC (Windows)
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install CMake
         run: |
@@ -206,9 +209,7 @@ jobs:
           python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
         shell: pwsh
 
-      # Note: Windows tests are currently less thorough than Linux/macOS tests.
-      # TODO: Improve Windows test coverage in future iterations.
-      - name: Run basic tests
+      - name: Run basic smoke tests
         run: |
           python -c "import pyspiel; print('Registered games:', len(pyspiel.registered_names()))"
           python -c "import pyspiel; g = pyspiel.load_game('kuhn_poker'); print('Kuhn poker loaded successfully')"

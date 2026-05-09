@@ -25,6 +25,15 @@ import setuptools
 from setuptools.command.build_ext import build_ext
 
 
+def _get_parallel_jobs() -> int:
+  env_jobs = os.environ.get("CMAKE_BUILD_PARALLEL_LEVEL")
+  if env_jobs:
+    return max(int(env_jobs), 1)
+
+  # Fallback: cpu_count, but cap to avoid thrashing
+  return min(os.cpu_count() or 1, 16)
+
+
 class CMakeExtension(setuptools.Extension):
   """An extension with no sources.
 
@@ -55,9 +64,9 @@ class BuildExt(build_ext):
     except OSError as e:
       ext_names = ", ".join(e.name for e in self.extensions)
       raise RuntimeError(
-          "CMake must be installed to build" +
-          f"the following extensions: {ext_names}") from e
-    print("Found CMake")
+          "CMake must be installed to build"
+          f" the following extensions: {ext_names}"
+      ) from e
 
     if not sys.platform.startswith("win"):
       cxx = "clang++"
@@ -68,15 +77,15 @@ class BuildExt(build_ext):
       except OSError as e:
         ext_names = ", ".join(e.name for e in self.extensions)
         raise RuntimeError(
-            "A C++ compiler that supports c++20 must be installed to build the "
-            + "following extensions: {}".format(ext_names)
-            + ". We recommend: Clang version >= 17.0.0."
+            "A C++ compiler that supports c++20 must be installed to build the"
+            f" following extensions: {ext_names}."
+            " We recommend: Clang version >= 17.0.0."
         ) from e
-      print("Found C++ compiler: {}".format(cxx))
 
   def build_extension(self, ext):
     extension_dir = os.path.abspath(
-        os.path.dirname(self.get_ext_fullpath(ext.name)))
+        os.path.dirname(self.get_ext_fullpath(ext.name))
+    )
 
     env = os.environ.copy()
     cmake_args = [
@@ -86,26 +95,19 @@ class BuildExt(build_ext):
         "-DOPEN_SPIEL_BUILDING_WHEEL=ON",
     ]
 
-    # Platform-specific configuration
+    jobs = _get_parallel_jobs()
+
     if sys.platform.startswith("win"):
-      # Windows-specific CMake arguments
       cmake_args += [
-          (
-              "-DCMAKE_CXX_FLAGS=/std:c++20 /utf-8 /bigobj /DWIN32 /D_WINDOWS"
-              " /GR /EHsc"
-          ),
+          "-DCMAKE_CXX_FLAGS=/std:c++20 /utf-8 /bigobj /DWIN32 /D_WINDOWS /GR /EHsc",
           f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={extension_dir}",
           "-A",
           "x64",
       ]
-    # Parallel build arguments
-    if sys.platform.startswith("win"):
-      build_args = ["--", "/m"]
+      build_args = ["--", f"/m:{jobs}"]
     else:
       cxx = os.environ.get("CXX", "clang++")
       cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
-      detected_jobs = os.cpu_count()
-      jobs = max(detected_jobs or 1, 1)
       build_args = ["--parallel", str(jobs)]
 
     if not os.path.exists(self.build_temp):
@@ -113,8 +115,8 @@ class BuildExt(build_ext):
 
     # Configure
     subprocess.check_call(
-        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp,
-        env=env)
+        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env
+    )
 
     # Build using cmake --build for better portability
     subprocess.check_call(
@@ -125,45 +127,7 @@ class BuildExt(build_ext):
     )
 
 
-def _get_requirements(requirements_file):  # pylint: disable=g-doc-args
-  """Returns a list of dependencies for setup() from requirements.txt.
-
-  Currently a requirements.txt is being used to specify dependencies. In order
-  to avoid specifying it in two places, we're going to use that file as the
-  source of truth.
-  """
-  with open(requirements_file) as f:
-    return [_parse_line(line) for line in f if line]
-
-
-def _parse_line(s):
-  """Parses a line of a requirements.txt file."""
-  requirement, *_ = s.split("#")
-  return requirement.strip()
-
-
-# Get the requirements from file.
-# When installing from pip it is in the parent directory
-req_file = ""
-if os.path.exists("requirements.txt"):
-  req_file = "requirements.txt"
-else:
-  req_file = "../requirements.txt"
-
 setuptools.setup(
-    name="open_spiel",
-    version="1.6.13",
-    license="Apache 2.0",
-    author="The OpenSpiel authors",
-    author_email="open_spiel@google.com",
-    description="A Framework for Reinforcement Learning in Games",
-    long_description=open("README.md").read(),
-    long_description_content_type="text/markdown",
-    url="https://github.com/deepmind/open_spiel",
-    install_requires=_get_requirements(req_file),
-    python_requires=">=3.11",
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt},
-    zip_safe=False,
-    packages=setuptools.find_packages(include=["open_spiel", "open_spiel.*"]),
 )

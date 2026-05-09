@@ -85,15 +85,19 @@ games and any special considerations are noted in the steps.
     example). Note: Python games cannot be tested using `ConsolePlayTest`,
     however both C++ and Python games can also be tested on the console using
     `open_spiel/python/examples/mcts_example` with human players.
-9.  Run your code through a linter so it conforms to Google's
+9.  Make sure that the project has its python API installed: `pip install -e."[dev]"`
+    to the development checks.
+10.  Run your code through a linter so it conforms to Google's
     [style guides](https://google.github.io/styleguide/). For C++ use
     [cpplint](https://pypi.org/project/cpplint/). For Python, use
     [pylint](https://pypi.org/project/pylint/) with the
     [pylintrc from the Google style guide](https://google.github.io/styleguide/pyguide.html).
     There is also [YAPF](https://github.com/google/yapf/) for Python as well.
-10. Once done, rebuild and rerun the tests to ensure everything passes
+    Alternatively, you can run `bash ./open_spiel/scripts/pre_commit_checks.sh`.
+    Don't foget to re-run the script, making sure that you've fixed the errors.
+11. Once done, rebuild and rerun the tests to ensure everything passes
     (including your new game’s test!).
-11. Add a playthrough file to catch regressions:
+12. Add a playthrough file to catch regressions:
     *   Run `./open_spiel/scripts/generate_new_playthrough.sh new_game` to
         generate a random game, to be used by integration tests to prevent any
         regression. `open_spiel/integration_tests/playthrough_test.py` will
@@ -116,7 +120,7 @@ build against them. The setup was designed to meet the following needs:
 -   **Light and safe defaults**: By default, we exclude the dependencies to
     diminish install time and compilation time. If the bash variable is unset,
     we download the dependency and we do not build against it.
--   **Respect the user-defined values**: The `global_variables.sh` script, which
+-   **Respect the user-defined values**: The `global_variables.sh` file, which
     is included in all the scripts that needs to access the constant values, do
     not override the constants but set them if and only if they are undefined.
     This respects the user-defined values, e.g. on their `.bashrc` or on the
