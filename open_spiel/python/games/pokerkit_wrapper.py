@@ -43,6 +43,11 @@ import pokerkit
 import pyspiel
 
 
+if not hasattr(pyspiel, "pokerkit_wrapper"):
+  raise ImportError(
+      "no pokerkit ")
+
+
 # For documentation on using pokerkit see
 # https://pokerkit.readthedocs.io/en/0.4/reference.html, and most notably
 # https://pokerkit.readthedocs.io/en/0.4/reference.html#module-pokerkit.state
