@@ -26,6 +26,8 @@ set(GAME_SOURCES
   bridge/bridge_scoring.h
   bridge/bridge_uncontested_bidding.cc
   bridge/bridge_uncontested_bidding.h
+  capture_the_flag/capture_the_flag.cc
+  capture_the_flag/capture_the_flag.h
   catch/catch.cc
   catch/catch.h
   checkers/checkers.cc
@@ -374,6 +376,10 @@ add_test(breakthrough_test breakthrough_test)
 add_executable(bridge_test bridge/bridge_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(bridge_test bridge_test)
+
+add_executable(capture_the_flag_test capture_the_flag/capture_the_flag_test.cc
+               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
+add_test(capture_the_flag_test capture_the_flag_test)
 
 add_executable(catch_test catch/catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
