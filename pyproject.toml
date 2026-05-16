@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open-spiel"
-version = "1.6.13"
+version = "1.6.14"
 description = "A Framework for Reinforcement Learning in Games"
 readme = "README.md"
 requires-python = ">=3.11"
