@@ -15,7 +15,6 @@
 #ifndef OPEN_SPIEL_GAMES_AMAZONS_H_
 #define OPEN_SPIEL_GAMES_AMAZONS_H_
 
-#include <array>
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,19 +23,18 @@
 
 // The "Game of Amazons":
 // https://en.wikipedia.org/wiki/Game_of_the_Amazons
+//
+// Parameters:
+//   "board_size"  int   side length of the (square) board.
+//                       Supported values: 6, 8, 10 (default 10).
 
 namespace open_spiel {
 namespace amazons {
 
 // Constants.
 inline constexpr int kNumPlayers = 2;
-inline constexpr int kNumRows = 10;
-inline constexpr int kNumCols = 10;
-inline constexpr int kNumCells = kNumRows * kNumCols;
+inline constexpr int kDefaultBoardSize = 10;
 inline constexpr int kCellStates = 4;  // empty, 'X', 'O', '@'.
-
-// Hensgens et al = 10e40 for 10x10
-inline constexpr int kNumberStates = 1000000000;
 
 // State of a cell.
 enum class CellState { kEmpty, kNought, kCross, kBlock };
@@ -48,7 +46,7 @@ class AmazonsState : public State {
  public:
   enum MoveState { amazon_select, destination_select, shot_select };
 
-  AmazonsState(std::shared_ptr<const Game> game);
+  AmazonsState(std::shared_ptr<const Game> game, int board_size);
 
   AmazonsState(const AmazonsState&) = default;
 
@@ -64,7 +62,7 @@ class AmazonsState : public State {
   bool IsTerminal() const override;
 
   void SetState(int cur_player, MoveState move_state,
-                const std::array<CellState, kNumCells>& board);
+                const std::vector<CellState>& board);
 
   std::vector<double> Returns() const override;
 
@@ -83,11 +81,14 @@ class AmazonsState : public State {
 
   CellState BoardAt(int cell) const { return board_[cell]; }
   CellState BoardAt(int row, int column) const {
-    return board_[row * kNumCols + column];
+    return board_[row * board_size_ + column];
   }
+  int BoardSize() const { return board_size_; }
+  int NumCells() const { return board_size_ * board_size_; }
 
  protected:
-  std::array<CellState, kNumCells> board_;
+  int board_size_;
+  std::vector<CellState> board_;
 
   void DoApplyAction(Action action) override;
 
@@ -111,10 +112,13 @@ class AmazonsGame : public Game {
  public:
   explicit AmazonsGame(const GameParameters& params);
 
-  int NumDistinctActions() const override { return kNumCells; }
+  int NumDistinctActions() const override {
+    return board_size_ * board_size_;
+  }
 
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new AmazonsState(shared_from_this()));
+    return std::unique_ptr<State>(
+        new AmazonsState(shared_from_this(), board_size_));
   }
 
   int NumPlayers() const override { return kNumPlayers; }
@@ -124,10 +128,17 @@ class AmazonsGame : public Game {
   double MaxUtility() const override { return 1; }
 
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, kNumRows, kNumCols};
+    return {kCellStates, board_size_, board_size_};
   }
 
-  int MaxGameLength() const override { return 3 * kNumCells; }
+  int MaxGameLength() const override {
+    return 3 * board_size_ * board_size_;
+  }
+
+  int board_size() const { return board_size_; }
+
+ private:
+  const int board_size_;
 };
 
 CellState PlayerToState(Player player);

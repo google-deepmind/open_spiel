@@ -40,8 +40,8 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
-};
+    /*parameter_specification=*/
+    {{"board_size", GameParameter(kDefaultBoardSize)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new AmazonsGame(params));
@@ -83,8 +83,8 @@ std::string StateToString(CellState state) {
 std::vector<Action> AmazonsState::GetAllMoves(Action cell) const {
   std::vector<Action> moves;
 
-  const int row = static_cast<int>(cell) / kNumCols;
-  const int col = static_cast<int>(cell) % kNumCols;
+  const int row = static_cast<int>(cell) / board_size_;
+  const int col = static_cast<int>(cell) % board_size_;
 
   // Directions: left, right, up, down, and the four diagonals.
   static constexpr int kDirRow[8] = {0,  0, -1, 1, -1, -1,  1,  1};
@@ -95,8 +95,8 @@ std::vector<Action> AmazonsState::GetAllMoves(Action cell) const {
     int c = col + kDirCol[d];
 
     // Walk along this ray until we leave the board or hit a non-empty cell.
-    while (r >= 0 && r < kNumRows && c >= 0 && c < kNumCols) {
-      const Action focus = r * kNumCols + c;
+    while (r >= 0 && r < board_size_ && c >= 0 && c < board_size_) {
+      const Action focus = r * board_size_ + c;
       if (board_[focus] != CellState::kEmpty) {
         break;  // blocked by amazon or arrow
       }
@@ -110,8 +110,8 @@ std::vector<Action> AmazonsState::GetAllMoves(Action cell) const {
 }
 
 bool AmazonsState::HasAnyMoveFromCell(Action cell) const {
-  const int row = static_cast<int>(cell) / kNumCols;
-  const int col = static_cast<int>(cell) % kNumCols;
+  const int row = static_cast<int>(cell) / board_size_;
+  const int col = static_cast<int>(cell) % board_size_;
 
   static constexpr int kDirRow[8] = {0,  0, -1, 1, -1, -1,  1,  1};
   static constexpr int kDirCol[8] = {-1, 1,  0, 0, -1,  1, -1,  1};
@@ -120,8 +120,8 @@ bool AmazonsState::HasAnyMoveFromCell(Action cell) const {
     int r = row + kDirRow[d];
     int c = col + kDirCol[d];
 
-    while (r >= 0 && r < kNumRows && c >= 0 && c < kNumCols) {
-      const Action focus = r * kNumCols + c;
+    while (r >= 0 && r < board_size_ && c >= 0 && c < board_size_) {
+      const Action focus = r * board_size_ + c;
       if (board_[focus] != CellState::kEmpty) break;  // ray blocked
       return true;  // found at least one legal destination
     r += kDirRow[d];
@@ -133,7 +133,8 @@ bool AmazonsState::HasAnyMoveFromCell(Action cell) const {
 
 bool AmazonsState::PlayerHasAnyMove(Player p) const {
   const CellState mine = PlayerToState(p);
-  for (int i = 0; i < static_cast<int>(kNumCells); ++i) {
+  const int num_cells = board_size_ * board_size_;
+  for (int i = 0; i < num_cells; ++i) {
     if (board_[i] == mine && HasAnyMoveFromCell(i)) return true;
   }
   return false;
@@ -217,7 +218,7 @@ std::vector<Action> AmazonsState::LegalActions() const {
 
   switch (state_) {
     case amazon_select:
-      for (int i = 0; i < board_.size(); i++) {
+      for (int i = 0; i < static_cast<int>(board_.size()); i++) {
         if (board_[i] == PlayerToState(CurrentPlayer())) {
           // check if the selected amazon has a possible move
           if (!HasAnyMoveFromCell(i)) continue;
@@ -243,8 +244,8 @@ std::vector<Action> AmazonsState::LegalActions() const {
 
 std::string AmazonsState::ActionToString(Player player,
                                          Action action) const {
-  const int row = static_cast<int>(action) / kNumCols;
-  const int col = static_cast<int>(action) % kNumCols;
+  const int row = static_cast<int>(action) / board_size_;
+  const int col = static_cast<int>(action) % board_size_;
 
   std::string coord = absl::StrCat("(", row + 1, ", ", col + 1, ")");
 
@@ -266,29 +267,59 @@ std::string AmazonsState::ActionToString(Player player,
   SpielFatalError("Unhandled state in AmazonsState::ActionToString");
 }
 
-AmazonsState::AmazonsState(std::shared_ptr<const Game> game)
-    : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
-
-  // Standard Amazons is defined for a 10x10 board
-  SPIEL_CHECK_EQ(kNumRows, 10);
-  SPIEL_CHECK_EQ(kNumCols, 10);
-
-  // Player 1 (Nought, 'O') – black: a7, d10, g10, j7
-  board_[3]  = CellState::kNought;  // d10
-  board_[6]  = CellState::kNought;  // g10
-  board_[30] = CellState::kNought;  // a7
-  board_[39] = CellState::kNought;  // j7
-
-  // Player 0 (Cross, 'X') – white: a4, d1, g1, j4
-  board_[60] = CellState::kCross;   // a4
-  board_[69] = CellState::kCross;   // j4
-  board_[93] = CellState::kCross;   // d1
-  board_[96] = CellState::kCross;   // g1
+AmazonsState::AmazonsState(std::shared_ptr<const Game> game, int board_size)
+    : State(game),
+      board_size_(board_size),
+      board_(board_size * board_size, CellState::kEmpty) {
+  // Amazons starting positions are scaled symmetrically from the standard
+  // 10x10 layout (4 amazons per side along the two ranks closest to each
+  // player's edge).
+  switch (board_size_) {
+    case 10:
+      // Player 1 (Nought, 'O') – d10, g10, a7, j7
+      board_[3]  = CellState::kNought;
+      board_[6]  = CellState::kNought;
+      board_[30] = CellState::kNought;
+      board_[39] = CellState::kNought;
+      // Player 0 (Cross, 'X') – a4, j4, d1, g1
+      board_[60] = CellState::kCross;
+      board_[69] = CellState::kCross;
+      board_[93] = CellState::kCross;
+      board_[96] = CellState::kCross;
+      break;
+    case 8:
+      // Player 1 (Nought, 'O') – c8, f8, a6, h6
+      board_[2]  = CellState::kNought;
+      board_[5]  = CellState::kNought;
+      board_[16] = CellState::kNought;
+      board_[23] = CellState::kNought;
+      // Player 0 (Cross, 'X') – a3, h3, c1, f1
+      board_[40] = CellState::kCross;
+      board_[47] = CellState::kCross;
+      board_[58] = CellState::kCross;
+      board_[61] = CellState::kCross;
+      break;
+    case 6:
+      // Player 1 (Nought, 'O') – b6, e6, a5, f5
+      board_[1]  = CellState::kNought;
+      board_[4]  = CellState::kNought;
+      board_[6]  = CellState::kNought;
+      board_[11] = CellState::kNought;
+      // Player 0 (Cross, 'X') – a2, f2, b1, e1
+      board_[24] = CellState::kCross;
+      board_[29] = CellState::kCross;
+      board_[31] = CellState::kCross;
+      board_[34] = CellState::kCross;
+      break;
+    default:
+      SpielFatalError(
+          absl::StrCat("Unsupported board_size: ", board_size_));
+  }
 }
 
 void AmazonsState::SetState(int cur_player, MoveState move_state,
-                            const std::array<CellState, kNumCells>& board) {
+                            const std::vector<CellState>& board) {
+  SPIEL_CHECK_EQ(board.size(), board_.size());
   current_player_ = cur_player;
   state_ = move_state;
   board_ = board;
@@ -296,11 +327,11 @@ void AmazonsState::SetState(int cur_player, MoveState move_state,
 
 std::string AmazonsState::ToString() const {
   std::string str;
-  for (int r = 0; r < kNumRows; ++r) {
-    for (int c = 0; c < kNumCols; ++c) {
+  for (int r = 0; r < board_size_; ++r) {
+    for (int c = 0; c < board_size_; ++c) {
       absl::StrAppend(&str, StateToString(BoardAt(r, c)));
     }
-    if (r < (kNumRows - 1)) {
+    if (r < (board_size_ - 1)) {
       absl::StrAppend(&str, "\n");
     }
   }
@@ -335,13 +366,14 @@ void AmazonsState::ObservationTensor(Player player,
                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  SPIEL_CHECK_EQ(values.size(), kCellStates * kNumCells);
+  const int num_cells = board_size_ * board_size_;
+  SPIEL_CHECK_EQ(values.size(), kCellStates * num_cells);
 
   // Clear tensor first.
   std::fill(values.begin(), values.end(), 0.0f);
 
-  TensorView<2> view(values, {kCellStates, kNumCells}, true);
-  for (int cell = 0; cell < kNumCells; ++cell) {
+  TensorView<2> view(values, {kCellStates, num_cells}, true);
+  for (int cell = 0; cell < num_cells; ++cell) {
     const int channel = static_cast<int>(board_[cell]);
     view[{channel, cell}] = 1.0f;
   }
@@ -352,7 +384,10 @@ std::unique_ptr<State> AmazonsState::Clone() const {
 }
 
 AmazonsGame::AmazonsGame(const GameParameters &params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      board_size_(ParameterValue<int>("board_size")) {
+  SPIEL_CHECK_TRUE(board_size_ == 6 || board_size_ == 8 || board_size_ == 10);
+}
 
 }  // namespace amazons
 }  // namespace open_spiel
