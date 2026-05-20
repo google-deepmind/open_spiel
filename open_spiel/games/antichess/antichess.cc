@@ -293,7 +293,7 @@ void AntichessState::MaybeGenerateLegalActions() const {
   if (cached_legal_actions_) return;
 
   // In Antichess, captures are mandatory
-  absl::optional<std::vector<Action>> capture_moves, non_capture_moves;
+  std::optional<std::vector<Action>> capture_moves, non_capture_moves;
   capture_moves.emplace();
   non_capture_moves.emplace();
 
@@ -423,7 +423,7 @@ AntichessState::ExtractFenAndMaybeMoves() const {
   return std::make_pair(initial_fen, move_lans);
 }
 
-absl::optional<std::vector<double>> AntichessState::MaybeFinalReturns() const {
+std::optional<std::vector<double>> AntichessState::MaybeFinalReturns() const {
   std::vector<double> returns(NumPlayers(), DrawUtility());
   if (IsRepetitionDraw()) return returns;
 
