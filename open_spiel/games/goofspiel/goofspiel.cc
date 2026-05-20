@@ -828,7 +828,7 @@ double GoofspielGame::MaxUtility() const {
   }
 }
 
-absl::optional<double> GoofspielGame::UtilitySum() const {
+std::optional<double> GoofspielGame::UtilitySum() const {
   if (returns_type_ == ReturnsType::kTotalPoints)
     return absl::nullopt;
   else
@@ -836,7 +836,7 @@ absl::optional<double> GoofspielGame::UtilitySum() const {
 }
 
 std::shared_ptr<Observer> GoofspielGame::MakeObserver(
-    absl::optional<IIGObservationType> iig_obs_type,
+    std::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
   // Allows for `egocentric` overrides if observer variant is needed.
   bool egocentric = egocentric_;
