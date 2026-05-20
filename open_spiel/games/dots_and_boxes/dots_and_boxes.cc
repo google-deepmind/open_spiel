@@ -659,9 +659,7 @@ double DotsAndBoxesGame::MinUtility() const {
   }
 }
 
-absl::optional<double> DotsAndBoxesGame::UtilitySum() const {
-  return 0;
-}
+std::optional<double> DotsAndBoxesGame::UtilitySum() const { return 0; }
 
 double DotsAndBoxesGame::MaxUtility() const {
   if (utility_margin_) {
