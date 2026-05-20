@@ -426,7 +426,7 @@ double KuhnGame::MinUtility() const {
 }
 
 std::shared_ptr<Observer> KuhnGame::MakeObserver(
-    absl::optional<IIGObservationType> iig_obs_type,
+    std::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
   if (params.empty()) {
     return std::make_shared<KuhnObserver>(
