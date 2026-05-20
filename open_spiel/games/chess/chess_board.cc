@@ -70,7 +70,7 @@ std::string ColorToString(Color c) {
   }
 }
 
-absl::optional<PieceType> PieceTypeFromChar(char c) {
+std::optional<PieceType> PieceTypeFromChar(char c) {
   switch (toupper(c)) {
     case 'P':
       return PieceType::kPawn;
@@ -168,7 +168,7 @@ std::string Piece::ToString() const {
                                 : absl::AsciiStrToLower(base);
 }
 
-absl::optional<Square> SquareFromString(const std::string &s) {
+std::optional<Square> SquareFromString(const std::string& s) {
   if (s.size() != 2) return kInvalidSquare;
 
   auto file = ParseFile(s[0]);
@@ -211,8 +211,8 @@ std::string Move::ToLAN(bool chess960,
     // <king position> <rook position> it is castling with.
     SPIEL_CHECK_TRUE(board_ptr != nullptr);
     Color to_play = board_ptr->ToPlay();
-    absl::optional<Square> maybe_rook_sq = board_ptr->MaybeCastlingRookSquare(
-      to_play, castle_dir);
+    std::optional<Square> maybe_rook_sq =
+        board_ptr->MaybeCastlingRookSquare(to_play, castle_dir);
     SPIEL_CHECK_TRUE(maybe_rook_sq.has_value());
     return absl::StrCat(SquareToString(from),
                         SquareToString(maybe_rook_sq.value()));
@@ -373,7 +373,7 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
   board_.fill(kEmptyPiece);
 }
 
-/*static*/ absl::optional<ChessBoard> ChessBoard::BoardFromFEN(
+/*static*/ std::optional<ChessBoard> ChessBoard::BoardFromFEN(
     const std::string& fen, int board_size, bool king_in_check_allowed,
     bool allow_pass_move, bool allow_king_promotion) {
   /* An FEN string includes a board position, side to play, castling
@@ -886,8 +886,8 @@ bool ChessBoard::HasSufficientMaterial() const {
   return dark_bishop_exists && light_bishop_exists;
 }
 
-absl::optional<Move> ChessBoard::ParseMove(const std::string &move,
-                                           bool chess960) const {
+std::optional<Move> ChessBoard::ParseMove(const std::string& move,
+                                          bool chess960) const {
   // First see if they are in the long form -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
   // SAN moves will never have this form because an SAN move that starts with
@@ -906,8 +906,8 @@ absl::optional<Move> ChessBoard::ParseMove(const std::string &move,
   return absl::nullopt;
 }
 
-absl::optional<Move> ChessBoard::ParseSANMove(
-    const std::string &move_str) const {
+std::optional<Move> ChessBoard::ParseSANMove(
+    const std::string& move_str) const {
   std::string move = move_str;
 
   if (move.empty()) return absl::nullopt;
@@ -987,7 +987,7 @@ absl::optional<Move> ChessBoard::ParseSANMove(
 
   // If necessary, source rank and/or file are also included for
   // disambiguation.
-  absl::optional<int8_t> source_file, source_rank;
+  std::optional<int8_t> source_file, source_rank;
   if (!move.empty()) {
     source_file = ParseFile(move[0]);
     if (source_file) {
@@ -1004,11 +1004,11 @@ absl::optional<Move> ChessBoard::ParseSANMove(
   if (!move.empty()) { return absl::nullopt; }
 
   // Pawn promations are annotated with =Q to indicate the promotion type.
-  absl::optional<PieceType> promotion_type;
+  std::optional<PieceType> promotion_type;
   if (!annotation.empty() && annotation[0] == '=') {
     if (annotation.size() < 2) { return absl::nullopt; }
     auto maybe_piece = PieceTypeFromChar(annotation[1]);
-    if (!maybe_piece) return absl::optional<Move>();
+    if (!maybe_piece) return std::optional<Move>();
     promotion_type = maybe_piece;
   }
 
@@ -1028,11 +1028,11 @@ absl::optional<Move> ChessBoard::ParseSANMove(
   if (candidates.size() == 1) return candidates[0];
   std::cerr << "expected exactly one matching move, got " << candidates.size()
             << std::endl;
-  return absl::optional<Move>();
+  return std::optional<Move>();
 }
 
-absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move,
-                                              bool chess960) const {
+std::optional<Move> ChessBoard::ParseLANMove(const std::string& move,
+                                             bool chess960) const {
   if (move.empty()) { return absl::nullopt; }
 
   // Long algebraic notation moves (of the variant we care about) are in one of
@@ -1054,7 +1054,7 @@ absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move,
     auto from = SquareFromString(move.substr(0, 2));
     auto to = SquareFromString(std::string(absl::ClippedSubstr(move, 2, 2)));
     if (from && to) {
-      absl::optional<PieceType> promotion_type;
+      std::optional<PieceType> promotion_type;
       if (move.size() == 5) {
         promotion_type = PieceTypeFromChar(move[4]);
         if (!promotion_type) {
@@ -1720,7 +1720,7 @@ std::string ChessBoard::ToUnicodeString() const {
 
 char ChessBoard::ShredderCastlingRightChar(Color color,
                                            CastlingDirection dir) const {
-  absl::optional<Square> maybe_rook_sq = MaybeCastlingRookSquare(color, dir);
+  std::optional<Square> maybe_rook_sq = MaybeCastlingRookSquare(color, dir);
   if (!maybe_rook_sq.has_value()) {
     return '-';
   }
@@ -1906,7 +1906,7 @@ void ChessBoard::set_square(Square sq, Piece piece) {
   board_[position] = piece;
 }
 
-absl::optional<Square> ChessBoard::MaybeCastlingRookSquare(
+std::optional<Square> ChessBoard::MaybeCastlingRookSquare(
     Color side, CastlingDirection direction) const {
   switch (direction) {
     case CastlingDirection::kLeft:
@@ -1934,7 +1934,7 @@ int ToInt(CastlingDirection direction) {
 }
 
 void ChessBoard::SetCastlingRight(Color side, CastlingDirection direction,
-                                  absl::optional<Square> maybe_rook_square) {
+                                  std::optional<Square> maybe_rook_square) {
   static const ZobristTableU64<2, 2, 2> kZobristValues(/*seed=*/876387212);
 
   // Remove old value from hash (note that we only use bool for castling rights,
