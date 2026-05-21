@@ -45,7 +45,7 @@ def _center(
 
 def _l2_norm(
   tensor: chex.Array,
-  mask: Optional[chex.Array] = None,
+  joint_mask: Optional[chex.Array] = None,
   unit_variance: bool = False,
 ) -> chex.Array:
   """Returns L2 norm.
@@ -57,7 +57,7 @@ def _l2_norm(
 
   Args:
     tensor: Array with shape [|S_1|,...|S_N|].
-    mask: Array with shape [|S_1|,...|S_N|].
+    joint_mask: Array with shape [|S_1|,...|S_N|].
     unit_variance: Scale so elements maintain unit variance.
 
   Returns:
@@ -65,18 +65,18 @@ def _l2_norm(
   """
   # Note: jnp.linalg.norm is only implemented for 2D arrays.
   scale = jnp.clip(
-    jnp.sqrt(jnp.sum(jnp.square(tensor), where=mask)), min=_MIN_SCALE
+    jnp.sqrt(jnp.sum(jnp.square(tensor), where=joint_mask)), min=_MIN_SCALE
   )
   if unit_variance:
-    size = jnp.sum(mask) if mask is not None else tensor.size
+    size = jnp.sum(joint_mask) if joint_mask is not None else tensor.size
     scale /= jnp.sqrt(size)
   return scale
 
 
 def _l2_scale(
   tensor: chex.Array,
-  mask: Optional[chex.Array] = None,
-  min_denominator: Optional[float] = 1e-12,
+  joint_mask: Optional[chex.Array] = None,
+  min_denominator: Optional[float] = 1e-8,
   unit_variance: bool = False,
 ) -> chex.Array:
   """Returns L2 normalized tensor.
@@ -90,46 +90,46 @@ def _l2_scale(
 
   Args:
     tensor: Array with shape [|S_1|,...|S_N|].
-    mask: Array with shape [|S_1|,...|S_N|].
-    min_denominator: Optional minimum value to normalize with. Default is 1e-12.
+    joint_mask: Array with shape [|S_1|,...|S_N|].
+    min_denominator: Optional minimum value to normalize with. Default is 1e-8.
       Pass None to disable denominator clipping.
     unit_variance: Scale so elements maintain unit variance.
 
   Returns:
     normalized_tensor: Array with shape [|S_1|,...|S_N|].
   """
-  scale = _l2_norm(tensor, mask=mask, unit_variance=unit_variance)
+  scale = _l2_norm(tensor, joint_mask=joint_mask, unit_variance=unit_variance)
   return tensor / jnp.clip(scale, min=min_denominator)
 
 
 def _l1_scale(
   tensor: chex.Array,
-  mask: Optional[chex.Array] = None,
-  min_denominator: Optional[float] = 1e-12,
+  joint_mask: Optional[chex.Array] = None,
+  min_denominator: Optional[float] = 1e-8,
   unit_variance: bool = False,
 ) -> chex.Array:
   """L1 normalisation: scaling by sum of absolute values."""
-  scale = jnp.sum(jnp.abs(tensor), where=mask)
+  scale = jnp.sum(jnp.abs(tensor), where=joint_mask)
   scale = jnp.clip(scale, min=min_denominator)
 
   if unit_variance:
-    size = jnp.sum(mask) if mask is not None else tensor.size
+    size = jnp.sum(joint_mask) if joint_mask is not None else tensor.size
     scale /= jnp.sqrt(size)
   return tensor / scale
 
 
 def _linf_scale(
   tensor: chex.Array,
-  mask: Optional[chex.Array] = None,
-  min_denominator: Optional[float] = 1e-12,
+  joint_mask: Optional[chex.Array] = None,
+  min_denominator: Optional[float] = 1e-8,
   unit_variance: bool = False,
 ) -> chex.Array:
   """L-infinity normalisation: scaling by max absolute value."""
-  scale = jnp.max(jnp.abs(tensor), initial=0.0, where=mask)
+  scale = jnp.max(jnp.abs(tensor), initial=0.0, where=joint_mask)
   scale = jnp.clip(scale, min=min_denominator)
 
   if unit_variance:
-    size = jnp.sum(mask) if mask is not None else tensor.size
+    size = jnp.sum(joint_mask) if joint_mask is not None else tensor.size
     scale /= jnp.sqrt(size)
   return tensor / scale
 
@@ -174,7 +174,7 @@ def _l_disc(
   payoffs_per_player = []
   for player in range(num_players):
     centered = _center(payoffs[player], player, joint_mask=joint_mask)
-    scaled = scale_fn(centered, mask=joint_mask, unit_variance=True)
+    scaled = scale_fn(centered, joint_mask=joint_mask, unit_variance=True)
     payoffs_per_player.append(scaled)
   return jnp.stack(payoffs_per_player)
 

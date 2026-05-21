@@ -19,6 +19,9 @@ from open_spiel.python.jax.nes import samplers
 from open_spiel.python.jax.nes import games
 from open_spiel.python.jax.nes import equilibria_utils as eu
 
+"""TODO: Comment
+"""
+
 # Shortcut for the data structrure
 Data = samplers.Data
 Game = samplers.Game
@@ -26,7 +29,7 @@ Game = samplers.Game
 
 @functools.partial(jax.jit, static_argnames=("mode",))
 def recover_primals(
-  alpha: chex.Array,
+  duals: chex.Array,
   data: Data,
   mu: float,
   rho: float,
@@ -37,30 +40,20 @@ def recover_primals(
   ε̂-MWMRE dual loss (Equation 7, [1]).
   L_dual = log_sum_exp + ε⁺ · Σ_p Σ_a α_p(a) - ρ · Σ_p ε_p
   """
-  G = data.reward  # [N, A1, ..., AN]
-  N = G.shape[0]
+  payoffs = data.reward  # [N, A1, ..., AN]
 
   hat_sigma = data.sigma_hat  # [A1, ..., AN]
   hat_epsilon = data.epsilon_hat  # [N]
   W = data.welfare  # [A1, ..., AN]
 
   if mode == networks.Mode.CCE.value:
-    contrib_fn = eu.player_contribution_cce
+    contrib_fn = eu.cce_logit
   else:  # noqa: E731
-    contrib_fn = eu.player_contribution_ce
-
-  deviations = []
-  sum_alphas = []
-  for p in range(N):
-    dev, sum_a = contrib_fn(alpha[p], G[p], p)
-    deviations.append(dev)
-    sum_alphas.append(sum_a)
-
-  deviations = jnp.stack(deviations)
-  sum_alphas = jnp.stack(sum_alphas)
+    contrib_fn = eu.ce_logit
 
   # Sum deviations over all players: Σ_p [...]
-  deviation_term = jnp.sum(deviations, axis=0)  # [A1, ..., AN]
+  deviation_term = contrib_fn(duals, payoffs).sum(0)
+  sum_alphas = duals.sum(0)
 
   W_masked = jnp.where(data.mask, W, 0.0)
 

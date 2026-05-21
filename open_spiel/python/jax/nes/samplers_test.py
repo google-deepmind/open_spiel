@@ -109,9 +109,15 @@ class SamplerTest(parameterized.TestCase):
     num_players = len(num_strategies)
 
     self.assertEqual(
-      batch.reward.shape, (batch_size, num_players) + num_strategies
+      batch.payoffs.shape, (batch_size, num_players) + num_strategies
     )
-    self.assertEqual(batch.mask.shape, (batch_size,) + num_strategies)
+    self.assertEqual(batch.joint_mask.shape, (batch_size,) + num_strategies)
+
+    for p in range(num_players):
+      self.assertEqual(
+        batch.strat_mask_per_player[p].shape,
+        (batch_size, num_strategies[p]),  # raw size, not max_actions
+      )
 
   @parameterized.parameters(itertools.product((1, 2, 8), test_configs.values()))
   def test_multi_game_sampler(self, batch_size, configs):
@@ -125,21 +131,40 @@ class SamplerTest(parameterized.TestCase):
     batch = sampler.sample_random(batch_size=batch_size, rng=jax.random.key(0))
 
     # All padded to max
-    self.assertEqual(batch.reward.shape, (batch_size, 2, 8, 8))
-    self.assertEqual(batch.mask.shape, (batch_size, 8, 8))
-
-    # Variable valid regions
-    # TODO: add test, expose the strategies number
-    valid_counts = jnp.sum(batch.mask, axis=(1, 2))  # noqa: F841
+    self.assertEqual(batch.payoffs.shape, (batch_size, 2, 8, 8))
+    self.assertEqual(batch.joint_mask.shape, (batch_size, 8, 8))
 
     # # Sigma valid
+    # valid_counts = jnp.sum(batch.joint_mask, axis=tuple(range(1, batch.joint_mask.ndim)))
     for i in range(batch_size):
-      valid = batch.mask[i]
-      self.assertTrue(jnp.all(batch.sigma_hat[i][valid] >= 0))
+      valid = batch.joint_mask[i]
+      self.assertTrue(jnp.all(batch.strategy_base[i][valid] >= 0))
       self.assertTrue(
-        jnp.allclose(jnp.sum(batch.sigma_hat[i][valid]), 1.0, atol=1e-4)
+        jnp.allclose(jnp.sum(batch.strategy_base[i][valid]), 1.0, atol=1e-4)
       )
-      self.assertTrue(jnp.all(batch.sigma_hat[i][~valid] == 0))
+      self.assertTrue(jnp.all(batch.strategy_base[i][~valid] == 0))
+
+  def test_strat_mask_per_player(self):
+    """Per-player masks should be padded to max_actions and sum to counts."""
+    configs = [
+      samplers.MixedGameConfig(
+        game_type=games.Game.L2_INVARIANT, num_strategies=(3, 5)
+      ),
+    ]
+    sampler = samplers.MultiGameSampler(
+      configs, max_actions=8, obj=BASE_OBJECTIVE, m=2
+    )
+    batch = sampler.sample_random(batch_size=4, rng=jax.random.key(0))
+
+    for i in range(4):
+      for p in range(2):
+        mask_p = batch.strat_mask_per_player[p][i]
+        self.assertEqual(mask_p.shape, (8,))
+        self.assertTrue(jnp.any(mask_p))
+        # Count valid actions should match sampled count (2 to 8)
+        count = jnp.sum(mask_p)
+        self.assertGreaterEqual(count, 2)
+        self.assertLessEqual(count, 8)
 
 
 if __name__ == "__main__":

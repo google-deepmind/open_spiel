@@ -14,6 +14,7 @@ from open_spiel.python.jax.nes import utils
   https://arxiv.org/abs/2210.09257
 """
 
+
 class Mode(enum.Enum):
   CE = 0
   CCE = 1
@@ -21,122 +22,211 @@ class Mode(enum.Enum):
 
 BASE_KERNEL_INIT = init.variance_scaling(
   1.0, mode="fan_in", distribution="normal"
-) #unit variance based on the number of inputs
+)  # unit variance based on the number of inputs
+
 
 class EquivariantPooling(nn.Module):
   """Base class for all equivariant poolings."""
-  def __init__(self, pool_fns: list[Callable]) -> None  :
+
+  def __init__(self, pool_fns: list[Callable]) -> None:
     self.pools = pool_fns
     self.num_pools = len(pool_fns)
 
   def __call__(self, x: chex.Array, mask: chex.Array) -> chex.Array:
     """x shape: [C, N, A1, ..., AN]"""
-    original_shape = x.shape
 
-    def broadcast(y: chex.Array) -> chex.Array:
-      """Helper to maintained the fixed tensor size."""
-      return jnp.broadcast_to(y, original_shape)
+    return jnp.concatenate(
+      [pool(x, mask) for pool in self.pools], axis=0
+    )  # [C * num_pools, N, *A]
 
-    pooled_list = [broadcast(pool(x, mask)) for pool in self.pools]
-
-    return jnp.concatenate(pooled_list, axis=0)  # [C * num_pools, N, *A]
 
 class EquivariantPayoffPooling(EquivariantPooling):
   """Payoff-to-Payoff poolings from Appendix C (18a)-(18l)."""
 
   def __init__(self, num_players: int) -> None:
-
     # We build the list of pooling functions once in __init__
     pools = []
 
     # (18a) identity
     pools.append(lambda x, m: x)
 
-    # (18b) per-player mean (joint-action mean)
+    # (18b) per-player mean (joint-action mean) φ_{a_1,...,a_N} g(p, ...)
     pools.append(
-      lambda x, m: utils.safe_masked_mean(x, axis=tuple(range(2, x.ndim)), keepdims=True, where=m)
+      lambda x, mask: utils.reduce(
+        x,
+        tuple(range(2, x.ndim)),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        where=mask,
+        broadcast=True,
+      )
     )
 
-    # (18c) player + joint-action mean
+    # (18c) player + joint-action mean φ_{p, a_1,...,a_N} g(p, ...)
     pools.append(
-      lambda x, m: utils.safe_masked_mean(x, axis=(1,) + tuple(range(2, x.ndim)), keepdims=True, where=m)
+      lambda x, mask: utils.reduce(
+        x,
+        (1,) + tuple(range(2, x.ndim)),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        where=mask,
+        broadcast=True,
+      )
     )
 
-    # (18d) own-action mean for each player p
-    pools.append(lambda x, m: utils.safe_masked_mean(x, axis=1, keepdims=True, where=m))
+    # (18d) own-action mean for each player p φ_p g(p, ...)
+    pools.append(
+      lambda x, mask: utils.reduce(
+        x,
+        (1,),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        where=mask,
+        broadcast=True,
+      )
+    )
 
     # (18e)–(18h) opponent-specific
     for q in range(num_players):
       q_act_axis = 2 + q  # Actions start at axis 2: AAAA!
 
-      # (18e) Depends on p and a_q.
+      # (18e) Depends on p and a_q: φ_{p, a_q} g(p, ...)
       pools.append(
-        lambda x, m, qa=q_act_axis: utils.safe_masked_mean(
-          x, axis=tuple(i for i in range(2, x.ndim) if i != qa), keepdims=True, where=m
+        lambda x, m, qa=q_act_axis: utils.reduce(
+          x,
+          axis=(1, qa),
+          reduction=utils.Reduction.MEAN,
+          include_identity=False,
+          include_all=True,
+          include_other=False,
+          where=m,
+          broadcast=True,
         )
       )
 
-      # (18f) Depends on p and a_{-q}.
+      # (18f)  φ_{p, a_{-q}} g(p, ...)
       pools.append(
-        lambda x, m, qa=q_act_axis: utils.safe_masked_mean(x, axis=qa, keepdims=True, where=m)
+        lambda x, m, qa=q_act_axis: utils.reduce(
+          x,
+          axis=(1,) + tuple(i for i in range(2, x.ndim) if i != qa),
+          reduction=utils.Reduction.MEAN,
+          include_identity=False,
+          include_all=True,
+          include_other=False,
+          where=m,
+          broadcast=True,
+        )
       )
 
       # (18g) Depends on a_q only.
       pools.append(
-        lambda x, m, qa=q_act_axis: utils.safe_masked_mean(
+        lambda x, m, qa=q_act_axis: utils.reduce(
           x,
-          axis=(1,) + tuple(i for i in range(2, x.ndim) if i != qa),
-          keepdims=True,
-          where=m
+          axis=(qa,),
+          reduction=utils.Reduction.MEAN,
+          include_identity=False,
+          include_all=True,
+          include_other=False,
+          where=m,
+          broadcast=True,
         )
       )
 
       # (18h) Depends on a_{-q} only. REDUCE player (axis 1) and a_q.
       pools.append(
-        lambda x, m, qa=q_act_axis: utils.safe_masked_mean(x, axis=(1, qa), keepdims=True, where=m)
+        lambda x, m, qa=q_act_axis: utils.reduce(
+          x,
+          axis=tuple(i for i in range(2, x.ndim) if i != qa),
+          reduction=utils.Reduction.MEAN,
+          include_identity=False,
+          include_all=True,
+          include_other=False,
+          where=m,
+          broadcast=True,
+        )
       )
 
     # (18i)-(18l) Cross-player pools
-    # TODO: disiabled for now for debug purposes
-    # for q in range(num_players):
-    #   for p in range(num_players):
-    #     if p == q:
-    #       continue
-    #     # Use a helper factory to strictly bind p and q without closure issues
-    #     pools.extend(self._build_cross_player_pools(p, q))
+    for q in range(num_players):
+      for p in range(num_players):
+        if p == q:
+          continue
+        # Use a helper factory to strictly bind p and q without closure issues
+        pools.extend(self._build_cross_player_pools(p, q))
 
     super().__init__(pools)
 
-  def _build_cross_player_pools(self, p: int, q: int) -> list[chex.Array]:
-    """Helper to build 18i-18l for a specific (p, q) pair."""
+  def _build_cross_player_pools(self, p: int, q: int):
+    """Build (18i)-(18l) for a specific (p, q) pair, p ≠ q.
 
-    def slice_and_broadcast(x, mask, reduce_axes):
-      # x_q shape: [C, A_0, ..., A_{N-1}]
+    All pools take player q's payoff, reduce over axes related to p,
+    then broadcast back to [C, N, A1, ..., AN].
+    """
+    pools = []
+
+    def _slice_reduce_broadcast(x, mask, reduce_axes):
+      """Slice to player q, reduce, broadcast back."""
+      # x: [C, N, A1, ..., AN]
+      # x_q: [C, A1, ..., AN]
       x_q = x[:, q]
-      mean_q = utils.safe_masked_mean(x_q, axis=reduce_axes, keepdims=True, where=mask)
-      # Add player dim back: [C, 1, A_0, ..., A_{N-1}]
-      mean_q = jnp.expand_dims(mean_q, axis=1)
-      return jnp.broadcast_to(mean_q, x.shape)
 
-    p_act = 1 + p  # SLICED!
+      # Apply mask if provided (mask has shape [A1, ..., AN])
+      if mask is not None:
+        where = mask
+      else:
+        where = None
+
+      # Reduce
+      reduced = utils.reduce(
+        x_q,
+        reduce_axes,
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=False,
+        where=where,
+      )  # shape depends on reduce_axes, but broadcast=True ensures [C, A1, ..., AN]
+
+      # Add player dimension back: [C, 1, A1, ..., AN]
+      expanded = jnp.expand_dims(reduced, axis=1)
+
+      # Broadcast to [C, N, A1, ..., AN]
+      return jnp.broadcast_to(expanded, x.shape)
+
+    p_act = 1 + p
     q_act = 1 + q
 
-    def pool_18i(x, mask):
-      return slice_and_broadcast(x, mask, reduce_axes=p_act)
+    # (18i) Reduce over a_p
+    # φ_{a_p} g(q, ...)
+    pools.append(lambda x, m: _slice_reduce_broadcast(x, m, (p_act,)))
 
-    def pool_18j(x, mask):
-      all_actions = tuple(range(1, x.ndim-1))
-      reduce_a_minus_q = tuple(i for i in all_actions if i != q_act)
-      return slice_and_broadcast(x, mask, reduce_axes=reduce_a_minus_q)
+    # (18j) Reduce over a_{-p}
+    pools.append(
+      lambda x, m: _slice_reduce_broadcast(
+        x, m, tuple(i for i in range(1, x.ndim - 1) if i != p_act)
+      )
+    )
 
-    def pool_18k(x, mask):
-      return slice_and_broadcast(x, mask, reduce_axes=q_act)
+    # (18k) Reduce over a_q
+    # φ_{a_p} g(q, ...)
+    pools.append(lambda x, m: _slice_reduce_broadcast(x, m, (q_act,)))
 
-    def pool_18l(x, mask):
-      all_actions = tuple(range(1, x.ndim-1))
-      return slice_and_broadcast(x, mask, reduce_axes=all_actions)
+    # (18l) Reduce over a_{-q}
+    # φ_{a_{-q}} g(q, ...)
+    pools.append(
+      lambda x, m: _slice_reduce_broadcast(
+        x, m, tuple(i for i in range(1, x.ndim - 1) if i != q_act)
+      )
+    )
 
-    return [pool_18i, pool_18j, pool_18k, pool_18l]
+    return pools
 
 
 class EquivariantPayoffToPayoff(nn.Module):
@@ -157,7 +247,7 @@ class EquivariantPayoffToPayoff(nn.Module):
       rngs=rngs,
       kernel_init=BASE_KERNEL_INIT,
     )
-    self.bn = nn.BatchNorm(out_channels, rngs=rngs, axis_name='batch')
+    self.bn = nn.BatchNorm(out_channels, rngs=rngs, axis_name="batch")
     self.act = nn.relu
 
   def __call__(self, x: chex.Array, mask: chex.Array) -> chex.Array:
@@ -203,7 +293,9 @@ class PayoffsToDuals(nn.Module):
         kernel_init=BASE_KERNEL_INIT,
       )
 
-  def _marginalise_payoffs(self, alpha: chex.Array) -> chex.Array:
+  def _marginalise_payoffs(
+    self, alpha: chex.Array, joint_mask: chex.Array
+  ) -> chex.Array:
     """Helper for marginalisation: [C_dual, N, A1, ..., AN] → [C_dual, N, A]"""
 
     # Detect if this is a cubic game (all players have the same number of actions)
@@ -213,7 +305,7 @@ class PayoffsToDuals(nn.Module):
 
     m_duals = []
     for p in range(alpha.shape[1]):
-      # Slice for this player → [C_dual, A1, A2, ..., AN]
+      # [C_dual, A1, A2, ..., AN]
       alpha_p_slice = alpha[:, p]
       own_axis = p + 1
 
@@ -222,20 +314,31 @@ class PayoffsToDuals(nn.Module):
         i for i in range(1, alpha_p_slice.ndim) if i != own_axis
       )
       #  [C_dual, A_p]
-      alpha_p = jnp.mean(alpha_p_slice, axis=reduce_axes, keepdims=False)
+      alpha_p = utils.reduce(
+        alpha_p_slice,
+        axis=reduce_axes,
+        reduction=utils.Reduction.MEAN,
+        where=joint_mask,
+        include_identity=False,
+        include_other=False,
+        broadcast=False,
+      ).squeeze()
+
       if is_cubic:
         m_duals.append(alpha_p)
       else:
         # Pad to max_A for non-cubic games
         if alpha_p.shape[-1] < max_A:
-          pad_width = [(0, 0)] * (alpha_p.ndim - 1) + [(0, max_A - alpha_p.shape[-1])]
-          alpha_p = jnp.pad(alpha_p, pad_width, mode='constant')
+          pad_width = [(0, 0)] * (alpha_p.ndim - 1) + [
+            (0, max_A - alpha_p.shape[-1])
+          ]
+          alpha_p = jnp.pad(alpha_p, pad_width, mode="constant")
         m_duals.append(alpha_p)
-      
+
     # Stack along the player dimension -> [C, N, max_A]
     return jnp.stack(m_duals, axis=1)
 
-  def __call__(self, x: chex.Array) -> chex.Array:
+  def __call__(self, x: chex.Array, joint_mask: chex.Array) -> chex.Array:
     # x is [C, N, *A]
 
     # NOTE: currently, we marginalise after the projection
@@ -245,7 +348,7 @@ class PayoffsToDuals(nn.Module):
 
     if self.mode == Mode.CCE:
       alpha_cce = jnp.moveaxis(self.linear(x_t), -1, 0)  # [C_dual, N, *A]
-      return self._marginalise_payoffs(alpha_cce)
+      return self._marginalise_payoffs(alpha_cce, joint_mask)
 
     elif self.mode == Mode.CE:
       # Outer product
@@ -253,8 +356,12 @@ class PayoffsToDuals(nn.Module):
       alpha_med = jnp.moveaxis(self.linear(x_t), -1, 0)
       alpha_rec = jnp.moveaxis(self.linear_aux(x_t), -1, 0)
 
-      alpha1 = self._marginalise_payoffs(alpha_med)  # [C_dual, N, A]
-      alpha2 = self._marginalise_payoffs(alpha_rec)  # [C_dual, N, A]
+      alpha1 = self._marginalise_payoffs(
+        alpha_med, joint_mask
+      )  # [C_dual, N, A]
+      alpha2 = self._marginalise_payoffs(
+        alpha_rec, joint_mask
+      )  # [C_dual, N, A]
 
       # Outer product (Eq. 13 generalisation)
       # same as jnp.einsum('cni,cnj->cnij', alpha1, alpha2)
@@ -272,10 +379,32 @@ class EquivariantDualPoolingCCE(nn.Module):
   def __init__(self, num_players: int):
     self.pools = [
       lambda x: x,  # (19a) identity
-      lambda x: jnp.mean(x, axis=1, keepdims=True),  # (19b) mean over players
-      lambda x: jnp.mean(x, axis=2, keepdims=True),  # (19c) mean over actions
-      lambda x: jnp.mean(
-        x, axis=(1, 2), keepdims=True
+      lambda x: utils.reduce(
+        x,
+        (1,),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),  # (19b) mean over players
+      lambda x: utils.reduce(
+        x,
+        (2,),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),  # (19c) mean over actions
+      lambda x: utils.reduce(
+        x,
+        (1, 2),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
       ),  # (19d) mean over player + actions
     ]
 
@@ -286,7 +415,7 @@ class EquivariantDualPoolingCCE(nn.Module):
     # x is a tensor of shape [C, N, A1, ..., AN]
     # returned shape has to be [B, C * num_pools, N, *A]
     return jnp.concatenate(
-      [jnp.broadcast_to(pool(x), x.shape) for pool in self.pools], axis=0
+      [pool(x) for pool in self.pools], axis=0
     )  # [C * num_pools, N, *A]
 
 
@@ -297,15 +426,59 @@ class EquivariantDualPoolingCE(nn.Module):
     self.pools = [
       lambda x: x,  # (20a) identity
       lambda x: jnp.swapaxes(x, 2, 3),  # (20b) swap a' ↔ a''
-      lambda x: jnp.mean(x, axis=2, keepdims=True),  # (20c) mean over a'
-      lambda x: jnp.mean(x, axis=3, keepdims=True),  # (20d) mean over a''
-      lambda x: jnp.mean(x, axis=(2, 3), keepdims=True),  # (20e) mean over both
-      lambda x: jnp.mean(x, axis=(1, 2), keepdims=True),  # (20f) mean over p,a'
-      lambda x: jnp.mean(
-        x, axis=(1, 3), keepdims=True
+      lambda x: utils.reduce(
+        x,
+        (2,),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),  # (20c) mean over a'
+      lambda x: utils.reduce(
+        x,
+        (2,),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),  # (20d) mean over a''
+      lambda x: utils.reduce(
+        x,
+        (2, 3),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),  # (20e) mean over both
+      lambda x: utils.reduce(
+        x,
+        (1, 2),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),  # (20f) mean over p,a'
+      lambda x: utils.reduce(
+        x,
+        (1, 3),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
       ),  # (20g) mean over p,a''
-      lambda x: jnp.mean(
-        x, axis=(1, 2, 3), keepdims=True
+      lambda x: utils.reduce(
+        x,
+        (1, 2, 3),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
       ),  # (20h) mean over all
     ]
 
@@ -315,7 +488,7 @@ class EquivariantDualPoolingCE(nn.Module):
     # x is a tensor of shape [C, N, A1, ..., AN]
     # returned shape has to be [C * num_pools, N, *A]
     return jnp.concatenate(
-      [jnp.broadcast_to(pool(x), x.shape) for pool in self.pools], axis=0
+      [pool(x) for pool in self.pools], axis=0
     )  # [C * num_pools, N, *A]
 
 
@@ -332,7 +505,6 @@ class EquivariantDualToDual(nn.Module):
     *,
     rngs: nn.Rngs,
   ) -> None:
-    
     self.pooling = (
       EquivariantDualPoolingCCE(num_players)
       if mode == Mode.CCE
@@ -344,7 +516,7 @@ class EquivariantDualToDual(nn.Module):
       rngs=rngs,
       kernel_init=BASE_KERNEL_INIT,
     )
-    self.bn = nn.BatchNorm(out_channels, rngs=rngs, axis_name='batch')
+    self.bn = nn.BatchNorm(out_channels, rngs=rngs, axis_name="batch")
     base_act = nn.relu
 
     if last_activation:
@@ -412,7 +584,6 @@ class NeuralEquilibriumModel(nn.Module):
     *,
     rngs: nn.Rngs,
   ) -> None:
-    
     self._mode = mode
 
     # Payoff-to-payoff layers (5 layers in paper)
@@ -464,36 +635,37 @@ class NeuralEquilibriumModel(nn.Module):
       if dual_channel_list[-1] != 1
       else lambda x: x
     )
-  
+
   def _mask_alpha(self, alpha: chex.Array, mask: chex.Array) -> chex.Array:
     """Zero out alphas for padded actions using the joint mask."""
     N = alpha.shape[1]
     alpha_mask = []
-    
+
     if self._mode == Mode.CCE:
       # alpha: [C, N, A]; mask: [A1, ..., AN]
       # Per-player valid actions: does any valid joint action use this a_p?
       for p in range(N):
-        axes = tuple(i for i in range(mask.ndim) if i != p)
-        valid = jnp.any(mask, axis=axes)  # [A_p]
-        alpha_mask.append(valid)
+        alpha_mask.append(mask[p])
     else:  # CE
       # alpha: [C, N, A, A]; mask: [A1, ..., AN]
       for p in range(N):
-        axes = tuple(i for i in range(mask.ndim) if i != p)
-        valid = jnp.any(mask, axis=axes)  # [A_p]
+        valid = mask[p]
         # Outer product for (dev, rec)
         ce_valid = jnp.logical_and(valid[:, None], valid[None, :])  # [A, A]
         diag = jnp.arange(ce_valid.shape[0])
         ce_valid = ce_valid.at[diag, diag].set(False)
         alpha_mask.append(ce_valid)
 
-    alpha_mask = jnp.stack(alpha_mask) 
+    alpha_mask = jnp.stack(alpha_mask)
     alpha_mask = jnp.broadcast_to(alpha_mask, alpha.shape)
     return jnp.where(alpha_mask, alpha, 0.0)
 
-
-  def __call__(self, game_tensor: chex.Array, mask: chex.Array) -> chex.Array:
+  def __call__(
+    self,
+    game_tensor: chex.Array,
+    strat_mask_per_player: list[chex.Array],
+    joint_mask: chex.Array | None = None,
+  ) -> chex.Array:
     """NES forward pass.
 
     Args:
@@ -507,23 +679,25 @@ class NeuralEquilibriumModel(nn.Module):
     """
     # Payoff processing
     x = game_tensor
-    # Can't be standard `nnx.Sequential`
-    # as it accepts mask
+
+    if joint_mask is None:
+      joint_mask = utils.make_joint_mask_from_strat_masks(strat_mask_per_player)
+
+    # Can't be standard `nnx.Sequential` as it accepts mask
     for layer in self.eq_payoff_layers:
-      x = layer(x, mask)
+      x = layer(x, joint_mask)
 
     # Project to dual space
-    x = self.payoff_to_dual_proj(x)
+    x = self.payoff_to_dual_proj(x, joint_mask)
 
     # Dual processing
     alpha = self.dual_layers(x)
-    
+
     # Returning
     # For CCE: [1, N, A]
     # For CE: [1, N, A, A]
 
     # Mask padded duals
-    if mask is not None:
-      alpha = self._mask_alpha(alpha, mask)
+    alpha = self._mask_alpha(alpha, strat_mask_per_player)
 
     return alpha.squeeze(0)

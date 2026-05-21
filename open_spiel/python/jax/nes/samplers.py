@@ -19,12 +19,14 @@ Game = pyspiel.Game | games.Game | list[pyspiel.Game | games.Game]
 class Data(NamedTuple):
   """Experience batch for the network."""
 
-  reward: chex.Array  # [B, N, A1, ..., AN] or [N, A1, ..., AN]
-  sigma_hat: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
-  sigma_norm: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
-  epsilon_hat: chex.Array  # [B, N] or [N]
+  payoffs: chex.Array  # [B, N, A1, ..., AN] or [N, A1, ..., AN]
+  strategy_base: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
+  strategy_norm: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
+  epsilon_target: chex.Array  # [B, N] or [N]
   welfare: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
-  mask: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
+  strat_mask_per_player: list[chex.Array]  # [[[A_p]] or [[B, A_p]] p={1,...,N}
+  joint_mask: chex.Array  # [B, A1, ..., AN] or [A1, ..., AN]
+  original_action_sizes: chex.Shape | None = None
 
 
 class Mechanism(NamedTuple):
@@ -34,26 +36,28 @@ class Mechanism(NamedTuple):
 
 
 def broadcast(data: Data) -> Data:
-  base_shape = data.reward.shape
-  A = tuple(range(1, data.reward.ndim))
+  base_shape = data.payoffs.shape
+  A = tuple(range(1, data.payoffs.ndim))
   # ε̂: [N] → [N, *A] (per-player constant across actions)
   epsilon_broadcast = jnp.broadcast_to(
-    jnp.expand_dims(data.epsilon_hat, axis=A),  # Add action dims
+    jnp.expand_dims(data.epsilon_target, axis=A),  # Add action dims
     base_shape,
   )
-  sigma_hat_broadcast = jnp.broadcast_to(data.sigma_hat, base_shape)
-  sigma_norm_broadcast = jnp.broadcast_to(data.sigma_norm, base_shape)
+  strat_base_broadcast = jnp.broadcast_to(data.strategy_base, base_shape)
+  strat_norm_broadcast = jnp.broadcast_to(data.strategy_norm, base_shape)
 
   # W: [*A] → [N, *A] (same for all players)
   welfare_broadcast = jnp.broadcast_to(data.welfare, base_shape)
 
   return Data(
-    data.reward,
-    sigma_hat_broadcast,
-    sigma_norm_broadcast,
+    data.payoffs,
+    strat_base_broadcast,
+    strat_norm_broadcast,
     epsilon_broadcast,
     welfare_broadcast,
-    data.mask,
+    data.strat_mask_per_player,
+    data.joint_mask,
+    data.original_action_sizes,
   )
 
 
@@ -61,7 +65,8 @@ def stack(data: Data, axis=1) -> chex.Array:
   """Constructs [B, C=4, N, A1, ..., AN] tensor."""
   # Stack along channel dim 0: [B, 4, N, A1, ..., AN]
   return jnp.stack(
-    [data.reward, data.epsilon_hat, data.sigma_norm, data.welfare], axis=axis
+    [data.payoffs, data.epsilon_target, data.strategy_norm, data.welfare],
+    axis=axis,
   )
 
 
@@ -88,14 +93,14 @@ class GameSampler:
     self.max_actions = None
 
   @functools.partial(jax.jit, static_argnums=(0,))
-  def _compute_payoff_stats(self, G: chex.Array):
-    action_axes = tuple(range(1, G.ndim))
+  def _compute_payoff_stats(self, payoffs: chex.Array):
+    action_axes = tuple(range(1, payoffs.ndim))
 
     # 16(a): Compute mean μ_p = (1/|A|) Σ_a G_p(a)
-    mean_payoffs = jnp.mean(G, axis=action_axes, keepdims=True)
+    mean_payoffs = jnp.mean(payoffs, axis=action_axes, keepdims=True)
 
     # 16(b): Center payoffs G̃_p(a) = G_p(a) - μ_p
-    centred_payoffs = G - mean_payoffs
+    centred_payoffs = payoffs - mean_payoffs
 
     # 16(c): Compute L_m norm ||G̃_p||_m = (Σ_a |G̃_p(a)|^m)^(1/m)
     norm_payoffs = utils.compute_L_m_norm(centred_payoffs, self.m, action_axes)
@@ -109,11 +114,13 @@ class GameSampler:
       "scale_factor": scale.squeeze(action_axes),
     }
 
-    G_hat = centred_payoffs * scale
-    return G_hat, stats
+    payoffs_norm = centred_payoffs * scale
+    return payoffs_norm, stats
 
-  def _initialise_epsilon(self, G: chex.Array, rng: chex.PRNGKey) -> chex.Array:
-    num_players = G.shape[0]
+  def _initialise_epsilon(
+    self, payoffs: chex.Array, rng: chex.PRNGKey
+  ) -> chex.Array:
+    num_players = payoffs.shape[0]
     if self.obj == Objective.MS:
       return jnp.full((num_players,), self.z_m)
     if self.obj in [
@@ -140,70 +147,73 @@ class GameSampler:
     # Clip to [-Z_m, +Z_m] (broadcast Z_m)
     return jnp.clip(scaled_eps, -self.z_m, self.z_m)
 
-  def _initialise_sigma(
-    self, G: chex.Array, rng: chex.Array, tgt_sigma: chex.Array
+  def _initialise_strategy(
+    self, payoffs: chex.Array, rng: chex.Array, strategy_proposal: chex.Array
   ) -> chex.Array:
     """Returns hat_sigma(a) of shape [A1, A2, ..., AN]"""
-    _, *A = G.shape
+    _, *A = payoffs.shape
     joint_A = math.prod(A)
     if self.obj in [Objective.MRE, Objective.EPS_MRE, Objective.EPS_MWMRE]:
       return jax.random.dirichlet(rng, alpha=jnp.ones(joint_A)).reshape(A)
     if self.obj == Objective.MT:
-      return tgt_sigma
+      return strategy_proposal
     return jnp.ones(A) / joint_A
 
   @functools.partial(jax.jit, static_argnums=(0,))
-  def _scale_sigma(self, hat_sigma: chex.Array) -> chex.Array:
+  def _scale_strategy(self, strat_base: chex.Array) -> chex.Array:
     """Equation (16d): L1 unit-variance scaling for target joint distribution"""
-    joint_A = math.prod(hat_sigma.shape)
+    joint_A = math.prod(strat_base.shape)
     mean = 1.0 / joint_A
     z_sigma = (joint_A / jnp.sqrt(joint_A + 1.0 / joint_A)) * (
       (joint_A - 1) / joint_A
     )
-    return z_sigma * (hat_sigma - mean)
+    return z_sigma * (strat_base - mean)
 
-  def _initialise_welfare(self, G: chex.Array) -> chex.Array:
-    _, *A = G.shape
+  def _initialise_welfare(self, payoffs: chex.Array) -> chex.Array:
+    _, *A = payoffs.shape
     if self.obj == Objective.MU:
-      return jnp.sum(G, axis=0)  # sum over p
+      return jnp.sum(payoffs, axis=0)  # sum over p
     if self.obj in [Objective.EPS_MWME, Objective.EPS_MWMRE]:
-      return jnp.sum(G, axis=0)
+      return jnp.sum(payoffs, axis=0)
     return jnp.zeros(A)
 
   @functools.partial(jax.jit, static_argnums=(0,))
-  def _scale_welfare(self, W: chex.Array) -> chex.Array:
+  def _scale_welfare(self, welfare: chex.Array) -> chex.Array:
     """Equation (16c): L_m unit-variance scaling for welfare (joint)"""
-    mean = jnp.mean(W, axis=tuple(range(W.ndim)), keepdims=True)
-    centered = W - mean
-    norm = utils.compute_L_m_norm(centered, self.m, tuple(range(W.ndim)))
+    mean = jnp.mean(welfare, axis=tuple(range(welfare.ndim)), keepdims=True)
+    centered = welfare - mean
+    norm = utils.compute_L_m_norm(centered, self.m, tuple(range(welfare.ndim)))
 
     return centered / (norm + utils.SMALL_NUMBER)
 
   def normalise_batch(self, data: Data) -> Data:
     def _normalise_single_item(item: Data):
       # Payoffs
-      G_hat, stats = self._compute_payoff_stats(item.reward)
+      payoff_norm, stats = self._compute_payoff_stats(item.payoffs)
       # Epsilon
-      eps_scaled = self._scale_epsilon(item.epsilon_hat, stats["norm_raw"])
+      epsilon_scaled = self._scale_epsilon(
+        item.epsilon_target, stats["norm_raw"]
+      )
       # Sigma
-      sigma_scaled = self._scale_sigma(item.sigma_hat)
+      strategy_norm = self._scale_strategy(item.strategy_base)
       # Welfare
-      W_scaled = self._scale_welfare(item.welfare)
+      welfare_scaled = self._scale_welfare(item.welfare)
 
       return Data(
-        reward=G_hat,
-        sigma_hat=item.sigma_hat,
-        sigma_norm=sigma_scaled,
-        epsilon_hat=eps_scaled,
-        welfare=W_scaled,
-        mask=data.mask,  # stays unchanged
+        payoffs=payoff_norm,
+        strategy_base=item.strategy_base,
+        strategy_norm=strategy_norm,
+        epsilon_target=epsilon_scaled,
+        welfare=welfare_scaled,
+        strat_mask_per_player=item.strat_mask_per_player,  # stays unchanged
+        joint_mask=item.joint_mask,  # stays unchanged
       )
 
     return jax.vmap(_normalise_single_item)(data)
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def _sample_single_random(
-    self, key: jax.Array, target_sigma_hat: chex.Array
+    self, rng: chex.PRNGKey, strategy_proposal: chex.Array
   ) -> Data:
     raise NotImplementedError()
 
@@ -211,14 +221,14 @@ class GameSampler:
     self,
     batch_size: int,
     rng: chex.PRNGKey,
-    target_sigma_hat: chex.Array = None,
+    strategy_proposal: chex.Array = None,
   ) -> Data:
     """Convert any OpenSpiel normal-form / matrix game → NES input Data."""
 
     # Vectorise over the batch size with unique random keys
     batch_keys = jax.random.split(rng, batch_size)
 
-    return jax.vmap(self._sample_single_random)(batch_keys, target_sigma_hat)
+    return jax.vmap(self._sample_single_random)(batch_keys, strategy_proposal)
 
 
 class OpenSpielGameSampler(GameSampler):
@@ -234,42 +244,50 @@ class OpenSpielGameSampler(GameSampler):
       game_payoffs_array(self.game), dtype=jnp.float32
     )
 
-    self.num_players, *A = self.payoff_tensor.shape
-    # For these types of games, mask is always identity
-    self.mask = jnp.ones(A, dtype=jnp.bool)
-    joint_A = math.prod(A)
-    self.max_actions = max(A)
+    self.num_players, *self.A = self.payoff_tensor.shape
+
+    # For these types of games, masks are always identity
+    self.strat_mask_per_player = [jnp.ones(a, dtype=jnp.bool) for a in self.A]
+    self.joint_mask = utils.make_joint_mask_from_strat_masks(
+      self.strat_mask_per_player
+    )
+
+    joint_A = math.prod(self.A)
+    self.max_actions = max(self.A)
     if self.z_m is None:
-      self.z_m = jnp.array(joint_A) ** (1.0 / self.m)
+      self.z_m = jnp.array(joint_A, dtype=jnp.float32) ** (1.0 / self.m)
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def _sample_single_random(
-    self, key: jax.Array, target_sigma_hat: chex.Array
+    self, rng: chex.PRNGKey, strategy_proposal: chex.Array
   ) -> Data:
-    eps_key, sigma_key = jax.random.split(key, 2)
+    eps_key, strat_key = jax.random.split(rng, 2)
     # Payoffs
-    G = self.payoff_tensor
-    G_hat, stats = self._compute_payoff_stats(G)
+    payoffs = self.payoff_tensor
+    payoffs_norm, stats = self._compute_payoff_stats(payoffs)
 
     # Epsilon
-    epsilon_hat = self._initialise_epsilon(G, eps_key)
+    epsilon_hat = self._initialise_epsilon(payoffs, eps_key)
     eps_scaled = self._scale_epsilon(epsilon_hat, stats["norm_raw"])
 
     # Sigma
-    sigma_hat = self._initialise_sigma(G, sigma_key, target_sigma_hat)
-    sigma_scaled = self._scale_sigma(sigma_hat)
+    strategy_base = self._initialise_strategy(
+      payoffs_norm, strat_key, strategy_proposal
+    )
+    strategy_norm = self._scale_strategy(strategy_base)
 
     # Welfare
-    W = self._initialise_welfare(G)
-    W_scaled = self._scale_welfare(W)
+    welfare = self._initialise_welfare(payoffs)
+    welfare_scaled = self._scale_welfare(welfare)
 
     return Data(
-      reward=G_hat,
-      sigma_hat=sigma_hat,
-      sigma_norm=sigma_scaled,
-      epsilon_hat=eps_scaled,
-      welfare=W_scaled,
-      mask=self.mask,
+      payoffs=payoffs,
+      strategy_base=strategy_base,
+      strategy_norm=strategy_norm,
+      epsilon_target=eps_scaled,
+      welfare=welfare_scaled,
+      strat_mask_per_player=self.strat_mask_per_player,
+      joint_mask=self.joint_mask,
     )
 
 
@@ -282,48 +300,64 @@ class RandomGameSampler(GameSampler):
     obj: Objective,
     m: int,
     z_m: float = None,
+    seed: int = 0,
   ) -> None:
     super().__init__(obj, m, z_m)
     self.game = game
     self.payoff_tensor_fn = games.generate_payoffs(
       self.game, game_settings, num_strategies
     )
-    sample_key = jax.random.key(0)
-    sample_tensor, mask = self.payoff_tensor_fn(sample_key)
-    self.num_players, *A = sample_tensor.shape
-    self.max_actions = max(A)
-    joint_A = utils.compute_joint_action_size(A)
+    sample_key = jax.random.key(seed)
+    sample_tensor, _ = self.payoff_tensor_fn(sample_key)
+    self.num_players, *self.A = sample_tensor.shape
+    self.max_actions = max(self.A)
+
+    joint_A = utils.compute_joint_action_size(self.A)
     if self.z_m is None:
-      self.z_m = jnp.array(joint_A) ** (1.0 / self.m)
+      self.z_m = jnp.array(joint_A, dtype=jnp.float32) ** (1.0 / self.m)
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def _sample_single_random(
-    self, rng: chex.PRNGKey, target_sigma_hat: chex.Array
+    self, rng: chex.PRNGKey, strategy_proposal: chex.Array
   ) -> Data:
-    payoff_rng, eps_rng, sigma_rng = jax.random.split(rng, 3)
+    payoff_rng, eps_rng, mask_rng, count_rng, strat_rng = jax.random.split(
+      rng, 5
+    )
     # Payoffs
-    G, mask = self.payoff_tensor_fn(payoff_rng)
-    G_hat, stats = self._compute_payoff_stats(G)
+    payoffs, _ = self.payoff_tensor_fn(payoff_rng)
+    payoffs_norm, stats = self._compute_payoff_stats(payoffs)
+
+    action_counts = jax.random.randint(
+      count_rng, (self.num_players,), minval=2, maxval=self.max_actions + 1
+    )
+
+    strat_mask_per_player = utils.rand_choice_strat_mask(
+      mask_rng, self.A, action_counts
+    )
+    joint_mask = utils.make_joint_mask_from_strat_masks(strat_mask_per_player)
 
     # Epsilon
-    epsilon_hat = self._initialise_epsilon(G, eps_rng)
+    epsilon_hat = self._initialise_epsilon(payoffs, eps_rng)
     eps_scaled = self._scale_epsilon(epsilon_hat, stats["norm_raw"])
 
     # Sigma
-    sigma_hat = self._initialise_sigma(G, sigma_rng, target_sigma_hat)
-    sigma_scaled = self._scale_sigma(sigma_hat)
+    strategy_base = self._initialise_strategy(
+      payoffs_norm, strat_rng, strategy_proposal
+    )
+    strategy_norm = self._scale_strategy(strategy_base)
 
     # Welfare
-    W = self._initialise_welfare(G_hat)
-    W_scaled = self._scale_welfare(W)
+    W = self._initialise_welfare(payoffs)
+    welfare_scaled = self._scale_welfare(W)
 
     return Data(
-      reward=G_hat,
-      sigma_hat=sigma_hat,
-      sigma_norm=sigma_scaled,
-      epsilon_hat=eps_scaled,
-      welfare=W_scaled,
-      mask=mask.astype(jnp.bool),
+      payoffs=payoffs,
+      strategy_base=strategy_base,
+      strategy_norm=strategy_norm,
+      epsilon_target=eps_scaled,
+      welfare=welfare_scaled,
+      strat_mask_per_player=strat_mask_per_player,
+      joint_mask=joint_mask,
     )
 
 
@@ -403,26 +437,28 @@ class MultiGameSampler(GameSampler):
     )
 
     if self.z_m is None:
-      self.z_m = jnp.array(self.max_actions**self.num_players) ** (1.0 / self.m)
+      self.z_m = jnp.array(
+        self.max_actions**self.num_players, dtype=jnp.float32
+      ) ** (1.0 / self.m)
 
     weights = jnp.array([gc.weight for gc in game_configs])
     self.sampling_probs = weights / jnp.sum(weights)
 
   def _sample_single_random(
-    self, rng: chex.PRNGKey, idx: int, target_sigma_hat: chex.Array = None
+    self, rng: chex.PRNGKey, idx: int, strategy_proposal: chex.Array = None
   ) -> Data:
     sampler = self._samplers[idx]
-    raw = sampler._sample_single_random(rng, target_sigma_hat)
+    raw = sampler._sample_single_random(rng, strategy_proposal)
     return self._pad_data(raw)
 
   def _pad_data(self, data: Data) -> Data:
-    action_sizes = data.mask.shape
-    G_pad = utils.pad_game_tensor(data.reward, self.max_actions, 0.0)
+    action_sizes = data.joint_mask.shape
+    payoffs = utils.pad_game_tensor(data.payoffs, self.max_actions, 0.0)
     mask_pad = utils.joint_mask(action_sizes, self.max_actions)
 
-    def _pad_sigma(sigma, normalise):
+    def _pad_stategy(strat, normalise):
       sigma_pad = utils.pad_game_tensor(
-        jnp.expand_dims(sigma, 0), self.max_actions, 0.0
+        jnp.expand_dims(strat, 0), self.max_actions, 0.0
       ).squeeze(0)
       sigma_pad = jnp.where(mask_pad, sigma_pad, 0.0)
       if normalise:
@@ -432,17 +468,25 @@ class MultiGameSampler(GameSampler):
         )
       return sigma_pad
 
-    welfare_pad = utils.pad_game_tensor(
+    def _pad_player_mask(mask: chex.Array) -> chex.Array:
+      """Pad a single player's strategy mask to max_actions."""
+      pad_width = (0, self.max_actions - mask.shape[0])
+      return jnp.pad(mask, pad_width, mode="constant", constant_values=False)
+
+    strat_masks_pad = [_pad_player_mask(m) for m in data.strat_mask_per_player]
+
+    welfare = utils.pad_game_tensor(
       jnp.expand_dims(data.welfare, 0), self.max_actions, 0.0
     ).squeeze(0)
 
     return Data(
-      reward=G_pad,
-      sigma_hat=_pad_sigma(data.sigma_hat, True),
-      sigma_norm=_pad_sigma(data.sigma_norm, False),
-      epsilon_hat=data.epsilon_hat,
-      welfare=welfare_pad,
-      mask=mask_pad,
+      payoffs=payoffs,
+      strategy_base=_pad_stategy(data.strategy_base, True),
+      strategy_norm=_pad_stategy(data.strategy_norm, False),
+      epsilon_target=data.epsilon_target,
+      welfare=welfare,
+      strat_mask_per_player=strat_masks_pad,
+      joint_mask=mask_pad,
     )
 
   def sample_random(
@@ -450,7 +494,7 @@ class MultiGameSampler(GameSampler):
     batch_size: int,
     rng: chex.PRNGKey,
     idx: int = None,
-    target_sigma_hat: chex.Array = None,
+    strategy_proposal: chex.Array = None,
   ) -> Data:
     keys = jax.random.split(rng, batch_size)
 
@@ -463,6 +507,6 @@ class MultiGameSampler(GameSampler):
 
     return jax.vmap(
       functools.partial(
-        self._sample_single_random, idx=idx, target_sigma_hat=target_sigma_hat
+        self._sample_single_random, idx=idx, strategy_proposal=strategy_proposal
       )
     )(keys)
