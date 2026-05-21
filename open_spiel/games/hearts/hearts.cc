@@ -591,7 +591,7 @@ std::vector<double> HeartsState::Returns() const {
   return returns;
 }
 
-absl::optional<Player> HeartsState::Played(int card) const {
+std::optional<Player> HeartsState::Played(int card) const {
   if (phase_ == Phase::kPlay && !holder_[card].has_value()) {
     Player p = *(initial_deal_[card]);
     // check if they kept the card or not
@@ -638,7 +638,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
   std::vector<std::vector<int>> play_known(kNumPlayers);
   if (phase_ == Phase::kPlay) {
     for (int card = 0; card < kNumCards; card++) {
-      absl::optional<Player> p = Played(card);
+      std::optional<Player> p = Played(card);
       if (p && *p != player_id) {
         play_known[*p].push_back(card);
       }
@@ -646,7 +646,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
   }
 
   // the two of clubs is also known once a player has played first
-  absl::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
+  std::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
   if (phase_ == Phase::kPlay && two_clubs_holder) {
     play_known[*two_clubs_holder].push_back(Card(Suit::kClubs, 0));
   }
