@@ -635,7 +635,7 @@ bool KriegspielState::IsThreefoldRepetitionDraw() const {
   return entry->second >= 3;
 }
 
-absl::optional<std::vector<double>> KriegspielState::MaybeFinalReturns() const {
+std::optional<std::vector<double>> KriegspielState::MaybeFinalReturns() const {
   if (!Board().HasSufficientMaterial()) {
     return std::vector<double>{kDrawUtility, kDrawUtility};
   }
@@ -686,8 +686,8 @@ std::vector<int> KriegspielGame::ObservationTensorShape() const {
 }
 
 std::shared_ptr<Observer> KriegspielGame::MakeObserver(
-    absl::optional<IIGObservationType> iig_obs_type,
-    const GameParameters &params) const {
+    std::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
   if (!params.empty()) SpielFatalError("Observation params not supported");
   IIGObservationType obs_type = iig_obs_type.value_or(kDefaultObsType);
   if (ObserverHasString(obs_type) || ObserverHasTensor(obs_type)) {
