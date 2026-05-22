@@ -107,7 +107,6 @@ class KriegspielObserver : public Observer {
         open_spiel::down_cast<const KriegspielGame &>(*state.GetGame());
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, game.NumPlayers());
-    chess::Color color = chess::PlayerToColor(player);
 
     if (iig_obs_type_.perfect_recall) {
       SpielFatalError(
@@ -122,7 +121,7 @@ class KriegspielObserver : public Observer {
       WritePrivateInfoTensor(state, player, prefix, allocator);
     } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
       for (int i = 0; i < chess::NumPlayers(); ++i) {
-        std::string prefix = chess::ColorToString(color);
+        std::string prefix = chess::ColorToString(chess::PlayerToColor(i));
         WritePrivateInfoTensor(state, i, prefix, allocator);
       }
     }
