@@ -2,11 +2,26 @@
 <!-- disableFinding(LINE_OVER_80) -->
 <!-- disableFinding(HEADING_REPEAT_H1) -->
 <!-- disableFinding(LIST_NO_LINE) -->
+
 # OpenSpiel Installation on Windows
 
 OpenSpiel now has official support for Windows with pre-built binary wheels
 available on PyPI. Windows wheels are built and tested automatically via GitHub
 Actions CI for Python 3.11, 3.12, and 3.13.
+
+This section assumes that you are into the isolated virtual environment. To
+create one: `PowerShell python -m venv .venv; .venv\Scripts\activate` If you
+need, activate the permissions: `PowerShell Set-ExecutionPolicy -ExecutionPolicy
+RemoteSigned -Scope CurrentUser`
+
+> [!WARNING] Current API mostly functions under the assumption of a direct pip
+> installation ([Option 1](#option-1-quick-installation-using-pip-recommended)).
+> Contributing guidelines `../CONTRIBUTING.md` currently work with unix-based
+> commits due the
+> [endings difference](https://stackoverflow.com/questions/1552749/difference-between-cr-lf-lf-and-cr-line-break-types).
+> If you plan to contribute to the library, for now, strongly consider using a
+> Unix- or Linux-based environment. See, for example, WSL2 environment
+> [Option 3](#option-3-windows-installation-using-windows-subsystem-for-linux-wsl2).
 
 > **Note:** Windows support is currently experimental. If you encounter any
 > issues, please [open an issue](https://github.com/deepmind/open_spiel/issues)
@@ -16,23 +31,41 @@ Actions CI for Python 3.11, 3.12, and 3.13.
 
 The easiest way to install OpenSpiel on Windows is using pip:
 
-```bash
+```
 pip install open-spiel
 ```
 
 ### Optional dependencies
 
-For additional features like visualization and machine learning: `bash pip
+For additional features like visualization and machine learning: `Bash pip
 install open-spiel[full]`
 
 ### Verification
 
-Test your installation: ```python import pyspiel
+Test your installation: `python -c "import pyspiel"`
 
-# Create a simple game
+#### Create a simple game
 
-game = pyspiel.load_game("tic_tac_toe") state = game.new_initial_state()
-print("OpenSpiel is working!") ```
+Directly in CLI:
+
+```
+python -c 'import pyspiel; game = pyspiel.load_game("tic_tac_toe"); state = game.new_initial_state(); print("OpenSpiel is working!")'
+```
+
+or in an editor:
+
+```python
+import pyspiel
+game = pyspiel.load_game("tic_tac_toe")
+state = game.new_initial_state()
+print("OpenSpiel is working!")
+```
+
+#### Output all the available games
+
+```
+python -c 'import pyspiel; print(pyspiel.registered_names())'
+```
 
 ### Building from Source
 
@@ -43,7 +76,11 @@ If you need to build from source or contribute to the project:
 -   **Python 3.11+** (get from [python.org](https://python.org))
 -   **Git** (get from [git-scm.com](https://git-scm.com))
 -   **CMake 3.15+** (get from [cmake.org](https://cmake.org))
--   **Visual Studio 2019 or later** with C++ development tools
+-   **Visual Studio 2019 or later** with C++ development tools from
+    [Microsoft](https://visualstudio.microsoft.com/vs/features/cplusplus/)
+
+> [!NOTE] Don't foget to add installed programmes to PATH checking the option
+> when committing the installation.
 
 #### Build Steps
 
@@ -59,33 +96,72 @@ If you need to build from source or contribute to the project:
 **"CMake not found"** - Install CMake from [cmake.org](https://cmake.org) and
 add it to your PATH
 
-**"Git not found"** \
-- Install Git from [git-scm.com](https://git-scm.com) and add it to your PATH
+**"Git not found"** - Install Git from [git-scm.com](https://git-scm.com) and
+add it to your PATH
 
 **"MSVC compiler not found"** - Install Visual Studio Community with C++
 development tools - Or install "Microsoft C++ Build Tools"
 
 **"Import pyspiel failed"** - Make sure you installed the package: `pip install
-open-spiel` - Try reinstalling: `pip uninstall open-spiel && pip install
-open-spiel`
+open-spiel`. - Try finding it in the list of installed packages: `pip show
+open-spiel`. - In case of any errors try reinstalling: `pip uninstall open-spiel
+&& pip install open-spiel`
 
-### Development Installation
+### Development Installation (Python API)
+
+#### Clone the repository
 
 ```bash
 git clone https://github.com/deepmind/open_spiel.git
 cd open_spiel
+```
+
+#### Clone necessary submodules:
+
+For the full process, you can refer to the
+installation script (`../open_spiel/scripts/install.sh`).
+
+```bash
+git clone --single-branch --depth 1 https://github.com/pybind/pybind11.git pybind11
+git clone -b 20250814.1 --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+git clone -b master https://github.com/nlohmann/json.git open_spiel/json
+cd open_spiel/json && git checkout 9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03 && cd ../..
+git clone -b master https://github.com/pybind/pybind11_json.git open_spiel/pybind11_json
+cd open_spiel/pybind11_json && git checkout d0bf434be9d287d73a963ff28745542daf02c08f && cd ../..
+git clone -b master https://github.com/pybind/pybind11_abseil.git open_spiel/pybind11_abseil
+cd open_spiel/pybind11_abseil && git checkout 73992b5 && cd ../..
+git clone -b develop --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel/games/bridge/double_dummy_solver
+```
+
+> [!NOTE] CLI separators "&" and "|" appear not in every version (for example,
+> in PowerShell, they are active since Version 7.xx.xx). If the code does not
+> work, replace "&&" with ";".
+
+It may take substantial amount of time.
+
+```
 pip install -e .
 ```
 
+If during the installation you get `fatal error C1083: Cannot open include file:
+'graphviz/cgraph.h': No such file or directory`, it is
+[recommended](https://stackoverflow.com/a/78664520) to separately download
+Graphviz and reinstall with the following command (or use
+[`Chocolatey`](https://pygraphviz.github.io/documentation/stable/install.html#id1)):
+``Bash python -m pip install --config-settings="--global-option=build_ext" `
+--config-settings="--global-option=-IC:\Program Files\Graphviz\include" `
+--config-settings="--global-option=-LC:\Program Files\Graphviz\lib" `
+pygraphviz``
+
 ### Using with Conda
 
-```bash
+```
 conda create -n openspiel python=3.11
 conda activate openspiel
 pip install open-spiel
 ```
 
-## Option 2: Windows Installation using Visual Studio Community Edition
+## Option 2: Windows Installation using Visual Studio Community Edition (Full installation)
 
 This option will describe how to install and use OpenSpiel on Windows 11 via
 [Visual Studio Community Edition](https://visualstudio.microsoft.com/vs/community/).
@@ -108,9 +184,10 @@ The rest of the instructions will assume that OpenSpiel is cloned in
 `C:\Users\MyUser\open_spiel`.
 
 Open a Windows Terminal (Windows Powershell), clone OpenSpiel and its
-dependencies (commands adapted from open_spiel/scripts/install.sh)
+dependencies (commands adapted from the installation script
+(`../open_spiel/scripts/install.sh`)
 
-```
+```bash
 cd C:\Users\MyUser
 git clone https://github.com/deepmind/open_spiel.git
 cd open_spiel
@@ -146,17 +223,18 @@ variable for it. To check that python is working, you can run the example in
 `open_spiel\python\examples`.
 
 OpenSpiel has various Python dependencies which may require installing. At a
-minimum, you will need the ones in
-[requirements.txt](https://github.com/deepmind/open_spiel/blob/master/requirements.txt).
+minimum, you will need the ones in `pyproject.toml`.
 
-```
+```bash
 pip install absl-py
 pip install attrs
 pip install numpy
 ```
 
-For a complete list, depending on what you will use, see
-[python_extra_deps.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/python_extra_deps.sh).
+For a complete list, depending on what you will use, see optinal dependencies of
+the `../pyproject.toml`. To set a env variable in the current terminal you can
+use the command
+`set`([some help](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/set_1))
 
 ## Option 3: Windows Installation using Windows Subsystem for Linux (WSL2)
 
