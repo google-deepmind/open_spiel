@@ -37,14 +37,16 @@ enum Phase {
 	kDeal = 0,
 	kAsk = 1,
 	kFish = 2,
-	kTerminal = 3
+	kEmptyDraw = 3,
+	kTerminal = 4
 };
 
 constexpr int kDefaultPlayers = 2;
 
 std::string RankString(int rank);
-std::string PhaseString(Phase phase);
 int RankFromChar(char c);
+std::string PhaseString(Phase phase);
+Phase PhaseFromString(std::string s);
 
 struct Event {
 	int player_id;
@@ -87,6 +89,7 @@ class GoFishState: public State {
   GoFishState& operator=(const GoFishState&) = default;
 	Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action_id) const override;
+	std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return phase_ == kTerminal; }
   std::vector<double> Returns() const override;
@@ -95,11 +98,35 @@ class GoFishState: public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 	int PoolSize() const;
-	int IndexToRank(int index) const;
 	// count of cards held by each player
 	int PlayerCounts(int player_id) const;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
+  const std::vector<std::vector<int>>& PlayerCards() const {
+    return player_cards_;
+  }
+  const std::vector<int>& Pool() const {
+    return pool_;
+  }
+  const std::vector<int>& PlayerBooks() const {
+    return player_books_;
+  }
+  const std::vector<std::vector<int>>& PlayerDidAsk() const {
+    return player_did_ask_;
+  }
+  const std::vector<std::vector<bool>>& PlayerWasAsked() const {
+    return player_was_asked_;
+  }
+  const std::vector<std::vector<int>>& DrawnSinceWasAsked() const {
+    return drawn_since_was_asked_;
+  }
+  const std::vector<std::vector<int>>& PlayerMin() const {
+    return player_min_;
+  }
+  const std::vector<int>& Booked() const {
+    return booked_;
+  }
+
  protected:
   void DoApplyAction(Action move) override;
  private:
@@ -122,15 +149,14 @@ class GoFishState: public State {
   std::vector<std::vector<int>> player_min_;
 	// has this rank been booked already?
 	std::vector<int> booked_;
+	void ParseRankCounts(absl::string_view s, std::vector<int>* counts);
 	bool CheckBook(int player_id, int rank);
-	void CheckPhase();
+	void CheckEmptyAsk();
 	void AdvancePlayer();
 	std::vector<Action> GenerateAsks(int player_id) const;
 	std::vector<Action> GenerateDraws() const; // draw from deck
 	std::vector<Event> events_;
   
-	// retrieve the card (rank) at index from pool_ 
-	int Draw(int index);
 	int num_players_;
 	int ranks_;
 	int suits_;
@@ -138,11 +164,16 @@ class GoFishState: public State {
 	int first_out_;
 	bool most_books_wins_;
 	bool end_on_first_out_;
+	bool ask_after_empty_draw_;
 };
 
 class GoFishGame : public Game {
  public:
   explicit GoFishGame(const GameParameters& params);
+	std::unique_ptr<State> NewInitialState() const override;
+
+  std::unique_ptr<State> NewInitialState(
+    const std::string& state) const override;
   int NumDistinctActions() const override {
 		return std::max(num_players_ * ranks_, suits_ * ranks_);
 	}
@@ -161,9 +192,6 @@ class GoFishGame : public Game {
 	double MinUtility() const override { return -1; }
 	absl::optional<double> UtilitySum() const override { return 0; }
 
-  std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new GoFishState(shared_from_this()));
-  }
  std::vector<int> ObservationTensorShape() const;
  int NumPlayers() const override { return num_players_; }
  int Ranks() const { return ranks_; }
@@ -171,6 +199,7 @@ class GoFishGame : public Game {
  int InitialCards() const { return initial_cards_; }
  bool MostBooksWins() const { return most_books_wins_; }
  bool EndOnFirstOut() const { return end_on_first_out_; }
+ bool AskAfterEmptyDraw() const { return ask_after_empty_draw_; }
 
  private:
 	int num_players_;
@@ -179,6 +208,7 @@ class GoFishGame : public Game {
 	int initial_cards_;
 	bool most_books_wins_;
 	bool end_on_first_out_;
+	bool ask_after_empty_draw_;
 };
 
 }  // namespace go_fish

@@ -32,7 +32,6 @@ void BasicGoFishTests() {
   testing::LoadGameTest("go_fish");
   testing::ChanceOutcomesTest(*LoadGame("go_fish"));
   testing::RandomSimTest(*LoadGame("go_fish"), 100);
-	return;
   for (Player players = 2; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("go_fish", {{"players", GameParameter(players)}}), 100);

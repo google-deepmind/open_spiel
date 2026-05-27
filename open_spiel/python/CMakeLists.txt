@@ -67,6 +67,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_gin_rummy.h
   pybind11/games_go.cc
   pybind11/games_go.h
+  pybind11/games_go_fish.cc
+  pybind11/games_go_fish.h
   pybind11/games_gomoku.cc
   pybind11/games_gomoku.h
   pybind11/games_hearts.cc

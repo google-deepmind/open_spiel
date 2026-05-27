@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "absl/strings/str_split.h"
+#include "absl/strings/string_view.h"
 #include "open_spiel/games/go_fish/go_fish.h"
 
 #include <vector>
@@ -39,7 +41,8 @@ const GameType kGameType{/*short_name=*/"go_fish",
                           {"suits", GameParameter(4)},
                           {"initial_cards", GameParameter(-1)},
                           {"most_books_wins", GameParameter(true)},
-												  {"end_on_first_out", GameParameter(false)}}
+												  {"end_on_first_out", GameParameter(false)},
+												  {"ask_after_empty_draw", GameParameter(true)}}
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -58,7 +61,7 @@ int RankFromChar(char c) {
 	return c - 'a';
 }
 
-std::string PhaseString(Phase phase){
+std::string PhaseString(Phase phase) {
 	switch(phase) {
 		case kDeal:
 			return "Deal";
@@ -66,12 +69,43 @@ std::string PhaseString(Phase phase){
 			return "Fish";
 		case kAsk:
 			return "Ask";
+		case kEmptyDraw:
+			return "EmptyDraw";
 		case kTerminal:
 			return "GameOver";
 	}
 	// this never happens
 	SpielFatalError("Illegal phase");
 	return "WTF";
+}
+
+Phase PhaseFromString(std::string s) {
+	if (s == "Deal") return kDeal;
+  if (s == "Fish") return kFish;
+	if (s == "Ask") return kAsk;
+	if (s =="EmptyDraw") return kEmptyDraw;
+	if (s == "GameOver") return kTerminal;
+	SpielFatalError("Illegal phase");
+	// this never happens
+	return kTerminal;
+
+}
+
+void GoFishState::ParseRankCounts(
+    absl::string_view s, std::vector<int>* counts) {
+  SPIEL_CHECK_EQ(s.size() % 2, 0);
+
+  for (int i = 0; i < s.size(); i += 2) {
+    int rank = RankFromChar(s[i]);
+    int count = s[i + 1] - '0';
+
+    SPIEL_CHECK_GE(rank, 0);
+    SPIEL_CHECK_LT(rank, ranks_);
+    SPIEL_CHECK_GE(count, 0);
+    SPIEL_CHECK_LE(count, suits_);
+
+    (*counts)[rank] = count;
+  }
 }
 
 GoFishState::GoFishState(std::shared_ptr<const Game> game,
@@ -81,8 +115,8 @@ GoFishState::GoFishState(std::shared_ptr<const Game> game,
     suits_(static_cast<const GoFishGame*>(game.get())->Suits()),
     most_books_wins_(static_cast<const GoFishGame*>(game.get())->MostBooksWins()),
     end_on_first_out_(static_cast<const GoFishGame*>(game.get())->EndOnFirstOut()),
+		ask_after_empty_draw_(static_cast<const GoFishGame*>(game.get())->AskAfterEmptyDraw()),
     num_players_(static_cast<const GoFishGame*>(game.get())->NumPlayers()) {
-	// TODO handle specified start
 	// initialize all the vectors
 	player_cards_.assign(num_players_, std::vector<int>(ranks_, 0));
 	pool_.assign(ranks_, suits_);
@@ -106,6 +140,40 @@ GoFishState::GoFishState(std::shared_ptr<const Game> game,
 		initial_cards_ = parent_initial;
 	}
 	phase_ = kDeal;
+	if (!state_str.empty()) {
+		std::fill(pool_.begin(), pool_.end(), 0);
+    std::vector<std::string> lines = absl::StrSplit(state_str, '\n');
+    SPIEL_CHECK_EQ(lines.size(), num_players_ + 3);
+
+    phase_ = PhaseFromString(lines[0]);
+    current_player_ = std::stoi(lines[1]);
+
+    for (int pid = 0; pid < num_players_; ++pid) {
+       std::vector<std::string> parts = absl::StrSplit(lines[pid + 2], ':');
+       SPIEL_CHECK_EQ(parts.size(), 2);
+
+       ParseRankCounts(parts[0], &player_cards_[pid]);
+       player_books_[pid] = std::stoi(parts[1]);
+   }
+
+   ParseRankCounts(lines[num_players_ + 2], &pool_);
+	 int booked = 0;
+	 int unbooked = 0;
+	 for (int rank = 0; rank < ranks_; ++rank) {
+      int total = pool_[rank];
+      for (int pid = 0; pid < num_players_; ++pid) {
+        total += player_cards_[pid][rank];
+      }
+			if (total > 0) {
+        SPIEL_CHECK_EQ(total, suits_);
+				++unbooked;
+			} else {
+				booked_[rank] = true;
+				++booked;
+			}
+	 }
+	 SPIEL_CHECK_EQ(booked + unbooked, ranks_);
+  }
 }
 
 std::unique_ptr<State> GoFishState::Clone() const {
@@ -128,25 +196,6 @@ int GoFishState::PlayerCounts(int player_id) const {
 	return cards;
 }
 
-int GoFishState::Draw(int index) {
-	int rank = 0;
-	while (index >= pool_[rank]  ) {
-		index -= pool_[rank];
-		++rank;
-	}
-	pool_[rank] -= 1;
-	return rank;
-}
-
-int GoFishState::IndexToRank(int index) const {
-  int rank = 0;
-  while (index >= pool_[rank]) {
-    index -= pool_[rank];
-    ++rank;
-  }
-  return rank;
-}
-
 void GoFishState::DoApplyAction(Action move_id) {
 	if (phase_ == kDeal) {
 		int player_id = 0;
@@ -155,8 +204,8 @@ void GoFishState::DoApplyAction(Action move_id) {
 			++player_id;
 			pc = PlayerCounts(player_id);
 		}
-		int index = move_id;
-		int rank = Draw(index);
+		int rank = move_id;
+		--pool_[rank];
 		player_cards_[player_id][rank] += 1;
 		if (pc + 1 == initial_cards_ && player_id == num_players_ - 1){
 			current_player_ = Player(0);
@@ -170,6 +219,8 @@ void GoFishState::DoApplyAction(Action move_id) {
 		}
 		return;
 	}
+	bool hit = false;
+	bool advance = true;
 	if (phase_ == kAsk) {
 		int event_player = current_player_;
 		int target = move_id / ranks_;
@@ -185,15 +236,14 @@ void GoFishState::DoApplyAction(Action move_id) {
     bool made_book;
 		int received = 0;
 		if (player_cards_[target][rank] > 0) {
+			hit = true;
 			received = player_cards_[target][rank]; 
 			player_cards_[current_player_][rank] += received;
 			player_min_[current_player_][rank] += received;
 			player_cards_[target][rank] = 0;
 			made_book = CheckBook(current_player_, rank);
-			if (phase_ != kTerminal && made_book) { 
-				if (PlayerCounts(current_player_) == 0) {
-				  AdvancePlayer();
-				}
+			if (phase_ != kTerminal) {
+			  CheckEmptyAsk();
 			}
 		} else { // go fish
 			if (PoolSize() > 0) {
@@ -203,17 +253,16 @@ void GoFishState::DoApplyAction(Action move_id) {
 				  AdvancePlayer();
 			}
 		}
-		if (phase_ == kAsk) {
-			CheckPhase();
-		}
 		if (current_player_ != event_player) last_ask_ = -1;
 		int booked = made_book ? rank : -1; 
 		Event event(event_player, target, rank, received, booked);
 		events_.push_back(event);
 		return;
 	}
-	if (phase_ == kFish) {
-		int rank = Draw(move_id);
+	if (phase_ == kFish || phase_ == kEmptyDraw) {
+		int rank = move_id;
+		if (phase_ == kFish && rank == last_ask_) hit = true;
+		--pool_[rank];
 		player_cards_[current_player_][rank] += 1;
 		for (int rank0 = 0; rank0 < ranks_; ++rank0) {
        if (player_was_asked_[current_player_][rank0]) {
@@ -222,49 +271,66 @@ void GoFishState::DoApplyAction(Action move_id) {
 		}
 		CheckBook(current_player_, rank);
 		if (phase_ != kTerminal) {
-			phase_ = kAsk;
-		  if (rank == last_ask_) {
-				if (PlayerCounts(current_player_== 0)) {
-			    AdvancePlayer();
-				} // else play contnues with current_player_
-		  } else {
-				AdvancePlayer();
+			bool advance = false;
+			if (phase_ == kEmptyDraw && ask_after_empty_draw_) {
+				advance = false;
 			}
+			if (phase_ == kFish && rank == last_ask_) {
+					advance = false;
+			}
+			if (advance) AdvancePlayer();
 	  }
 	}
-	CheckPhase();
 	last_ask_ = -1;
+	phase_ = kAsk;
+	CheckEmptyAsk();
 }
 
-// special cases: If a player would be asking,
-// but he either has no cards left or is the only player with cards left
-// he must fish.
-void GoFishState::CheckPhase() {
+// special case: If a player would be asking but he has no
+// cards left (and there are cards in the pool) he fishes.
+// If ask_after_empty_draw is true he may then
+// ask for what he drew.
+void GoFishState::CheckEmptyAsk() {
 	if (PlayerCounts(current_player_) == 0) {
-			phase_ = kFish;
-			return;
+		  if (PoolSize() > 0) {
+			   phase_ = kEmptyDraw;
+			   last_ask_ = -1;
+			   return;
+			} else {
+				AdvancePlayer();
+			}
 	}
-	for (int pid = 0; pid < num_players_; ++pid) {
-    if (pid == current_player_) continue;
-		if (PlayerCounts(pid) > 0) return;
-	}
-	phase_ = kFish;
 }
 
 std::string GoFishState::ActionToString(Player player, Action action_id) const {
 	if (player == kChancePlayerId) {
-    int rank = IndexToRank(action_id);
-    return RankString(rank);
+    return RankString(action_id);
   }
 	int target = action_id / ranks_;
 	int rank = action_id % ranks_;
 	return  absl::StrCat('0' + target, 'a' + rank);
 }
 
+std::vector<std::pair<Action, double>> GoFishState::ChanceOutcomes() const {
+  SPIEL_CHECK_TRUE(IsChanceNode());
+	int num_outcomes = PoolSize();
+  std::vector<std::pair<Action, double>> outcomes;
+  outcomes.reserve(num_outcomes);
+
+  for (int rank = 0; rank < ranks_; rank++) {
+	  if (pool_[rank] > 0) {
+		  double prob = 1.0 * pool_[rank] / num_outcomes;
+      outcomes.emplace_back(std::make_pair(rank, prob));
+		}
+  }
+  return outcomes;
+}
+
 Player GoFishState::CurrentPlayer() const {
-  if (phase_ == kDeal || phase_ == kFish) {
+  if (phase_ == kDeal || phase_ == kFish || phase_ == kEmptyDraw) {
     return kChancePlayerId;
   }
+	if (phase_ == kTerminal) return kTerminalPlayerId;
   return current_player_;
 }
 
@@ -300,7 +366,11 @@ void GoFishState::AdvancePlayer() {
 	if (current_player_ == num_players_) {
 		current_player_ = 0;
 	}
-	if (PoolSize() > 0) return;
+	if (PlayerCounts(current_player_) > 0) return;
+	if (PoolSize() > 0) {
+		phase_ = kEmptyDraw;
+		return;
+	}
 	while (PlayerCounts(current_player_) == 0) {
 		current_player_ += 1;
 		if (current_player_ == num_players_) {
@@ -356,18 +426,20 @@ std::vector<Action> GoFishState::GenerateAsks(int player_id) const {
 	return result;
 }
 
+// Draw action should represent ranks which can be drawn
 std::vector<Action> GoFishState::GenerateDraws() const {
 	std::vector<Action> result;
-	int ps = PoolSize(); 
-	for (Action ii = 0; ii < ps; ++ii) {
-		result.push_back(ii);
+	for (int rank = 0; rank < ranks_; ++rank) {
+		if (pool_[rank] > 0) {
+			result.push_back(rank);
+		}
 	}
 	return result;
 }
 
 std::vector<Action> GoFishState::LegalActions() const {
 	// TODO cache
-	if (phase_ == kFish || phase_ == kDeal) {
+	if (phase_ == kFish || phase_ == kDeal || phase_ == kEmptyDraw) {
 		return GenerateDraws();
 	}
 	if (phase_ == kAsk) {
@@ -476,6 +548,15 @@ std::vector<int> GoFishGame::ObservationTensorShape() const {
   return {size};
 }
 
+std::unique_ptr<State> GoFishGame::NewInitialState() const {
+  return std::unique_ptr<State>(new GoFishState(shared_from_this()));
+}
+
+std::unique_ptr<State> GoFishGame::NewInitialState(
+    const std::string& state) const {
+  return std::unique_ptr<State>(new GoFishState(shared_from_this(), state));
+}
+
 GoFishGame::GoFishGame(const GameParameters& params)
 		: Game(kGameType, params),
 		num_players_(ParameterValue<int>("players")),
@@ -483,7 +564,8 @@ GoFishGame::GoFishGame(const GameParameters& params)
 		suits_(ParameterValue<int>("suits")),
 		initial_cards_(ParameterValue<int>("initial_cards")),
 		most_books_wins_(ParameterValue<bool>("most_books_wins")),
-		end_on_first_out_(ParameterValue<bool>("end_on_first_out")) {
+		end_on_first_out_(ParameterValue<bool>("end_on_first_out")),
+		ask_after_empty_draw_(ParameterValue<bool>("ask_after_empty_draw")) {
 }
 
 }  // go_fish
