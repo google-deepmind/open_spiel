@@ -13,132 +13,123 @@ from open_spiel.python.jax.nes import utils
 """Tests for open_spiel.python.jax.nes.nes.py"""
 
 
-
 class NESTest(parameterized.TestCase):
   @parameterized.parameters(
     itertools.product(
       (networks.Mode.CCE, networks.Mode.CE),
-      (2, 5),
-      (2, 3, 4,),
+      (2, 3),
+      (2, 3, 5),
     )
   )
   def test_dummy_cubic_model(self, mode, num_players, num_actions):
     # Testing for (C)CE
-    batch_size = 10
     action_sizes = tuple(num_actions for _ in range(num_players))
-    game_tensor = jnp.zeros((batch_size, 4, num_players, *action_sizes))
-    mask = jnp.ones((batch_size, *action_sizes), dtype=jnp.bool)
+    batch_size = 10
 
+    batch = samplers.dummy_nes_batch(
+      batch_size, num_players, action_sizes, jax.random.key(0)
+    )
+    
     _model = networks.NeuralEquilibriumModel(
       num_players,
-      dual_channels=32,
+      # action_sizes,
+      dual_channels=128,
       mode=mode,
       rngs=nn.Rngs(jax.random.key(0)),
     )
-    batch = nes.Data(
-      **utils.dummy_nes_batch(
-        batch_size, num_players, action_sizes, jax.random.key(0)
-      )
+    _model.eval()
+    duals = utils.batched_call(
+      _model,
+      samplers.stack(jax.vmap(samplers.broadcast)(batch)),
+      batch.strat_mask_per_player,
     )
-    alpha = utils.batched_call(_model, game_tensor, mask)
-    logits, sigma, epsilon, _, _ = jax.vmap(
+
+    logits, strategy, epsilon, _, _ = jax.vmap(
       nes.recover_primals, in_axes=(0, 0, None, None, None, None)
-    )(alpha, batch, 1, 1, 10, int(mode.value))
+    )(duals, batch, 1, 1, 10, int(mode.value))
 
     self.assertEqual(logits.shape, (batch_size, *action_sizes))
-    self.assertEqual(sigma.shape, (batch_size, *action_sizes))
+    self.assertEqual(strategy.shape, (batch_size, *action_sizes))
     self.assertEqual(epsilon.shape, (batch_size, num_players))
 
   @parameterized.parameters(
     itertools.product(
-      (networks.Mode.CCE, networks.Mode.CE), #mode
-      (2, 3), #num_players
-      (2, ), #num_actions
-      # (0, 0.1, 1.0),  # mu
-      # (0, 0.8, 1.5),  # rho
-      # (0, 0.1, 1.0),  # eps_plus
+      (networks.Mode.CCE, networks.Mode.CE),  # mode
+      (2, 3),  # num_players
+      (2,),  # num_actions
+      (0.0, 1.0),
+      (0.5, 5),
+      (0.1, 0.5),
     )
   )
   def test_gradient_correctness(
-    self, mode, num_players, num_actions,
+    self,
+    mode,
+    num_players,
+    num_actions,
+    welfare_coeff,
+    entropy_coeff,
+    epsilon_max,
   ):
-    """∂L/∂α must match ε_p - (1/ρ)·E_σ[gain]."""
-    mu, rho, eps_plus = 1, 1, 0.1
+    """∂L/∂α must match ε_p - E_σ[gain]."""
 
-    rng = jax.random.PRNGKey(42)
-    rng_G, rng_sigma, rng_eps, rng = jax.random.split(rng, 4)
+    data_rng, duals_rng = jax.random.split(jax.random.PRNGKey(num_players), 2)
 
     action_sizes = tuple(num_actions for _ in range(num_players))
-    joint_A = utils.compute_joint_action_size(action_sizes)
-    shape = (num_players,) + action_sizes
-
-    # Random game data
-    G = jax.random.uniform(rng_G, shape)
-    sigma_hat = jax.random.dirichlet(rng_sigma, alpha=jnp.ones(joint_A))
-    sigma_hat = sigma_hat.reshape(action_sizes)
-    epsilon_hat = jax.random.uniform(
-      rng_eps, (num_players,), minval=-0.5, maxval=0.5
-    )
-    W = jnp.sum(G, axis=0)
-    mask = jnp.ones(action_sizes, dtype=jnp.bool)
-
-    data = samplers.Data(
-      reward=G,
-      sigma_hat=sigma_hat,
-      sigma_norm=None,  # dont' need that
-      epsilon_hat=epsilon_hat,
-      welfare=W,
-      mask=mask,
+    data = jax.tree.map(
+      lambda x: jnp.squeeze(x, 0),
+      samplers.dummy_nes_batch(1, num_players, action_sizes, data_rng)
     )
 
-    def loss_fn(alpha):
+    def loss_fn(duals):
       _, _, epsilon, sum_alphas, lse = nes.recover_primals(
-        alpha, data, mu, rho, eps_plus, mode.value
+        duals, data, welfare_coeff, entropy_coeff, epsilon_max, mode.value
       )
-      return lse + eps_plus * jnp.sum(sum_alphas) - rho * jnp.sum(epsilon)
+      return (
+        lse
+        + epsilon_max * jnp.sum(sum_alphas)
+        - entropy_coeff * jnp.sum(epsilon)
+      )
 
-    # Random positive duals (network outputs softplus(·), so alpha >= 0)
     if mode == networks.Mode.CCE:
-      alpha_shape = (1, num_players, num_actions)
+      duals_shape = (num_players, num_actions)
     else:
-      alpha_shape = (1, num_players, num_actions, num_actions)
+      duals_shape = (num_players, num_actions, num_actions)
 
     # dummy alphas, that there're under softplus
-    alpha = jax.random.exponential(rng, alpha_shape)
+    sample_duals = jax.random.exponential(duals_rng, duals_shape)
 
     # Autodiff gradient
-    grad_auto = jax.grad(loss_fn)(alpha)
+    grad_auto = jax.grad(loss_fn)(sample_duals)
 
-    _, sigma, epsilon, _, _ = nes.recover_primals(
-      alpha, data, mu, rho, eps_plus, action_sizes, mode.value
+    _, strategy, epsilon, _, _ = nes.recover_primals(
+      sample_duals, data, welfare_coeff, entropy_coeff, epsilon_max, mode.value
     )
 
-    grad_theory = jnp.zeros_like(alpha)
-    indices = jnp.indices(action_sizes)  # [N, A1, ..., AN]
+    grad_theory = jnp.zeros_like(sample_duals)
+    indices = jnp.indices(action_sizes)  # [A1, ..., AN]
 
     for p in range(num_players):
-      G_p = G[p]
+      payoff = data.payoffs[p]
 
       if mode == networks.Mode.CCE:
         for dev in range(num_actions):
           # G_p(dev, a_{-p}) for every joint action a
           idx_dev = indices.at[p].set(dev)
-          G_p_dev = G_p[tuple(idx_dev)]
-          gain = G_p_dev - G_p
-          expected_gain = jnp.sum(sigma * gain)
-          grad_theory = grad_theory.at[0, p, dev].set(
-            epsilon[p] - (1.0 / rho) * expected_gain
-          )
+          payoff_at_dev = payoff[tuple(idx_dev)]
+          gain = payoff_at_dev - payoff
+          expected_gain = jnp.sum(strategy * gain)
+          grad_theory = grad_theory.at[p, dev].set(epsilon[p] - expected_gain)
       else:  # CE
         for dev in range(num_actions):
           idx_dev = indices.at[p].set(dev)
-          G_p_dev = G_p[tuple(idx_dev)]
-          gain = G_p_dev - G_p
+          payoff_at_dev = payoff[tuple(idx_dev)]
+          gain = payoff_at_dev - payoff
           for rec in range(num_actions):
             mask_rec = indices[p] == rec
-            expected_gain = jnp.sum(sigma * gain * mask_rec)
-            grad_theory = grad_theory.at[0, p, dev, rec].set(
-              epsilon[p] - (1.0 / rho) * expected_gain
+            expected_gain = jnp.sum(strategy * gain * mask_rec)
+            grad_theory = grad_theory.at[p, dev, rec].set(
+              epsilon[p] - expected_gain
             )
 
     self.assertTrue(

@@ -19,7 +19,12 @@ from open_spiel.python.jax.nes import samplers
 from open_spiel.python.jax.nes import games
 from open_spiel.python.jax.nes import equilibria_utils as eu
 
-"""TODO: Comment
+"""Neural Equilibrium Solver agent implemented in Jax.
+
+See the paper "Turbocharging Solution Concepts: 
+Solving NEs, CEs and CCEs with Neural Equilibrium Solvers"
+
+https://arxiv.org/abs/2210.09257 for more details.
 """
 
 # Shortcut for the data structrure
@@ -31,44 +36,54 @@ Game = samplers.Game
 def recover_primals(
   duals: chex.Array,
   data: Data,
-  mu: float,
-  rho: float,
-  epsilon_plus: float,
+  welfare_coeff: float,
+  entropy_coeff: float,
+  epsilon_max: float,
   mode: networks.Mode = networks.Mode.CCE,
 ) -> tuple:
-  """
-  ε̂-MWMRE dual loss (Equation 7, [1]).
+  """ε̂-MWMRE dual loss (Equation 7, [1]).
   L_dual = log_sum_exp + ε⁺ · Σ_p Σ_a α_p(a) - ρ · Σ_p ε_p
-  """
-  payoffs = data.reward  # [N, A1, ..., AN]
 
-  hat_sigma = data.sigma_hat  # [A1, ..., AN]
-  hat_epsilon = data.epsilon_hat  # [N]
+    Args:
+      duals: Player payoffs with shape [N, A] or [N, A, A].
+      data: Batch of network data.
+      welfare_coeff: A coefficient of the ME objective.
+      entropy_coeff: A coefficient of the MRE objective.
+      epsilon_max: MRE cap.
+      mode: CE or CCE.
+
+  Returns:
+      Recovered primal variabls: A tuple consisting of
+        logits, strategy, epsilon, sum_duals, log_sum_exp
+  """
+  payoffs = data.payoffs  # [N, A1, ..., AN]
+
+  strategy = data.strategy_base  # [A1, ..., AN]
+  epsilon_target = data.epsilon_target  # [N]
   W = data.welfare  # [A1, ..., AN]
 
   if mode == networks.Mode.CCE.value:
-    contrib_fn = eu.cce_logit
-  else:  # noqa: E731
-    contrib_fn = eu.ce_logit
+    deviation_term = eu.cce_logit(duals, payoffs=payoffs)  # [A1, ..., AN]
+  else:  # CE
+    deviation_term = eu.ce_logit(duals, payoffs=payoffs)  # [A1, ..., AN]
+  sum_duals = jnp.sum(duals, axis=tuple(range(1, duals.ndim)))  # [N]
 
-  # Sum deviations over all players: Σ_p [...]
-  deviation_term = contrib_fn(duals, payoffs).sum(0)
-  sum_alphas = duals.sum(0)
+  W_masked = jnp.where(data.joint_mask, W, 0.0)
 
-  W_masked = jnp.where(data.mask, W, 0.0)
+  logits = welfare_coeff * W_masked - deviation_term
 
-  logits = mu * W_masked - deviation_term
+  log_strat_base = jnp.log(strategy + utils.SMALL_NUMBER)
 
-  log_hat_sigma = jnp.log(hat_sigma + utils.SMALL_NUMBER)
+  log_sum_exp = jax.nn.logsumexp(log_strat_base + logits, where=data.joint_mask)
+  strategy = jnp.where(
+    data.joint_mask, strategy * jnp.exp(logits - log_sum_exp), 0.0
+  )
 
-  log_sum_exp = jax.nn.logsumexp(log_hat_sigma + logits, where=data.mask)
-  sigma = jnp.where(data.mask, hat_sigma * jnp.exp(logits - log_sum_exp), 0.0)
+  epsilon = (epsilon_target - epsilon_max) * jnp.exp(
+    -sum_duals / entropy_coeff
+  ) + epsilon_max
 
-  epsilon = (hat_epsilon - epsilon_plus) * jnp.exp(
-    -sum_alphas / rho
-  ) + epsilon_plus
-
-  return logits, sigma, epsilon, sum_alphas, log_sum_exp
+  return logits, strategy, epsilon, sum_duals, log_sum_exp
 
 
 class DifferentiableEquilibriumBlock(nn.Module):
@@ -77,74 +92,62 @@ class DifferentiableEquilibriumBlock(nn.Module):
   def __init__(
     self,
     network: networks.NeuralEquilibriumModel,
-    mu: float,
-    rho: float,
-    epsilon_plus: float,
+    welfare_coeff: float,
+    entropy_coeff: float,
+    epsilon_max: float,
     mode: networks.Mode,
   ) -> None:
-    self._mu = mu
-    self._rho = rho
-    self._eps_plus = epsilon_plus
+    self._mu = welfare_coeff
+    self._rho = entropy_coeff
+    self._eps_plus = epsilon_max
     self._mode = mode
     self._network = network
 
   def __call__(self, data: Data) -> chex.Array:
-    alpha = self._network(
-      samplers.stack(samplers.broadcastn(data), axis=1), data.mask
+    duals = self._network(
+      samplers.stack(samplers.broadcastn(data), axis=1),
+      data.strat_mask_per_player,
     )
-    _, sigma, _, _, _ = recover_primals(
-      alpha, data, self._mu, self._rho, self._eps_plus, self._mode.value
+    _, strategy, _, _, _ = recover_primals(
+      duals, data, self._mu, self._rho, self._eps_plus, self._mode.value
     )
-    return sigma
+    return strategy
 
 
-def lr_schedule(base_learning_rate: float = 1e-4):
-  """Joint learning schedule from the NES paper."""
+def lr_schedule(base_learning_rate: float = 1e-4) -> optax.Schedule:
+  """Joint learning schedule from the NES paper.
+  (iteration, factor) pairs of
+  - (1e6, 1.0)
+  - (4e6, 0.6)
+  - (7e6, 0.3)
+  - (10e6, 0.1)
+  - (100e6, 0.06)
+  - (inf, 0.03)
+  where each "iteration" is the *duration* of that segment.
+  """
 
-  boundaries = [
-    100_000,
-    1_000_000,
-    4_000_000,
-    7_000_000,
-    10_000_000,
-    100_000_000,
-  ]
+  # Cumulative boundaries from segment durations
+  segment_durations = [1_000_000, 4_000_000, 7_000_000, 10_000_000, 100_000_000]
   factors = [1.0, 0.6, 0.3, 0.1, 0.06, 0.03]
 
-  schedules = []
-  for i, (start, factor) in enumerate(zip([0] + boundaries[:-1], factors)):
-    end = boundaries[i] if i < len(boundaries) else None
-    # Constant schedule for this segment
-    schedules.append(optax.constant_schedule(base_learning_rate * factor))
+  # Convert durations to cumulative boundaries for optax
+  boundaries = []
+  cumulative = 0
+  for duration in segment_durations[:-1]:
+    cumulative += duration
+    boundaries.append(cumulative)
+  # boundaries = [1_000_000, 5_000_000, 12_000_000, 22_000_000]
 
-  return optax.join_schedules(schedules=schedules, boundaries=boundaries[:-1])
+  # Build constant schedules for each segment
+  schedules = [
+    optax.constant_schedule(base_learning_rate * factor) 
+    for factor in factors
+  ]
 
-
-def objective_from_coefficients(
-  mu: float,
-  eps_hat: float | chex.Array,
-  uniform_sigma: bool,
-) -> samplers.Objective:
-  # Simplified version
-
-  if mu:
-    if uniform_sigma:
-      if eps_hat == 0:
-        return samplers.Objective.MWME
-      elif eps_hat > 0:
-        return samplers.Objective.EPS_MWME
-    else:
-      if eps_hat == 0:
-        return samplers.Objective.EPS_MRE
-  else:
-    if uniform_sigma:
-      if eps_hat == 0:
-        return samplers.Objective.ME
-    else:
-      if eps_hat == 0:
-        return samplers.Objective.MRE
-      elif eps_hat > 0:
-        return samplers.Objective.EPS_MRE
+  return optax.join_schedules(
+    schedules=schedules,
+    boundaries=boundaries,
+  )
 
 
 class NESolver:
@@ -156,9 +159,9 @@ class NESolver:
     mode: networks.Mode,
     network_config: dict[str, int | list[int]],
     objective: samplers.Objective | None = samplers.Objective.EPS_MWMRE,
-    mu: float = 1.0,
-    rho: float = 1.0,
-    epsilon_plus: float = None,
+    welfare_coeff: float = 1.0,
+    entropy_coeff: float = 1.0,
+    epsilon_max: float = None,
     norm: int = 2,
     batch_size: int = 100,
     eval_batch_size: int = 1,
@@ -172,7 +175,7 @@ class NESolver:
     game_kwargs: Optional[dict] = {},
     allow_checkpointing: Optional[bool] = False,
   ) -> None:
-    """Initializes the NES optimizer for a specific game."""
+    """Initialises the NES optimizer for a specific game."""
 
     self._game = game
     self._mode = mode
@@ -180,8 +183,8 @@ class NESolver:
     self._eval_batch_size = eval_batch_size
 
     self._network_train_steps = network_train_steps
-    self._mu = mu
-    self._rho = rho
+    self._mu = welfare_coeff
+    self._rho = entropy_coeff
 
     if game in pyspiel.registered_names():
       _game = pyspiel.load_game(game)
@@ -191,7 +194,7 @@ class NESolver:
       )
 
       self._sampler = samplers.OpenSpielGameSampler(
-        _game, obj=objective, m=norm, z_m=epsilon_plus
+        _game, obj=objective, m=norm, z_m=epsilon_max
       )
     elif isinstance(game, games.Game):
       assert "num_strategies" in game_kwargs, (
@@ -210,7 +213,7 @@ class NESolver:
         game_settings,
         obj=objective,
         m=norm,
-        z_m=epsilon_plus,
+        z_m=epsilon_max,
       )
     elif isinstance(game, list):
       assert "max_actions" in game_kwargs, (
@@ -240,7 +243,7 @@ class NESolver:
         max_actions=game_kwargs["max_actions"],
         obj=objective,
         m=norm,
-        z_m=epsilon_plus,
+        z_m=epsilon_max,
       )
 
       self._num_players = self._sampler.num_players
@@ -255,7 +258,7 @@ class NESolver:
     self._last_data = self._sampler.sample_random(self._batch_size, init_key)
 
     self._eps_plus = (
-      epsilon_plus if epsilon_plus is not None else self._sampler.z_m
+      epsilon_max if epsilon_max is not None else self._sampler.z_m
     )
 
     self._iteration = 0
@@ -310,14 +313,16 @@ class NESolver:
     ) -> chex.Array:
       """Loss function for the NES-network."""
 
-      alpha = utils.batched_call(
-        network, samplers.stack(self.broadcast_fn(data), axis=1), data.mask
+      duals = utils.batched_call(
+        network,
+        samplers.stack(self.broadcast_fn(data), axis=1),
+        data.strat_mask_per_player,
       )
       # Recovering primal variables
-      logits, sigma, epsilon, sum_alphas, log_sum_exp = jax.vmap(
+      logits, strategy, epsilon, sum_duals, log_sum_exp = jax.vmap(
         recover_primals, in_axes=(0, 0, None, None, None, None)
       )(
-        alpha,
+        duals,
         data,
         self._mu,
         self._rho,
@@ -328,16 +333,16 @@ class NESolver:
       # Total loss: Equation (7)
       loss = (
         log_sum_exp
-        + self._eps_plus * jnp.sum(sum_alphas, axis=-1)
+        + self._eps_plus * jnp.sum(sum_duals, axis=-1)
         - self._rho * jnp.sum(epsilon, axis=-1)
       )
 
       primals = {
         "logits": logits,
-        "sigma": sigma,
+        "strategy": strategy,
         "epsilon": epsilon,
       }
-      return loss.mean(), (primals, alpha)
+      return loss.mean(), (primals, duals)
 
     self._loss_fn = _dual_loss_fn
     self._update_fn = self._get_jitted_update()
@@ -443,23 +448,29 @@ class NESolver:
     self._checkpointer.wait_until_finished()
 
   def _logging_callback(self, batch: Data, primals: dict) -> dict:
-    batch_size = batch.reward.shape[0]
+    batch_size = batch.payoffs.shape[0]
     if self._mode == networks.Mode.CCE:
       regret = jax.vmap(eu.compute_cce_gap)(
-        batch.reward, primals["sigma"], batch.epsilon_hat, batch.mask
+        batch.payoffs,
+        primals["strategy"],
+        batch.epsilon_target,
+        joint_mask=batch.joint_mask,
       )
     else:  # CE gap
       regret = jax.vmap(eu.compute_ce_gap)(
-        batch.reward, primals["sigma"], batch.epsilon_hat, batch.mask
+        batch.payoffs,
+        primals["strategy"],
+        batch.epsilon_target,
+        joint_mask=batch.joint_mask,
       )
 
     data = []
     for i in range(batch_size):
       solver_data = eu.mwmre_solver(
-        batch.reward[i],
-        primals["sigma"][i],
-        batch.epsilon_hat[i],
-        batch.mask[i],
+        batch.payoffs[i],
+        primals["strategy"][i],
+        batch.epsilon_target[i],
+        batch.joint_mask[i],
         self._mu,
         self._rho,
         self._eps_plus,

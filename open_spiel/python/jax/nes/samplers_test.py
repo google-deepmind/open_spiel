@@ -77,11 +77,10 @@ class SamplerTest(parameterized.TestCase):
     action_sizes = tuple(
       game.num_distinct_actions() for _ in range(game.num_players())
     )
-    batch2 = samplers.Data(
-      **utils.dummy_nes_batch(
-        batch_size, game.num_players(), action_sizes, jax.random.key(0)
-      )
+    batch2 = samplers.dummy_nes_batch(
+      batch_size, game.num_players(), action_sizes, jax.random.key(0)
     )
+    
     batch_normalised = sampler.normalise_batch(batch2)
 
     self.assertTrue(

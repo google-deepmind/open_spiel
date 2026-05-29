@@ -294,28 +294,28 @@ class PayoffsToDuals(nn.Module):
       )
 
   def _marginalise_payoffs(
-    self, alpha: chex.Array, joint_mask: chex.Array
+    self, duals: chex.Array, joint_mask: chex.Array
   ) -> chex.Array:
     """Helper for marginalisation: [C_dual, N, A1, ..., AN] → [C_dual, N, A]"""
 
     # Detect if this is a cubic game (all players have the same number of actions)
-    A_sizes = tuple(alpha.shape[2:])
+    A_sizes = tuple(duals.shape[2:])
     is_cubic = len(set(A_sizes)) == 1
     max_A = max(A_sizes)
 
     m_duals = []
-    for p in range(alpha.shape[1]):
+    for p in range(duals.shape[1]):
       # [C_dual, A1, A2, ..., AN]
-      alpha_p_slice = alpha[:, p]
+      duals_per_player = duals[:, p]
       own_axis = p + 1
 
       # Reduce everything except the own-action dimension
       reduce_axes = tuple(
-        i for i in range(1, alpha_p_slice.ndim) if i != own_axis
+        i for i in range(1, duals_per_player.ndim) if i != own_axis
       )
       #  [C_dual, A_p]
-      alpha_p = utils.reduce(
-        alpha_p_slice,
+      dual = utils.reduce(
+        duals_per_player,
         axis=reduce_axes,
         reduction=utils.Reduction.MEAN,
         where=joint_mask,
@@ -325,15 +325,15 @@ class PayoffsToDuals(nn.Module):
       ).squeeze()
 
       if is_cubic:
-        m_duals.append(alpha_p)
+        m_duals.append(dual)
       else:
         # Pad to max_A for non-cubic games
-        if alpha_p.shape[-1] < max_A:
-          pad_width = [(0, 0)] * (alpha_p.ndim - 1) + [
-            (0, max_A - alpha_p.shape[-1])
+        if dual.shape[-1] < max_A:
+          pad_width = [(0, 0)] * (dual.ndim - 1) + [
+            (0, max_A - dual.shape[-1])
           ]
-          alpha_p = jnp.pad(alpha_p, pad_width, mode="constant")
-        m_duals.append(alpha_p)
+          dual = jnp.pad(dual, pad_width, mode="constant")
+        m_duals.append(dual)
 
     # Stack along the player dimension -> [C, N, max_A]
     return jnp.stack(m_duals, axis=1)
@@ -347,28 +347,28 @@ class PayoffsToDuals(nn.Module):
     x_t = jnp.moveaxis(x, 0, -1)  # [N, *A, C]
 
     if self.mode == Mode.CCE:
-      alpha_cce = jnp.moveaxis(self.linear(x_t), -1, 0)  # [C_dual, N, *A]
-      return self._marginalise_payoffs(alpha_cce, joint_mask)
+      duals_cce = jnp.moveaxis(self.linear(x_t), -1, 0)  # [C_dual, N, *A]
+      return self._marginalise_payoffs(duals_cce, joint_mask)
 
     elif self.mode == Mode.CE:
       # Outer product
 
-      alpha_med = jnp.moveaxis(self.linear(x_t), -1, 0)
-      alpha_rec = jnp.moveaxis(self.linear_aux(x_t), -1, 0)
+      duals_med = jnp.moveaxis(self.linear(x_t), -1, 0)
+      duals_rec = jnp.moveaxis(self.linear_aux(x_t), -1, 0)
 
-      alpha1 = self._marginalise_payoffs(
-        alpha_med, joint_mask
+      duals1 = self._marginalise_payoffs(
+        duals_med, joint_mask
       )  # [C_dual, N, A]
-      alpha2 = self._marginalise_payoffs(
-        alpha_rec, joint_mask
+      duals2 = self._marginalise_payoffs(
+        duals_rec, joint_mask
       )  # [C_dual, N, A]
 
       # Outer product (Eq. 13 generalisation)
-      # same as jnp.einsum('cni,cnj->cnij', alpha1, alpha2)
-      alpha_ce = alpha1[:, :, :, None] * alpha2[:, :, None, :]
-      alpha_ce = utils.mask_diagonal(alpha_ce)
+      # same as jnp.einsum('cni,cnj->cnij', duals1, duals2)
+      duals_ce = duals1[:, :, :, None] * duals2[:, :, None, :]
+      duals_ce = utils.mask_diagonal(duals_ce)
 
-      return alpha_ce
+      return duals_ce
 
     raise ValueError(f"Unknown mode {self.mode}")
 
@@ -636,34 +636,35 @@ class NeuralEquilibriumModel(nn.Module):
       else lambda x: x
     )
 
-  def _mask_alpha(self, alpha: chex.Array, mask: chex.Array) -> chex.Array:
-    """Zero out alphas for padded actions using the joint mask."""
-    N = alpha.shape[1]
-    alpha_mask = []
+  def _mask_duals(self, duals: chex.Array, mask: chex.Array) -> chex.Array:
+    """Zero out duals for padded actions using the joint mask."""
+    N = duals.shape[1]
+    duals_mask = []
 
     if self._mode == Mode.CCE:
-      # alpha: [C, N, A]; mask: [A1, ..., AN]
+      # duals: [C, N, A]; mask: [A1, ..., AN]
       # Per-player valid actions: does any valid joint action use this a_p?
       for p in range(N):
-        alpha_mask.append(mask[p])
+        duals_mask.append(mask[p])
     else:  # CE
-      # alpha: [C, N, A, A]; mask: [A1, ..., AN]
+      # duals: [C, N, A, A]; mask: [A1, ..., AN]
       for p in range(N):
         valid = mask[p]
         # Outer product for (dev, rec)
         ce_valid = jnp.logical_and(valid[:, None], valid[None, :])  # [A, A]
         diag = jnp.arange(ce_valid.shape[0])
         ce_valid = ce_valid.at[diag, diag].set(False)
-        alpha_mask.append(ce_valid)
+        duals_mask.append(ce_valid)
 
-    alpha_mask = jnp.stack(alpha_mask)
-    alpha_mask = jnp.broadcast_to(alpha_mask, alpha.shape)
-    return jnp.where(alpha_mask, alpha, 0.0)
+    duals_mask = jnp.stack(duals_mask)
+    duals_mask = jnp.broadcast_to(duals_mask, duals.shape)
+    return jnp.where(duals_mask, duals, 0.0)
 
   def __call__(
     self,
     game_tensor: chex.Array,
     strat_mask_per_player: list[chex.Array],
+    *,
     joint_mask: chex.Array | None = None,
   ) -> chex.Array:
     """NES forward pass.
@@ -672,7 +673,7 @@ class NeuralEquilibriumModel(nn.Module):
         game_tensor (chex.Array): game tensor or shape [4, N, *A]
 
     Returns:
-        alpha (chex.Array): dual variables of the shape dependent on
+        duals (chex.Array): dual variables of the shape dependent on
           the type of equilibrium:
           1. [C, N, |Ap|] for CCE
           2. [C, N, |Ap|, |Ap|] for CE
@@ -691,13 +692,13 @@ class NeuralEquilibriumModel(nn.Module):
     x = self.payoff_to_dual_proj(x, joint_mask)
 
     # Dual processing
-    alpha = self.dual_layers(x)
+    duals = self.dual_layers(x)
 
     # Returning
     # For CCE: [1, N, A]
     # For CE: [1, N, A, A]
 
     # Mask padded duals
-    alpha = self._mask_alpha(alpha, strat_mask_per_player)
+    duals = self._mask_duals(duals, strat_mask_per_player)
 
-    return alpha.squeeze(0)
+    return duals.squeeze(0)

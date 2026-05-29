@@ -1,6 +1,5 @@
 import enum
 import functools
-import math
 import dataclasses
 from typing import NamedTuple
 
@@ -67,6 +66,26 @@ def stack(data: Data, axis=1) -> chex.Array:
   return jnp.stack(
     [data.payoffs, data.epsilon_target, data.strategy_norm, data.welfare],
     axis=axis,
+  )
+
+
+def dummy_nes_batch(
+  batch_size, n_players, action_sizes, rng: chex.PRNGKey
+) -> Data:
+  """Quick placeholder for testing without OpenSpiel"""
+  A = jnp.array(action_sizes)
+  joint_shape = (batch_size, *A)
+
+  return Data(
+    payoffs=jnp.zeros((batch_size, n_players, *A)),
+    strategy_base=jnp.ones(joint_shape) / jnp.prod(A),
+    strategy_norm=jnp.ones(joint_shape) / jnp.prod(A),
+    epsilon_target=jnp.zeros((batch_size, n_players)),
+    welfare=jnp.zeros(joint_shape),
+    strat_mask_per_player=[
+      jnp.ones((batch_size, a), dtype=jnp.bool) for a in A
+    ],
+    joint_mask=jnp.ones((batch_size, *A), dtype=jnp.bool),
   )
 
 
@@ -152,7 +171,7 @@ class GameSampler:
   ) -> chex.Array:
     """Returns hat_sigma(a) of shape [A1, A2, ..., AN]"""
     _, *A = payoffs.shape
-    joint_A = math.prod(A)
+    joint_A = utils.compute_joint_action_size(A)
     if self.obj in [Objective.MRE, Objective.EPS_MRE, Objective.EPS_MWMRE]:
       return jax.random.dirichlet(rng, alpha=jnp.ones(joint_A)).reshape(A)
     if self.obj == Objective.MT:
@@ -162,7 +181,7 @@ class GameSampler:
   @functools.partial(jax.jit, static_argnums=(0,))
   def _scale_strategy(self, strat_base: chex.Array) -> chex.Array:
     """Equation (16d): L1 unit-variance scaling for target joint distribution"""
-    joint_A = math.prod(strat_base.shape)
+    joint_A = utils.compute_joint_action_size(strat_base.shape)
     mean = 1.0 / joint_A
     z_sigma = (joint_A / jnp.sqrt(joint_A + 1.0 / joint_A)) * (
       (joint_A - 1) / joint_A
@@ -252,7 +271,7 @@ class OpenSpielGameSampler(GameSampler):
       self.strat_mask_per_player
     )
 
-    joint_A = math.prod(self.A)
+    joint_A = utils.compute_joint_action_size(self.A)
     self.max_actions = max(self.A)
     if self.z_m is None:
       self.z_m = jnp.array(joint_A, dtype=jnp.float32) ** (1.0 / self.m)

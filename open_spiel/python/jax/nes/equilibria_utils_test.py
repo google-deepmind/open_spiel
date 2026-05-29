@@ -82,9 +82,7 @@ class EquilibriaTest(absltest.TestCase):
   # === CCE gain ===
   def test_cce_gain_per_player_from_payoff(self):
     """CCE gain from payoff tensor."""
-    payoffs = jnp.array(
-        [[[3, 0], [5, 1]], [[3, 5], [0, 1]]], dtype=jnp.float32
-    )
+    payoffs = jnp.array([[[3, 0], [5, 1]], [[3, 5], [0, 1]]], dtype=jnp.float32)
     # Player 0's payoff: [[3, 0], [5, 1]]
     gain_0 = eu.cce_gain_per_player(0, payoff=payoffs[0])
     # Shape: [2, 2, 2] = [A0', A0, A1]
@@ -102,7 +100,7 @@ class EquilibriaTest(absltest.TestCase):
     # Should sum over axis 1 (rec axis)
     expected = jnp.ones((2, 2, 2)) * 2  # sum of two 1s
     self.assertTrue(jnp.allclose(cce_gain, expected))
-  
+
   # === Expected CCE gain ===
   def test_expected_cce_gain_from_payoff_and_joint(self):
     """Expected CCE gain under joint strategy."""
@@ -110,7 +108,7 @@ class EquilibriaTest(absltest.TestCase):
     sigma = jnp.ones((2, 2)) / 4.0
 
     gain_0 = eu.expected_cce_gain_per_player(
-        player=0, payoff=G[0], correlated_joint_strategy=sigma
+      player=0, payoff=G[0], correlated_joint_strategy=sigma
     )
     # Uniform strategy: expected payoff = 0 for both players
     # Deviation gain for player 0:
@@ -128,13 +126,13 @@ class EquilibriaTest(absltest.TestCase):
     margs = (jnp.array([0.5, 0.5]), jnp.array([0.5, 0.5]))
 
     gain_joint = eu.expected_cce_gain_per_player(
-        player=0, payoff=G[0], correlated_joint_strategy=sigma
+      player=0, payoff=G[0], correlated_joint_strategy=sigma
     )
     gain_marg = eu.expected_cce_gain_per_player(
-        player=0, payoff=G[0], player_marg_per_player=margs
+      player=0, payoff=G[0], player_marg_per_player=margs
     )
     self.assertTrue(jnp.allclose(gain_joint, gain_marg))
-  
+
   def test_expected_cce_gain_with_strat_mask(self):
     """Masking invalid deviations."""
     G = _prisoners_dilemma()["payoffs"]
@@ -142,7 +140,7 @@ class EquilibriaTest(absltest.TestCase):
     mask = jnp.array([True, False])  # action 1 invalid
 
     gain_0 = eu.expected_cce_gain_per_player(
-        player=0, payoff=G[0], correlated_joint_strategy=sigma, strat_mask=mask
+      player=0, payoff=G[0], correlated_joint_strategy=sigma, strat_mask=mask
     )
     # Action 0 valid, action 1 masked to 0
     self.assertTrue(jnp.isfinite(gain_0[0]))
@@ -152,12 +150,9 @@ class EquilibriaTest(absltest.TestCase):
   def test_expected_cce_gain_from_cce_dual_grad(self):
     """Direct dual gradient path."""
     grad = jnp.array([1.0, -2.0])
-    gain = eu.expected_cce_gain_per_player(
-        player=0, cce_dual_grad=grad
-    )
+    gain = eu.expected_cce_gain_per_player(player=0, cce_dual_grad=grad)
     self.assertTrue(jnp.allclose(gain, -grad))
 
-  
   # === CCE logit ===
   def test_cce_logit_shape(self):
     """Logit output shape matches joint strategy."""
@@ -169,9 +164,7 @@ class EquilibriaTest(absltest.TestCase):
 
   def test_cce_logit_finite(self):
     """Logit should be finite for valid inputs."""
-    G = jnp.array(
-        [[[1, 0], [0, 1]], [[1, 0], [0, 1]]], dtype=jnp.float32
-    )
+    G = jnp.array([[[1, 0], [0, 1]], [[1, 0], [0, 1]]], dtype=jnp.float32)
     duals = (jnp.ones(2), jnp.ones(2))
 
     logit = eu.cce_logit(cce_dual_per_player=duals, payoffs=G)
@@ -183,20 +176,20 @@ class EquilibriaTest(absltest.TestCase):
     duals = (jnp.ones(2) / 2, jnp.ones(2) / 2)
 
     logit_no_offset = eu.cce_logit(cce_dual_per_player=duals, payoffs=G)
-    logit_with_offset = eu.cce_logit(cce_dual_per_player=duals, payoffs=G, max_cce_gain=1.0)
+    logit_with_offset = eu.cce_logit(
+      cce_dual_per_player=duals, payoffs=G, max_cce_gain=1.0
+    )
 
     # Offset adds sum(dual) * max_cce_gain per player to each entry
     expected_shift = sum(jnp.sum(d) * 1.0 for d in duals)
     self.assertTrue(
-        jnp.allclose(logit_with_offset - logit_no_offset, expected_shift)
+      jnp.allclose(logit_with_offset - logit_no_offset, expected_shift)
     )
-  
+
   # === CE gain ===
   def test_ce_gain_per_player_from_payoff(self):
     """CE gain from payoff tensor."""
-    payoffs = jnp.array(
-        [[[3, 0], [5, 1]], [[3, 5], [0, 1]]], dtype=jnp.float32
-    )
+    payoffs = jnp.array([[[3, 0], [5, 1]], [[3, 5], [0, 1]]], dtype=jnp.float32)
     gain_0 = eu.ce_gain_per_player(0, payoff=payoffs[0])
     # Shape: [2, 2, 2, 2] = [A0', A0'', A0, A1]
     self.assertEqual(gain_0.shape, (2, 2, 2, 2))
@@ -210,7 +203,7 @@ class EquilibriaTest(absltest.TestCase):
     self.assertTrue(jnp.allclose(ce[0, 0], expected_00))
     expected_01 = cce[0] - cce[1]
     self.assertTrue(jnp.allclose(ce[0, 1], expected_01))
-  
+
   # === Expected CE gain ===
   def test_expected_ce_gain_from_payoff_and_joint(self):
     """Expected CE gain under joint strategy."""
@@ -218,7 +211,7 @@ class EquilibriaTest(absltest.TestCase):
     sigma = _coordination_game()["sigma_good"]  # 0.5 at (0,0) and (1,1)
 
     gain_0 = eu.expected_ce_gain_per_player(
-        0, payoff=G[0], correlated_joint_strategy=sigma
+      0, payoff=G[0], correlated_joint_strategy=sigma
     )
     # Shape: [2, 2] = [dev, rec]
     self.assertEqual(gain_0.shape, (2, 2))
@@ -235,7 +228,7 @@ class EquilibriaTest(absltest.TestCase):
 
     for p in range(2):
       self.assertTrue(
-          jnp.allclose(jnp.diag(ce_gains[p]), cce_gains[p], atol=1e-5)
+        jnp.allclose(jnp.diag(ce_gains[p]), cce_gains[p], atol=1e-5)
       )
 
   def test_expected_ce_gain_from_ce_gain_and_joint(self):
@@ -245,10 +238,10 @@ class EquilibriaTest(absltest.TestCase):
 
     ce_gains = eu.ce_gain(payoffs=G)
     gain_0_from_payoff = eu.expected_ce_gain_per_player(
-        0, payoff=G[0], correlated_joint_strategy=sigma
+      0, payoff=G[0], correlated_joint_strategy=sigma
     )
     gain_0_from_ce = eu.expected_ce_gain_per_player(
-        0, ce_gain=ce_gains[0], correlated_joint_strategy=sigma
+      0, ce_gain=ce_gains[0], correlated_joint_strategy=sigma
     )
     self.assertTrue(jnp.allclose(gain_0_from_payoff, gain_0_from_ce))
 
@@ -275,13 +268,15 @@ class EquilibriaTest(absltest.TestCase):
     duals = (jnp.ones((2, 2)) / 4, jnp.ones((2, 2)) / 4)
 
     logit_no_offset = eu.ce_logit(ce_dual_per_player=duals, payoffs=G)
-    logit_with_offset = eu.ce_logit(ce_dual_per_player=duals, payoffs=G, max_ce_gain=1.0)
+    logit_with_offset = eu.ce_logit(
+      ce_dual_per_player=duals, payoffs=G, max_ce_gain=1.0
+    )
 
     expected_shift = sum(jnp.sum(d) * 1.0 for d in duals)
     self.assertTrue(
-        jnp.allclose(logit_with_offset - logit_no_offset, expected_shift)
+      jnp.allclose(logit_with_offset - logit_no_offset, expected_shift)
     )
-  
+
   ## CCE gap tests
   def test_cce_gap_uniform_matching_pennies(self):
     """Uniform strategy in matching pennies should have zero CCE gap with large epsilon."""
@@ -378,10 +373,13 @@ class EquilibriaTest(absltest.TestCase):
 
   def test_ce_vs_cce_gap_comparison(self):
     """CE gap should be >= CCE gap (CE is stricter)."""
-    G = jnp.array([
-        [[2, 0], [0, 1]],   # player 0 (row)
-        [[1, 0], [0, 2]],   # player 1 (col) — not used for this check
-    ], dtype=jnp.float32)
+    G = jnp.array(
+      [
+        [[2, 0], [0, 1]],  # player 0 (row)
+        [[1, 0], [0, 2]],  # player 1 (col) — not used for this check
+      ],
+      dtype=jnp.float32,
+    )
 
     # Anti-diagonal correlation: always miscoordinate
     sigma = jnp.zeros((2, 2))
@@ -438,12 +436,12 @@ class EquilibriaTest(absltest.TestCase):
 
     # Mask out action 1 for both players
     strat_masks = (
-        jnp.array([True, False]),
-        jnp.array([True, False]),
+      jnp.array([True, False]),
+      jnp.array([True, False]),
     )
 
     gap = eu.compute_cce_gap(
-        G, sigma, epsilon, strat_mask_per_player=strat_masks
+      G, sigma, epsilon, strat_mask_per_player=strat_masks
     )
     # With only action 0 valid, no deviation possible, gap = 0
     self.assertAlmostEqual(gap, 0.0, 5)

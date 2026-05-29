@@ -82,13 +82,13 @@ flags.DEFINE_float(
 )
 
 flags.DEFINE_float(
-  "mu", 1.0, "Maximum Welfare coefficient of the loss function."
+  "welfare_coeff", 1.0, "Maximum Welfare coefficient of the loss function."
 )
 flags.DEFINE_float(
-  "rho", 1.0, "Minimum Relative Entropy coefficient of the loss function."
+  "entropy_coeff", 1.0, "Minimum Relative Entropy coefficient of the loss function."
 )
 flags.DEFINE_float(
-  "epslion_plus", None, "Epsilon plus coefficient of the loss function."
+  "epsilon_max", None, "Epsilon plus coefficient of the loss function."
 )
 
 flags.DEFINE_integer("norm", 2, "Norm of the payoff tensor.")
@@ -115,9 +115,9 @@ def main(_) -> None:
     random_games + openspiel_names,
     networks.Mode[FLAGS.mode],
     network_config,
-    rho=FLAGS.rho,
-    mu=FLAGS.mu,
-    epsilon_plus=FLAGS.epslion_plus,
+    entropy_coeff=FLAGS.entropy_coeff,
+    welfare_coeff=FLAGS.welfare_coeff,
+    epsilon_max=FLAGS.epsilon_max,
     norm=FLAGS.norm,  
     batch_size=FLAGS.batch_size,
     learning_rate=FLAGS.learning_rate,

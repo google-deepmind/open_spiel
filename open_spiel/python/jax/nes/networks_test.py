@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import jax
 import flax.nnx as nn
 import itertools
-import math
+
 
 """Tests for open_spiel.python.jax.nes.networks.py"""
 
@@ -44,28 +44,26 @@ class NESModelTest(parameterized.TestCase):
       rngs=nn.Rngs(jax.random.key(0)),
     )
     _model.eval()
-    alpha = utils.batched_call(_model, batch_padded, strat_masks_batched)
+    duals = utils.batched_call(_model, batch_padded, strat_masks_batched)
 
     if mode == networks.Mode.CCE:
-      self.assertEqual(alpha.shape, (1, num_players, max_size))
+      self.assertEqual(duals.shape, (1, num_players, max_size))
 
     if mode == networks.Mode.CE:
-      self.assertEqual(
-        alpha.shape, (1, num_players, max_size, max_size)
-      )
+      self.assertEqual(duals.shape, (1, num_players, max_size, max_size))
 
     # Should it be the case?
-    self.assertTrue((alpha >= 0).all())
+    self.assertTrue((duals >= 0).all())
 
     # Verify ALL masked actions (padded + explicitly masked) are zero
     for p in range(num_players):
       padded_actions = ~strat_masks[p]
       if mode == networks.Mode.CCE:
-        self.assertTrue(jnp.all(alpha[0, p, padded_actions] == 0))
+        self.assertTrue(jnp.all(duals[0, p, padded_actions] == 0))
       if mode == networks.Mode.CE:
         # For CE, both dev and rec should be zero for padded actions
-        self.assertTrue(jnp.all(alpha[0, p, padded_actions, :] == 0))
-        self.assertTrue(jnp.all(alpha[0, p, :, padded_actions] == 0))
+        self.assertTrue(jnp.all(duals[0, p, padded_actions, :] == 0))
+        self.assertTrue(jnp.all(duals[0, p, :, padded_actions] == 0))
 
 
 if __name__ == "__main__":

@@ -47,25 +47,6 @@ def mask_diagonal(x: chex.Array) -> chex.Array:
   x = x.at[..., diag, diag].set(0.0)
   return x
 
-
-def dummy_nes_batch(
-  batch_size, n_players, action_sizes, rng: chex.PRNGKey
-) -> dict[str, chex.Array]:
-  """Quick placeholder for testing without OpenSpiel"""
-  A = jnp.array(action_sizes)
-  joint_shape = (batch_size, *A)
-
-  return {
-    "payoffs": jnp.zeros((batch_size, n_players, *A)),
-    "strategy_base": jnp.ones(joint_shape) / jnp.prod(A),
-    "strategy_norm": jnp.ones(joint_shape) / jnp.prod(A),
-    "epsilon_target": jnp.zeros((batch_size, n_players)),
-    "welfare": jnp.zeros(joint_shape),
-    "strat_mask_per_player": [jnp.ones((batch_size, a), dtype=jnp.bool) for a in A],
-    "joint_mask": jnp.ones((batch_size, *A), dtype=jnp.bool),
-  }
-
-
 def compute_joint_action_size(action_shape: chex.Shape) -> int:
   """|A| = product of all players' action sizes"""
   return math.prod(action_shape)
