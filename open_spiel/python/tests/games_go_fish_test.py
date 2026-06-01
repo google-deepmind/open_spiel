@@ -27,16 +27,47 @@ FLAGS = flags.FLAGS
 
 # From CMakeLists.txt:Python tests are run from the main binary directory which
 # will be something like build/python.
-flags.DEFINE_string(
-    "chess960_fens_file",
-    "../../open_spiel/games/chess/chess960_starting_positions.txt",
-    "FENs database for chess960",
-)
 
 
-class GamesCrazyhouseTest(parameterized.TestCase):
+class GamesGoFishTest(parameterized.TestCase):
 
-  def test_bindings_sim(self):
+  def test_bindings(self):
+      go_fish = pyspiel.go_fish
+      game = pyspiel.load_game("go_fish")
+      assert(game.ranks() == 13)
+      assert(game.suits() == 4)
+      assert(game.initial_cards() == 7)
+      assert(game.most_books_wins() == True)
+      assert(game.end_on_first_out() == False)
+      assert(game.ask_after_empty_draw() == True)
+      start = "Ask\n0\nc1d1f1g2h1i1:0\nb2d1g1l2m1:0\na4b2c3d2e4f3g1h3i3j4k4l2m3"
+      state = game.new_initial_state(start)
+      action = game.ask_string_to_action('1,g')
+      state.apply_action(action)
+      action = game.ask_string_to_action('1,d')
+      state.apply_action(action)
+      action = game.ask_string_to_action('1,h') # miss
+      state.apply_action(action)
+      action = game.fish_string_to_action('g') # made book
+      state.apply_action(action)
+      action = game.ask_string_to_action('1,i') # miss
+      state.apply_action(action)
+      assert(state.phase() == go_fish.Phase.FISH)
+      assert(state.booked()[0] == 0)
+      assert(state.booked()[6] == 1) # g 
+      assert(state.player_did_ask() == 
+             [[0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]])
+      assert(state.player_was_asked() ==
+        [[False, False, False, False, False, False, False, False, False, False, False, False, False],
+          [False, False, False, True, False, False, True, True, True, False, False, False, False]])
+
+      #state.drawn_since_was_asked())
+
+
+      print(state)
+
+  def test_agame(self):
     game = pyspiel.load_game("go_fish")
     state = game.new_initial_state()
     count = 0
@@ -47,10 +78,11 @@ class GamesCrazyhouseTest(parameterized.TestCase):
       count += 1
       legal_actions = state.legal_actions()
       action = np.random.choice(legal_actions)
-      print("action", action)
+      #print("action", action)
       state.apply_action(action)
     if state.is_terminal():
-        print("returns", state.returns())
+        pass
+        #print("returns", state.returns())
 
 
   # state.to_string does not save the whole state, it loses ask history.
@@ -79,7 +111,8 @@ class GamesCrazyhouseTest(parameterized.TestCase):
       start = "Deal\n0\na4:0\nb3:0\nb1c4d4"
       state = game.new_initial_state(start)
       state.apply_action(2)
-      assert(state.returns == [1.0, -1.0])
+      # print("returns", state.returns())
+      assert(state.returns() == [1.0, -1.0])
 
 
 if __name__ == "__main__":

@@ -40,7 +40,6 @@ enum Phase {
 	kEmptyDraw = 3,
 	kTerminal = 4
 };
-
 constexpr int kDefaultPlayers = 2;
 
 std::string RankString(int rank);
@@ -127,6 +126,10 @@ class GoFishState: public State {
     return booked_;
   }
 
+	const Phase StatePhase() const {
+		return phase_; 
+  }
+
  protected:
   void DoApplyAction(Action move) override;
  private:
@@ -152,7 +155,7 @@ class GoFishState: public State {
 	void ParseRankCounts(absl::string_view s, std::vector<int>* counts);
 	bool CheckBook(int player_id, int rank);
 	void CheckEmptyAsk();
-	void AdvancePlayer();
+	void AdvancePlayer(bool needs_cards);
 	std::vector<Action> GenerateAsks(int player_id) const;
 	std::vector<Action> GenerateDraws() const; // draw from deck
 	std::vector<Event> events_;
@@ -200,6 +203,8 @@ class GoFishGame : public Game {
  bool MostBooksWins() const { return most_books_wins_; }
  bool EndOnFirstOut() const { return end_on_first_out_; }
  bool AskAfterEmptyDraw() const { return ask_after_empty_draw_; }
+ Action AskStringToAction(std::string) const; 
+ Action FishStringToAction(std::string) const; 
 
  private:
 	int num_players_;

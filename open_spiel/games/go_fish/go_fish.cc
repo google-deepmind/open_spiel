@@ -116,6 +116,7 @@ GoFishState::GoFishState(std::shared_ptr<const Game> game,
     most_books_wins_(static_cast<const GoFishGame*>(game.get())->MostBooksWins()),
     end_on_first_out_(static_cast<const GoFishGame*>(game.get())->EndOnFirstOut()),
 		ask_after_empty_draw_(static_cast<const GoFishGame*>(game.get())->AskAfterEmptyDraw()),
+		initial_cards_(static_cast<const GoFishGame*>(game.get())->InitialCards()),
     num_players_(static_cast<const GoFishGame*>(game.get())->NumPlayers()) {
 	// initialize all the vectors
 	player_cards_.assign(num_players_, std::vector<int>(ranks_, 0));
@@ -128,17 +129,6 @@ GoFishState::GoFishState(std::shared_ptr<const Game> game,
 	player_min_.assign(num_players_, std::vector<int>(ranks_, 0));
 	current_player_ = 0;
 	first_out_ = -1;
-	int parent_initial = static_cast<const GoFishGame*>(game.get())->InitialCards();
-	// TODO add some sanity checks
-	if (parent_initial == -1) {
-		if (num_players_ == 2){
-			initial_cards_ = 7;
-		} else {
-			initial_cards_ = 5;
-		}
-	} else {
-		initial_cards_ = parent_initial;
-	}
 	phase_ = kDeal;
 	if (!state_str.empty()) {
 		std::fill(pool_.begin(), pool_.end(), 0);
@@ -219,8 +209,7 @@ void GoFishState::DoApplyAction(Action move_id) {
 		}
 		return;
 	}
-	bool hit = false;
-	bool advance = true;
+	bool advance = false;
 	if (phase_ == kAsk) {
 		int event_player = current_player_;
 		int target = move_id / ranks_;
@@ -233,35 +222,28 @@ void GoFishState::DoApplyAction(Action move_id) {
 		player_was_asked_[target][rank] = true;
 		drawn_since_was_asked_[target][rank] = 0;
 		player_min_[target][rank] = 0;
-    bool made_book;
+    bool made_book = false;
 		int received = 0;
 		if (player_cards_[target][rank] > 0) {
-			hit = true;
 			received = player_cards_[target][rank]; 
 			player_cards_[current_player_][rank] += received;
 			player_min_[current_player_][rank] += received;
 			player_cards_[target][rank] = 0;
 			made_book = CheckBook(current_player_, rank);
-			if (phase_ != kTerminal) {
-			  CheckEmptyAsk();
-			}
-		} else { // go fish
+		} else {
 			if (PoolSize() > 0) {
 				phase_ = kFish;
 				last_ask_ = rank;
-			} else { // pool empty, play pases to next player with cards.
-				  AdvancePlayer();
+			} else {
+				advance = true;
 			}
 		}
-		if (current_player_ != event_player) last_ask_ = -1;
-		int booked = made_book ? rank : -1; 
+		int booked = made_book ? rank : -1;
 		Event event(event_player, target, rank, received, booked);
 		events_.push_back(event);
-		return;
-	}
-	if (phase_ == kFish || phase_ == kEmptyDraw) {
+	} else if (phase_ == kFish || phase_ == kEmptyDraw) {
 		int rank = move_id;
-		if (phase_ == kFish && rank == last_ask_) hit = true;
+		bool hit = phase_ == kFish && rank == last_ask_;
 		--pool_[rank];
 		player_cards_[current_player_][rank] += 1;
 		for (int rank0 = 0; rank0 < ranks_; ++rank0) {
@@ -269,27 +251,25 @@ void GoFishState::DoApplyAction(Action move_id) {
 				  drawn_since_was_asked_[current_player_][rank0] += 1;
 			 }
 		}
+		if (phase_ == kEmptyDraw || !ask_after_empty_draw_) advance = true;
+		if (phase_ == kFish || !hit) advance = true;
+		phase_ = kAsk;
 		CheckBook(current_player_, rank);
-		if (phase_ != kTerminal) {
-			bool advance = false;
-			if (phase_ == kEmptyDraw && ask_after_empty_draw_) {
-				advance = false;
-			}
-			if (phase_ == kFish && rank == last_ask_) {
-					advance = false;
-			}
-			if (advance) AdvancePlayer();
-	  }
 	}
-	last_ask_ = -1;
-	phase_ = kAsk;
-	CheckEmptyAsk();
+	if (phase_ != kTerminal) {
+		if (advance) AdvancePlayer(false);
+	}
+	if (phase_ == kAsk) {
+		CheckEmptyAsk();
+	}
 }
 
-// special case: If a player would be asking but he has no
+// Special cases: If a player would be asking but he has no
 // cards left (and there are cards in the pool) he fishes.
 // If ask_after_empty_draw is true he may then
-// ask for what he drew.
+// ask for what he drew. If no other players have cards,
+// the player cannot ask (since there is no one to ask from)
+// so next player does an empty draw.
 void GoFishState::CheckEmptyAsk() {
 	if (PlayerCounts(current_player_) == 0) {
 		  if (PoolSize() > 0) {
@@ -297,8 +277,20 @@ void GoFishState::CheckEmptyAsk() {
 			   last_ask_ = -1;
 			   return;
 			} else {
-				AdvancePlayer();
+				AdvancePlayer(true);
 			}
+	} else {
+		bool askee = false;
+    for (int ii = 0; ii < num_players_; ++ii) {
+			if (ii != current_player_ && PlayerCounts(ii) > 0) {
+				askee = true;
+				break;
+			}
+		}
+		if (!askee) {
+			phase_ = kEmptyDraw;
+			AdvancePlayer(false);
+		}
 	}
 }
 
@@ -360,23 +352,16 @@ bool GoFishState::CheckBook(int player_id, int rank) {
   return true;
 }
 
-void GoFishState::AdvancePlayer() {
+void GoFishState::AdvancePlayer(bool needs_cards) {
 	int old = current_player_;
-	current_player_ += 1;
-	if (current_player_ == num_players_) {
-		current_player_ = 0;
-	}
-	if (PlayerCounts(current_player_) > 0) return;
-	if (PoolSize() > 0) {
-		phase_ = kEmptyDraw;
-		return;
-	}
-	while (PlayerCounts(current_player_) == 0) {
-		current_player_ += 1;
-		if (current_player_ == num_players_) {
-			current_player_ = 0;	
-		}
-		SPIEL_CHECK_NE(current_player_, old);
+	while(true) {
+	   current_player_ += 1;
+	   if (current_player_ == num_players_) {
+		    current_player_ = 0;
+	   }
+		 if (!needs_cards) return;
+		 if (PlayerCounts(current_player_) > 0) return;
+		 SPIEL_CHECK_NE(current_player_, old);
 	}
 }
 
@@ -562,10 +547,33 @@ GoFishGame::GoFishGame(const GameParameters& params)
 		num_players_(ParameterValue<int>("players")),
 		ranks_(ParameterValue<int>("ranks")),
 		suits_(ParameterValue<int>("suits")),
-		initial_cards_(ParameterValue<int>("initial_cards")),
 		most_books_wins_(ParameterValue<bool>("most_books_wins")),
 		end_on_first_out_(ParameterValue<bool>("end_on_first_out")),
 		ask_after_empty_draw_(ParameterValue<bool>("ask_after_empty_draw")) {
+			if (ParameterValue<int>("initial_cards") == -1) {
+				if (num_players_ == 2) {
+					initial_cards_ = 7;
+				} else {
+					initial_cards_ = 5;
+				}
+			} else {
+				initial_cards_ = ParameterValue<int>("initial_cards");
+			}
+}
+
+// ask string should look like target, rank e.g 1,c
+Action GoFishGame::AskStringToAction(std::string ask) const {
+  size_t comma = ask.find(',');
+	if (comma == std::string::npos) return -1;
+	if (comma + 2 != ask.size()) return -1;
+  int target = std::stoi(ask.substr(0, comma));
+  int rank = ask[comma + 1] - 'a';
+  return target * ranks_ + rank;
+}
+
+// fish string is just the rank
+Action  GoFishGame::FishStringToAction(std::string fish) const {
+	return fish[0] - 'a';
 }
 
 }  // go_fish
