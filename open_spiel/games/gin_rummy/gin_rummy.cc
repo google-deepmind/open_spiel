@@ -979,7 +979,8 @@ std::unique_ptr<State> GinRummyState::ResampleFromInfostate(
   }
 
   // Shuffle the sample pool.
-  std::shuffle(sample_pool.begin(), sample_pool.end(), std::mt19937(rng()));
+  std::mt19937 shuffle_rng(rng() * std::mt19937::max());
+  std::shuffle(sample_pool.begin(), sample_pool.end(), shuffle_rng);
 
   // Clear opponent's hand and stock in the new state.
   new_state->hands_[opponent].clear();
