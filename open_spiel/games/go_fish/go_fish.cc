@@ -251,8 +251,8 @@ void GoFishState::DoApplyAction(Action move_id) {
 				  drawn_since_was_asked_[current_player_][rank0] += 1;
 			 }
 		}
-		if (phase_ == kEmptyDraw || !ask_after_empty_draw_) advance = true;
-		if (phase_ == kFish || !hit) advance = true;
+		if (phase_ == kEmptyDraw && !ask_after_empty_draw_) advance = true;
+		if (phase_ == kFish && !hit) advance = true;
 		phase_ = kAsk;
 		CheckBook(current_player_, rank);
 	}
