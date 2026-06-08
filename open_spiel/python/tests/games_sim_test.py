@@ -38,6 +38,11 @@ SPIEL_GAMES_LIST = pyspiel.registered_games()
 # All games loadable without parameter values.
 SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 
+# All games with action structs only.
+SPIEL_ACTION_STRUCTS_ONLY_GAMES_LIST = [
+    g.short_name for g in SPIEL_GAMES_LIST if g.action_structs_only
+]
+
 # A list of games to exclude from the general simulation tests. This should
 # remain empty, but it is helpful to use while a game is under construction,
 # or while there are any known issues with the game causing test failures.
@@ -260,6 +265,11 @@ class GamesSimTest(parameterized.TestCase):
   def test_game_sim(self, game_info):
     if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
       print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
+      return
+    if game_info.short_name in SPIEL_ACTION_STRUCTS_ONLY_GAMES_LIST:
+      # Games that use action structs only are not supported by this test.
+      # They have to be tested separately. See e.g. games_crossword_test.py
+      print(f"{game_info.short_name} uses action structs only. Skipping.")
       return
     game = pyspiel.load_game(game_info.short_name)
     self.assertLessEqual(game_info.min_num_players, game.num_players())

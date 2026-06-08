@@ -19,6 +19,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -162,6 +163,16 @@ struct GameType {
   // example, game wrappers and other game transforms, or games that are
   // constructed from a file (e.g. efg_game).
   bool is_concrete = true;
+
+  // Some games have complicated or combinatorial action spaces and representing
+  // them as flat integers is infeasible. When this field is true, the actions
+  // in this game are not represented as integers, and only action structs are
+  // supported. Some methods will not be available for these games, such as
+  // ApplyAction(int) and vector<int> LegalActions(). These functions should be
+  // are replaced by ValidateActionStruct() and ApplyActionStruct(). The game
+  // should implement LegalActionStructsSampler() to provide the set of legal
+  // actions. When this is true NumDistinctActions() should return 0.
+  bool action_structs_only = false;
 };
 
 // Information about a concrete Game instantiation.
@@ -244,6 +255,21 @@ struct ObservationStruct : public SpielStruct {};
 // Structured information specifying an action for a player in a game.
 struct ActionStruct : public SpielStruct {};
 
+class ActionStructSampler {
+ public:
+  ActionStructSampler(const State* state, int rng_seed)
+      : state_(state), rng_(rng_seed) {}
+  virtual ~ActionStructSampler() = default;
+  virtual std::unique_ptr<ActionStruct> SampleActionStruct() {
+    SpielFatalError("SampleActionStruct not implemented. Must be overridden.");
+    return nullptr;
+  }
+
+ protected:
+  const State* state_;
+  std::mt19937 rng_;
+};
+
 // Structured information specifying the parameters used to configure a game.
 // This struct pattern allows for JSON-based game configuration while
 // maintaining backward compatibility with the GameParameters map API.
@@ -303,6 +329,16 @@ class State {
 
   // Helper versions of ApplyAction that first does a legality check.
   virtual void ApplyActionWithLegalityCheck(Action action_id);
+
+  // Returns an action struct sampler for this state. Only required for
+  // games that use action structs. The sampler should persist even as the state
+  // changes, making it unnecessary to create a new sampler every time the
+  // state changes.
+  virtual std::unique_ptr<ActionStructSampler> GetActionStructSampler(
+      int seed) const {
+    SpielFatalError("GetActionStructSampler not implemented.");
+    return nullptr;
+  }
 
   // Validates an action struct without applying it. Returns OkStatus
   // if valid, or an error status if invalid. Does not mutate state.
@@ -901,6 +937,8 @@ class Game : public std::enable_shared_from_this<Game> {
   // Note: chance node outcomes are not included in this count.
   // For example, this would correspond to the size of the policy net head
   // learning which move to play.
+  //
+  // Special case: in games that use action structs only, this should be 0.
   virtual int NumDistinctActions() const = 0;
 
   // Returns a newly allocated initial state.

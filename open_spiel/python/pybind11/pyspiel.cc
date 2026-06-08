@@ -51,6 +51,7 @@
 #include "open_spiel/python/pybind11/games_connect_four.h"
 #include "open_spiel/python/pybind11/games_crazy_eights.h"
 #include "open_spiel/python/pybind11/games_crazyhouse.h"
+#include "open_spiel/python/pybind11/games_crossword.h"
 #include "open_spiel/python/pybind11/games_dots_and_boxes.h"
 #include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
@@ -213,7 +214,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<std::string, std::string, GameType::Dynamics,
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
-                    bool, bool, bool, GameParameters, bool, bool>(),
+                    bool, bool, bool, GameParameters, bool, bool, bool>(),
            py::arg("short_name"), py::arg("long_name"), py::arg("dynamics"),
            py::arg("chance_mode"), py::arg("information"), py::arg("utility"),
            py::arg("reward_model"), py::arg("max_num_players"),
@@ -224,7 +225,8 @@ PYBIND11_MODULE(pyspiel, m) {
            py::arg("provides_observation_tensor"),
            py::arg("parameter_specification") = GameParameters(),
            py::arg("default_loadable") = true,
-           py::arg("provides_factored_observation_string") = false)
+           py::arg("provides_factored_observation_string") = false,
+           py::arg("action_structs_only") = false)
       .def(py::init<const GameType&>())
       .def_readonly("short_name", &GameType::short_name)
       .def_readonly("long_name", &GameType::long_name)
@@ -249,6 +251,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("provides_factored_observation_string",
                     &GameType::provides_factored_observation_string)
       .def_readonly("is_concrete", &GameType::is_concrete)
+      .def_readonly("action_structs_only", &GameType::action_structs_only)
       .def("pretty_print",
            [](const GameType& value) { return GameTypeToString(value); })
       .def("__repr__",
@@ -334,6 +337,13 @@ PYBIND11_MODULE(pyspiel, m) {
   player_action.def_readonly("player", &State::PlayerAction::player)
       .def_readonly("action", &State::PlayerAction::action);
 
+  py::classh<ActionStructSampler> action_struct_sampler(
+      m, "ActionStructSampler");
+  // Constructor arguments: a State and an rng seed.
+  action_struct_sampler.def(py::init<const State*, int>())
+      // Returns a unique_ptr<ActionStruct>.
+      .def("sample_action_struct", &ActionStructSampler::SampleActionStruct);
+
   // https://github.com/pybind/pybind11/blob/smart_holder/README_smart_holder.rst
   py::classh<State, PyState> state(m, "State");
   state.def(py::init<std::shared_ptr<const Game>>())
@@ -373,6 +383,7 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::unique_ptr<ActionStruct>(State::*)(Action) const) &
                State::ActionToStruct)
       .def("struct_to_actions", &State::StructToActions)
+      .def("get_action_struct_sampler", &State::GetActionStructSampler)
       .def(
           "actions_to_struct",
           [](const State& state, Player player,
@@ -834,6 +845,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_catch(m);
   init_pyspiel_games_chess(m);
   init_pyspiel_games_crazyhouse(m);
+  init_pyspiel_games_crossword(m);
   init_pyspiel_games_colored_trails(m);
   init_pyspiel_games_connect_four(m);
   init_pyspiel_games_crazy_eights(m);
