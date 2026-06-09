@@ -138,6 +138,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "python_mfg_dynamic_routing",
     "python_mfg_periodic_aversion",
     "python_mfg_predator_prey",
+    "python_pursuit_evasion",
     "python_kuhn_poker",
     "python_team_dominoes",
     "python_tic_tac_toe",
