@@ -115,13 +115,14 @@ class CrosswordState : public State {
 
   Status ValidateActionStruct(
       const ActionStruct& action_struct) const override;
-
   Status ApplyActionStruct(const ActionStruct& action_struct) override;
 
   std::unique_ptr<ActionStructSampler> GetActionStructSampler(
       int seed) const override {
     return std::make_unique<CrosswordActionStructSampler>(this, seed);
   }
+
+  std::string Serialize() const override;
 
   char CharAt(int row, int col) const {
     return board_state_[row * board_.num_cols() + col];
@@ -143,6 +144,7 @@ class CrosswordState : public State {
 
   const CrosswordGame& parent_game_;
   CrosswordBoard board_;
+  std::vector<CrosswordActionStruct> action_struct_history_;
 
   int num_actions_ = 0;
   int puzzle_loading_attempts_ = 0;
@@ -182,6 +184,9 @@ class CrosswordGame : public Game {
   const absl::flat_hash_set<std::string>& word_set() const {
     return word_set_;
   }
+
+  std::unique_ptr<State> DeserializeState(const std::string& str) const
+      override;
 
  private:
   Status ParseWordList();

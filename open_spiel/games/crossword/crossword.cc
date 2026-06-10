@@ -24,6 +24,7 @@
 
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/ascii.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
@@ -255,6 +256,7 @@ Status CrosswordState::ApplyActionStruct(const ActionStruct& action_struct) {
                                     crossword_action.word)) {
     num_actions_++;
     SetRewardAndIncrementReturn(kIncorrectCluePenalty);
+    action_struct_history_.push_back(crossword_action);
     return OkStatus();
   }
   // Correct answer, update the board and clue solved status.
@@ -270,6 +272,7 @@ Status CrosswordState::ApplyActionStruct(const ActionStruct& action_struct) {
   int reward = kCorrectClueReward + (IsSolved() ? kSolvedPuzzleReward : 0);
   SetRewardAndIncrementReturn(reward);
   num_actions_++;
+  action_struct_history_.push_back(crossword_action);
   return OkStatus();
 }
 
@@ -449,6 +452,43 @@ void CrosswordState::ObservationTensor(Player player,
 
 std::unique_ptr<State> CrosswordState::Clone() const {
   return std::unique_ptr<State>(new CrosswordState(*this));
+}
+
+std::string CrosswordState::Serialize() const {
+  std::string result = "";
+
+  // Chance outcome(s)
+  std::vector<Action> history = History();
+  if (!history.empty()) {
+    for (Action outcome : history) {
+      absl::StrAppend(&result, "Chance outcome: ", outcome, "\n");
+    }
+  }
+
+  // Action struct history.
+  for (const auto& action_struct : action_struct_history_) {
+    absl::StrAppend(&result, "CrosswordAction: ", action_struct.ToJson(), "\n");
+  }
+
+  return result;
+}
+
+std::unique_ptr<State> CrosswordGame::DeserializeState(
+    const std::string& str) const {
+  std::unique_ptr<State> state = NewInitialState();
+  std::vector<std::string> lines = absl::StrSplit(str, '\n');
+  for (const std::string& line : lines) {
+    if (line.starts_with("Chance outcome: ")) {
+      int outcome = kInvalidAction;
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(line.substr(16), &outcome));
+      state->ApplyAction(outcome);
+    } else if (line.starts_with("CrosswordAction: ")) {
+      std::string json_str = line.substr(17);
+      CrosswordActionStruct action_struct(json_str);
+      state->ApplyActionStruct(action_struct);
+    }
+  }
+  return state;
 }
 
 Status CrosswordGame::ParseWordList() {

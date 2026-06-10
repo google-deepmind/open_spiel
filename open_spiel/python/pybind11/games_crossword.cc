@@ -14,7 +14,9 @@
 
 #include "open_spiel/python/pybind11/games_crossword.h"
 
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "open_spiel/games/crossword/crossword.h"
 #include "open_spiel/games/crossword/crossword_board.h"
@@ -74,33 +76,32 @@ void open_spiel::init_pyspiel_games_crossword(py::module& m) {
 
   py::classh<CrosswordState, State>(m, "CrosswordState")
       .def("board", &CrosswordState::board)
-      .def("clue_solved", &CrosswordState::clue_solved);
-      // Serialization not yet supported.
+      .def("clue_solved", &CrosswordState::clue_solved)
       // Pickle support
-      // .def(py::pickle(
-      //     [](const ChessState& state) {  // __getstate__
-      //       return SerializeGameAndState(*state.GetGame(), state);
-      //     },
-      //     [](const std::string& data) {  // __setstate__
-      //       std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
-      //           game_and_state = DeserializeGameAndState(data);
-      //       return dynamic_cast<ChessState*>(
-      //           game_and_state.second.release());
-      //     }));
+      .def(py::pickle(
+          [](const CrosswordState& state) {  // __getstate__
+            return SerializeGameAndState(*state.GetGame(), state);
+          },
+          [](const std::string& data) {  // __setstate__
+            std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+                game_and_state = DeserializeGameAndState(data);
+            return dynamic_cast<CrosswordState*>(
+                game_and_state.second.release());
+          }));
 
   py::classh<CrosswordGame, Game>(m, "CrosswordGame")
       .def("num_words", &CrosswordGame::num_words)
       .def("num_puzzles", &CrosswordGame::num_puzzles)
-      .def("crossword_file", &CrosswordGame::crossword_file);
+      .def("crossword_file", &CrosswordGame::crossword_file)
       // Pickle support
-      // .def(py::pickle(
-      //     [](std::shared_ptr<const ChessGame> game) {  // __getstate__
-      //       return game->ToString();
-      //     },
-      //     [](const std::string& data) {  // __setstate__
-      //       return std::dynamic_pointer_cast<ChessGame>(
-      //           std::const_pointer_cast<Game>(LoadGame(data)));
-      //     }));
+      .def(py::pickle(
+          [](std::shared_ptr<const CrosswordGame> game) {  // __getstate__
+            return game->ToString();
+          },
+          [](const std::string& data) {  // __setstate__
+            return std::dynamic_pointer_cast<CrosswordGame>(
+                std::const_pointer_cast<Game>(LoadGame(data)));
+          }));
 
   // clue_id(clue: Clue) -> str
   crossword.def("clue_id", &crossword::ClueId, py::arg("clue"));

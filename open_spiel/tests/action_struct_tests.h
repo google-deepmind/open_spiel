@@ -12,26 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_CROSSWORD_LIB_H_
-#define OPEN_SPIEL_GAMES_CROSSWORD_LIB_H_
+#ifndef OPEN_SPIEL_TESTS_ACTION_STRUCT_TESTS_H_
+#define OPEN_SPIEL_TESTS_ACTION_STRUCT_TESTS_H_
 
 #include <memory>
 
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
-namespace crossword {
+namespace testing {
 
-// Simulate a game that uses the action sampler to choose actions randomly.
-void SimulateRandomGame(std::shared_ptr<const open_spiel::Game> game, int seed);
+// Simulate a game that uses ActionStructSampler. This is mostly intended for
+// games that use action structs only as they can't use the core API's way of
+// simulating random games.
+void SimulateRandomGame(std::shared_ptr<const open_spiel::Game> game,
+                        int seed, bool serialize = true);
 
-// Simulate a game that uses the answers to the clues to choose actions, in
-// random order.
-void SimulateWinningGame(std::shared_ptr<const open_spiel::Game> game,
-                         int seed);
-
-}  // namespace crossword
+}  // namespace testing
 }  // namespace open_spiel
 
 
-#endif  // OPEN_SPIEL_GAMES_CROSSWORD_CROSSWORD_LIB_H_
+#endif  // OPEN_SPIEL_TESTS_ACTION_STRUCT_TESTS_H_
+
+
+

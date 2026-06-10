@@ -69,8 +69,6 @@ set(GAME_SOURCES
   crossword/crossword_default_puzzle.h
   crossword/crossword_board.cc
   crossword/crossword_board.h
-  crossword/crossword_lib.cc
-  crossword/crossword_lib.h
   cursor_go/cursor_go.cc
   cursor_go/cursor_go.h
   dark_chess/dark_chess.cc

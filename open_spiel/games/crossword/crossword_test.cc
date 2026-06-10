@@ -22,10 +22,13 @@
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/games/crossword/crossword.h"
-#include "open_spiel/games/crossword/crossword_lib.h"
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/games/crossword/crossword_board.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/tests/action_struct_tests.h"
 #include "open_spiel/utils/init.h"
 #include "open_spiel/utils/status.h"
 
@@ -35,12 +38,67 @@ ABSL_FLAG(std::string, puzzles_root, "",
 ABSL_FLAG(std::string, word_list_file, "", "Word list file to use. "
           "Default is empty, which will allow all words.");
 
-
 namespace open_spiel {
 namespace crossword {
 namespace {
 
 constexpr int kSeed = 42397719;
+
+void SimulateWinningGame(std::shared_ptr<const open_spiel::Game> game,
+                         int seed, bool serialize = true) {
+  std::unique_ptr<State> state = game->NewInitialState();
+  auto* crossword_state = down_cast<CrosswordState*>(state.get());
+  const std::vector<int>& clue_solved = crossword_state->clue_solved();
+  std::mt19937 rng(seed);
+  double util_return = 0.0;
+
+  while (!state->IsTerminal()) {
+    if (serialize) {
+      std::string serialized_state = state->Serialize();
+      std::unique_ptr<State> deserialized_state =
+          game->DeserializeState(serialized_state);
+      SPIEL_CHECK_EQ(state->Serialize(), deserialized_state->Serialize());
+    }
+
+    if (state->IsChanceNode()) {
+      std::vector<std::pair<open_spiel::Action, double>> outcomes =
+          state->ChanceOutcomes();
+      open_spiel::Action action = open_spiel::SampleAction(outcomes, rng).first;
+      std::cerr << "sampled outcome: "
+                << state->ActionToString(open_spiel::kChancePlayerId, action)
+                << std::endl;
+      state->ApplyAction(action);
+    } else {
+      std::vector<int> unsolved_clue_indices;
+      for (int i = 0; i < clue_solved.size(); ++i) {
+        if (clue_solved[i] == 0) {
+          unsolved_clue_indices.push_back(i);
+        }
+      }
+      int sampled_idx = absl::Uniform<int>(rng, 0,
+                                           unsolved_clue_indices.size());
+      int clue_index = unsolved_clue_indices[sampled_idx];
+      const Clue& clue = crossword_state->board().clue(clue_index);
+      std::string cid = ClueId(clue);
+      std::string answer = crossword_state->board().answer(cid);
+      CrosswordActionStruct action = CrosswordActionStruct(cid, answer);
+      Status status = state->ValidateActionStruct(action);
+      if (!status.ok()) {
+        SpielFatalError("SimulateWinningGame: failed to validate action: " +
+                        status.ToString());
+      }
+      status = state->ApplyActionStruct(action);
+      if (!status.ok()) {
+        SpielFatalError("SimulateWinningGame: failed to apply action: " +
+                        status.ToString());
+      }
+      SPIEL_CHECK_GT(state->Rewards()[0], 0);
+      SPIEL_CHECK_GT(state->Returns()[0], util_return);
+      util_return = state->Returns()[0];
+      std::cout << "State: \n" << state->ToString() << "\n";
+    }
+  }
+}
 
 void TestCrosswordGameDefaultPuzzleNoWordList() {
   std::shared_ptr<const Game> game = LoadGame("crossword");
@@ -87,7 +145,7 @@ void TestCrosswordGameDefaultRandomSim() {
       absl::StrCat("crossword(word_list_file=", word_list_file, ")"));
   SPIEL_CHECK_TRUE(game != nullptr);
   std::unique_ptr<State> state = game->NewInitialState();
-  SimulateRandomGame(game, kSeed);
+  testing::SimulateRandomGame(game, kSeed);
 }
 
 void TestCrosswordGameDefaultWinningSim() {
