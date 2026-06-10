@@ -74,6 +74,7 @@
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/python/pybind11/python_games.h"
 #include "open_spiel/python/pybind11/utils.h"
+#include "open_spiel/python/pybind11/utils_trajectories.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -868,6 +869,7 @@ PYBIND11_MODULE(pyspiel, m) {
   bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
+  init_pyspiel_utils_trajectories(m);       // Trajectories utilities.
   init_pyspiel_infostate_tree(
       m);  // Infostate-Tree and associated classes (Id etc.)
 
