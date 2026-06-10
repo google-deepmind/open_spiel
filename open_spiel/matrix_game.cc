@@ -60,7 +60,7 @@ GameType::Utility GetUtilityType(const std::vector<double>& row_player_utils,
   }
 }
 
-absl::optional<double> GetUtilitySum(
+std::optional<double> GetUtilitySum(
     const std::vector<double>& row_player_utils,
     const std::vector<double>& col_player_utils) {
   double util_sum = 0;
@@ -210,7 +210,7 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
       game_type, {}, row_names, col_names, flat_row_utils, flat_col_utils));
 }
 
-absl::optional<double> MatrixGame::UtilitySum() const {
+std::optional<double> MatrixGame::UtilitySum() const {
   return GetUtilitySum(row_utilities_, col_utilities_);
 }
 

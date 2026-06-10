@@ -218,5 +218,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: wheels-windows-py${{ matrix.python-version }}
+          name: artifact-windows-py${{ matrix.python-version }}
           path: dist/*.whl

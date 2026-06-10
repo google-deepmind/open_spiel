@@ -107,7 +107,6 @@ class KriegspielObserver : public Observer {
         open_spiel::down_cast<const KriegspielGame &>(*state.GetGame());
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, game.NumPlayers());
-    chess::Color color = chess::PlayerToColor(player);
 
     if (iig_obs_type_.perfect_recall) {
       SpielFatalError(
@@ -122,7 +121,7 @@ class KriegspielObserver : public Observer {
       WritePrivateInfoTensor(state, player, prefix, allocator);
     } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
       for (int i = 0; i < chess::NumPlayers(); ++i) {
-        std::string prefix = chess::ColorToString(color);
+        std::string prefix = chess::ColorToString(chess::PlayerToColor(i));
         WritePrivateInfoTensor(state, i, prefix, allocator);
       }
     }
@@ -635,7 +634,7 @@ bool KriegspielState::IsThreefoldRepetitionDraw() const {
   return entry->second >= 3;
 }
 
-absl::optional<std::vector<double>> KriegspielState::MaybeFinalReturns() const {
+std::optional<std::vector<double>> KriegspielState::MaybeFinalReturns() const {
   if (!Board().HasSufficientMaterial()) {
     return std::vector<double>{kDrawUtility, kDrawUtility};
   }
@@ -686,8 +685,8 @@ std::vector<int> KriegspielGame::ObservationTensorShape() const {
 }
 
 std::shared_ptr<Observer> KriegspielGame::MakeObserver(
-    absl::optional<IIGObservationType> iig_obs_type,
-    const GameParameters &params) const {
+    std::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
   if (!params.empty()) SpielFatalError("Observation params not supported");
   IIGObservationType obs_type = iig_obs_type.value_or(kDefaultObsType);
   if (ObserverHasString(obs_type) || ObserverHasTensor(obs_type)) {

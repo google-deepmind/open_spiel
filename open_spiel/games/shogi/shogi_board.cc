@@ -123,7 +123,7 @@ std::string ColorToString(Color c) {
   }
 }
 
-absl::optional<PieceType> PieceTypeFromChar(char c) {
+std::optional<PieceType> PieceTypeFromChar(char c) {
   switch (toupper(c)) {
     case 'L':
       return PieceType::kLance;
@@ -192,7 +192,7 @@ std::string Piece::ToString() const {
                                 : absl::AsciiStrToLower(base);
 }
 
-absl::optional<Square> SquareFromString(const std::string& s) {
+std::optional<Square> SquareFromString(const std::string& s) {
   if (s.size() != 2) return kInvalidSquare;
 
   auto file = ParseFile(s[0]);
@@ -222,7 +222,7 @@ ShogiBoard::ShogiBoard()
   board_.fill(kEmptyPiece);
 }
 
-/*static*/ absl::optional<ShogiBoard> ShogiBoard::BoardFromSFEN(
+/*static*/ std::optional<ShogiBoard> ShogiBoard::BoardFromSFEN(
     const std::string& fen) {
   ShogiBoard board;
   std::vector<std::string> fen_parts = absl::StrSplit(fen, ' ');
@@ -584,7 +584,7 @@ bool InPromoZone(Color player, int8_t y) {
   return false;
 }
 
-absl::optional<Move> ShogiBoard::ParseMove(const std::string& move) const {
+std::optional<Move> ShogiBoard::ParseMove(const std::string& move) const {
   // First see if they are in the long form -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
   // SAN moves will never have this form because an SAN move that starts with
@@ -598,7 +598,7 @@ absl::optional<Move> ShogiBoard::ParseMove(const std::string& move) const {
   return absl::nullopt;
 }
 
-absl::optional<Move> ShogiBoard::ParseDropMove(const std::string& move) const {
+std::optional<Move> ShogiBoard::ParseDropMove(const std::string& move) const {
   if (move.empty()) {
     return absl::nullopt;
   }
@@ -606,7 +606,7 @@ absl::optional<Move> ShogiBoard::ParseDropMove(const std::string& move) const {
     char pc = move[0];
 
     // Parse piece type
-    absl::optional<PieceType> opt = PieceTypeFromChar(pc);
+    std::optional<PieceType> opt = PieceTypeFromChar(pc);
     if (!opt) return absl::nullopt;
 
     PieceType ptype = *opt;
@@ -628,7 +628,7 @@ absl::optional<Move> ShogiBoard::ParseDropMove(const std::string& move) const {
   return absl::nullopt;
 }
 
-absl::optional<Move> ShogiBoard::ParseLANMove(const std::string& move) const {
+std::optional<Move> ShogiBoard::ParseLANMove(const std::string& move) const {
   if (move.empty()) return absl::nullopt;
 
   // Try drop syntax first.

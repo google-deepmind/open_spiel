@@ -50,7 +50,7 @@ void CheckUndo(const char* sfen, const char* move_lan, const char* sfen_after) {
   std::shared_ptr<const Game> game = LoadGame("shogi");
   ShogiState state(game, sfen);
   Player player = state.CurrentPlayer();
-  absl::optional<Move> maybe_move = state.Board().ParseLANMove(move_lan);
+  std::optional<Move> maybe_move = state.Board().ParseLANMove(move_lan);
   SPIEL_CHECK_TRUE(maybe_move);
   Action action = MoveToAction(*maybe_move);
   state.ApplyAction(action);

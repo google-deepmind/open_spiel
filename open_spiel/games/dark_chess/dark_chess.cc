@@ -14,11 +14,23 @@
 
 #include "open_spiel/games/dark_chess/dark_chess.h"
 
-#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/games/chess/chess.h"
+#include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -290,7 +302,7 @@ class DarkChessObserver : public Observer {
                              allocator);
     } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
       for (int i = 0; i < chess::NumPlayers(); ++i) {
-        chess::Color color = chess::PlayerToColor(player);
+        chess::Color color = chess::PlayerToColor(i);
         std::string prefix = chess::ColorToString(color);
         WritePrivateInfoTensor(state, public_info_table, i, prefix, allocator);
       }

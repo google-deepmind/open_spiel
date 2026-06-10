@@ -14,6 +14,9 @@
 
 """DQN agents trained on Breakthrough by independent Q-learning."""
 
+import os
+import tempfile
+
 from absl import app
 from absl import flags
 from absl import logging
@@ -26,8 +29,11 @@ from open_spiel.python.jax import dqn
 FLAGS = flags.FLAGS
 
 # Training parameters
-flags.DEFINE_string("checkpoint_dir", "/tmp/dqn_test",
-                    "Directory to save/load the agent models.")
+flags.DEFINE_string(
+    "checkpoint_dir",
+    os.path.join(tempfile.gettempdir(), "dqn_test"),
+    "Directory to save/load the agent models.",
+)
 flags.DEFINE_integer(
     "save_every", int(1e4),
     "Episode frequency at which the DQN agent models are saved.")

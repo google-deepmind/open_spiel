@@ -226,8 +226,8 @@ std::unique_ptr<State> PenniesGame::NewInitialState() const {
 }
 
 std::shared_ptr<Observer> PenniesGame::MakeObserver(
-    absl::optional<IIGObservationType> iig_obs_type,
-    const GameParameters &params) const {
+    std::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
   SPIEL_CHECK_TRUE(params.empty());
   return std::make_shared<PenniesObserver>(
       iig_obs_type.value_or(kDefaultObsType));

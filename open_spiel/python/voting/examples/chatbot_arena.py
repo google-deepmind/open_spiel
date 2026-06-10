@@ -17,7 +17,9 @@
 # pylint: disable=unused-import
 
 import collections
+import os
 import sys
+import tempfile
 from absl import app
 from absl import flags
 import numpy as np
@@ -42,7 +44,7 @@ from open_spiel.python.voting import stv
 SEED = 23875711
 
 # Downloaded from: https://lmsys.org/blog/2023-07-20-dataset/
-DATASET_FILE = "/tmp/chatbot_arena_battles.csv"
+DATASET_FILE = os.path.join(tempfile.gettempdir(), "chatbot_arena_battles.csv")
 
 
 def parse_battles_dataset(filter_ties=False):
@@ -170,13 +172,15 @@ def ranked_pairs_viz(model_names, dataset):
             orig_alternatives[idx_i], orig_alternatives[idx_j]
         )
         edge.attr["label"] = margin_matrix[idx_i, idx_j]
-  graph.write("/tmp/chatbot_arena_rps.dot")  # write to simple.dot
+  dot_path = os.path.join(tempfile.gettempdir(), "chatbot_arena_rps.dot")
+  png_path = os.path.join(tempfile.gettempdir(), "chatbot_arena_rps.png")
+  graph.write(dot_path)  # write to simple.dot
   graph.draw(
-      "/tmp/chatbot_arena_rps.png",
+      png_path,
       # args='-Gdpi=100',
       prog="dot",
   )  # , args="-n2")  # draw
-  print("Wrote to /tmp/chatbot_arena_rps.png")
+  print(f"Wrote to {png_path}")
 
 
 def main(_):

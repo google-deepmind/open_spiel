@@ -15,8 +15,14 @@
 #include "open_spiel/games/amazons/amazons.h"
 
 #include <algorithm>
+#include <iostream>
+#include <memory>
+#include <vector>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -29,6 +35,12 @@ void BasicSpielTests() {
   testing::LoadGameTest("amazons");
   testing::RandomSimTest(*LoadGame("amazons"), 100);
   testing::RandomSimTestWithUndo(*LoadGame("amazons"), 5);
+
+  // Parameterized board sizes.
+  for (int size : {6, 8, 10}) {
+    GameParameters params = {{"board_size", GameParameter(size)}};
+    testing::RandomSimTest(*LoadGame("amazons", params), 20);
+  }
 }
 
 // Test the given configuration for player 1 win:
@@ -39,10 +51,7 @@ void PlayerOneSimpleWinTest() {
   std::unique_ptr<State> state = game->NewInitialState();
   AmazonsState* astate = static_cast<AmazonsState*>(state.get());
 
-  std::array<CellState, kNumCells> board = {};
-  for (int i = 0; i < board.size(); i++) {
-    board[i] = CellState::kBlock;
-  }
+  std::vector<CellState> board(astate->NumCells(), CellState::kBlock);
   board[0] = CellState::kNought;
   board[2] = CellState::kCross;
   board[3] = CellState::kEmpty;
@@ -65,10 +74,7 @@ void PlayerTwoSimpleWinTest() {
   std::unique_ptr<State> state = game->NewInitialState();
   AmazonsState* astate = static_cast<AmazonsState*>(state.get());
 
-  std::array<CellState, kNumCells> board = {};
-  for (int i = 0; i < board.size(); i++) {
-    board[i] = CellState::kBlock;
-  }
+  std::vector<CellState> board(astate->NumCells(), CellState::kBlock);
   board[0] = CellState::kCross;
   board[2] = CellState::kNought;
   board[3] = CellState::kEmpty;
@@ -94,17 +100,15 @@ void PlayerOneTrappedByAmazonsTest() {
   std::unique_ptr<State> state = game->NewInitialState();
   AmazonsState* astate = static_cast<AmazonsState*>(state.get());
 
-  std::array<CellState, kNumCells> board = {};
-  for (int i = 0; i < board.size(); i++) {
-    board[i] = CellState::kEmpty;
-  }
-  int center = kNumCells / 2 + kNumRows / 2;
+  const int size = astate->BoardSize();
+  std::vector<CellState> board(astate->NumCells(), CellState::kEmpty);
+  int center = astate->NumCells() / 2 + size / 2;
   board[center] = CellState::kCross;
   board[center - 1] = board[center + 1] = CellState::kNought;
-  board[center - kNumRows] = board[center - kNumRows - 1] =
-      board[center - kNumRows + 1] = CellState::kNought;
-  board[center + kNumRows] = board[center + kNumRows - 1] =
-      board[center + kNumRows + 1] = CellState::kNought;
+  board[center - size] = board[center - size - 1] = board[center - size + 1] =
+      CellState::kNought;
+  board[center + size] = board[center + size - 1] = board[center + size + 1] =
+      CellState::kNought;
 
   astate->SetState(0, AmazonsState::MoveState::amazon_select, board);
 
@@ -127,17 +131,15 @@ void PlayerOneTrappedByBlocksTest() {
   std::unique_ptr<State> state = game->NewInitialState();
   AmazonsState* astate = static_cast<AmazonsState*>(state.get());
 
-  std::array<CellState, kNumCells> board = {};
-  for (int i = 0; i < board.size(); i++) {
-    board[i] = CellState::kEmpty;
-  }
-  int center = kNumCells / 2 + kNumRows / 2;
+  const int size = astate->BoardSize();
+  std::vector<CellState> board(astate->NumCells(), CellState::kEmpty);
+  int center = astate->NumCells() / 2 + size / 2;
   board[center] = CellState::kCross;
   board[center - 1] = board[center + 1] = CellState::kBlock;
-  board[center - kNumRows] = board[center - kNumRows - 1] =
-      board[center - kNumRows + 1] = CellState::kBlock;
-  board[center + kNumRows] = board[center + kNumRows - 1] =
-      board[center + kNumRows + 1] = CellState::kBlock;
+  board[center - size] = board[center - size - 1] = board[center - size + 1] =
+      CellState::kBlock;
+  board[center + size] = board[center + size - 1] = board[center + size + 1] =
+      CellState::kBlock;
 
   astate->SetState(0, AmazonsState::MoveState::amazon_select, board);
 
@@ -244,8 +246,7 @@ void TerminalAndReturnsOnShotTest() {
   AmazonsState* astate = static_cast<AmazonsState*>(state.get());
 
   // Only a single X on an otherwise empty board.
-  std::array<CellState, kNumCells> board;
-  board.fill(CellState::kEmpty);
+  std::vector<CellState> board(astate->NumCells(), CellState::kEmpty);
   board[55] = CellState::kCross;
   astate->SetState(0, AmazonsState::MoveState::amazon_select, board);
 
@@ -274,6 +275,33 @@ void TerminalAndReturnsOnShotTest() {
   SPIEL_CHECK_EQ(returns[1], -1.0);
 }
 
+// Verifies smaller-board games load with the expected dimensions and
+// initial amazon counts.
+void BoardSizeParameterTest() {
+  for (int size : {6, 8, 10}) {
+    GameParameters params = {{"board_size", GameParameter(size)}};
+    std::shared_ptr<const Game> game = LoadGame("amazons", params);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), size * size);
+
+    std::unique_ptr<State> state = game->NewInitialState();
+    AmazonsState* astate = static_cast<AmazonsState*>(state.get());
+    SPIEL_CHECK_EQ(astate->BoardSize(), size);
+    SPIEL_CHECK_EQ(astate->NumCells(), size * size);
+
+    int crosses = 0;
+    int noughts = 0;
+    for (int i = 0; i < astate->NumCells(); ++i) {
+      if (astate->BoardAt(i) == CellState::kCross) ++crosses;
+      if (astate->BoardAt(i) == CellState::kNought) ++noughts;
+    }
+    SPIEL_CHECK_EQ(crosses, 4);
+    SPIEL_CHECK_EQ(noughts, 4);
+
+    // Player 0 (Cross) moves first and must have legal selections.
+    SPIEL_CHECK_EQ(astate->CurrentPlayer(), 0);
+    SPIEL_CHECK_EQ(astate->LegalActions().size(), 4);
+  }
+}
 
 }  // namespace
 }  // namespace amazons
@@ -288,4 +316,5 @@ int main(int argc, char** argv) {
   open_spiel::amazons::PhasedMoveGenerationAndStringsTest();
   open_spiel::amazons::UndoRoundTripTest();
   open_spiel::amazons::TerminalAndReturnsOnShotTest();
+  open_spiel::amazons::BoardSizeParameterTest();
 }

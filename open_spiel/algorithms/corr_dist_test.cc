@@ -245,7 +245,7 @@ void Test1PInOutGame() {
 }
 
 void TestGreenwaldSarfatiExample1() {
-  absl::optional<std::string> file = FindFile(kGreenwaldSarfatiEg1File, 2);
+  std::optional<std::string> file = FindFile(kGreenwaldSarfatiEg1File, 2);
   if (file.has_value()) {
     std::shared_ptr<const Game> efg_game =
         LoadGame(absl::StrCat("efg_game(filename=", file.value(), ")"));
@@ -281,7 +281,7 @@ void TestGreenwaldSarfatiExample1() {
 }
 
 void TestGreenwaldSarfatiExample2() {
-  absl::optional<std::string> file = FindFile(kGreenwaldSarfatiEg2File, 2);
+  std::optional<std::string> file = FindFile(kGreenwaldSarfatiEg2File, 2);
   if (file.has_value()) {
     std::shared_ptr<const Game> efg_game =
         LoadGame(absl::StrCat("efg_game(filename=", file.value(), ")"));
