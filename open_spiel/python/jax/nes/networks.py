@@ -34,11 +34,12 @@ class EquivariantPooling(nn.Module):
 
   def __call__(self, x: chex.Array, mask: chex.Array) -> chex.Array:
     """x shape: [C, N, A1, ..., AN]"""
-
-    return jnp.concatenate(
+  
+    out_cl = jnp.concatenate(
       [pool(x, mask) for pool in self.pools], axis=0
     )  # [C * num_pools, N, *A]
 
+    return out_cl
 
 class EquivariantPayoffPooling(EquivariantPooling):
   """Payoff-to-Payoff poolings from Appendix C (18a)-(18l)."""
@@ -153,12 +154,12 @@ class EquivariantPayoffPooling(EquivariantPooling):
       )
 
     # (18i)-(18l) Cross-player pools
-    for q in range(num_players):
-      for p in range(num_players):
-        if p == q:
-          continue
-        # Use a helper factory to strictly bind p and q without closure issues
-        pools.extend(self._build_cross_player_pools(p, q))
+    # for q in range(num_players):
+    #   for p in range(num_players):
+    #     if p == q:
+    #       continue
+    #     # Use a helper factory to strictly bind p and q without closure issues
+    #     pools.extend(self._build_cross_player_pools(p, q))
 
     super().__init__(pools)
 
@@ -182,10 +183,12 @@ class EquivariantPayoffPooling(EquivariantPooling):
       else:
         where = None
 
+      adjusted_axes = tuple(a - 2 for a in reduce_axes if a >= 2)
+
       # Reduce
       reduced = utils.reduce(
         x_q,
-        reduce_axes,
+        adjusted_axes,
         utils.Reduction.MEAN,
         include_identity=False,
         include_all=True,
@@ -194,14 +197,13 @@ class EquivariantPayoffPooling(EquivariantPooling):
         where=where,
       )  # shape depends on reduce_axes, but broadcast=True ensures [C, A1, ..., AN]
 
-      # Add player dimension back: [C, 1, A1, ..., AN]
       expanded = jnp.expand_dims(reduced, axis=1)
 
       # Broadcast to [C, N, A1, ..., AN]
       return jnp.broadcast_to(expanded, x.shape)
 
-    p_act = 1 + p
-    q_act = 1 + q
+    p_act = 2 + p
+    q_act = 2 + q
 
     # (18i) Reduce over a_p
     # φ_{a_p} g(q, ...)
@@ -210,7 +212,7 @@ class EquivariantPayoffPooling(EquivariantPooling):
     # (18j) Reduce over a_{-p}
     pools.append(
       lambda x, m: _slice_reduce_broadcast(
-        x, m, tuple(i for i in range(1, x.ndim - 1) if i != p_act)
+        x, m, tuple(i for i in range(2, x.ndim) if i != p_act)
       )
     )
 
@@ -222,7 +224,7 @@ class EquivariantPayoffPooling(EquivariantPooling):
     # φ_{a_{-q}} g(q, ...)
     pools.append(
       lambda x, m: _slice_reduce_broadcast(
-        x, m, tuple(i for i in range(1, x.ndim - 1) if i != q_act)
+        x, m, tuple(i for i in range(2, x.ndim) if i != q_act)
       )
     )
 
@@ -254,6 +256,7 @@ class EquivariantPayoffToPayoff(nn.Module):
     pooled = self.pooling(x, mask)
     # [N, *A, C * num_pools]
     pooled_t = jnp.moveaxis(pooled, 0, -1)
+
     out_t = self.act(self.bn(self.linear(pooled_t)))
     return jnp.moveaxis(out_t, -1, 0)
 
@@ -322,16 +325,21 @@ class PayoffsToDuals(nn.Module):
         include_identity=False,
         include_other=False,
         broadcast=False,
-      ).squeeze()
+      )
+
+      squeeze_axes = tuple(
+        i for i in range(1, dual.ndim) 
+        if i != own_axis and dual.shape[i] == 1
+      )
+      # TODO: check on this.
+      dual = jnp.squeeze(dual, axis=squeeze_axes)
 
       if is_cubic:
         m_duals.append(dual)
       else:
         # Pad to max_A for non-cubic games
         if dual.shape[-1] < max_A:
-          pad_width = [(0, 0)] * (dual.ndim - 1) + [
-            (0, max_A - dual.shape[-1])
-          ]
+          pad_width = [(0, 0)] * (dual.ndim - 1) + [(0, max_A - dual.shape[-1])]
           dual = jnp.pad(dual, pad_width, mode="constant")
         m_duals.append(dual)
 
@@ -374,9 +382,10 @@ class PayoffsToDuals(nn.Module):
 
 
 class EquivariantDualPoolingCCE(nn.Module):
-  """Equivariant Payoff-to-Payoff poolings based on Appendix C, Equations of (18a)-(18l)."""
+  """Equivariant Payoff-to-Payoff poolings based on Appendix C, Equations 19."""
 
   def __init__(self, num_players: int):
+
     self.pools = [
       lambda x: x,  # (19a) identity
       lambda x: utils.reduce(
@@ -414,13 +423,14 @@ class EquivariantDualPoolingCCE(nn.Module):
   def __call__(self, x: chex.Array) -> chex.Array:
     # x is a tensor of shape [C, N, A1, ..., AN]
     # returned shape has to be [B, C * num_pools, N, *A]
-    return jnp.concatenate(
+    out_cl = jnp.concatenate(
       [pool(x) for pool in self.pools], axis=0
     )  # [C * num_pools, N, *A]
+    return out_cl
 
 
 class EquivariantDualPoolingCE(nn.Module):
-  """Equivariant Payoff-to-Payoff poolings based on Appendix C, Equations of (18a)-(18l)."""
+  """Equivariant Payoff-to-Payoff poolings based on Appendix C, Equations 20."""
 
   def __init__(self, num_players: int):
     self.pools = [
@@ -436,8 +446,8 @@ class EquivariantDualPoolingCE(nn.Module):
         broadcast=True,
       ),  # (20c) mean over a'
       lambda x: utils.reduce(
-        x,
-        (2,),
+        jnp.swapaxes(x, 2, 3),  # SWAP FIRST
+        (3,),  # reduce over a' of swapped
         utils.Reduction.MEAN,
         include_identity=False,
         include_all=True,
@@ -446,7 +456,7 @@ class EquivariantDualPoolingCE(nn.Module):
       ),  # (20d) mean over a''
       lambda x: utils.reduce(
         x,
-        (2, 3),
+        (3,),
         utils.Reduction.MEAN,
         include_identity=False,
         include_all=True,
@@ -454,8 +464,8 @@ class EquivariantDualPoolingCE(nn.Module):
         broadcast=True,
       ),  # (20e) mean over both
       lambda x: utils.reduce(
-        x,
-        (1, 2),
+        jnp.swapaxes(x, 2, 3),  # SWAP FIRST
+        (2,),  # reduce over a'' of swapped
         utils.Reduction.MEAN,
         include_identity=False,
         include_all=True,
@@ -464,7 +474,7 @@ class EquivariantDualPoolingCE(nn.Module):
       ),  # (20f) mean over p,a'
       lambda x: utils.reduce(
         x,
-        (1, 3),
+        (2, 3),
         utils.Reduction.MEAN,
         include_identity=False,
         include_all=True,
@@ -487,10 +497,11 @@ class EquivariantDualPoolingCE(nn.Module):
   def __call__(self, x: chex.Array) -> chex.Array:
     # x is a tensor of shape [C, N, A1, ..., AN]
     # returned shape has to be [C * num_pools, N, *A]
-    return jnp.concatenate(
+    out_cl = jnp.concatenate(
       [pool(x) for pool in self.pools], axis=0
     )  # [C * num_pools, N, *A]
-
+    return out_cl
+  
 
 class EquivariantDualToDual(nn.Module):
   """Equavariant Dual variables processing layer, Eq. 14-15"""
@@ -520,16 +531,18 @@ class EquivariantDualToDual(nn.Module):
     base_act = nn.relu
 
     if last_activation:
+      # Final layer: non-negative duals
       self.act = (
-        lambda x: utils.mask_diagonal(nn.softplus(x))
-        if mode == Mode.CE
-        else nn.softplus(x)
+        nn.softplus
+        if mode == Mode.CCE
+        else lambda x: utils.mask_diagonal(nn.softplus(x))
       )
     else:
+      # Hidden layer: ReLU, with diagonal masking for CE
       self.act = (
-        lambda x: utils.mask_diagonal(base_act(x))
-        if mode == Mode.CE
-        else base_act(x)
+        base_act
+        if mode == Mode.CCE
+        else lambda x: utils.mask_diagonal(base_act(x))
       )
 
   def __call__(self, x: chex.Array) -> chex.Array:
@@ -636,7 +649,9 @@ class NeuralEquilibriumModel(nn.Module):
       else lambda x: x
     )
 
-  def _mask_duals(self, duals: chex.Array, mask: chex.Array) -> chex.Array:
+  def _mask_duals(
+    self, duals: chex.Array, strat_mask_per_player: list[chex.Array]
+  ) -> chex.Array:
     """Zero out duals for padded actions using the joint mask."""
     N = duals.shape[1]
     duals_mask = []
@@ -644,12 +659,14 @@ class NeuralEquilibriumModel(nn.Module):
     if self._mode == Mode.CCE:
       # duals: [C, N, A]; mask: [A1, ..., AN]
       # Per-player valid actions: does any valid joint action use this a_p?
-      for p in range(N):
-        duals_mask.append(mask[p])
+
+      mask = jnp.stack([strat_mask_per_player[p] for p in range(N)])  # [N, A]
+      mask = jnp.broadcast_to(mask[None, :, :], duals.shape)
+      return jnp.where(mask, duals, 0.0)
     else:  # CE
       # duals: [C, N, A, A]; mask: [A1, ..., AN]
       for p in range(N):
-        valid = mask[p]
+        valid = strat_mask_per_player[p]
         # Outer product for (dev, rec)
         ce_valid = jnp.logical_and(valid[:, None], valid[None, :])  # [A, A]
         diag = jnp.arange(ce_valid.shape[0])
@@ -686,7 +703,7 @@ class NeuralEquilibriumModel(nn.Module):
 
     # Can't be standard `nnx.Sequential` as it accepts mask
     for layer in self.eq_payoff_layers:
-      x = layer(x, joint_mask)
+      x = layer(x, joint_mask) 
 
     # Project to dual space
     x = self.payoff_to_dual_proj(x, joint_mask)

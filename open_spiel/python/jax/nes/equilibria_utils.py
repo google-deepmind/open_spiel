@@ -282,7 +282,7 @@ def cce_logit(
 
     inds = string.ascii_lowercase[:num_players]
     pind = inds[player]
-    oinds = inds[:player] + inds[player + 1 :]
+    oinds = inds[:player] + inds[player+1:]
 
     # sum_{a_p'} dual[a_p'] * G_p(a_p', a_{-p})  -> shape [A1, ..., 1, ..., AN]
     contracted = jnp.einsum(f"{inds},{pind}->{oinds}", payoff, dual)
@@ -750,6 +750,7 @@ def mwmre_solver(
 
   # KL(sigma || target) over valid entries
   kl_term = -cp.sum(cp.entr(strategy)) - strategy @ np.log(target_valid)
+  kl_term *= entropy_coeff
 
   # Epsilon penalty: rho * sum_p [ entr(diff) + diff + diff*log(target_diff) ]
   eps_term = 0

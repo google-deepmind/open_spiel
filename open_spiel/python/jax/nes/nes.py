@@ -1,7 +1,8 @@
 import functools
 from typing import Callable, Optional
 
-import absl.logging
+#TODO: inclusive logging
+from open_spiel.python.utils import data_logger, file_logger
 
 import chex
 import flax.nnx as nn
@@ -9,6 +10,7 @@ import jax
 import jax.numpy as jnp
 import optax
 import pyspiel
+import trackio
 import etils.epath
 import orbax.checkpoint as ocp
 
@@ -27,9 +29,10 @@ Solving NEs, CEs and CCEs with Neural Equilibrium Solvers"
 https://arxiv.org/abs/2210.09257 for more details.
 """
 
-# Shortcut for the data structrure
+# Shortcut for data structrures
 Data = samplers.Data
 Game = samplers.Game
+Objective = samplers.Objective 
 
 
 @functools.partial(jax.jit, static_argnames=("mode",))
@@ -39,7 +42,7 @@ def recover_primals(
   welfare_coeff: float,
   entropy_coeff: float,
   epsilon_max: float,
-  mode: networks.Mode = networks.Mode.CCE,
+  mode: int,
 ) -> tuple:
   """ε̂-MWMRE dual loss (Equation 7, [1]).
   L_dual = log_sum_exp + ε⁺ · Σ_p Σ_a α_p(a) - ρ · Σ_p ε_p
@@ -105,49 +108,13 @@ class DifferentiableEquilibriumBlock(nn.Module):
 
   def __call__(self, data: Data) -> chex.Array:
     duals = self._network(
-      samplers.stack(samplers.broadcastn(data), axis=1),
+      samplers.stack(samplers.broadcast(data), axis=1),
       data.strat_mask_per_player,
     )
     _, strategy, _, _, _ = recover_primals(
       duals, data, self._mu, self._rho, self._eps_plus, self._mode.value
     )
     return strategy
-
-
-def lr_schedule(base_learning_rate: float = 1e-4) -> optax.Schedule:
-  """Joint learning schedule from the NES paper.
-  (iteration, factor) pairs of
-  - (1e6, 1.0)
-  - (4e6, 0.6)
-  - (7e6, 0.3)
-  - (10e6, 0.1)
-  - (100e6, 0.06)
-  - (inf, 0.03)
-  where each "iteration" is the *duration* of that segment.
-  """
-
-  # Cumulative boundaries from segment durations
-  segment_durations = [1_000_000, 4_000_000, 7_000_000, 10_000_000, 100_000_000]
-  factors = [1.0, 0.6, 0.3, 0.1, 0.06, 0.03]
-
-  # Convert durations to cumulative boundaries for optax
-  boundaries = []
-  cumulative = 0
-  for duration in segment_durations[:-1]:
-    cumulative += duration
-    boundaries.append(cumulative)
-  # boundaries = [1_000_000, 5_000_000, 12_000_000, 22_000_000]
-
-  # Build constant schedules for each segment
-  schedules = [
-    optax.constant_schedule(base_learning_rate * factor) 
-    for factor in factors
-  ]
-
-  return optax.join_schedules(
-    schedules=schedules,
-    boundaries=boundaries,
-  )
 
 
 class NESolver:
@@ -294,6 +261,8 @@ class NESolver:
     if allow_checkpointing:
       self._checkpointer = ocp.StandardCheckpointer()
 
+    self._logger = None
+  
     if gradient_clipping:
       optimiser = optax.chain(
         # Clip the raw gradients first
@@ -313,9 +282,12 @@ class NESolver:
     ) -> chex.Array:
       """Loss function for the NES-network."""
 
+      broadcasted = self.broadcast_fn(data)
+      stacked = samplers.stack(broadcasted, axis=1)
+
       duals = utils.batched_call(
         network,
-        samplers.stack(self.broadcast_fn(data), axis=1),
+        stacked,
         data.strat_mask_per_player,
       )
       # Recovering primal variables
@@ -373,6 +345,7 @@ class NESolver:
       policy_model, optimiser = nn.merge(
         self._graphdef_network_opt,
         network_opt_state,
+        copy=True
       )
       policy_model.train()
       (loss, (primals, _)), grads = nn.value_and_grad(
@@ -492,11 +465,11 @@ class NESolver:
     return mean_batch_data
 
   def evaluate(
-    self, batch_size: int, sampler: Optional[samplers.GameSampler] = None
+    self, step: int, batch_size: int, sampler: Optional[samplers.GameSampler] = None
   ) -> dict:
-    sampler = sampler if sampler else self._sampler
+    sampler = sampler if sampler is not None else self._sampler
     batch = sampler.sample_random(
-      batch_size, jax.random.key(self._network_train_steps), None
+      batch_size, jax.random.key(step), None
     )
     primals, duals = self._infer_fn(nn.state(self._network), batch)
     log = self._logging_callback(batch, primals)
@@ -506,11 +479,19 @@ class NESolver:
 
     return log
 
-  def solve(self, logger=None) -> dict:
+  def solve(self, logging_path: etils.epath.Path = None) -> dict:
     """
     Executes the optimization loop to find the equilibrium.
     Returns the optimal dual variables and the recovered primal policy.
     """
+    # Logger setup
+    trackio.init(
+      project="NES", 
+    )
+    logger = None
+    if logging_path is not None:
+      logger = data_logger.DataLoggerJsonLines(logging_path, "NES_learner", True)
+
     logs = []
 
     network_state = nn.state((self._network, self._optimizer))
@@ -526,15 +507,23 @@ class NESolver:
 
       self._iteration += 1
 
-      # TODO: do actual logging
-      if self._iteration % self._log_every == 0:
+
+      if self._log_every > 0 and self._iteration % self._log_every == 0:
         # Cheap evaluation during training
+
         print(f"It. {self._iteration} | Loss {loss_val}")
 
-        log = self.evaluate(self._batch_size)
+        log = self.evaluate(self._iteration, self._batch_size)
+        trackio.log({k: v.item() for k,v in log.items()}, step=self._iteration)
+        if logger is not None:
+          logger.write(
+            {k: v.item() for k,v in log.items()}
+          )
+        
         logs.append(log)
 
     # Peform expensive evaluation after the training
-    logs.append(self.evaluate(self._eval_batch_size))
-
+    logs.append(self.evaluate(self._iteration, self._eval_batch_size))
+    trackio.finish()
+    
     return logs

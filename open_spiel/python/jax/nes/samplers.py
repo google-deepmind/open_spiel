@@ -35,6 +35,8 @@ class Mechanism(NamedTuple):
 
 
 def broadcast(data: Data) -> Data:
+  """Helper to broadcast Data to [N, A_1, ..., A_N]. """
+
   base_shape = data.payoffs.shape
   A = tuple(range(1, data.payoffs.ndim))
   # ε̂: [N] → [N, *A] (per-player constant across actions)
@@ -62,6 +64,7 @@ def broadcast(data: Data) -> Data:
 
 def stack(data: Data, axis=1) -> chex.Array:
   """Constructs [B, C=4, N, A1, ..., AN] tensor."""
+
   # Stack along channel dim 0: [B, 4, N, A1, ..., AN]
   return jnp.stack(
     [data.payoffs, data.epsilon_target, data.strategy_norm, data.welfare],
@@ -72,7 +75,8 @@ def stack(data: Data, axis=1) -> chex.Array:
 def dummy_nes_batch(
   batch_size, n_players, action_sizes, rng: chex.PRNGKey
 ) -> Data:
-  """Quick placeholder for testing without OpenSpiel"""
+  """Quick placeholder for testing without calling game samplers."""
+
   A = jnp.array(action_sizes)
   joint_shape = (batch_size, *A)
 
@@ -300,7 +304,7 @@ class OpenSpielGameSampler(GameSampler):
     welfare_scaled = self._scale_welfare(welfare)
 
     return Data(
-      payoffs=payoffs,
+      payoffs=payoffs_norm,
       strategy_base=strategy_base,
       strategy_norm=strategy_norm,
       epsilon_target=eps_scaled,
@@ -370,7 +374,7 @@ class RandomGameSampler(GameSampler):
     welfare_scaled = self._scale_welfare(W)
 
     return Data(
-      payoffs=payoffs,
+      payoffs=payoffs_norm,
       strategy_base=strategy_base,
       strategy_norm=strategy_norm,
       epsilon_target=eps_scaled,

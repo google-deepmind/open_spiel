@@ -2,6 +2,7 @@ import enum
 import functools
 import math
 
+import optax
 import chex
 import flax.nnx as nn
 import jax
@@ -31,6 +32,42 @@ mesh_rules = MeshRules(
 )
 
 SMALL_NUMBER = jnp.finfo(jnp.float32).eps
+
+
+def lr_schedule(base_learning_rate: float = 1e-4) -> optax.Schedule:
+  """Joint learning schedule from the NES paper.
+  (iteration, factor) pairs of
+  - (1e6, 1.0)
+  - (4e6, 0.6)
+  - (7e6, 0.3)
+  - (10e6, 0.1)
+  - (100e6, 0.06)
+  - (inf, 0.03)
+  where each "iteration" is the *duration* of that segment.
+  """
+
+  # Cumulative boundaries from segment durations
+  segment_durations = [1_000_000, 4_000_000, 7_000_000, 10_000_000, 100_000_000]
+  factors = [1.0, 0.6, 0.3, 0.1, 0.06, 0.03]
+
+  # Convert durations to cumulative boundaries for optax
+  boundaries = []
+  cumulative = 0
+  for duration in segment_durations[:-1]:
+    cumulative += duration
+    boundaries.append(cumulative)
+  # boundaries = [1_000_000, 5_000_000, 12_000_000, 22_000_000]
+
+  # Build constant schedules for each segment
+  schedules = [
+    optax.constant_schedule(base_learning_rate * factor) 
+    for factor in factors
+  ]
+
+  return optax.join_schedules(
+    schedules=schedules,
+    boundaries=boundaries,
+  )
 
 
 @nn.vmap(in_axes=(None, 0, 0), out_axes=0, axis_name="batch")
@@ -275,7 +312,7 @@ def reduce_sum(
     jnp.broadcast_to(a, reduced_none.shape) if broadcast else a
     for a in _include_arrays(*arrays, *includes)
   ]
-  return jnp.concatenate(arrays, axis=-1)
+  return jnp.concatenate(arrays, axis=0)
 
 def reduce_mean(
   array: chex.Array,
@@ -288,6 +325,7 @@ def reduce_mean(
 ) -> chex.Array:
   """Mean reduction with NaN-safe masking."""
   reduced_none = array
+
   reduced_all = jnp.sum(array, axis=axis, keepdims=True, where=where)
   reduced_other = reduced_all - reduced_none
 
@@ -299,10 +337,8 @@ def reduce_mean(
     all_divisor = math.prod([array.shape[a] for a in axis])
 
   # Multiplication replaces division to be cleaner about the comp. graph
-  inv_all = jnp.where(all_divisor > 0, 1.0 / all_divisor, 0.0)
-  inv_other = jnp.where(all_divisor > 1, 1.0 / (all_divisor - 1), 0.0)
-  reduced_all = reduced_all * inv_all
-  reduced_other = reduced_other * inv_other
+  reduced_all = reduced_all / all_divisor
+  reduced_other = reduced_other / (all_divisor - 1)
 
   arrays = (reduced_none, reduced_all, reduced_other)
   includes = (include_identity, include_all, include_other)
@@ -310,7 +346,7 @@ def reduce_mean(
     jnp.broadcast_to(a, reduced_none.shape) if broadcast else a
     for a in _include_arrays(*arrays, *includes)
   ]
-  return jnp.concatenate(arrays, axis=-1)
+  return jnp.concatenate(arrays, axis=0)
 
 
 def reduce_meanvar(
@@ -336,10 +372,8 @@ def reduce_meanvar(
     all_divisor = math.prod([array.shape[a] for a in axis])
 
   # Multiplication replaces division to be cleaner about the comp. graph
-  inv_all = jnp.where(all_divisor > 0, 1.0 / all_divisor, 0.0)
-  inv_other = jnp.where(all_divisor > 1, 1.0 / (all_divisor - 1), 0.0)
-  reduced_all = reduced_all * inv_all
-  reduced_other = reduced_other * inv_other
+  reduced_all = reduced_all / all_divisor
+  reduced_other = reduced_other / (all_divisor - 1)
 
   arrays = (reduced_none, reduced_all, reduced_other)
   includes = (include_identity, include_all, include_other)
@@ -347,7 +381,7 @@ def reduce_meanvar(
     jnp.broadcast_to(a, reduced_none.shape) if broadcast else a
     for a in _include_arrays(*arrays, *includes)
   ]
-  return jnp.concatenate(arrays, axis=-1)
+  return jnp.concatenate(arrays, axis=0)
 
 
 def reduce_max(
@@ -388,7 +422,7 @@ def reduce_max(
     jnp.broadcast_to(a, reduced_none.shape) if broadcast else a
     for a in _include_arrays(*arrays, *includes)
   ]
-  return jnp.concatenate(arrays, axis=-1)
+  return jnp.concatenate(arrays, axis=0)
 
 
 def reduce_min(
