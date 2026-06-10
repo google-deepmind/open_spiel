@@ -458,9 +458,9 @@ std::string  GoFishState::ToString() const {
 
 void GoFishState::ObservationTensor(Player player,
                                    absl::Span<float> values) const {
+  std::fill(values.begin(), values.end(), 0.0f);
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  std::fill(values.begin(), values.end(), 0.0f);
   int offset = 0;
 	// player knows hism own cards for sure.
 	// encode counts as fraction of total
@@ -469,33 +469,37 @@ void GoFishState::ObservationTensor(Player player,
 	}
 	// everything else is common info
 	// one hots for phase
-	if (phase_ == kDeal) values[offset++] = 1;
-	if (phase_ == kAsk) values[offset++] = 1;
-	if (phase_ == kFish) values[offset++] = 1;
-	if (phase_ == kTerminal) values[offset++] = 1;
+	values[offset++] = phase_ == kDeal ? 1.0f : 0.0f;
+  values[offset++] = phase_ == kAsk ? 1.0f : 0.0f;
+  values[offset++] = phase_ == kFish ? 1.0f : 0.0f;
+  values[offset++] = phase_ == kTerminal ? 1.0f : 0.0f;
 	// pool size.
 	values[offset++] = 1.0f * PoolSize() / (ranks_ * suits_);
+	// booked count = ranks
+	for (int rank = 0; rank < ranks_; ++rank) {
+		values[offset++] = booked_[rank] ? 1.0f : 0.0f;
+	}
 	for (int pid = 0; pid < num_players_; ++pid) {
 		// Add common info about each player
 	  // outer fields count = players
     values[offset++] = pid == current_player_ ? 1.0f : 0.0f;
-		values[offset++] = 1.0f * player_books_[pid] / suits_;
-		values[offset++] = PlayerCounts(pid);
+		values[offset++] = 1.0f * player_books_[pid] / ranks_;
+		values[offset++] = 1.0f * PlayerCounts(pid) / (ranks_ * suits_);
 		for (int rank = 0; rank < ranks_; ++rank) {
       // inner fields count = players * ranks
-      values[offset++] = player_did_ask_[pid][rank] ? 1.0f : 0.0f;
+			// number of times player asked
+      values[offset++] = 1.0f * player_did_ask_[pid][rank] / (suits_ * ranks_);
       values[offset++] = player_was_asked_[pid][rank] ? 1.0f : 0.0f;
       values[offset++] = 1.0f * drawn_since_was_asked_[pid][rank]/ (ranks_ * suits_);
       values[offset++] = 1.0f * player_min_[pid][rank]/ suits_;
 		}
 	}
-	// count = ranks
-	for (int rank = 0; rank < ranks_; ++rank) {
-		values[offset++] = booked_[rank] ? 1.0f : 0.0f;
-	}
+	SPIEL_CHECK_EQ(offset, values.size());
 }
 
 std::string GoFishState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
 	std::string result;
 	absl::StrAppend(&result, "Phase ", PhaseString(phase_), "\n");
 	absl::StrAppend(&result, "Current Player ",  current_player_, "\n");
@@ -527,8 +531,10 @@ std::string GoFishState::InformationStateString(Player player) const {
 
 std::vector<int> GoFishGame::ObservationTensorShape() const {
 	int size = 4 + // phase one hots
+						 1 + // pool size
 					   2 * ranks_ + // secret info, booked
 						 3 * num_players_ +  // current, player_booked, player counts
+						 //  did_ask, was_asked, drawn_since, min
 						 4 * num_players_ * ranks_;
   return {size};
 }

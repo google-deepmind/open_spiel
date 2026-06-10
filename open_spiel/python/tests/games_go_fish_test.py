@@ -54,10 +54,11 @@ class GamesGoFishTest(parameterized.TestCase):
       action = game.fish_string_to_action('g') # made book
       assert(action in state.legal_actions())
       state.apply_action(action)
-      # print(state)
       action = game.ask_string_to_action('0,b') # miss
       assert(action in state.legal_actions())
       state.apply_action(action)
+      #print("first asserts")
+      #print(state)
       assert(state.phase() == go_fish.Phase.FISH)
       assert(state.booked()[0] == 0)
       assert(state.booked()[6] == 1) # g 
@@ -91,6 +92,8 @@ class GamesGoFishTest(parameterized.TestCase):
       assert(state.drawn_since_was_asked() == 
              [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                [0, 0, 0, 2, 0, 0, 2, 2, 1, 0, 0, 0, 0]])
+      print("min", state.player_min())
+     
 
   def test_agame(self):
     game = pyspiel.load_game("go_fish")

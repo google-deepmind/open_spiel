@@ -56,9 +56,18 @@ void open_spiel::init_pyspiel_games_go_fish(py::module& m) {
     .def("drawn_since_was_asked", &GoFishState::DrawnSinceWasAsked)
     .def("player_min", &GoFishState::PlayerMin)
     .def("booked", &GoFishState::Booked)
-	  .def("phase", &GoFishState::StatePhase);
+	  .def("phase", &GoFishState::StatePhase)
+      // Pickle support
+    .def(py::pickle(
+          [](const GoFishState& state) {  // __getstate__
+            return SerializeGameAndState(*state.GetGame(), state);
+          },
+          [](const std::string& data) {  // __setstate__
+            std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+                game_and_state = DeserializeGameAndState(data);
+            return dynamic_cast<GoFishState*>(game_and_state.second.release());
+          }));
 
-  // py::classh<GoFishGame, Game, std::shared_ptr<GoFishGame>>(m, "GoFishGame")
   py::classh<GoFishGame, Game>(m, "GoFishGame")
 		.def("ranks", &GoFishGame::Ranks)
 		.def("suits", &GoFishGame::Suits)
