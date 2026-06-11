@@ -83,10 +83,10 @@ flags.DEFINE_float(
 )
 
 flags.DEFINE_float(
-  "welfare_coeff", 2.0, "Maximum Welfare coefficient of the loss function."
+  "welfare_coeff", 8.0, "Maximum Welfare coefficient of the loss function."
 )
 flags.DEFINE_float(
-  "entropy_coeff", 10.0, "Minimum Relative Entropy coefficient of the loss function."
+  "entropy_coeff", 8.0, "Minimum Relative Entropy coefficient of the loss function."
 )
 flags.DEFINE_float(
   "epsilon_max", None, "Epsilon plus coefficient of the loss function."
@@ -96,7 +96,7 @@ flags.DEFINE_integer("norm", 2, "Norm of the payoff tensor.")
 flags.DEFINE_integer("seed", 42, "A random seed.")
 
 flags.DEFINE_integer(
-  "batch_size", 64, "Number of transitions to sample at each learning step."
+  "batch_size", 32, "Number of transitions to sample at each learning step."
 )
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
 

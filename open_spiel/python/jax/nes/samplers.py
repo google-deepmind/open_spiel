@@ -35,7 +35,7 @@ class Mechanism(NamedTuple):
 
 
 def broadcast(data: Data) -> Data:
-  """Helper to broadcast Data to [N, A_1, ..., A_N]. """
+  """Helper to broadcast Data to [N, A_1, ..., A_N]."""
 
   base_shape = data.payoffs.shape
   A = tuple(range(1, data.payoffs.ndim))
@@ -176,7 +176,7 @@ class GameSampler:
     """Returns hat_sigma(a) of shape [A1, A2, ..., AN]"""
     _, *A = payoffs.shape
     joint_A = utils.compute_joint_action_size(A)
-    if self.obj in [Objective.MRE, Objective.EPS_MRE, Objective.EPS_MWMRE]:
+    if self.obj in [Objective.MRE, Objective.EPS_MRE]:
       return jax.random.dirichlet(rng, alpha=jnp.ones(joint_A)).reshape(A)
     if self.obj == Objective.MT:
       return strategy_proposal
@@ -479,16 +479,15 @@ class MultiGameSampler(GameSampler):
     payoffs = utils.pad_game_tensor(data.payoffs, self.max_actions, 0.0)
     mask_pad = utils.joint_mask(action_sizes, self.max_actions)
 
-    def _pad_stategy(strat, normalise):
+    def _pad_stategy(strat):
       sigma_pad = utils.pad_game_tensor(
         jnp.expand_dims(strat, 0), self.max_actions, 0.0
       ).squeeze(0)
       sigma_pad = jnp.where(mask_pad, sigma_pad, 0.0)
-      if normalise:
-        sigma_sum = jnp.sum(sigma_pad, where=mask_pad)
-        sigma_pad = jnp.where(
-          mask_pad, sigma_pad / (sigma_sum + utils.SMALL_NUMBER), 0.0
-        )
+      sigma_sum = jnp.sum(sigma_pad, where=mask_pad)
+      sigma_pad = jnp.where(
+        mask_pad, sigma_pad / (sigma_sum + utils.SMALL_NUMBER), 0.0
+      )
       return sigma_pad
 
     def _pad_player_mask(mask: chex.Array) -> chex.Array:
@@ -502,10 +501,15 @@ class MultiGameSampler(GameSampler):
       jnp.expand_dims(data.welfare, 0), self.max_actions, 0.0
     ).squeeze(0)
 
+    strategy_base_padded = _pad_stategy(data.strategy_base)
+    
+    # Recompute strategy_norm from the padded strategy_base
+    strategy_norm_padded = self._scale_strategy(strategy_base_padded)
+    
     return Data(
       payoffs=payoffs,
-      strategy_base=_pad_stategy(data.strategy_base, True),
-      strategy_norm=_pad_stategy(data.strategy_norm, False),
+      strategy_base=strategy_base_padded,
+      strategy_norm=strategy_norm_padded,
       epsilon_target=data.epsilon_target,
       welfare=welfare,
       strat_mask_per_player=strat_masks_pad,
@@ -522,14 +526,11 @@ class MultiGameSampler(GameSampler):
     keys = jax.random.split(rng, batch_size)
 
     if idx is None:
-      idx_rng, rng = jax.random.split(rng)
-      source_idx = jax.random.choice(
+      idx_rng, _ = jax.random.split(rng)
+      idx = jax.random.choice(
         idx_rng, len(self._samplers), p=self.sampling_probs
       )
-      idx = source_idx
 
     return jax.vmap(
-      functools.partial(
-        self._sample_single_random, idx=idx, strategy_proposal=strategy_proposal
-      )
+      functools.partial(self._sample_single_random, idx=idx, strategy_proposal=strategy_proposal)
     )(keys)

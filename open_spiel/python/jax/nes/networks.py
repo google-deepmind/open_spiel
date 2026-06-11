@@ -154,12 +154,12 @@ class EquivariantPayoffPooling(EquivariantPooling):
       )
 
     # (18i)-(18l) Cross-player pools
-    # for q in range(num_players):
-    #   for p in range(num_players):
-    #     if p == q:
-    #       continue
-    #     # Use a helper factory to strictly bind p and q without closure issues
-    #     pools.extend(self._build_cross_player_pools(p, q))
+    for q in range(num_players):
+      for p in range(num_players):
+        if p == q:
+          continue
+        # Use a helper factory to strictly bind p and q without closure issues
+        pools.extend(self._build_cross_player_pools(p, q))
 
     super().__init__(pools)
 

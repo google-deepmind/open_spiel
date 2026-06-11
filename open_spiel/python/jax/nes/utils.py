@@ -232,7 +232,7 @@ def rand_choice_strat_mask_per_player(
   key: chex.PRNGKey,
   num_strats: int,
   count: int,
-) -> jax.Array:
+) -> chex.Array:
   """Returns random choice strat mask.
 
   Args:
@@ -372,8 +372,8 @@ def reduce_meanvar(
     all_divisor = math.prod([array.shape[a] for a in axis])
 
   # Multiplication replaces division to be cleaner about the comp. graph
-  reduced_all = reduced_all / all_divisor
-  reduced_other = reduced_other / (all_divisor - 1)
+  reduced_all /= jnp.sqrt(all_divisor)
+  reduced_other /= jnp.sqrt(all_divisor - 1)
 
   arrays = (reduced_none, reduced_all, reduced_other)
   includes = (include_identity, include_all, include_other)

@@ -625,7 +625,19 @@ def compute_ce_gap(
   )  # tuple of [Ap', Ap''] per player
 
   gap = jnp.array(0.0, dtype=payoffs.dtype)
+
   for p, gain_p in enumerate(gains):
+
+    diag = jnp.arange(gain_p.shape[0])
+    gain_p = gain_p.at[diag, diag].set(0.0)
+    
+    # Mask invalid actions so they don't affect the maximum.
+    if strat_mask_per_player is not None:
+      valid = strat_mask_per_player[p]
+      valid_2d = jnp.logical_and(valid[:, None], valid[None, :])
+      min_val = jnp.finfo(gain_p.dtype).min
+      gain_p = jnp.where(valid_2d, gain_p, min_val)
+    
     best_gain = jnp.max(gain_p)
     slack = best_gain - epsilon[p]
     gap = gap + jnp.maximum(slack, 0.0)
@@ -728,6 +740,7 @@ def mwmre_solver(
 
   for p in range(N):
     constraints.append(epsilon[p] <= epsilon_max)
+    
 
   # --- Equilibrium constraints ---
   if mode == "CCE":
@@ -748,20 +761,29 @@ def mwmre_solver(
   target_valid = np.clip(target_flat[valid_idx], utils.SMALL_NUMBER, 1.0)
   target_valid = target_valid / target_valid.sum()
 
-  # KL(sigma || target) over valid entries
+
+  # KL(sigma || target) = sum(sigma * log(sigma/target)) = -entr(sigma) - sigma^T log(target)
   kl_term = -cp.sum(cp.entr(strategy)) - strategy @ np.log(target_valid)
   kl_term *= entropy_coeff
 
-  # Epsilon penalty: rho * sum_p [ entr(diff) + diff + diff*log(target_diff) ]
+  # Epsilon penalty: -rho * sum_p KL(epsilon_p || epsilon_target_p)
+  # Using cp.kl_div for correctness and clarity
   eps_term = 0
   for p in range(N):
     diff = epsilon_max - epsilon[p]
     target_diff = epsilon_max - epsilon_target[p]
+    
+    # Clamp target_diff to avoid log(0) — it's a constant parameter
+    target_diff_safe = float(np.maximum(target_diff, utils.SMALL_NUMBER))
+    
+    # cp.entr(diff) = -diff*log(diff) is concave in diff, hence concave in epsilon
+    # Add SMALL_NUMBER to avoid log(0) gradient singularity when epsilon -> epsilon_max.
+    diff_safe = diff + utils.SMALL_NUMBER
+    
     eps_term += entropy_coeff * (
-      cp.entr(diff + utils.SMALL_NUMBER)  # -diff*log(diff), concave
-      + diff  # linear
-      + diff
-      * np.log(target_diff + utils.SMALL_NUMBER)  # linear (constant coeff)
+      cp.entr(diff_safe)           # -diff*log(diff), concave
+      + diff                        # linear in epsilon
+      + diff * np.log(target_diff_safe)  # linear in epsilon
     )
 
   objective = welfare_term - kl_term + eps_term

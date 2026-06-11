@@ -102,7 +102,7 @@ class DifferentiableEquilibriumBlock(nn.Module):
   ) -> None:
     self._mu = welfare_coeff
     self._rho = entropy_coeff
-    self._eps_plus = epsilon_max
+    self._eps_cap = epsilon_max
     self._mode = mode
     self._network = network
 
@@ -112,7 +112,7 @@ class DifferentiableEquilibriumBlock(nn.Module):
       data.strat_mask_per_player,
     )
     _, strategy, _, _, _ = recover_primals(
-      duals, data, self._mu, self._rho, self._eps_plus, self._mode.value
+      duals, data, self._mu, self._rho, self._eps_cap, self._mode.value
     )
     return strategy
 
@@ -224,7 +224,7 @@ class NESolver:
     self._rngkey, init_key = jax.random.split(jax.random.key(seed), 2)
     self._last_data = self._sampler.sample_random(self._batch_size, init_key)
 
-    self._eps_plus = (
+    self._eps_cap = (
       epsilon_max if epsilon_max is not None else self._sampler.z_m
     )
 
@@ -266,7 +266,7 @@ class NESolver:
     if gradient_clipping:
       optimiser = optax.chain(
         # Clip the raw gradients first
-        optax.clip_by_global_norm(gradient_clipping),
+        optax.adaptive_grad_clip(gradient_clipping),
         optimiser,
       )
 
@@ -298,14 +298,14 @@ class NESolver:
         data,
         self._mu,
         self._rho,
-        self._eps_plus,
+        self._eps_cap,
         self._mode.value,
       )
 
       # Total loss: Equation (7)
       loss = (
         log_sum_exp
-        + self._eps_plus * jnp.sum(sum_duals, axis=-1)
+        + self._eps_cap * jnp.sum(sum_duals, axis=-1)
         - self._rho * jnp.sum(epsilon, axis=-1)
       )
 
@@ -329,8 +329,8 @@ class NESolver:
       policy_model = nn.merge(self._graphdef_network, network_state)
       policy_model.eval()
 
-      _, (primals, duals) = self._loss_fn(policy_model, data)
-      return primals, duals
+      loss, (primals, duals) = self._loss_fn(policy_model, data)
+      return loss, (primals, duals)
 
     return infer
 
@@ -351,6 +351,8 @@ class NESolver:
       (loss, (primals, _)), grads = nn.value_and_grad(
         self._loss_fn, has_aux=True
       )(policy_model, data)
+
+      # jax.debug.print("{x}",x=optax.global_norm(grads))
 
       optimiser.update(policy_model, grads)
 
@@ -446,7 +448,7 @@ class NESolver:
         batch.joint_mask[i],
         self._mu,
         self._rho,
-        self._eps_plus,
+        self._eps_cap,
         self._mode.name,
       )
       data.append(
@@ -471,8 +473,9 @@ class NESolver:
     batch = sampler.sample_random(
       batch_size, jax.random.key(step), None
     )
-    primals, duals = self._infer_fn(nn.state(self._network), batch)
+    loss, (primals, duals) = self._infer_fn(nn.state(self._network), batch)
     log = self._logging_callback(batch, primals)
+    log["eval_loss"] = loss
     for k, v in log.items():
       print(f"\t{k}:\t{v}")
     print()
