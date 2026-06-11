@@ -718,6 +718,60 @@ class StructApiTest(absltest.TestCase):
     self.assertEqual(s.current_player, "o")
     self.assertEqual(s.board[0], "x")
 
+  # ===== Game Struct Type Property Tests =====
+
+  def test_game_action_struct_property(self):
+    """Test that game.ActionStruct returns the correct type."""
+    self.assertIs(self.game.ActionStruct, self.ttt.TicTacToeActionStruct)
+
+  def test_game_state_struct_property(self):
+    """Test that game.StateStruct returns the correct type."""
+    self.assertIs(self.game.StateStruct, self.ttt.TicTacToeStateStruct)
+
+  def test_game_observation_struct_property(self):
+    """Test that game.ObservationStruct returns the correct type."""
+    self.assertIs(
+        self.game.ObservationStruct, self.ttt.TicTacToeObservationStruct
+    )
+
+  def test_game_action_struct_constructor(self):
+    """Test constructing ActionStruct via game.ActionStruct(json)."""
+    action_json = '{"row": 1, "col": 2}'
+    action_struct = self.game.ActionStruct(action_json)
+    self.assertIsInstance(action_struct, pyspiel.ActionStruct)
+    self.assertEqual(action_struct.row, 1)
+    self.assertEqual(action_struct.col, 2)
+
+  def test_game_state_struct_constructor(self):
+    """Test constructing StateStruct via game.StateStruct(json)."""
+    json_str = self.ref_state.to_json()
+    state_struct = self.game.StateStruct(json_str)
+    self.assertIsInstance(state_struct, pyspiel.StateStruct)
+    self.assertEqual(state_struct.current_player, "o")
+
+  def test_game_state_struct_dict_constructor(self):
+    """Test constructing StateStruct via game.StateStruct(dict)."""
+    d = {
+        "current_player": "x",
+        "board": [".", ".", ".", ".", ".", ".", ".", ".", "."],
+    }
+    state_struct = self.game.StateStruct(d)
+    self.assertEqual(state_struct.current_player, "x")
+
+  def test_game_struct_round_trip(self):
+    """Test round-trip: state -> JSON -> game.StateStruct -> JSON."""
+    original_json = self.ref_state.to_json()
+    state_struct = self.game.StateStruct(original_json)
+    round_trip_json = state_struct.to_json()
+    self.assertEqual(original_json, round_trip_json)
+
+  def test_connect_four_game_struct_properties(self):
+    """Test struct properties on a different game (connect_four)."""
+    game = pyspiel.load_game("connect_four")
+    # Construct an action struct via the game object
+    action_struct = game.ActionStruct('{"column": 3}')
+    self.assertEqual(action_struct.column, 3)
+
 
 class LoadGameFromJsonTest(absltest.TestCase):
   """Tests for load_game_from_json API."""

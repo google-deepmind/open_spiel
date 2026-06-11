@@ -96,13 +96,20 @@ struct ConnectFourGameParams : public GameParametersStruct {
 
   ConnectFourGameParams() { game_name = "connect_four"; }
 
-  nlohmann::json to_json_base() const override {
-    return nlohmann::json{{"game_name", game_name},
-                          {"rows", rows},
-                          {"columns", columns},
-                          {"x_in_row", x_in_row},
-                          {"egocentric_obs_tensor", egocentric_obs_tensor}};
+  explicit ConnectFourGameParams(const std::string& json_str)
+      : ConnectFourGameParams() {
+    nlohmann::json::parse(json_str).get_to(*this);
   }
+
+  explicit ConnectFourGameParams(const nlohmann::json& json)
+      : ConnectFourGameParams() {
+    json.get_to(*this);
+  }
+
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConnectFourGameParams, game_name, rows,
+                                 columns, x_in_row, egocentric_obs_tensor)
+
+  nlohmann::json to_json_base() const override { return *this; }
 };
 
 // State of an in-play game.
@@ -167,6 +174,7 @@ class ConnectFourState : public State {
 // Game object.
 class ConnectFourGame : public Game {
  public:
+  using Game::NewInitialState;
   explicit ConnectFourGame(const GameParameters& params);
   int NumDistinctActions() const override { return cols_; }
   std::unique_ptr<State> NewInitialState() const override {
