@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the game-specific functions for chess."""
+"""Tests for the game-specific functions for crossword."""
 
 from absl import flags
 from absl.testing import absltest
@@ -128,6 +128,50 @@ class GamesCrosswordTest(absltest.TestCase):
     state.apply_action(outcome)
     print(f"Sampled puzzle: {game.crossword_file(outcome)}")
     self.simulate_winning_game(state)
+
+  def test_default_crossword_manually(self):
+    action_json_strings = [
+        '{"clue_id": "A1", "word": "GO"}',    # valid and correct: +1
+        '{"clue_id": "D1", "word": "GAME"}',  # valid and correct: +1
+        '{"clue_id": "A4", "word": "ACHE"}',  # valid but incorrect: -1
+        '{"clue_id": "A4", "word": "ARGH"}',  # valid but incorrect: -1
+        '{"clue_id": "A4", "word": "ARID"}',  # valid and correct: +1
+        '{"clue_id": "D3", "word": "ARGH"}',  # invalid (not applied)
+        '{"clue_id": "D3", "word": "ABLE"}',  # invalid (not applied)
+        '{"clue_id": "D3", "word": "AMEN"}',  # invalid (not applied)
+        '{"clue_id": "D3", "word": "ADAM"}',  # valid and correct: +1
+        '{"clue_id": "D6", "word": "ITA"}',   # valid and correct: +1
+    ]
+    game = pyspiel.load_game("crossword")
+    state = game.new_initial_state()
+    for action_json_string in action_json_strings:
+      print("Current state:")
+      print(state)
+      action_struct = game.ActionStruct(action_json_string)
+      print(f"Applying action: {action_struct}")
+      status = state.validate_action_struct(action_struct)
+      if not status.ok():
+        print(f"Invalid action: {status.message}")
+      else:
+        status = state.apply_action_struct(action_struct)
+        self.assertTrue(status.ok())
+    print("Final state:")
+    print(state)
+    self.assertEqual(state.returns()[0], 3)
+
+  def test_bad_json_action(self):
+    game = pyspiel.load_game("crossword")
+    state = game.new_initial_state()
+    with self.assertRaises(RuntimeError):
+      action_struct = game.ActionStruct('{"foo": "bar"}')
+      state.apply_action_struct(action_struct)
+    # See what the error message is.. is it informative?
+    try:
+      _ = game.ActionStruct('{"foo": "bar"}')
+    except RuntimeError as e:
+      # Prints "Error creating action struct:
+      # json.exception.out_of_range.403] key 'clue_id' not found"
+      print(f"Error creating action struct: {e}")
 
 
 if __name__ == "__main__":

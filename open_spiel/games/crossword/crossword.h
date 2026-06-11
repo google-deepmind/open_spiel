@@ -80,8 +80,7 @@ struct CrosswordActionStruct : public ActionStruct {
   CrosswordActionStruct(const std::string& _clue_id, const std::string& _word)
        : clue_id(_clue_id), word(_word) {}
   std::string ToString() const {
-    return absl::StrCat("CrosswordActionStruct(clue_id=", clue_id,
-                        ", word=", word, ")");
+    return ToJson();
   }
   SPIEL_STRUCT_BOILERPLATE(CrosswordActionStruct, clue_id, word);
 };
@@ -115,6 +114,7 @@ class CrosswordState : public State {
 
   Status ValidateActionStruct(
       const ActionStruct& action_struct) const override;
+
   Status ApplyActionStruct(const ActionStruct& action_struct) override;
 
   std::unique_ptr<ActionStructSampler> GetActionStructSampler(
@@ -169,6 +169,13 @@ class CrosswordGame : public Game {
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new CrosswordState(shared_from_this()));
+  }
+
+  std::pair<std::string, std::string> ActionStructSpec() const override {
+    return std::make_pair(
+        "{\"clue_id\": string, \"word\": string}",
+        "{\"clue_id\": \"A1\", \"word\": \"GO\"}"
+    );
   }
 
   void AddWordToWordSet(const std::string& word) {

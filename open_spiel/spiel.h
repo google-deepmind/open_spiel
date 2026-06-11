@@ -24,7 +24,10 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/base/thread_annotations.h"
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -961,6 +964,12 @@ class Game : public std::enable_shared_from_this<Game> {
     SpielFatalError("NewInitialState from state json is not implemented.");
   }
 
+  // Return a new state from StateStruct.
+  virtual std::unique_ptr<State> NewInitialState(
+      const StateStruct& state_struct) const {
+    return NewInitialState(state_struct.to_json_base());
+  }
+
   // Returns newly allocated initial states. In most cases, this will be a
   // single state.
   // Games with multi-population mean field dynamics have multiple initial
@@ -1148,6 +1157,16 @@ class Game : public std::enable_shared_from_this<Game> {
   // independent of the state.
   virtual std::string ActionToString(Player player, Action action_id) const {
     return absl::StrCat("Action(id=", action_id, ", player=", player, ")");
+  }
+
+  // For games with action structs, returns a string representation of the
+  // action struct format and an example.
+  //
+  // E.g. for the game of crossword:
+  //   {{"clue_id": string, "word": string},
+  //    {"clue_id": "A1", "word": "GO"}}
+  virtual std::pair<std::string, std::string> ActionStructSpec() const {
+    return std::make_pair("", "");
   }
 
   // Returns an observer that was registered, based on its name.

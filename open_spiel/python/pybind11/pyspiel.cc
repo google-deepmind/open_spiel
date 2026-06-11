@@ -22,6 +22,8 @@
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
@@ -485,6 +487,10 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::unique_ptr<State>(open_spiel::Game::*)(
                                    const nlohmann::json&) const)
            &Game::NewInitialState)
+      .def("new_initial_state",
+           (std::unique_ptr<State>(open_spiel::Game::*)(
+                                   const StateStruct&) const)
+           &Game::NewInitialState)
       .def("new_initial_state_for_population",
            &Game::NewInitialStateForPopulation)
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
@@ -505,6 +511,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("action_to_string", &Game::ActionToString)
+      // action_struct_spec (no arguments), return {spec, example}
+      .def("action_struct_spec", &Game::ActionStructSpec)
       .def("max_chance_nodes_in_history", &Game::MaxChanceNodesInHistory)
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)

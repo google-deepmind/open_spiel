@@ -53,12 +53,13 @@ void open_spiel::init_pyspiel_games_crossword(py::module& m) {
   auto action_struct_cls =
       bind_spiel_struct<CrosswordActionStruct, ActionStruct>(
           crossword, "CrosswordActionStruct")
-          .def(py::init<const std::string&, const std::string&>(),
-               py::arg("clue_id"), py::arg("word"))
-          .def_readonly("clue_id", &CrosswordActionStruct::clue_id)
-          .def_readonly("word", &CrosswordActionStruct::word)
-          .def("to_string", &CrosswordActionStruct::ToString)
-          .def("__str__", &CrosswordActionStruct::ToString);
+      .def(py::init<const std::string&>(), py::arg("json_str"))
+      .def(py::init<const std::string&, const std::string&>(),
+            py::arg("clue_id"), py::arg("word"))
+      .def_readonly("clue_id", &CrosswordActionStruct::clue_id)
+      .def_readonly("word", &CrosswordActionStruct::word)
+      .def("to_string", &CrosswordActionStruct::ToString)
+      .def("__str__", &CrosswordActionStruct::ToString);
 
   py::classh<CrosswordBoard>(crossword, "CrosswordBoard")
       .def("to_string", &CrosswordBoard::ToString)

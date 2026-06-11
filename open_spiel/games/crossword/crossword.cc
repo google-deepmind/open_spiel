@@ -241,6 +241,7 @@ void CrosswordState::SetRewardAndIncrementReturn(int reward) {
 }
 
 Status CrosswordState::ApplyActionStruct(const ActionStruct& action_struct) {
+  SPIEL_CHECK_EQ(CurrentPlayer(), 0);
   auto status = ValidateActionStruct(action_struct);
   if (!status.ok()) {
     return status;
@@ -374,7 +375,7 @@ std::string CrosswordState::ToString() const {
     absl::StrAppend(&result, "rows: ", board_.num_rows(),
                     ", cols: ", board_.num_cols(), "\n");
     absl::StrAppend(&result, "num_actions: ", num_actions_, "\n");
-    absl::StrAppend(&result, "return: ", return_, "\n\n");
+    absl::StrAppend(&result, "return: ", return_, "\n\nBoard:\n\n");
     for (int r = 0; r < board_.num_rows(); ++r) {
       for (int c = 0; c < board_.num_cols(); ++c) {
         if (CharAt(r, c) == kBlockedCell) {
@@ -412,6 +413,14 @@ std::string CrosswordState::ToString() const {
       absl::StrAppend(&result, "\n");
     }
   }
+
+  // Add the clue strings.
+  absl::StrAppend(&result, "\nClues:\n\n");
+  for (int i = 0; i < board_.num_clues(); ++i) {
+    const Clue& clue = board_.clue(i);
+    absl::StrAppend(&result, ClueId(clue), ". ", clue.description, "\n");
+  }
+
   return result;
 }
 
