@@ -64,7 +64,7 @@ Action SimpleGinRummyBot::Step(const State& state) {
   std::vector<int> hand;
   std::vector<int> layed_melds;
   std::vector<int> discard_pile;
-  absl::optional<int> upcard = absl::nullopt;
+  std::optional<int> upcard = absl::nullopt;
   int knock_card = 0;
   int stock_size = 0;
 
@@ -196,8 +196,8 @@ Action SimpleGinRummyBot::Step(const State& state) {
 // Returns the "best" deadwood, i.e. the cards that do not belong to one of the
 // "best" melds. Here "best" means any meld group that achieves the lowest
 // possible deadwood count for the given hand. In general this is non-unique.
-std::vector<int> SimpleGinRummyBot::GetBestDeadwood(std::vector<int> hand,
-    const absl::optional<int> card) const {
+std::vector<int> SimpleGinRummyBot::GetBestDeadwood(
+    std::vector<int> hand, const std::optional<int> card) const {
   if (card.has_value()) hand.push_back(card.value());
   for (const auto& meld : utils_.BestMeldGroup(hand)) {
     for (auto card : meld) {

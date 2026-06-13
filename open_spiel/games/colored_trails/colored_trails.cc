@@ -337,61 +337,60 @@ void ColoredTrailsState::ObservationTensor(Player player,
 
 std::unique_ptr<State> ColoredTrailsState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
-  std::vector<std::unique_ptr<State>> candidates;
+  // Standard OpenSpiel ResampleFromInfostate pattern (cf. bargaining, kuhn,
+  // leduc): resample only the chance outcome (board) and replay all subsequent
+  // player actions from the history verbatim.
+  //
+  // The only hidden information to resample is the board assignment (which
+  // determines other players' chip allocations). Player actions in the history
+  // are either known to the caller (IS-MCTS always passes
+  // player_id == CurrentPlayer()) or at minimum consistent with the current
+  // game stage.
+
+  // Collect board indices consistent with player_id's observable information.
+  std::vector<int> valid_board_indices;
   const std::vector<Board>& all_boards = parent_game_->AllBoards();
 
   for (int o = 0; o < all_boards.size(); ++o) {
-    if (board_.ToString() != all_boards[o].ToString()) {
+    const Board& cb = all_boards[o];
+
+    // Board grid and positions are always public.
+    if (board_.board != cb.board || board_.positions != cb.positions) {
       continue;
     }
 
-    std::unique_ptr<State> candidate_state = parent_game_->NewInitialState();
-    candidate_state->ApplyAction(o);
-
-    if (player_id == 0) {
-      if (candidate_state->InformationStateString(0) ==
-          InformationStateString(0)) {
-        candidates.push_back(std::move(candidate_state));
-      }
-    } else if (player_id == 1) {
-      // Enumerate legal moves.
-      for (Action action : candidate_state->LegalActions()) {
-        std::unique_ptr<State> candidate_child = candidate_state->Child(action);
-        if (candidate_child->InformationStateString(1) ==
-            InformationStateString(1)) {
-          candidates.push_back(std::move(candidate_child));
-        } else {
-          // Player 0's move is hidden. No need to keep trying actions if P1's
-          // infostate doesn't match.
-          break;
-        }
+    // Check player-visible chip information.
+    if (player_id < kResponderId) {
+      // Proposer sees own chips and responder's chips.
+      if (board_.chips[player_id] != cb.chips[player_id] ||
+          board_.chips[kResponderId] != cb.chips[kResponderId]) {
+        continue;
       }
     } else {
-      SPIEL_CHECK_EQ(player_id, 2);
-      SPIEL_CHECK_EQ(History().size(), 3);
-      Action p0_action = History()[1];
-      Action p1_action = History()[2];
-      // Receiver sees everything, so replay the moves.
-      std::vector<Action> legal_actions = candidate_state->LegalActions();
-      if (absl::c_find(legal_actions, p0_action) != legal_actions.end()) {
-        candidate_state->ApplyAction(p0_action);
-        legal_actions = candidate_state->LegalActions();
-        if (absl::c_find(legal_actions, p1_action) != legal_actions.end()) {
-          candidate_state->ApplyAction(p1_action);
-          candidates.push_back(std::move(candidate_state));
-        }
+      // Responder sees all players' chips.
+      if (board_.chips != cb.chips) {
+        continue;
       }
     }
+
+    valid_board_indices.push_back(o);
   }
 
-  SPIEL_CHECK_GE(candidates.size(), 1);
-  if (candidates.size() == 1) {
-    return std::move(candidates[0]);
-  } else {
-    int idx = static_cast<int>(rng() * candidates.size());
-    SPIEL_CHECK_LE(idx, candidates.size());
-    return std::move(candidates[idx]);
+  SPIEL_CHECK_GE(valid_board_indices.size(), 1);
+  int idx = static_cast<int>(rng() * valid_board_indices.size());
+  SPIEL_CHECK_LT(idx, valid_board_indices.size());
+  int board_idx = valid_board_indices[idx];
+
+  // Build state by replaying the full history with the resampled board.
+  std::unique_ptr<State> state = parent_game_->NewInitialState();
+  for (int i = 0; i < History().size(); ++i) {
+    if (state->IsChanceNode()) {
+      state->ApplyAction(board_idx);
+    } else {
+      state->ApplyAction(History()[i]);
+    }
   }
+  return state;
 }
 
 void ColoredTrailsState::InformationStateTensor(

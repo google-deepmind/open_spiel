@@ -18,6 +18,8 @@
 #include <sys/types.h>
 
 #include <cstdlib>
+#include <system_error>  // NOLINT: only used externally.
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 
 #ifdef _WIN32
 // https://stackoverflow.com/a/42906151
@@ -34,6 +36,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <filesystem>  // NOLINT: only used externally.
+#include <algorithm>
+#include <vector>
 
 #include "open_spiel/spiel_utils.h"
 
@@ -163,5 +168,36 @@ std::string GetEnv(const std::string& key, const std::string& default_value) {
 }
 
 std::string GetTmpDir() { return GetEnv("TMPDIR", "/tmp"); }
+
+std::vector<std::string> ListDir(const std::string& prefix_path,
+                                 bool recrusive) {
+  std::vector<std::string> results;
+  std::error_code ec;
+  if (!std::filesystem::exists(prefix_path, ec) ||
+      !std::filesystem::is_directory(prefix_path, ec)) {
+    return results;
+  }
+
+  if (recrusive) {
+    std::filesystem::recursive_directory_iterator it(prefix_path, ec);
+    if (ec) return results;
+    std::filesystem::recursive_directory_iterator end;
+    while (it != end && !ec) {
+      results.push_back(it->path().string());
+      it.increment(ec);
+    }
+  } else {
+    std::filesystem::directory_iterator it(prefix_path, ec);
+    if (ec) return results;
+    std::filesystem::directory_iterator end;
+    while (it != end && !ec) {
+      results.push_back(it->path().string());
+      it.increment(ec);
+    }
+  }
+
+  std::sort(results.begin(), results.end());
+  return results;
+}
 
 }  // namespace open_spiel::file

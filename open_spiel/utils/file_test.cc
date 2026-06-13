@@ -14,7 +14,6 @@
 
 #include "open_spiel/utils/file.h"
 
-#include <cstdlib>
 #include <ctime>
 #include <random>
 #include <string>

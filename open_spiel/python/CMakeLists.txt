@@ -55,6 +55,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_crazyhouse.h
   pybind11/games_crazy_eights.cc
   pybind11/games_crazy_eights.h
+  pybind11/games_crossword.cc
+  pybind11/games_crossword.h
   pybind11/games_colored_trails.cc
   pybind11/games_colored_trails.h
   pybind11/games_connect_four.cc
@@ -107,6 +109,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/python_policy.h
   pybind11/utils.cc
   pybind11/utils.h
+  pybind11/utils_trajectories.cc
+  pybind11/utils_trajectories.h
 )
 
 if (OPEN_SPIEL_BUILD_WITH_ACPC)
@@ -286,6 +290,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_connect_four_test.py
   tests/games_crazy_eights_test.py
   tests/games_crazyhouse_test.py
+  tests/games_crossword_test.py
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
@@ -301,6 +306,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/sampled_stochastic_games_test.py
   tests/sgf_reader_test.py
   tests/tensor_game_utils_test.py
+  tests/utils_trajectories_test.py
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py

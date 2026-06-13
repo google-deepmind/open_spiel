@@ -136,7 +136,7 @@ void SpielFatalError(const std::string& error_msg) {
   std::exit(1);
 }
 
-std::ostream& operator<<(std::ostream& stream, const absl::nullopt_t& v) {
+std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v) {
   return stream << "(nullopt)";
 }
 

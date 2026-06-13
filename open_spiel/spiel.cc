@@ -514,6 +514,7 @@ Status State::ApplyActionStruct(const ActionStruct& action_struct) {
   return OkStatus();
 }
 
+
 std::vector<int> State::LegalActionsMask(Player player) const {
   int length = (player == kChancePlayerId) ? game_->MaxChanceOutcomes()
                                            : num_distinct_actions_;

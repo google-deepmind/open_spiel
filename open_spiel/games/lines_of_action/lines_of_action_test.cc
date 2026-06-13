@@ -117,7 +117,7 @@ void PlayThroughTestGames() {
 
   for (const char* filename : kTestGameFileNames) {
     std::string full_filename = absl::StrCat(kFilePathPrefix, filename);
-    absl::optional<std::string> file = FindFile(full_filename, 2);
+    std::optional<std::string> file = FindFile(full_filename, 2);
 
     if (file != absl::nullopt) {
       std::cout << "Playing through test game " << filename << std::endl;

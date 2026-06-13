@@ -147,8 +147,8 @@ void ShootTheMoonTest() {
 std::string InformationStateTensorToString(Player player,
                                            const std::vector<float>& tensor) {
   PassDir pass_dir;
-  std::array<absl::optional<Player>, kNumCards> dealt_hand;
-  std::array<absl::optional<Player>, kNumCards> current_hand;
+  std::array<std::optional<Player>, kNumCards> dealt_hand;
+  std::array<std::optional<Player>, kNumCards> current_hand;
   std::vector<int> passed_cards;
   std::vector<int> received_cards;
   std::vector<int> points;

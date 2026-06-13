@@ -1,4 +1,7 @@
 add_library (tests OBJECT
+  action_struct_tests.h
+  action_struct_tests.cc
+  basic_tests.cc
   basic_tests.h
   basic_tests.cc
   console_play_test.h

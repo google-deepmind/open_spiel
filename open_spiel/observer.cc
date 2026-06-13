@@ -123,7 +123,7 @@ class NoPrivateObserver : public Observer {
 }  // namespace
 
 std::shared_ptr<Observer> Game::MakeRegisteredObserver(
-    absl::optional<IIGObservationType> iig_obs_type,
+    std::optional<IIGObservationType> iig_obs_type,
     const ObservationParams& params) const {
   auto iter = params.find("name");
   if (iter == params.end()) {
@@ -135,7 +135,7 @@ std::shared_ptr<Observer> Game::MakeRegisteredObserver(
 }
 
 std::shared_ptr<Observer> Game::MakeBuiltInObserver(
-    absl::optional<IIGObservationType> iig_obs_type) const {
+    std::optional<IIGObservationType> iig_obs_type) const {
   if (!iig_obs_type) {
     if (game_type_.provides_observation()) {
       return absl::make_unique<DefaultObserver>(*this);
@@ -175,7 +175,7 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
 }
 
 std::shared_ptr<Observer> Game::MakeObserver(
-    absl::optional<IIGObservationType> iig_obs_type,
+    std::optional<IIGObservationType> iig_obs_type,
     const ObservationParams& params) const {
   // This implementation falls back to the original information state and
   // observation methods in case of empty parameters and otherwise creates
@@ -345,7 +345,7 @@ void ObserverRegisterer::RegisterObserver(const std::string& game_name,
 }
 
 std::shared_ptr<Observer> MakeSingleTensorObserver(
-    const Game& game, absl::optional<IIGObservationType> iig_obs_type,
+    const Game& game, std::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) {
   return std::shared_ptr<Observer>(game.MakeBuiltInObserver(iig_obs_type));
 }
@@ -357,9 +357,8 @@ RegisterSingleTensorObserver::RegisterSingleTensorObserver(
 }
 
 std::shared_ptr<Observer> ObserverRegisterer::CreateByName(
-    const std::string& observer_name,
-    const Game& game,
-    absl::optional<IIGObservationType> iig_obs_type,
+    const std::string& observer_name, const Game& game,
+    std::optional<IIGObservationType> iig_obs_type,
     const ObservationParams& params) {
   auto key = std::pair(game.GetType().short_name, observer_name);
   auto it = observers().find(key);
