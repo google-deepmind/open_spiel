@@ -255,7 +255,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   egt/dynamics_test.py
   egt/heuristic_payoff_table_test.py
   egt/utils_test.py
-  examples/mcp_tool_server/tools_test.py
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/ant_foraging_test.py
@@ -358,7 +357,7 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
 endif()
 
 # Add miscellaneous Python tests if enabled.
-# These require extra dependencies like cvxopt, nashpy, or matplotlib
+# These require extra dependencies like cvxopt, nashpy, matplotlib, etc.
 if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/adidas_test.py
@@ -373,6 +372,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/stackelberg_lp_test.py
       algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
+      examples/mcp_tool_server/tools_test.py
       coalitional_games/least_core_lp_test.py
       coalitional_games/wvg_test.py
       egt/alpharank_test.py
