@@ -255,6 +255,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   egt/dynamics_test.py
   egt/heuristic_payoff_table_test.py
   egt/utils_test.py
+  examples/mcp_tool_server/tools_test.py
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/ant_foraging_test.py
