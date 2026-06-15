@@ -320,6 +320,9 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<SpielStruct> spiel_struct(m, "SpielStruct");
   spiel_struct.def("to_json", &SpielStruct::ToJson);
+  spiel_struct.def("to_dict", [](const SpielStruct& self) {
+    return self.to_json_base();
+  });
 
   py::class_<StateStruct, SpielStruct>(m, "StateStruct");
 

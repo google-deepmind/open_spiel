@@ -440,6 +440,10 @@ class PyspielTest(parameterized.TestCase):
     json_str = action_struct.to_json()
     self.assertIn('"row":', json_str)
     self.assertIn('"col":', json_str)
+    json_dict = action_struct.to_dict()
+    self.assertIsInstance(json_dict, dict)
+    self.assertIn("row", json_dict)
+    self.assertIn("col", json_dict)
 
     # Test StructToActions
     self.assertEqual([action], state.struct_to_actions(action_struct))
@@ -451,6 +455,9 @@ class PyspielTest(parameterized.TestCase):
     self.assertIsInstance(state_struct, pyspiel.StateStruct)
     json_str = state_struct.to_json()
     self.assertIn('"board":', json_str)
+    json_dict = state_struct.to_dict()
+    self.assertIsInstance(json_dict, dict)
+    self.assertIn("board", json_dict)
 
     # Test ObservationStruct
     observation_struct = state.to_observation_struct()
@@ -459,6 +466,9 @@ class PyspielTest(parameterized.TestCase):
     self.assertIsInstance(observation_struct, pyspiel.ObservationStruct)
     json_str = observation_struct.to_json()
     self.assertIn('"board":', json_str)
+    json_dict = observation_struct.to_dict()
+    self.assertIsInstance(json_dict, dict)
+    self.assertIn("board", json_dict)
 
 
 class StructApiTest(absltest.TestCase):
@@ -735,12 +745,18 @@ class StructApiTest(absltest.TestCase):
     )
 
   def test_game_action_struct_constructor(self):
-    """Test constructing ActionStruct via game.ActionStruct(json)."""
+    """Test constructing ActionStruct via game.ActionStruct(json/dict)."""
     action_json = '{"row": 1, "col": 2}'
     action_struct = self.game.ActionStruct(action_json)
     self.assertIsInstance(action_struct, pyspiel.ActionStruct)
     self.assertEqual(action_struct.row, 1)
     self.assertEqual(action_struct.col, 2)
+
+    action_dict = {"row": 0, "col": 1}
+    action_struct_2 = self.game.ActionStruct(action_dict)
+    self.assertIsInstance(action_struct_2, pyspiel.ActionStruct)
+    self.assertEqual(action_struct_2.row, 0)
+    self.assertEqual(action_struct_2.col, 1)
 
   def test_game_state_struct_constructor(self):
     """Test constructing StateStruct via game.StateStruct(json)."""
