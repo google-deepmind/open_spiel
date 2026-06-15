@@ -627,9 +627,6 @@ def compute_ce_gap(
   gap = jnp.array(0.0, dtype=payoffs.dtype)
 
   for p, gain_p in enumerate(gains):
-
-    diag = jnp.arange(gain_p.shape[0])
-    gain_p = gain_p.at[diag, diag].set(0.0)
     
     # Mask invalid actions so they don't affect the maximum.
     if strat_mask_per_player is not None:
@@ -751,8 +748,23 @@ def mwmre_solver(
   else:
     gains = _build_ce_gains(np.asarray(payoffs), valid_idx)
     for p, gain_p in enumerate(gains):
-      # gain_p shape: (Ap, Ap, n_valid) -> flatten first two dims
-      constraints.append(gain_p.reshape(-1, n_valid) @ strategy <= epsilon[p])
+        for dev in range(gain_p.shape[0]):
+          for rec in range(gain_p.shape[1]):
+            if dev == rec:
+              continue  # diagonal is naturally zero
+            
+            coeffs = gain_p[dev, rec, :].copy()
+            
+            for i, flat_idx in enumerate(valid_idx):
+              a = np.unravel_index(flat_idx, A)
+              if a[p] != rec:
+                coeffs[i] = 0.0
+
+            constraints.append(coeffs @ strategy <= epsilon[p])
+            
+    # for p, gain_p in enumerate(gains):
+    #   # gain_p shape: (Ap, Ap, n_valid) -> flatten first two dims
+    #   constraints.append(gain_p.reshape(-1, n_valid) @ strategy <= epsilon[p])
 
   # --- Objective ---
   welfare = payoffs_flat.sum(axis=0)[valid_idx]
@@ -766,8 +778,7 @@ def mwmre_solver(
   kl_term = -cp.sum(cp.entr(strategy)) - strategy @ np.log(target_valid)
   kl_term *= entropy_coeff
 
-  # Epsilon penalty: -rho * sum_p KL(epsilon_p || epsilon_target_p)
-  # Using cp.kl_div for correctness and clarity
+  # Epsilon penalty
   eps_term = 0
   for p in range(N):
     diff = epsilon_max - epsilon[p]

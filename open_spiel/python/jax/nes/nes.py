@@ -1,25 +1,22 @@
+import dataclasses
 import functools
 from typing import Callable, Optional
 
-#TODO: inclusive logging
-from open_spiel.python.utils import data_logger, file_logger
-
 import chex
+import etils.epath
 import flax.nnx as nn
 import jax
 import jax.numpy as jnp
 import optax
+import orbax.checkpoint as ocp
 import pyspiel
 import trackio
-import etils.epath
-import orbax.checkpoint as ocp
 
-
-from open_spiel.python.jax.nes import networks
-from open_spiel.python.jax.nes import utils
-from open_spiel.python.jax.nes import samplers
-from open_spiel.python.jax.nes import games
 from open_spiel.python.jax.nes import equilibria_utils as eu
+from open_spiel.python.jax.nes import games, networks, samplers, utils
+
+#TODO: inclusive logging
+from open_spiel.python.utils import data_logger
 
 """Neural Equilibrium Solver agent implemented in Jax.
 
@@ -33,6 +30,138 @@ https://arxiv.org/abs/2210.09257 for more details.
 Data = samplers.Data
 Game = samplers.Game
 Objective = samplers.Objective 
+
+
+
+@dataclasses.dataclass
+class MWMREConfig:
+  """Configuration for ε-MWMRE family of equilibrium solvers."""
+
+  strategy_target: chex.Array | None
+  """σ̂: Target joint strategy for entropy regularization."""
+
+  welfare_coeff: float = 1.0
+  """μ: Weight on welfare term W(a) = Σ_p G_p(a). 
+  μ > 0 for welfare-aware, μ = 0 for welfare-agnostic."""
+
+  entropy_coeff: float = 10.0
+  """ρ: Weight on KL-divergence penalty KL(σ || σ̂).
+    ρ > 0 always (required for convexity).
+  """
+
+  epsilon_max: float = 10.0
+  """ε⁺: Upper bound / budget on per-player slack ε_p.
+    Sets the feasible region for incentive constraints.
+  """
+
+  has_eps: bool = True
+  """ε_p > 0: Whether to consider the approximate objectives 
+    or the regualr ones.
+  """
+
+  @property
+  def objective_name(self) -> Objective:
+    """Name of the specific objective variant."""
+
+    has_welfare = self.welfare_coeff > 0
+    has_entropy = self.entropy_coeff > 0
+    has_eps = self.has_eps
+    has_strategy_proposal = self.strategy_target is not None
+
+    if (has_welfare and has_entropy) and has_eps:
+      return Objective.EPS_MWMRE
+    elif (has_welfare and has_entropy) and not has_eps:
+      return Objective.MWME
+    elif not has_welfare and has_entropy and has_eps:
+      return Objective.EPS_MRE
+    elif not has_welfare and has_entropy and not has_eps:
+      return Objective.EPS_MRE
+    else:
+      raise ValueError("Wrong objective specification.")
+
+  def validate(self) -> None:
+    """Check parameter consistency."""
+    assert self.entropy_coeff > 0, "ρ must be > 0 for convexity"
+    assert self.epsilon_max >= 0, "ε⁺ must be non-negative"
+    assert self.welfare_coeff > 0, "Need μ > 0 if no entropy target"
+
+    if self.objective_name in (Objective.MWME, Objective.MRE):
+      assert not self.has_eps, f"{self.objective_name} requires ε̂ = 0"
+
+
+def mwme(
+  welfare_coeff: float = 1.0,
+  entropy_coeff: float = 10.0,
+  epsilon_max: float = 10.0,
+) -> MWMREConfig:
+  """Max Welfare, Min Entropy: μ>0, ρ>0, ε̂=0, σ̂=uniform."""
+  return MWMREConfig(
+    welfare_coeff=welfare_coeff,
+    entropy_coeff=entropy_coeff,
+    epsilon_max=epsilon_max,
+  )
+
+
+def mre(
+  entropy_coeff: float = 10.0,
+  epsilon_max: float = 10.0,
+) -> MWMREConfig:
+  """Min Relative Entropy: μ=0, ρ>0, ε̂=0, σ̂=arbitrary."""
+  return MWMREConfig(
+    welfare_coeff=0.0,
+    entropy_coeff=entropy_coeff,
+    epsilon_max=epsilon_max,
+  )
+
+
+def me(
+  entropy_coeff: float = 10.0,
+  epsilon_max: float = 10.0,
+) -> MWMREConfig:
+  """Max Entropy: μ=0, ρ>0, ε̂=0, σ̂=uniform."""
+  return MWMREConfig(
+    welfare_coeff=0.0,
+    entropy_coeff=entropy_coeff,
+    epsilon_max=epsilon_max,
+  )
+
+
+def eps_mwme(
+  welfare_coeff: float = 1.0,
+  entropy_coeff: float = 10.0,
+  epsilon_max: float = 10.0,
+) -> MWMREConfig:
+  """ε-approx MWME: μ>0, ρ>0, ε̂>0, σ̂=uniform."""
+  return MWMREConfig(
+    welfare_coeff=welfare_coeff,
+    entropy_coeff=entropy_coeff,
+    epsilon_max=epsilon_max,
+  )
+
+
+def eps_mre(
+  entropy_coeff: float = 10.0,
+  epsilon_max: float = 10.0,
+) -> MWMREConfig:
+  """ε-approx MRE: μ=0, ρ>0, ε̂>0, σ̂=arbitrary."""
+  return MWMREConfig(
+    welfare_coeff=0.0,
+    entropy_coeff=entropy_coeff,
+    epsilon_max=epsilon_max,
+  )
+
+
+def eps_mwmre(
+  welfare_coeff: float = 1.0,
+  entropy_coeff: float = 10.0,
+  epsilon_max: float = 10.0,
+) -> MWMREConfig:
+  """Full ε-MWMRE: μ>0, ρ>0, ε̂>0, σ̂=arbitrary."""
+  return MWMREConfig(
+    welfare_coeff=welfare_coeff,
+    entropy_coeff=entropy_coeff,
+    epsilon_max=epsilon_max,
+  )
 
 
 @functools.partial(jax.jit, static_argnames=("mode",))
@@ -251,7 +380,7 @@ class NESolver:
       )
 
     optimiser = optax.adamw(
-      learning_rate=learning_rate, weight_decay=weight_decay, mask=mask_fn
+      learning_rate=learning_rate, weight_decay=weight_decay, mask=None
     )
 
     self._checkpointer = None
@@ -509,7 +638,6 @@ class NESolver:
       nn.update((self._network, self._optimizer), network_state)
 
       self._iteration += 1
-
 
       if self._log_every > 0 and self._iteration % self._log_every == 0:
         # Cheap evaluation during training

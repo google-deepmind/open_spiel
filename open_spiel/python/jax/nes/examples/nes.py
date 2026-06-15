@@ -76,20 +76,20 @@ flags.DEFINE_integer(
   "max_actions", None, "Number of maximum actions for all games."
 )
 
-flags.DEFINE_float("max_grad_norm", 1e-3, "Max allowed gradient norm.")
+flags.DEFINE_float("max_grad_norm", 1, "Max allowed gradient norm.")
 flags.DEFINE_float("decay", 1e-7, "Weight decay of the optimiser.")
 flags.DEFINE_float(
-  "learning_rate", 4e-4, "Learning rate of the solver's updates."
+  "learning_rate", 1e-4, "Learning rate of the solver's updates."
 )
 
 flags.DEFINE_float(
-  "welfare_coeff", 8.0, "Maximum Welfare coefficient of the loss function."
+  "welfare_coeff", 2.0, "Maximum Welfare coefficient of the loss function."
 )
 flags.DEFINE_float(
-  "entropy_coeff", 8.0, "Minimum Relative Entropy coefficient of the loss function."
+  "entropy_coeff", 10.0, "Minimum Relative Entropy coefficient of the loss function."
 )
 flags.DEFINE_float(
-  "epsilon_max", None, "Epsilon plus coefficient of the loss function."
+  "epsilon_max", 10.0, "Epsilon plus coefficient of the loss function."
 )
 
 flags.DEFINE_integer("norm", 2, "Norm of the payoff tensor.")

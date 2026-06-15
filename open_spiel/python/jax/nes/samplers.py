@@ -152,9 +152,10 @@ class GameSampler:
       Objective.EPS_MWME,
       Objective.EPS_MWMRE,
     ]:
-      return jax.random.uniform(
-        rng, (num_players,), jnp.float32, -self.z_m, self.z_m
-      )
+      # return jax.random.uniform(
+      #   rng, (num_players,), jnp.float32, -self.z_m, self.z_m
+      # )
+      return jax.random.uniform(rng, (num_players,), jnp.float32, 0.0, self.z_m)
     return jnp.zeros(num_players)
 
   @functools.partial(jax.jit, static_argnums=(0,))
@@ -168,7 +169,9 @@ class GameSampler:
     scaled_eps = hat_epsilon / (safe_norm + utils.SMALL_NUMBER)
 
     # Clip to [-Z_m, +Z_m] (broadcast Z_m)
-    return jnp.clip(scaled_eps, -self.z_m, self.z_m)
+    # return jnp.clip(scaled_eps, -self.z_m, self.z_m)
+    return jnp.clip(scaled_eps, 0, self.z_m)
+
 
   def _initialise_strategy(
     self, payoffs: chex.Array, rng: chex.Array, strategy_proposal: chex.Array

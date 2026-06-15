@@ -250,6 +250,7 @@ class EquivariantPayoffToPayoff(nn.Module):
       kernel_init=BASE_KERNEL_INIT,
     )
     self.bn = nn.BatchNorm(out_channels, rngs=rngs, axis_name="batch")
+    # self.bn = nn.LayerNorm(out_channels, rngs=rngs)
     self.act = nn.relu
 
   def __call__(self, x: chex.Array, mask: chex.Array) -> chex.Array:
@@ -528,6 +529,8 @@ class EquivariantDualToDual(nn.Module):
       kernel_init=BASE_KERNEL_INIT,
     )
     self.bn = nn.BatchNorm(out_channels, rngs=rngs, axis_name="batch")
+    # self.bn = nn.LayerNorm(out_channels, rngs=rngs)
+
     base_act = nn.relu
 
     if last_activation:

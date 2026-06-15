@@ -34,6 +34,16 @@ mesh_rules = MeshRules(
 SMALL_NUMBER = jnp.finfo(jnp.float32).eps
 
 
+def lr_schedule_with_warmup(
+  base_lr: float = 1e-4, warmup_steps: int = 10000, total_steps: int = 500000
+) -> optax.Schedule:
+  warmup = optax.linear_schedule(0.0, base_lr, warmup_steps)
+  decay = optax.cosine_decay_schedule(
+    base_lr, total_steps - warmup_steps, alpha=0.1
+  )
+  return optax.join_schedules([warmup, decay], [warmup_steps])
+
+
 def lr_schedule(base_learning_rate: float = 1e-4) -> optax.Schedule:
   """Joint learning schedule from the NES paper.
   (iteration, factor) pairs of
@@ -60,8 +70,7 @@ def lr_schedule(base_learning_rate: float = 1e-4) -> optax.Schedule:
 
   # Build constant schedules for each segment
   schedules = [
-    optax.constant_schedule(base_learning_rate * factor) 
-    for factor in factors
+    optax.constant_schedule(base_learning_rate * factor) for factor in factors
   ]
 
   return optax.join_schedules(
@@ -83,6 +92,7 @@ def mask_diagonal(x: chex.Array) -> chex.Array:
   diag = jnp.arange(x.shape[-1])
   x = x.at[..., diag, diag].set(0.0)
   return x
+
 
 def compute_joint_action_size(action_shape: chex.Shape) -> int:
   """|A| = product of all players' action sizes"""
@@ -163,7 +173,6 @@ def make_masks_for_batch(
       strat_masks_batch: Tuple of [B, max_Ap] boolean arrays per player.
       joint_mask_batch: [B, A1, ..., AN] boolean array.
   """
-  B = len(batch_num_strats)
   N = len(batch_num_strats[0])
 
   # Find max actions per player across batch
@@ -180,7 +189,7 @@ def make_masks_for_batch(
     strat_masks_per_player.append(masks_p)
 
   # Derive joint masks: [B, A1, ..., AN]
-  # Vectorize over batch dimension
+  # Vectorise over batch dimension
   make_joint = jax.vmap(make_joint_mask_from_strat_masks, in_axes=0)
   joint_mask_batch = make_joint(
     tuple(strat_masks_per_player)
@@ -313,6 +322,7 @@ def reduce_sum(
     for a in _include_arrays(*arrays, *includes)
   ]
   return jnp.concatenate(arrays, axis=0)
+
 
 def reduce_mean(
   array: chex.Array,
