@@ -14,9 +14,11 @@
 
 #include "open_spiel/games/oh_hell/oh_hell.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <memory>
-#include <algorithm>
+#include <random>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
@@ -531,62 +533,158 @@ void OhHellState::InformationStateTensor(Player player,
   SPIEL_CHECK_EQ(ptr, values.end());
 }
 
-// This implementation produces samples that may be inconsistent w.r.t. voids.
-// i.e. if a player has played another suit when a diamond was lead,
-// this player cannot have any diamonds according to the rules of the game, but
-// the generated sample could be a state that contradicts this rule.
+// Resample hidden opponent cards, respecting void information from play
+// history. Cards are classified as "known" (player_id's cards and played
+// cards whose original holder is public knowledge) or "shuffleable" (unplayed
+// cards in opponents' hands). Shuffleable cards are redistributed among
+// opponents while respecting observed suit voids where possible.
 std::unique_ptr<State> OhHellState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
   std::unique_ptr<State> clone = game_->NewInitialState();
   if (phase_ != Phase::kBid && phase_ != Phase::kPlay) return clone;
 
-  // initial chance actions (choose num tricks and dealer)
+  // Initial chance actions (choose num tricks and dealer).
   clone->ApplyAction(num_tricks_);
   clone->ApplyAction(dealer_);
 
-  // deal needs to be consistent with the player's hand, and the opponent's
-  // played cards
+  // Classify each dealt card as "known" or "shuffleable".
+  // A card's holder is known if: (a) it belongs to player_id (own hand), or
+  // (b) it has been played (holder_ is nullopt, so its original holder is
+  // public knowledge from the trick history).
+  // All other cards (unplayed cards in opponents' hands) are shuffleable.
   std::vector<std::vector<int>> known(num_players_);
+  std::vector<int> shuffleable;
   for (int card = 0; card < deck_props_.NumCards(); ++card) {
     absl::optional<Player> p = initial_deal_[card];
-    if (p.has_value() && (*p == player_id || !holder_[card].has_value())) {
-      // if player_id was initially dealt the card, or if anyone was but no
-      // longer holds it (because it was played), player_id knows where it was
-      // dealt
+    if (!p.has_value()) continue;  // Not dealt to a player (leftover/trump).
+    if (*p == player_id || !holder_[card].has_value()) {
       known[*p].push_back(card);
+    } else {
+      shuffleable.push_back(card);
     }
   }
 
-  // the only other known card is trump
-  // apply num_tricks * num_players deal actions
-  std::vector<int> known_deal_counter(num_players_, 0);
-  for (int i = 0; i < num_players_ * num_tricks_; ++i) {
-    Player deal_to = i % num_players_;
-    if (known_deal_counter[deal_to] < known[deal_to].size()) {
-      clone->ApplyAction(known[deal_to][known_deal_counter[deal_to]]);
-      known_deal_counter[deal_to]++;
-    } else {
-      // deal randomly from the remaining unknown cards
-      Action candidate = kInvalidAction;
-      while (candidate == kInvalidAction) {
-        candidate = SampleAction(clone->ChanceOutcomes(), rng()).first;
-        absl::optional<Player> p = initial_deal_[candidate];
-        if (candidate == trump_ ||  (p.has_value() &&
-            (*p == player_id || !holder_[candidate].has_value()))) {
-          // can't use this card if player_id has it, or if it was played by
-          // any player
-          candidate = kInvalidAction;
+  // Detect void suits: scan trick history to find players who didn't follow
+  // the led suit.
+  std::vector<std::vector<bool>> void_in(
+      num_players_, std::vector<bool>(deck_props_.NumSuits(), false));
+  if (num_cards_played_ > 0) {
+    int play_start = NumChanceActions() + num_players_;
+    int num_complete_tricks = num_cards_played_ / num_players_;
+    int cards_in_partial = num_cards_played_ % num_players_;
+    int num_tricks_to_scan =
+        num_complete_tricks + (cards_in_partial > 0 ? 1 : 0);
+    for (int t = 0; t < num_tricks_to_scan; ++t) {
+      int trick_size =
+          (t < num_complete_tricks) ? num_players_ : cards_in_partial;
+      Player leader = tricks_[t].Leader();
+      int first_card = history_[play_start].action;
+      Suit led_suit = deck_props_.CardSuit(first_card);
+      Player player = leader;
+      for (int j = 1; j < trick_size; ++j) {
+        player = (player + 1) % num_players_;
+        int card = history_[play_start + j].action;
+        if (deck_props_.CardSuit(card) != led_suit) {
+          void_in[player][static_cast<int>(led_suit)] = true;
         }
       }
-      clone->ApplyAction(candidate);
+      play_start += trick_size;
     }
   }
 
-  // deal the trump card
+  // Determine how many unknown cards each opponent still needs.
+  std::vector<int> cards_needed(num_players_, 0);
+  std::vector<Player> hidden_players;
+  for (int p = 0; p < num_players_; ++p) {
+    if (p == player_id) continue;
+    cards_needed[p] = num_tricks_ - static_cast<int>(known[p].size());
+    if (cards_needed[p] > 0) {
+      hidden_players.push_back(p);
+    }
+  }
+
+  std::mt19937 shuffle_rng(rng() * std::mt19937::max());
+
+  // Start with known cards, then distribute shuffleable cards below.
+  std::vector<std::vector<int>> player_cards(num_players_);
+  for (int p = 0; p < num_players_; ++p) {
+    player_cards[p] = known[p];
+  }
+
+  // Distribute shuffleable cards among hidden players, respecting voids.
+  // Phase 1: Iteratively force-assign cards that only one player can hold.
+  std::vector<bool> assigned(shuffleable.size(), false);
+  bool changed = true;
+  while (changed) {
+    changed = false;
+    for (size_t i = 0; i < shuffleable.size(); ++i) {
+      if (assigned[i]) continue;
+      int card = shuffleable[i];
+      int suit = static_cast<int>(deck_props_.CardSuit(card));
+      Player sole = kInvalidPlayer;
+      int count = 0;
+      for (Player p : hidden_players) {
+        if (cards_needed[p] > 0 && !void_in[p][suit]) {
+          sole = p;
+          if (++count > 1) break;
+        }
+      }
+      if (count == 1) {
+        player_cards[sole].push_back(card);
+        --cards_needed[sole];
+        assigned[i] = true;
+        changed = true;
+      }
+    }
+  }
+
+  // Phase 2: Collect remaining unassigned shuffleable cards, shuffle them,
+  // and assign to hidden players respecting voids where possible.
+  std::vector<int> remaining;
+  for (size_t i = 0; i < shuffleable.size(); ++i) {
+    if (!assigned[i]) remaining.push_back(shuffleable[i]);
+  }
+  std::shuffle(remaining.begin(), remaining.end(), shuffle_rng);
+
+  // Process hidden players in random order for fairness.
+  std::vector<Player> hp_order(hidden_players);
+  std::shuffle(hp_order.begin(), hp_order.end(), shuffle_rng);
+  for (Player p : hp_order) {
+    for (auto it = remaining.begin();
+         it != remaining.end() && cards_needed[p] > 0;) {
+      int suit = static_cast<int>(deck_props_.CardSuit(*it));
+      if (!void_in[p][suit]) {
+        player_cards[p].push_back(*it);
+        it = remaining.erase(it);
+        --cards_needed[p];
+      } else {
+        ++it;
+      }
+    }
+  }
+  // Fallback: if voids over-constrain (shouldn't happen in valid game states),
+  // assign remaining cards ignoring void constraints.
+  for (Player p : hp_order) {
+    while (cards_needed[p] > 0 && !remaining.empty()) {
+      player_cards[p].push_back(remaining.back());
+      remaining.pop_back();
+      --cards_needed[p];
+    }
+  }
+
+  // Deal the cards to the clone in round-robin order
+  // (player 0 first, matching the original dealing convention).
+  for (int i = 0; i < num_players_ * num_tricks_; ++i) {
+    Player deal_to = i % num_players_;
+    clone->ApplyAction(player_cards[deal_to].back());
+    player_cards[deal_to].pop_back();
+  }
+
+  // Deal the trump card (public knowledge).
   clone->ApplyAction(trump_);
 
-  // now apply all of the bid and play phase actions in the same order as the
-  // original state
+  // Replay all post-deal actions (bids and play) verbatim from the original
+  // history — these are all public actions.
   int start = kNumPreDealChanceActions + num_players_ * num_tricks_ + 1;
   for (size_t i = start; i < history_.size(); i++) {
     clone->ApplyAction(history_.at(i).action);
