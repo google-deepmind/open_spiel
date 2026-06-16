@@ -830,7 +830,7 @@ double GoofspielGame::MaxUtility() const {
 
 std::optional<double> GoofspielGame::UtilitySum() const {
   if (returns_type_ == ReturnsType::kTotalPoints)
-    return absl::nullopt;
+    return std::nullopt;
   else
     return 0;
 }
