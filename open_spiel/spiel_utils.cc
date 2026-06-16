@@ -94,7 +94,7 @@ absl::optional<std::string> FindFile(const std::string& filename, int levels) {
       }
     }
   }
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::string FormatDouble(double value) {
