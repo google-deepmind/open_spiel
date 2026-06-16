@@ -308,7 +308,7 @@ void SheriffState::UndoAction(Player player, Action action_id) {
     // has just started and the only action so far was for the smuggler to
     // select the number of illegal items to place into the smuggler's cargo.
     SPIEL_CHECK_TRUE(num_illegal_items_);
-    num_illegal_items_ = absl::nullopt;
+    num_illegal_items_ = std::nullopt;
   }
 }
 
