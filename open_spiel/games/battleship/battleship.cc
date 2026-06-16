@@ -961,7 +961,7 @@ std::optional<double> BattleshipGame::UtilitySum() const {
   if (std::abs(conf.loss_multiplier - 1.0) < kFloatTolerance) {
     return 0.0;
   } else {
-    return absl::nullopt;
+    return std::nullopt;
   }
 }
 
