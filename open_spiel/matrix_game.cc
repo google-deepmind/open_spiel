@@ -79,7 +79,7 @@ std::optional<double> GetUtilitySum(
   if (constant_sum) {
     return Near(util_sum, 0.0) ? 0 : util_sum;
   } else {
-    return absl::nullopt;
+    return std::nullopt;
   }
 }
 
