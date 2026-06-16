@@ -470,7 +470,7 @@ std::optional<std::vector<double>> AntichessState::MaybeFinalReturns() const {
     return returns;
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::string AntichessState::Serialize() const {
