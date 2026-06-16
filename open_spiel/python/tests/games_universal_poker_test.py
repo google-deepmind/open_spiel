@@ -104,6 +104,37 @@ class GamesUniversalPokerTest(absltest.TestCase):
     unpickled_state = pickle.loads(pickled_state)
     self.assertEqual(str(state), str(unpickled_state))
 
+  def test_struct_json_constructor(self):
+    """Test constructing UniversalPokerStateStruct from JSON string."""
+    game = pyspiel.load_game("universal_poker")
+    state = game.new_initial_state()
+    original_struct = state.to_struct()
+    state_json = state.to_json()
+    universal_poker = pyspiel.universal_poker
+    state_struct = universal_poker.UniversalPokerStateStruct(state_json)
+    self.assertEqual(state_struct.blinds, original_struct.blinds)
+    self.assertEqual(state_struct.pot_size, original_struct.pot_size)
+
+  def test_struct_dict_constructor(self):
+    """Test constructing UniversalPokerStateStruct from a Python dict."""
+    game = pyspiel.load_game("universal_poker")
+    state = game.new_initial_state()
+    original_struct = state.to_struct()
+    state_dict = state.to_dict()
+    universal_poker = pyspiel.universal_poker
+    state_struct = universal_poker.UniversalPokerStateStruct(state_dict)
+    self.assertEqual(state_struct.blinds, original_struct.blinds)
+    self.assertEqual(state_struct.pot_size, original_struct.pot_size)
+
+  def test_struct_json_round_trip(self):
+    """Test JSON round-trip for UniversalPokerStateStruct."""
+    game = pyspiel.load_game("universal_poker")
+    state = game.new_initial_state()
+    universal_poker = pyspiel.universal_poker
+    original_json = state.to_json()
+    reconstructed = universal_poker.UniversalPokerStateStruct(original_json)
+    self.assertEqual(reconstructed.to_json(), original_json)
+
 
 if __name__ == "__main__":
   if "universal_poker" in pyspiel.registered_names():

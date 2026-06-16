@@ -136,29 +136,17 @@ struct GinRummyStructContents {
                                  finished_layoffs);
 };
 
-struct GinRummyStateStruct : StateStruct, GinRummyStructContents {
-  GinRummyStateStruct() = default;
-  explicit GinRummyStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
+SPIEL_DEFINE_STRUCT(GinRummyStateStruct, StateStruct, GinRummyStructContents);
 
-  nlohmann::json to_json_base() const override { return *this; }
-};
-
-struct GinRummyObservationStruct : ObservationStruct, GinRummyStructContents {
-  GinRummyObservationStruct() = default;
-  explicit GinRummyObservationStruct(const std::string& json_str) {
-    nlohmann::json data = nlohmann::json::parse(json_str);
-    data.get_to(static_cast<GinRummyStructContents&>(*this));
-    observing_player = data.value("observing_player", -1);
-  }
-  nlohmann::json to_json_base() const override {
-    nlohmann::json j = static_cast<const GinRummyStructContents&>(*this);
-    j["observing_player"] = observing_player;
-    return j;
-  }
+struct GinRummyObservationExtras {
   int observing_player = -1;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
+      GinRummyObservationExtras, observing_player);
 };
+
+SPIEL_DEFINE_STRUCT_WITH_EXTRAS(GinRummyObservationStruct, ObservationStruct,
+                                GinRummyStructContents,
+                                GinRummyObservationExtras);
 
 class GinRummyGame;
 class GinRummyObserver;

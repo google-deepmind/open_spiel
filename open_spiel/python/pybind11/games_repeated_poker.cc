@@ -31,9 +31,8 @@ using open_spiel::universal_poker::repeated_poker::RepeatedPokerStateStruct;
 void open_spiel::init_pyspiel_games_repeated_poker(py::module& m) {
   py::module sub = m.def_submodule("repeated_poker");
 
-  py::class_<RepeatedPokerStateStruct, StateStruct>(
+  bind_spiel_struct<RepeatedPokerStateStruct, StateStruct>(
       sub, "RepeatedPokerStateStruct")
-      .def(py::init<>())
       .def_readwrite("hand_number", &RepeatedPokerStateStruct::hand_number)
       .def_readwrite("max_num_hands", &RepeatedPokerStateStruct::max_num_hands)
       .def_readwrite("stacks", &RepeatedPokerStateStruct::stacks)

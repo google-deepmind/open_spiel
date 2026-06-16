@@ -100,17 +100,11 @@ struct RepeatedPokerStateStruct : StateStruct {
   std::string current_universal_poker_json;
   std::string prev_universal_poker_json;
 
-  RepeatedPokerStateStruct() = default;
-  explicit RepeatedPokerStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override { return *this; }
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(RepeatedPokerStateStruct, hand_number,
-                                 max_num_hands, stacks, dealer, small_blind,
-                                 big_blind, hand_returns,
-                                 current_universal_poker_json,
-                                 prev_universal_poker_json);
+  SPIEL_STRUCT_BOILERPLATE(RepeatedPokerStateStruct, hand_number,
+                           max_num_hands, stacks, dealer, small_blind,
+                           big_blind, hand_returns,
+                           current_universal_poker_json,
+                           prev_universal_poker_json);
 };
 
 class RepeatedPokerState : public State {

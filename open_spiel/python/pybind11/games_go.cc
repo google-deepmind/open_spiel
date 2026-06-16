@@ -20,6 +20,7 @@
 
 #include "open_spiel/games/go/go.h"
 #include "open_spiel/games/go/sgf_game_loader.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 
 namespace py = ::pybind11;
@@ -32,18 +33,17 @@ using open_spiel::go::GoStateStruct;
 void open_spiel::init_pyspiel_games_go(py::module& m) {
   py::module_ go = m.def_submodule("go");
 
-  py::class_<GoStateStruct, open_spiel::StateStruct>(
-      go, "GoStateStruct")
-      .def(py::init<>())
-      .def(py::init<std::string>())
-      .def_readwrite("board_size", &GoStateStruct::board_size)
-      .def_readwrite("komi", &GoStateStruct::komi)
-      .def_readwrite("current_player", &GoStateStruct::current_player)
-      .def_readwrite("move_number", &GoStateStruct::move_number)
-      .def_readwrite("previous_move_a1", &GoStateStruct::previous_move_a1)
-      .def_readwrite("board_grid", &GoStateStruct::board_grid)
-      .def_readwrite("is_terminal", &GoStateStruct::is_terminal)
-      .def_readwrite("winner", &GoStateStruct::winner);
+  auto state_struct_class =
+      bind_spiel_struct<GoStateStruct, open_spiel::StateStruct>(
+          go, "GoStateStruct")
+          .def_readwrite("board_size", &GoStateStruct::board_size)
+          .def_readwrite("komi", &GoStateStruct::komi)
+          .def_readwrite("current_player", &GoStateStruct::current_player)
+          .def_readwrite("move_number", &GoStateStruct::move_number)
+          .def_readwrite("previous_move_a1", &GoStateStruct::previous_move_a1)
+          .def_readwrite("board_grid", &GoStateStruct::board_grid)
+          .def_readwrite("is_terminal", &GoStateStruct::is_terminal)
+          .def_readwrite("winner", &GoStateStruct::winner);
 
   py::classh<GoState, State>(go, "GoState")
       // Pickle support
@@ -58,7 +58,7 @@ void open_spiel::init_pyspiel_games_go(py::module& m) {
                 game_and_state.second.release());
           }));
 
-  py::classh<GoGame, Game>(go, "GoGame")
+  auto go_game = py::classh<GoGame, Game>(go, "GoGame")
       .def("komi", &open_spiel::go::GoGame::komi)
       .def("board_size", &open_spiel::go::GoGame::board_size)
       .def("handicap", &open_spiel::go::GoGame::handicap)
@@ -71,6 +71,7 @@ void open_spiel::init_pyspiel_games_go(py::module& m) {
             return std::dynamic_pointer_cast<GoGame>(
                 std::const_pointer_cast<Game>(LoadGame(data)));
           }));
+  go_game.attr("StateStruct") = state_struct_class;
 
   // Args: sgf_filename (string). Returns a vector of (game, state) tuples.
   go.def("load_games_from_sgf_file", &open_spiel::go::LoadGamesFromSGFFile,

@@ -15,6 +15,7 @@
 #include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
 
 #include "open_spiel/games/repeated_pokerkit/repeated_pokerkit_struct.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 
 namespace py = ::pybind11;
@@ -24,10 +25,8 @@ using open_spiel::repeated_pokerkit::RepeatedPokerkitStateStruct;
 void open_spiel::bind_repeated_pokerkit_state_struct(py::module& m) {
   py::module_ repeated_pokerkit = m.def_submodule("repeated_pokerkit");
 
-  py::class_<RepeatedPokerkitStateStruct, open_spiel::StateStruct>(
+  bind_spiel_struct<RepeatedPokerkitStateStruct, open_spiel::StateStruct>(
       repeated_pokerkit, "RepeatedPokerkitStateStruct")
-      .def(py::init<>())  // Default constructor.
-      .def("to_json_base", &RepeatedPokerkitStateStruct::to_json_base)
       .def_readwrite("pokerkit_state_struct",
                      &RepeatedPokerkitStateStruct::pokerkit_state_struct)
       .def_readwrite("hand_number", &RepeatedPokerkitStateStruct::hand_number)
