@@ -64,7 +64,7 @@ Action SimpleGinRummyBot::Step(const State& state) {
   std::vector<int> hand;
   std::vector<int> layed_melds;
   std::vector<int> discard_pile;
-  std::optional<int> upcard = absl::nullopt;
+  std::optional<int> upcard = std::nullopt;
   int knock_card = 0;
   int stock_size = 0;
 
