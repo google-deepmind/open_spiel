@@ -168,6 +168,12 @@ std::string UltimateTTTState::ToString() const {
       }
     }
   }
+  absl::StrAppend(&str, "\nCurrent player: ", current_player_);
+  if (current_state_ >= 0) {
+    absl::StrAppend(&str, "\nForced board: ", current_state_);
+  } else {
+    absl::StrAppend(&str, "\nForced board: any");
+  }
   return str;
 }
 
@@ -199,17 +205,27 @@ void UltimateTTTState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // Treat `values` as a 3-d tensor: 3 x 9 x 9:
-  //   - empty versus x versus o, then
-  //   - local state index, then
-  //   - then 3x3 position within the local board.
-  TensorView<3> view(values, {ttt::kCellStates, ttt::kNumCells, ttt::kNumCells},
-                     /*reset*/true);
+  const int board_size = ttt::kCellStates * ttt::kNumCells * ttt::kNumCells;
+  // Zero the entire tensor (board planes + extra values).
+  std::fill(values.begin(), values.end(), 0.0);
+
+  // Board planes: 3 x 9 x 9 (empty vs x vs o, sub-board, cell).
+  TensorView<3> view(values.subspan(0, board_size),
+                     {ttt::kCellStates, ttt::kNumCells, ttt::kNumCells},
+                     /*reset=*/false);
   for (int state = 0; state < ttt::kNumCells; ++state) {
     for (int cell = 0; cell < ttt::kNumCells; ++cell) {
       view[{static_cast<int>(local_state(state)->BoardAt(cell)),
             state, cell}] = 1.0;
     }
+  }
+  // Current player (1 value).
+  values[board_size] = static_cast<float>(current_player_);
+  // Forced board one-hot (10 values: 9 boards + 1 for free choice).
+  if (current_state_ >= 0) {
+    values[board_size + 1 + current_state_] = 1.0;
+  } else {
+    values[board_size + 1 + ttt::kNumCells] = 1.0;  // free choice
   }
 }
 

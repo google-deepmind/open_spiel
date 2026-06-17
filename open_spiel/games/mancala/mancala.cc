@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
@@ -161,6 +162,8 @@ std::string MancalaState::ToString() const {
     absl::StrAppend(&str, board_[i + 1]);
     absl::StrAppend(&str, separator);
   }
+  absl::StrAppend(&str, "\nCurrent player: ", current_player_);
+  absl::StrAppend(&str, "\nMove number: ", move_number_);
   return str;
 }
 
@@ -216,11 +219,13 @@ void MancalaState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  SPIEL_CHECK_EQ(values.size(), kTotalPits);
+  SPIEL_CHECK_EQ(values.size(), kTotalPits + 2);
   auto value_it = values.begin();
   for (int count : board_) {
     *value_it++ = count;
   }
+  *value_it++ = current_player_;
+  *value_it++ = move_number_;
   SPIEL_CHECK_EQ(value_it, values.end());
 }
 
