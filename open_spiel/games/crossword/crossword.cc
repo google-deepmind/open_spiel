@@ -402,7 +402,7 @@ std::string CrosswordState::ToString() const {
         if (CharAt(r, c) == kBlockedCell) {
           absl::StrAppend(&result, "## ");
         } else if (CharAt(r, c) == kEmptyCell) {
-          absl::StrAppend(&result, "   ");
+          absl::StrAppend(&result, " . ");
           continue;
         } else {
           absl::StrAppend(&result, " ");
