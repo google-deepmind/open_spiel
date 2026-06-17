@@ -125,9 +125,9 @@ const GameType kGameType{/*short_name=*/"cribbage",
                          GameType::RewardModel::kRewards,
                          /*max_num_players=*/4,
                          /*min_num_players=*/2,
-                         /*provides_information_state_string=*/false,
+                         /*provides_information_state_string=*/true,
                          /*provides_information_state_tensor=*/false,
-                         /*provides_observation_string=*/false,
+                         /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
                          {{"players", GameParameter(kDefaultNumPlayers)},
@@ -481,7 +481,52 @@ std::vector<double> CribbageState::Returns() const {
 std::string CribbageState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, game_->NumPlayers());
-  return "";
+  std::string str;
+  absl::StrAppend(&str, "Round: ", round_, "\n");
+  absl::StrAppend(
+      &str, "Phase: ", phase_ == Phase::kCardPhase ? "Card" : "Play", "\n");
+  absl::StrAppend(&str, "Dealer: ", dealer_, "\n");
+  absl::StrAppend(&str, "Cur player: ", cur_player_, "\n");
+  absl::StrAppend(&str, "Scores:");
+  for (int p = 0; p < num_players_; ++p) {
+    absl::StrAppend(&str, " ", scores_[p]);
+  }
+  absl::StrAppend(&str, "\n");
+  if (starter_.has_value()) {
+    absl::StrAppend(&str, "Starter: ", (*starter_).to_string(), "\n");
+  }
+  absl::StrAppend(&str, "Hand:");
+  for (int i = 0; i < hands_[player].size(); ++i) {
+    absl::StrAppend(&str, " ", hands_[player][i].to_string());
+  }
+  absl::StrAppend(&str, "\n");
+  absl::StrAppend(&str, "Running total: ", current_sum_, "\n");
+  absl::StrAppend(&str, "Played cards:");
+  for (int i = 0; i < played_cards_.size(); ++i) {
+    absl::StrAppend(&str, " ", played_cards_[i].to_string());
+  }
+  absl::StrAppend(&str, "\n");
+  return str;
+}
+
+std::string CribbageState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, game_->NumPlayers());
+  std::string str = ObservationString(player);
+  // Include only play-phase actions which are public (the starter card reveal
+  // and all card plays / passes). Card-phase actions (deals and crib
+  // selections) are private.
+  absl::StrAppend(&str, "Actions:");
+  SPIEL_CHECK_EQ(history_.size(), phase_history_.size());
+  for (int i = 0; i < history_.size(); ++i) {
+    if (phase_history_[i] == Phase::kPlayPhase) {
+      absl::StrAppend(
+          &str, " ",
+          ActionToString(history_[i].player, history_[i].action));
+    }
+  }
+  absl::StrAppend(&str, "\n");
+  return str;
 }
 
 bool CribbageState::AllHandsAreEmpty() const {
@@ -626,6 +671,7 @@ void CribbageState::DoEndOfPlayRound() {
 
 void CribbageState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(IsTerminal(), false);
+  phase_history_.push_back(phase_);
 
   if (IsChanceNode()) {
     SPIEL_CHECK_GE(move, 0);
