@@ -35,7 +35,7 @@ ISMCTSBot::ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator,
                      double uct_c, int max_simulations, int max_world_samples,
                      ISMCTSFinalPolicyType final_policy_type,
                      bool use_observation_string,
-                     bool allow_inconsistent_action_sets)
+                     bool allow_inconsistent_action_sets, double risk_lambda)
     : rng_(seed),
       evaluator_(evaluator),
       uct_c_(uct_c),
@@ -43,7 +43,8 @@ ISMCTSBot::ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator,
       max_world_samples_(max_world_samples),
       final_policy_type_(final_policy_type),
       use_observation_string_(use_observation_string),
-      allow_inconsistent_action_sets_(allow_inconsistent_action_sets) {}
+      allow_inconsistent_action_sets_(allow_inconsistent_action_sets),
+      risk_lambda_(risk_lambda) {}
 
 double ISMCTSBot::RandomNumber() { return absl::Uniform(rng_, 0.0, 1.0); }
 
@@ -253,7 +254,7 @@ ISMCTSNode ISMCTSBot::FilterIllegals(
 
 void ISMCTSBot::ExpandIfNecessary(ISMCTSNode* node, Action action) const {
   if (node->child_info.find(action) == node->child_info.end()) {
-    node->child_info[action] = ChildInfo{0, 0.0};
+    node->child_info[action] = ChildInfo{0, 0.0, 0.0}; // Initialize visits, sum of returns, and sum of squared returns for variance tracking.
   }
 }
 
@@ -289,9 +290,13 @@ Action ISMCTSBot::SelectActionUCB(ISMCTSNode* node) {
     SPIEL_CHECK_GT(action_and_child.second.visits, 0);
 
     Action action = action_and_child.first;
-    double uct_val = action_and_child.second.value() +
-                     uct_c_ * std::sqrt(std::log(node->total_visits) /
-                                        action_and_child.second.visits);
+    int visits = action_and_child.second.visits;
+    double mean = action_and_child.second.value();
+    
+    double var = std::max(0.0, action_and_child.second.variance()); // Estimated return variance for this action.
+    // Risk-sensitive ucb:  
+    double uct_val = (mean - risk_lambda_ * var) + //
+                     uct_c_ * std::sqrt(std::log(node->total_visits) / visits); // Prefer high-mean, low-variance actions while still exploring less-visited ones.
 
     actions_and_values.push_back({action, uct_val});
     max_value = std::max(max_value, uct_val);
@@ -334,7 +339,7 @@ Action ISMCTSBot::CheckExpand(ISMCTSNode* node,
 
 std::vector<double> ISMCTSBot::RunSimulation(State* state) {
   if (state->IsTerminal()) {
-    return state->Returns();
+  return state->Returns();
   } else if (state->IsChanceNode()) {
     Action chance_action =
         SampleAction(state->ChanceOutcomes(), RandomNumber()).first;
@@ -373,7 +378,10 @@ std::vector<double> ISMCTSBot::RunSimulation(State* state) {
 
     state->ApplyAction(chosen_action);
     std::vector<double> returns = RunSimulation(state);
-    node->child_info[chosen_action].return_sum += returns[cur_player];
+    double r = returns[cur_player];
+    // Update return statistics so variance can be estimated later.
+    node->child_info[chosen_action].return_sum += r;
+    node->child_info[chosen_action].return_sq_sum += r * r;
     return returns;
   }
 }
