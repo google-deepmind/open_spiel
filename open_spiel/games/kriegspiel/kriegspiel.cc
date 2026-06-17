@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/chess/chess.h"
@@ -46,7 +47,7 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state_string=*/false,
+    /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
@@ -81,8 +82,7 @@ chess::ObservationTable ComputePrivateInfoTable(const chess::ChessBoard &board,
 
 bool ObserverHasString(IIGObservationType iig_obs_type) {
   return iig_obs_type.public_info &&
-         iig_obs_type.private_info == PrivateInfoType::kSinglePlayer &&
-         !iig_obs_type.perfect_recall;
+         iig_obs_type.private_info == PrivateInfoType::kSinglePlayer;
 }
 bool ObserverHasTensor(IIGObservationType iig_obs_type) {
   return !iig_obs_type.perfect_recall;
@@ -137,19 +137,64 @@ class KriegspielObserver : public Observer {
     SPIEL_CHECK_LT(player, game.NumPlayers());
 
     if (iig_obs_type_.perfect_recall) {
-      SpielFatalError(
-          "KriegspielObserver: string with perfect recall is unimplemented");
+      return state.InformationStateString(player);
     }
 
     if (iig_obs_type_.public_info &&
         iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-      // No observation before the first move
-      if (state.MoveMsgHistory().empty()) {
-        return std::string();
+      std::string str;
+      const chess::Color color = chess::PlayerToColor(player);
+      const chess::ChessBoard &board = state.Board();
+      const int board_size = board.BoardSize();
+
+      // Private info: player's own piece positions in FEN-like notation.
+      // Squares without own pieces are counted as digits (like FEN empty
+      // squares).  This shows only what the player can see.
+      for (int8_t y = board_size - 1; y >= 0; --y) {
+        int unknown_count = 0;
+        for (int8_t x = 0; x < board_size; ++x) {
+          const chess::Piece &piece = board.at({x, y});
+          if (piece.color == color) {
+            if (unknown_count > 0) {
+              absl::StrAppend(&str, unknown_count);
+              unknown_count = 0;
+            }
+            absl::StrAppend(&str,
+                            chess::PieceTypeToString(
+                                piece.type, color == chess::Color::kWhite));
+          } else {
+            ++unknown_count;
+          }
+        }
+        if (unknown_count > 0) {
+          absl::StrAppend(&str, unknown_count);
+        }
+        if (y > 0) absl::StrAppend(&str, "/");
       }
 
-      // Write last umpire message
-      return state.last_umpire_msg_->ToString();
+      // Public info: side to play.
+      absl::StrAppend(&str, " ",
+                       board.ToPlay() == chess::Color::kWhite ? "w" : "b");
+
+      // Private info: own castling rights.
+      std::string castling;
+      if (board.CastlingRight(color, chess::CastlingDirection::kRight)) {
+        castling += (color == chess::Color::kWhite ? "K" : "k");
+      }
+      if (board.CastlingRight(color, chess::CastlingDirection::kLeft)) {
+        castling += (color == chess::Color::kWhite ? "Q" : "q");
+      }
+      absl::StrAppend(&str, " ", castling.empty() ? "-" : castling);
+
+      // Public info: umpire message (or "none" if no moves yet).
+      absl::StrAppend(&str, "\n");
+      if (state.last_umpire_msg_) {
+        absl::StrAppend(&str, state.last_umpire_msg_->ToString());
+      } else {
+        absl::StrAppend(&str, "none");
+      }
+
+      return str;
     } else {
       SpielFatalError(
           "KriegspielObserver: string with imperfect recall is implemented only"
@@ -597,6 +642,45 @@ std::string KriegspielState::ToString() const { return Board().ToFEN(); }
 
 std::vector<double> KriegspielState::Returns() const {
   return MaybeFinalReturns().value_or(std::vector<double>{0., 0.});
+}
+
+std::string KriegspielState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
+  const chess::Color color = chess::PlayerToColor(player);
+
+  // The information state is the full action-observation history from this
+  // player's perspective.  For Kriegspiel that means:
+  //   1. Player identifier (ensures different players always get different
+  //      strings, even at the initial state).
+  //   2. The starting FEN (shared knowledge, includes initial side to play).
+  //   3. For every entry in move_msg_history_:
+  //      - If the move was made by this player: the move (in LAN) plus the
+  //        umpire's response.
+  //      - If the move was made by the opponent: only the umpire's response
+  //        (which is all this player observes).
+  //
+  // Properties:
+  //   - Non-empty:  always starts with player identifier + FEN.
+  //   - Player-aware:  prefixed with "P0" or "P1".
+  //   - Action-consistent:  legal actions depend only on own piece positions
+  //     and tried illegal moves, both derivable from this string.
+  //   - Perfect-recall:  the full history is encoded.
+  std::string str;
+  absl::StrAppend(&str, "P", player, "\n");
+  absl::StrAppend(&str, StartBoard().ToFEN(), "\n");
+
+  for (const auto& [move, msg] : move_msg_history_) {
+    if (move.piece.color == color) {
+      // This player's own move — they know exactly what they tried.
+      absl::StrAppend(&str, move.ToLAN());
+    } else {
+      // Opponent's move — this player only observes the umpire message.
+      absl::StrAppend(&str, "?");
+    }
+    absl::StrAppend(&str, " ", msg.ToString(), "\n");
+  }
+  return str;
 }
 
 std::string KriegspielState::ObservationString(Player player) const {
