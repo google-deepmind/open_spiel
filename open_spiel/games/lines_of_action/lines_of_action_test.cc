@@ -119,7 +119,7 @@ void PlayThroughTestGames() {
     std::string full_filename = absl::StrCat(kFilePathPrefix, filename);
     std::optional<std::string> file = FindFile(full_filename, 2);
 
-    if (file != absl::nullopt) {
+    if (file != std::nullopt) {
       std::cout << "Playing through test game " << filename << std::endl;
       std::string game_trace = file::ReadContentsFromFile(*file, "r");
       std::replace(game_trace.begin(), game_trace.end(), '\n', ' ');
