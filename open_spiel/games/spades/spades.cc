@@ -516,7 +516,7 @@ void SpadesState::ApplyBiddingAction(int bid) {
 
 void SpadesState::ApplyPlayAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
-  holder_[card] = absl::nullopt;
+  holder_[card] = std::nullopt;
   if (num_cards_played_ % kNumPlayers == 0) {
     CurrentTrick() = Trick(current_player_, card);
   } else {
