@@ -30,7 +30,7 @@ constexpr int kNumLiarsDiceCFRIterations = 1;
 constexpr double kFloatTolerance = 1e-12;
 
 double NashConvTest(const std::string& game_string, const Policy& policy,
-                    std::optional<double> expected_nash_conv = absl::nullopt) {
+                    std::optional<double> expected_nash_conv = std::nullopt) {
   std::shared_ptr<const Game> game = LoadGame(game_string);
   TabularBestResponseMDP tbr(*game, policy);
   TabularBestResponseMDPInfo br_info = tbr.NashConv();

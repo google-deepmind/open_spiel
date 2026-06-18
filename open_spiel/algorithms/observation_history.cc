@@ -40,13 +40,13 @@ ActionObservationHistory::ActionObservationHistory(Player player,
   history_.reserve(history.size());
 
   std::unique_ptr<State> state = target.GetGame()->NewInitialState();
-  history_.push_back({absl::nullopt, state->ObservationString(player)});
+  history_.push_back({std::nullopt, state->ObservationString(player)});
   for (int i = 0; i < history.size(); i++) {
     const auto& [history_player, action] = history[i];
     const bool is_acting = state->CurrentPlayer() == player;
     state->ApplyAction(action);
     history_.push_back(
-        {is_acting ? action : static_cast<std::optional<Action>>(absl::nullopt),
+        {is_acting ? action : static_cast<std::optional<Action>>(std::nullopt),
          state->ObservationString(player)});
   }
 }
@@ -60,12 +60,12 @@ ActionObservationHistory::ActionObservationHistory(
     : player_(player), history_(std::move(history)) {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_FALSE(history_.empty());  // There is always an obs for root node.
-  SPIEL_CHECK_EQ(history_[0].first, absl::nullopt);  // No action available.
+  SPIEL_CHECK_EQ(history_[0].first, std::nullopt);  // No action available.
 }
 
 int ActionObservationHistory::MoveNumber() const {
   SPIEL_CHECK_FALSE(history_.empty());
-  SPIEL_CHECK_EQ(history_.at(0).first, absl::nullopt);
+  SPIEL_CHECK_EQ(history_.at(0).first, std::nullopt);
   return history_.size() - 1;
 }
 
@@ -166,7 +166,7 @@ bool ActionObservationHistory::CheckStateCorrespondenceInSimulation(
     if (simulation->CurrentPlayer() == pl) {
       if (history_[j].first != state_history[i].action) return false;
     } else {
-      if (history_[j].first != absl::nullopt) return false;
+      if (history_[j].first != std::nullopt) return false;
     }
 
     simulation->ApplyAction(state_history[i].action);
@@ -184,7 +184,7 @@ std::string ActionObservationHistory::ToString() const {
     const auto& action_observation = history_[i];
     if (i > 0) absl::StrAppend(&s, ", ");
     absl::StrAppend(&s, "(action=",
-                    (action_observation.first == absl::nullopt
+                    (action_observation.first == std::nullopt
                          ? "None"
                          : std::to_string(*action_observation.first)),
                     ", observation=\"", action_observation.second, "\")");

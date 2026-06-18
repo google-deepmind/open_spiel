@@ -24,7 +24,7 @@ void CheckKuhnPokerObservationHistory() {
   using AOH = ActionObservationHistory;
   using POH = PublicObservationHistory;
   // Use NONE constant to make it similar to the Python test.
-  constexpr std::optional<Action> NONE = absl::nullopt;
+  constexpr std::optional<Action> NONE = std::nullopt;
 
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
 
