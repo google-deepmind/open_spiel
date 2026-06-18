@@ -21,6 +21,7 @@
 
 #include "open_spiel/abseil-cpp/absl/random/discrete_distribution.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -35,11 +36,13 @@ ISMCTSBot::ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator,
                      double uct_c, int max_simulations, int max_world_samples,
                      ISMCTSFinalPolicyType final_policy_type,
                      bool use_observation_string,
-                     bool allow_inconsistent_action_sets)
+                     bool allow_inconsistent_action_sets,
+                     double max_wall_clock_time)
     : rng_(seed),
       evaluator_(evaluator),
       uct_c_(uct_c),
       max_simulations_(max_simulations),
+      max_wall_clock_time_(max_wall_clock_time),
       max_world_samples_(max_world_samples),
       final_policy_type_(final_policy_type),
       use_observation_string_(use_observation_string),
@@ -79,7 +82,12 @@ ActionsAndProbs ISMCTSBot::RunSearch(const State& state) {
 
   auto root_infostate_key = GetStateKey(state);
 
-  for (int sim = 0; sim < max_simulations_; ++sim) {
+  absl::Time start_time = absl::Now();
+  for (int sim = 0; (max_wall_clock_time_ > 0
+                         ? absl::ToDoubleSeconds(absl::Now() - start_time) <
+                               max_wall_clock_time_
+                         : sim < max_simulations_);
+       ++sim) {
     std::unique_ptr<State> sampled_root_state = SampleRootState(state);
     SPIEL_CHECK_TRUE(root_infostate_key == GetStateKey(*sampled_root_state));
     SPIEL_CHECK_TRUE(sampled_root_state != nullptr);

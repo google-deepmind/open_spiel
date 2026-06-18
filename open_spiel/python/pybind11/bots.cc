@@ -127,21 +127,23 @@ void init_pyspiel_bots(py::module& m) {
       .def("children_str", &SearchNode::ChildrenStr);
 
   py::classh<algorithms::MCTSBot, Bot>(m, "MCTSBot")
-      .def(
-          py::init([](std::shared_ptr<const Game> game,
-                      std::shared_ptr<Evaluator> evaluator, double uct_c,
-                      int max_simulations, int64_t max_memory_mb, bool solve,
-                      int seed, bool verbose,
-                      algorithms::ChildSelectionPolicy child_selection_policy) {
-            return new algorithms::MCTSBot(
-                *game, evaluator, uct_c, max_simulations, max_memory_mb, solve,
-                seed, verbose, child_selection_policy);
-          }),
-          py::arg("game"), py::arg("evaluator"), py::arg("uct_c"),
-          py::arg("max_simulations"), py::arg("max_memory_mb"),
-          py::arg("solve"), py::arg("seed"), py::arg("verbose"),
-          py::arg("child_selection_policy") =
-              algorithms::ChildSelectionPolicy::UCT)
+      .def(py::init([](std::shared_ptr<const Game> game,
+                       std::shared_ptr<Evaluator> evaluator, double uct_c,
+                       int max_simulations, int64_t max_memory_mb, bool solve,
+                       int seed, bool verbose,
+                       algorithms::ChildSelectionPolicy child_selection_policy,
+                       double max_wall_clock_time) {
+             return new algorithms::MCTSBot(
+                 *game, evaluator, uct_c, max_simulations, max_memory_mb, solve,
+                 seed, verbose, child_selection_policy, 0.0, 0.0, false,
+                 max_wall_clock_time);
+           }),
+           py::arg("game"), py::arg("evaluator"), py::arg("uct_c"),
+           py::arg("max_simulations"), py::arg("max_memory_mb"),
+           py::arg("solve"), py::arg("seed"), py::arg("verbose"),
+           py::arg("child_selection_policy") =
+               algorithms::ChildSelectionPolicy::UCT,
+           py::arg("max_wall_clock_time") = -1.0)
       .def("step", &algorithms::MCTSBot::Step,
            py::call_guard<py::gil_scoped_release>())
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
@@ -155,14 +157,15 @@ void init_pyspiel_bots(py::module& m) {
 
   py::classh<algorithms::ISMCTSBot, Bot>(m, "ISMCTSBot")
       .def(py::init<int, std::shared_ptr<Evaluator>, double, int, int,
-                    algorithms::ISMCTSFinalPolicyType, bool, bool>(),
+                    algorithms::ISMCTSFinalPolicyType, bool, bool, double>(),
            py::arg("seed"), py::arg("evaluator"), py::arg("uct_c"),
            py::arg("max_simulations"),
            py::arg("max_world_samples") = algorithms::kUnlimitedNumWorldSamples,
            py::arg("final_policy_type") =
                algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount,
            py::arg("use_observation_string") = false,
-           py::arg("allow_inconsistent_action_sets") = false)
+           py::arg("allow_inconsistent_action_sets") = false,
+           py::arg("max_wall_clock_time") = -1.0)
       .def("step", &algorithms::ISMCTSBot::Step,
            py::call_guard<py::gil_scoped_release>())
       .def("provides_policy", &algorithms::MCTSBot::ProvidesPolicy)
