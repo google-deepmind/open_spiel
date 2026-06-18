@@ -612,7 +612,7 @@ std::optional<std::vector<double>> CrazyhouseState::MaybeFinalReturns() const {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::string CrazyhouseState::Serialize() const {

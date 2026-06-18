@@ -111,7 +111,7 @@ std::optional<PieceType> PieceTypeFromChar(char c) {
       return PieceType::kQueenP;
     default:
       std::cerr << "Invalid piece type: " << c << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
   }
 }
 
@@ -217,7 +217,7 @@ std::optional<Square> SquareFromString(const std::string& s) {
   auto file = ParseFile(s[0]);
   auto rank = ParseRank(s[1]);
   if (file && rank) return Square{*file, *rank};
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 bool IsLongDiagonal(const crazyhouse::Square& from_sq,
@@ -459,7 +459,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     auto rb = fen_copy.find(']', lb);
     if (rb == std::string::npos) {
       std::cerr << "Malformed pocket section in FEN: " << fen << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
     pocket_section = fen_copy.substr(lb + 1, rb - lb - 1);
     fen_copy.erase(lb, rb - lb + 1);
@@ -483,7 +483,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
 
   if (fen_parts.size() != 6 && fen_parts.size() != 4) {
     std::cerr << "Invalid FEN: " << fen << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   std::string& piece_configuration = fen_parts[0];
@@ -509,7 +509,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     for (char c : rank) {
       if (current_x >= board_size) {
         std::cerr << "Too many things on FEN rank: " << rank << std::endl;
-        return absl::nullopt;
+        return std::nullopt;
       }
 
       if (c >= '1' && c <= '8') {
@@ -518,7 +518,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
         auto piece_type = PieceTypeFromChar(c);
         if (!piece_type) {
           std::cerr << "Invalid piece type in FEN: " << c << std::endl;
-          return absl::nullopt;
+          return std::nullopt;
         }
 
         Color color = isupper(c) ? Color::kWhite : Color::kBlack;
@@ -536,7 +536,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     board.SetToPlay(Color::kWhite);
   } else {
     std::cerr << "Invalid side to move in FEN: " << side_to_move << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   // Castling rights are done differently in standard FEN versus shredder FEN.
@@ -603,7 +603,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     if (!maybe_ep_square) {
       std::cerr << "Invalid en passant square in FEN: " << ep_square
                 << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
     // Only set the en-passant square if it's being threatened. This is to
     // prevent changing the hash of the board for the purposes of the
@@ -624,7 +624,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
       PieceType pptype = *opt;
       if (!opt) {
         std::cerr << "Invalid pocket char in FEN: " << pc << std::endl;
-        return absl::nullopt;
+        return std::nullopt;
       }
       if (white) {
         board.AddToPocket(Color::kWhite, pptype, 1);
@@ -1054,7 +1054,7 @@ std::optional<Move> CrazyhouseBoard::ParseMove(const std::string& move,
     return san_move;
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::optional<Move> CrazyhouseBoard::ParseSANMove(
@@ -1065,7 +1065,7 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
     return drop_move;
   }
 
-  if (move.empty()) return absl::nullopt;
+  if (move.empty()) return std::nullopt;
 
   if (absl::StartsWith(move, "O-O-O")) {
     // Queenside / left castling.
@@ -1078,7 +1078,7 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
     });
     if (candidates.size() == 1) return candidates[0];
     std::cerr << "Invalid O-O-O" << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   if (absl::StartsWith(move, "O-O")) {
@@ -1092,13 +1092,13 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
     });
     if (candidates.size() == 1) return candidates[0];
     std::cerr << "Invalid O-O" << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   auto move_annotation = SplitAnnotations(move);
   move = move_annotation.first;
   if (move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   auto annotation = move_annotation.second;
@@ -1111,7 +1111,7 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
     auto maybe_piece_type = PieceTypeFromChar(move[0]);
     if (!maybe_piece_type) {
       std::cerr << "Invalid piece type: " << move[0] << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
     piece_type = *maybe_piece_type;
     move = std::string(absl::ClippedSubstr(move, 1));
@@ -1120,7 +1120,7 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
   // A move always ends with the destination square.
   if (move.size() < 2) {
     std::cerr << "Missing destination square" << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
   auto destination = std::string(absl::ClippedSubstr(move, move.size() - 2));
   move = move.substr(0, move.size() - 2);
@@ -1131,7 +1131,7 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
   if (!dest_file || !dest_rank) {
     std::cerr << "Failed to parse destination square: " << destination
               << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   Square destination_square{*dest_file, *dest_rank};
@@ -1159,14 +1159,14 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
   }
 
   if (!move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   // Pawn promations are annotated with =Q to indicate the promotion type.
   std::optional<PieceType> promotion_type;
   if (!annotation.empty() && annotation[0] == '=') {
     if (annotation.size() < 2) {
-      return absl::nullopt;
+      return std::nullopt;
     }
     auto maybe_piece = PieceTypeFromChar(annotation[1]);
     if (!maybe_piece) return std::optional<Move>();
@@ -1195,7 +1195,7 @@ std::optional<Move> CrazyhouseBoard::ParseSANMove(
 std::optional<Move> CrazyhouseBoard::ParseDropMove(
     const std::string& move) const {
   if (move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
   if (move.size() == 4 && move[1] == '@') {
     char pc = move[0];
@@ -1205,20 +1205,20 @@ std::optional<Move> CrazyhouseBoard::ParseDropMove(
     // Validate square
     if (file < 'a' || file >= ('a' + board_size_) || rank < '1' ||
         rank >= ('1' + board_size_)) {
-      return absl::nullopt;
+      return std::nullopt;
     }
 
     // Parse piece type
     std::optional<PieceType> opt = PieceTypeFromChar(pc);
-    if (!opt) return absl::nullopt;
+    if (!opt) return std::nullopt;
 
     PieceType ptype = *opt;
 
     // Disallow illegal drops
-    if (ptype == PieceType::kKing) return absl::nullopt;
+    if (ptype == PieceType::kKing) return std::nullopt;
 
     auto to = SquareFromString(move.substr(2, 2));
-    if (!to) return absl::nullopt;
+    if (!to) return std::nullopt;
 
     // Construct drop move
     Move drop;
@@ -1229,13 +1229,13 @@ std::optional<Move> CrazyhouseBoard::ParseDropMove(
     return drop;
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
                                                   bool chess960) const {
   if (move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
   auto drop_move = ParseDropMove(move);
   if (drop_move) {
@@ -1250,12 +1250,12 @@ std::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
         move[1] >= ('1' + board_size_) || move[2] < 'a' ||
         move[2] >= ('a' + board_size_) || move[3] < '1' ||
         move[3] >= ('1' + board_size_)) {
-      return absl::nullopt;
+      return std::nullopt;
     }
 
     if (move.size() == 5 && move[4] != 'q' && move[4] != 'r' &&
         move[4] != 'b' && move[4] != 'n') {
-      return absl::nullopt;
+      return std::nullopt;
     }
 
     auto from = SquareFromString(move.substr(0, 2));
@@ -1266,7 +1266,7 @@ std::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
         promotion_type = PieceTypeFromChar(move[4]);
         if (!promotion_type) {
           std::cerr << "Invalid promotion type" << std::endl;
-          return absl::nullopt;
+          return std::nullopt;
         }
       }
 
@@ -1331,7 +1331,7 @@ std::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
       return candidates[0];
     }
   } else {
-    return absl::nullopt;
+    return std::nullopt;
   }
   SpielFatalError("All conditionals failed; this is a bug.");
 }
@@ -1410,23 +1410,23 @@ void CrazyhouseBoard::ApplyMove(const Move& move) {
   if (moving_piece.type == PieceType::kRook) {
     if (castling_rights_[ToInt(to_play_)].left_castle.has_value() &&
         *castling_rights_[ToInt(to_play_)].left_castle == move.from) {
-      SetCastlingRight(to_play_, CastlingDirection::kLeft, absl::nullopt);
+      SetCastlingRight(to_play_, CastlingDirection::kLeft, std::nullopt);
     } else if (castling_rights_[ToInt(to_play_)].right_castle.has_value() &&
                *castling_rights_[ToInt(to_play_)].right_castle == move.from) {
-      SetCastlingRight(to_play_, CastlingDirection::kRight, absl::nullopt);
+      SetCastlingRight(to_play_, CastlingDirection::kRight, std::nullopt);
     }
   }
   if (destination_piece.type == PieceType::kRook) {
     if (castling_rights_[ToInt(OppColor(to_play_))].left_castle.has_value() &&
         *castling_rights_[ToInt(OppColor(to_play_))].left_castle == move.to) {
       SetCastlingRight(OppColor(to_play_), CastlingDirection::kLeft,
-                       absl::nullopt);
+                       std::nullopt);
     } else if (castling_rights_[ToInt(OppColor(to_play_))]
                    .right_castle.has_value() &&
                *castling_rights_[ToInt(OppColor(to_play_))].right_castle ==
                    move.to) {
       SetCastlingRight(OppColor(to_play_), CastlingDirection::kRight,
-                       absl::nullopt);
+                       std::nullopt);
     }
   }
 
@@ -1462,8 +1462,8 @@ void CrazyhouseBoard::ApplyMove(const Move& move) {
   }
 
   if (moving_piece.type == PieceType::kKing) {
-    SetCastlingRight(to_play_, CastlingDirection::kLeft, absl::nullopt);
-    SetCastlingRight(to_play_, CastlingDirection::kRight, absl::nullopt);
+    SetCastlingRight(to_play_, CastlingDirection::kLeft, std::nullopt);
+    SetCastlingRight(to_play_, CastlingDirection::kRight, std::nullopt);
   }
 
   // 2. En-passant
