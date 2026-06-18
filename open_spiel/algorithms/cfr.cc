@@ -272,7 +272,7 @@ void CFRSolverBase::EvaluateAndUpdatePolicy() {
       ApplyRegretMatching();
     }
   } else {
-    ComputeCounterFactualRegret(*root_state_, absl::nullopt, root_reach_probs_,
+    ComputeCounterFactualRegret(*root_state_, std::nullopt, root_reach_probs_,
                                 nullptr);
     if (regret_matching_plus_) {
       ApplyRegretMatchingPlusReset();
