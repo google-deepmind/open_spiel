@@ -749,7 +749,7 @@ std::optional<std::vector<double>> KriegspielState::MaybeFinalReturns() const {
     return std::vector<double>{kDrawUtility, kDrawUtility};
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 KriegspielGame::KriegspielGame(const GameParameters &params)
