@@ -490,7 +490,7 @@ void HeartsState::ApplyDealAction(int card) {
 
 void HeartsState::ApplyPassAction(int card) {
   passed_cards_[current_player_].push_back(card);
-  holder_[card] = absl::nullopt;
+  holder_[card] = std::nullopt;
   if (passed_cards_[current_player_].size() % kNumCardsInPass == 0)
     ++current_player_;
   if (current_player_ == kNumPlayers) {
@@ -508,7 +508,7 @@ void HeartsState::ApplyPassAction(int card) {
 
 void HeartsState::ApplyPlayAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
-  holder_[card] = absl::nullopt;
+  holder_[card] = std::nullopt;
   if (num_cards_played_ % kNumPlayers == 0) {
     CurrentTrick() = Trick(current_player_, card, jd_bonus_);
   } else {
@@ -602,7 +602,7 @@ std::optional<Player> HeartsState::Played(int card) const {
     return p;
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 bool HeartsState::KnowsLocation(Player player, int card) const {
