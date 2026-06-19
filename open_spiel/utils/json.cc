@@ -68,7 +68,7 @@ std::nullopt_t ParseError(absl::string_view error, absl::string_view str) {
                                    std::min(30, static_cast<int>(str.size()))));
 
   // TODO(author7): Maybe return a variant of error string or Value?
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 bool ConsumeToken(absl::string_view* str, absl::string_view token) {
@@ -170,7 +170,7 @@ std::optional<Array> ParseArray(absl::string_view* str) {
     ConsumeWhitespace(str);
     std::optional<Value> v = ParseValue(str);
     if (!v) {
-      return absl::nullopt;
+      return std::nullopt;
     }
     out.push_back(*v);
   }
@@ -195,7 +195,7 @@ std::optional<Object> ParseObject(absl::string_view* str) {
     ConsumeWhitespace(str);
     std::optional<std::string> key = ParseString(str);
     if (!key) {
-      return absl::nullopt;
+      return std::nullopt;
     }
     ConsumeWhitespace(str);
     if (!ConsumeToken(str, ":")) {
@@ -204,7 +204,7 @@ std::optional<Object> ParseObject(absl::string_view* str) {
     ConsumeWhitespace(str);
     std::optional<Value> v = ParseValue(str);
     if (!v) {
-      return absl::nullopt;
+      return std::nullopt;
     }
     out.emplace(*key, *v);
   }
