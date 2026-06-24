@@ -307,7 +307,7 @@ PYBIND11_MODULE(pyspiel, m) {
                     int>(),
            py::arg("num_distinct_actions"), py::arg("max_chance_outcomes"),
            py::arg("num_players"), py::arg("min_utility"),
-           py::arg("max_utility"), py::arg("utility_sum") = absl::nullopt,
+           py::arg("max_utility"), py::arg("utility_sum") = std::nullopt,
            py::arg("max_game_length"))
       .def(py::init<const GameInfo&>())
       .def_readonly("num_distinct_actions", &GameInfo::num_distinct_actions)
@@ -480,20 +480,17 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("num_distinct_actions", &Game::NumDistinctActions)
       .def("new_initial_states", &Game::NewInitialStates)
       .def("new_initial_state",
-           (std::unique_ptr<State>(open_spiel::Game::*)() const)
-           &Game::NewInitialState)
-      .def("new_initial_state",
-           (std::unique_ptr<State>(open_spiel::Game::*)(
-                                   const std::string&) const)
-           &Game::NewInitialState)
-      .def("new_initial_state",
-           (std::unique_ptr<State>(open_spiel::Game::*)(
-                                   const nlohmann::json&) const)
-           &Game::NewInitialState)
-      .def("new_initial_state",
-           (std::unique_ptr<State>(open_spiel::Game::*)(
-                                   const StateStruct&) const)
-           &Game::NewInitialState)
+           (std::unique_ptr<State> (open_spiel::Game::*)() const) &
+               Game::NewInitialState)
+      .def("new_initial_state", (std::unique_ptr<State> (open_spiel::Game::*)(
+                                    const std::string&) const) &
+                                    Game::NewInitialState)
+      .def("new_initial_state", (std::unique_ptr<State> (open_spiel::Game::*)(
+                                    const nlohmann::json&) const) &
+                                    Game::NewInitialState)
+      .def("new_initial_state", (std::unique_ptr<State> (open_spiel::Game::*)(
+                                    const StateStruct&) const) &
+                                    Game::NewInitialState)
       .def("new_initial_state_for_population",
            &Game::NewInitialStateForPopulation)
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
@@ -528,7 +525,7 @@ PYBIND11_MODULE(pyspiel, m) {
            })
       .def("make_observer",
            [](std::shared_ptr<const Game> game, const GameParameters& params) {
-             return game->MakeObserver(absl::nullopt, params);
+             return game->MakeObserver(std::nullopt, params);
            })
       .def("__str__", &Game::ToString)
       .def("__repr__", &Game::ToString)
