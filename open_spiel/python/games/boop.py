@@ -31,7 +31,8 @@ Rules:
   - Win: 3 of your cats in a row (any of 8 directions)
   - Promote: 3 of your kittens in a row -> remove from board (back to hand),
     earn cats (capped at 6 total cats per player across hand + board)
-  - Draw: game reaches 500 moves without a winner
+  - Draw: game reaches 500 moves without a winner, or both players
+    simultaneously have no pieces to place
 
 Action encoding: piece_type * 36 + row * 6 + col
   piece_type 0 = kitten, piece_type 1 = cat
@@ -180,6 +181,12 @@ class BoopState(pyspiel.State):
         return
 
     self._cur_player = 1 - p
+    # Real Boop rule: skip the next player's turn if they have no pieces.
+    # Only declare a draw if BOTH players are simultaneously out of pieces.
+    if not self._legal_actions(self._cur_player):
+      self._cur_player = p  # stay with current player
+      if not self._legal_actions(self._cur_player):
+        self._is_terminal = True  # both stuck -> draw
 
   def _action_to_string(self, player, action):
     pt = action // _NUM_CELLS
