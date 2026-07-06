@@ -230,6 +230,21 @@ void MoveConversionTests() {
   }
 }
 
+void SFENRoundTripPromotedRookTest() {
+  // Regression test: PieceTypeToString returned "+R" (uppercase) for both
+  // Black and White promoted rooks, causing White promoted rooks to be
+  // serialized incorrectly in SFEN. A round-trip through ToSFEN→BoardFromSFEN
+  // would flip the White promoted rook to Black.
+  std::shared_ptr<const Game> game = LoadGame("shogi");
+  // Position with a White promoted rook (+r) at 8h.
+  const std::string sfen =
+      "lnsgkgsnl/7b1/ppppppppp/9/9/9/"
+      "PPPPPPPPP/1+r5R1/LNSGKGSNL b - 1";
+  ShogiState state(game, sfen);
+  std::string round_tripped = state.Board().ToSFEN();
+  SPIEL_CHECK_EQ(sfen, round_tripped);
+}
+
 void SerializaitionTests() {
   auto game = LoadGame("shogi");
 
@@ -256,6 +271,7 @@ void SerializaitionTests() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::shogi::SFENRoundTripPromotedRookTest();
   open_spiel::shogi::BasicShogiTests();
   open_spiel::shogi::UndoTests();
   open_spiel::shogi::ObservationTensorTests();

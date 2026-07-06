@@ -176,7 +176,7 @@ std::string PieceTypeToString(PieceType p, bool uppercase) {
     case PieceType::kSilverP:
       return uppercase ? "+S" : "+s";
     case PieceType::kRookP:
-      return uppercase ? "+R" : "+R";
+      return uppercase ? "+R" : "+r";
     case PieceType::kBishopP:
       return uppercase ? "+B" : "+b";
     default:
