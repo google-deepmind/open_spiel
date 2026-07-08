@@ -194,7 +194,7 @@ void NineMensMorrisState::GetCurrentLegalActions() {
         if (player == current_player_) {
           for (int dir = 0; dir < 4; ++dir) {
             int np = kPointNeighbors[p][dir];
-            if (np > 0 && board_[np] == CellState::kEmpty) {
+            if (np >= 0 && board_[np] == CellState::kEmpty) {
               cur_legal_actions_.push_back(ToMoveAction(p, np));
             }
           }
