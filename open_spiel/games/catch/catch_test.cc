@@ -102,6 +102,84 @@ void ToStringTest() {
                  "..x..\n");
 }
 
+void TestStateStruct() {
+  auto game = LoadGame("catch");
+  auto state = game->NewInitialState();
+  
+  // Chance action to initialize the ball (say, column 2)
+  state->ApplyAction(2);
+  
+  CatchState* catch_state = static_cast<CatchState*>(state.get());
+  auto state_struct = catch_state->ToStruct();
+  
+  // Test state/state_struct -> json string.
+  SPIEL_CHECK_EQ(state_struct->ToJson(), catch_state->ToJson());
+  std::string state_json =
+      "{\"ball_col\":2,\"ball_row\":0,\"paddle_col\":2}";
+  SPIEL_CHECK_EQ(state_struct->ToJson(), state_json);
+  
+  // Test json string -> state_struct.
+  SPIEL_CHECK_EQ(nlohmann::json::parse(state_json).dump(),
+                 CatchStateStruct(state_json).ToJson());
+
+  // Test JSON integration via NewInitialState(json)
+  auto state_from_json = game->NewInitialState(state_json);
+  auto* catch_state_from_json = static_cast<CatchState*>(state_from_json.get());
+  SPIEL_CHECK_EQ(catch_state_from_json->ball_col(), 2);
+  SPIEL_CHECK_EQ(catch_state_from_json->ball_row(), 0);
+  SPIEL_CHECK_EQ(catch_state_from_json->paddle_col(), 2);
+}
+
+void TestObservationStruct() {
+  auto game = LoadGame("catch");
+  auto state = game->NewInitialState();
+  state->ApplyAction(2);  // ball at col 2
+  
+  CatchState* catch_state = static_cast<CatchState*>(state.get());
+  auto obs_struct = catch_state->ToObservationStruct(0);
+  std::string obs_json =
+      "{\"ball_col\":2,\"ball_row\":0,\"paddle_col\":2}";
+  SPIEL_CHECK_EQ(obs_struct->ToJson(), obs_json);
+  SPIEL_CHECK_EQ(nlohmann::json::parse(obs_json).dump(),
+                 CatchObservationStruct(obs_json).ToJson());
+}
+
+void TestActionStruct() {
+  auto game = LoadGame("catch");
+  auto state = game->NewInitialState();
+  state->ApplyAction(2); // ball at col 2
+  
+  auto* catch_state = static_cast<CatchState*>(state.get());
+
+  // Test ActionToStruct.
+  Action action_id = kLeft;  // paddle moves left
+  auto action_struct = catch_state->ActionToStruct(0, action_id);
+  std::string action_json = "{\"direction\":\"left\"}";
+  SPIEL_CHECK_EQ(action_struct->ToJson(), action_json);
+
+  // Test ApplyActionStruct.
+  auto state2 = game->NewInitialState();
+  state2->ApplyAction(2);
+  Status status = state2->ApplyActionStruct(*action_struct);
+  SPIEL_CHECK_TRUE(status.ok());
+  auto* state2_catch = static_cast<CatchState*>(state2.get());
+  // Paddle was at 2 (since num_columns / 2 = 5 / 2 = 2). Moved left -> 1.
+  SPIEL_CHECK_EQ(state2_catch->paddle_col(), 1);
+
+  // Test ValidateActionStruct with valid action.
+  auto state3 = game->NewInitialState();
+  state3->ApplyAction(2);
+  SPIEL_CHECK_TRUE(state3->ValidateActionStruct(*action_struct).ok());
+
+  // Test JSON parsing.
+  SPIEL_CHECK_EQ(nlohmann::json::parse(action_json).dump(),
+                 CatchActionStruct(action_json).ToJson());
+
+  // Test StructToActions.
+  std::vector<Action> expected_actions = {action_id};
+  SPIEL_CHECK_EQ(expected_actions, catch_state->StructToActions(*action_struct));
+}
+
 }  // namespace
 }  // namespace catch_
 }  // namespace open_spiel
@@ -111,4 +189,7 @@ int main(int argc, char** argv) {
   open_spiel::catch_::GetAllStatesTest();
   open_spiel::catch_::PlayAndWinTest();
   open_spiel::catch_::ToStringTest();
+  open_spiel::catch_::TestStateStruct();
+  open_spiel::catch_::TestObservationStruct();
+  open_spiel::catch_::TestActionStruct();
 }
