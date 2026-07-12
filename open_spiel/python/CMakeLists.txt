@@ -280,6 +280,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
+  tests/vector_env_test.py
   tests/sampled_stochastic_games_test.py
   tests/sgf_reader_test.py
   tests/tensor_game_utils_test.py
