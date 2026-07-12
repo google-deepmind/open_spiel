@@ -143,7 +143,7 @@ std::optional<PieceType> PieceTypeFromChar(char c) {
       return PieceType::kPawn;
     default:
       std::cerr << "Invalid piece type: " << c << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
   }
 }
 
@@ -198,7 +198,7 @@ std::optional<Square> SquareFromString(const std::string& s) {
   auto file = ParseFile(s[0]);
   auto rank = ParseRank(s[1]);
   if (file && rank) return Square{*file, *rank};
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::string Move::ToString() const {
@@ -228,7 +228,7 @@ ShogiBoard::ShogiBoard()
   std::vector<std::string> fen_parts = absl::StrSplit(fen, ' ');
   if (fen_parts.size() != 4) {
     std::cerr << "Invalid FEN: " << fen << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
   std::string& piece_configuration = fen_parts[0];
   std::string& side_to_move = fen_parts[1];
@@ -246,7 +246,7 @@ ShogiBoard::ShogiBoard()
 
       if (current_x >= kBoardSize) {
         std::cerr << "Too many things on SFEN rank: " << rank << std::endl;
-        return absl::nullopt;
+        return std::nullopt;
       }
 
       // Empty squares
@@ -260,14 +260,14 @@ ShogiBoard::ShogiBoard()
         ++i;
         if (i >= rank.size()) {
           std::cerr << "Dangling + in SFEN rank: " << rank << std::endl;
-          return absl::nullopt;
+          return std::nullopt;
         }
         c = rank[i];
       }
       auto piece_type = PieceTypeFromChar(c);
       if (!piece_type) {
         std::cerr << "Invalid piece type in SFEN: " << c << std::endl;
-        return absl::nullopt;
+        return std::nullopt;
       }
 
       PieceType final_type = promoted ? PromotedType(*piece_type) : *piece_type;
@@ -281,7 +281,7 @@ ShogiBoard::ShogiBoard()
 
     if (current_x != kBoardSize) {
       std::cerr << "Incorrect number of squares in rank: " << rank << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
   }
 
@@ -307,7 +307,7 @@ ShogiBoard::ShogiBoard()
       auto piece_type = PieceTypeFromChar(c);
       if (!piece_type) {
         std::cerr << "Invalid piece in SFEN hand: " << c << std::endl;
-        return absl::nullopt;
+        return std::nullopt;
       }
       Color color = std::isupper(c) ? Color::kBlack : Color::kWhite;
 
@@ -325,7 +325,7 @@ ShogiBoard::ShogiBoard()
     board.SetToPlay(Color::kWhite);
   } else {
     std::cerr << "Invalid side to move in FEN: " << side_to_move << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
   board.SetMovenumber(std::stoi(move_number));
   return board;
@@ -595,27 +595,27 @@ std::optional<Move> ShogiBoard::ParseMove(const std::string& move) const {
     return lan_move;
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::optional<Move> ShogiBoard::ParseDropMove(const std::string& move) const {
   if (move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
   if (move.size() == 4 && move[1] == '*') {
     char pc = move[0];
 
     // Parse piece type
     std::optional<PieceType> opt = PieceTypeFromChar(pc);
-    if (!opt) return absl::nullopt;
+    if (!opt) return std::nullopt;
 
     PieceType ptype = *opt;
 
     // Disallow illegal drops
-    if (ptype == PieceType::kKing) return absl::nullopt;
+    if (ptype == PieceType::kKing) return std::nullopt;
 
     auto to = SquareFromString(move.substr(2, 2));
-    if (!to) return absl::nullopt;
+    if (!to) return std::nullopt;
 
     // Construct drop move
     Move drop;
@@ -625,11 +625,11 @@ std::optional<Move> ShogiBoard::ParseDropMove(const std::string& move) const {
     drop.drop = true;
     return drop;
   }
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::optional<Move> ShogiBoard::ParseLANMove(const std::string& move) const {
-  if (move.empty()) return absl::nullopt;
+  if (move.empty()) return std::nullopt;
 
   // Try drop syntax first.
   if (auto drop_move = ParseDropMove(move)) {
@@ -637,7 +637,7 @@ std::optional<Move> ShogiBoard::ParseLANMove(const std::string& move) const {
   }
 
   // Non-drop LAN: "6g6f" or "6g6f+"
-  if (move.size() != 4 && move.size() != 5) return absl::nullopt;
+  if (move.size() != 4 && move.size() != 5) return std::nullopt;
 
   // Validate coordinate characters
   auto in_file = [](char c) { return c >= '1' && c < ('1' + kBoardSize); };
@@ -645,40 +645,40 @@ std::optional<Move> ShogiBoard::ParseLANMove(const std::string& move) const {
 
   if (!in_file(move[0]) || !in_rank(move[1]) || !in_file(move[2]) ||
       !in_rank(move[3])) {
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   bool promo = false;
   if (move.size() == 5) {
     if (move[4] != '+') {
       std::cerr << "Illegal move - " << move << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
     promo = true;
   }
 
   auto from_opt = SquareFromString(move.substr(0, 2));
   auto to_opt = SquareFromString(move.substr(2, 2));
-  if (!from_opt || !to_opt) return absl::nullopt;
+  if (!from_opt || !to_opt) return std::nullopt;
 
   Square from = *from_opt;
   Square to = *to_opt;
 
-  if (from == to) return absl::nullopt;
+  if (from == to) return std::nullopt;
 
   Piece on_from = at(from);
 
   // Check there is a piece to move.
   if (on_from.type == PieceType::kEmpty) {
     std::cerr << "No piece on from-square in move - " << move << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   // Check correct side.
   if (on_from.color != ToPlay()) {
     std::cerr << "Piece on from-square is not side-to-move in move - " << move
               << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   // Construct Move with the piece actually on the board.

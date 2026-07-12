@@ -371,7 +371,7 @@ std::optional<std::vector<double>> ShogiState::MaybeFinalReturns() const {
   if (Board().KingInEnemyCamp(just_moved) && Board().KingInEnemyCamp(on_move)) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::string ShogiState::Serialize() const {
