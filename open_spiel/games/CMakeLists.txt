@@ -207,6 +207,8 @@ set(GAME_SOURCES
   skat/skat.h
   snake/snake.cc
   snake/snake.h
+  social_deduction/social_deduction.cc
+  social_deduction/social_deduction.h
   solitaire/solitaire.cc
   solitaire/solitaire.h
   spades/spades.cc
@@ -707,6 +709,10 @@ add_test(skat_test skat_test)
 add_executable(snake_test snake/snake_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(snake_test snake_test)
+
+add_executable(social_deduction_test social_deduction/social_deduction_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(social_deduction_test social_deduction_test)
 
 add_executable(solitaire_test solitaire/solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
