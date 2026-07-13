@@ -1,0 +1,762 @@
+game: go_fish
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Go Fish"
+GameType.max_num_players = 10
+GameType.min_num_players = 2
+GameType.parameter_specification = ["ask_after_empty_draw", "end_on_first_out", "initial_cards", "most_books_wins", "players", "ranks", "suits"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "go_fish"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 52
+PolicyTensorShape() = [52]
+MaxChanceOutcomes() = 52
+GetParameters() = {ask_after_empty_draw=True,end_on_first_out=False,initial_cards=-1,most_books_wins=True,players=2,ranks=13,suits=4}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [141]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 141
+MaxGameLength() = 1040
+ToString() = "go_fish()"
+
+# State 0
+# Deal
+# 0
+# :0
+# :0
+# a4b4c4d4e4f4g4h4i4j4k4l4m4
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "Phase Deal\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 0\nplayer 1 cards 0 books 0\n"
+InformationStateString(1) = "Phase Deal\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 0\nplayer 1 cards 0 books 0\n"
+ObservationString(0) = "Phase Deal\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 0\nplayer 1 cards 0 books 0\n"
+ObservationString(1) = "Phase Deal\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 0\nplayer 1 cards 0 books 0\n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0,0.0769231), (1,0.0769231), (2,0.0769231), (3,0.0769231), (4,0.0769231), (5,0.0769231), (6,0.0769231), (7,0.0769231), (8,0.0769231), (9,0.0769231), (10,0.0769231), (11,0.0769231), (12,0.0769231)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+
+# Apply action "h"
+action: 7
+
+# State 1
+# Deal
+# 0
+# h1:0
+# :0
+# a4b4c4d4e4f4g4h3i4j4k4l4m4
+IsTerminal() = False
+History() = [7]
+HistoryString() = "7"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "Phase Deal\nCurrent Player 0\nYour cards: h1 \nplayer 0 cards 1 books 0\nplayer 1 cards 0 books 0\n"
+InformationStateString(1) = "Phase Deal\nCurrent Player 0\nYour cards: \nplayer 0 cards 1 books 0\nplayer 1 cards 0 books 0\n"
+ObservationString(0) = "Phase Deal\nCurrent Player 0\nYour cards: h1 \nplayer 0 cards 1 books 0\nplayer 1 cards 0 books 0\n"
+ObservationString(1) = "Phase Deal\nCurrent Player 0\nYour cards: \nplayer 0 cards 1 books 0\nplayer 1 cards 0 books 0\n"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.98077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.98077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ChanceOutcomes() = [(0,0.0784314), (1,0.0784314), (2,0.0784314), (3,0.0784314), (4,0.0784314), (5,0.0784314), (6,0.0784314), (7,0.0588235), (8,0.0784314), (9,0.0784314), (10,0.0784314), (11,0.0784314), (12,0.0784314)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+
+# Apply action "c"
+action: 2
+
+# State 2
+# Apply action "d"
+action: 3
+
+# State 3
+# Apply action "g"
+action: 6
+
+# State 4
+# Apply action "g"
+action: 6
+
+# State 5
+# Apply action "f"
+action: 5
+
+# State 6
+# Apply action "h"
+action: 7
+
+# State 7
+# Apply action "f"
+action: 5
+
+# State 8
+# Apply action "c"
+action: 2
+
+# State 9
+# Apply action "c"
+action: 2
+
+# State 10
+# Apply action "g"
+action: 6
+
+# State 11
+# Apply action "j"
+action: 9
+
+# State 12
+# Apply action "h"
+action: 7
+
+# State 13
+# Apply action "j"
+action: 9
+
+# State 14
+# Ask
+# 0
+# c1d1f1g2h2:0
+# c2f1g1h1j2:0
+# a4b4c1d3e4f2g1h1i4j2k4l4m4
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Phase Ask\nCurrent Player 0\nYour cards: c1 d1 f1 g2 h2 \nplayer 0 cards 7 books 0\nplayer 1 cards 7 books 0\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 0\nYour cards: c2 f1 g1 h1 j2 \nplayer 0 cards 7 books 0\nplayer 1 cards 7 books 0\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 0\nYour cards: c1 d1 f1 g2 h2 \nplayer 0 cards 7 books 0\nplayer 1 cards 7 books 0\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 0\nYour cards: c2 f1 g1 h1 j2 \nplayer 0 cards 7 books 0\nplayer 1 cards 7 books 0\n"
+ObservationTensor(0) = [0.0, 0.0, 0.25, 0.25, 0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.73077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.5, 0.0, 0.0, 0.25, 0.25, 0.25, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.73077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [15, 16, 18, 19, 20]
+StringLegalActions() = ["1c", "1d", "1f", "1g", "1h"]
+
+# Apply action "1g"
+action: 19
+
+# State 15
+# Ask
+# 0
+# c1d1f1g3h2:0
+# c2f1h1j2:0
+# a4b4c1d3e4f2g1h1i4j2k4l4m4
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Phase Ask\nCurrent Player 0\nYour cards: c1 d1 f1 g3 h2 \nplayer 0 cards 8 books 0\nplayer 1 cards 6 books 0\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 0\nYour cards: c2 f1 h1 j2 \nplayer 0 cards 8 books 0\nplayer 1 cards 6 books 0\n0 asked 1 for 6 recieved 1\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 0\nYour cards: c1 d1 f1 g3 h2 \nplayer 0 cards 8 books 0\nplayer 1 cards 6 books 0\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 0\nYour cards: c2 f1 h1 j2 \nplayer 0 cards 8 books 0\nplayer 1 cards 6 books 0\n0 asked 1 for 6 recieved 1\n"
+ObservationTensor(0) = [0.0, 0.0, 0.25, 0.25, 0.0, 0.25, 0.75, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.73077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.15385, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.5, 0.0, 0.0, 0.25, 0.0, 0.25, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.73077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.15385, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [15, 16, 18, 19, 20]
+StringLegalActions() = ["1c", "1d", "1f", "1g", "1h"]
+
+# Apply action "1g"
+action: 19
+
+# State 16
+# Apply action "b"
+action: 1
+
+# State 17
+# Ask
+# 1
+# b1c1d1f1g3h2:0
+# c2f1h1j2:0
+# a4b3c1d3e4f2g1h1i4j2k4l4m4
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b1 c1 d1 f1 g3 h2 \nplayer 0 cards 9 books 0\nplayer 1 cards 6 books 0\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 1\nYour cards: c2 f1 h1 j2 \nplayer 0 cards 9 books 0\nplayer 1 cards 6 books 0\n0 asked -3 for 1 recieved 1\n0 asked 1 for 6\n0 asked 1 for 6 recieved 1\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b1 c1 d1 f1 g3 h2 \nplayer 0 cards 9 books 0\nplayer 1 cards 6 books 0\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 1\nYour cards: c2 f1 h1 j2 \nplayer 0 cards 9 books 0\nplayer 1 cards 6 books 0\n0 asked -3 for 1 recieved 1\n0 asked 1 for 6\n0 asked 1 for 6 recieved 1\n"
+ObservationTensor(0) = [0.0, 0.25, 0.25, 0.25, 0.0, 0.25, 0.75, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.71154, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17308, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.5, 0.0, 0.0, 0.25, 0.0, 0.25, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.71154, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.17308, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [2, 5, 7, 9]
+StringLegalActions() = ["0c", "0f", "0h", "0j"]
+
+# Apply action "0j"
+action: 9
+
+# State 18
+# Apply action "c"
+action: 2
+
+# State 19
+# Ask
+# 0
+# b1c1d1f1g3h2:0
+# c3f1h1j2:0
+# a4b3d3e4f2g1h1i4j2k4l4m4
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Phase Ask\nCurrent Player 0\nYour cards: b1 c1 d1 f1 g3 h2 \nplayer 0 cards 9 books 0\nplayer 1 cards 7 books 0\n1 asked -3 for 2 recieved 1\n1 asked 0 for 9\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 0\nYour cards: c3 f1 h1 j2 \nplayer 0 cards 9 books 0\nplayer 1 cards 7 books 0\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 0\nYour cards: b1 c1 d1 f1 g3 h2 \nplayer 0 cards 9 books 0\nplayer 1 cards 7 books 0\n1 asked -3 for 2 recieved 1\n1 asked 0 for 9\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 0\nYour cards: c3 f1 h1 j2 \nplayer 0 cards 9 books 0\nplayer 1 cards 7 books 0\n"
+ObservationTensor(0) = [0.0, 0.25, 0.25, 0.25, 0.0, 0.25, 0.75, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.69231, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.17308, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.75, 0.0, 0.0, 0.25, 0.0, 0.25, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.69231, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.17308, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [14, 15, 16, 18, 19, 20]
+StringLegalActions() = ["1b", "1c", "1d", "1f", "1g", "1h"]
+
+# Apply action "1f"
+action: 18
+
+# State 20
+# Apply action "1d"
+action: 16
+
+# State 21
+# Apply action "g"
+action: 6
+
+# State 22
+# Ask
+# 1
+# b1c1d1f2h2:1
+# c3h1j2:0
+# a4b3d3e4f2h1i4j2k4l4m4
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b1 c1 d1 f2 h2 \nplayer 0 cards 7 books 1\nplayer 1 cards 6 books 0\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 1\nYour cards: c3 h1 j2 \nplayer 0 cards 7 books 1\nplayer 1 cards 6 books 0\n0 asked -3 for 6 recieved 1 booked 6\n0 asked 1 for 3\n0 asked 1 for 5 recieved 1\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b1 c1 d1 f2 h2 \nplayer 0 cards 7 books 1\nplayer 1 cards 6 books 0\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 1\nYour cards: c3 h1 j2 \nplayer 0 cards 7 books 1\nplayer 1 cards 6 books 0\n0 asked -3 for 6 recieved 1 booked 6\n0 asked 1 for 3\n0 asked 1 for 5 recieved 1\n"
+ObservationTensor(0) = [0.0, 0.25, 0.25, 0.25, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.67308, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.67308, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.13462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [2, 7, 9]
+StringLegalActions() = ["0c", "0h", "0j"]
+
+# Apply action "0j"
+action: 9
+
+# State 23
+# Apply action "f"
+action: 5
+
+# State 24
+# Apply action "1f"
+action: 18
+
+# State 25
+# Apply action "1h"
+action: 20
+
+# State 26
+# Apply action "1b"
+action: 14
+
+# State 27
+# Apply action "k"
+action: 10
+
+# State 28
+# Ask
+# 1
+# b1c1d1f3h3k1:1
+# c3j2:0
+# a4b3d3e4f1h1i4j2k3l4m4
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b1 c1 d1 f3 h3 k1 \nplayer 0 cards 10 books 1\nplayer 1 cards 5 books 0\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 1\nYour cards: c3 j2 \nplayer 0 cards 10 books 1\nplayer 1 cards 5 books 0\n0 asked -3 for 10 recieved 1\n0 asked 1 for 1\n0 asked 1 for 7 recieved 1\n0 asked 1 for 5 recieved 1\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b1 c1 d1 f3 h3 k1 \nplayer 0 cards 10 books 1\nplayer 1 cards 5 books 0\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 1\nYour cards: c3 j2 \nplayer 0 cards 10 books 1\nplayer 1 cards 5 books 0\n0 asked -3 for 10 recieved 1\n0 asked 1 for 1\n0 asked 1 for 7 recieved 1\n0 asked 1 for 5 recieved 1\n"
+ObservationTensor(0) = [0.0, 0.25, 0.25, 0.25, 0.0, 0.75, 0.0, 0.75, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.63462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.19231, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.75, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09615, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.03846, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.63462, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.19231, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.75, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09615, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.03846, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [2, 9]
+StringLegalActions() = ["0c", "0j"]
+
+# Apply action "0c"
+action: 2
+
+# State 29
+# Apply action "0j"
+action: 9
+
+# State 30
+# Apply action "k"
+action: 10
+
+# State 31
+# Apply action "1d"
+action: 16
+
+# State 32
+# Apply action "d"
+action: 3
+
+# State 33
+# Apply action "1b"
+action: 14
+
+# State 34
+# Apply action "a"
+action: 0
+
+# State 35
+# Apply action "0k"
+action: 10
+
+# State 36
+# Apply action "0j"
+action: 9
+
+# State 37
+# Apply action "h"
+action: 7
+
+# State 38
+# Apply action "1f"
+action: 18
+
+# State 39
+# Apply action "a"
+action: 0
+
+# State 40
+# Apply action "0k"
+action: 10
+
+# State 41
+# Apply action "a"
+action: 0
+
+# State 42
+# Ask
+# 0
+# a2b1d2f3h3:1
+# a1h1j2k2:1
+# a1b3d2e4f1i4j2k2l4m4
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Phase Ask\nCurrent Player 0\nYour cards: a2 b1 d2 f3 h3 \nplayer 0 cards 11 books 1\nplayer 1 cards 6 books 1\n1 asked -3 for 0 recieved 1\n1 asked 0 for 10\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 0\nYour cards: a1 h1 j2 k2 \nplayer 0 cards 11 books 1\nplayer 1 cards 6 books 1\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 0\nYour cards: a2 b1 d2 f3 h3 \nplayer 0 cards 11 books 1\nplayer 1 cards 6 books 1\n1 asked -3 for 0 recieved 1\n1 asked 0 for 10\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 0\nYour cards: a1 h1 j2 k2 \nplayer 0 cards 11 books 1\nplayer 1 cards 6 books 1\n"
+ObservationTensor(0) = [0.5, 0.25, 0.0, 0.5, 0.0, 0.75, 0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.51923, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.07692, 0.21154, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 1.0, 0.05769, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.75, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.03846, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.05769, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.25, 0.03846, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.51923, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.07692, 0.21154, 0.0, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 1.0, 0.05769, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.75, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.11538, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.03846, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.0, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.05769, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.25, 0.03846, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [13, 14, 16, 18, 20]
+StringLegalActions() = ["1a", "1b", "1d", "1f", "1h"]
+
+# Apply action "1a"
+action: 13
+
+# State 43
+# Apply action "1b"
+action: 14
+
+# State 44
+# Apply action "m"
+action: 12
+
+# State 45
+# Apply action "0j"
+action: 9
+
+# State 46
+# Apply action "a"
+action: 0
+
+# State 47
+# Apply action "1b"
+action: 14
+
+# State 48
+# Apply action "j"
+action: 9
+
+# State 49
+# Apply action "0k"
+action: 10
+
+# State 50
+# Apply action "l"
+action: 11
+
+# State 51
+# Apply action "1b"
+action: 14
+
+# State 52
+# Apply action "b"
+action: 1
+
+# State 53
+# Apply action "1j"
+action: 22
+
+# State 54
+# Apply action "1m"
+action: 25
+
+# State 55
+# Apply action "d"
+action: 3
+
+# State 56
+# Apply action "0a"
+action: 0
+
+# State 57
+# Ask
+# 1
+# b2d3f3h3j3m1:1
+# h1k2l1:2
+# b2d1e4f1i4j1k2l3m3
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b2 d3 f3 h3 j3 m1 \nplayer 0 cards 15 books 1\nplayer 1 cards 4 books 2\n1 asked 0 for 0 recieved 3 booked 0\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 1\nYour cards: h1 k2 l1 \nplayer 0 cards 15 books 1\nplayer 1 cards 4 books 2\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 1\nYour cards: b2 d3 f3 h3 j3 m1 \nplayer 0 cards 15 books 1\nplayer 1 cards 4 books 2\n1 asked 0 for 0 recieved 3 booked 0\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 1\nYour cards: h1 k2 l1 \nplayer 0 cards 15 books 1\nplayer 1 cards 4 books 2\n"
+ObservationTensor(0) = [0.0, 0.5, 0.0, 0.75, 0.0, 0.75, 0.0, 0.75, 0.0, 0.75, 0.0, 0.0, 0.25, 0.0, 1.0, 0.0, 0.0, 0.40385, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.28846, 0.01923, 1.0, 0.0, 0.0, 0.09615, 0.0, 0.0, 0.25, 0.0, 1.0, 0.13462, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.75, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.05769, 0.75, 0.0, 1.0, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 1.0, 0.15385, 0.07692, 0.01923, 1.0, 0.03846, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.05769, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.0, 1.0, 0.09615, 0.0, 0.0, 0.0, 0.0, 0.0, 0.09615, 1.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.5, 0.25, 0.0, 0.0, 1.0, 0.0, 0.0, 0.40385, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07692, 0.28846, 0.01923, 1.0, 0.0, 0.0, 0.09615, 0.0, 0.0, 0.25, 0.0, 1.0, 0.13462, 0.0, 0.03846, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.75, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.05769, 0.75, 0.0, 1.0, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 1.0, 0.15385, 0.07692, 0.01923, 1.0, 0.03846, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.05769, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.0, 1.0, 0.09615, 0.0, 0.0, 0.0, 0.0, 0.0, 0.09615, 1.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [7, 10, 11]
+StringLegalActions() = ["0h", "0k", "0l"]
+
+# Apply action "0k"
+action: 10
+
+# State 58
+# Apply action "k"
+action: 10
+
+# State 59
+# Apply action "0k"
+action: 10
+
+# State 60
+# Apply action "b"
+action: 1
+
+# State 61
+# Apply action "1j"
+action: 22
+
+# State 62
+# Apply action "f"
+action: 5
+
+# State 63
+# Apply action "0k"
+action: 10
+
+# State 64
+# Apply action "d"
+action: 3
+
+# State 65
+# Apply action "1d"
+action: 16
+
+# State 66
+# Apply action "1h"
+action: 20
+
+# State 67
+# Apply action "1b"
+action: 14
+
+# State 68
+# Ask
+# 0
+# b3j3m1:4
+# k3l1:2
+# b1e4i4j1k1l3m3
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Phase Ask\nCurrent Player 0\nYour cards: b3 j3 m1 \nplayer 0 cards 7 books 4\nplayer 1 cards 4 books 2\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 0\nYour cards: k3 l1 \nplayer 0 cards 7 books 4\nplayer 1 cards 4 books 2\n0 asked 1 for 1 recieved 1\n0 asked 1 for 7 recieved 1 booked 7\n0 asked 1 for 3 recieved 1 booked 3\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 0\nYour cards: b3 j3 m1 \nplayer 0 cards 7 books 4\nplayer 1 cards 4 books 2\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 0\nYour cards: k3 l1 \nplayer 0 cards 7 books 4\nplayer 1 cards 4 books 2\n0 asked 1 for 1 recieved 1\n0 asked 1 for 7 recieved 1 booked 7\n0 asked 1 for 3 recieved 1 booked 3\n"
+ObservationTensor(0) = [0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.75, 0.0, 0.0, 0.25, 0.0, 1.0, 0.0, 0.0, 0.32692, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.30769, 0.13462, 0.01923, 1.0, 0.01923, 0.0, 0.11538, 0.0, 0.0, 0.5, 0.0, 1.0, 0.15385, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 1.0, 0.07692, 0.75, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.15385, 0.07692, 0.01923, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.11538, 0.0, 0.0, 1.0, 0.19231, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.09615, 1.0, 0.01923, 0.0, 0.11538, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.05769, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.75, 0.25, 0.0, 0.0, 1.0, 0.0, 0.0, 0.32692, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.30769, 0.13462, 0.01923, 1.0, 0.01923, 0.0, 0.11538, 0.0, 0.0, 0.5, 0.0, 1.0, 0.15385, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03846, 1.0, 0.07692, 0.75, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.0, 0.15385, 0.07692, 0.01923, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.11538, 0.0, 0.0, 1.0, 0.19231, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.09615, 1.0, 0.01923, 0.0, 0.11538, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.05769, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [14, 22, 25]
+StringLegalActions() = ["1b", "1j", "1m"]
+
+# Apply action "1j"
+action: 22
+
+# State 69
+# Apply action "l"
+action: 11
+
+# State 70
+# Apply action "0k"
+action: 10
+
+# State 71
+# Apply action "l"
+action: 11
+
+# State 72
+# Apply action "1j"
+action: 22
+
+# State 73
+# Apply action "e"
+action: 4
+
+# State 74
+# Apply action "0l"
+action: 11
+
+# State 75
+# Apply action "0l"
+action: 11
+
+# State 76
+# Apply action "b"
+action: 1
+
+# State 77
+# Apply action "1e"
+action: 17
+
+# State 78
+# Apply action "i"
+action: 8
+
+# State 79
+# Apply action "0l"
+action: 11
+
+# State 80
+# Apply action "k"
+action: 10
+
+# State 81
+# Apply action "1i"
+action: 21
+
+# State 82
+# Apply action "e"
+action: 4
+
+# State 83
+# Apply action "0l"
+action: 11
+
+# State 84
+# Apply action "e"
+action: 4
+
+# State 85
+# Apply action "1m"
+action: 25
+
+# State 86
+# Apply action "j"
+action: 9
+
+# State 87
+# Apply action "0b"
+action: 1
+
+# State 88
+# Apply action "0e"
+action: 4
+
+# State 89
+# Ask
+# 1
+# i1m1:5
+# e3l3:4
+# e1i3l1m3
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14, 22, 11, 10, 11, 22, 4, 11, 11, 1, 17, 8, 11, 10, 21, 4, 11, 4, 25, 9, 1, 4]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14, 22, 11, 10, 11, 22, 4, 11, 11, 1, 17, 8, 11, 10, 21, 4, 11, 4, 25, 9, 1, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Phase Ask\nCurrent Player 1\nYour cards: i1 m1 \nplayer 0 cards 2 books 5\nplayer 1 cards 6 books 4\n1 asked 0 for 4 recieved 2\n1 asked 0 for 1 recieved 3 booked 1\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 1\nYour cards: e3 l3 \nplayer 0 cards 2 books 5\nplayer 1 cards 6 books 4\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 1\nYour cards: i1 m1 \nplayer 0 cards 2 books 5\nplayer 1 cards 6 books 4\n1 asked 0 for 4 recieved 2\n1 asked 0 for 1 recieved 3 booked 1\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 1\nYour cards: e3 l3 \nplayer 0 cards 2 books 5\nplayer 1 cards 6 books 4\n"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.25, 0.0, 1.0, 0.0, 0.0, 0.15385, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.38462, 0.03846, 0.01923, 1.0, 0.11538, 0.0, 0.11538, 1.0, 0.0, 0.0, 0.0, 1.0, 0.25, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.07692, 1.0, 0.17308, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.03846, 0.0, 0.0, 0.25, 1.0, 0.30769, 0.11538, 0.01923, 1.0, 0.17308, 0.0, 0.01923, 1.0, 0.07692, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.01923, 1.0, 0.03846, 0.75, 0.0, 1.0, 0.19231, 0.0, 0.0, 1.0, 0.26923, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.05769, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.5, 0.0, 1.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.75, 0.0, 0.0, 1.0, 0.0, 0.0, 0.15385, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.38462, 0.03846, 0.01923, 1.0, 0.11538, 0.0, 0.11538, 1.0, 0.0, 0.0, 0.0, 1.0, 0.25, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.0, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.01923, 0.0, 0.0, 0.25, 0.07692, 1.0, 0.17308, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.03846, 0.0, 0.0, 0.25, 1.0, 0.30769, 0.11538, 0.01923, 1.0, 0.17308, 0.0, 0.01923, 1.0, 0.07692, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.01923, 1.0, 0.03846, 0.75, 0.0, 1.0, 0.19231, 0.0, 0.0, 1.0, 0.26923, 0.0, 0.0, 1.0, 0.07692, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.05769, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.5, 0.0, 1.0, 0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [4, 11]
+StringLegalActions() = ["0e", "0l"]
+
+# Apply action "0e"
+action: 4
+
+# State 90
+# Apply action "e"
+action: 4
+
+# State 91
+# Apply action "0l"
+action: 11
+
+# State 92
+# Apply action "i"
+action: 8
+
+# State 93
+# Apply action "1i"
+action: 21
+
+# State 94
+# Apply action "1i"
+action: 21
+
+# State 95
+# Apply action "i"
+action: 8
+
+# State 96
+# Apply action "1i"
+action: 21
+
+# State 97
+# Apply action "i"
+action: 8
+
+# State 98
+# Apply action "1m"
+action: 25
+
+# State 99
+# Apply action "m"
+action: 12
+
+# State 100
+# Apply action "1m"
+action: 25
+
+# State 101
+# Apply action "l"
+action: 11
+
+# State 102
+# Apply action "0l"
+action: 11
+
+# State 103
+# Apply action "m"
+action: 12
+
+# State 104
+# Apply action "0m"
+action: 12
+
+# State 105
+# Apply action "m"
+action: 12
+
+# State 106
+# Ask
+# 0
+# m1:6
+# m3:6
+IsTerminal() = False
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14, 22, 11, 10, 11, 22, 4, 11, 11, 1, 17, 8, 11, 10, 21, 4, 11, 4, 25, 9, 1, 4, 4, 4, 11, 8, 21, 21, 8, 21, 8, 25, 12, 25, 11, 11, 12, 12, 12]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14, 22, 11, 10, 11, 22, 4, 11, 11, 1, 17, 8, 11, 10, 21, 4, 11, 4, 25, 9, 1, 4, 4, 4, 11, 8, 21, 21, 8, 21, 8, 25, 12, 25, 11, 11, 12, 12, 12"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Phase Ask\nCurrent Player 0\nYour cards: m1 \nplayer 0 cards 1 books 6\nplayer 1 cards 3 books 6\n"
+InformationStateString(1) = "Phase Ask\nCurrent Player 0\nYour cards: m3 \nplayer 0 cards 1 books 6\nplayer 1 cards 3 books 6\n0 asked -3 for 12 recieved 1\n"
+ObservationString(0) = "Phase Ask\nCurrent Player 0\nYour cards: m1 \nplayer 0 cards 1 books 6\nplayer 1 cards 3 books 6\n"
+ObservationString(1) = "Phase Ask\nCurrent Player 0\nYour cards: m3 \nplayer 0 cards 1 books 6\nplayer 1 cards 3 books 6\n0 asked -3 for 12 recieved 1\n"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.46154, 0.01923, 0.01923, 1.0, 0.21154, 0.0, 0.11538, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.34615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.09615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.0, 0.07692, 1.0, 0.26923, 0.0, 0.0, 1.0, 0.17308, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.07692, 1.0, 0.01923, 0.0, 0.0, 0.46154, 0.05769, 0.01923, 1.0, 0.23077, 0.0, 0.01923, 1.0, 0.13462, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.03846, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.25, 0.0, 0.0, 1.0, 0.32692, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.11538, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.01923, 0.75]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.75, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.46154, 0.01923, 0.01923, 1.0, 0.21154, 0.0, 0.11538, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.34615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.09615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.0, 0.07692, 1.0, 0.26923, 0.0, 0.0, 1.0, 0.17308, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.07692, 1.0, 0.01923, 0.0, 0.0, 0.46154, 0.05769, 0.01923, 1.0, 0.23077, 0.0, 0.01923, 1.0, 0.13462, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.03846, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.25, 0.0, 0.0, 1.0, 0.32692, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.11538, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.01923, 0.75]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [25]
+StringLegalActions() = ["1m"]
+
+# Apply action "1m"
+action: 25
+
+# State 107
+# GameOver
+# 0
+# :7
+# :6
+IsTerminal() = True
+History() = [7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14, 22, 11, 10, 11, 22, 4, 11, 11, 1, 17, 8, 11, 10, 21, 4, 11, 4, 25, 9, 1, 4, 4, 4, 11, 8, 21, 21, 8, 21, 8, 25, 12, 25, 11, 11, 12, 12, 12, 25]
+HistoryString() = "7, 2, 3, 6, 6, 5, 7, 5, 2, 2, 6, 9, 7, 9, 19, 19, 1, 9, 2, 18, 16, 6, 9, 5, 18, 20, 14, 10, 2, 9, 10, 16, 3, 14, 0, 10, 9, 7, 18, 0, 10, 0, 13, 14, 12, 9, 0, 14, 9, 10, 11, 14, 1, 22, 25, 3, 0, 10, 10, 10, 1, 22, 5, 10, 3, 16, 20, 14, 22, 11, 10, 11, 22, 4, 11, 11, 1, 17, 8, 11, 10, 21, 4, 11, 4, 25, 9, 1, 4, 4, 4, 11, 8, 21, 21, 8, 21, 8, 25, 12, 25, 11, 11, 12, 12, 12, 25"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "Phase GameOver\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 7\nplayer 1 cards 0 books 6\n"
+InformationStateString(1) = "Phase GameOver\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 7\nplayer 1 cards 0 books 6\n0 asked 1 for 12 recieved 3 booked 12\n0 asked -3 for 12 recieved 1\n"
+ObservationString(0) = "Phase GameOver\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 7\nplayer 1 cards 0 books 6\n"
+ObservationString(1) = "Phase GameOver\nCurrent Player 0\nYour cards: \nplayer 0 cards 0 books 7\nplayer 1 cards 0 books 6\n0 asked 1 for 12 recieved 3 booked 12\n0 asked -3 for 12 recieved 1\n"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.53846, 0.0, 0.01923, 1.0, 0.21154, 0.0, 0.11538, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.34615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.09615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.0, 0.07692, 1.0, 0.26923, 0.0, 0.0, 1.0, 0.17308, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.01923, 0.0, 0.0, 0.46154, 0.0, 0.01923, 1.0, 0.23077, 0.0, 0.01923, 1.0, 0.13462, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.03846, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.25, 0.0, 0.0, 1.0, 0.32692, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.11538, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.53846, 0.0, 0.01923, 1.0, 0.21154, 0.0, 0.11538, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.34615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.09615, 0.0, 0.05769, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.03846, 0.0, 0.0, 0.0, 0.07692, 0.0, 0.0, 0.0, 0.07692, 1.0, 0.26923, 0.0, 0.0, 1.0, 0.17308, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.01923, 0.0, 0.0, 0.46154, 0.0, 0.01923, 1.0, 0.23077, 0.0, 0.01923, 1.0, 0.13462, 0.0, 0.01923, 0.0, 0.0, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.03846, 1.0, 0.09615, 0.0, 0.0, 1.0, 0.25, 0.0, 0.0, 1.0, 0.32692, 0.0, 0.0, 1.0, 0.13462, 0.0, 0.0, 1.0, 0.01923, 0.0, 0.09615, 1.0, 0.11538, 0.0, 0.13462, 0.0, 0.0, 0.0, 0.11538, 0.0, 0.0, 0.0, 0.01923, 1.0, 0.0, 0.0]
+Rewards() = [1, -1]
+Returns() = [1, -1]
