@@ -86,6 +86,29 @@ class KuhnPokerTest(absltest.TestCase):
     game = pyspiel.load_game("python_kuhn_poker")
     unused_results = pyspiel.CFRSolver(game)
 
+  def test_struct_fallthrough_raises(self):
+    """Games without struct methods should raise RuntimeError."""
+    game = pyspiel.load_game("python_kuhn_poker")
+    state = game.new_initial_state()
+    # Move past initial chance nodes.
+    state.apply_action(state.legal_actions()[0])
+    state.apply_action(state.legal_actions()[0])
+
+    with self.assertRaises(RuntimeError):
+      state.to_struct()
+
+    with self.assertRaises(RuntimeError):
+      state.action_to_struct(state.current_player(), state.legal_actions()[0])
+
+    with self.assertRaises(RuntimeError):
+      state.to_observation_struct(0)
+
+  def test_new_initial_state_from_dict_fallthrough_raises(self):
+    """Games without new_initial_state(dict) support should raise."""
+    game = pyspiel.load_game("python_kuhn_poker")
+    with self.assertRaises(TypeError):
+      game.new_initial_state({"card": 0})
+
 
 if __name__ == "__main__":
   absltest.main()

@@ -15,8 +15,9 @@
 #include "open_spiel/python/pybind11/python_games.h"
 
 #include <algorithm>
-#include <string>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 // Interface code for using Python Games and States from C++.
@@ -26,17 +27,18 @@
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/observer.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
-
+#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 namespace open_spiel {
 
@@ -54,6 +56,18 @@ std::unique_ptr<State> PyGame::NewInitialState() const {
 std::unique_ptr<State> PyGame::NewInitialState(const std::string& str) const {
   PYBIND11_OVERLOAD_PURE_NAME(std::unique_ptr<State>, Game, "new_initial_state",
                               NewInitialState, str);
+}
+
+std::unique_ptr<State> PyGame::NewInitialState(
+    const nlohmann::json& json) const {
+  py::function fn =
+      py::get_override(static_cast<const Game*>(this), "new_initial_state");
+  if (fn) {
+    // pybind11_json auto-converts nlohmann::json to a Python dict.
+    py::object result = fn(json);
+    return result.cast<std::unique_ptr<State>>();
+  }
+  return Game::NewInitialState(json);
 }
 
 std::unique_ptr<State> PyGame::NewInitialStateForPopulation(
@@ -168,6 +182,58 @@ std::vector<std::string> PyState::DistributionSupport() {
 void PyState::UpdateDistribution(const std::vector<double>& distribution) {
   PYBIND11_OVERLOAD_PURE_NAME(void, State, "update_distribution",
                               UpdateDistribution, distribution);
+}
+
+// SpielStruct API trampoline implementations.
+// Each method checks for a Python override, converts Python dicts to/from
+// generic Dict*Struct wrappers. Falls through to C++ base if no override.
+
+std::unique_ptr<StateStruct> PyState::ToStruct() const {
+  py::function fn =
+      py::get_override(static_cast<const State*>(this), "_to_struct");
+  if (fn) {
+    py::object result = fn();
+    nlohmann::json j = result.cast<nlohmann::json>();
+    return std::make_unique<DictStateStruct>(std::move(j));
+  }
+  return State::ToStruct();
+}
+
+std::unique_ptr<ActionStruct> PyState::ActionToStruct(Player player,
+                                                      Action action_id) const {
+  py::function fn =
+      py::get_override(static_cast<const State*>(this), "_action_to_struct");
+  if (fn) {
+    py::object result = fn(player, action_id);
+    nlohmann::json j = result.cast<nlohmann::json>();
+    return std::make_unique<DictActionStruct>(std::move(j));
+  }
+  return State::ActionToStruct(player, action_id);
+}
+
+std::vector<Action> PyState::StructToActions(
+    const ActionStruct& action_struct) const {
+  py::function fn =
+      py::get_override(static_cast<const State*>(this), "_struct_to_actions");
+  if (fn) {
+    // Convert the ActionStruct to a JSON dict and pass to Python.
+    py::object json_dict = py::cast(action_struct.to_json_base());
+    py::object result = fn(json_dict);
+    return result.cast<std::vector<Action>>();
+  }
+  return State::StructToActions(action_struct);
+}
+
+std::unique_ptr<ObservationStruct> PyState::ToObservationStruct(
+    Player player) const {
+  py::function fn = py::get_override(static_cast<const State*>(this),
+                                     "_to_observation_struct");
+  if (fn) {
+    py::object result = fn(player);
+    nlohmann::json j = result.cast<nlohmann::json>();
+    return std::make_unique<DictObservationStruct>(std::move(j));
+  }
+  return State::ToObservationStruct(player);
 }
 
 // Register a Python game.
