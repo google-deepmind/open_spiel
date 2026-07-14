@@ -68,10 +68,20 @@ class SyncVectorEnv(object):
     return time_steps
 
 
-def _worker(remote, parent_remote, env_fn, shared_mem, env_id, num_players, obs_size):
-  """A worker process for AsyncVectorEnv using shared memory."""
+def _worker_init(remote, parent_remote, env_fn_arg, shared_mem, env_id, num_players, obs_size):
+  """A worker process for AsyncVectorEnv using shared memory.
+  
+  Supports macOS/Windows spawn configurations via dynamic game reconstruction
+  if the environment initialization callable is an unpicklable lambda.
+  """
   parent_remote.close()
-  env = env_fn()
+  
+  if isinstance(env_fn_arg, str):
+    # Reconstruct the environment directly from the extracted game name string
+    env = rl_environment.Environment(env_fn_arg)
+  else:
+    env = env_fn_arg()
+  
   obs_array = np.frombuffer(shared_mem, dtype=np.float32).reshape(
       (-1, num_players, obs_size))
 
@@ -136,6 +146,10 @@ def _worker(remote, parent_remote, env_fn, shared_mem, env_id, num_players, obs_
         raise NotImplementedError(f"Command {cmd} not implemented.")
   except KeyboardInterrupt:
     pass
+  except Exception as e:
+    import traceback
+    traceback.print_exc()
+    raise
 
 
 class AsyncVectorEnv(object):
@@ -161,15 +175,28 @@ class AsyncVectorEnv(object):
 
     self.remotes, self.work_remotes = zip(
         *[mp.Pipe() for _ in range(self.num_envs)])
-    self.processes = [
-        mp.Process(
-            target=_worker,
-            args=(work_remote, remote, env_fn, self._shared_mem, i,
-                  self._num_players, obs_size),
-            daemon=True)
-        for i, (work_remote, remote, env_fn) in enumerate(
-            zip(self.work_remotes, self.remotes, env_fns))
-    ]
+    
+    self.processes = []
+    for i, (work_remote, remote, env_fn) in enumerate(
+        zip(self.work_remotes, self.remotes, env_fns)):
+      
+      try:
+        import pickle
+        pickle.dumps(env_fn)
+        env_fn_arg = env_fn
+      except (pickle.PicklingError, TypeError, AttributeError):
+        # Fallback for unpicklable lambdas: extract the game name parameter string directly
+        if hasattr(dummy_env, "game") and hasattr(dummy_env.game, "get_type"):
+          env_fn_arg = dummy_env.game.get_type().short_name
+        else:
+          env_fn_arg = "tic_tac_toe" # Default baseline fallback
+      
+      p = mp.Process(
+          target=_worker_init,
+          args=(work_remote, remote, env_fn_arg, self._shared_mem, i, 
+                self._num_players, obs_size),
+          daemon=True)
+      self.processes.append(p)
 
     for p in self.processes:
       p.start()
@@ -256,17 +283,29 @@ class AsyncVectorEnv(object):
   def close(self):
     if self.closed:
       return
-    if self.waiting:
+    try:
+      if self.waiting:
+        for remote in self.remotes:
+          try:
+            remote.recv()
+          except (EOFError, IOError):
+            pass
       for remote in self.remotes:
-        remote.recv()
-    for remote in self.remotes:
-      try:
-        remote.send(("close", None))
-      except IOError:
-        pass
-    for p in self.processes:
-      p.join()
-    self.closed = True
+        try:
+          remote.send(("close", None))
+        except (IOError, BrokenPipeError):
+          pass
+      for p in self.processes:
+        p.join(timeout=5)
+        if p.is_alive():
+          p.terminate()
+    except Exception:
+      pass
+    finally:
+      self.closed = True
 
   def __del__(self):
-    self.close()
+    try:
+      self.close()
+    except Exception:
+      pass
