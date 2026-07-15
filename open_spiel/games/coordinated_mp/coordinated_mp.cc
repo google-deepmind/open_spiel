@@ -207,7 +207,7 @@ std::string PenniesState::ObservationString(Player player) const {
 }
 
 std::unique_ptr<State> PenniesState::Clone() const {
-  return absl::make_unique<PenniesState>(*this);
+  return std::make_unique<PenniesState>(*this);
 }
 
 std::vector<std::pair<Action, double>> PenniesState::ChanceOutcomes() const {
@@ -222,7 +222,7 @@ PenniesGame::PenniesGame(const GameParameters &params)
 }
 
 std::unique_ptr<State> PenniesGame::NewInitialState() const {
-  return absl::make_unique<PenniesState>(shared_from_this());
+  return std::make_unique<PenniesState>(shared_from_this());
 }
 
 std::shared_ptr<Observer> PenniesGame::MakeObserver(
