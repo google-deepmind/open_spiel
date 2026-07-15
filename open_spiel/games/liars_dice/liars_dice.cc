@@ -576,7 +576,8 @@ ImperfectRecallLiarsDiceGame::ImperfectRecallLiarsDiceGame(
           ParameterValue<int>("rollout_length", kDefaultRecallLength)) {}
 
 std::unique_ptr<State> ImperfectRecallLiarsDiceGame::NewInitialState() const {
-  return absl::make_unique<ImperfectRecallLiarsDiceState>(shared_from_this(),
+  return std::make_unique<ImperfectRecallLiarsDiceState>(
+      shared_from_this(),
       /*total_num_dice=*/total_num_dice(),
       /*max_dice_per_player=*/max_dice_per_player(),
       /*num_dice=*/num_dice());
