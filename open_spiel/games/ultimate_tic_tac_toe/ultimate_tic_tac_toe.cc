@@ -70,6 +70,9 @@ void UltimateTTTState::DoApplyAction(Action move) {
     SPIEL_CHECK_GE(move, 0);
     SPIEL_CHECK_LT(move, ttt::kNumCells);
     current_state_ = move;
+    // Sync the chosen board's current player; mirrors the SetCurrentPlayer
+    // call in the choose_cell branch below.
+    local_state(current_state_)->SetCurrentPlayer(current_player_);
   } else {
     // Apply action to local state, then apply that move.
     SPIEL_CHECK_FALSE(local_states_[current_state_]->IsTerminal());
