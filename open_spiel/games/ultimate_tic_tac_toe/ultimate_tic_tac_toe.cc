@@ -70,6 +70,13 @@ void UltimateTTTState::DoApplyAction(Action move) {
     SPIEL_CHECK_GE(move, 0);
     SPIEL_CHECK_LT(move, ttt::kNumCells);
     current_state_ = move;
+    // Sync the chosen local board's current player with the meta-game's
+    // current player. Without this, the local board's current player is
+    // whatever it was left at after the previous visit (which flips it),
+    // so the next ApplyAction would place the wrong player's piece.
+    // The mirror SetCurrentPlayer call below (after a normal choose_cell
+    // that redirects to a new board) does not run on this code path.
+    local_state(current_state_)->SetCurrentPlayer(current_player_);
   } else {
     // Apply action to local state, then apply that move.
     SPIEL_CHECK_FALSE(local_states_[current_state_]->IsTerminal());
