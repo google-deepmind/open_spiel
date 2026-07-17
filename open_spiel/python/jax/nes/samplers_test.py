@@ -6,7 +6,6 @@ import pyspiel
 from absl.testing import absltest, parameterized
 
 from open_spiel.python.jax.nes import samplers
-from open_spiel.python.jax.nes import utils
 from open_spiel.python.jax.nes import games
 
 """Tests for open_spiel.python.jax.nes.samplers.py"""
@@ -80,7 +79,7 @@ class SamplerTest(parameterized.TestCase):
     batch2 = samplers.dummy_nes_batch(
       batch_size, game.num_players(), action_sizes, jax.random.key(0)
     )
-    
+
     batch_normalised = sampler.normalise_batch(batch2)
 
     self.assertTrue(

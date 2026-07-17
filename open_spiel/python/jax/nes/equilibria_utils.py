@@ -282,7 +282,7 @@ def cce_logit(
 
     inds = string.ascii_lowercase[:num_players]
     pind = inds[player]
-    oinds = inds[:player] + inds[player+1:]
+    oinds = inds[:player] + inds[player + 1 :]
 
     # sum_{a_p'} dual[a_p'] * G_p(a_p', a_{-p})  -> shape [A1, ..., 1, ..., AN]
     contracted = jnp.einsum(f"{inds},{pind}->{oinds}", payoff, dual)
@@ -549,7 +549,7 @@ def ce_logit(
 
 def compute_cce_gap(
   payoffs: chex.Array,  # [N, A1, ..., AN]
-  sigma: chex.Array,  # [A1, ..., AN]
+  correlated_joint_strategy: chex.Array,  # [A1, ..., AN]
   epsilon: chex.Array,  # [N]
   *,
   joint_mask: chex.Array | None = None,
@@ -561,7 +561,7 @@ def compute_cce_gap(
 
   Args:
       payoffs: Player payoffs with shape [N, A1, ..., AN].
-      sigma: Joint strategy with shape [A1, ..., AN].
+      correlated_joint_strategy: Joint strategy with shape [A1, ..., AN].
       epsilon: Per-player slack with shape [N].
       joint_mask: Valid joint action mask with shape [A1, ..., AN].
           If None and strat_mask_per_player is provided, derived automatically.
@@ -577,7 +577,7 @@ def compute_cce_gap(
   # Reuse expected_cce_gain: computes E[G_p(dev, a_{-p}) - G_p(a)] for each dev
   gains = expected_cce_gain(
     payoffs=payoffs,
-    correlated_joint_strategy=sigma,
+    correlated_joint_strategy=correlated_joint_strategy,
     strat_mask_per_player=strat_mask_per_player,
   )  # tuple of [Ap] per player
 
@@ -592,19 +592,20 @@ def compute_cce_gap(
 
 def compute_ce_gap(
   payoffs: chex.Array,  # [N, A1, ..., AN]
-  sigma: chex.Array,  # [A1, ..., AN]
+  correlated_joint_strategy: chex.Array,  # [A1, ..., AN]
   epsilon: chex.Array,  # [N]
   *,
   joint_mask: chex.Array | None = None,
   strat_mask_per_player: list[chex.Array] | None = None,
 ) -> chex.Array:
-  """CE gap: sum_p [max_{dev,rec} (E[G_p(dev,a_{-p})|a_p=rec] - E[G_p(a)|a_p=rec] - epsilon_p)]^+.
+  """CE gap:
+    sum_p [max_{dev,rec}(E[G_p(dev,a_{-p})|a_p=rec]-E[G_p(a)|a_p=rec] - epsilon_p)]^+.
 
   Delegates to expected_ce_gain for conditional deviation gain computation.
 
   Args:
       payoffs: Player payoffs with shape [N, A1, ..., AN].
-      sigma: Joint strategy (correlated) with shape [A1, ..., AN].
+      correlated_joint_strategy: Joint strategy (correlated) with shape [A1, ..., AN].
       epsilon: Per-player slack with shape [N].
       joint_mask: Valid joint action mask with shape [A1, ..., AN].
           If None and strat_mask_per_player is provided, derived automatically.
@@ -621,20 +622,19 @@ def compute_ce_gap(
   # for each (dev, rec) pair
   gains = expected_ce_gain(
     payoffs=payoffs,
-    correlated_joint_strategy=sigma,
+    correlated_joint_strategy=correlated_joint_strategy,
   )  # tuple of [Ap', Ap''] per player
 
   gap = jnp.array(0.0, dtype=payoffs.dtype)
 
   for p, gain_p in enumerate(gains):
-    
     # Mask invalid actions so they don't affect the maximum.
     if strat_mask_per_player is not None:
       valid = strat_mask_per_player[p]
       valid_2d = jnp.logical_and(valid[:, None], valid[None, :])
       min_val = jnp.finfo(gain_p.dtype).min
       gain_p = jnp.where(valid_2d, gain_p, min_val)
-    
+
     best_gain = jnp.max(gain_p)
     slack = best_gain - epsilon[p]
     gap = gap + jnp.maximum(slack, 0.0)
@@ -686,6 +686,7 @@ def _build_ce_gains(
 
 def mwmre_solver(
   payoffs: chex.Array,
+  welfare: chex.Array,
   strat_pred: chex.Array,
   epsilon_target: chex.Array,
   joint_mask: chex.Array,
@@ -695,20 +696,32 @@ def mwmre_solver(
   mode: str = "CE",
   verbose: bool = False,
 ) -> dict:
-  """Solve exact ε-MWMRE CE or CCE via convex optimization.
-  Primal objective:
-      max_{σ ≥ 0}  μ·Σ_a σ(a)·W(a) - ρ·KL(σ || σ̂)
-      s.t. Σ_a σ(a) = 1
-      and (C)CE incentive constraints
-      KL(σ || σ̂) = Σ_a σ(a)·log(σ(a)/σ̂(a))
-                 = Σ_a σ(a)·log σ(a) - Σ_a σ(a)·log σ̂(a)
-                 = -cp.entr(σ) - σ^T·log(σ̂)
+  """Solve exact ε-MWMRE CE or CCE via convex optimisation.
 
-  Therefore, network adopts the dual objective:
-    μ · welfare^T σ
-    + ρ·cp.sum(cp.entr(σ))
-    + ρ·σ^T·log(σ̂)
-    - ρ ∑_p(ε_p^+ - ε_p)ln( 1/e (ε_p^+ - ε_p) / (ε_p^+ - ε_p))
+  Primal objective:
+    max_{σ ≥ 0}  μ·Σ_a σ(a)·W(a) - KL(σ || σ̂)
+                 - ρ·Σ_p(ε_p⁺-ε_p)·ln(1/e · (ε_p⁺-ε_p)/(ε_p⁺-ε̂_p))
+    s.t. Σ_a σ(a) = 1
+    and (C)CE incentive constraints
+    KL(σ || σ̂) = Σ_a σ(a)·log(σ(a)/σ̂(a))
+               = Σ_a σ(a)·log σ(a) - Σ_a σ(a)·log σ̂(a)
+                = -cp.entr(σ) - σ^T·log(σ̂)
+
+  Args:
+    payoffs: Player payoffs with shape [N, A1, ..., AN].
+    welfare: Player welfare with shape [N, A1, ..., AN].
+    strat_pred: Joint strategy with shape [A1, ..., AN].
+    epsilon_target: Per-player slack with shape [N].
+    joint_mask: Valid joint action mask with shape [A1, ..., AN].
+        If None and strat_mask_per_player is provided, derived automatically.
+    welfare_coeff: Objective scalar coefficient
+    ent_coeff: Objective scalar coefficient
+    epsilon_max: Objective scalar coefficient
+    mode: str: CCE or CE
+    verbose: Where to verbose the `cvxpy` solver
+
+  Returns:
+    report: A dict with scalar solver metrics and gaps.
   """
 
   N, *A = payoffs.shape
@@ -731,13 +744,17 @@ def mwmre_solver(
 
   # --- Variables: only over valid joints ---
   strategy = cp.Variable(n_valid, nonneg=True)
-  epsilon = cp.Variable(N, nonneg=True)
+  # epsilon_p ranges over [-epsilon_max, epsilon_max] (Table 3)
+  # negative epsilon represents a strict/robust
+  # equilibrium margin and is required to reproduce e.g. the "MS" and
+  # eps-ME/eps-MRE parameterisations.
+  epsilon = cp.Variable(N)
 
   constraints = [cp.sum(strategy) == 1]
 
   for p in range(N):
     constraints.append(epsilon[p] <= epsilon_max)
-    
+    constraints.append(epsilon[p] >= -epsilon_max)
 
   # --- Equilibrium constraints ---
   if mode == "CCE":
@@ -748,70 +765,69 @@ def mwmre_solver(
   else:
     gains = _build_ce_gains(np.asarray(payoffs), valid_idx)
     for p, gain_p in enumerate(gains):
-        for dev in range(gain_p.shape[0]):
-          for rec in range(gain_p.shape[1]):
-            if dev == rec:
-              continue  # diagonal is naturally zero
-            
-            coeffs = gain_p[dev, rec, :].copy()
-            
-            for i, flat_idx in enumerate(valid_idx):
-              a = np.unravel_index(flat_idx, A)
-              if a[p] != rec:
-                coeffs[i] = 0.0
+      for dev in range(gain_p.shape[0]):
+        for rec in range(gain_p.shape[1]):
+          if dev == rec:
+            continue  # diagonal is naturally zero
 
-            constraints.append(coeffs @ strategy <= epsilon[p])
-            
+          coeffs = gain_p[dev, rec, :].copy()
+
+          for i, flat_idx in enumerate(valid_idx):
+            a = np.unravel_index(flat_idx, A)
+            if a[p] != rec:
+              coeffs[i] = 0.0
+
+          constraints.append(coeffs @ strategy <= epsilon[p])
+
     # for p, gain_p in enumerate(gains):
     #   # gain_p shape: (Ap, Ap, n_valid) -> flatten first two dims
     #   constraints.append(gain_p.reshape(-1, n_valid) @ strategy <= epsilon[p])
 
-  # --- Objective ---
-  welfare = payoffs_flat.sum(axis=0)[valid_idx]
-  welfare_term = welfare_coeff * (welfare @ strategy)
+  if welfare is not None:
+    welfare_flat = np.asarray(welfare).reshape(joint_size)[valid_idx]
+  else:
+    welfare_flat = payoffs_flat.sum(axis=0)[valid_idx]
+  welfare_term = welfare_coeff * (welfare_flat @ strategy)
 
   target_valid = np.clip(target_flat[valid_idx], utils.SMALL_NUMBER, 1.0)
   target_valid = target_valid / target_valid.sum()
 
-
   # KL(sigma || target) = sum(sigma * log(sigma/target)) = -entr(sigma) - sigma^T log(target)
   kl_term = -cp.sum(cp.entr(strategy)) - strategy @ np.log(target_valid)
-  kl_term *= entropy_coeff
 
   # Epsilon penalty
   eps_term = 0
   for p in range(N):
     diff = epsilon_max - epsilon[p]
     target_diff = epsilon_max - epsilon_target[p]
-    
+
     # Clamp target_diff to avoid log(0) — it's a constant parameter
     target_diff_safe = float(np.maximum(target_diff, utils.SMALL_NUMBER))
-    
+
     # cp.entr(diff) = -diff*log(diff) is concave in diff, hence concave in epsilon
     # Add SMALL_NUMBER to avoid log(0) gradient singularity when epsilon -> epsilon_max.
     diff_safe = diff + utils.SMALL_NUMBER
-    
+
     eps_term += entropy_coeff * (
-      cp.entr(diff_safe)           # -diff*log(diff), concave
-      + diff                        # linear in epsilon
+      cp.entr(diff_safe)  # -diff*log(diff), concave
+      + diff  # linear in epsilon
       + diff * np.log(target_diff_safe)  # linear in epsilon
     )
 
   objective = welfare_term - kl_term + eps_term
 
-  # --- Solve ---
   prob = cp.Problem(cp.Maximize(objective), constraints)
   prob.solve(solver=cp.ECOS, verbose=verbose, abstol=1e-6, reltol=1e-6)
 
   if strategy.value is None:
-    return {"sigma": None, "status": prob.status, "error": "Solver failed"}
+    return {"stat_pred": None, "status": prob.status, "error": "Solver failed"}
 
-  # --- Reconstruct full sigma ---
+  # Reconstruct full sigma
   strategy_target = np.zeros(joint_size)
   strategy_target[valid_idx] = strategy.value
   strategy_target = strategy_target.reshape(A)
 
-  # --- Metrics ---
+  # Metrics
   actual_welfare = float(np.sum(strategy_target * payoffs.sum(axis=0)))
   actual_kl = float(
     np.sum(
@@ -831,7 +847,7 @@ def mwmre_solver(
     "solver_gap": solver_gap,
     "welfare_gap": welfare_gap,
     "eps_gap": eps_gap,
-    "sigma": strategy_target,
+    "strategy_target": strategy_target,
     "status": prob.status,
     "objective_value": float(prob.value),
     "welfare": actual_welfare,

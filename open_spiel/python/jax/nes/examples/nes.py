@@ -22,14 +22,11 @@ flags.DEFINE_integer(
   int(1e4),
   "Episode frequency at which the the solver's weights are saved.",
 )
-flags.DEFINE_integer(
-  "iterations", int(6e4), "Number of training episodes."
-)
+flags.DEFINE_integer("iterations", int(6e4), "Number of training episodes.")
 flags.DEFINE_integer(
   "log_every", 5000, "Episode frequency at which the NESolver is evaluated."
 )
 
-# DQN model hyper-parameters
 flags.DEFINE_list(
   "payoff_channel_list",
   [32, 32, 32, 32, 32],
@@ -45,17 +42,17 @@ flags.DEFINE_integer(
 )
 
 flags.DEFINE_multi_enum(
-    "random_games",
-    [],  # default list
-    [m.name for m in games.Game],
-    "Random game types to sample from. Can specify multiple times.",
+  "random_games",
+  [],  # default list
+  [m.name for m in games.Game],
+  "Random game types to sample from. Can specify multiple times.",
 )
 
 flags.DEFINE_multi_enum(
-    "openspiel_games",
-    [],  # default list
-    list(pyspiel.registered_names()),
-    "OpenSpiel games to sample from. Can specify multiple times.",
+  "openspiel_games",
+  [],  # default list
+  list(pyspiel.registered_names()),
+  "OpenSpiel games to sample from. Can specify multiple times.",
 )
 
 flags.DEFINE_enum(
@@ -83,26 +80,27 @@ flags.DEFINE_float(
 )
 
 flags.DEFINE_float(
-  "welfare_coeff", 2.0, "Maximum Welfare coefficient of the loss function."
+  "welfare_coeff", 4.0, "Maximum Welfare coefficient of the loss function."
 )
 flags.DEFINE_float(
-  "entropy_coeff", 10.0, "Minimum Relative Entropy coefficient of the loss function."
+  "entropy_coeff",
+  10.0,
+  "Minimum Relative Entropy coefficient of the loss function.",
 )
 flags.DEFINE_float(
-  "epsilon_max", 10.0, "Epsilon plus coefficient of the loss function."
+  "epsilon_max", None, "Epsilon plus coefficient of the loss function."
 )
 
 flags.DEFINE_integer("norm", 2, "Norm of the payoff tensor.")
 flags.DEFINE_integer("seed", 42, "A random seed.")
 
 flags.DEFINE_integer(
-  "batch_size", 32, "Number of transitions to sample at each learning step."
+  "batch_size", 64, "Number of transitions to sample at each learning step."
 )
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
 
 
 def main(_) -> None:
-
   network_config = dict(
     dual_channels=FLAGS.dual_channels,
     payoff_channel_list=FLAGS.payoff_channel_list,
@@ -110,8 +108,10 @@ def main(_) -> None:
   )
 
   random_games = [games.Game[game] for game in FLAGS.random_games]
-  openspiel_names = FLAGS.openspiel_games  
-  assert len(openspiel_names) + len(random_games) > 0, "Any games should be specified"
+  openspiel_names = FLAGS.openspiel_games
+  assert len(openspiel_names) + len(random_games) > 0, (
+    "Any games should be specified"
+  )
 
   solver = nes.NESolver(
     random_games + openspiel_names,
@@ -120,7 +120,7 @@ def main(_) -> None:
     entropy_coeff=FLAGS.entropy_coeff,
     welfare_coeff=FLAGS.welfare_coeff,
     epsilon_max=FLAGS.epsilon_max,
-    norm=FLAGS.norm,  
+    norm=FLAGS.norm,
     batch_size=FLAGS.batch_size,
     learning_rate=utils.lr_schedule(FLAGS.learning_rate),
     weight_decay=FLAGS.decay,
@@ -130,11 +130,12 @@ def main(_) -> None:
     seed=FLAGS.seed,
     game_kwargs={
       "num_strategies": tuple(int(_) for _ in FLAGS.num_strategies),
-      "max_actions": FLAGS.max_actions
+      "max_actions": FLAGS.max_actions,
     },
     allow_checkpointing=FLAGS.use_checkpoints,
   )
   solver.solve()
+
 
 if __name__ == "__main__":
   app.run(main)

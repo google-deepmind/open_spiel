@@ -1,6 +1,7 @@
 import enum
 import functools
 import math
+import os
 
 import optax
 import chex
@@ -9,6 +10,9 @@ import jax
 import jax.numpy as jnp
 from jax.sharding import NamedSharding
 from jax.sharding import PartitionSpec as P
+
+from concurrent.futures import ThreadPoolExecutor
+from typing import Callable
 
 
 def named_sharding(
@@ -643,3 +647,71 @@ def calc_pooled_payoffs_chan(
     )
 
   return payoffs_chan
+
+
+class AsyncExactSolver:
+  """Thread-pool wrapper for eu.mwmre_solver.
+
+  CVXPY releases the GIL during the ECOS C call, so threads give
+  real parallelism.  Used inside NESolver._logging_callback.
+  """
+
+  def __init__(self, max_workers: int | None = None):
+    if max_workers is None:
+      max_workers = max(1, (os.cpu_count() or 2) // 2)
+    self._executor = ThreadPoolExecutor(max_workers=max_workers)
+    self._pending = []
+
+  def shutdown(self):
+    self._executor.shutdown(wait=True)
+
+  def submit_batch(
+    self,
+    mwmre_solver_fn: Callable,
+    payoffs: chex.Array,  # [B, N, *A]
+    welfares: chex.Array,  # [B, N]
+    strategies: chex.Array,  # [B, *A]
+    epsilon_targets: chex.Array,  # [B, N]
+    joint_masks: chex.Array,  # [B, *A]
+    mu: float,
+    rho: float,
+    eps_max: float,
+    mode_name: str,
+  ):
+    """Run B solves asynchronously. Returns a Future."""
+    batch_size = payoffs.shape[0]
+
+    def _solve_one(i: int):
+      return mwmre_solver_fn(
+        payoffs[i],
+        welfares[i],
+        strategies[i],
+        epsilon_targets[i],
+        joint_masks[i],
+        mu,
+        rho,
+        eps_max,
+        mode_name,
+        verbose=False,
+      )
+
+    # Submit all B tasks; ECOS runs in C and releases the GIL
+    futures = [self._executor.submit(_solve_one, i) for i in range(batch_size)]
+    return futures
+
+  def collect(self, futures: list, timeout: float | None = None):
+    """Block until all futures done and return mean stats."""
+    results = [f.result(timeout=timeout) for f in futures]
+
+    # Stack scalar fields
+    def _maybe_stack(key: str):
+      vals = [r[key] for r in results if key in r and r[key] is not None]
+      if not vals:
+        return None
+      return jnp.mean(jnp.stack([jnp.array(v) for v in vals]), axis=0)
+
+    return {
+      "solver_gap": _maybe_stack("solver_gap"),
+      "welfare_gap": _maybe_stack("welfare_gap"),
+      "eps_gap": _maybe_stack("eps_gap"),
+    }

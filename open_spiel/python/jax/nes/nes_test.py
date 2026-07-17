@@ -29,10 +29,9 @@ class NESTest(parameterized.TestCase):
     batch = samplers.dummy_nes_batch(
       batch_size, num_players, action_sizes, jax.random.key(0)
     )
-    
+
     _model = networks.NeuralEquilibriumModel(
       num_players,
-      # action_sizes,
       dual_channels=128,
       mode=mode,
       rngs=nn.Rngs(jax.random.key(0)),
@@ -78,7 +77,7 @@ class NESTest(parameterized.TestCase):
     action_sizes = tuple(num_actions for _ in range(num_players))
     data = jax.tree.map(
       lambda x: jnp.squeeze(x, 0),
-      samplers.dummy_nes_batch(1, num_players, action_sizes, data_rng)
+      samplers.dummy_nes_batch(1, num_players, action_sizes, data_rng),
     )
 
     def loss_fn(duals):

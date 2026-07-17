@@ -27,6 +27,7 @@ import chex
 
 _MIN_SCALE = 1e-12
 
+
 def _center(
   payoff: chex.Array, player: int, joint_mask: Optional[chex.Array] = None
 ) -> chex.Array:
@@ -114,7 +115,7 @@ def _l1_scale(
 
   if unit_variance:
     size = jnp.sum(joint_mask) if joint_mask is not None else tensor.size
-    scale /= jnp.sqrt(size)
+    scale /= jnp.abs(size)
   return tensor / scale
 
 
@@ -130,7 +131,7 @@ def _linf_scale(
 
   if unit_variance:
     size = jnp.sum(joint_mask) if joint_mask is not None else tensor.size
-    scale /= jnp.sqrt(size)
+    scale /= jnp.max(size)
   return tensor / scale
 
 
@@ -226,6 +227,7 @@ class Game(enum.Enum):
   CE_COUNTER_EXAMPLE = 4
   CCE_COUNTER_EXAMPLE = 5
 
+
 def generate_payoffs(
   game: Game,
   game_settings: Mapping[str, Any],
@@ -250,20 +252,24 @@ def generate_payoffs(
     elif game == Game.EMPIRICAL_DISC_GAME:
       payoffs, mask = empirical_disc_game(key, num_strategies, **game_settings)
     elif game == Game.CCE_COUNTER_EXAMPLE:
-      payoffs = jnp.array([
-        [[2, 2], [0, 0],   [0, 0],     [0, 2]],
-        [[0, 0], [3, 3],   [0, 3],     [-10, 7]],
-        [[0, 0], [3, 0],   [-10, -10], [-10, -6]],
-        [[2, 0], [7, -10], [-6, -10],  [0, 0]],
-      ])
+      payoffs = jnp.array(
+        [
+          [[2, 2], [0, 0], [0, 0], [0, 2]],
+          [[0, 0], [3, 3], [0, 3], [-10, 7]],
+          [[0, 0], [3, 0], [-10, -10], [-10, -6]],
+          [[2, 0], [7, -10], [-6, -10], [0, 0]],
+        ]
+      )
       mask = jnp.ones_like(payoffs[0])
     elif game == Game.CE_COUNTER_EXAMPLE:
-      payoffs = jnp.array([
-        [[-4, -4],     [2, -2],      [-999, -999], [-999, -999]],
-        [[-2, 2],      [1, 1],       [-999, -999], [-999, -999]],
-        [[-999, -999], [-999, -999], [-3, -3], [2, -2]],
-        [[-999, -999], [-999, -999], [-2, 2], [1.1, 1.1]],
-      ])
+      payoffs = jnp.array(
+        [
+          [[-4, -4], [2, -2], [-999, -999], [-999, -999]],
+          [[-2, 2], [1, 1], [-999, -999], [-999, -999]],
+          [[-999, -999], [-999, -999], [-3, -3], [2, -2]],
+          [[-999, -999], [-999, -999], [-2, 2], [1.1, 1.1]],
+        ]
+      )
       mask = jnp.ones_like(payoffs[0])
     else:
       raise ValueError(f"Unrecognised game type: {game}.")

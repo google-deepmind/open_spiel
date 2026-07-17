@@ -152,10 +152,9 @@ class GameSampler:
       Objective.EPS_MWME,
       Objective.EPS_MWMRE,
     ]:
-      # return jax.random.uniform(
-      #   rng, (num_players,), jnp.float32, -self.z_m, self.z_m
-      # )
-      return jax.random.uniform(rng, (num_players,), jnp.float32, 0.0, self.z_m)
+      return jax.random.uniform(
+        rng, (num_players,), jnp.float32, -self.z_m, self.z_m
+      )
     return jnp.zeros(num_players)
 
   @functools.partial(jax.jit, static_argnums=(0,))
@@ -169,8 +168,7 @@ class GameSampler:
     scaled_eps = hat_epsilon / (safe_norm + utils.SMALL_NUMBER)
 
     # Clip to [-Z_m, +Z_m] (broadcast Z_m)
-    # return jnp.clip(scaled_eps, -self.z_m, self.z_m)
-    return jnp.clip(scaled_eps, 0, self.z_m)
+    return jnp.clip(scaled_eps, -self.z_m, self.z_m)
 
 
   def _initialise_strategy(
@@ -190,9 +188,8 @@ class GameSampler:
     """Equation (16d): L1 unit-variance scaling for target joint distribution"""
     joint_A = utils.compute_joint_action_size(strat_base.shape)
     mean = 1.0 / joint_A
-    z_sigma = (joint_A / jnp.sqrt(joint_A + 1.0 / joint_A)) * (
-      (joint_A - 1) / joint_A
-    )
+    z_sigma = joint_A * jnp.sqrt((joint_A + 1) / (joint_A - 1 + utils.SMALL_NUMBER))
+
     return z_sigma * (strat_base - mean)
 
   def _initialise_welfare(self, payoffs: chex.Array) -> chex.Array:
@@ -210,7 +207,7 @@ class GameSampler:
     centered = welfare - mean
     norm = utils.compute_L_m_norm(centered, self.m, tuple(range(welfare.ndim)))
 
-    return centered / (norm + utils.SMALL_NUMBER)
+    return self.z_m * centered / (norm + utils.SMALL_NUMBER)
 
   def normalise_batch(self, data: Data) -> Data:
     def _normalise_single_item(item: Data):

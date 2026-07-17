@@ -1,4 +1,3 @@
-import dataclasses
 import functools
 from typing import Callable, Optional
 
@@ -14,154 +13,21 @@ import trackio
 
 from open_spiel.python.jax.nes import equilibria_utils as eu
 from open_spiel.python.jax.nes import games, networks, samplers, utils
-
-#TODO: inclusive logging
 from open_spiel.python.utils import data_logger
 
 """Neural Equilibrium Solver agent implemented in Jax.
 
-See the paper "Turbocharging Solution Concepts: 
-Solving NEs, CEs and CCEs with Neural Equilibrium Solvers"
+  See the paper
+  [1] "Turbocharging Solution Concepts: Solving NEs, CEs and 
+  CCEs with Neural Equilibrium Solvers"
 
-https://arxiv.org/abs/2210.09257 for more details.
+  https://arxiv.org/abs/2210.09257 for more details.
 """
 
 # Shortcut for data structrures
 Data = samplers.Data
 Game = samplers.Game
-Objective = samplers.Objective 
-
-
-
-@dataclasses.dataclass
-class MWMREConfig:
-  """Configuration for ε-MWMRE family of equilibrium solvers."""
-
-  strategy_target: chex.Array | None
-  """σ̂: Target joint strategy for entropy regularization."""
-
-  welfare_coeff: float = 1.0
-  """μ: Weight on welfare term W(a) = Σ_p G_p(a). 
-  μ > 0 for welfare-aware, μ = 0 for welfare-agnostic."""
-
-  entropy_coeff: float = 10.0
-  """ρ: Weight on KL-divergence penalty KL(σ || σ̂).
-    ρ > 0 always (required for convexity).
-  """
-
-  epsilon_max: float = 10.0
-  """ε⁺: Upper bound / budget on per-player slack ε_p.
-    Sets the feasible region for incentive constraints.
-  """
-
-  has_eps: bool = True
-  """ε_p > 0: Whether to consider the approximate objectives 
-    or the regualr ones.
-  """
-
-  @property
-  def objective_name(self) -> Objective:
-    """Name of the specific objective variant."""
-
-    has_welfare = self.welfare_coeff > 0
-    has_entropy = self.entropy_coeff > 0
-    has_eps = self.has_eps
-    has_strategy_proposal = self.strategy_target is not None
-
-    if (has_welfare and has_entropy) and has_eps:
-      return Objective.EPS_MWMRE
-    elif (has_welfare and has_entropy) and not has_eps:
-      return Objective.MWME
-    elif not has_welfare and has_entropy and has_eps:
-      return Objective.EPS_MRE
-    elif not has_welfare and has_entropy and not has_eps:
-      return Objective.EPS_MRE
-    else:
-      raise ValueError("Wrong objective specification.")
-
-  def validate(self) -> None:
-    """Check parameter consistency."""
-    assert self.entropy_coeff > 0, "ρ must be > 0 for convexity"
-    assert self.epsilon_max >= 0, "ε⁺ must be non-negative"
-    assert self.welfare_coeff > 0, "Need μ > 0 if no entropy target"
-
-    if self.objective_name in (Objective.MWME, Objective.MRE):
-      assert not self.has_eps, f"{self.objective_name} requires ε̂ = 0"
-
-
-def mwme(
-  welfare_coeff: float = 1.0,
-  entropy_coeff: float = 10.0,
-  epsilon_max: float = 10.0,
-) -> MWMREConfig:
-  """Max Welfare, Min Entropy: μ>0, ρ>0, ε̂=0, σ̂=uniform."""
-  return MWMREConfig(
-    welfare_coeff=welfare_coeff,
-    entropy_coeff=entropy_coeff,
-    epsilon_max=epsilon_max,
-  )
-
-
-def mre(
-  entropy_coeff: float = 10.0,
-  epsilon_max: float = 10.0,
-) -> MWMREConfig:
-  """Min Relative Entropy: μ=0, ρ>0, ε̂=0, σ̂=arbitrary."""
-  return MWMREConfig(
-    welfare_coeff=0.0,
-    entropy_coeff=entropy_coeff,
-    epsilon_max=epsilon_max,
-  )
-
-
-def me(
-  entropy_coeff: float = 10.0,
-  epsilon_max: float = 10.0,
-) -> MWMREConfig:
-  """Max Entropy: μ=0, ρ>0, ε̂=0, σ̂=uniform."""
-  return MWMREConfig(
-    welfare_coeff=0.0,
-    entropy_coeff=entropy_coeff,
-    epsilon_max=epsilon_max,
-  )
-
-
-def eps_mwme(
-  welfare_coeff: float = 1.0,
-  entropy_coeff: float = 10.0,
-  epsilon_max: float = 10.0,
-) -> MWMREConfig:
-  """ε-approx MWME: μ>0, ρ>0, ε̂>0, σ̂=uniform."""
-  return MWMREConfig(
-    welfare_coeff=welfare_coeff,
-    entropy_coeff=entropy_coeff,
-    epsilon_max=epsilon_max,
-  )
-
-
-def eps_mre(
-  entropy_coeff: float = 10.0,
-  epsilon_max: float = 10.0,
-) -> MWMREConfig:
-  """ε-approx MRE: μ=0, ρ>0, ε̂>0, σ̂=arbitrary."""
-  return MWMREConfig(
-    welfare_coeff=0.0,
-    entropy_coeff=entropy_coeff,
-    epsilon_max=epsilon_max,
-  )
-
-
-def eps_mwmre(
-  welfare_coeff: float = 1.0,
-  entropy_coeff: float = 10.0,
-  epsilon_max: float = 10.0,
-) -> MWMREConfig:
-  """Full ε-MWMRE: μ>0, ρ>0, ε̂>0, σ̂=arbitrary."""
-  return MWMREConfig(
-    welfare_coeff=welfare_coeff,
-    entropy_coeff=entropy_coeff,
-    epsilon_max=epsilon_max,
-  )
+Objective = samplers.Objective
 
 
 @functools.partial(jax.jit, static_argnames=("mode",))
@@ -240,8 +106,14 @@ class DifferentiableEquilibriumBlock(nn.Module):
       samplers.stack(samplers.broadcast(data), axis=1),
       data.strat_mask_per_player,
     )
+    # Recovering primal variables
     _, strategy, _, _, _ = recover_primals(
-      duals, data, self._mu, self._rho, self._eps_cap, self._mode.value
+      duals,
+      data,
+      self._mu,
+      self._rho,
+      self._eps_cap,
+      self._mode.value,
     )
     return strategy
 
@@ -391,7 +263,7 @@ class NESolver:
       self._checkpointer = ocp.StandardCheckpointer()
 
     self._logger = None
-  
+
     if gradient_clipping:
       optimiser = optax.chain(
         # Clip the raw gradients first
@@ -400,6 +272,7 @@ class NESolver:
       )
 
     self._optimizer = nn.Optimizer(self._network, optimiser, wrt=nn.Param)
+    self._exact_solver = utils.AsyncExactSolver()
 
     self._graphdef_network_opt = nn.graphdef((self._network, self._optimizer))
     self._graphdef_network = nn.graphdef(self._network)
@@ -472,16 +345,12 @@ class NESolver:
       data: Data,
     ) -> tuple[chex.Array, nn.State, nn.State]:
       policy_model, optimiser = nn.merge(
-        self._graphdef_network_opt,
-        network_opt_state,
-        copy=True
+        self._graphdef_network_opt, network_opt_state, copy=True
       )
       policy_model.train()
       (loss, (primals, _)), grads = nn.value_and_grad(
         self._loss_fn, has_aux=True
       )(policy_model, data)
-
-      # jax.debug.print("{x}",x=optax.global_norm(grads))
 
       optimiser.update(policy_model, grads)
 
@@ -552,7 +421,7 @@ class NESolver:
     self._checkpointer.wait_until_finished()
 
   def _logging_callback(self, batch: Data, primals: dict) -> dict:
-    batch_size = batch.payoffs.shape[0]
+    # Fast JAX-computed gap (always available immediately)
     if self._mode == networks.Mode.CCE:
       regret = jax.vmap(eu.compute_cce_gap)(
         batch.payoffs,
@@ -560,7 +429,7 @@ class NESolver:
         batch.epsilon_target,
         joint_mask=batch.joint_mask,
       )
-    else:  # CE gap
+    else:
       regret = jax.vmap(eu.compute_ce_gap)(
         batch.payoffs,
         primals["strategy"],
@@ -568,40 +437,35 @@ class NESolver:
         joint_mask=batch.joint_mask,
       )
 
-    data = []
-    for i in range(batch_size):
-      solver_data = eu.mwmre_solver(
-        batch.payoffs[i],
-        primals["strategy"][i],
-        batch.epsilon_target[i],
-        batch.joint_mask[i],
-        self._mu,
-        self._rho,
-        self._eps_cap,
-        self._mode.name,
-      )
-      data.append(
-        {
-          "solver_gap": solver_data["solver_gap"],
-          "welfare_gap": solver_data["welfare_gap"],
-          "eps_gap": solver_data["eps_gap"],
-        }
-      )
-
-    mean_batch_data = jax.tree.map(
-      lambda *args: jnp.mean(jnp.stack(args), axis=0), *data
+    # Expensive exact solves: run in parallel via thread pool
+    futures = self._exact_solver.submit_batch(
+      eu.mwmre_solver,
+      batch.payoffs,
+      batch.welfare,
+      primals["strategy"],
+      batch.epsilon_target,
+      batch.joint_mask,
+      self._mu,
+      self._rho,
+      self._eps_cap,
+      self._mode.name,
     )
 
-    mean_batch_data.update({f"{self._mode.name}_gap": regret.mean()})
+    # Block here only for logging (still much faster than sequential)
+    exact_stats = self._exact_solver.collect(futures, timeout=30.0)
+
+    mean_batch_data = exact_stats
+    mean_batch_data[f"{self._mode.name}_gap"] = regret.mean()
     return mean_batch_data
 
   def evaluate(
-    self, step: int, batch_size: int, sampler: Optional[samplers.GameSampler] = None
+    self,
+    step: int,
+    batch_size: int,
+    sampler: Optional[samplers.GameSampler] = None,
   ) -> dict:
     sampler = sampler if sampler is not None else self._sampler
-    batch = sampler.sample_random(
-      batch_size, jax.random.key(step), None
-    )
+    batch = sampler.sample_random(batch_size, jax.random.key(step), None)
     loss, (primals, duals) = self._infer_fn(nn.state(self._network), batch)
     log = self._logging_callback(batch, primals)
     log["eval_loss"] = loss
@@ -618,11 +482,13 @@ class NESolver:
     """
     # Logger setup
     trackio.init(
-      project="NES", 
+      project="NES",
     )
     logger = None
     if logging_path is not None:
-      logger = data_logger.DataLoggerJsonLines(logging_path, "NES_learner", True)
+      logger = data_logger.DataLoggerJsonLines(
+        logging_path, "NES_learner", True
+      )
 
     logs = []
 
@@ -645,16 +511,14 @@ class NESolver:
         print(f"It. {self._iteration} | Loss {loss_val}")
 
         log = self.evaluate(self._iteration, self._batch_size)
-        trackio.log({k: v.item() for k,v in log.items()}, step=self._iteration)
+        trackio.log({k: v.item() for k, v in log.items()}, step=self._iteration)
         if logger is not None:
-          logger.write(
-            {k: v.item() for k,v in log.items()}
-          )
-        
+          logger.write({k: v.item() for k, v in log.items()})
+
         logs.append(log)
 
     # Peform expensive evaluation after the training
     logs.append(self.evaluate(self._iteration, self._eval_batch_size))
     trackio.finish()
-    
+
     return logs

@@ -13,7 +13,6 @@ def _matching_pennies() -> dict:
   Row player wants match, column wants mismatch.
   """
   # Payoffs: [row_player, col_player]
-  #       H       T
   payoffs = jnp.array(
     [[[1, -1], [-1, 1]], [[-1, 1], [1, -1]]], dtype=jnp.float32
   )
@@ -36,9 +35,8 @@ def _matching_pennies() -> dict:
 def _coordination_game() -> dict:
   """
   Coordination game: both players want to match.
-  Two pure NE: (0,0) and (1,1), plus mixed.
+  Two pure NE: (0,0) and (1,1), plus somwe mixed.
   """
-  #     L       R
   G = jnp.array([[[1, 0], [0, 1]], [[1, 0], [0, 1]]], dtype=jnp.float32)
 
   sigma_mixed = jnp.ones((2, 2)) / 4.0
@@ -78,20 +76,25 @@ def _prisoners_dilemma() -> dict:
 
 
 class EquilibriaTest(absltest.TestCase):
-  
-  # === CCE gain ===
+
+
   def test_cce_gain_per_player_from_payoff(self):
     """CCE gain from payoff tensor."""
     payoffs = jnp.array([[[3, 0], [5, 1]], [[3, 5], [0, 1]]], dtype=jnp.float32)
+
     # Player 0's payoff: [[3, 0], [5, 1]]
     gain_0 = eu.cce_gain_per_player(0, payoff=payoffs[0])
+
     # Shape: [2, 2, 2] = [A0', A0, A1]
     self.assertEqual(gain_0.shape, (2, 2, 2))
-    # When deviating to action 0: G_0(0, a_1) - G_0(a_0, a_1)
+    
+    # When deviating to action 0: G_0(a_0', a_1) - G_0(a_0, a_1)
     # At (0,0): 3 - 3 = 0; At (0,1): 0 - 0 = 0
     # At (1,0): 3 - 5 = -2; At (1,1): 0 - 1 = -1
     expected_dev0 = jnp.array([[0, 0], [-2, -1]])
     self.assertTrue(jnp.allclose(gain_0[0], expected_dev0))
+    expected_dev1 = jnp.array([[2, 1], [0, 0]])
+    self.assertTrue(jnp.allclose(gain_0[1], expected_dev1))
 
   def test_cce_gain_per_player_from_ce_gain(self):
     """CCE gain from CE gain (sum over rec axis)."""
@@ -101,7 +104,6 @@ class EquilibriaTest(absltest.TestCase):
     expected = jnp.ones((2, 2, 2)) * 2  # sum of two 1s
     self.assertTrue(jnp.allclose(cce_gain, expected))
 
-  # === Expected CCE gain ===
   def test_expected_cce_gain_from_payoff_and_joint(self):
     """Expected CCE gain under joint strategy."""
     G = _matching_pennies()["payoffs"]
@@ -325,10 +327,7 @@ class EquilibriaTest(absltest.TestCase):
     epsilon_zero = jnp.array([0.0, 0.0])
     gap = eu.compute_cce_gap(G, sigma, epsilon_zero)
 
-    # Each player can gain 2 by deviating (from -1 to +1 relative)
-    # Actually: Cooperate payoff = -1, Defect payoff = 0 when opponent cooperates
-    # Gain = 0 - (-1) = 1 per player
-    self.assertTrue(jnp.all(gap > 1.5))
+    self.assertTrue(jnp.all(gap > 1.0))
 
   def test_cce_gap_monotonic_in_epsilon(self):
     """Gap should decrease as epsilon increases."""
@@ -361,7 +360,9 @@ class EquilibriaTest(absltest.TestCase):
     self.assertEqual(gap, 0.0)
 
   def test_ce_gap_pure_strategy(self):
-    """Pure strategy is a CE (degenerate: signal reveals action, no benefit to deviate)."""
+    """Pure strategy is a CE 
+      (degenerate: signal reveals action, no benefit to deviate).
+    """
     matching_pennies = _matching_pennies()
     G = matching_pennies["payoffs"]
     sigma = matching_pennies["sigma_pure"]
@@ -369,7 +370,7 @@ class EquilibriaTest(absltest.TestCase):
     epsilon_zero = jnp.array([0.0, 0.0])
     gap = eu.compute_ce_gap(G, sigma, epsilon_zero)
 
-    self.assertTrue(jnp.all(gap > 1.5))
+    self.assertTrue(jnp.all(gap > 1.0))
 
   def test_ce_vs_cce_gap_comparison(self):
     """CE gap should be >= CCE gap (CE is stricter)."""

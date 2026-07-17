@@ -8,10 +8,9 @@ import jax.numpy as jnp
 
 from open_spiel.python.jax.nes import utils
 
-"""Implements modules from NES paper: 'Turbocharging
-  Solution Concepts: Solving NEs, CEs and CCEs with
-  Neural Equilibrium Solver.' See the paper:
-  https://arxiv.org/abs/2210.09257
+"""Implements modules from NES paper: 'Turbocharging Solution Concepts: 
+    Solving NEs, CEs and CCEs with Neural Equilibrium Solver.' See the paper:
+    https://arxiv.org/abs/2210.09257
 """
 
 
@@ -183,7 +182,7 @@ class EquivariantPayoffPooling(EquivariantPooling):
       else:
         where = None
 
-      adjusted_axes = tuple(a - 2 for a in reduce_axes if a >= 2)
+      adjusted_axes = tuple(a - 1 for a in reduce_axes if a >= 2)
 
       # Reduce
       reduced = utils.reduce(
@@ -389,15 +388,7 @@ class EquivariantDualPoolingCCE(nn.Module):
 
     self.pools = [
       lambda x: x,  # (19a) identity
-      lambda x: utils.reduce(
-        x,
-        (1,),
-        utils.Reduction.MEAN,
-        include_identity=False,
-        include_all=True,
-        include_other=False,
-        broadcast=True,
-      ),  # (19b) mean over players
+      # (19b) mean over a'_p (action axis = 2)
       lambda x: utils.reduce(
         x,
         (2,),
@@ -406,7 +397,20 @@ class EquivariantDualPoolingCCE(nn.Module):
         include_all=True,
         include_other=False,
         broadcast=True,
-      ),  # (19c) mean over actions
+      ),
+
+      # (19c) mean over player p (axis = 1)
+      lambda x: utils.reduce(
+        x,
+        (1,),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),
+
+      # (19d) mean over player + action (axes 1, 2)
       lambda x: utils.reduce(
         x,
         (1, 2),
@@ -415,7 +419,7 @@ class EquivariantDualPoolingCCE(nn.Module):
         include_all=True,
         include_other=False,
         broadcast=True,
-      ),  # (19d) mean over player + actions
+      ),
     ]
 
     # given that there are N `num_players`
@@ -437,6 +441,7 @@ class EquivariantDualPoolingCE(nn.Module):
     self.pools = [
       lambda x: x,  # (20a) identity
       lambda x: jnp.swapaxes(x, 2, 3),  # (20b) swap a' ↔ a''
+      # (20c) mean over a' (axis 2)
       lambda x: utils.reduce(
         x,
         (2,),
@@ -445,16 +450,9 @@ class EquivariantDualPoolingCE(nn.Module):
         include_all=True,
         include_other=False,
         broadcast=True,
-      ),  # (20c) mean over a'
-      lambda x: utils.reduce(
-        jnp.swapaxes(x, 2, 3),  # SWAP FIRST
-        (3,),  # reduce over a' of swapped
-        utils.Reduction.MEAN,
-        include_identity=False,
-        include_all=True,
-        include_other=False,
-        broadcast=True,
-      ),  # (20d) mean over a''
+      ),
+
+      # (20d) mean over a'' (axis 3)
       lambda x: utils.reduce(
         x,
         (3,),
@@ -463,16 +461,9 @@ class EquivariantDualPoolingCE(nn.Module):
         include_all=True,
         include_other=False,
         broadcast=True,
-      ),  # (20e) mean over both
-      lambda x: utils.reduce(
-        jnp.swapaxes(x, 2, 3),  # SWAP FIRST
-        (2,),  # reduce over a'' of swapped
-        utils.Reduction.MEAN,
-        include_identity=False,
-        include_all=True,
-        include_other=False,
-        broadcast=True,
-      ),  # (20f) mean over p,a'
+      ),
+
+      # (20e) mean over both a' and a'' (axes 2, 3)
       lambda x: utils.reduce(
         x,
         (2, 3),
@@ -481,7 +472,31 @@ class EquivariantDualPoolingCE(nn.Module):
         include_all=True,
         include_other=False,
         broadcast=True,
-      ),  # (20g) mean over p,a''
+      ),
+
+      # (20f) mean over p and a' (axes 1, 2)
+      lambda x: utils.reduce(
+        x,
+        (1, 2),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),
+
+      # (20g) mean over p and a'' (axes 1, 3)
+      lambda x: utils.reduce(
+        x,
+        (1, 3),
+        utils.Reduction.MEAN,
+        include_identity=False,
+        include_all=True,
+        include_other=False,
+        broadcast=True,
+      ),
+
+      # (20h) mean over all (axes 1, 2, 3)
       lambda x: utils.reduce(
         x,
         (1, 2, 3),
@@ -490,7 +505,7 @@ class EquivariantDualPoolingCE(nn.Module):
         include_all=True,
         include_other=False,
         broadcast=True,
-      ),  # (20h) mean over all
+      ),
     ]
 
     self.num_pools = len(self.pools)
@@ -643,14 +658,6 @@ class NeuralEquilibriumModel(nn.Module):
 
     self.dual_layers = nn.Sequential(*dual_layers)
 
-    # Final projection to single channel (if needed)
-    self.final_proj = (
-      nn.Linear(
-        dual_channel_list[-1], 1, rngs=rngs, kernel_init=BASE_KERNEL_INIT
-      )
-      if dual_channel_list[-1] != 1
-      else lambda x: x
-    )
 
   def _mask_duals(
     self, duals: chex.Array, strat_mask_per_player: list[chex.Array]
