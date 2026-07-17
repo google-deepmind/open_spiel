@@ -11,7 +11,7 @@ class CacheInfo(
 
   @property
   def usage(self):
-    return self.size / self.max_size if self._max_size else 0
+    return self.size / self.max_size if self.max_size else 0
 
   @property
   def total(self):
