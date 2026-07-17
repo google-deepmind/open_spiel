@@ -121,7 +121,7 @@ def exact_baseline(
 ) -> dict[str, Any]:
   """Solve the exact ε-MWMRE problem via CVXPY for small games."""
   N, *A = payoffs.shape
-  joint_size = int(np.prod(A))
+  joint_size = utils.compute_joint_action_size(A)
   sigma_hat = np.ones(A) / joint_size
   eps_hat = np.zeros(N)
   mask = np.ones(A, dtype=bool)
@@ -193,7 +193,8 @@ def experiment_2_indistribution() -> dict[str, Any]:
 
   # Also compute exact baseline on a single game for sanity
   key = jax.random.key(FLAGS.seed)
-  payoffs, _ = games.l_invariant(key, utils._l2_scale, (8, 8))
+  payoff_tensor_fn = games.generate_payoffs(games.Game.L2_INVARIANT, {}, (8, 8))
+  payoffs, _ = payoff_tensor_fn(key)
   exact = exact_baseline(
     np.array(payoffs),
     networks.Mode.CCE,
