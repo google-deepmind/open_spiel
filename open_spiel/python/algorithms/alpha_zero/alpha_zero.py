@@ -35,13 +35,14 @@ import datetime
 import functools
 import itertools
 import json
-import multiprocessing
+import threading
+import queue
 import os
 import sys
 import tempfile
 import time
 import traceback
-from typing import Any, Callable
+from typing import Any
 
 import chex
 import jax.numpy as jnp
@@ -54,31 +55,8 @@ from open_spiel.python.algorithms.alpha_zero import utils
 import pyspiel
 from open_spiel.python.utils import data_logger
 from open_spiel.python.utils import file_logger
-from open_spiel.python.utils import spawn
 from open_spiel.python.utils import stats
 
-# pylint: disable=g-bare-generic
-
-# Set the start method to 'spawn' for CUDA compatibility and monkey-patch
-# to prevent OpenSpiel from overriding it.
-# See:
-# https://github.com/google-deepmind/open_spiel/issues/1326
-try:
-  # jax and TF aren't compatible with the `fork` strategy due to the inner
-  # multitheading
-  # see:
-  # https://github.com/jax-ml/jax/issues/1805
-  multiprocessing.set_start_method("spawn", force=True)
-
-  # Monkey-patch to prevent OpenSpiel from changing the start method.
-  def _do_nothing_set_start_method(method, force=False):
-    del method, force
-    pass
-
-  multiprocessing.set_start_method = _do_nothing_set_start_method
-except RuntimeError:
-  # This may be raised in child processes where the context is already set.
-  pass
 
 # Time to wait for processes to join.
 JOIN_WAIT_DELAY = 0.001
@@ -269,78 +247,56 @@ def _play_game(
   return trajectory
 
 
-def update_checkpoint(
-    logger: Any,
-    queue: spawn._ProcessQueue,
-    model: Any,
-    az_evaluator: evaluator_lib.AlphaZeroEvaluator,
-) -> bool:
-  """Read the queue for a checkpoint to load, or an exit signal."""
-  path = None
-  while True:  # Get the last message, ignore intermediate ones.
-    try:
-      path = queue.get_nowait()
-    except spawn.Empty:
-      break
-  if path:
-    logger.print("Inference cache:", az_evaluator.cache_info())
-    logger.print("Loading checkpoint", path)
-    model.load_checkpoint(path)
-    az_evaluator.clear_cache()
-  elif path is not None:  # Empty string means stop this process.
-    return False
-  return True
-
-
 @watcher
 def actor(
     *,
     config: Config,
     game: pyspiel.Game,
+    model: Any,
     logger: Any,
-    queue: spawn._ProcessQueue,
+    out_queue: queue.Queue,
+    stop_event: threading.Event
 ) -> None:
   """An actor process runner that generates games and returns trajectories."""
-  logger.print("Initializing model")
-  model = _init_model_from_config(config)
-  logger.print("Initializing bots")
+
+  logger.print("Initialising bots")
+  # Per-thread evaluator (own LRU cache) referencing shared model
   az_evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
+  
   bots = [
       _init_bot(config, game, az_evaluator, False),
       _init_bot(config, game, az_evaluator, False),
   ]
   for game_num in itertools.count(1):
-    if not update_checkpoint(logger, queue, model, az_evaluator):
+    if stop_event.is_set():
       return
-    queue.put(
-        _play_game(
-            logger,
-            game_num,
-            game,
-            bots,
-            config.temperature,
-            config.temperature_drop,
-        )
+    traj = _play_game(
+        logger, game_num, game, bots,
+        config.temperature, config.temperature_drop,
     )
+    out_queue.put(traj)
 
 
 @watcher
 def evaluator(
-    *, game: pyspiel.Game, config: Config, logger: Any, queue
+    *, 
+    game: pyspiel.Game, 
+    model: Any,
+    config: Config, 
+    logger: Any, 
+    out_queue: queue.Queue,
+    stop_event: threading.Event
 ) -> None:
   """A process that plays the latest checkpoint vs standard MCTS."""
   results = buffer_lib.Buffer(config.evaluation_window, force_cpu=True)
 
-  logger.print("Initializing model")
-  model = _init_model_from_config(config)
-  logger.print("Initializing bots")
+  logger.print("Initialising bots")
   az_evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
   random_evaluator = mcts.RandomRolloutEvaluator()
 
   for game_num in itertools.count():
-    if not update_checkpoint(logger, queue, model, az_evaluator):
+    if stop_event.is_set():
       return
-
     az_player = game_num % 2
     difficulty = (game_num // 2) % config.eval_levels
     max_simulations = int(config.max_simulations * (10 ** (difficulty / 2)))
@@ -362,12 +318,13 @@ def evaluator(
     trajectory = _play_game(
         logger, game_num, game, bots, temperature=1, temperature_drop=0
     )
-    results.append(jnp.asarray(trajectory.returns[az_player]))
-    queue.put((difficulty, jnp.asarray(trajectory.returns[az_player])))
+    result = jnp.asarray(trajectory.returns[az_player])
+    results.append(result)
+    out_queue.put((difficulty, result))
 
     logger.print(
         f"AZ: {trajectory.returns[az_player]},      MCTS:"
-        f" {trajectory.returns[1 - az_player]},      AZ avg/{len(results)}:"
+        f" {trajectory.returns[1 - az_player]},     AZ avg/{len(results)}:"
         f" {jnp.mean(results.data):.3f}"
     )
 
@@ -376,10 +333,11 @@ def evaluator(
 def learner(
     *,
     game: pyspiel.Game,
+    model: Any,
     config: Config,
-    actors: list[spawn.Process],
-    evaluators: list[spawn.Process],
-    broadcast_fn: Callable,
+    trajectory_queue: queue.Queue, 
+    eval_queue: queue.Queue,
+    eval_lock: threading.Lock,
     logger: Any,
 ) -> None:
   """A learner that consumes the replay buffer and trains the network."""
@@ -387,16 +345,6 @@ def learner(
 
   replay_buffer = buffer_lib.Buffer(config.replay_buffer_size)
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
-  logger.print("Initializing model")
-  model = _init_model_from_config(config)
-  logger.print(
-      f"Model type: {config.nn_model}({config.nn_width}, {config.nn_depth})"
-  )
-  logger.print("Model size:", model.num_trainable_variables, "variables")
-
-  save_path = model.save_checkpoint(0)
-  logger.print("Initial checkpoint:", save_path)
-  broadcast_fn(str(save_path))
 
   data_log = data_logger.DataLoggerJsonLines(config.path, "learner", True)
 
@@ -413,19 +361,17 @@ def learner(
   ]
   total_trajectories = 0
 
-  def trajectory_generator():
-    """Merge all the actor queues into a single generator."""
+  def drain_queue(q):
     while True:
-      found = 0
-      for actor_process in actors:
-        try:
-          yield actor_process.queue.get_nowait()
-        except spawn.Empty:
-          pass
-        else:
-          found += 1
-      if found == 0:
-        time.sleep(0.01)  # 10ms
+      try:
+        yield q.get_nowait()
+      except queue.Empty:
+        break
+
+  def trajectory_generator():
+    """Yield trajectories from the shared actor queue."""
+    while True:
+      yield trajectory_queue.get()
 
   def collect_trajectories() -> tuple[int, int]:
     """Collects the trajectories from actors into the replay buffer."""
@@ -482,6 +428,7 @@ def learner(
 
     # Always save a checkpoint, either for keeping or for loading the weights to
     # the actors. We only allow numbers, so use -1 as the "latest".
+    # with eval_lock:  # blocks all actor inference
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1
     )
@@ -526,13 +473,8 @@ def learner(
 
     save_path, losses = learn(step)
 
-    for eval_process in evaluators:
-      while True:
-        try:
-          difficulty, outcome = eval_process.queue.get_nowait()
-          evals[difficulty].append(outcome)
-        except spawn.Empty:
-          break
+    for difficulty, outcome in drain_queue(eval_queue):
+      evals[difficulty].append(outcome)
 
     batch_size_stats = stats.BasicStats()  # Only makes sense in C++.
     batch_size_stats.add(1)
@@ -560,7 +502,7 @@ def learner(
             "l2reg": float(losses.l2),
             "sum": float(losses.total),
         },
-        "cache": {  # Null stats because it's hard to report between processes.
+        "cache": {  # Null stats because it's hard to report between workers.
             "size": 0,
             "max_size": 0,
             "usage": 0,
@@ -577,13 +519,10 @@ def learner(
     if config.max_steps > 0 and step >= config.max_steps:
       break
 
-    broadcast_fn(str(save_path))
-
-
 def alpha_zero(config: Config) -> None:
   # NOTE: a single device accelearation is currently supported
 
-  """Start all the worker processes for a full alphazero setup."""
+  """Start all the worker threads for a full alphazero setup."""
   game = pyspiel.load_game(config.game)
   config = config.replace(
       observation_shape=game.observation_tensor_shape(),
@@ -621,40 +560,77 @@ def alpha_zero(config: Config) -> None:
   with open(os.path.join(config.path, "config.json"), "w") as fp:
     fp.write(json.dumps(config.__dict__, indent=2, sort_keys=True) + "\n")
 
+  print("Initializing model")
+  model = _init_model_from_config(config)
+  print(
+      f"Model type: {config.nn_model}({config.nn_width}, {config.nn_depth})"
+  )
+  print("Model size:", model.num_trainable_variables, "variables")
+
+  save_path = model.save_checkpoint(0)
+  print("Initial checkpoint:", save_path)
+
+  # Shared queues
+  trajectory_queue = queue.Queue()
+  eval_queue = queue.Queue()
+  stop_event = threading.Event()
+  eval_lock = threading.Lock()
+  # Spawn actor threads, and each gets its own Game instance.
   actors = [
-      spawn.Process(actor, kwargs={"game": game, "config": config, "num": i})
-      for i in range(config.actors)
+    threading.Thread(
+        target=actor,
+        kwargs={
+            "config": config,
+            "game": pyspiel.load_game(config.game),  # per-thread
+            "model": model,
+            "out_queue": trajectory_queue,
+            "num": i,
+            "stop_event": stop_event
+        },
+        daemon=True,  # so they die with main process
+    )
+    for i in range(config.actors)
   ]
 
   evaluators = [
-      spawn.Process(
-          evaluator, kwargs={"game": game, "config": config, "num": i}
-      )
-      for i in range(config.evaluators)
+    threading.Thread(
+        target=evaluator,
+        kwargs={
+            "config": config,
+            "game": pyspiel.load_game(config.game),
+            "model": model,
+            "out_queue": eval_queue,
+            "num": i,
+            "stop_event": stop_event
+        },
+        daemon=True,
+    )
+    for i in range(config.evaluators)
   ]
 
-  def broadcast(msg):
-    for proc in actors + evaluators:
-      proc.queue.put(msg)
+  for t in actors + evaluators:
+    t.start()
 
   try:
     learner(
         game=game,
         config=config,
-        actors=actors,  # pylint: disable=missing-kwoa
-        evaluators=evaluators,
-        broadcast_fn=broadcast,
-    )
+        model=model,
+        trajectory_queue=trajectory_queue,
+        eval_queue=eval_queue,
+        eval_lock=eval_lock
+      )
   except (KeyboardInterrupt, EOFError):
     print("Caught a KeyboardInterrupt, stopping early.")
   finally:
-    broadcast("")
-    # for actor processes to join we have to make sure that their q_in is empty,
-    # including backed up items
-    for proc in actors:
-      while proc.exitcode is None:
-        while not proc.queue.empty():
-          proc.queue.get_nowait()
-        proc.join(JOIN_WAIT_DELAY)
-    for proc in evaluators:
-      proc.join()
+    stop_event.set()
+    # Drain queues to unblock waiting threads, then join
+    for q in (trajectory_queue, eval_queue):
+      while not q.empty():
+        try:
+          q.get_nowait()
+        except queue.Empty:
+          break
+    for t in actors + evaluators:
+      t.join(timeout=1.0)
+

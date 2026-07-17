@@ -551,8 +551,15 @@ class Model:
       self, observation: chex.Array, legals_mask: chex.Array
   ) -> tuple[chex.Array, chex.Array]:
     """Returns the policy and value for a given observation."""
+    
+      # ATOMIC SNAPSHOT
+    state = self._state
+    graphdef = state.graphdef
+    params = state.params
+    batch_stats = state.batch_stats
+
     model = nn.merge(
-        self._state.graphdef, self._state.params, self._state.batch_stats
+        graphdef, params, batch_stats
     )
     model.eval()
 
@@ -586,6 +593,8 @@ class Model:
 
   def save_checkpoint(self, step: int) -> int:
     """Saves a checkpoint of the model."""
+    jax.block_until_ready(self._state)
+
     path = os.path.join(self._path, f"checkpoint-{step}")
     if self._checkpointer:
       self._checkpointer.save(path, self._state, force=True)
