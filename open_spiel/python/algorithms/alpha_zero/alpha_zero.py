@@ -20,8 +20,8 @@ generates new weights, saves a checkpoint, and tells the actors to update. There
 are also M evaluators running games continuously against a standard MCTS+Solver,
 though each at a different difficulty (i.e. number of simulations for MCTS).
 
-Due to the multi-process nature of this algorithm the logs are written to files,
-one per process. The learner logs are also output to stdout. The checkpoints are
+Due to the multi-thread nature of this algorithm the logs are written to files,
+one per thread. The learner logs are also output to stdout. The checkpoints are
 also written to the same directory.
 
 Links to relevant articles/papers:
@@ -58,8 +58,8 @@ from open_spiel.python.utils import file_logger
 from open_spiel.python.utils import stats
 
 
-# Time to wait for processes to join.
-JOIN_WAIT_DELAY = 0.001
+# Time to wait for threads to join.
+JOIN_WAIT_DELAY = 10.0
 
 
 @chex.dataclass(frozen=True)
@@ -132,8 +132,8 @@ def _init_model_from_config(config: Config):
   )
 
 
-def watcher(fn):
-  """A decorator to fn/processes that gives a logger and logs exceptions."""
+def watcher(fn, barrier=None):
+  """A decorator to fn/threads that gives a logger and logs exceptions."""
 
   @functools.wraps(fn)
   def _watcher(*, config, num=None, **kwargs):
@@ -156,6 +156,8 @@ def watcher(fn):
             ])
         )
         print("Exception caught in {}: {}".format(name, e))
+        if barrier is not None:
+          barrier.signal(e)
         raise
       finally:
         logger.print("{} exiting".format(name))
@@ -247,7 +249,7 @@ def _play_game(
   return trajectory
 
 
-@watcher
+# @watcher
 def actor(
     *,
     config: Config,
@@ -257,7 +259,7 @@ def actor(
     out_queue: queue.Queue,
     stop_event: threading.Event
 ) -> None:
-  """An actor process runner that generates games and returns trajectories."""
+  """An actor thread runner that generates games and returns trajectories."""
 
   logger.print("Initialising bots")
   # Per-thread evaluator (own LRU cache) referencing shared model
@@ -277,7 +279,7 @@ def actor(
     out_queue.put(traj)
 
 
-@watcher
+# @watcher
 def evaluator(
     *, 
     game: pyspiel.Game, 
@@ -287,7 +289,7 @@ def evaluator(
     out_queue: queue.Queue,
     stop_event: threading.Event
 ) -> None:
-  """A process that plays the latest checkpoint vs standard MCTS."""
+  """A thread that plays the latest checkpoint vs standard MCTS."""
   results = buffer_lib.Buffer(config.evaluation_window, force_cpu=True)
 
   logger.print("Initialising bots")
@@ -329,7 +331,7 @@ def evaluator(
     )
 
 
-@watcher
+# @watcher
 def learner(
     *,
     game: pyspiel.Game,
@@ -337,7 +339,7 @@ def learner(
     config: Config,
     trajectory_queue: queue.Queue, 
     eval_queue: queue.Queue,
-    eval_lock: threading.Lock,
+    barrier: utils.ExceptionBarrier,
     logger: Any,
 ) -> None:
   """A learner that consumes the replay buffer and trains the network."""
@@ -368,18 +370,19 @@ def learner(
       except queue.Empty:
         break
 
-  def trajectory_generator():
+  def trajectory_generator(barrier):
     """Yield trajectories from the shared actor queue."""
     while True:
+      barrier.check()
       yield trajectory_queue.get()
 
-  def collect_trajectories() -> tuple[int, int]:
+  def collect_trajectories(barrier) -> tuple[int, int]:
     """Collects the trajectories from actors into the replay buffer."""
 
     logger.print("Collecting trajectories")
     num_trajectories = 0
     num_states = 0
-    for trajectory in trajectory_generator():
+    for trajectory in trajectory_generator(barrier):
       num_trajectories += 1
       num_states += len(trajectory.states)
       game_lengths.add(len(trajectory.states))
@@ -428,7 +431,6 @@ def learner(
 
     # Always save a checkpoint, either for keeping or for loading the weights to
     # the actors. We only allow numbers, so use -1 as the "latest".
-    # with eval_lock:  # blocks all actor inference
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1
     )
@@ -453,7 +455,7 @@ def learner(
     game_lengths_hist.reset()
     outcomes.reset()
 
-    num_trajectories, num_states = collect_trajectories()
+    num_trajectories, num_states = collect_trajectories(barrier)
     total_trajectories += num_trajectories
     now = time.time()
     seconds = now - last_time
@@ -574,11 +576,12 @@ def alpha_zero(config: Config) -> None:
   trajectory_queue = queue.Queue()
   eval_queue = queue.Queue()
   stop_event = threading.Event()
-  eval_lock = threading.Lock()
+  barrier = utils.ExceptionBarrier()
+
   # Spawn actor threads, and each gets its own Game instance.
   actors = [
     threading.Thread(
-        target=actor,
+        target=watcher(actor, barrier=barrier),
         kwargs={
             "config": config,
             "game": pyspiel.load_game(config.game),  # per-thread
@@ -594,7 +597,7 @@ def alpha_zero(config: Config) -> None:
 
   evaluators = [
     threading.Thread(
-        target=evaluator,
+        target=watcher(evaluator, barrier=barrier),
         kwargs={
             "config": config,
             "game": pyspiel.load_game(config.game),
@@ -612,13 +615,13 @@ def alpha_zero(config: Config) -> None:
     t.start()
 
   try:
-    learner(
+    watcher(learner, barrier=barrier)(
         game=game,
         config=config,
         model=model,
         trajectory_queue=trajectory_queue,
         eval_queue=eval_queue,
-        eval_lock=eval_lock
+        barrier=barrier
       )
   except (KeyboardInterrupt, EOFError):
     print("Caught a KeyboardInterrupt, stopping early.")
@@ -632,5 +635,5 @@ def alpha_zero(config: Config) -> None:
         except queue.Empty:
           break
     for t in actors + evaluators:
-      t.join(timeout=1.0)
+      t.join(timeout=JOIN_WAIT_DELAY)
 
