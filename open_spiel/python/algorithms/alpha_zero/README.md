@@ -12,7 +12,7 @@ The code is arranged as follows:
 ├── alpha_zero.py # main script
 ├── analysis.py # experiments' results plotting
 ├── evaluator.py # mcts evaluator
-├── export_model.py # model conversion util
+├── export_model.py # model conversion util (ONNX/JIT are supported)
 ├── model_linen.py # AZ in flax.linen
 ├── model_nnx.py # AZ in flax.nnx
 ├── replay_buffer.py # simple temporary replay buffer
@@ -30,6 +30,42 @@ Each file implements the following parts of the main documentation: *
 [MCTS evaluator](evaluator.py), to run evaluation *
 [analysis script](analysis.py), to plot the results of the experiment in the
 visual form * [the main script](alpha_zero.py)
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│  Main Process (single JAX runtime)          │
+│                                             │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐        │
+│  │Actor Thd│ │Actor Thd│ │Actor Thd│ ...    │  ← Python MCTS
+│  │  (GIL)  │ │  (GIL)  │ │  (GIL)  │        │
+│  └────┬────┘ └────┬────┘ └────┬────┘        │
+│       │           │           │             │
+│       └───────────┼───────────┘             │
+│                   ▼                         │
+│         ┌─────────────────┐                 │ 
+│         │ JAX Async Queue │ ← natural       │
+│         │ (batching)      │   batching      │
+│         └────────┬────────┘                 │
+│                  ▼                          │
+│            ┌─────────┐                      │  
+│            │  GPU    │                      │
+│            └─────────┘                      │
+└─────────────────────────────────────────────┘
+```
+
+> [!NOTE]
+> If your game has expensive Python logic (e.g., complex chance node sampling), the GIL becomes the bottleneck. But for most OpenSpiel games, the C++ state operations dominate and release the GIL.
+
+| Metric                    | Before (processes)                   | After (threads)        |
+| ------------------------- | ------------------------------------ | ---------------------- |
+| JAX compilation caches    | N + M                                | 1                      |
+| GPU memory overhead       | ~90% × (N+M)                         | ~90% × 1               |
+| Weight sync latency       | Disk I/O + deserialization           | Atomic reference swap  |
+| Actor startup time        | Model init + JIT compile per process | Instant (thread start) |
+| Python 3.14 compatibility | Fragile (forkserver/spawn conflicts) | Native                 |
+
 
 ## Example Usage
 
@@ -80,12 +116,13 @@ provided by the `flax.nnx` lifted tranforms:
     device-agnostic implementation
 3.  Added `vmap` to the modules for the batched computation
 4.  Added full test coverage for the utility
+5. Replaced `multiprocessing` with GIL-compatible threads for `python>=3.14`
+6. Added conversion to ONNX and JIT for web demos.
 
 ## Challenges (contributions are open!)
 
-1.  Implement sharding for multi-processing or multi-hostage (`xmap,
-    jax.shard_map`) training and inference to reduce the overhead.
-2.  Add support of different logging methods, like `wandb` and such
-3.  Add Tensorboard support for a "on-line" logging
-4.  Currently the checkpointer is hardcoded to be a single-device! This makes it
+
+1.  Add Tensorboard support for a "on-line" logging
+2.  Currently the checkpointer is hardcoded to be a single-device! This makes it
     viable due to incoming API changes.
+3. Make sure to optimise execution time.
