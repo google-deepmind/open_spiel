@@ -338,6 +338,11 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/policy_gradient_jax_test.py
     coalitional_games/least_core_lagrangian_test.py
     mfg/algorithms/fictitious_play_test.py
+    #NES tests
+    jax/nes/equilibria_utils_test.py
+    jax/nes/networks_test.py
+    jax/nes/samplers_test.py
+    jax/nes/utils_test.py
   )
 endif()
 
