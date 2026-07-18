@@ -145,6 +145,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "python_team_dominoes",
     "python_tic_tac_toe",
     "python_liars_poker",
+    "quarto",
     "quoridor",
     "repeated_game",
     "repeated_leduc_poker",
