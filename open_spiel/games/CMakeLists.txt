@@ -209,6 +209,8 @@ set(GAME_SOURCES
   shogi/shogi_board.h
   skat/skat.cc
   skat/skat.h
+  skull/skull.cc
+  skull/skull.h
   snake/snake.cc
   snake/snake.h
   social_deduction/social_deduction.cc
@@ -717,6 +719,10 @@ add_test(shogi_test shogi_test)
 add_executable(skat_test skat/skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(skat_test skat_test)
+
+add_executable(skull_test skull/skull_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(skull_test skull_test)
 
 add_executable(snake_test snake/snake_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
