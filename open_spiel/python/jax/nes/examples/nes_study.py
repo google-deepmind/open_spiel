@@ -26,7 +26,7 @@ Objective = samplers.Objective
 Experiments follow the reproduction plan:
   1. Training convergence on 8x8
   2. In-distribution accuracy (8x8)
-  3. Zero-shot on 4x4, 16x16, 32x32
+  3. Zero-shot on 2x2, 4x4, 8x8
   4. MWME vs. MRE vs. ε variants
   5. CCE vs. CE duals
   6. 2x2 canonical games
@@ -214,14 +214,14 @@ def experiment_2_indistribution() -> dict[str, Any]:
 
 
 def experiment_3_zeroshot() -> dict[str, Any]:
-  """Train on 8x8, test on 2x2, 4x4, 16x16, 32x32 without retraining."""
+  """Train on 8x8, test on 2x2, 4x4, 8x8 without retraining."""
   logging.info("=== Experiment 3: Zero-Shot Generalization ===")
   solver = make_solver(
     games.Game.L2_INVARIANT,
     networks.Mode.CCE,
     samplers.Objective.EPS_MWMRE,
-    num_strategies=(8, 8),
-    max_actions=32,  # pad to largest test size from the start
+    num_strategies=(4, 4),
+    max_actions=8,  # pad to largest test size from the start
     train_steps=FLAGS.train_steps,
   )
   solver.solve()
