@@ -444,7 +444,7 @@ class NESolver:
       batch.welfare,
       primals["strategy"],
       batch.epsilon_target,
-      batch.joint_mask,
+      batch.strat_mask_per_player,
       self._mu,
       self._rho,
       self._eps_cap,

@@ -672,7 +672,7 @@ class AsyncExactSolver:
     welfares: chex.Array,  # [B, N]
     strategies: chex.Array,  # [B, *A]
     epsilon_targets: chex.Array,  # [B, N]
-    joint_masks: chex.Array,  # [B, *A]
+    strat_mask_per_player: list[chex.Array],  # [[B, *A]_p]_{p=1}^N
     mu: float,
     rho: float,
     eps_max: float,
@@ -687,7 +687,7 @@ class AsyncExactSolver:
         welfares[i],
         strategies[i],
         epsilon_targets[i],
-        joint_masks[i],
+        list(m[i] for m in strat_mask_per_player),
         mu,
         rho,
         eps_max,
