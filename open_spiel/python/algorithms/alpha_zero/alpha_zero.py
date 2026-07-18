@@ -114,6 +114,7 @@ class Config:
   output_size: int
   verbose: bool
   quiet: bool
+  pretrained_checkpoint_step: int
 
   nn_api_version: str = "nnx"
 
@@ -249,7 +250,6 @@ def _play_game(
   return trajectory
 
 
-# @watcher
 def actor(
     *,
     config: Config,
@@ -279,7 +279,6 @@ def actor(
     out_queue.put(traj)
 
 
-# @watcher
 def evaluator(
     *, 
     game: pyspiel.Game, 
@@ -331,7 +330,6 @@ def evaluator(
     )
 
 
-# @watcher
 def learner(
     *,
     game: pyspiel.Game,
@@ -473,7 +471,7 @@ def learner(
         f" {replay_buffer.total_seen}"
     )
 
-    save_path, losses = learn(step)
+    _, losses = learn(step)
 
     for difficulty, outcome in drain_queue(eval_queue):
       evals[difficulty].append(outcome)
@@ -569,8 +567,17 @@ def alpha_zero(config: Config) -> None:
   )
   print("Model size:", model.num_trainable_variables, "variables")
 
-  save_path = model.save_checkpoint(0)
+  if config.pretrained_checkpoint_step is None:
+    save_path = model.save_checkpoint(0)
+  else:
+    assert isinstance(config.pretrained_checkpoint_step, int)
+    save_path = config.pretrained_checkpoint_step
+    assert model._path is not None, "Path has to be specified."
+    model.load_checkpoint(
+        config.pretrained_checkpoint_step
+    )
   print("Initial checkpoint:", save_path)
+
 
   # Shared queues
   trajectory_queue = queue.Queue()
