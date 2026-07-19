@@ -269,6 +269,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/hangman_test.py
   games/heuristics_test.py
   games/liars_poker_test.py
+  games/mahjong_riichi_test.py
+  games/mahjong_riichi_utils_test.py
   games/pokerkit_wrapper_test.py
   games/team_dominoes_test.py
   games/tic_tac_toe_test.py

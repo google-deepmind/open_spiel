@@ -136,6 +136,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "python_dynamic_routing",
     "python_hangman",
     "python_iterated_prisoners_dilemma",
+    "python_mahjong_riichi",
     "python_mfg_crowd_avoidance",
     "python_mfg_crowd_modelling",
     "python_mfg_dynamic_routing",
