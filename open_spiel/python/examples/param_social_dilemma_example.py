@@ -14,12 +14,18 @@
 
 """Example: N-player parameterized social dilemma with Axelrod-style bots.
 
-Plays one episode of python_param_social_dilemma using a rotation of simple,
-well-known Iterated-Prisoner's-Dilemma-style strategies (Always Cooperate,
-Always Defect, Tit-for-Tat, and Grim Trigger, generalized to N players), and
+Plays one episode of python_param_social_dilemma using a rotation of simple
+strategies inspired by Axelrod's 2-player Iterated Prisoner's Dilemma
+tournament (Always Cooperate, Always Defect, Tit-for-Tat, Grim Trigger), and
 prints the resulting action sequence and returns. Intended as a minimal
 demonstration of using the game for MARL benchmarking; see
 https://github.com/google-deepmind/open_spiel/issues/1431.
+
+Axelrod's strategies were defined for exactly 2 players and reference "the"
+opponent's last move; there is no single agreed-upon way to extend them to N
+players. Tit-for-Tat and Grim Trigger below use one reasonable
+generalization each (see their docstrings for the specific rule used) --
+not a claim that this is *the* canonical N-player version.
 
 Usage:
   python param_social_dilemma_example.py --players=4 \
@@ -73,7 +79,10 @@ def always_defect(state, player):
 
 
 def tit_for_tat(state, player):
-  """Cooperates in round 1; afterwards, mirrors the majority of co-players."""
+  """N-player Tit-for-Tat: cooperates in round 1; afterwards, defects iff a
+  majority of co-players defected last round (majority-rule generalization
+  of "mirror the opponent's last move" -- with N-1 > 1 co-players there is
+  no single move to mirror, so this aggregates them by majority vote)."""
   num_players = state.get_game().num_players()
   others = [p for p in range(num_players) if p != player]
   other_histories = [_own_action_history(state, p) for p in others]
@@ -84,7 +93,11 @@ def tit_for_tat(state, player):
 
 
 def grim_trigger(state, player):
-  """Cooperates until any co-player has ever defected, then defects forever."""
+  """N-player Grim Trigger: cooperates until *any* co-player has *ever*
+  defected, then defects forever against everyone. Since actions here are
+  not addressed to a specific opponent, this can't retaliate selectively
+  against just the defector(s) -- one defection poisons the well for the
+  whole group, which is a harsher generalization than the 2-player original."""
   num_players = state.get_game().num_players()
   others = [p for p in range(num_players) if p != player]
   ever_defected = any(
