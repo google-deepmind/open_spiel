@@ -49,33 +49,31 @@ _GAME_TYPE = pyspiel.GameType(
         "num_digits": _NUM_DIGITS,
     },
 )
-_GAME_INFO = pyspiel.GameInfo(
-    # Num actions = total number of cards * number of digits + action enum
-    num_distinct_actions=_HAND_LENGTH * _NUM_DIGITS * _MIN_NUM_PLAYERS
-    + BID_ACTION_OFFSET,
-    max_chance_outcomes=_HAND_LENGTH * _NUM_DIGITS,
-    num_players=_MIN_NUM_PLAYERS,
-    min_utility=-(
-        _MIN_NUM_PLAYERS - 1
-    ),  # Reward from being challenged and losing.
-    max_utility=_MIN_NUM_PLAYERS
-    - 1,  # Reward for being challenged and winning.
-    utility_sum=0.0,
-    # Number of possible rounds: hand_length * num_digits * num_players
-    # Total moves per round: num_players for non-rebid, num_players-1 for rebid
-    # Max game length: number of possible rounds * total moves per round
-    max_game_length=_HAND_LENGTH * _NUM_DIGITS * _MIN_NUM_PLAYERS**2,
-)
-
-
 class LiarsPoker(pyspiel.Game):
   """A Python version of Liar's poker."""
 
   def __init__(self, params=None):
-    super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
-    game_parameters = self.get_parameters()
-    self.hand_length = game_parameters.get("hand_length", _HAND_LENGTH)
-    self.num_digits = game_parameters.get("num_digits", _NUM_DIGITS)
+    params = params or {}
+    num_players = params.get("players", _MIN_NUM_PLAYERS)
+    hand_length = params.get("hand_length", _HAND_LENGTH)
+    num_digits = params.get("num_digits", _NUM_DIGITS)
+    game_info = pyspiel.GameInfo(
+        # Num actions = total number of cards * number of digits + action enum
+        num_distinct_actions=hand_length * num_digits * num_players
+        + BID_ACTION_OFFSET,
+        max_chance_outcomes=hand_length * num_digits,
+        num_players=num_players,
+        min_utility=-(num_players - 1),  # Being challenged and losing.
+        max_utility=num_players - 1,  # Being challenged and winning.
+        utility_sum=0.0,
+        # Number of possible rounds: hand_length * num_digits * num_players
+        # Total moves per round: num_players for non-rebid, num_players-1 for
+        # rebid. Max game length: possible rounds * total moves per round.
+        max_game_length=hand_length * num_digits * num_players**2,
+    )
+    super().__init__(_GAME_TYPE, game_info, params)
+    self.hand_length = hand_length
+    self.num_digits = num_digits
     self.deck = _FULL_DECK[: self.num_digits]
 
   def new_initial_state(self):
