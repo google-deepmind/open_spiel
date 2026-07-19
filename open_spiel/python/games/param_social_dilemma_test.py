@@ -17,6 +17,7 @@
 from absl.testing import absltest
 from absl.testing import parameterized
 
+from open_spiel.python.algorithms import cfr
 from open_spiel.python.games import param_social_dilemma
 import pyspiel
 
@@ -135,6 +136,22 @@ class ParamSocialDilemmaTest(parameterized.TestCase):
     turn_based = pyspiel.convert_to_turn_based(game)
     pyspiel.random_sim_test(
         turn_based, num_sims=5, serialize=False, verbose=False)
+
+  def test_cfr_runs_on_turn_based_conversion(self):
+    """This game is SIMULTANEOUS-dynamics, so cfr.py's CFRSolver (which
+    requires SEQUENTIAL dynamics) can't run on it directly -- only after
+    pyspiel.convert_to_turn_based(). Actually run the solver here rather
+    than just checking the conversion is well-formed, so the CFR-usability
+    claim in the module docs/PR description is backed by a real test."""
+    game = pyspiel.load_game(
+        "python_param_social_dilemma", {"players": 2, "max_game_length": 3})
+    turn_based = pyspiel.convert_to_turn_based(game)
+    self.assertEqual(turn_based.get_type().dynamics,
+                      pyspiel.GameType.Dynamics.SEQUENTIAL)
+    solver = cfr.CFRSolver(turn_based)
+    for _ in range(3):
+      solver.evaluate_and_update_policy()
+    self.assertIsNotNone(solver.average_policy())
 
   @parameterized.parameters(2, 3, 5)
   def test_random_sim(self, num_players):
