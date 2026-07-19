@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Python Parameterized N-Player Social Dilemma"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["dynamic_payoffs", "max_game_length", "payoff_change_prob", "payoff_regimes", "players", "reward_noise_std", "termination_probability"]
+GameType.parameter_specification = ["dynamic_payoffs", "max_game_length", "payoff_change_prob", "payoff_kind", "payoff_regimes", "pgg_endowment", "pgg_multiplier", "players", "reward_noise_std", "termination_probability"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,13 +19,13 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 2
 PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 9
-GetParameters() = {dynamic_payoffs=False,max_game_length=9999,payoff_change_prob=0.1,payoff_regimes=10 5 1 0,players=2,reward_noise_std=0.0,termination_probability=0.125}
+GetParameters() = {dynamic_payoffs=False,max_game_length=9999,payoff_change_prob=0.1,payoff_kind=linear,payoff_regimes=10 5 1 0,pgg_endowment=10.0,pgg_multiplier=1.5,players=2,reward_noise_std=0.0,termination_probability=0.125}
 NumPlayers() = 2
 MinUtility() = 0.0
 MaxUtility() = 9.999e+04
 UtilitySum() = None
 MaxGameLength() = 9999
-ToString() = "python_param_social_dilemma(dynamic_payoffs=False,max_game_length=9999,payoff_change_prob=0.1,payoff_regimes=10 5 1 0,players=2,reward_noise_std=0.0,termination_probability=0.125)"
+ToString() = "python_param_social_dilemma(dynamic_payoffs=False,max_game_length=9999,payoff_change_prob=0.1,payoff_kind=linear,payoff_regimes=10 5 1 0,pgg_endowment=10.0,pgg_multiplier=1.5,players=2,reward_noise_std=0.0,termination_probability=0.125)"
 
 # State 0
 # p0: p1: regime:0

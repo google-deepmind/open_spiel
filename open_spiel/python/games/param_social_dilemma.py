@@ -21,11 +21,13 @@ reward noise, so it can be used as an N-player benchmark for MARL algorithms
 in non-stationary or noisy-reward settings. See
 https://github.com/google-deepmind/open_spiel/issues/1431.
 
-Each round, all players simultaneously choose to COOPERATE or DEFECT. A
-player's payoff depends on their own action and the number of *other*
-players who cooperated that round, generalizing the classic 2x2
-Temptation/Reward/Punishment/Sucker payoff matrix linearly in the fraction of
-other players who cooperated:
+Each round, all players simultaneously choose to COOPERATE or DEFECT. Two
+payoff models are available via `payoff_kind`:
+
+`payoff_kind="linear"` (default): a player's payoff depends on their own
+action and the *fraction* of other players who cooperated that round,
+generalizing the classic 2x2 Temptation/Reward/Punishment/Sucker payoff
+matrix linearly:
 
   defect payoff  (k other cooperators) = P + (T - P) * k / (N - 1)
   cooperate payoff (k other cooperators) = S + (R - S) * k / (N - 1)
@@ -34,13 +36,35 @@ which reduces exactly to the 2-player payoff matrix when N == 2. This is the
 standard linear generalization of the Prisoner's Dilemma to N players; see
 e.g. Hauert & Schuster, 1997, "Effects of increasing the number of players
 and memory size in the iterated Prisoner's Dilemma: a numerical approach",
-Proc. Royal Society B.
+Proc. Royal Society B. IMPORTANT PROPERTY: because it depends only on the
+*fraction* of cooperators, a defector's payoff advantage over a cooperator
+facing the same co-player behavior is *independent of N* -- this formula
+does not, by itself, reproduce the "cooperation is harder to sustain via
+reciprocity in larger groups" effect that is often the point of interest in
+N-player social dilemma research. Use `payoff_kind="public_goods"` for that.
 
-Non-stationary payoffs are supported by specifying multiple (T, R, P, S)
-"regimes" via the `payoff_regimes` parameter; when `dynamic_payoffs` is set,
-the active regime can switch (round-robin) with probability
-`payoff_change_prob` after each round. Stochastic rewards are supported via
-`reward_noise_std`, which adds a shared, zero-mean, discretized
+`payoff_kind="public_goods"`: a classic linear public-goods game. Each
+player has an endowment `pgg_endowment` (E); cooperating means contributing
+the full endowment to a shared pool, defecting means keeping it. The pool is
+multiplied by `pgg_multiplier` (m, with 1 < m < N required for this to be a
+genuine dilemma) and split evenly among all N players regardless of
+contribution:
+
+  defect payoff    (k other cooperators) = E + (m * E / N) * k
+  cooperate payoff (k other cooperators) = (m * E / N) * (k + 1)
+
+Unlike the linear model, a defector's advantage here is E * (1 - m / N),
+which *grows with N* for fixed m -- free-riding becomes structurally more
+attractive as the group gets larger, matching the classic public-goods
+group-size effect (e.g. Ledyard, 1995, "Public Goods: A Survey of
+Experimental Research"). `dynamic_payoffs`/`payoff_regimes` (below) only
+apply to `payoff_kind="linear"`.
+
+Non-stationary payoffs (linear mode only) are supported by specifying
+multiple (T, R, P, S) "regimes" via the `payoff_regimes` parameter; when
+`dynamic_payoffs` is set, the active regime can switch (round-robin) with
+probability `payoff_change_prob` after each round. Stochastic rewards are
+supported via `reward_noise_std`, which adds a shared, zero-mean, discretized
 (binomially-approximated Gaussian) noise term to every player's reward each
 round.
 
@@ -66,10 +90,13 @@ _DEFAULT_PARAMS = {
     "players": _DEFAULT_PLAYERS,
     "termination_probability": 0.125,
     "max_game_length": 9999,
+    "payoff_kind": "linear",
     "payoff_regimes": _DEFAULT_PAYOFF_REGIMES,
     "dynamic_payoffs": False,
     "payoff_change_prob": 0.1,
     "reward_noise_std": 0.0,
+    "pgg_endowment": 10.0,
+    "pgg_multiplier": 1.5,
 }
 
 # Discretized zero-mean noise outcomes approximating a Gaussian via a
@@ -140,8 +167,16 @@ class ParamSocialDilemmaGame(pyspiel.Game):
           f"{num_players}")
     max_game_length = int(params["max_game_length"])
 
+    self._payoff_kind = str(params["payoff_kind"])
+    if self._payoff_kind not in ("linear", "public_goods"):
+      raise ValueError(
+          f'payoff_kind must be "linear" or "public_goods", got: '
+          f'{self._payoff_kind!r}')
     self._payoff_regimes = _parse_payoff_regimes(params["payoff_regimes"])
     self._dynamic_payoffs = bool(params["dynamic_payoffs"])
+    if self._dynamic_payoffs and self._payoff_kind != "linear":
+      raise ValueError(
+          'dynamic_payoffs is only supported with payoff_kind="linear"')
     if self._dynamic_payoffs and self._payoff_regimes.shape[0] < 2:
       raise ValueError(
           "dynamic_payoffs=True requires at least 2 payoff regimes to be "
@@ -149,12 +184,38 @@ class ParamSocialDilemmaGame(pyspiel.Game):
     self._payoff_change_prob = float(params["payoff_change_prob"])
     self._reward_noise_std = float(params["reward_noise_std"])
     self._termination_probability = float(params["termination_probability"])
+    self._pgg_endowment = float(params["pgg_endowment"])
+    self._pgg_multiplier = float(params["pgg_multiplier"])
+    if self._payoff_kind == "public_goods" and not (
+        1 < self._pgg_multiplier < num_players):
+      raise ValueError(
+          "pgg_multiplier must satisfy 1 < pgg_multiplier < players for "
+          "public_goods to be a genuine social dilemma (otherwise "
+          "contributing is either worthless or individually dominant), got "
+          f"pgg_multiplier={self._pgg_multiplier} with players={num_players}")
 
-    max_temptation = float(np.max(self._payoff_regimes[:, 0]))
-    min_sucker = float(np.min(self._payoff_regimes[:, 3]))
     max_noise = (
         max(_NOISE_LEVELS) * self._reward_noise_std / 2.0
         if self._reward_noise_std else 0.0)
+    if self._payoff_kind == "linear":
+      max_round_payoff = float(np.max(self._payoff_regimes[:, 0]))
+      min_round_payoff = float(np.min(self._payoff_regimes[:, 3]))
+    else:
+      e, m = self._pgg_endowment, self._pgg_multiplier
+      max_round_payoff = e * (1 + m * (num_players - 1) / num_players)
+      min_round_payoff = m * e / num_players
+
+    # The game runs for anywhere from 1 to max_game_length rounds (it always
+    # plays at least one round before termination is checked). A per-round
+    # payoff bound of `lo` does *not* imply a total-return bound of
+    # `lo * max_game_length`: if lo > 0, the smallest achievable total comes
+    # from the *shortest* game (1 round), not the longest -- more rounds of a
+    # positive-only payoff can only increase the total, never decrease it
+    # below what a single round already gives. So each bound must be taken
+    # over both extremes of the round count, not just max_game_length.
+    lo, hi = min_round_payoff - max_noise, max_round_payoff + max_noise
+    min_utility = min(lo * 1, lo * max_game_length)
+    max_utility = max(hi * 1, hi * max_game_length)
 
     super().__init__(
         _GAME_TYPE,
@@ -162,8 +223,8 @@ class ParamSocialDilemmaGame(pyspiel.Game):
             num_distinct_actions=2,
             max_chance_outcomes=_NUM_CHANCE_OUTCOMES,
             num_players=num_players,
-            min_utility=(min_sucker - max_noise) * max_game_length,
-            max_utility=(max_temptation + max_noise) * max_game_length,
+            min_utility=min_utility,
+            max_utility=max_utility,
             utility_sum=None,
             max_game_length=max_game_length,
         ),
@@ -189,11 +250,14 @@ class ParamSocialDilemmaState(pyspiel.State):
     super().__init__(game)
     self._num_players = game.num_players()
     # pylint: disable=protected-access
+    self._payoff_kind = game._payoff_kind
     self._payoff_regimes = game._payoff_regimes
     self._dynamic_payoffs = game._dynamic_payoffs
     self._payoff_change_prob = game._payoff_change_prob
     self._reward_noise_std = game._reward_noise_std
     self._termination_probability = game._termination_probability
+    self._pgg_endowment = game._pgg_endowment
+    self._pgg_multiplier = game._pgg_multiplier
     # pylint: enable=protected-access
 
     # The ordered sequence of chance phases resolved after each round.
@@ -285,19 +349,28 @@ class ParamSocialDilemmaState(pyspiel.State):
   def _apply_actions(self, actions):
     """Applies the specified actions (per player) to the state."""
     assert self._chance_phase is None and not self._game_over
-    temptation, reward, punishment, sucker = self._payoff_regimes[
-        self._regime_index]
     n = self._num_players
     num_cooperators = sum(1 for a in actions if a == Action.COOPERATE)
 
     self._rewards = np.zeros(n)
-    for i, a in enumerate(actions):
-      other_cooperators = num_cooperators - (1 if a == Action.COOPERATE else 0)
-      frac = other_cooperators / (n - 1) if n > 1 else 0.0
-      if a == Action.DEFECT:
-        self._rewards[i] = punishment + (temptation - punishment) * frac
-      else:
-        self._rewards[i] = sucker + (reward - sucker) * frac
+    if self._payoff_kind == "linear":
+      temptation, reward, punishment, sucker = self._payoff_regimes[
+          self._regime_index]
+      for i, a in enumerate(actions):
+        other_cooperators = num_cooperators - (
+            1 if a == Action.COOPERATE else 0)
+        frac = other_cooperators / (n - 1) if n > 1 else 0.0
+        if a == Action.DEFECT:
+          self._rewards[i] = punishment + (temptation - punishment) * frac
+        else:
+          self._rewards[i] = sucker + (reward - sucker) * frac
+    else:
+      assert self._payoff_kind == "public_goods"
+      e, m = self._pgg_endowment, self._pgg_multiplier
+      pool_share = m * e * num_cooperators / n
+      for i, a in enumerate(actions):
+        self._rewards[i] = (
+            pool_share if a == Action.COOPERATE else e + pool_share)
     # self._returns is updated once self._rewards is finalized; see
     # _advance_chance_phase, which is guaranteed to run at least once
     # (TERMINATION is always in self._active_phases) before control returns

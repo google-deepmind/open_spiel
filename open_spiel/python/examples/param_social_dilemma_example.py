@@ -45,18 +45,30 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("players", 4, "Number of players.")
 flags.DEFINE_float("termination_probability", 0.125,
                     "Probability the episode ends after each round.")
+flags.DEFINE_enum("payoff_kind", "linear", ["linear", "public_goods"],
+                   "Payoff model: 'linear' (fraction-based generalization "
+                   "of the 2x2 PD matrix) or 'public_goods' (classic "
+                   "public-goods game, where the free-rider advantage "
+                   "grows with the number of players).")
 flags.DEFINE_float("reward_noise_std", 0.0,
                     "Std. dev. of the (discretized) reward noise. 0 to "
                     "disable.")
 flags.DEFINE_bool("dynamic_payoffs", False,
-                   "Whether payoffs can switch between regimes.")
+                   "Whether payoffs can switch between regimes. Only "
+                   "valid with --payoff_kind=linear.")
 flags.DEFINE_string("payoff_regimes", "10 5 1 0 20 5 1 0",
                      "Whitespace-separated (temptation, reward, punishment, "
                      "sucker) groups of 4 floats, used when dynamic_payoffs "
-                     "is set.")
+                     "is set. Only used with --payoff_kind=linear.")
 flags.DEFINE_float("payoff_change_prob", 0.1,
                     "Probability of switching payoff regime each round, "
                     "when dynamic_payoffs is set.")
+flags.DEFINE_float("pgg_endowment", 10.0,
+                    "Per-round endowment in public_goods mode.")
+flags.DEFINE_float("pgg_multiplier", 1.5,
+                    "Public-goods pool multiplier (must satisfy "
+                    "1 < pgg_multiplier < players). Only used with "
+                    "--payoff_kind=public_goods.")
 flags.DEFINE_integer("seed", 0, "Random seed.")
 
 Action = param_social_dilemma.Action
@@ -114,10 +126,13 @@ def main(_):
       "python_param_social_dilemma", {
           "players": FLAGS.players,
           "termination_probability": FLAGS.termination_probability,
+          "payoff_kind": FLAGS.payoff_kind,
           "reward_noise_std": FLAGS.reward_noise_std,
           "dynamic_payoffs": FLAGS.dynamic_payoffs,
           "payoff_regimes": FLAGS.payoff_regimes,
           "payoff_change_prob": FLAGS.payoff_change_prob,
+          "pgg_endowment": FLAGS.pgg_endowment,
+          "pgg_multiplier": FLAGS.pgg_multiplier,
       })
   player_bots = [BOTS[p % len(BOTS)] for p in range(game.num_players())]
   print("Players -> strategies: " +

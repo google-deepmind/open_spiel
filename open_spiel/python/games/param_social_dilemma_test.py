@@ -154,6 +154,122 @@ class ParamSocialDilemmaTest(parameterized.TestCase):
         })
     pyspiel.random_sim_test(game, num_sims=5, serialize=True, verbose=False)
 
+  def test_invalid_payoff_kind_raises(self):
+    with self.assertRaises(ValueError):
+      pyspiel.load_game(
+          "python_param_social_dilemma", {"payoff_kind": "quadratic"})
+
+  def test_public_goods_payoffs(self):
+    """Payoffs should match the closed-form public-goods formula exactly."""
+    d = param_social_dilemma.Action.DEFECT
+    c = param_social_dilemma.Action.COOPERATE
+    game = pyspiel.load_game(
+        "python_param_social_dilemma", {
+            "players": 4, "payoff_kind": "public_goods",
+            "pgg_endowment": 10.0, "pgg_multiplier": 2.0,
+        })
+    state = game.new_initial_state()
+    state.apply_actions([d, c, c, d])  # 2 cooperators out of 4.
+    pool_share = 2.0 * 10.0 * 2 / 4  # m * E * num_cooperators / N.
+    self.assertSequenceAlmostEqual(
+        state.rewards(), [10.0 + pool_share, pool_share, pool_share,
+                           10.0 + pool_share])
+
+  def test_public_goods_requires_valid_multiplier(self):
+    # multiplier must satisfy 1 < m < players, else it isn't a real dilemma.
+    with self.assertRaises(ValueError):
+      pyspiel.load_game("python_param_social_dilemma", {
+          "payoff_kind": "public_goods", "players": 4, "pgg_multiplier": 4.0})
+    with self.assertRaises(ValueError):
+      pyspiel.load_game("python_param_social_dilemma", {
+          "payoff_kind": "public_goods", "players": 4, "pgg_multiplier": 1.0})
+
+  def test_public_goods_incompatible_with_dynamic_payoffs(self):
+    with self.assertRaises(ValueError):
+      pyspiel.load_game("python_param_social_dilemma", {
+          "payoff_kind": "public_goods", "dynamic_payoffs": True})
+
+  def test_public_goods_free_rider_advantage_grows_with_n(self):
+    """The point of public_goods mode: unlike linear mode, a defector's edge
+    over a cooperator (holding everyone else's behavior fixed at cooperate)
+    strictly grows with N -- this is what makes it useful for studying the
+    classic group-size effect in public-goods/social-dilemma research."""
+    advantages = []
+    for num_players in (2, 3, 5, 10):
+      game = pyspiel.load_game(
+          "python_param_social_dilemma", {
+              "players": num_players, "payoff_kind": "public_goods",
+              "pgg_endowment": 10.0, "pgg_multiplier": 1.5,
+          })
+      all_cooperate = game.new_initial_state()
+      all_cooperate.apply_actions(
+          [param_social_dilemma.Action.COOPERATE] * num_players)
+      coop_payoff = all_cooperate.rewards()[0]
+
+      lone_defector = game.new_initial_state()
+      lone_defector.apply_actions(
+          [param_social_dilemma.Action.DEFECT] +
+          [param_social_dilemma.Action.COOPERATE] * (num_players - 1))
+      defect_payoff = lone_defector.rewards()[0]
+
+      advantage = defect_payoff - coop_payoff
+      self.assertAlmostEqual(advantage, 10.0 * (1 - 1.5 / num_players))
+      advantages.append(advantage)
+    self.assertEqual(advantages, sorted(advantages))  # Strictly increasing.
+
+  def test_linear_mode_free_rider_advantage_is_n_invariant(self):
+    """Contrast with the above: linear mode's defector advantage depends
+    only on the *fraction* of cooperators, not on N -- documented as a
+    property (not a bug) in the module docstring."""
+    advantages = []
+    for num_players in (2, 3, 5, 10):
+      game = pyspiel.load_game(
+          "python_param_social_dilemma", {"players": num_players})
+      all_cooperate = game.new_initial_state()
+      all_cooperate.apply_actions(
+          [param_social_dilemma.Action.COOPERATE] * num_players)
+      coop_payoff = all_cooperate.rewards()[0]
+
+      lone_defector = game.new_initial_state()
+      lone_defector.apply_actions(
+          [param_social_dilemma.Action.DEFECT] +
+          [param_social_dilemma.Action.COOPERATE] * (num_players - 1))
+      defect_payoff = lone_defector.rewards()[0]
+      advantages.append(defect_payoff - coop_payoff)
+    self.assertSequenceAlmostEqual(advantages, [advantages[0]] * 4)
+
+  def test_utility_bounds_are_valid_for_all_round_counts(self):
+    """Regression test: MinUtility()/MaxUtility() must bound every possible
+    return, including a game that terminates after just one round -- a
+    positive-only per-round payoff (as in public_goods mode) previously
+    made a 1-round return fall *below* the claimed MinUtility(), because the
+    bound was computed as min_round_payoff * max_game_length, which is only
+    a valid lower bound when the per-round minimum is <= 0."""
+    game = pyspiel.load_game(
+        "python_param_social_dilemma", {
+            "players": 2, "payoff_kind": "public_goods",
+            "pgg_endowment": 10.0, "pgg_multiplier": 1.5,
+        })
+    state = game.new_initial_state()
+    state.apply_actions([param_social_dilemma.Action.DEFECT,
+                          param_social_dilemma.Action.COOPERATE])
+    # Force termination after this single round.
+    outcomes = state.chance_outcomes()
+    stop_action = max(a for a, _ in outcomes)  # _TERMINATION_STOP > _CONTINUE
+    state.apply_action(stop_action)
+    self.assertTrue(state.is_terminal())
+    self.assertGreaterEqual(state.returns()[0], game.min_utility())
+    self.assertLessEqual(state.returns()[0], game.max_utility())
+
+  @parameterized.parameters(2, 3, 5, 10)
+  def test_public_goods_random_sim(self, num_players):
+    game = pyspiel.load_game(
+        "python_param_social_dilemma", {
+            "players": num_players, "payoff_kind": "public_goods",
+            "pgg_endowment": 10.0, "pgg_multiplier": 1.5,
+        })
+    pyspiel.random_sim_test(game, num_sims=5, serialize=True, verbose=False)
+
 
 if __name__ == "__main__":
   absltest.main()
