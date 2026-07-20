@@ -511,6 +511,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("policy_tensor_shape", &Game::PolicyTensorShape)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
+      .def("max_serialization_length", &Game::MaxSerializationLength)
       .def("action_to_string", &Game::ActionToString)
       // action_struct_spec (no arguments), return {spec, example}
       .def("action_struct_spec", &Game::ActionStructSpec)
