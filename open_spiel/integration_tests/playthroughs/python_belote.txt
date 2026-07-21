@@ -1,4 +1,4 @@
-game: belote_python
+game: python_belote
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -13,7 +13,7 @@ GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = False
 GameType.reward_model = RewardModel.TERMINAL
-GameType.short_name = "belote_python"
+GameType.short_name = "python_belote"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 38
@@ -31,7 +31,7 @@ ObservationTensorShape() = player: [4], hand: [32], dealer: [4], turned_card: [3
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 147
 MaxGameLength() = 72
-ToString() = "belote_python(dealer=0)"
+ToString() = "python_belote(dealer=0)"
 
 # State 0
 # Dealer: 0
