@@ -24,13 +24,21 @@ redealt with the next player as dealer. Card play follows standard suit- and
 trump-following obligations, and scoring uses the standard 162-point deck
 (152 card points + 10 for the last trick), with an all-or-nothing rule: the
 declaring team keeps its points only if it scores strictly more than 81;
-otherwise the defending team collects all 162 points.
+otherwise the defending team collects all 162 points. If one team wins all
+8 tricks ("capot"), the last-trick bonus is 100 instead of 10, so the deck
+is worth 252 points instead of 162, and that full total goes to whichever
+team scores higher (the capot-winning team on success, or the defenders'
+252 on a failed contract).
 
 The "belote/rebelote" bonus (20 extra points awarded to whichever team has a
 single player holding both the King and Queen of the trump suit) is optional
 and controlled via the "use_belote_rebelote" game parameter (off by default).
-When enabled, the bonus is credited to the holder's team regardless of
-whether the declaring team makes its contract.
+When enabled, the bonus counts toward the declaring team's contract
+threshold (its own or the defenders', per official rules) and is always
+credited to the holder's team, win or lose.
+
+Official rules (Fédération Française de Belote):
+https://www.ffbelote.org/wp-content/uploads/2016/01/regles-officielles-de-la-Belote-27-01-2016.pdf
 """
 
 import bisect
@@ -44,6 +52,9 @@ _NUM_SUITS = 4
 _NUM_RANKS = 8
 _NUM_CARDS = _NUM_SUITS * _NUM_RANKS
 _MAX_SCORE = 162
+_LAST_TRICK_BONUS = 10
+_CAPOT_LAST_TRICK_BONUS = 100
+_MAX_SCORE_CAPOT = _MAX_SCORE - _LAST_TRICK_BONUS + _CAPOT_LAST_TRICK_BONUS
 _BELOTE_REBELOTE_BONUS = 20
 
 _SUIT_NAMES = ["C", "D", "H", "S"]
@@ -110,9 +121,10 @@ _GAME_INFO = pyspiel.GameInfo(
     num_distinct_actions=_NUM_CARDS + 2 + _NUM_SUITS,
     max_chance_outcomes=_NUM_CARDS,
     num_players=_NUM_PLAYERS,
-    # Loose bounds that also cover the optional belote/rebelote bonus.
-    min_utility=-float(_MAX_SCORE + _BELOTE_REBELOTE_BONUS),
-    max_utility=float(_MAX_SCORE + _BELOTE_REBELOTE_BONUS),
+    # Loose bounds that also cover a capot (252 instead of 162) and the
+    # optional belote/rebelote bonus.
+    min_utility=-float(_MAX_SCORE_CAPOT + _BELOTE_REBELOTE_BONUS),
+    max_utility=float(_MAX_SCORE_CAPOT + _BELOTE_REBELOTE_BONUS),
     utility_sum=0.0,
     # Dealing (~32 draws) + bidding (up to 8 calls) + card play (32 plays).
     max_game_length=_NUM_CARDS + 8 + _NUM_CARDS,
@@ -233,6 +245,7 @@ class BeloteState(pyspiel.State):
     self._tricks_played = 0
     self._played_cards = []
     self._trick_history = []
+    self._trick_winners = []
     self._team_points = [0, 0]
     self._returns = [0.0] * _NUM_PLAYERS
 
@@ -444,14 +457,20 @@ class BeloteState(pyspiel.State):
     other_team = 1 - declarer_team
     declarer_points = self._team_points[declarer_team]
     other_points = self._team_points[other_team]
-    if declarer_points > _MAX_SCORE // 2:
+    # 162 normally, or 252 if one team won all 8 tricks (capot).
+    trick_total = declarer_points + other_points
+    declarer_bonus = (
+        _BELOTE_REBELOTE_BONUS if self._belote_team == declarer_team else 0)
+    other_bonus = (
+        _BELOTE_REBELOTE_BONUS if self._belote_team == other_team else 0)
+    # Contract success/failure is decided on totals that include the
+    # belote/rebelote bonus, not on trick points alone.
+    if declarer_points + declarer_bonus > other_points + other_bonus:
       final_declarer, final_other = declarer_points, other_points
     else:
-      final_declarer, final_other = 0, _MAX_SCORE
-    if self._belote_team == declarer_team:
-      final_declarer += _BELOTE_REBELOTE_BONUS
-    elif self._belote_team == other_team:
-      final_other += _BELOTE_REBELOTE_BONUS
+      final_declarer, final_other = 0, trick_total
+    final_declarer += declarer_bonus
+    final_other += other_bonus
     diff = float(final_declarer - final_other)
     self._returns = [
         diff if team_of(p) == declarer_team else -diff
@@ -469,8 +488,11 @@ class BeloteState(pyspiel.State):
     winner = self._trick_winner(self._trick)
     points = sum(card_points(c, self._trump_suit) for _, c in self._trick)
     self._tricks_played += 1
+    self._trick_winners.append(winner)
     if self._tricks_played == _NUM_CARDS // _NUM_PLAYERS:
-      points += 10
+      is_capot = all(
+          team_of(w) == team_of(winner) for w in self._trick_winners)
+      points += _CAPOT_LAST_TRICK_BONUS if is_capot else _LAST_TRICK_BONUS
     self._team_points[team_of(winner)] += points
     self._trick_history.append([c for _, c in self._trick])
 
@@ -591,8 +613,10 @@ class BeloteObserver:
       for card in state._played_cards:
         self.dict["cards_played"][card] = 1
     if "team_points" in self.dict:
-      self.dict["team_points"][0] = state._team_points[0] / float(_MAX_SCORE)
-      self.dict["team_points"][1] = state._team_points[1] / float(_MAX_SCORE)
+      self.dict["team_points"][0] = (
+          state._team_points[0] / float(_MAX_SCORE_CAPOT))
+      self.dict["team_points"][1] = (
+          state._team_points[1] / float(_MAX_SCORE_CAPOT))
     if "trick_history" in self.dict:
       for trick_idx, cards in enumerate(state._trick_history):
         for card in cards:

@@ -206,7 +206,8 @@ class BeloteTest(absltest.TestCase):
       self.assertAlmostEqual(sum(returns), 0.0)
       self.assertEqual(returns[0], returns[2])
       self.assertEqual(returns[1], returns[3])
-      self.assertEqual(sum(state._team_points), 162)
+      # 162 normally, or 252 in the (rare, random-play) case of a capot.
+      self.assertIn(sum(state._team_points), (162, 252))
 
   def test_belote_rebelote_not_applied_by_default(self):
     """Without the parameter, holding K+Q of trump earns no bonus."""
@@ -268,6 +269,44 @@ class BeloteTest(absltest.TestCase):
     self.assertEqual(state.returns()[0], 20 - 162)
     self.assertEqual(state.returns()[1], 162 - 20)
 
+  def test_belote_rebelote_bonus_can_flip_a_failed_contract_to_success(self):
+    """Official rule: the belote total counts toward contract success.
+
+    75 raw trick points would fail the plain >81 threshold, but 75+20=95
+    exceeds the defenders' 87, so the contract must succeed and the
+    declarer keeps its 75 points (plus the 20-point bonus).
+    """
+    game = belote.BeloteGame({"use_belote_rebelote": True})
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs.
+    state.hands[0] = [6, 5]  # King and Queen of Clubs held by player 0.
+    state._enter_play_phase()
+    self.assertEqual(state._belote_team, belote.team_of(0))
+
+    state._declarer_team = 0
+    state._team_points = [75, 87]
+    state._finalize_scores()
+    self.assertEqual(state.returns()[0], (75 + 20) - 87)
+
+  def test_belote_rebelote_bonus_can_flip_a_made_contract_to_failure(self):
+    """Symmetric case: the defenders' belote can sink an otherwise-made contract.
+
+    The declarer's raw 85 trick points clear the plain >81 threshold, but
+    the defenders hold belote (77+20=97 > 85), so the contract fails and
+    the declarer keeps nothing.
+    """
+    game = belote.BeloteGame({"use_belote_rebelote": True})
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs.
+    state.hands[1] = [6, 5]  # King and Queen of Clubs held by player 1.
+    state._enter_play_phase()
+    self.assertEqual(state._belote_team, belote.team_of(1))
+
+    state._declarer_team = 0
+    state._team_points = [85, 77]
+    state._finalize_scores()
+    self.assertEqual(state.returns()[0], 0 - (162 + 20))
+
   def test_belote_rebelote_requires_same_player_to_hold_both_cards(self):
     """Splitting K and Q of trump across partners does not earn the bonus."""
     game = belote.BeloteGame({"use_belote_rebelote": True})
@@ -297,9 +336,74 @@ class BeloteTest(absltest.TestCase):
       self.assertAlmostEqual(sum(returns), 0.0)
       self.assertEqual(returns[0], returns[2])
       self.assertEqual(returns[1], returns[3])
-      self.assertEqual(sum(state._team_points), 162)
+      trick_total = sum(state._team_points)
+      self.assertIn(trick_total, (162, 252))
       bonus = belote._BELOTE_REBELOTE_BONUS if state._belote_team >= 0 else 0
-      self.assertLessEqual(abs(returns[0]), 162 + bonus)
+      self.assertLessEqual(abs(returns[0]), trick_total + bonus)
+
+  def test_capot_awards_100_point_last_trick_bonus(self):
+    """If one team wins all 8 tricks, the last trick is worth 100, not 10."""
+    game = belote.BeloteGame()
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs; the final trick below is all Hearts.
+    state._declarer_team = 0
+    state._tricks_played = 7
+    state._trick_winners = [0, 2, 0, 2, 0, 2, 0]  # Team 0 won every trick.
+    state._team_points = [140, 12]
+
+    # Final trick: player 0's Ace of Hearts (23) beats 8/9/10 of Hearts.
+    state._trick = []
+    state._trick_leader = 0
+    state._current_player_play = 0
+    state.hands[0] = [23]
+    state.hands[1] = [17]
+    state.hands[2] = [18]
+    state.hands[3] = [19]
+    state._apply_play_action(23, 0)
+    state._apply_play_action(17, 1)
+    state._apply_play_action(18, 2)
+    state._apply_play_action(19, 3)
+
+    # Card points in the trick: A=11, 8=0, 9=0, 10=10, i.e. 21, plus the
+    # 100-point capot bonus (instead of the usual 10).
+    self.assertEqual(state._team_points[0], 140 + 21 + 100)
+    self.assertEqual(sum(state._team_points), 140 + 12 + 21 + 100)
+
+  def test_non_capot_last_trick_keeps_10_point_bonus(self):
+    """If tricks were split between teams, the last trick is worth only 10."""
+    game = belote.BeloteGame()
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs; the final trick below is all Hearts.
+    state._declarer_team = 0
+    state._tricks_played = 7
+    state._trick_winners = [0, 2, 0, 2, 0, 2, 1]  # Team 1 won one trick.
+    state._team_points = [130, 22]
+
+    state._trick = []
+    state._trick_leader = 0
+    state._current_player_play = 0
+    state.hands[0] = [23]
+    state.hands[1] = [17]
+    state.hands[2] = [18]
+    state.hands[3] = [19]
+    state._apply_play_action(23, 0)
+    state._apply_play_action(17, 1)
+    state._apply_play_action(18, 2)
+    state._apply_play_action(19, 3)
+
+    self.assertEqual(state._team_points[0], 130 + 21 + 10)
+    self.assertEqual(sum(state._team_points), 130 + 22 + 21 + 10)
+
+  def test_capot_gives_defenders_252_points_on_failed_contract(self):
+    """A capot changes the trick total used when the contract fails."""
+    game = belote.BeloteGame()
+    state = game.new_initial_state()
+    state._declarer_team = 0
+    # Team 1 (the defenders) achieved a capot: all 252 points are theirs.
+    state._team_points = [0, 252]
+    state._finalize_scores()
+    self.assertEqual(state.returns()[0], 0 - 252)
+    self.assertEqual(state.returns()[1], 252 - 0)
 
   def test_game_from_cc(self):
     """Runs the standard game tests, checking API consistency."""

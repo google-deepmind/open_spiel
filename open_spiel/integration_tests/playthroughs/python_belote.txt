@@ -21,8 +21,8 @@ PolicyTensorShape() = [38]
 MaxChanceOutcomes() = 32
 GetParameters() = {dealer=0,use_belote_rebelote=False}
 NumPlayers() = 4
-MinUtility() = -182.0
-MaxUtility() = 182.0
+MinUtility() = -272.0
+MaxUtility() = 272.0
 UtilitySum() = 0.0
 InformationStateTensorShape() = player: [4], hand: [32], dealer: [4], turned_card: [32], trump_suit: [5], declarer: [4], current_trick: [32], cards_played: [32], team_points: [2], trick_history: [8, 32]
 InformationStateTensorLayout() = TensorLayout.CHW
@@ -1139,7 +1139,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).team_points = [0.0, 0.03704]
+InformationStateTensor(0).team_points = [0.0, 0.02381]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1156,7 +1156,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1).team_points = [0.0, 0.03704]
+InformationStateTensor(1).team_points = [0.0, 0.02381]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1173,7 +1173,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2).team_points = [0.0, 0.03704]
+InformationStateTensor(2).team_points = [0.0, 0.02381]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1190,7 +1190,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3).team_points = [0.0, 0.03704]
+InformationStateTensor(3).team_points = [0.0, 0.02381]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1216,7 +1216,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).team_points = [0.0, 0.03704]
+ObservationTensor(0).team_points = [0.0, 0.02381]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◉◉◉◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -1225,7 +1225,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).team_points = [0.0, 0.03704]
+ObservationTensor(1).team_points = [0.0, 0.02381]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◉◯◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -1234,7 +1234,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(2).team_points = [0.0, 0.03704]
+ObservationTensor(2).team_points = [0.0, 0.02381]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -1243,7 +1243,7 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(3).team_points = [0.0, 0.03704]
+ObservationTensor(3).team_points = [0.0, 0.02381]
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [10, 11, 12, 14, 19, 24, 27]
@@ -1278,7 +1278,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).team_points = [0.0, 0.03704]
+InformationStateTensor(0).team_points = [0.0, 0.02381]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1295,7 +1295,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1).team_points = [0.0, 0.03704]
+InformationStateTensor(1).team_points = [0.0, 0.02381]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1312,7 +1312,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2).team_points = [0.0, 0.03704]
+InformationStateTensor(2).team_points = [0.0, 0.02381]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1329,7 +1329,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3).team_points = [0.0, 0.03704]
+InformationStateTensor(3).team_points = [0.0, 0.02381]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1355,7 +1355,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).team_points = [0.0, 0.03704]
+ObservationTensor(0).team_points = [0.0, 0.02381]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -1364,7 +1364,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).team_points = [0.0, 0.03704]
+ObservationTensor(1).team_points = [0.0, 0.02381]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◉◯◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -1373,7 +1373,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(2).team_points = [0.0, 0.03704]
+ObservationTensor(2).team_points = [0.0, 0.02381]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -1382,7 +1382,7 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(3).team_points = [0.0, 0.03704]
+ObservationTensor(3).team_points = [0.0, 0.02381]
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 2, 4, 5, 7, 28, 31]
@@ -1417,7 +1417,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).team_points = [0.0, 0.03704]
+InformationStateTensor(0).team_points = [0.0, 0.02381]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1434,7 +1434,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1).team_points = [0.0, 0.03704]
+InformationStateTensor(1).team_points = [0.0, 0.02381]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1451,7 +1451,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2).team_points = [0.0, 0.03704]
+InformationStateTensor(2).team_points = [0.0, 0.02381]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1468,7 +1468,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3).team_points = [0.0, 0.03704]
+InformationStateTensor(3).team_points = [0.0, 0.02381]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1494,7 +1494,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).team_points = [0.0, 0.03704]
+ObservationTensor(0).team_points = [0.0, 0.02381]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -1503,7 +1503,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).team_points = [0.0, 0.03704]
+ObservationTensor(1).team_points = [0.0, 0.02381]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -1512,7 +1512,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(2).team_points = [0.0, 0.03704]
+ObservationTensor(2).team_points = [0.0, 0.02381]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -1521,7 +1521,7 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(3).team_points = [0.0, 0.03704]
+ObservationTensor(3).team_points = [0.0, 0.02381]
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [15]
@@ -1556,7 +1556,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).team_points = [0.0, 0.03704]
+InformationStateTensor(0).team_points = [0.0, 0.02381]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1573,7 +1573,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1).team_points = [0.0, 0.03704]
+InformationStateTensor(1).team_points = [0.0, 0.02381]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1590,7 +1590,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2).team_points = [0.0, 0.03704]
+InformationStateTensor(2).team_points = [0.0, 0.02381]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1607,7 +1607,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3).team_points = [0.0, 0.03704]
+InformationStateTensor(3).team_points = [0.0, 0.02381]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1633,7 +1633,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).team_points = [0.0, 0.03704]
+ObservationTensor(0).team_points = [0.0, 0.02381]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -1642,7 +1642,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).team_points = [0.0, 0.03704]
+ObservationTensor(1).team_points = [0.0, 0.02381]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -1651,7 +1651,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(2).team_points = [0.0, 0.03704]
+ObservationTensor(2).team_points = [0.0, 0.02381]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -1660,7 +1660,7 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(3).team_points = [0.0, 0.03704]
+ObservationTensor(3).team_points = [0.0, 0.02381]
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [8, 9, 13]
@@ -1695,7 +1695,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).team_points = [0.0, 0.12963]
+InformationStateTensor(0).team_points = [0.0, 0.08333]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1712,7 +1712,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1).team_points = [0.0, 0.12963]
+InformationStateTensor(1).team_points = [0.0, 0.08333]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1729,7 +1729,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2).team_points = [0.0, 0.12963]
+InformationStateTensor(2).team_points = [0.0, 0.08333]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1746,7 +1746,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3).team_points = [0.0, 0.12963]
+InformationStateTensor(3).team_points = [0.0, 0.08333]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1772,7 +1772,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).team_points = [0.0, 0.12963]
+ObservationTensor(0).team_points = [0.0, 0.08333]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -1781,7 +1781,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).team_points = [0.0, 0.12963]
+ObservationTensor(1).team_points = [0.0, 0.08333]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -1790,7 +1790,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(2).team_points = [0.0, 0.12963]
+ObservationTensor(2).team_points = [0.0, 0.08333]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -1799,7 +1799,7 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(3).team_points = [0.0, 0.12963]
+ObservationTensor(3).team_points = [0.0, 0.08333]
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [1, 3, 6, 26, 29, 30]
@@ -1834,7 +1834,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).team_points = [0.0, 0.12963]
+InformationStateTensor(0).team_points = [0.0, 0.08333]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1851,7 +1851,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1).team_points = [0.0, 0.12963]
+InformationStateTensor(1).team_points = [0.0, 0.08333]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1868,7 +1868,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2).team_points = [0.0, 0.12963]
+InformationStateTensor(2).team_points = [0.0, 0.08333]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1885,7 +1885,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3).team_points = [0.0, 0.12963]
+InformationStateTensor(3).team_points = [0.0, 0.08333]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1911,7 +1911,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).team_points = [0.0, 0.12963]
+ObservationTensor(0).team_points = [0.0, 0.08333]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -1920,7 +1920,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).team_points = [0.0, 0.12963]
+ObservationTensor(1).team_points = [0.0, 0.08333]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -1929,7 +1929,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(2).team_points = [0.0, 0.12963]
+ObservationTensor(2).team_points = [0.0, 0.08333]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -1938,7 +1938,7 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(3).team_points = [0.0, 0.12963]
+ObservationTensor(3).team_points = [0.0, 0.08333]
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [9, 13]
@@ -1977,7 +1977,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).team_points = [0.0, 0.12963]
+InformationStateTensor(0).team_points = [0.0, 0.08333]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1994,7 +1994,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1).team_points = [0.0, 0.12963]
+InformationStateTensor(1).team_points = [0.0, 0.08333]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2011,7 +2011,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2).team_points = [0.0, 0.12963]
+InformationStateTensor(2).team_points = [0.0, 0.08333]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2028,7 +2028,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3).team_points = [0.0, 0.12963]
+InformationStateTensor(3).team_points = [0.0, 0.08333]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2054,7 +2054,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).team_points = [0.0, 0.12963]
+ObservationTensor(0).team_points = [0.0, 0.08333]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -2063,7 +2063,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1).team_points = [0.0, 0.12963]
+ObservationTensor(1).team_points = [0.0, 0.08333]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -2072,7 +2072,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(2).team_points = [0.0, 0.12963]
+ObservationTensor(2).team_points = [0.0, 0.08333]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◉◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -2081,7 +2081,7 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◯◯◉◉◯◯◯◯◉◯◯◉◯◉◉◉◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(3).team_points = [0.0, 0.12963]
+ObservationTensor(3).team_points = [0.0, 0.08333]
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 4, 5, 7]
@@ -2196,7 +2196,7 @@ InformationStateTensor(0).trump_suit: ◯◉◯◯◯
 InformationStateTensor(0).declarer: ◯◉◯◯
 InformationStateTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-InformationStateTensor(0).team_points = [0.12963, 0.87037]
+InformationStateTensor(0).team_points = [0.08333, 0.55952]
 InformationStateTensor(0).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◉◉◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2213,7 +2213,7 @@ InformationStateTensor(1).trump_suit: ◯◉◯◯◯
 InformationStateTensor(1).declarer: ◯◉◯◯
 InformationStateTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-InformationStateTensor(1).team_points = [0.12963, 0.87037]
+InformationStateTensor(1).team_points = [0.08333, 0.55952]
 InformationStateTensor(1).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◉◉◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2230,7 +2230,7 @@ InformationStateTensor(2).trump_suit: ◯◉◯◯◯
 InformationStateTensor(2).declarer: ◯◉◯◯
 InformationStateTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-InformationStateTensor(2).team_points = [0.12963, 0.87037]
+InformationStateTensor(2).team_points = [0.08333, 0.55952]
 InformationStateTensor(2).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◉◉◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2247,7 +2247,7 @@ InformationStateTensor(3).trump_suit: ◯◉◯◯◯
 InformationStateTensor(3).declarer: ◯◉◯◯
 InformationStateTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(3).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-InformationStateTensor(3).team_points = [0.12963, 0.87037]
+InformationStateTensor(3).team_points = [0.08333, 0.55952]
 InformationStateTensor(3).trick_history: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯
                                          ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                                          ◯◯◯◉◉◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2273,7 +2273,7 @@ ObservationTensor(0).trump_suit: ◯◉◯◯◯
 ObservationTensor(0).declarer: ◯◉◯◯
 ObservationTensor(0).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-ObservationTensor(0).team_points = [0.12963, 0.87037]
+ObservationTensor(0).team_points = [0.08333, 0.55952]
 ObservationTensor(1).player: ◯◉◯◯
 ObservationTensor(1).hand: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).dealer: ◉◯◯◯
@@ -2282,7 +2282,7 @@ ObservationTensor(1).trump_suit: ◯◉◯◯◯
 ObservationTensor(1).declarer: ◯◉◯◯
 ObservationTensor(1).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-ObservationTensor(1).team_points = [0.12963, 0.87037]
+ObservationTensor(1).team_points = [0.08333, 0.55952]
 ObservationTensor(2).player: ◯◯◉◯
 ObservationTensor(2).hand: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).dealer: ◉◯◯◯
@@ -2291,7 +2291,7 @@ ObservationTensor(2).trump_suit: ◯◉◯◯◯
 ObservationTensor(2).declarer: ◯◉◯◯
 ObservationTensor(2).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-ObservationTensor(2).team_points = [0.12963, 0.87037]
+ObservationTensor(2).team_points = [0.08333, 0.55952]
 ObservationTensor(3).player: ◯◯◯◉
 ObservationTensor(3).hand: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).dealer: ◉◯◯◯
@@ -2300,6 +2300,6 @@ ObservationTensor(3).trump_suit: ◯◉◯◯◯
 ObservationTensor(3).declarer: ◯◉◯◯
 ObservationTensor(3).current_trick: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(3).cards_played: ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉
-ObservationTensor(3).team_points = [0.12963, 0.87037]
+ObservationTensor(3).team_points = [0.08333, 0.55952]
 Rewards() = [-120, 120, -120, 120]
 Returns() = [-120, 120, -120, 120]
