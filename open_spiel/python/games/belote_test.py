@@ -210,12 +210,12 @@ class BeloteTest(absltest.TestCase):
 
   def test_game_from_cc(self):
     """Runs the standard game tests, checking API consistency."""
-    game = pyspiel.load_game("belote")
+    game = pyspiel.load_game("belote_python")
     pyspiel.random_sim_test(game, num_sims=10, serialize=False, verbose=False)
 
   def test_pickle(self):
     """Checks pickling and unpickling of game and state."""
-    game = pyspiel.load_game("belote")
+    game = pyspiel.load_game("belote_python")
     pickled_game = pickle.dumps(game)
     unpickled_game = pickle.loads(pickled_game)
     self.assertEqual(str(game), str(unpickled_game))

@@ -72,7 +72,7 @@ TAKE_ACTION = _NUM_CARDS + 1  # 33
 CHOOSE_SUIT_ACTION_BASE = _NUM_CARDS + 2  # + suit index (0..3) : 34, 35, 36, 37
 
 _GAME_TYPE = pyspiel.GameType(
-    short_name="belote",
+    short_name="belote_python",
     long_name="Python Belote",
     dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
     chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,

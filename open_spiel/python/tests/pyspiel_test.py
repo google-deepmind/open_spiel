@@ -44,6 +44,7 @@ EXPECTED_MANDATORY_GAMES = frozenset(
         "bargaining",
         "battleship",
         "belote",
+        "belote_python",
         "blackjack",
         "blotto",
         "breakthrough",
