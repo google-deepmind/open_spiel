@@ -208,6 +208,99 @@ class BeloteTest(absltest.TestCase):
       self.assertEqual(returns[1], returns[3])
       self.assertEqual(sum(state._team_points), 162)
 
+  def test_belote_rebelote_not_applied_by_default(self):
+    """Without the parameter, holding K+Q of trump earns no bonus."""
+    game = belote.BeloteGame()
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs.
+    state.hands[0] = [6, 5]  # King and Queen of Clubs held by player 0.
+    state._enter_play_phase()
+    self.assertEqual(state._belote_team, -1)
+
+    state._declarer_team = 0
+    state._team_points = [100, 62]
+    state._finalize_scores()
+    self.assertEqual(state.returns()[0], 100 - 62)
+
+  def test_belote_rebelote_bonus_awarded_to_declarer_when_enabled(self):
+    """With the parameter on, the holder's team gets a 20-point bonus."""
+    game = belote.BeloteGame({"use_belote_rebelote": True})
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs.
+    state.hands[0] = [6, 5]  # King and Queen of Clubs held by player 0.
+    state._enter_play_phase()
+    self.assertEqual(state._belote_team, belote.team_of(0))
+
+    state._declarer_team = 0
+    state._team_points = [100, 62]
+    state._finalize_scores()
+    self.assertEqual(state.returns()[0], (100 + 20) - 62)
+
+  def test_belote_rebelote_bonus_awarded_to_defenders_when_enabled(self):
+    """The bonus goes to whichever team holds K+Q, even if defending."""
+    game = belote.BeloteGame({"use_belote_rebelote": True})
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs.
+    state.hands[1] = [6, 5]  # King and Queen of Clubs held by player 1.
+    state._enter_play_phase()
+    self.assertEqual(state._belote_team, belote.team_of(1))
+
+    state._declarer_team = 0
+    state._team_points = [100, 62]
+    state._finalize_scores()
+    self.assertEqual(state.returns()[0], 100 - (62 + 20))
+
+  def test_belote_rebelote_bonus_survives_failed_contract(self):
+    """The bonus is paid even if the holder's team scores 0 trick points."""
+    game = belote.BeloteGame({"use_belote_rebelote": True})
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs.
+    state.hands[0] = [6, 5]  # King and Queen of Clubs held by player 0.
+    state._enter_play_phase()
+    self.assertEqual(state._belote_team, belote.team_of(0))
+
+    state._declarer_team = 0
+    # Declarer team fails its contract outright: 0 trick points, so the
+    # 162 trick points all go to the defenders, but the 20-point bonus
+    # for holding K+Q of trump is unaffected by the failed contract.
+    state._team_points = [0, 162]
+    state._finalize_scores()
+    self.assertEqual(state.returns()[0], 20 - 162)
+    self.assertEqual(state.returns()[1], 162 - 20)
+
+  def test_belote_rebelote_requires_same_player_to_hold_both_cards(self):
+    """Splitting K and Q of trump across partners does not earn the bonus."""
+    game = belote.BeloteGame({"use_belote_rebelote": True})
+    state = game.new_initial_state()
+    state._trump_suit = 0  # Clubs.
+    state.hands[0] = [6]  # King of Clubs held by player 0.
+    state.hands[2] = [5]  # Queen of Clubs held by partner (player 2).
+    state._enter_play_phase()
+    self.assertEqual(state._belote_team, -1)
+
+  def test_full_random_game_with_belote_rebelote_scores_correctly(self):
+    """Same sanity checks as above, with the belote/rebelote bonus enabled."""
+    game = belote.BeloteGame({"use_belote_rebelote": True})
+    for _ in range(20):
+      state = game.new_initial_state()
+      while not state.is_terminal():
+        if state.is_chance_node():
+          outcomes_with_probs = state.chance_outcomes()
+          action_list, prob_list = zip(*outcomes_with_probs)
+          action = np.random.choice(action_list, p=prob_list)
+        else:
+          legal = state.legal_actions()
+          action = np.random.choice(legal)
+        state.apply_action(int(action))
+
+      returns = state.returns()
+      self.assertAlmostEqual(sum(returns), 0.0)
+      self.assertEqual(returns[0], returns[2])
+      self.assertEqual(returns[1], returns[3])
+      self.assertEqual(sum(state._team_points), 162)
+      bonus = belote._BELOTE_REBELOTE_BONUS if state._belote_team >= 0 else 0
+      self.assertLessEqual(abs(returns[0]), 162 + bonus)
+
   def test_game_from_cc(self):
     """Runs the standard game tests, checking API consistency."""
     game = pyspiel.load_game("python_belote")

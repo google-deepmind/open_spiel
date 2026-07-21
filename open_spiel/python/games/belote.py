@@ -25,6 +25,12 @@ trump-following obligations, and scoring uses the standard 162-point deck
 (152 card points + 10 for the last trick), with an all-or-nothing rule: the
 declaring team keeps its points only if it scores strictly more than 81;
 otherwise the defending team collects all 162 points.
+
+The "belote/rebelote" bonus (20 extra points awarded to whichever team has a
+single player holding both the King and Queen of the trump suit) is optional
+and controlled via the "use_belote_rebelote" game parameter (off by default).
+When enabled, the bonus is credited to the holder's team regardless of
+whether the declaring team makes its contract.
 """
 
 import bisect
@@ -38,6 +44,7 @@ _NUM_SUITS = 4
 _NUM_RANKS = 8
 _NUM_CARDS = _NUM_SUITS * _NUM_RANKS
 _MAX_SCORE = 162
+_BELOTE_REBELOTE_BONUS = 20
 
 _SUIT_NAMES = ["C", "D", "H", "S"]
 _RANK_NAMES = ["7", "8", "9", "10", "J", "Q", "K", "A"]
@@ -95,6 +102,7 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_tensor=True,
     parameter_specification={
         "dealer": 0,
+        "use_belote_rebelote": False,
     },
 )
 _GAME_INFO = pyspiel.GameInfo(
@@ -102,8 +110,9 @@ _GAME_INFO = pyspiel.GameInfo(
     num_distinct_actions=_NUM_CARDS + 2 + _NUM_SUITS,
     max_chance_outcomes=_NUM_CARDS,
     num_players=_NUM_PLAYERS,
-    min_utility=-float(_MAX_SCORE),
-    max_utility=float(_MAX_SCORE),
+    # Loose bounds that also cover the optional belote/rebelote bonus.
+    min_utility=-float(_MAX_SCORE + _BELOTE_REBELOTE_BONUS),
+    max_utility=float(_MAX_SCORE + _BELOTE_REBELOTE_BONUS),
     utility_sum=0.0,
     # Dealing (~32 draws) + bidding (up to 8 calls) + card play (32 plays).
     max_game_length=_NUM_CARDS + 8 + _NUM_CARDS,
@@ -171,6 +180,8 @@ class BeloteGame(pyspiel.Game):
   def __init__(self, params=None) -> None:
     super().__init__(_GAME_TYPE, _GAME_INFO, params or {})
     self.dealer = self.get_parameters().get("dealer", 0)
+    self.use_belote_rebelote = self.get_parameters().get(
+        "use_belote_rebelote", False)
 
   def new_initial_state(self) -> "BeloteState":
     """Returns a state corresponding to the start of a game."""
@@ -213,6 +224,8 @@ class BeloteState(pyspiel.State):
     self._taker = -1
     self._trump_suit = -1
     self._declarer_team = -1
+    self._use_belote_rebelote = game.use_belote_rebelote
+    self._belote_team = -1
 
     self._trick = []
     self._trick_leader = -1
@@ -342,6 +355,17 @@ class BeloteState(pyspiel.State):
     self._trick = []
     self._tricks_played = 0
     self._team_points = [0, 0]
+    if self._use_belote_rebelote:
+      self._belote_team = self._find_belote_team()
+
+  def _find_belote_team(self) -> int:
+    """Returns the team id of the player holding K+Q of trump, or -1."""
+    trump_king = self._trump_suit * _NUM_RANKS + _RANK_NAMES.index("K")
+    trump_queen = self._trump_suit * _NUM_RANKS + _RANK_NAMES.index("Q")
+    for player, hand in enumerate(self.hands):
+      if trump_king in hand and trump_queen in hand:
+        return team_of(player)
+    return -1
 
   def _apply_deal_action(self, card) -> None:
     self._deck.remove(card)
@@ -424,6 +448,10 @@ class BeloteState(pyspiel.State):
       final_declarer, final_other = declarer_points, other_points
     else:
       final_declarer, final_other = 0, _MAX_SCORE
+    if self._belote_team == declarer_team:
+      final_declarer += _BELOTE_REBELOTE_BONUS
+    elif self._belote_team == other_team:
+      final_other += _BELOTE_REBELOTE_BONUS
     diff = float(final_declarer - final_other)
     self._returns = [
         diff if team_of(p) == declarer_team else -diff
@@ -499,6 +527,8 @@ class BeloteState(pyspiel.State):
     if self._phase in ("play", "done"):
       lines.append(f"Trick: {[(p, card_string(c)) for p, c in self._trick]}")
       lines.append(f"Team points: {self._team_points}")
+      if self._belote_team >= 0:
+        lines.append(f"Belote/rebelote team: {self._belote_team}")
     return "\n".join(lines)
 
 
