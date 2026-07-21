@@ -29,7 +29,7 @@ import pyspiel
 
 
 def _deal_hands(state):
-  """Applies chance actions until the initial 5-card deal + turned card is done."""
+  """Applies chance actions until the initial 5-card deal + turned card."""
   while state.current_player(
   ) == pyspiel.PlayerId.CHANCE and state._phase == "deal":
     outcomes_with_probs = state.chance_outcomes()
@@ -122,7 +122,7 @@ class BeloteTest(absltest.TestCase):
     self.assertEqual(all_cards, list(range(32)))
 
   def test_all_pass_twice_redeals_and_rotates_dealer(self):
-    """If everyone passes both rounds, the deal restarts with the next dealer."""
+    """If everyone passes both rounds, the deal restarts with next dealer."""
     game = belote.BeloteGame()
     state = game.new_initial_state()
     original_dealer = state._dealer
@@ -146,7 +146,7 @@ class BeloteTest(absltest.TestCase):
     self.assertEqual(legal, [1])  # Must follow with the Clubs card.
 
   def test_must_trump_when_void_and_opponent_winning(self):
-    """A player void in the led suit must cut with trump if an opponent leads."""
+    """A player void in the led suit must cut with trump if opponent leads."""
     game = belote.BeloteGame()
     state = game.new_initial_state()
     state._trump_suit = 3  # Spades.

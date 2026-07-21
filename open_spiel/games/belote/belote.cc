@@ -68,6 +68,19 @@ constexpr int kTrumpStrength[kNumRanks] = {0, 1, 6, 4, 7, 2, 3, 5};
 constexpr int kNonTrumpPoints[kNumRanks] = {0, 0, 0, 10, 2, 3, 4, 11};
 constexpr int kTrumpPoints[kNumRanks] = {0, 0, 14, 10, 20, 3, 4, 11};
 
+// A hand holds at most kNumRanks (8) cards, so a fixed-capacity stack array
+// avoids heap allocations in the LegalCardPlays hot path.
+struct SmallCardList {
+  std::array<int, kNumRanks> cards;
+  int count = 0;
+  void push_back(int card) { cards[count++] = card; }
+  bool empty() const { return count == 0; }
+  int* begin() { return cards.data(); }
+  int* end() { return cards.data() + count; }
+  const int* begin() const { return cards.data(); }
+  const int* end() const { return cards.data() + count; }
+};
+
 std::vector<Player> OrderFrom(Player start) {
   std::vector<Player> order(kNumPlayers);
   for (int i = 0; i < kNumPlayers; ++i) {
@@ -134,8 +147,12 @@ BeloteState::BeloteState(std::shared_ptr<const Game> game, Player dealer)
       dealer_(dealer),
       deal_schedule_(InitialDealSchedule(dealer)),
       bid_turn_order_(OrderFrom((dealer + 1) % kNumPlayers)) {
-  deck_.reserve(kNumCards);
-  for (int card = 0; card < kNumCards; ++card) deck_.push_back(card);
+  in_deck_.fill(true);
+  deck_size_ = kNumCards;
+  for (auto& hand : hands_) hand.reserve(kNumRanks);
+  played_cards_.reserve(kNumCards);
+  trick_.reserve(kNumPlayers);
+  trick_history_.reserve(kNumCards / kNumPlayers);
 }
 
 Player BeloteState::CurrentPlayer() const {
@@ -150,10 +167,13 @@ Player BeloteState::CurrentPlayer() const {
 std::vector<Action> BeloteState::LegalActions() const {
   if (IsTerminal()) return {};
   if (phase_ == Phase::kDeal) {
+    // Cards 0..31 are scanned in index order, which is already ascending, so
+    // no sort is needed (unlike sorting a freshly-collected vector).
     std::vector<Action> actions;
-    actions.reserve(deck_.size());
-    for (int card : deck_) actions.push_back(card);
-    absl::c_sort(actions);
+    actions.reserve(deck_size_);
+    for (int card = 0; card < kNumCards; ++card) {
+      if (in_deck_[card]) actions.push_back(card);
+    }
     return actions;
   }
   if (phase_ == Phase::kBid1) {
@@ -182,7 +202,7 @@ std::vector<Action> BeloteState::LegalCardPlays(Player player) const {
 
   int led_suit = CardSuit(trick_[0].second);
   int trump = trump_suit_;
-  std::vector<int> same_suit_cards;
+  SmallCardList same_suit_cards;
   for (int c : hand) {
     if (CardSuit(c) == led_suit) same_suit_cards.push_back(c);
   }
@@ -192,7 +212,7 @@ std::vector<Action> BeloteState::LegalCardPlays(Player player) const {
   if (!same_suit_cards.empty()) {
     if (led_suit != trump) {
       // If the led suit is not trump, must follow suit.
-      absl::c_sort(same_suit_cards);
+      std::sort(same_suit_cards.begin(), same_suit_cards.end());
       return std::vector<Action>(same_suit_cards.begin(),
                                  same_suit_cards.end());
     }
@@ -204,17 +224,17 @@ std::vector<Action> BeloteState::LegalCardPlays(Player player) const {
         highest = std::max(highest, CardStrength(c, trump));
       }
     }
-    std::vector<int> higher;
+    SmallCardList higher;
     for (int c : same_suit_cards) {
       if (CardStrength(c, trump) > highest) higher.push_back(c);
     }
-    std::vector<int>& result = higher.empty() ? same_suit_cards : higher;
-    absl::c_sort(result);
+    SmallCardList& result = higher.empty() ? same_suit_cards : higher;
+    std::sort(result.begin(), result.end());
     return std::vector<Action>(result.begin(), result.end());
   }
 
   // No cards of the led suit: may play trump if possible.
-  std::vector<int> trump_cards;
+  SmallCardList trump_cards;
   for (int c : hand) {
     if (CardSuit(c) == trump) trump_cards.push_back(c);
   }
@@ -226,13 +246,13 @@ std::vector<Action> BeloteState::LegalCardPlays(Player player) const {
       return actions;
     }
 
-    std::vector<int> trumps_played;
+    SmallCardList trumps_played;
     for (const auto& [p, c] : trick_) {
       if (CardSuit(c) == trump) trumps_played.push_back(c);
     }
     if (trumps_played.empty()) {
       // No trumps have been played yet, play any trump.
-      absl::c_sort(trump_cards);
+      std::sort(trump_cards.begin(), trump_cards.end());
       return std::vector<Action>(trump_cards.begin(), trump_cards.end());
     }
 
@@ -241,12 +261,12 @@ std::vector<Action> BeloteState::LegalCardPlays(Player player) const {
     for (int c : trumps_played) {
       highest = std::max(highest, CardStrength(c, trump));
     }
-    std::vector<int> higher;
+    SmallCardList higher;
     for (int c : trump_cards) {
       if (CardStrength(c, trump) > highest) higher.push_back(c);
     }
-    std::vector<int>& result = higher.empty() ? trump_cards : higher;
-    absl::c_sort(result);
+    SmallCardList& result = higher.empty() ? trump_cards : higher;
+    std::sort(result.begin(), result.end());
     return std::vector<Action>(result.begin(), result.end());
   }
 
@@ -301,12 +321,12 @@ Player BeloteState::TrickWinner(
 
 std::vector<std::pair<Action, double>> BeloteState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(phase_ == Phase::kDeal);
-  std::vector<int> sorted_deck = deck_;
-  absl::c_sort(sorted_deck);
-  double probability = 1.0 / sorted_deck.size();
+  double probability = 1.0 / deck_size_;
   std::vector<std::pair<Action, double>> outcomes;
-  outcomes.reserve(sorted_deck.size());
-  for (int card : sorted_deck) outcomes.emplace_back(card, probability);
+  outcomes.reserve(deck_size_);
+  for (int card = 0; card < kNumCards; ++card) {
+    if (in_deck_[card]) outcomes.emplace_back(card, probability);
+  }
   return outcomes;
 }
 
@@ -319,7 +339,8 @@ void BeloteState::EnterPlayPhase() {
 }
 
 void BeloteState::ApplyDealAction(int card) {
-  deck_.erase(std::remove(deck_.begin(), deck_.end(), card), deck_.end());
+  in_deck_[card] = false;
+  --deck_size_;
   Player destination = deal_schedule_[deal_index_];
   if (destination == kInvalidPlayer) {
     turned_card_ = card;
@@ -384,8 +405,8 @@ void BeloteState::ApplyBid2Action(int action, Player player) {
       dealer_ = (dealer_ + 1) % kNumPlayers;
       for (auto& hand : hands_) hand.clear();
       turned_card_ = kInvalidAction;
-      deck_.clear();
-      for (int card = 0; card < kNumCards; ++card) deck_.push_back(card);
+      in_deck_.fill(true);
+      deck_size_ = kNumCards;
       bid_turn_order_ = OrderFrom((dealer_ + 1) % kNumPlayers);
       bid_pointer_ = 0;
       deal_schedule_ = InitialDealSchedule(dealer_);
@@ -398,7 +419,8 @@ void BeloteState::ApplyBid2Action(int action, Player player) {
     taker_ = player;
     trump_suit_ = suit;
     declarer_team_ = TeamOf(player);
-    deck_.push_back(turned_card_);
+    in_deck_[turned_card_] = true;
+    ++deck_size_;
 
     std::vector<Player> order = OrderFrom((dealer_ + 1) % kNumPlayers);
     std::vector<Player> schedule;

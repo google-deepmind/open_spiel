@@ -107,7 +107,11 @@ class BeloteState : public State {
 
   Player dealer_;
   std::array<std::vector<int>, kNumPlayers> hands_{};
-  std::vector<int> deck_;
+  // Cards still in the stock, tracked as a membership bitmap (rather than a
+  // vector requiring O(n) erase-by-value and repeated sorting) since cards
+  // 0..31 are already in ascending order when scanned in index order.
+  std::array<bool, kNumCards> in_deck_{};
+  int deck_size_ = 0;
   int turned_card_ = kInvalidAction;
 
   Phase phase_ = Phase::kDeal;

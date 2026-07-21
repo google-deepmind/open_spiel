@@ -27,6 +27,8 @@ declaring team keeps its points only if it scores strictly more than 81;
 otherwise the defending team collects all 162 points.
 """
 
+import bisect
+
 import numpy as np
 
 import pyspiel
@@ -65,6 +67,12 @@ _TRUMP_POINTS = {
     "10": 10,
     "A": 11,
 }
+_NONTRUMP_STRENGTH_BY_RANK = [
+    _NONTRUMP_ORDER.index(name) for name in _RANK_NAMES
+]
+_TRUMP_STRENGTH_BY_RANK = [_TRUMP_ORDER.index(name) for name in _RANK_NAMES]
+_NONTRUMP_POINTS_BY_RANK = [_NONTRUMP_POINTS[name] for name in _RANK_NAMES]
+_TRUMP_POINTS_BY_RANK = [_TRUMP_POINTS[name] for name in _RANK_NAMES]
 
 # Card are defined as 0, 1, ..., 31
 PASS_ACTION = _NUM_CARDS  # 32
@@ -119,16 +127,16 @@ def card_string(card) -> str:
 
 def card_points(card, trump_suit) -> int:
   """Returns the point value of `card` given the current `trump_suit`."""
-  name = card_rank_name(card)
-  return (_TRUMP_POINTS[name]
-          if card_suit(card) == trump_suit else _NONTRUMP_POINTS[name])
+  rank = card % _NUM_RANKS
+  return (_TRUMP_POINTS_BY_RANK[rank]
+          if card_suit(card) == trump_suit else _NONTRUMP_POINTS_BY_RANK[rank])
 
 
 def card_strength(card, trump_suit) -> int:
   """Returns the relative ranking strength of `card` given `trump_suit`."""
-  name = card_rank_name(card)
-  order = _TRUMP_ORDER if card_suit(card) == trump_suit else _NONTRUMP_ORDER
-  return order.index(name)
+  rank = card % _NUM_RANKS
+  return (_TRUMP_STRENGTH_BY_RANK[rank] if card_suit(card) == trump_suit else
+          _NONTRUMP_STRENGTH_BY_RANK[rank])
 
 
 def team_of(player) -> int:
@@ -241,8 +249,9 @@ class BeloteState(pyspiel.State):
       return self._legal_card_plays(player)
     return []
 
-  def _legal_card_plays(self, player) -> list[int]:  # pylint: disable=too-many-return-statements
-    """Cards `player` may legally play, given suit- and trump-following rules."""
+  # pylint: disable-next=too-many-return-statements
+  def _legal_card_plays(self, player) -> list[int]:
+    """Cards `player` may legally play, given suit/trump-following rules."""
     hand = self.hands[player]
     if not self._trick:  # No cards played for the trick, any card may be led.
       return sorted(hand)
@@ -300,7 +309,7 @@ class BeloteState(pyspiel.State):
     card_led = card_suit(card) == led_suit
     other_led = card_suit(other) == led_suit
 
-    # Exactly one card follows the led suit, so `card` wins iff it follows the led suit.
+    # Exactly one card follows the led suit, so `card` wins iff it follows it.
     if card_led != other_led:
       return card_led
 
@@ -325,7 +334,7 @@ class BeloteState(pyspiel.State):
     """Returns the possible chance outcomes and their probabilities."""
     assert self.is_chance_node()
     probability = 1.0 / len(self._deck)
-    return [(card, probability) for card in sorted(self._deck)]
+    return [(card, probability) for card in self._deck]
 
   def _enter_play_phase(self) -> None:
     self._trick_leader = (self._dealer + 1) % _NUM_PLAYERS
@@ -398,7 +407,9 @@ class BeloteState(pyspiel.State):
       self._taker = player
       self._trump_suit = suit
       self._declarer_team = team_of(player)
-      self._deck.append(self._turned_card)
+      # insort (not append) to keep `self._deck` sorted, which lets
+      # chance_outcomes() skip an explicit sort on every deal.
+      bisect.insort(self._deck, self._turned_card)
 
       order = _order_from((self._dealer + 1) % _NUM_PLAYERS)
       schedule = order * 3
