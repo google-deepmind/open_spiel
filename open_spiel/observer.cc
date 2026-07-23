@@ -138,7 +138,7 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
     std::optional<IIGObservationType> iig_obs_type) const {
   if (!iig_obs_type) {
     if (game_type_.provides_observation()) {
-      return absl::make_unique<DefaultObserver>(*this);
+      return std::make_unique<DefaultObserver>(*this);
     } else {
       return nullptr;
     }
@@ -153,11 +153,11 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
     // Handle the dummy case, where we do not use any public information.
     // The game will just have empty private observations.
     if (!iig_obs_type->public_info)
-      return absl::make_unique<NoPrivateObserver>(*this);
+      return std::make_unique<NoPrivateObserver>(*this);
     if (game_type_.provides_information_state() && iig_obs_type->perfect_recall)
-      return absl::make_unique<InformationStateObserver>(*this);
+      return std::make_unique<InformationStateObserver>(*this);
     if (game_type_.provides_observation() && !iig_obs_type->perfect_recall)
-      return absl::make_unique<DefaultObserver>(*this);
+      return std::make_unique<DefaultObserver>(*this);
   }
 
   // TODO(author11) Reinstate this check
@@ -165,11 +165,11 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
   //                GameType::Information::kImperfectInformation);
   if (iig_obs_type.value() == kDefaultObsType) {
     if (game_type_.provides_observation())
-      return absl::make_unique<DefaultObserver>(*this);
+      return std::make_unique<DefaultObserver>(*this);
   }
   if (iig_obs_type.value() == kInfoStateObsType) {
     if (game_type_.provides_information_state())
-      return absl::make_unique<InformationStateObserver>(*this);
+      return std::make_unique<InformationStateObserver>(*this);
   }
   return nullptr;
 }
