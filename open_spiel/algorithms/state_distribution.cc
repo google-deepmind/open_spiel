@@ -46,7 +46,7 @@ int GetBeliefHistorySize(const HistoryDistribution& beliefs) {
 std::unique_ptr<HistoryDistribution> AdvanceBeliefHistoryOneAction(
     std::unique_ptr<HistoryDistribution> previous, Action action,
     Player player_id, const Policy& opponent_policy) {
-  auto dist = absl::make_unique<HistoryDistribution>();
+  auto dist = std::make_unique<HistoryDistribution>();
   for (int i = 0; i < previous->first.size(); ++i) {
     std::unique_ptr<State>& state = previous->first[i];
     const double& prob = previous->second[i];
@@ -111,7 +111,7 @@ std::unique_ptr<HistoryDistribution> FilterOutBeliefs(
     const State& state, std::unique_ptr<HistoryDistribution> dist,
     int player_id) {
   const std::string infostate = state.InformationStateString(player_id);
-  auto new_dist = absl::make_unique<HistoryDistribution>();
+  auto new_dist = std::make_unique<HistoryDistribution>();
   std::vector<int> good_indices;
   for (int i = 0; i < dist->first.size(); ++i) {
     if (dist->first[i]->InformationStateString(player_id) == infostate) {
@@ -131,7 +131,7 @@ std::unique_ptr<HistoryDistribution> FilterOutBeliefs(
 
 std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
     const open_spiel::HistoryDistribution& beliefs) {
-  auto beliefs_copy = absl::make_unique<open_spiel::HistoryDistribution>();
+  auto beliefs_copy = std::make_unique<open_spiel::HistoryDistribution>();
   for (int i = 0; i < beliefs.first.size(); ++i) {
     beliefs_copy->first.push_back(beliefs.first[i]->Clone());
     beliefs_copy->second.push_back(beliefs.second[i]);
@@ -276,7 +276,7 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     if (!dist || dist->first.empty()) {
       // If the previous pair is empty, then we have to do a BFS to find all
       // relevant nodes:
-      dist = absl::make_unique<HistoryDistribution>(
+      dist = std::make_unique<HistoryDistribution>(
           GetStateDistribution(state, opponent_policy));
     }
   }
