@@ -166,15 +166,24 @@ bool KingMissing(const ChessBoard& board, Color color) {
   return !board.InBoardArea(board.find(Piece{color, PieceType::kKing}));
 }
 
-// Castling legality for atomic chess: king may not start in, pass through, or
-// land on an attacked square. Castling is never a capture, so no explosion.
+// Castling legality for atomic chess: the king may not start on, pass through,
+// or land on a square where it could be captured. As with ordinary checks, an
+// enemy king adjacent to a square nullifies attacks on it -- any capture there
+// would explode the adjacent enemy king, so the square is safe (this mirrors
+// InAtomicCheck / KingsAdjacent). Castling is never a capture, so no explosion.
 bool CastlingLegal(const ChessBoard& board, const Move& move) {
   Color me = move.piece.color;
+  Square enemy_king = board.find(Piece{OtherColor(me), PieceType::kKing});
   int8_t y = move.from.y;
   int8_t lo = std::min(move.from.x, move.to.x);
   int8_t hi = std::max(move.from.x, move.to.x);
   for (int8_t x = lo; x <= hi; ++x) {
-    if (board.UnderAttack(Square{x, y}, me)) return false;
+    Square sq{x, y};
+    bool enemy_king_adjacent =
+        board.InBoardArea(enemy_king) &&
+        std::max(std::abs(enemy_king.x - sq.x),
+                 std::abs(enemy_king.y - sq.y)) == 1;
+    if (board.UnderAttack(sq, me) && !enemy_king_adjacent) return false;
   }
   return true;
 }
@@ -454,6 +463,10 @@ absl::optional<std::vector<double>> AtomicChessState::MaybeFinalReturns()
     return returns;
   }
 
+  // NOTE: Unlike standard chess, no insufficient-material draw is applied.
+  // Atomic chess has very different material-draw conditions (a lone minor
+  // piece can still win by exploding the enemy king), so material-based draws
+  // are intentionally left to the repetition and fifty-move rules below.
   if (IsRepetitionDraw()) return returns;
 
   if (Board().IrreversibleMoveCounter() >= kNumReversibleMovesToDraw) {

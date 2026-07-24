@@ -120,8 +120,9 @@ class AtomicChessState : public State {
 
   std::string Serialize() const override;
 
-  // Draw can be claimed under the 3-fold repetition rule (the current board
-  // position has already appeared twice in the history).
+  // Returns true once the current board position has appeared three times in
+  // the history. Threefold repetition is enforced as an automatic draw (see
+  // MaybeFinalReturns), not merely claimable.
   bool IsRepetitionDraw() const;
 
   // Get the FEN for this move and the list of moves in UCI format.

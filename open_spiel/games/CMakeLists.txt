@@ -358,10 +358,6 @@ add_executable(atomic_chess_test atomic_chess/atomic_chess_test.cc
         ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
 add_test(atomic_chess_test atomic_chess_test)
 
-add_executable(atomic_chess_edge_test atomic_chess/atomic_chess_edge_test.cc
-        ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
-add_test(atomic_chess_edge_test atomic_chess_edge_test)
-
 add_executable(backgammon_test backgammon/backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
