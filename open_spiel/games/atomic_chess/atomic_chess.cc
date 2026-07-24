@@ -92,6 +92,29 @@ bool IsCapture(const ChessBoard& board, const Move& move) {
          IsEnPassant(board, move);
 }
 
+// Revokes any castling right whose rook is no longer standing on its recorded
+// castling square. ChessBoard::ApplyMove only clears a castling right when the
+// rook is the direct capture target; an explosion removes rooks via set_square
+// on the surrounding squares, which bypasses that bookkeeping. Without this the
+// right outlives its rook, which (a) makes ToFEN() and the Zobrist hash
+// disagree with the actual position, and (b) if a friendly non-rook piece later
+// occupies the vacated corner, lets the board generate a castle that fabricates
+// a phantom rook.
+void RevokeCastlingForMissingRooks(ChessBoard* board) {
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    for (chess::CastlingDirection dir :
+         {chess::CastlingDirection::kLeft, chess::CastlingDirection::kRight}) {
+      absl::optional<Square> rook_sq =
+          board->MaybeCastlingRookSquare(color, dir);
+      if (!rook_sq.has_value()) continue;
+      Piece piece = board->at(*rook_sq);
+      if (piece.type != PieceType::kRook || piece.color != color) {
+        board->SetCastlingRight(color, dir, absl::nullopt);
+      }
+    }
+  }
+}
+
 // Applies the atomic explosion for a capture that has ALREADY been applied to
 // `board` via ApplyMove. `move` is the move that was applied and
 // `was_en_passant` records whether it was an en passant capture (in which case
@@ -116,6 +139,8 @@ void ApplyExplosion(ChessBoard* board, const Move& move, bool was_en_passant) {
       }
     }
   }
+  // A rook blown up by the explosion must also forfeit its castling right.
+  RevokeCastlingForMissingRooks(board);
 }
 
 // True if the two kings are on adjacent squares (Chebyshev distance 1).
