@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -66,7 +67,7 @@ class AtomicChessGame;
 class AtomicChessState : public State {
  public:
   // Constructs an atomic chess state at the standard start position.
-  AtomicChessState(std::shared_ptr<const Game> game);
+  explicit AtomicChessState(std::shared_ptr<const Game> game);
 
   // Constructs an atomic chess state at the given position in Forsyth-Edwards
   // Notation: https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation

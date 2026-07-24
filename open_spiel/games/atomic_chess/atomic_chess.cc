@@ -93,9 +93,10 @@ bool IsCapture(const ChessBoard& board, const Move& move) {
 }
 
 // Applies the atomic explosion for a capture that has ALREADY been applied to
-// `board` via ApplyMove. `move` is the move that was applied and `was_en_passant`
-// records whether it was an en passant capture (in which case the captured pawn
-// sits one rank behind the destination square and must be removed explicitly).
+// `board` via ApplyMove. `move` is the move that was applied and
+// `was_en_passant` records whether it was an en passant capture (in which case
+// the captured pawn sits one rank behind the destination square and must be
+// removed explicitly).
 void ApplyExplosion(ChessBoard* board, const Move& move, bool was_en_passant) {
   if (was_en_passant) {
     board->set_square(Square{move.to.x, move.from.y}, kEmptyPiece);
