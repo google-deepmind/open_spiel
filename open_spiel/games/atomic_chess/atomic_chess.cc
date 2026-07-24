@@ -61,7 +61,7 @@ using chess::WinUtility;
 
 constexpr int kNumReversibleMovesToDraw = 100;
 constexpr int kNumRepetitionsToDraw = 3;
-// Standard chess start position; atomic chess keeps castling rights.
+// Standard chess start position.
 inline const std::string kDefaultStandardFEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -79,27 +79,20 @@ inline Color OtherColor(Color c) {
   return c == Color::kWhite ? Color::kBlack : Color::kWhite;
 }
 
-// True if `move` is an en passant capture on `board` (a pawn moving to the
-// current en passant target square, which is empty).
 bool IsEnPassant(const ChessBoard& board, const Move& move) {
   return move.piece.type == PieceType::kPawn &&
          board.EpSquare() != kInvalidSquare && move.to == board.EpSquare();
 }
 
-// True if `move` captures a piece on `board` (including en passant).
+//check if kabloom should happen
 bool IsCapture(const ChessBoard& board, const Move& move) {
   return board.at(move.to).type != PieceType::kEmpty ||
          IsEnPassant(board, move);
 }
 
 // Revokes any castling right whose rook is no longer standing on its recorded
-// castling square. ChessBoard::ApplyMove only clears a castling right when the
-// rook is the direct capture target; an explosion removes rooks via set_square
-// on the surrounding squares, which bypasses that bookkeeping. Without this the
-// right outlives its rook, which (a) makes ToFEN() and the Zobrist hash
-// disagree with the actual position, and (b) if a friendly non-rook piece later
-// occupies the vacated corner, lets the board generate a castle that fabricates
-// a phantom rook.
+// castling square. 
+
 void RevokeCastlingForMissingRooks(ChessBoard* board) {
   for (Color color : {Color::kWhite, Color::kBlack}) {
     for (chess::CastlingDirection dir :
@@ -143,7 +136,7 @@ void ApplyExplosion(ChessBoard* board, const Move& move, bool was_en_passant) {
   RevokeCastlingForMissingRooks(board);
 }
 
-// True if the two kings are on adjacent squares (Chebyshev distance 1).
+// Checks if the two kings are on adjacent squares.
 bool KingsAdjacent(const ChessBoard& board) {
   Square wk = board.find(Piece{Color::kWhite, PieceType::kKing});
   Square bk = board.find(Piece{Color::kBlack, PieceType::kKing});
@@ -161,7 +154,7 @@ bool InAtomicCheck(const ChessBoard& board, Color color) {
   return board.UnderAttack(ksq, color);
 }
 
-// Returns true if `color`'s king is not on the board (was exploded).
+// Checks if king went kabloom
 bool KingMissing(const ChessBoard& board, Color color) {
   return !board.InBoardArea(board.find(Piece{color, PieceType::kKing}));
 }
