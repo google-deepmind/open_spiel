@@ -34,6 +34,7 @@ _FULLY_OPTIONAL_PYTHON_GAMES = frozenset([
 # "Mandatory" = neither optional nor included only if certain flags are set.
 EXPECTED_MANDATORY_GAMES = frozenset([
     "2048",
+    "abalone",
     "add_noise",
     "amazons",
     "antichess",

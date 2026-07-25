@@ -39,6 +39,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/evaluation_elo.h
   pybind11/evaluation_sco.cc
   pybind11/evaluation_sco.h
+  pybind11/games_abalone.cc
+  pybind11/games_abalone.h
   pybind11/games_backgammon.cc
   pybind11/games_backgammon.h
   pybind11/games_bargaining.cc
