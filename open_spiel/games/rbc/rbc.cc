@@ -556,7 +556,7 @@ absl::optional<std::vector<double>> RbcState::MaybeFinalReturns() const {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 SenseWindow RbcState::GetSenseWindow(Player player) const {
