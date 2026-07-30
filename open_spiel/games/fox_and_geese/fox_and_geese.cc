@@ -36,6 +36,9 @@ namespace open_spiel {
 namespace fox_and_geese {
 namespace {
 
+using AdjacencyTable = std::array<std::array<bool, kNumCells>, kNumCells>;
+using JumpMidTable = std::array<std::array<int, kNumCells>, kNumCells>;
+
 constexpr bool IsPlayableCell(int row, int col) {
   bool top_left = (row < 2 && col < 2);
   bool top_right = (row < 2 && col > 4);
@@ -61,50 +64,131 @@ constexpr int kCenterCell = (kNumRows / 2) * kNumCols + (kNumCols / 2);
 // nested and is read as a prefix of length num_geese: the first 13 entries give
 // the 13-goose layout, the first 15 the 15-goose layout, and all 17 the
 // 17-goose layout.
-constexpr std::array<std::pair<int, int>, kMaxNumGeese> kTraditionalGeeseCells =
-    {{
-        // The bottom arm of the cross (6).
-        {6, 2},
-        {6, 3},
-        {6, 4},
-        {5, 2},
-        {5, 3},
-        {5, 4},
-        // The whole adjacent row, out to the extremities (+7 -> 13).
-        {4, 0},
-        {4, 1},
-        {4, 2},
-        {4, 3},
-        {4, 4},
-        {4, 5},
-        {4, 6},
-        // The outer end points of the fox's row (+2 -> 15).
-        {3, 0},
-        {3, 6},
-        // Continuing inward along the fox's row (+2 -> 17).
-        {3, 1},
-        {3, 5},
-    }};
+constexpr std::array<std::pair<int, int>, kMaxNumGeese> kTraditionalGeeseCells{{
+    // The bottom arm of the cross (6).
+    {6, 2},
+    {6, 3},
+    {6, 4},
+    {5, 2},
+    {5, 3},
+    {5, 4},
+    // The whole adjacent row, out to the extremities (+7 -> 13).
+    {4, 0},
+    {4, 1},
+    {4, 2},
+    {4, 3},
+    {4, 4},
+    {4, 5},
+    {4, 6},
+    // The outer end points of the fox's row (+2 -> 15).
+    {3, 0},
+    {3, 6},
+    // Continuing inward along the fox's row (+2 -> 17).
+    {3, 1},
+    {3, 5},
+}};
+
+// Every diagonal line on the board is incident to one of these five points.
+constexpr std::array<std::pair<int, int>, 5> kDiagonalHubs{{
+    {1, 3},
+    {3, 1},
+    {3, 3},
+    {3, 5},
+    {5, 3},
+}};
+
+constexpr std::array<std::pair<int, int>, 4> kOrthogonalDirs{{
+    {-1, 0},
+    {1, 0},
+    {0, -1},
+    {0, 1},
+}};
+
+constexpr std::array<std::pair<int, int>, 4> kDiagonalDirs{{
+    {-1, -1},
+    {-1, 1},
+    {1, -1},
+    {1, 1},
+}};
+
+constexpr AdjacencyTable ComputeAdjacency() {
+  AdjacencyTable adj{};
+
+  for (int r = 0; r < kNumRows; ++r) {
+    for (int c = 0; c < kNumCols; ++c) {
+      if (!IsPlayableCell(r, c)) continue;
+      for (const auto& d : kOrthogonalDirs) {
+        const int nr = r + d.first;
+        const int nc = c + d.second;
+        if (nr < 0 || nr >= kNumRows || nc < 0 || nc >= kNumCols) continue;
+        if (!IsPlayableCell(nr, nc)) continue;
+        adj[r * kNumCols + c][nr * kNumCols + nc] = true;
+      }
+    }
+  }
+
+  for (const auto& h : kDiagonalHubs) {
+    const int hub = h.first * kNumCols + h.second;
+    for (const auto& d : kDiagonalDirs) {
+      const int nr = h.first + d.first;
+      const int nc = h.second + d.second;
+      if (nr < 0 || nr >= kNumRows || nc < 0 || nc >= kNumCols) continue;
+      if (!IsPlayableCell(nr, nc)) continue;
+      adj[hub][nr * kNumCols + nc] = true;
+      adj[nr * kNumCols + nc][hub] = true;
+    }
+  }
+  return adj;
+}
+
+constexpr auto kAdjacent = ComputeAdjacency();
+
+constexpr JumpMidTable ComputeJumpMids() {
+  JumpMidTable mids{};
+  for (auto& row : mids) {
+    for (int& v : row) v = -1;
+  }
+  for (int r = 0; r < kNumRows; ++r) {
+    for (int c = 0; c < kNumCols; ++c) {
+      if (!IsPlayableCell(r, c)) continue;
+      for (int dr = -1; dr <= 1; ++dr) {
+        for (int dc = -1; dc <= 1; ++dc) {
+          if (dr == 0 && dc == 0) continue;
+          const int tr = r + 2 * dr;
+          const int tc = c + 2 * dc;
+          if (tr < 0 || tr >= kNumRows || tc < 0 || tc >= kNumCols) continue;
+          const int from = r * kNumCols + c;
+          const int mid = (r + dr) * kNumCols + (c + dc);
+          const int to = tr * kNumCols + tc;
+          if (kAdjacent[from][mid] && kAdjacent[mid][to]) mids[from][to] = mid;
+        }
+      }
+    }
+  }
+  return mids;
+}
+
+constexpr auto kJumpMid = ComputeJumpMids();
 
 // Facts about the game.
-const GameType kGameType{/*short_name=*/"fox_and_geese",
-                         /*long_name=*/"Fox and Geese",
-                         GameType::Dynamics::kSequential,
-                         GameType::ChanceMode::kDeterministic,
-                         GameType::Information::kPerfectInformation,
-                         GameType::Utility::kZeroSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/2,
-                         /*min_num_players=*/2,
-                         /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/false,
-                         /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/true,
-                         /*parameter_specification=*/
-                         {
-                             {"num_foxes", GameParameter(kDefaultNumFoxes)},
-                             {"num_geese", GameParameter(kDefaultNumGeese)},
-                         }};
+const GameType kGameType{
+    /*short_name=*/"fox_and_geese",
+    /*long_name=*/"Fox and Geese",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kPerfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {{"num_foxes", GameParameter(kDefaultNumFoxes)},
+     {"num_geese", GameParameter(kDefaultNumGeese)}}
+};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new FoxAndGeeseGame(params));
@@ -167,25 +251,106 @@ std::vector<CellState> FoxAndGeeseState::Board() const {
   return board;
 }
 
-void FoxAndGeeseState::DoApplyAction(Action move) {
-  SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
-  board_[move] = PlayerToState(CurrentPlayer());
-  if (/* need to fill-in */) {
-    outcome_ = current_player_;
+void FoxAndGeeseState::AddStepMoves(int from,
+                                    std::vector<Action>* moves) const {
+  const bool restrict_backward =
+      board_[from] == CellState::kGoose && !GeeseMayMoveBackward(num_geese_);
+  const int from_row = from / kNumCols;
+  for (int to = 0; to < kNumCells; ++to) {
+    if (!kAdjacent[from][to]) continue;
+    if (board_[to] != CellState::kEmpty) continue;
+    if (restrict_backward && to / kNumCols > from_row) continue;
+    moves->push_back(from * kNumCells + to);
+  }
+}
+
+void FoxAndGeeseState::AddJumpMoves(int from,
+                                    std::vector<Action>* moves) const {
+  for (int to = 0; to < kNumCells; ++to) {
+    const int mid = kJumpMid[from][to];
+    if (mid < 0) continue;
+    if (board_[mid] != CellState::kGoose) continue;
+    if (board_[to] != CellState::kEmpty) continue;
+    moves->push_back(from * kNumCells + to);
+  }
+}
+
+bool FoxAndGeeseState::HasJumpFrom(int from) const {
+  for (int to = 0; to < kNumCells; ++to) {
+    const int mid = kJumpMid[from][to];
+    if (mid >= 0 && board_[mid] == CellState::kGoose &&
+        board_[to] == CellState::kEmpty) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void FoxAndGeeseState::EndTurn() {
+  if (current_player_ == 0 && num_geese_remaining_ < kMinGeeseToTrapFox) {
+    outcome_ = 0;
+    return;
   }
   ChangePlayer();
+  // A player who cannot move loses.
+  std::vector<Action> moves;
+  const CellState piece = PlayerToState(current_player_);
+  for (int cell = 0; cell < kNumCells && moves.empty(); ++cell) {
+    if (board_[cell] != piece) continue;
+    AddStepMoves(cell, &moves);
+    if (piece == CellState::kFox) AddJumpMoves(cell, &moves);
+  }
+  if (moves.empty()) outcome_ = 1 - current_player_;
+}
+
+void FoxAndGeeseState::DoApplyAction(Action move) {
+  UndoRecord record{-1, -1, -1, continue_jump_from_, outcome_};
+  if (move == kEndTurnAction) {
+    SPIEL_CHECK_GE(continue_jump_from_, 0);
+    continue_jump_from_ = -1;
+    EndTurn();
+  } else {
+    const int from = move / kNumCells;
+    const int to = move % kNumCells;
+    SPIEL_CHECK_EQ(board_[from], PlayerToState(current_player_));
+    SPIEL_CHECK_EQ(board_[to], CellState::kEmpty);
+    const int mid = kJumpMid[from][to];
+    record.from = from;
+    record.to = to;
+    board_[to] = board_[from];
+    board_[from] = CellState::kEmpty;
+    if (mid >= 0) {
+      SPIEL_CHECK_EQ(board_[mid], CellState::kGoose);
+      board_[mid] = CellState::kEmpty;
+      record.captured = mid;
+      --num_geese_remaining_;
+    }
+    if (mid >= 0 && HasJumpFrom(to)) {
+      continue_jump_from_ = to;
+    } else {
+      continue_jump_from_ = -1;
+      EndTurn();
+    }
+  }
+  undo_stack_.push_back(record);
   num_moves_ += 1;
 }
 
 std::vector<Action> FoxAndGeeseState::LegalActions() const {
   if (IsTerminal()) return {};
-  // Can move in any empty cell.
   std::vector<Action> moves;
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    if (board_[cell] == CellState::kEmpty) {
-      moves.push_back(cell);
-    }
+  if (continue_jump_from_ >= 0) {
+    AddJumpMoves(continue_jump_from_, &moves);
+    moves.push_back(kEndTurnAction);
+    return moves;
   }
+  const CellState piece = PlayerToState(current_player_);
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    if (board_[cell] != piece) continue;
+    AddStepMoves(cell, &moves);
+    if (piece == CellState::kFox) AddJumpMoves(cell, &moves);
+  }
+  std::sort(moves.begin(), moves.end());
   return moves;
 }
 
@@ -199,6 +364,7 @@ FoxAndGeeseState::FoxAndGeeseState(std::shared_ptr<const Game> game)
   const auto* fg_game = down_cast<const FoxAndGeeseGame*>(game.get());
   num_foxes_ = fg_game->NumFoxes();
   num_geese_ = fg_game->NumGeese();
+  num_geese_remaining_ = num_geese_;
 
   SPIEL_CHECK_TRUE(IsSupportedNumFoxes(num_foxes_));
   SPIEL_CHECK_TRUE(IsSupportedNumGeese(num_geese_));
@@ -255,27 +421,49 @@ std::unique_ptr<ObservationStruct> FoxAndGeeseState::ToObservationStruct(
 std::unique_ptr<ActionStruct> FoxAndGeeseState::ActionToStruct(
     Player player, Action action_id) const {
   auto action_struct = std::make_unique<FoxAndGeeseActionStruct>();
-  action_struct->row = action_id / kNumCols;
-  action_struct->col = action_id % kNumCols;
+  if (action_id == kEndTurnAction) {
+    action_struct->from_row = -1;
+    action_struct->from_col = -1;
+    action_struct->to_row = -1;
+    action_struct->to_col = -1;
+    action_struct->end_turn = true;
+    return action_struct;
+  }
+  const int from = action_id / kNumCells;
+  const int to = action_id % kNumCells;
+  action_struct->from_row = from / kNumCols;
+  action_struct->from_col = from % kNumCols;
+  action_struct->to_row = to / kNumCols;
+  action_struct->to_col = to % kNumCols;
+  action_struct->end_turn = false;
   return action_struct;
 }
 
 std::vector<Action> FoxAndGeeseState::StructToActions(
     const ActionStruct& action_struct) const {
   const auto* a = SafeActionCast<FoxAndGeeseActionStruct>(action_struct);
-  SPIEL_CHECK_GE(a->row, 0);
-  SPIEL_CHECK_LT(a->row, kNumRows);
-  SPIEL_CHECK_GE(a->col, 0);
-  SPIEL_CHECK_LT(a->col, kNumCols);
-  return {a->row * kNumCols + a->col};
+  if (a->end_turn) return {kEndTurnAction};
+  SPIEL_CHECK_GE(a->from_row, 0);
+  SPIEL_CHECK_LT(a->from_row, kNumRows);
+  SPIEL_CHECK_GE(a->from_col, 0);
+  SPIEL_CHECK_LT(a->from_col, kNumCols);
+  SPIEL_CHECK_GE(a->to_row, 0);
+  SPIEL_CHECK_LT(a->to_row, kNumRows);
+  SPIEL_CHECK_GE(a->to_col, 0);
+  SPIEL_CHECK_LT(a->to_col, kNumCols);
+  const int from = a->from_row * kNumCols + a->from_col;
+  const int to = a->to_row * kNumCols + a->to_col;
+  return {from * kNumCells + to};
 }
 
-bool FoxAndGeeseState::IsTerminal() const { return outcome_ != kInvalidPlayer; }
+bool FoxAndGeeseState::IsTerminal() const {
+  return outcome_ != kInvalidPlayer || num_moves_ >= kMaxGameLength;
+}
 
 std::vector<double> FoxAndGeeseState::Returns() const {
-  if (/* need to fill-in */ (Player{0})) {
+  if (outcome_ == Player{0}) {
     return {1.0, -1.0};
-  } else if (/* need to fill-in */ (Player{1})) {
+  } else if (outcome_ == Player{1}) {
     return {-1.0, 1.0};
   } else {
     return {0.0, 0.0};
@@ -307,9 +495,20 @@ void FoxAndGeeseState::ObservationTensor(Player player,
 }
 
 void FoxAndGeeseState::UndoAction(Player player, Action move) {
-  board_[move] = CellState::kEmpty;
+  SPIEL_CHECK_FALSE(undo_stack_.empty());
+  const UndoRecord record = undo_stack_.back();
+  undo_stack_.pop_back();
+  if (record.from >= 0) {
+    board_[record.from] = board_[record.to];
+    board_[record.to] = CellState::kEmpty;
+    if (record.captured >= 0) {
+      board_[record.captured] = CellState::kGoose;
+      ++num_geese_remaining_;
+    }
+  }
+  continue_jump_from_ = record.previous_continue_jump_from;
+  outcome_ = record.previous_outcome;
   current_player_ = player;
-  outcome_ = kInvalidPlayer;
   num_moves_ -= 1;
   history_.pop_back();
   --move_number_;
@@ -321,14 +520,23 @@ std::unique_ptr<State> FoxAndGeeseState::Clone() const {
 
 std::string FoxAndGeeseGame::ActionToString(Player player,
                                             Action action_id) const {
-  return absl::StrCat(StateToString(PlayerToState(player)), "(",
-                      action_id / kNumCols, ",", action_id % kNumCols, ")");
+  if (action_id == kEndTurnAction) return "end turn";
+  const int from = action_id / kNumCells;
+  const int to = action_id % kNumCells;
+  std::string str =
+      absl::StrCat(StateToString(PlayerToState(player)), "(", from / kNumCols,
+                   ",", from % kNumCols, ")->(", to / kNumCols, ",",
+                   to % kNumCols, ")");
+  if (kJumpMid[from][to] >= 0) absl::StrAppend(&str, "x");
+  return str;
 }
 
 FoxAndGeeseState::FoxAndGeeseState(const std::shared_ptr<const Game> game,
                                    const FoxAndGeeseStateStruct& state_struct)
     : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
+  const auto* fg_game = down_cast<const FoxAndGeeseGame*>(game.get());
+  num_foxes_ = fg_game->NumFoxes();
+  num_geese_ = fg_game->NumGeese();
 
   if (state_struct.board.size() != kNumCells) {
     SpielFatalError(absl::StrFormat("Invalid board size: expected %d, got %d",
@@ -337,56 +545,43 @@ FoxAndGeeseState::FoxAndGeeseState(const std::shared_ptr<const Game> game,
   num_moves_ = 0;
   int num_f = 0;
   int num_g = 0;
-  for (Action action = 0; action < state_struct.board.size(); ++action) {
-    CellState cell_state = StringToCellState(state_struct.board[action]);
-    if (cell_state != CellState::kEmpty) {
-      board_[action] = cell_state;
-      num_moves_++;
-      if (cell_state == CellState::kFox) {
-        num_f++;
-      } else {
-        num_g++;
-      }
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    CellState cell_state = StringToCellState(state_struct.board[cell]);
+    if (kPlayableMask[cell] == (cell_state == CellState::kOutOfBounds)) {
+      SpielFatalError(absl::StrFormat(
+          "Invalid board state: cell %d does not match the board shape", cell));
+    }
+    board_[cell] = cell_state;
+    if (cell_state == CellState::kFox) {
+      num_f++;
+    } else if (cell_state == CellState::kGoose) {
+      num_g++;
     }
   }
-  if (num_f < num_g || num_f > num_g + 1) {
+  if (num_f != num_foxes_) {
     SpielFatalError(absl::StrFormat(
-        "Invalid board state: invalid number of pieces, got f = %d, g = %d",
-        num_f, num_g));
+        "Invalid board state: expected %d foxes, got %d", num_foxes_, num_f));
   }
-  current_player_ = (num_f == num_g ? 0 : 1);
-
-  bool f_wins = /* needs to be filled-in */ (0);
-  bool g_wins = /* needs to be filled-in */ (1);
-
-  if (f_wins && g_wins) {
-    SpielFatalError("Invalid board state: both players have a line.");
+  if (num_g > num_geese_) {
+    SpielFatalError(absl::StrFormat(
+        "Invalid board state: expected at most %d geese, got %d", num_geese_,
+        num_g));
   }
+  num_geese_remaining_ = num_g;
 
-  if (f_wins) {
-    if (num_f != num_g + 1) {
-      SpielFatalError(absl::StrFormat(
-          "Invalid board state: fox has a line, but number of pieces is "
-          "inconsistent, got f = %d, g = %d",
-          num_f, num_g));
-    }
-    outcome_ = 0;
-  } else if (g_wins) {
-    if (num_f != num_g) {
-      SpielFatalError(absl::StrFormat(
-          "Invalid board state: o has a line, but number of pieces is "
-          "inconsistent, got f = %d, g = %d",
-          num_f, num_g));
-    }
-    outcome_ = 1;
+  if (state_struct.current_player == PlayerToString(Player{0})) {
+    current_player_ = 0;
+  } else if (state_struct.current_player == PlayerToString(Player{1})) {
+    current_player_ = 1;
   } else {
-    outcome_ = kInvalidPlayer;
+    SpielFatalError(
+        absl::StrCat("Invalid current player: ", state_struct.current_player));
   }
 
-  if (state_struct.current_player != PlayerToString(CurrentPlayer())) {
-    SpielFatalError(absl::StrCat("Invalid current player: expected ",
-                                 PlayerToString(CurrentPlayer()), ", got ",
-                                 state_struct.current_player));
+  if (num_geese_remaining_ < kMinGeeseToTrapFox) {
+    outcome_ = 0;
+  } else if (LegalActions().empty()) {
+    outcome_ = 1 - current_player_;
   }
 
   starting_state_str_ = this->ToJson();

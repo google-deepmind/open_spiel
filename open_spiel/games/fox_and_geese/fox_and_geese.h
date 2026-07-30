@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_FOX_AND_GEESE_H_
-#define OPEN_SPIEL_GAMES_FOX_AND_GEESE_H_
+#ifndef OPEN_SPIEL_GAMES_FOX_AND_GEESE_FOX_AND_GEESE_H_
+#define OPEN_SPIEL_GAMES_FOX_AND_GEESE_FOX_AND_GEESE_H_
 
 #include <array>
+#include <cstdint>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -54,6 +55,10 @@
 // -- the geese race to occupy a goal region rather than trying to trap the fox
 // -- and needs its own implementation. Asalto is likewise a separate game.
 //
+// Captures are optional and may be chained: after a jump the fox keeps the
+// move while further jumps are available, and ends its turn by
+// playing kEndTurnAction.
+//
 // Parameters:
 //   "num_foxes": int, number of foxes. Only 1 is supported. (default: 1)
 //   "num_geese": int, number of geese. Must be 13, 15, or 17. (default: 13)
@@ -64,25 +69,24 @@ namespace fox_and_geese {
 // Compile-time calculation helpers.
 namespace internal {
 
-constexpr long long Combinations(long long n, long long k) {
+constexpr int64_t Combinations(int64_t n, int64_t k) {
   if (k > n) return 0;
   if (k * 2 > n) k = n - k;
   if (k == 0) return 1;
 
-  long long result = n;
-  for (long long i = 2; i <= k; ++i) {
+  int64_t result = n;
+  for (int64_t i = 2; i <= k; ++i) {
     result *= (n - i + 1);
     result /= i;
   }
   return result;
 }
 
-constexpr long long CalculateTotalStates(long long c, long long f,
-                                         long long g_max) {
-  long long total_states = 0;
-  long long fox_placements = Combinations(c, f);
+constexpr int64_t CalculateTotalStates(int64_t c, int64_t f, int64_t g_max) {
+  int64_t total_states = 0;
+  int64_t fox_placements = Combinations(c, f);
 
-  for (long long g = 0; g <= g_max; ++g) {
+  for (int64_t g = 0; g <= g_max; ++g) {
     total_states += fox_placements * Combinations(c - f, g);
   }
 
@@ -97,12 +101,22 @@ inline constexpr int kNumRows = 7;
 inline constexpr int kNumCols = 7;
 inline constexpr int kNumCells = kNumRows * kNumCols;  // 49 total array slots
 inline constexpr int kPlayableCells = 33;  // 33 valid grid positions
-inline constexpr int kCellStates =
-    1 + kNumPlayers + 1;  // empty, fox, goose, out of bounds
+// empty, fox, goose, out of bounds
+inline constexpr int kCellStates = 1 + kNumPlayers + 1;
 inline constexpr int kDefaultNumFoxes = 1;
 inline constexpr int kDefaultNumGeese = 13;
 inline constexpr int kNumSupportedFoxes = 1;
 inline constexpr int kMaxNumGeese = 17;
+inline constexpr int kEndTurnAction = kNumCells * kNumCells;
+inline constexpr int kNumActions = kNumCells * kNumCells + 1;
+inline constexpr int kMaxGameLength = 1000;
+
+// The geese need at least four pieces to trap the fox, so the fox wins as soon
+// as it has reduced them below that.
+// Sources:
+// - Rule 9 from http://www.cyningstan.com/game/57/fox-geese
+// - The last sentence: https://www.knauer.org/mike/sca/classes/foxgeese.html
+inline constexpr int kMinGeeseToTrapFox = 4;
 
 constexpr bool IsSupportedNumFoxes(int num_foxes) {
   return num_foxes == kNumSupportedFoxes;
@@ -112,11 +126,17 @@ constexpr bool IsSupportedNumGeese(int num_geese) {
   return num_geese == 13 || num_geese == 15 || num_geese == 17;
 }
 
+// The earliest form of the game set the fox against thirteen geese with no
+// restriction on how the geese may move. The later fifteen- and seventeen-goose
+// forms restrict the geese to forward and sideways moves, to offset their
+// increase in material.
+constexpr bool GeeseMayMoveBackward(int num_geese) { return num_geese == 13; }
+
 // Upper bound on the number of distinct board configurations, over all
 // supported starting configurations (i.e. using the largest goose count).
 // Derivation for a given goose count:
 // https://math.stackexchange.com/questions/5145511/fox-and-geese-state-space-calculation
-inline constexpr long long kNumberStates = internal::CalculateTotalStates(
+inline constexpr int64_t kNumberStates = internal::CalculateTotalStates(
     kPlayableCells, kNumSupportedFoxes, kMaxNumGeese);
 
 // State of a cell.
@@ -142,15 +162,19 @@ SPIEL_DEFINE_STRUCT(FoxAndGeeseObservationStruct, ObservationStruct,
 
 // Action struct using SPIEL_STRUCT_BOILERPLATE macro
 struct FoxAndGeeseActionStruct : public ActionStruct {
-  int row;
-  int col;
-  SPIEL_STRUCT_BOILERPLATE(FoxAndGeeseActionStruct, row, col);
+  int from_row;
+  int from_col;
+  int to_row;
+  int to_col;
+  bool end_turn;
+  SPIEL_STRUCT_BOILERPLATE(FoxAndGeeseActionStruct, from_row, from_col, to_row,
+                           to_col, end_turn);
 };
 
 // State of an in-play game.
 class FoxAndGeeseState : public State {
  public:
-  FoxAndGeeseState(std::shared_ptr<const Game> game);
+  explicit FoxAndGeeseState(std::shared_ptr<const Game> game);
   FoxAndGeeseState(std::shared_ptr<const Game> game,
                    const FoxAndGeeseStateStruct& state_struct);
 
@@ -177,6 +201,7 @@ class FoxAndGeeseState : public State {
     return board_[row * kNumCols + column];
   }
   Player outcome() const { return outcome_; }
+  int NumGeeseRemaining() const { return num_geese_remaining_; }
   void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
 
   std::unique_ptr<StateStruct> ToStruct() const override;
@@ -199,6 +224,20 @@ class FoxAndGeeseState : public State {
   }
 
  private:
+  // Everything needed to reverse a single action.
+  struct UndoRecord {
+    int from;
+    int to;
+    int captured;
+    int previous_continue_jump_from;
+    Player previous_outcome;
+  };
+
+  void AddStepMoves(int from, std::vector<Action>* moves) const;
+  void AddJumpMoves(int from, std::vector<Action>* moves) const;
+  bool HasJumpFrom(int from) const;
+  void EndTurn();
+
   Player current_player_ = 0;  // Player 0 = fox, Player 1 = geese
   Player outcome_ = kInvalidPlayer;
   int num_moves_ = 0;
@@ -207,13 +246,17 @@ class FoxAndGeeseState : public State {
   // the initial count and does not decrease as geese are captured.
   int num_foxes_ = kDefaultNumFoxes;
   int num_geese_ = kDefaultNumGeese;
+  int num_geese_remaining_ = kDefaultNumGeese;
+  // Cell the fox must continue jumping from, or -1 when not mid-chain.
+  int continue_jump_from_ = -1;
+  std::vector<UndoRecord> undo_stack_;
 };
 
 // Game object.
 class FoxAndGeeseGame : public Game {
  public:
   explicit FoxAndGeeseGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumCells; }
+  int NumDistinctActions() const override { return kNumActions; }
   using Game::NewInitialState;
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new FoxAndGeeseState(shared_from_this()));
@@ -234,7 +277,7 @@ class FoxAndGeeseGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kNumRows, kNumCols};
   }
-  int MaxGameLength() const override { return 1000; }
+  int MaxGameLength() const override { return kMaxGameLength; }
   std::string ActionToString(Player player, Action action_id) const override;
   int NumFoxes() const { return num_foxes_; }
   int NumGeese() const { return num_geese_; }
@@ -254,4 +297,4 @@ inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
 }  // namespace fox_and_geese
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_FOX_AND_GEESE_H_
+#endif  // OPEN_SPIEL_GAMES_FOX_AND_GEESE_FOX_AND_GEESE_H_
