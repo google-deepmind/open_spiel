@@ -23,18 +23,40 @@
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/spiel.h"
 
 // Traditional board game of Fox and Geese:
 // https://en.wikipedia.org/wiki/Fox_games#Fox_and_geese
 //
+// An asymmetric, zero-sum, perfect-information game played on a cross-shaped
+// board of 33 points (a 7x7 grid with the four 2x2 corners removed).
+//
+//   Player 0 (the fox)   moves to an adjacent empty point, or captures a goose
+//                        by jumping over it into the empty point beyond. The
+//                        fox wins by capturing enough geese that they can no
+//                        longer trap it.
+//   Player 1 (the geese) move to an adjacent empty point. The geese win by
+//                        trapping the fox so that it has no legal move.
+//
+// Only the classic one-fox game is implemented. The supported starting
+// configurations are the three traditional ones, which are nested: the
+// 13-goose layout fills one arm of the cross plus the whole adjacent row, and
+// the 15- and 17-goose layouts add two and four further geese along the fox's
+// row. The fox always starts on the center point.
+//
+// Out of scope for this implementation: the other fox games described in the
+// same Wikipedia article. In particular the two-fox Scandinavian game
+// (Halatafl / Raevspelet, and the German two-fox variant) is a different game
+// -- the geese race to occupy a goal region rather than trying to trap the fox
+// -- and needs its own implementation. Asalto is likewise a separate game.
+//
 // Parameters:
-//   "num_foxes": int, number of initial foxes (default: 1)
-//   "num_geese": int, number of initial geese (default: 13)
+//   "num_foxes": int, number of foxes. Only 1 is supported. (default: 1)
+//   "num_geese": int, number of geese. Must be 13, 15, or 17. (default: 13)
 
 namespace open_spiel {
 namespace fox_and_geese {
@@ -74,14 +96,28 @@ inline constexpr int kNumPlayers = 2;
 inline constexpr int kNumRows = 7;
 inline constexpr int kNumCols = 7;
 inline constexpr int kNumCells = kNumRows * kNumCols;  // 49 total array slots
-inline constexpr int kPlayableCells = 33;              // 33 valid grid positions
-inline constexpr int kCellStates = 1 + kNumPlayers + 1;  // empty, fox, goose, out of bounds
+inline constexpr int kPlayableCells = 33;  // 33 valid grid positions
+inline constexpr int kCellStates =
+    1 + kNumPlayers + 1;  // empty, fox, goose, out of bounds
 inline constexpr int kDefaultNumFoxes = 1;
 inline constexpr int kDefaultNumGeese = 13;
+inline constexpr int kNumSupportedFoxes = 1;
+inline constexpr int kMaxNumGeese = 17;
 
+constexpr bool IsSupportedNumFoxes(int num_foxes) {
+  return num_foxes == kNumSupportedFoxes;
+}
+
+constexpr bool IsSupportedNumGeese(int num_geese) {
+  return num_geese == 13 || num_geese == 15 || num_geese == 17;
+}
+
+// Upper bound on the number of distinct board configurations, over all
+// supported starting configurations (i.e. using the largest goose count).
+// Derivation for a given goose count:
 // https://math.stackexchange.com/questions/5145511/fox-and-geese-state-space-calculation
 inline constexpr long long kNumberStates = internal::CalculateTotalStates(
-    kPlayableCells, kDefaultNumFoxes, kDefaultNumGeese);
+    kPlayableCells, kNumSupportedFoxes, kMaxNumGeese);
 
 // State of a cell.
 enum class CellState {
@@ -91,7 +127,6 @@ enum class CellState {
   kOutOfBounds,  // for extra cells
 };
 
-
 struct FoxAndGeeseStructContents {
   std::string current_player;
   std::vector<std::string> board;
@@ -100,7 +135,8 @@ struct FoxAndGeeseStructContents {
 };
 
 // State and Observation structs using SPIEL_DEFINE_STRUCT macro
-SPIEL_DEFINE_STRUCT(FoxAndGeeseStateStruct, StateStruct, FoxAndGeeseStructContents);
+SPIEL_DEFINE_STRUCT(FoxAndGeeseStateStruct, StateStruct,
+                    FoxAndGeeseStructContents);
 SPIEL_DEFINE_STRUCT(FoxAndGeeseObservationStruct, ObservationStruct,
                     FoxAndGeeseStructContents);
 
@@ -116,7 +152,7 @@ class FoxAndGeeseState : public State {
  public:
   FoxAndGeeseState(std::shared_ptr<const Game> game);
   FoxAndGeeseState(std::shared_ptr<const Game> game,
-                 const FoxAndGeeseStateStruct& state_struct);
+                   const FoxAndGeeseStateStruct& state_struct);
 
   FoxAndGeeseState(const FoxAndGeeseState&) = default;
   FoxAndGeeseState& operator=(const FoxAndGeeseState&) = default;
@@ -146,8 +182,8 @@ class FoxAndGeeseState : public State {
   std::unique_ptr<StateStruct> ToStruct() const override;
   std::unique_ptr<ObservationStruct> ToObservationStruct(
       Player player) const override;
-  std::unique_ptr<ActionStruct> ActionToStruct(
-      Player player, Action action_id) const override;
+  std::unique_ptr<ActionStruct> ActionToStruct(Player player,
+                                               Action action_id) const override;
   std::vector<Action> StructToActions(
       const ActionStruct& action_struct) const override;
 
@@ -158,13 +194,17 @@ class FoxAndGeeseState : public State {
     return row >= 0 && row < kNumRows && col >= 0 && col < kNumCols;
   }
   bool IsPlayable(int row, int col) const {
-    return InBounds(row, col) && board_[row * kNumCols + col] != CellState::kOutOfBounds;
+    return InBounds(row, col) &&
+           board_[row * kNumCols + col] != CellState::kOutOfBounds;
   }
 
  private:
   Player current_player_ = 0;  // Player 0 = fox, Player 1 = geese
   Player outcome_ = kInvalidPlayer;
   int num_moves_ = 0;
+  // Starting piece counts, copied from the Game object. num_foxes_ is always
+  // kNumSupportedFoxes; num_geese_ is one of 13, 15, 17. Note num_geese_ is
+  // the initial count and does not decrease as geese are captured.
   int num_foxes_ = kDefaultNumFoxes;
   int num_geese_ = kDefaultNumGeese;
 };

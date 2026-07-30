@@ -18,13 +18,14 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -35,23 +36,75 @@ namespace open_spiel {
 namespace fox_and_geese {
 namespace {
 
+constexpr bool IsPlayableCell(int row, int col) {
+  bool top_left = (row < 2 && col < 2);
+  bool top_right = (row < 2 && col > 4);
+  bool bottom_left = (row > 4 && col < 2);
+  bool bottom_right = (row > 4 && col > 4);
+  return !(top_left || top_right || bottom_left || bottom_right);
+}
+
+constexpr std::array<bool, kNumCells> ComputePlayableMask() {
+  std::array<bool, kNumCells> mask{};
+  for (int r = 0; r < kNumRows; ++r) {
+    for (int c = 0; c < kNumCols; ++c) {
+      mask[r * kNumCols + c] = IsPlayableCell(r, c);
+    }
+  }
+  return mask;
+}
+
+constexpr std::array<bool, kNumCells> kPlayableMask = ComputePlayableMask();
+constexpr int kCenterCell = (kNumRows / 2) * kNumCols + (kNumCols / 2);
+
+// Traditional starting points for the geese, as (row, col) pairs. The table is
+// nested and is read as a prefix of length num_geese: the first 13 entries give
+// the 13-goose layout, the first 15 the 15-goose layout, and all 17 the
+// 17-goose layout.
+constexpr std::array<std::pair<int, int>, kMaxNumGeese> kTraditionalGeeseCells =
+    {{
+        // The bottom arm of the cross (6).
+        {6, 2},
+        {6, 3},
+        {6, 4},
+        {5, 2},
+        {5, 3},
+        {5, 4},
+        // The whole adjacent row, out to the extremities (+7 -> 13).
+        {4, 0},
+        {4, 1},
+        {4, 2},
+        {4, 3},
+        {4, 4},
+        {4, 5},
+        {4, 6},
+        // The outer end points of the fox's row (+2 -> 15).
+        {3, 0},
+        {3, 6},
+        // Continuing inward along the fox's row (+2 -> 17).
+        {3, 1},
+        {3, 5},
+    }};
+
 // Facts about the game.
-const GameType kGameType{
-    /*short_name=*/"fox_and_geese",
-    /*long_name=*/"Fox and Geese",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/false,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
-};
+const GameType kGameType{/*short_name=*/"fox_and_geese",
+                         /*long_name=*/"Fox and Geese",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {
+                             {"num_foxes", GameParameter(kDefaultNumFoxes)},
+                             {"num_geese", GameParameter(kDefaultNumGeese)},
+                         }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new FoxAndGeeseGame(params));
@@ -66,9 +119,9 @@ RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 CellState PlayerToState(Player player) {
   switch (player) {
     case 0:
-      return CellState::kCross;
+      return CellState::kFox;
     case 1:
-      return CellState::kNought;
+      return CellState::kGoose;
     default:
       SpielFatalError(absl::StrCat("Invalid player id ", player));
       return CellState::kEmpty;
@@ -78,18 +131,19 @@ CellState PlayerToState(Player player) {
 std::string PlayerToString(Player player) {
   switch (player) {
     case 0:
-      return "x";
+      return "f";
     case 1:
-      return "o";
+      return "g";
     default:
       return DefaultPlayerString(player);
   }
 }
 
 CellState StringToCellState(const std::string& s) {
-  if (s == "x") return CellState::kCross;
-  if (s == "o") return CellState::kNought;
+  if (s == "f") return CellState::kFox;
+  if (s == "g") return CellState::kGoose;
   if (s == ".") return CellState::kEmpty;
+  if (s == " ") return CellState::kOutOfBounds;
   SpielFatalError(absl::StrCat("Invalid cell string: ", s));
 }
 
@@ -97,26 +151,15 @@ std::string StateToString(CellState state) {
   switch (state) {
     case CellState::kEmpty:
       return ".";
-    case CellState::kNought:
-      return "o";
-    case CellState::kCross:
-      return "x";
+    case CellState::kGoose:
+      return "g";
+    case CellState::kFox:
+      return "f";
+    case CellState::kOutOfBounds:
+      return " ";
     default:
       SpielFatalError("Unknown state.");
   }
-}
-
-bool BoardHasLine(const std::array<CellState, kNumCells>& board,
-                  const Player player) {
-  CellState c = PlayerToState(player);
-  return (board[0] == c && board[1] == c && board[2] == c) ||
-         (board[3] == c && board[4] == c && board[5] == c) ||
-         (board[6] == c && board[7] == c && board[8] == c) ||
-         (board[0] == c && board[3] == c && board[6] == c) ||
-         (board[1] == c && board[4] == c && board[7] == c) ||
-         (board[2] == c && board[5] == c && board[8] == c) ||
-         (board[0] == c && board[4] == c && board[8] == c) ||
-         (board[2] == c && board[4] == c && board[6] == c);
 }
 
 std::vector<CellState> FoxAndGeeseState::Board() const {
@@ -124,14 +167,13 @@ std::vector<CellState> FoxAndGeeseState::Board() const {
   return board;
 }
 
-
 void FoxAndGeeseState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   board_[move] = PlayerToState(CurrentPlayer());
-  if (HasLine(current_player_)) {
+  if (/* need to fill-in */) {
     outcome_ = current_player_;
   }
-  current_player_ = 1 - current_player_;
+  ChangePlayer();
   num_moves_ += 1;
 }
 
@@ -148,18 +190,34 @@ std::vector<Action> FoxAndGeeseState::LegalActions() const {
 }
 
 std::string FoxAndGeeseState::ActionToString(Player player,
-                                           Action action_id) const {
+                                             Action action_id) const {
   return game_->ActionToString(player, action_id);
 }
 
-bool FoxAndGeeseState::HasLine(Player player) const {
-  return BoardHasLine(board_, player);
-}
+FoxAndGeeseState::FoxAndGeeseState(std::shared_ptr<const Game> game)
+    : State(game) {
+  const auto* fg_game = down_cast<const FoxAndGeeseGame*>(game.get());
+  num_foxes_ = fg_game->NumFoxes();
+  num_geese_ = fg_game->NumGeese();
 
-bool FoxAndGeeseState::IsFull() const { return num_moves_ == kNumCells; }
+  SPIEL_CHECK_TRUE(IsSupportedNumFoxes(num_foxes_));
+  SPIEL_CHECK_TRUE(IsSupportedNumGeese(num_geese_));
 
-FoxAndGeeseState::FoxAndGeeseState(std::shared_ptr<const Game> game) : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
+  // Mark shape: playable cells start empty, everything else is out of bounds.
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    board_[cell] =
+        kPlayableMask[cell] ? CellState::kEmpty : CellState::kOutOfBounds;
+  }
+
+  board_[kCenterCell] = CellState::kFox;
+
+  for (int i = 0; i < num_geese_; ++i) {
+    const int cell = kTraditionalGeeseCells[i].first * kNumCols +
+                     kTraditionalGeeseCells[i].second;
+    SPIEL_CHECK_TRUE(kPlayableMask[cell]);
+    SPIEL_CHECK_EQ(board_[cell], CellState::kEmpty);
+    board_[cell] = CellState::kGoose;
+  }
 }
 
 std::string FoxAndGeeseState::ToString() const {
@@ -212,14 +270,12 @@ std::vector<Action> FoxAndGeeseState::StructToActions(
   return {a->row * kNumCols + a->col};
 }
 
-bool FoxAndGeeseState::IsTerminal() const {
-  return outcome_ != kInvalidPlayer || IsFull();
-}
+bool FoxAndGeeseState::IsTerminal() const { return outcome_ != kInvalidPlayer; }
 
 std::vector<double> FoxAndGeeseState::Returns() const {
-  if (HasLine(Player{0})) {
+  if (/* need to fill-in */ (Player{0})) {
     return {1.0, -1.0};
-  } else if (HasLine(Player{1})) {
+  } else if (/* need to fill-in */ (Player{1})) {
     return {-1.0, 1.0};
   } else {
     return {0.0, 0.0};
@@ -239,7 +295,7 @@ std::string FoxAndGeeseState::ObservationString(Player player) const {
 }
 
 void FoxAndGeeseState::ObservationTensor(Player player,
-                                       absl::Span<float> values) const {
+                                         absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -264,13 +320,13 @@ std::unique_ptr<State> FoxAndGeeseState::Clone() const {
 }
 
 std::string FoxAndGeeseGame::ActionToString(Player player,
-                                          Action action_id) const {
+                                            Action action_id) const {
   return absl::StrCat(StateToString(PlayerToState(player)), "(",
                       action_id / kNumCols, ",", action_id % kNumCols, ")");
 }
 
 FoxAndGeeseState::FoxAndGeeseState(const std::shared_ptr<const Game> game,
-                               const FoxAndGeeseStateStruct& state_struct)
+                                   const FoxAndGeeseStateStruct& state_struct)
     : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
 
@@ -279,48 +335,48 @@ FoxAndGeeseState::FoxAndGeeseState(const std::shared_ptr<const Game> game,
                                     kNumCells, state_struct.board.size()));
   }
   num_moves_ = 0;
-  int num_x = 0;
-  int num_o = 0;
+  int num_f = 0;
+  int num_g = 0;
   for (Action action = 0; action < state_struct.board.size(); ++action) {
     CellState cell_state = StringToCellState(state_struct.board[action]);
     if (cell_state != CellState::kEmpty) {
       board_[action] = cell_state;
       num_moves_++;
-      if (cell_state == CellState::kCross) {
-        num_x++;
+      if (cell_state == CellState::kFox) {
+        num_f++;
       } else {
-        num_o++;
+        num_g++;
       }
     }
   }
-  if (num_x < num_o || num_x > num_o + 1) {
+  if (num_f < num_g || num_f > num_g + 1) {
     SpielFatalError(absl::StrFormat(
-        "Invalid board state: invalid number of pieces, got x = %d, o = %d",
-        num_x, num_o));
+        "Invalid board state: invalid number of pieces, got f = %d, g = %d",
+        num_f, num_g));
   }
-  current_player_ = (num_x == num_o ? 0 : 1);
+  current_player_ = (num_f == num_g ? 0 : 1);
 
-  bool x_wins = HasLine(0);
-  bool o_wins = HasLine(1);
+  bool f_wins = /* needs to be filled-in */ (0);
+  bool g_wins = /* needs to be filled-in */ (1);
 
-  if (x_wins && o_wins) {
+  if (f_wins && g_wins) {
     SpielFatalError("Invalid board state: both players have a line.");
   }
 
-  if (x_wins) {
-    if (num_x != num_o + 1) {
+  if (f_wins) {
+    if (num_f != num_g + 1) {
       SpielFatalError(absl::StrFormat(
-          "Invalid board state: x has a line, but number of pieces is "
-          "inconsistent, got x = %d, o = %d",
-          num_x, num_o));
+          "Invalid board state: fox has a line, but number of pieces is "
+          "inconsistent, got f = %d, g = %d",
+          num_f, num_g));
     }
     outcome_ = 0;
-  } else if (o_wins) {
-    if (num_x != num_o) {
+  } else if (g_wins) {
+    if (num_f != num_g) {
       SpielFatalError(absl::StrFormat(
           "Invalid board state: o has a line, but number of pieces is "
-          "inconsistent, got x = %d, o = %d",
-          num_x, num_o));
+          "inconsistent, got f = %d, g = %d",
+          num_f, num_g));
     }
     outcome_ = 1;
   } else {
@@ -329,15 +385,30 @@ FoxAndGeeseState::FoxAndGeeseState(const std::shared_ptr<const Game> game,
 
   if (state_struct.current_player != PlayerToString(CurrentPlayer())) {
     SpielFatalError(absl::StrCat("Invalid current player: expected ",
-                                 PlayerToString(CurrentPlayer()),
-                                 ", got ", state_struct.current_player));
+                                 PlayerToString(CurrentPlayer()), ", got ",
+                                 state_struct.current_player));
   }
 
   starting_state_str_ = this->ToJson();
 }
 
 FoxAndGeeseGame::FoxAndGeeseGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      num_foxes_(ParameterValue<int>("num_foxes")),
+      num_geese_(ParameterValue<int>("num_geese")) {
+  if (!IsSupportedNumFoxes(num_foxes_)) {
+    SpielFatalError(absl::StrCat(
+        "Only the one-fox game is implemented; got num_foxes = ", num_foxes_,
+        ". The two-fox game has different win conditions and needs a "
+        "separate implementation."));
+  }
+  if (!IsSupportedNumGeese(num_geese_)) {
+    SpielFatalError(absl::StrCat(
+        "num_geese must be one of the three traditional configurations "
+        "(13, 15, or 17); got ",
+        num_geese_));
+  }
+}
 
 }  // namespace fox_and_geese
 }  // namespace open_spiel
