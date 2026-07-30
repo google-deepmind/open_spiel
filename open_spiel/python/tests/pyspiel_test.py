@@ -76,6 +76,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "einstein_wurfelt_nicht",
     "euchre",
     "first_sealed_auction",
+    "fox_and_geese",
     "gin_rummy",
     "go",
     "go_fish",

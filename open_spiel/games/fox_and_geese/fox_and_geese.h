@@ -1,0 +1,217 @@
+// Copyright 2019 DeepMind Technologies Limited
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef OPEN_SPIEL_GAMES_FOX_AND_GEESE_H_
+#define OPEN_SPIEL_GAMES_FOX_AND_GEESE_H_
+
+#include <array>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
+#include "open_spiel/spiel.h"
+
+// Traditional board game of Fox and Geese:
+// https://en.wikipedia.org/wiki/Fox_games#Fox_and_geese
+//
+// Parameters:
+//   "num_foxes": int, number of initial foxes (default: 1)
+//   "num_geese": int, number of initial geese (default: 13)
+
+namespace open_spiel {
+namespace fox_and_geese {
+
+// Compile-time calculation helpers.
+namespace internal {
+
+constexpr long long Combinations(long long n, long long k) {
+  if (k > n) return 0;
+  if (k * 2 > n) k = n - k;
+  if (k == 0) return 1;
+
+  long long result = n;
+  for (long long i = 2; i <= k; ++i) {
+    result *= (n - i + 1);
+    result /= i;
+  }
+  return result;
+}
+
+constexpr long long CalculateTotalStates(long long c, long long f,
+                                         long long g_max) {
+  long long total_states = 0;
+  long long fox_placements = Combinations(c, f);
+
+  for (long long g = 0; g <= g_max; ++g) {
+    total_states += fox_placements * Combinations(c - f, g);
+  }
+
+  return total_states;
+}
+
+}  // namespace internal
+
+// Constants.
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kNumRows = 7;
+inline constexpr int kNumCols = 7;
+inline constexpr int kNumCells = kNumRows * kNumCols;  // 49 total array slots
+inline constexpr int kPlayableCells = 33;              // 33 valid grid positions
+inline constexpr int kCellStates = 1 + kNumPlayers + 1;  // empty, fox, goose, out of bounds
+inline constexpr int kDefaultNumFoxes = 1;
+inline constexpr int kDefaultNumGeese = 13;
+
+// https://math.stackexchange.com/questions/5145511/fox-and-geese-state-space-calculation
+inline constexpr long long kNumberStates = internal::CalculateTotalStates(
+    kPlayableCells, kDefaultNumFoxes, kDefaultNumGeese);
+
+// State of a cell.
+enum class CellState {
+  kEmpty,
+  kFox,
+  kGoose,
+  kOutOfBounds,  // for extra cells
+};
+
+
+struct FoxAndGeeseStructContents {
+  std::string current_player;
+  std::vector<std::string> board;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(FoxAndGeeseStructContents, current_player,
+                                 board);
+};
+
+// State and Observation structs using SPIEL_DEFINE_STRUCT macro
+SPIEL_DEFINE_STRUCT(FoxAndGeeseStateStruct, StateStruct, FoxAndGeeseStructContents);
+SPIEL_DEFINE_STRUCT(FoxAndGeeseObservationStruct, ObservationStruct,
+                    FoxAndGeeseStructContents);
+
+// Action struct using SPIEL_STRUCT_BOILERPLATE macro
+struct FoxAndGeeseActionStruct : public ActionStruct {
+  int row;
+  int col;
+  SPIEL_STRUCT_BOILERPLATE(FoxAndGeeseActionStruct, row, col);
+};
+
+// State of an in-play game.
+class FoxAndGeeseState : public State {
+ public:
+  FoxAndGeeseState(std::shared_ptr<const Game> game);
+  FoxAndGeeseState(std::shared_ptr<const Game> game,
+                 const FoxAndGeeseStateStruct& state_struct);
+
+  FoxAndGeeseState(const FoxAndGeeseState&) = default;
+  FoxAndGeeseState& operator=(const FoxAndGeeseState&) = default;
+
+  Player CurrentPlayer() const override {
+    return IsTerminal() ? kTerminalPlayerId : current_player_;
+  }
+  std::string ActionToString(Player player, Action action_id) const override;
+  std::string ToString() const override;
+  bool IsTerminal() const override;
+  std::vector<double> Returns() const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         absl::Span<float> values) const override;
+  std::unique_ptr<State> Clone() const override;
+  void UndoAction(Player player, Action move) override;
+  std::vector<Action> LegalActions() const override;
+  std::vector<CellState> Board() const;
+  CellState BoardAt(int cell) const { return board_[cell]; }
+  CellState BoardAt(int row, int column) const {
+    return board_[row * kNumCols + column];
+  }
+  Player outcome() const { return outcome_; }
+  void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
+
+  std::unique_ptr<StateStruct> ToStruct() const override;
+  std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const override;
+  std::unique_ptr<ActionStruct> ActionToStruct(
+      Player player, Action action_id) const override;
+  std::vector<Action> StructToActions(
+      const ActionStruct& action_struct) const override;
+
+ protected:
+  std::array<CellState, kNumCells> board_;
+  void DoApplyAction(Action move) override;
+  bool InBounds(int row, int col) const {
+    return row >= 0 && row < kNumRows && col >= 0 && col < kNumCols;
+  }
+  bool IsPlayable(int row, int col) const {
+    return InBounds(row, col) && board_[row * kNumCols + col] != CellState::kOutOfBounds;
+  }
+
+ private:
+  Player current_player_ = 0;  // Player 0 = fox, Player 1 = geese
+  Player outcome_ = kInvalidPlayer;
+  int num_moves_ = 0;
+  int num_foxes_ = kDefaultNumFoxes;
+  int num_geese_ = kDefaultNumGeese;
+};
+
+// Game object.
+class FoxAndGeeseGame : public Game {
+ public:
+  explicit FoxAndGeeseGame(const GameParameters& params);
+  int NumDistinctActions() const override { return kNumCells; }
+  using Game::NewInitialState;
+  std::unique_ptr<State> NewInitialState() const override {
+    return std::unique_ptr<State>(new FoxAndGeeseState(shared_from_this()));
+  }
+  std::unique_ptr<State> NewInitialState(
+      const FoxAndGeeseStateStruct& state_struct) const {
+    return std::unique_ptr<State>(
+        new FoxAndGeeseState(shared_from_this(), state_struct));
+  }
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const override {
+    return NewInitialState(FoxAndGeeseStateStruct(json));
+  }
+  int NumPlayers() const override { return kNumPlayers; }
+  double MinUtility() const override { return -1; }
+  absl::optional<double> UtilitySum() const override { return 0; }
+  double MaxUtility() const override { return 1; }
+  std::vector<int> ObservationTensorShape() const override {
+    return {kCellStates, kNumRows, kNumCols};
+  }
+  int MaxGameLength() const override { return 1000; }
+  std::string ActionToString(Player player, Action action_id) const override;
+  int NumFoxes() const { return num_foxes_; }
+  int NumGeese() const { return num_geese_; }
+
+ private:
+  int num_foxes_ = kDefaultNumFoxes;
+  int num_geese_ = kDefaultNumGeese;
+};
+
+CellState PlayerToState(Player player);
+std::string StateToString(CellState state);
+
+inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
+  return stream << StateToString(state);
+}
+
+}  // namespace fox_and_geese
+}  // namespace open_spiel
+
+#endif  // OPEN_SPIEL_GAMES_FOX_AND_GEESE_H_

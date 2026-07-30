@@ -99,6 +99,8 @@ set(GAME_SOURCES
   euchre/euchre.h
   first_sealed_auction/first_sealed_auction.cc
   first_sealed_auction/first_sealed_auction.h
+  fox_and_geese/fox_and_geese.cc
+  fox_and_geese/fox_and_geese.h
   gin_rummy/gin_rummy.cc
   gin_rummy/gin_rummy.h
   gin_rummy/gin_rummy_utils.cc
@@ -523,6 +525,10 @@ add_executable(first_sealed_auction_test first_sealed_auction/first_sealed_aucti
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(first_sealed_auction_test first_sealed_auction_test)
+
+add_executable(fox_and_geese_test fox_and_geese/fox_and_geese_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(fox_and_geese_test fox_and_geese_test)
 
 add_executable(garnet_test mfg/garnet_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
