@@ -41,13 +41,14 @@
 //                        fox wins by capturing enough geese that they can no
 //                        longer trap it.
 //   Player 1 (the geese) move to an adjacent empty point. The geese win by
-//                        trapping the fox so that it has no legal move.
+//                        trapping the fox so that it has no legal move. A
+//                        player with no legal move loses.
 //
 // Only the classic one-fox game is implemented. The supported starting
 // configurations are the three traditional ones, which are nested: the
 // 13-goose layout fills one arm of the cross plus the whole adjacent row, and
 // the 15- and 17-goose layouts add two and four further geese along the fox's
-// row. The fox always starts on the center point.
+// row. The fox always starts on the center point. The geese move first.
 //
 // Out of scope for this implementation: the other fox games described in the
 // same Wikipedia article. In particular the two-fox Scandinavian game
@@ -57,7 +58,8 @@
 //
 // Captures are optional and may be chained: after a jump the fox keeps the
 // move while further jumps are available, and ends its turn by
-// playing kEndTurnAction.
+// playing kEndTurnAction. Play reaching kMaxGameLength actions is declared
+// a draw; this is an implementation cutoff rather than a traditional rule.
 //
 // Parameters:
 //   "num_foxes": int, number of foxes. Only 1 is supported. (default: 1)
@@ -150,8 +152,10 @@ enum class CellState {
 struct FoxAndGeeseStructContents {
   std::string current_player;
   std::vector<std::string> board;
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(FoxAndGeeseStructContents, current_player,
-                                 board);
+  int continue_jump_from = -1;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(FoxAndGeeseStructContents,
+                                              current_player, board,
+                                              continue_jump_from);
 };
 
 // State and Observation structs using SPIEL_DEFINE_STRUCT macro
@@ -238,7 +242,7 @@ class FoxAndGeeseState : public State {
   bool HasJumpFrom(int from) const;
   void EndTurn();
 
-  Player current_player_ = 0;  // Player 0 = fox, Player 1 = geese
+  Player current_player_ = 1;  // Player 0 = fox, Player 1 = geese
   Player outcome_ = kInvalidPlayer;
   int num_moves_ = 0;
   // Starting piece counts, copied from the Game object. num_foxes_ is always

@@ -406,8 +406,10 @@ std::unique_ptr<StateStruct> FoxAndGeeseState::ToStruct() const {
   for (const CellState& cell : board_) {
     board.push_back(StateToString(cell));
   }
-  rv->current_player = PlayerToString(CurrentPlayer());
+  // Not CurrentPlayer(), which reports kTerminalPlayerId once the game ends.
+  rv->current_player = PlayerToString(current_player_);
   rv->board = board;
+  rv->continue_jump_from = continue_jump_from_;
   return rv;
 }
 
@@ -576,6 +578,17 @@ FoxAndGeeseState::FoxAndGeeseState(const std::shared_ptr<const Game> game,
   } else {
     SpielFatalError(
         absl::StrCat("Invalid current player: ", state_struct.current_player));
+  }
+
+  continue_jump_from_ = state_struct.continue_jump_from;
+  if (continue_jump_from_ != -1) {
+    if (current_player_ != 0 || continue_jump_from_ < 0 ||
+        continue_jump_from_ >= kNumCells ||
+        board_[continue_jump_from_] != CellState::kFox ||
+        !HasJumpFrom(continue_jump_from_)) {
+      SpielFatalError(absl::StrFormat("Invalid continue_jump_from: %d",
+                                      continue_jump_from_));
+    }
   }
 
   if (num_geese_remaining_ < kMinGeeseToTrapFox) {
