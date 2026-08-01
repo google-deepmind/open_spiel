@@ -398,7 +398,7 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
 std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
     const std::string& str) const {
   if (str.empty()) {
-    return absl::make_unique<UncontestedBiddingState>(
+    return std::make_unique<UncontestedBiddingState>(
         shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
         rng_seed_, num_redeals_);
   }
@@ -443,7 +443,7 @@ std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
     SPIEL_CHECK_EQ(actions[i], forced_actions_[i]);
   }
 
-  return absl::make_unique<UncontestedBiddingState>(
+  return std::make_unique<UncontestedBiddingState>(
       shared_from_this(), reference_contracts_, Deal(cards), actions, rng_seed_,
       num_redeals_);
 }
