@@ -2,10 +2,15 @@
 // Whist
 
 #include <cassert>
-
+#include "open_spiel/abseil-cpp/absl/flags/flag.h"
+#include "open_spiel/abseil-cpp/absl/flags/parse.h"
+#include "german_whist_foregame.h"
 #include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/thread.h"
+
+ABSL_FLAG(std::string, output_path, "TTable13.txt",
+          "Where to write the generated tablebase.");
 
 // #define DEBUG
 namespace open_spiel {
@@ -68,10 +73,9 @@ class Node {
   char TotalTricks() { return total_tricks_; }
   uint32_t Cards() { return cards_; }
   std::array<uint32_t, kNumSuits> SuitMasks() { return suit_masks_; }
-  uint64_t GetNodeKey() { return key_; }
   bool Trick(ActionStruct lead, ActionStruct follow) {
     // true if leader won//
-    return (lead.suit != follow.suit && lead.suit == trump_) ||
+    return (lead.suit != follow.suit && follow.suit != trump_) ||
            (lead.suit == follow.suit && lead.index <= follow.index);
   }
 
@@ -116,7 +120,7 @@ class Node {
       suit++;
     }
   }
-  void UpdateNodeKey() {
+  std::tuple<uint32_t,uint32_t,uint32_t> Canonicalise() {
     // recasts the cards and suitlengths into quasi-canonical form//
     // least sig part of 32bit card is trump, then suits in ascending length//
 
@@ -129,71 +133,33 @@ class Node {
     // single suit isomorphism. Namely all single suit games with the same card
     // distribution are isomorphic. Currently this considers all trump, all no
     // trump games as distinct//
-    uint64_t suit_sig = 0;
-    char trump_length = popcnt_u32(suit_masks_[trump_]);
-    if (trump_length > kNumRanks) {
-      throw;
+    using suit_info = std::tuple<bool,uint32_t,uint32_t,uint32_t>;
+    std::vector<suit_info> suit_infos={{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
+    for(uint8_t i=0;i<kNumSuits;++i){
+      bool is_trump = (i==trump_);
+      uint32_t suit_length = popcnt_u32(suit_masks_[i]);
+      uint32_t suit_sig =(suit_masks_[i]&cards_)>>(tzcnt_u32(suit_masks_[i]));
+      uint32_t suit_idx = i;
+      suit_infos[i]={is_trump,suit_length,suit_sig,suit_idx};
     }
-    std::vector<Triple> non_trump_lengths;
-    for (char i = 0; i < kNumSuits; ++i) {
-      if (i != trump_) {
-        char length = popcnt_u32(suit_masks_[i]);
-        uint32_t sig = suit_masks_[i] & cards_;
-        if (suit_masks_[i] != 0) {
-          sig = (sig >> (tzcnt_u32(suit_masks_[i])));
-        }
-        if (length > kNumRanks) {
-          throw 1;
-        }
-        non_trump_lengths.push_back(Triple{i, length, sig});
-      }
+    auto custom_cmp = [&](const suit_info&lhs,const suit_info&rhs){
+      const auto& [t1, l1,s1,i1] = lhs;
+      const auto& [t2, l2,s2,i2] = rhs;
+      return std::tie(t2, l1,i1) < std::tie(t1, l2,i2);
+    };
+    std::sort(suit_infos.begin(),suit_infos.end(),custom_cmp);
+    uint32_t bitpacked_suit_lengths = 0;
+    uint32_t card_mask=0;
+    uint32_t total_cards=0;
+    for(uint32_t i=0;i<kNumSuits;++i){
+      uint32_t suit_length = std::get<1>(suit_infos[i]);
+      bitpacked_suit_lengths = (bitpacked_suit_lengths|(suit_length<<(4*i)));
+      card_mask = (card_mask)|(std::get<2>(suit_infos[i])<<(total_cards));
+      total_cards+=suit_length;
     }
-    // sorting takes advantage of two isomorphisms namely nontrump suits of
-    // nonequal length can be exchanged and the value of the game does not
-    // change// and this more complicated suppose two games with two or more
-    // (non_trump)suits of equal length, permuting those suits should not change
-    // the value of solved game ie it is an isomorphism//
-    std::sort(non_trump_lengths.begin(), non_trump_lengths.end());
-    suit_sig = suit_sig | trump_length;
-    for (size_t i = 0; i < non_trump_lengths.size(); ++i) {
-      suit_sig =
-          suit_sig | ((uint64_t)non_trump_lengths[i].length << (4 * (i + 1)));
-    }
-    suit_sig = suit_sig << 32;
-    std::array<uint32_t, kNumSuits> suit_cards;
-    suit_cards[0] = cards_ & suit_masks_[trump_];
-    if (suit_masks_[trump_] != 0) {
-      suit_cards[0] = suit_cards[0] >> tzcnt_u32(suit_masks_[trump_]);
-    }
-    uint32_t sum = popcnt_u32(suit_masks_[trump_]);
-    uint32_t cards = 0 | suit_cards[0];
-    for (size_t i = 0; i < non_trump_lengths.size(); ++i) {
-      suit_cards[i] = cards_ & suit_masks_[non_trump_lengths[i].index];
-      uint32_t val = 0;
-      if (suit_masks_[non_trump_lengths[i].index] != 0) {
-        val = tzcnt_u32(suit_masks_[non_trump_lengths[i].index]);
-      }
-      suit_cards[i] = suit_cards[i] >> val;
-      suit_cards[i] = suit_cards[i] << sum;
-      sum += popcnt_u32(suit_masks_[non_trump_lengths[i].index]);
-      cards = cards | suit_cards[i];
-    }
-    // cards = cards | (player_ << 31);
-    key_ = suit_sig | (uint64_t)cards;
-#ifdef DEBUG_KEY
-    std::cout << "CARDS_ " << cards_ << std::endl;
-    std::cout << "CARDS " << cards << std::endl;
-    std::cout << "SUIT MASKS " << std::endl;
-    for (int i = 0; i < kNumSuits; ++i) {
-      std::cout << suit_masks_[i] << std::endl;
-    }
-    std::cout << "SUIT_SIG " << suit_sig << std::endl;
-    std::cout << "KEY " << key_ << std::endl;
-#endif
-  }
-  uint64_t AltKey() {
-    uint32_t mask = bzhi_u32(~0, 2 * RemainingTricks());
-    return key_ ^ (uint64_t)mask;
+    uint32_t sel_mask = ((0b1<<(total_cards))-1);
+    uint32_t alt_card_mask = (~card_mask)&sel_mask;
+    return {card_mask,alt_card_mask,bitpacked_suit_lengths};
   }
   // Move Ordering Heuristics//
   // These could Definitely be improved, very hacky//
@@ -212,7 +178,7 @@ class Node {
     std::vector<ActionStruct> moves = LegalActions();
     UndoAction(action);
     int sum = 0;
-    for (size_t i = 0; i < moves.size(); ++i) {
+    for (uint32_t i = 0; i < moves.size(); ++i) {
       sum += Trick(action, moves[i]);
     }
     if (sum == moves.size()) {
@@ -259,7 +225,7 @@ class Node {
     if (player_ == 0) {
       copy_cards = ~copy_cards;
     }
-    for (size_t i = 0; i < kNumSuits; ++i) {
+    for (uint32_t i = 0; i < kNumSuits; ++i) {
       uint32_t suit_cards = copy_cards & suit_masks_[i];
       player_suit_masks[i] = suit_cards & ~(suit_cards >> 1);
 #ifdef DEBUG
@@ -289,7 +255,7 @@ class Node {
     }
 #ifdef DEBUG
     std::cout << "Player " << player_ << " MoveGen " << std::endl;
-    for (size_t i = 0; i < out.size(); ++i) {
+    for (uint32_t i = 0; i < out.size(); ++i) {
       std::cout << out[i].index << " " << (int)out[i].suit << std::endl;
     }
 #endif
@@ -396,6 +362,14 @@ int AlphaBeta(Node* node, int alpha, int beta) {
 
 // Credit to computationalcombinatorics.wordpress.com
 // hideous code for generating the next colexicographical combination//
+
+//CREDIT TO GOSPERS//
+uint32_t NextColex(uint32_t n){
+  const uint32_t c = n & -n;
+  const uint32_t r = n + c;
+  return ( ( ( r ^ n ) >> 2 ) / c ) | r;
+}
+
 bool NextColex(std::vector<int>& v, int k) {
   int num = 0;
   for (int i = 0; i < v.size(); ++i) {
@@ -423,8 +397,7 @@ bool NextColex(std::vector<int>& v, int k) {
 
 char IncrementalAlphaBetaMemoryIso(
     Node* node, char alpha, char beta, int depth, const vectorNa* TTable,
-    const std::unordered_map<uint32_t, uint32_t>* SuitRanks,
-    const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+    const std::unordered_map<uint32_t, uint32_t>* SuitRanks) {
   // fail soft ab search
   char val = 0;
   uint64_t key = 0;
@@ -433,15 +406,17 @@ char IncrementalAlphaBetaMemoryIso(
     return node->Score();
   }
   if (node->Moves() % 2 == 0 && depth == 0) {
-    node->UpdateNodeKey();
-    key = (player) ? node->AltKey() : node->GetNodeKey();
-    uint32_t cards = key & bzhi_u64(~0, 32);
-    uint32_t colex = HalfColexer(cards, &bin_coeffs);
-    uint32_t suits = (key & (~0 ^ bzhi_u64(~0, 32))) >> 32;
+    std::tuple<uint32_t,uint32_t,uint32_t> canonical = node->Canonicalise();
+    uint32_t suits = std::get<2>(canonical);
+    uint32_t cards = std::get<0>(canonical);
+    uint32_t alt_cards = std::get<1>(canonical);
+
+    cards  = (player) ? alt_cards : cards;
+    uint32_t colex = Colex(cards);
     uint32_t suit_rank = SuitRanks->at(suits);
     char value = (player)
-                     ? node->RemainingTricks() - TTable->Get(colex, suit_rank)
-                     : TTable->Get(colex, suit_rank);
+                     ? node->RemainingTricks() - TTable->Get(suit_rank,colex)
+                     : TTable->Get(suit_rank,colex);
     return value + node->Score();
   } else if (node->Player() == 0) {
     val = 0;
@@ -450,7 +425,7 @@ char IncrementalAlphaBetaMemoryIso(
       node->ApplyAction(actions[i]);
       val = std::max(
           val, IncrementalAlphaBetaMemoryIso(node, alpha, beta, depth - 1,
-                                             TTable, SuitRanks, bin_coeffs));
+                                             TTable, SuitRanks));
       node->UndoAction(actions[i]);
       alpha = std::max(val, alpha);
       if (val >= beta) {
@@ -464,7 +439,7 @@ char IncrementalAlphaBetaMemoryIso(
       node->ApplyAction(actions[i]);
       val = std::min(
           val, IncrementalAlphaBetaMemoryIso(node, alpha, beta, depth - 1,
-                                             TTable, SuitRanks, bin_coeffs));
+                                             TTable, SuitRanks));
       node->UndoAction(actions[i]);
       beta = std::min(val, beta);
       if (val <= alpha) {
@@ -537,58 +512,40 @@ std::vector<Node> GWhistGenerator(int num, unsigned int seed) {
   return out;
 }
 
-void ThreadSolver(int size_endgames, vectorNa* outTTable,
+void ThreadSolver(uint32_t size_endgames, vectorNa* outTTable,
                   const vectorNa* TTable,
-                  const std::vector<std::vector<uint32_t>>& bin_coeffs,
                   const std::vector<uint32_t>& suit_splits,
                   const std::unordered_map<uint32_t, uint32_t>& SuitRanks,
-                  size_t start_id, size_t end_id) {
+                  uint32_t start_id, uint32_t end_id) {
   // takes endgames solved to depth d-1 and returns endgames solved to depth d
-  // //
-  std::vector<int> combination;
-  combination.reserve(size_endgames);
-  for (int i = 0; i < size_endgames; ++i) {
-    combination.push_back(i);
-  }
-  bool control = true;
-  int count = 0;
-  uint32_t cards = 0;
-  for (int i = 0; i < combination.size(); ++i) {
-    cards = cards | (1 << combination[i]);
-  }
-  while (count < start_id) {
-    NextColex(combination, 2 * size_endgames);
-    count++;
-  }
-  while (count < end_id && control) {
-    uint32_t cards = 0;
-    for (int i = 0; i < combination.size(); ++i) {
-      cards = cards | (1 << combination[i]);
+  //NEW//
+  uint32_t cards = (1<<size_endgames)-1;
+  for (uint32_t i = start_id; i < end_id; ++i) {
+    std::array<uint32_t, kNumSuits> suit_arr;
+    suit_arr[0] = bzhi_u32(~0, suit_splits[i] & 0b1111);
+    uint32_t sum = suit_splits[i] & 0b1111;
+    for (uint32_t j = 1; j < kNumSuits; ++j) {
+      uint32_t mask = bzhi_u32(~0, sum);
+      sum += (suit_splits[i] & (0b1111 << (4 * j))) >> 4 * j;
+      suit_arr[j] = bzhi_u32(~0, sum);
+      suit_arr[j] = suit_arr[j] ^ mask;
     }
-    for (int i = 0; i < suit_splits.size(); ++i) {
-      std::array<uint32_t, kNumSuits> suit_arr;
-      suit_arr[0] = bzhi_u32(~0, suit_splits[i] & 0b1111);
-      uint32_t sum = suit_splits[i] & 0b1111;
-      for (int j = 1; j < kNumSuits; ++j) {
-        uint32_t mask = bzhi_u32(~0, sum);
-        sum += (suit_splits[i] & (0b1111 << (4 * j))) >> 4 * j;
-        suit_arr[j] = bzhi_u32(~0, sum);
-        suit_arr[j] = suit_arr[j] ^ mask;
-      }
+    for(uint32_t colex_rank =0;colex_rank<BIN_COEFFS_LUT[2*size_endgames][size_endgames];++colex_rank){
       Node node(cards, suit_arr, 0, false);
       char result = IncrementalAlphaBetaMemoryIso(
-          &node, 0, size_endgames, 2, TTable, &SuitRanks, bin_coeffs);
-      outTTable->Set(count, i, result);
+        &node, 0, size_endgames, 2, TTable, &SuitRanks);
+      outTTable->Set(i,colex_rank,result);
+      cards = NextColex(cards);
     }
-    control = NextColex(combination, 2 * size_endgames);
-    count++;
   }
+  return;
 }
+
 vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
-                     const std::vector<std::vector<uint32_t>>& bin_coeffs,const uint32_t hard_threads) {
+                     const uint32_t hard_threads) {
   // takes endgames solved to depth d-1 and returns endgames solved to depth d
   // //
-  vectorNa outTTable = InitialiseTTable(size_endgames, bin_coeffs);
+  vectorNa outTTable = InitialiseTTable(size_endgames);
   std::vector<uint32_t> suit_splits = GenQuads(size_endgames);
   std::unordered_map<uint32_t, uint32_t> SuitRanks;
   GenSuitRankingsRel(size_endgames - 1, &SuitRanks);
@@ -597,13 +554,13 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
   for (int i = 0; i < size_endgames; ++i) {
     combination.push_back(i);
   }
-  uint32_t v_length = (suit_splits.size() >> 1) + 1;
+
   uint32_t min_block_size = 256;
   uint32_t num_threads = 1;
-  uint32_t num_outers = outTTable.GetOuterSize();
+  uint32_t num_outers = suit_splits.size();
   // a haphazard attempt to mitigate false sharing//
   for (uint32_t i = hard_threads; i >= 1; i--) {
-    if ((num_outers * v_length / i) >= min_block_size) {
+    if ((outTTable.size() / i) >= min_block_size) {
       num_threads = i;
       break;
     }
@@ -624,7 +581,7 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
       end_id = block_size * (i + 1);
     }
     threads.emplace_back([&, start_id, end_id]() {
-      ThreadSolver(size_endgames, &outTTable, TTable, std::ref(bin_coeffs),
+      ThreadSolver(size_endgames, &outTTable, TTable,
                    std::ref(suit_splits), std::ref(SuitRanks), start_id,
                    end_id);
     });
@@ -636,19 +593,19 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
 }
 
 bool TestRetroSolve(int samples, int depth, uint32_t seed,
-                    const std::vector<std::vector<uint32_t>>& bin_coeffs,const uint32_t hard_threads) {
+                    const uint32_t hard_threads) {
   // Tests endgame solution with TTable vs raw seach
   std::vector<Node> nodes = GWhistGenerator(samples, seed);
   vectorNa v;
   for (int i = 1; i <= depth; ++i) {
-    v = RetroSolver(i, &v, bin_coeffs,hard_threads);
+    v = RetroSolver(i, &v,hard_threads);
   }
   std::unordered_map<uint32_t, uint32_t> SuitRanks;
   GenSuitRankingsRel(depth, &SuitRanks);
   for (auto it = nodes.begin(); it != nodes.end(); ++it) {
     char abm_unsafe = IncrementalAlphaBetaMemoryIso(&*it, 0, kNumRanks,
                                                     2 * (kNumRanks - depth), &v,
-                                                    &SuitRanks, bin_coeffs);
+                                                    &SuitRanks);
     char abm_safe = AlphaBeta(&*it, 0, kNumRanks);
     if (abm_unsafe != abm_safe) {
       return false;
@@ -656,26 +613,25 @@ bool TestRetroSolve(int samples, int depth, uint32_t seed,
   }
   return true;
 }
-vectorNa BuildTablebase(const std::vector<std::vector<uint32_t>>& bin_coeffs,const uint32_t hard_threads) {
+vectorNa BuildTablebase(const uint32_t hard_threads) {
   vectorNa v;
   std::cout << "Building Tablebase"
             << "\n";
   for (int i = 1; i <= kNumRanks; ++i) {
-    v = RetroSolver(i, &v, bin_coeffs,hard_threads);
+    v = RetroSolver(i, &v,hard_threads);
     std::cout << "Done " << i << "\n";
   }
   std::cout << "Built Tablebase"
             << "\n";
   return v;
 }
-bool TestTablebase(int samples, uint32_t seed, const vectorNa& table_base,
-                   const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+bool TestTablebase(int samples, uint32_t seed, const vectorNa& table_base) {
   std::vector<Node> nodes = GWhistGenerator(samples, seed);
   std::unordered_map<uint32_t, uint32_t> SuitRanks;
   GenSuitRankingsRel(kNumRanks, &SuitRanks);
   for (auto it = nodes.begin(); it != nodes.end(); ++it) {
     char abm_unsafe = IncrementalAlphaBetaMemoryIso(
-        &*it, 0, kNumRanks, 0, &table_base, &SuitRanks, bin_coeffs);
+        &*it, 0, kNumRanks, 0, &table_base, &SuitRanks);
     char abm_safe = AlphaBeta(&*it, 0, kNumRanks);
     if (abm_unsafe != abm_safe) {
       return false;
@@ -686,25 +642,20 @@ bool TestTablebase(int samples, uint32_t seed, const vectorNa& table_base,
 void StoreTTable(const std::string filename, const vectorNa& solution) {
   // stores solution into a text file//
   std::ofstream file(filename);
-  for (int i = 0; i < solution.GetOuterSize(); ++i) {
-    for (int j = 0; j < solution.GetInnerSize(); ++j) {
-      file.put(solution.GetChar(i, j));
-    }
+  for (int i = 0; i < solution.size(); ++i) {
+      file.put(solution.GetChar(i));
   }
   file.close();
 }
 
-bool TestTTableStorage(std::string filename, const vectorNa& v, int depth,
-                       const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+bool TestTTableStorage(std::string filename, const vectorNa& v, int depth) {
   // Tests storage fidelity//
   StoreTTable(filename, v);
-  vectorNa new_v = LoadTTable(filename, depth, bin_coeffs);
-  for (int i = 0; i < v.GetOuterSize(); ++i) {
-    for (int j = 0; j < v.GetInnerSize(); ++j) {
-      if (v.GetChar(i, j) != new_v.GetChar(i, j)) {
+  vectorNa new_v = LoadTTable(filename, depth);
+  for (int i = 0; i < v.size(); ++i) {
+      if (v.GetChar(i) != new_v.GetChar(i)) {
         return false;
       }
-    }
   }
   return true;
 }
@@ -712,22 +663,21 @@ bool TestTTableStorage(std::string filename, const vectorNa& v, int depth,
 }  // namespace german_whist_foregame
 }  // namespace open_spiel
 
-int main() {
-  std::vector<std::vector<uint32_t>> bin_coeffs =
-      open_spiel::german_whist_foregame::BinCoeffs(
-          2 * open_spiel::german_whist_foregame::kNumRanks);
-    const uint32_t hard_threads = 8;//set this to take advantage of more cores on your machine//
+int main(int argc, char** argv) {
+  absl::ParseCommandLine(argc, argv);
+  const uint32_t hard_threads = 8;//set this to take advantage of more cores on your machine//
   open_spiel::german_whist_foregame::vectorNa tablebase =
-      open_spiel::german_whist_foregame::BuildTablebase(bin_coeffs,hard_threads);
+  open_spiel::german_whist_foregame::BuildTablebase(hard_threads);
   std::random_device rd;
   int num_samples = 100;
   if (open_spiel::german_whist_foregame::TestTablebase(num_samples, rd(),
-                                                       tablebase, bin_coeffs)) {
+    tablebase)) {
     std::cout << "Tablebase accurate" << std::endl;
-  } else {
-    std::cout << "Tablebase inaccurate" << std::endl;
-  }
-  std::cout << "Starting Saving Tablebase" << std::endl;
-  open_spiel::german_whist_foregame::StoreTTable("TTable13.txt", tablebase);
+    } else {
+      std::cout << "Tablebase inaccurate" << std::endl;
+    }
+    std::cout << "Starting Saving Tablebase" << std::endl;
+  open_spiel::german_whist_foregame::StoreTTable(
+    absl::GetFlag(FLAGS_output_path), tablebase);
   std::cout << "Finished Saving Tablebase" << std::endl;
 }

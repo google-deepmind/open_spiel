@@ -14,9 +14,9 @@
 namespace open_spiel {
 namespace german_whist_foregame {
 
-// set this to the path you expect TTable to be once you have made it so
-// recompilation is not necessary//
-std::string kTTablePath = "";
+//TODO REFACTOR HIDEOUS ENDGAME KEY CODE//
+
+constexpr std::array<std::array<uint32_t,33>,33>BIN_COEFFS_LUT = BinCoeffsLUT<32>();
 
 uint32_t tzcnt_u32(uint32_t a) { return __builtin_ctz(a); }
 uint64_t tzcnt_u64(uint64_t a) { return __builtin_ctzll(a); }
@@ -95,35 +95,17 @@ std::vector<uint32_t> GenQuads(int size_endgames) {
   }
   return v;
 }
-std::vector<std::vector<uint32_t>> BinCoeffs(uint32_t max_n) {
-  // tabulates binomial coefficients//
-  std::vector<std::vector<uint32_t>> C(max_n + 1,
-                                       std::vector<uint32_t>(max_n + 1));
-  for (uint32_t i = 1; i <= max_n; ++i) {
-    C[0][i] = 0;
-  }
-  for (uint32_t i = 0; i <= max_n; ++i) {
-    C[i][0] = 1;
-  }
-  for (uint32_t i = 1; i <= max_n; ++i) {
-    for (uint32_t j = 1; j <= max_n; ++j) {
-      C[i][j] = C[i - 1][j] + C[i - 1][j - 1];
-    }
-  }
-  return C;
-}
-uint32_t HalfColexer(uint32_t cards,
-                     const std::vector<std::vector<uint32_t>>* bin_coeffs) {
-  // returns the colexicographical ranking of a combination of indices where the
-  // the size of the combination is half that of the set of indices//
+
+uint32_t Colex(uint32_t cards) {
+  //sum NCR(S[i],i+1)
   uint32_t out = 0;
-  uint32_t count = 0;
-  while (cards != 0) {
+  #pragma unroll
+  for(uint32_t i =0;i<32;++i){
+    uint32_t mask = (1<<i)-1;
+    uint32_t count = popcnt_u32(cards&mask);
     uint32_t ind = tzcnt_u32(cards);
-    uint32_t val = bin_coeffs->at(ind)[count + 1];
+    uint32_t val =((cards>>i)&0b1)?BIN_COEFFS_LUT[i][count + 1]:0;
     out += val;
-    cards = blsr_u32(cards);
-    count++;
   }
   return out;
 }
@@ -137,56 +119,52 @@ void GenSuitRankingsRel(uint32_t size,
   }
 }
 
-vectorNa::vectorNa(size_t card_combs, size_t suit_splits, char val) {
-  data = std::vector<char>(card_combs * ((suit_splits >> 1) + 1), val);
-  inner_size = (suit_splits >> 1) + 1;
-  outer_size = card_combs;
+vectorNa::vectorNa(uint32_t suit_splits, uint32_t card_combs, uint8_t val) {
+  data = std::vector<uint8_t>(((card_combs*suit_splits)>>1) +((card_combs*suit_splits)&0b1), val);
+  inner_size = card_combs>>1;
 }
 vectorNa::vectorNa() {
   data = {};
   inner_size = 0;
-  outer_size = 0;
 }
-size_t vectorNa::size() const { return data.size(); }
-size_t vectorNa::GetInnerSize() const { return inner_size; }
-size_t vectorNa::GetOuterSize() const { return outer_size; }
-char const& vectorNa::operator[](size_t index) const { return data[index]; }
-char vectorNa::GetChar(size_t i, size_t j) const {
-  return data[i * inner_size + j];
+uint32_t vectorNa::size() const { return data.size(); }
+uint32_t vectorNa::GetInnerSize() const { return inner_size; }
+uint8_t const& vectorNa::operator[](uint32_t idx) const { return data[idx]; }
+uint8_t vectorNa::GetChar(uint32_t idx) const {
+  return data[idx];
 }
-void vectorNa::SetChar(size_t i, size_t j, char value) {
-  data[i * inner_size + j] = value;
+void vectorNa::SetChar(uint32_t idx,uint8_t value) {
+  data[idx] = value;
 }
-char vectorNa::Get(size_t i, size_t j) const {
-  int remainder = j & 0b1;
-  if (remainder == 0) {
-    return 0b1111 & data[i * inner_size + (j >> 1)];
-  } else {
-    return ((0b11110000 & data[i * inner_size + (j >> 1)]) >> 4);
-  }
+uint8_t vectorNa::Get(uint32_t suit_idx, uint32_t card_idx) const {
+  uint32_t idx = suit_idx*2*inner_size+(card_idx);
+  uint8_t val = data[idx>>1];
+  uint8_t uval = (val&u_sel_mask)>>u_shift;
+  uint8_t lval = (val&l_sel_mask)>>l_shift;
+  uint8_t ret = (idx&0b1)?uval:lval;
+  return ret;
 }
-void vectorNa::Set(size_t i, size_t j, char value) {
-  int remainder = j & 0b1;
-  if (remainder == 0) {
-    char datastore = 0b11110000 & data[i * inner_size + (j >> 1)];
-    data[i * inner_size + (j >> 1)] = datastore | value;
-  } else {
-    char datastore = (0b1111 & data[i * inner_size + (j >> 1)]);
-    data[i * inner_size + (j >> 1)] = datastore | (value << 4);
-  }
+void vectorNa::Set(uint32_t suit_idx, uint32_t card_idx, uint8_t value) {
+  uint32_t idx = suit_idx*2*inner_size+(card_idx);
+  uint32_t real_idx = idx>>1;
+  uint32_t u = idx&0b1;
+  uint8_t s_val = data[real_idx];
+  s_val = (u)?(s_val&u_del_mask):(s_val&l_del_mask);
+  s_val= (u)?(s_val|(value<<u_shift)):(s_val|(value<<l_shift));
+  data[real_idx]=s_val;
+  return;
 }
-vectorNa InitialiseTTable(int size,
-                          const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+vectorNa InitialiseTTable(int size
+                          ) {
   // initialises TTable for a certain depth//
-  size_t suit_size = GenQuads(size).size();
-  return vectorNa(bin_coeffs[2 * size][size], suit_size, 0);
+  uint32_t suit_size = GenQuads(size).size();
+  return vectorNa(suit_size,BIN_COEFFS_LUT[2 * size][size], 0);
 }
-vectorNa LoadTTable(const std::string filename, int depth,
-                    const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+vectorNa LoadTTable(const std::string filename, int depth) {
   // loads solution from a text file into a vector for use//
   std::cout << "Loading Tablebase"
             << "\n";
-  vectorNa v = InitialiseTTable(depth, bin_coeffs);
+  vectorNa v = InitialiseTTable(depth);
   std::ifstream file(filename, std::ios::binary);
   if (!file.is_open()) {
     std::cout << "Failed to load Tablebase"
@@ -196,12 +174,10 @@ vectorNa LoadTTable(const std::string filename, int depth,
     file.close();
     return v;
   } else {
-    char c;
-    for (int i = 0; i < v.GetOuterSize(); ++i) {
-      for (int j = 0; j < v.GetInnerSize(); ++j) {
+    uint8_t c;
+    for (int i = 0; i < v.size(); ++i) {
         file.get(c);
-        v.SetChar(i, j, c);
-      }
+        v.SetChar(i, c);
     }
     file.close();
     std::cout << "Tablebase Loaded"
@@ -228,6 +204,8 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/false,
+    {{"ttable_path", GameParameter(std::string(""))}}
+
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -238,12 +216,12 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
 GWhistFGame::GWhistFGame(const GameParameters& params)
-    : Game(kGameType, params) {
-  bin_coeffs_ = BinCoeffs(2 * kNumRanks);
+: Game(kGameType, params) {
+  std::string ttable_path = ParameterValue<std::string>("ttable_path");
   std::unordered_map<uint32_t, uint32_t> temp;
   GenSuitRankingsRel(13, &temp);
   suit_ranks_ = temp;
-  ttable_ = LoadTTable(kTTablePath, 13, bin_coeffs_);
+  ttable_ = LoadTTable(ttable_path, 13);
 };
 std::unique_ptr<State> GWhistFGame::NewInitialState() const {
   const auto ptr =
@@ -262,7 +240,6 @@ GWhistFState::GWhistFState(std::shared_ptr<const GWhistFGame> game)
   history_.reserve(78);
   ttable_ = &(game->ttable_);
   suit_ranks_ = &(game->suit_ranks_);
-  bin_coeffs_ = &(game->bin_coeffs_);
 }
 bool GWhistFState::Trick(int lead, int follow) const {
   int lead_suit = CardSuit(lead);
@@ -326,10 +303,10 @@ std::vector<double> GWhistFState::Returns() const {
     int opp = (player_to_move == 0) ? 1 : 0;
     uint64_t key = EndgameKey(player_to_move);
     uint32_t cards = (key & bzhi_u64(~0, 32));
-    uint32_t colex = HalfColexer(cards, bin_coeffs_);
+    uint32_t colex = Colex(cards);
     uint32_t suits = (key & (~0 ^ bzhi_u64(~0, 32))) >> 32;
     uint32_t suit_rank = suit_ranks_->at(suits);
-    char value = ttable_->Get(colex, suit_rank);
+    char value = ttable_->Get(suit_rank,colex);
     out[player_to_move] = 2 * value - kNumRanks;
     out[opp] = -out[player_to_move];
     return out;
