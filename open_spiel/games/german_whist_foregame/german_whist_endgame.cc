@@ -2,9 +2,10 @@
 // Whist
 
 #include <cassert>
+
+#include "german_whist_foregame.h"
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "german_whist_foregame.h"
 #include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/thread.h"
@@ -18,8 +19,8 @@ namespace german_whist_foregame {
 
 struct Pair {
   char index;
-  char value;
-  Pair(char index_, char value_) {
+  uint8_t value;
+  Pair(uint8_t index_, uint8_t value_) {
     index = index_;
     value = value_;
   }
@@ -27,9 +28,9 @@ struct Pair {
 };
 struct ActionStruct {
   uint32_t index;
-  unsigned char suit;
+  uint8_t suit;
   bool player;
-  ActionStruct(uint32_t index_, unsigned char suit_, bool player_) {
+  ActionStruct(uint32_t index_, uint8_t suit_, bool player_) {
     index = index_;
     suit = suit_;
     player = player_;
@@ -45,17 +46,17 @@ class Node {
  private:
   uint32_t cards_;
   std::array<uint32_t, kNumSuits> suit_masks_;
-  char total_tricks_;
-  char trump_;
-  char score_;
-  char moves_;
+  uint8_t total_tricks_;
+  uint8_t trump_;
+  uint8_t score_;
+  uint8_t moves_;
   bool player_;
   std::vector<ActionStruct> history_;
   uint64_t key_;
 
  public:
-  Node(uint32_t cards, std::array<uint32_t, kNumSuits> suit_masks, char trump,
-       bool player) {
+  Node(uint32_t cards, std::array<uint32_t, kNumSuits> suit_masks,
+       uint8_t trump, bool player) {
     cards_ = cards;
     suit_masks_ = suit_masks;
     total_tricks_ = popcnt_u32(cards);
@@ -66,11 +67,13 @@ class Node {
     history_ = {};
   };
   bool Player() { return player_; };
-  char Score() { return score_; };
-  char Moves() { return moves_; };
+  uint8_t Score() { return score_; };
+  uint8_t Moves() { return moves_; };
   bool IsTerminal() { return (moves_ == 2 * total_tricks_); }
-  char RemainingTricks() { return (char)(total_tricks_ - (moves_ >> 1)); }
-  char TotalTricks() { return total_tricks_; }
+  uint8_t RemainingTricks() {
+    return static_cast<uint8_t>(total_tricks_ - (moves_ >> 1));
+  }
+  uint8_t TotalTricks() { return total_tricks_; }
   uint32_t Cards() { return cards_; }
   std::array<uint32_t, kNumSuits> SuitMasks() { return suit_masks_; }
   bool Trick(ActionStruct lead, ActionStruct follow) {
@@ -91,7 +94,7 @@ class Node {
     cards_ = copy_a | copy_b;
     // decrements appropriate suits//
     suit_masks_[action.suit] = blsr_u32(suit_masks_[action.suit]) >> 1;
-    char suit = action.suit;
+    uint8_t suit = action.suit;
     suit++;
     while (suit < kNumSuits) {
       suit_masks_[suit] = suit_masks_[suit] >> 1;
@@ -113,58 +116,53 @@ class Node {
         (suit_masks_[action.suit] & mask_b) | (1 << action.index);
     suit_masks_[action.suit] =
         ((suit_masks_[action.suit] & mask_a) << 1) | new_suit;
-    char suit = action.suit;
+    uint8_t suit = action.suit;
     suit++;
     while (suit < kNumSuits) {
       suit_masks_[suit] = suit_masks_[suit] << 1;
       suit++;
     }
   }
-  std::tuple<uint32_t,uint32_t,uint32_t> Canonicalise() {
-    // recasts the cards and suitlengths into quasi-canonical form//
+  std::tuple<uint32_t, uint32_t, uint32_t> Canonicalise() {
+    // recasts the cards and suitlengths into canonical form//
     // least sig part of 32bit card is trump, then suits in ascending length//
-
-    // note this canonical form does not take advantage of all isomorphisms//
-    // suppose a game is transformed as follows: all card bits flipped and the
-    // player bit flipped, ie player 1 has the lead and has player 0s cards from
-    // the original game// this implies player 1 achieves the minimax value of
-    // the original game ie the value is remaining tricks - value of the
-    // original game for this transformed game// also does not take advantage of
-    // single suit isomorphism. Namely all single suit games with the same card
-    // distribution are isomorphic. Currently this considers all trump, all no
-    // trump games as distinct//
-    using suit_info = std::tuple<bool,uint32_t,uint32_t,uint32_t>;
-    std::vector<suit_info> suit_infos={{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-    for(uint8_t i=0;i<kNumSuits;++i){
-      bool is_trump = (i==trump_);
+    // note this canonical form does not take advantage of all isomorphisms, but
+    // enough for our purposes//
+    using suit_info = std::tuple<bool, uint32_t, uint32_t, uint32_t>;
+    std::vector<suit_info> suit_infos = {
+        {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+    for (uint8_t i = 0; i < kNumSuits; ++i) {
+      bool is_trump = (i == trump_);
       uint32_t suit_length = popcnt_u32(suit_masks_[i]);
-      uint32_t suit_sig =(suit_masks_[i]&cards_)>>(tzcnt_u32(suit_masks_[i]));
+      uint32_t suit_sig =
+          (suit_masks_[i] & cards_) >> (tzcnt_u32(suit_masks_[i]));
       uint32_t suit_idx = i;
-      suit_infos[i]={is_trump,suit_length,suit_sig,suit_idx};
+      suit_infos[i] = {is_trump, suit_length, suit_sig, suit_idx};
     }
-    auto custom_cmp = [&](const suit_info&lhs,const suit_info&rhs){
-      const auto& [t1, l1,s1,i1] = lhs;
-      const auto& [t2, l2,s2,i2] = rhs;
-      return std::tie(t2, l1,i1) < std::tie(t1, l2,i2);
+    auto custom_cmp = [&](const suit_info& lhs, const suit_info& rhs) {
+      const auto& [t1, l1, s1, i1] = lhs;
+      const auto& [t2, l2, s2, i2] = rhs;
+      return std::tie(t2, l1, i1) < std::tie(t1, l2, i2);
     };
-    std::sort(suit_infos.begin(),suit_infos.end(),custom_cmp);
+    std::sort(suit_infos.begin(), suit_infos.end(), custom_cmp);
     uint32_t bitpacked_suit_lengths = 0;
-    uint32_t card_mask=0;
-    uint32_t total_cards=0;
-    for(uint32_t i=0;i<kNumSuits;++i){
+    uint32_t card_mask = 0;
+    uint32_t total_cards = 0;
+    for (uint32_t i = 0; i < kNumSuits; ++i) {
       uint32_t suit_length = std::get<1>(suit_infos[i]);
-      bitpacked_suit_lengths = (bitpacked_suit_lengths|(suit_length<<(4*i)));
-      card_mask = (card_mask)|(std::get<2>(suit_infos[i])<<(total_cards));
-      total_cards+=suit_length;
+      bitpacked_suit_lengths =
+          (bitpacked_suit_lengths | (suit_length << (4 * i)));
+      card_mask = (card_mask) | (std::get<2>(suit_infos[i]) << (total_cards));
+      total_cards += suit_length;
     }
-    uint32_t sel_mask = ((0b1<<(total_cards))-1);
-    uint32_t alt_card_mask = (~card_mask)&sel_mask;
-    return {card_mask,alt_card_mask,bitpacked_suit_lengths};
+    uint32_t sel_mask = ((0b1 << (total_cards)) - 1);
+    uint32_t alt_card_mask = (~card_mask) & sel_mask;
+    return {card_mask, alt_card_mask, bitpacked_suit_lengths};
   }
   // Move Ordering Heuristics//
   // These could Definitely be improved, very hacky//
   int LeadOrdering(ActionStruct action) {
-    char suit = action.suit;
+    uint8_t suit = action.suit;
     uint32_t copy_cards = cards_;
     if (player_ == 0) {
       copy_cards = ~copy_cards;
@@ -198,7 +196,7 @@ class Node {
     ActionStruct lead = history_.back();
     // follow ordering for fast cut offs//
     // win as cheaply as possible, followed by lose as cheaply as possible
-    char suit = action.suit;
+    uint8_t suit = action.suit;
     uint32_t copy_cards = cards_;
     if (player_ == 0) {
       copy_cards = ~copy_cards;
@@ -231,11 +229,11 @@ class Node {
 #ifdef DEBUG
       std::cout << "Cards " << cards_ << std::endl;
       std::cout << "Suit Mask " << i << " " << suit_masks_[i] << std::endl;
-      std::cout << "Player " << player_ << " suit mask " << (int)i << " "
+      std::cout << "Player " << player_ << " suit mask " << static_cast<int>(i) << " "
                 << player_suit_masks[i] << std::endl;
 #endif
     }
-    for (char i = 0; i < kNumSuits; ++i) {
+    for (uint8_t i = 0; i < kNumSuits; ++i) {
       uint32_t suit_mask = player_suit_masks[i];
       bool lead = (moves_ % 2 == 0);
       bool follow = (moves_ % 2 == 1);
@@ -256,7 +254,7 @@ class Node {
 #ifdef DEBUG
     std::cout << "Player " << player_ << " MoveGen " << std::endl;
     for (uint32_t i = 0; i < out.size(); ++i) {
-      std::cout << out[i].index << " " << (int)out[i].suit << std::endl;
+      std::cout << out[i].index << " " << static_cast<int>(out[i].suit) << std::endl;
     }
 #endif
     return out;
@@ -264,7 +262,7 @@ class Node {
   void ApplyAction(ActionStruct action) {
 #ifdef DEBUG
     std::cout << "Player " << player_ << " ApplyAction " << action.index << " "
-              << (int)action.suit << std::endl;
+              << static_cast<int>(action.suit)<< std::endl;
 #endif
     if (moves_ % 2 == 1) {
       ActionStruct lead = history_.back();
@@ -302,7 +300,7 @@ class Node {
     history_.pop_back();
 #ifdef DEBUG
     std::cout << "Player " << player_ << " UndoAction " << action.index << " "
-              << (int)action.suit << std::endl;
+              << static_cast<int>(action.suit) << std::endl;
 #endif
   }
 };
@@ -363,69 +361,43 @@ int AlphaBeta(Node* node, int alpha, int beta) {
 // Credit to computationalcombinatorics.wordpress.com
 // hideous code for generating the next colexicographical combination//
 
-//CREDIT TO GOSPERS//
-uint32_t NextColex(uint32_t n){
+// CREDIT TO GOSPERS//
+uint32_t NextColex(uint32_t n) {
   const uint32_t c = n & -n;
   const uint32_t r = n + c;
-  return ( ( ( r ^ n ) >> 2 ) / c ) | r;
+  return (((r ^ n) >> 2) / c) | r;
 }
 
-bool NextColex(std::vector<int>& v, int k) {
-  int num = 0;
-  for (int i = 0; i < v.size(); ++i) {
-    if (i == v.size() - 1) {
-      v[i] = v[i] + 1;
-      if (v[i] > k - v.size() + i) {
-        return false;
-      }
-      num = i;
-      break;
-    } else if (v[i + 1] - v[i] > 1 && v[i + 1] != i) {
-      v[i] = v[i] + 1;
-      if (v[i] > k - v.size() + i) {
-        return false;
-      }
-      num = i;
-      break;
-    }
-  }
-  for (int i = 0; i < num; ++i) {
-    v[i] = i;
-  }
-  return true;
-}
-
-char IncrementalAlphaBetaMemoryIso(
-    Node* node, char alpha, char beta, int depth, const vectorNa* TTable,
+uint8_t IncrementalAlphaBetaMemoryIso(
+    Node* node, uint8_t alpha, uint8_t beta, int depth, const vectorNa* TTable,
     const std::unordered_map<uint32_t, uint32_t>* SuitRanks) {
   // fail soft ab search
-  char val = 0;
+  uint8_t val = 0;
   uint64_t key = 0;
   bool player = node->Player();
   if (node->IsTerminal()) {
     return node->Score();
   }
   if (node->Moves() % 2 == 0 && depth == 0) {
-    std::tuple<uint32_t,uint32_t,uint32_t> canonical = node->Canonicalise();
+    std::tuple<uint32_t, uint32_t, uint32_t> canonical = node->Canonicalise();
     uint32_t suits = std::get<2>(canonical);
     uint32_t cards = std::get<0>(canonical);
     uint32_t alt_cards = std::get<1>(canonical);
 
-    cards  = (player) ? alt_cards : cards;
+    cards = (player) ? alt_cards : cards;
     uint32_t colex = Colex(cards);
     uint32_t suit_rank = SuitRanks->at(suits);
-    char value = (player)
-                     ? node->RemainingTricks() - TTable->Get(suit_rank,colex)
-                     : TTable->Get(suit_rank,colex);
+    uint8_t value =
+        (player) ? node->RemainingTricks() - TTable->Get(suit_rank, colex)
+                 : TTable->Get(suit_rank, colex);
     return value + node->Score();
   } else if (node->Player() == 0) {
     val = 0;
     std::vector<ActionStruct> actions = node->LegalActions();
     for (int i = 0; i < actions.size(); ++i) {
       node->ApplyAction(actions[i]);
-      val = std::max(
-          val, IncrementalAlphaBetaMemoryIso(node, alpha, beta, depth - 1,
-                                             TTable, SuitRanks));
+      val = std::max(val, IncrementalAlphaBetaMemoryIso(
+                              node, alpha, beta, depth - 1, TTable, SuitRanks));
       node->UndoAction(actions[i]);
       alpha = std::max(val, alpha);
       if (val >= beta) {
@@ -437,9 +409,8 @@ char IncrementalAlphaBetaMemoryIso(
     std::vector<ActionStruct> actions = node->LegalActions();
     for (int i = 0; i < actions.size(); ++i) {
       node->ApplyAction(actions[i]);
-      val = std::min(
-          val, IncrementalAlphaBetaMemoryIso(node, alpha, beta, depth - 1,
-                                             TTable, SuitRanks));
+      val = std::min(val, IncrementalAlphaBetaMemoryIso(
+                              node, alpha, beta, depth - 1, TTable, SuitRanks));
       node->UndoAction(actions[i]);
       beta = std::min(val, beta);
       if (val <= alpha) {
@@ -518,9 +489,9 @@ void ThreadSolver(uint32_t size_endgames, vectorNa* outTTable,
                   const std::unordered_map<uint32_t, uint32_t>& SuitRanks,
                   uint32_t start_id, uint32_t end_id) {
   // takes endgames solved to depth d-1 and returns endgames solved to depth d
-  //NEW//
-  uint32_t cards = (1<<size_endgames)-1;
+  // NEW//
   for (uint32_t i = start_id; i < end_id; ++i) {
+    uint32_t cards = (1 << size_endgames) - 1;
     std::array<uint32_t, kNumSuits> suit_arr;
     suit_arr[0] = bzhi_u32(~0, suit_splits[i] & 0b1111);
     uint32_t sum = suit_splits[i] & 0b1111;
@@ -530,11 +501,13 @@ void ThreadSolver(uint32_t size_endgames, vectorNa* outTTable,
       suit_arr[j] = bzhi_u32(~0, sum);
       suit_arr[j] = suit_arr[j] ^ mask;
     }
-    for(uint32_t colex_rank =0;colex_rank<BIN_COEFFS_LUT[2*size_endgames][size_endgames];++colex_rank){
+    for (uint32_t colex_rank = 0;
+         colex_rank < BIN_COEFFS_LUT[2 * size_endgames][size_endgames];
+         ++colex_rank) {
       Node node(cards, suit_arr, 0, false);
-      char result = IncrementalAlphaBetaMemoryIso(
-        &node, 0, size_endgames, 2, TTable, &SuitRanks);
-      outTTable->Set(i,colex_rank,result);
+      uint8_t result = IncrementalAlphaBetaMemoryIso(&node, 0, size_endgames, 2,
+                                                     TTable, &SuitRanks);
+      outTTable->Set(i, colex_rank, result);
       cards = NextColex(cards);
     }
   }
@@ -581,9 +554,8 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
       end_id = block_size * (i + 1);
     }
     threads.emplace_back([&, start_id, end_id]() {
-      ThreadSolver(size_endgames, &outTTable, TTable,
-                   std::ref(suit_splits), std::ref(SuitRanks), start_id,
-                   end_id);
+      ThreadSolver(size_endgames, &outTTable, TTable, std::ref(suit_splits),
+                   std::ref(SuitRanks), start_id, end_id);
     });
   }
   for (int i = 0; i < num_threads; ++i) {
@@ -598,15 +570,14 @@ bool TestRetroSolve(int samples, int depth, uint32_t seed,
   std::vector<Node> nodes = GWhistGenerator(samples, seed);
   vectorNa v;
   for (int i = 1; i <= depth; ++i) {
-    v = RetroSolver(i, &v,hard_threads);
+    v = RetroSolver(i, &v, hard_threads);
   }
   std::unordered_map<uint32_t, uint32_t> SuitRanks;
   GenSuitRankingsRel(depth, &SuitRanks);
   for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-    char abm_unsafe = IncrementalAlphaBetaMemoryIso(&*it, 0, kNumRanks,
-                                                    2 * (kNumRanks - depth), &v,
-                                                    &SuitRanks);
-    char abm_safe = AlphaBeta(&*it, 0, kNumRanks);
+    uint8_t abm_unsafe = IncrementalAlphaBetaMemoryIso(
+        &*it, 0, kNumRanks, 2 * (kNumRanks - depth), &v, &SuitRanks);
+    uint8_t abm_safe = AlphaBeta(&*it, 0, kNumRanks);
     if (abm_unsafe != abm_safe) {
       return false;
     }
@@ -618,7 +589,7 @@ vectorNa BuildTablebase(const uint32_t hard_threads) {
   std::cout << "Building Tablebase"
             << "\n";
   for (int i = 1; i <= kNumRanks; ++i) {
-    v = RetroSolver(i, &v,hard_threads);
+    v = RetroSolver(i, &v, hard_threads);
     std::cout << "Done " << i << "\n";
   }
   std::cout << "Built Tablebase"
@@ -630,9 +601,9 @@ bool TestTablebase(int samples, uint32_t seed, const vectorNa& table_base) {
   std::unordered_map<uint32_t, uint32_t> SuitRanks;
   GenSuitRankingsRel(kNumRanks, &SuitRanks);
   for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-    char abm_unsafe = IncrementalAlphaBetaMemoryIso(
-        &*it, 0, kNumRanks, 0, &table_base, &SuitRanks);
-    char abm_safe = AlphaBeta(&*it, 0, kNumRanks);
+    uint8_t abm_unsafe = IncrementalAlphaBetaMemoryIso(&*it, 0, kNumRanks, 0,
+                                                       &table_base, &SuitRanks);
+    uint8_t abm_safe = AlphaBeta(&*it, 0, kNumRanks);
     if (abm_unsafe != abm_safe) {
       return false;
     }
@@ -643,7 +614,7 @@ void StoreTTable(const std::string filename, const vectorNa& solution) {
   // stores solution into a text file//
   std::ofstream file(filename);
   for (int i = 0; i < solution.size(); ++i) {
-      file.put(solution.GetChar(i));
+    file.put(solution.GetChar(i));
   }
   file.close();
 }
@@ -653,9 +624,9 @@ bool TestTTableStorage(std::string filename, const vectorNa& v, int depth) {
   StoreTTable(filename, v);
   vectorNa new_v = LoadTTable(filename, depth);
   for (int i = 0; i < v.size(); ++i) {
-      if (v.GetChar(i) != new_v.GetChar(i)) {
-        return false;
-      }
+    if (v.GetChar(i) != new_v.GetChar(i)) {
+      return false;
+    }
   }
   return true;
 }
@@ -664,20 +635,26 @@ bool TestTTableStorage(std::string filename, const vectorNa& v, int depth) {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::german_whist_foregame::Node node(
+      0b11111110000001111110000000,
+      {0b1111111111111, 0b11111111111111 << 13, 0, 0}, 2, 0);
+  uint8_t result = open_spiel::german_whist_foregame::AlphaBeta(&node, 0, 13);
+  printf("solution:%u", result);
   absl::ParseCommandLine(argc, argv);
-  const uint32_t hard_threads = 8;//set this to take advantage of more cores on your machine//
+  const uint32_t hard_threads =
+      8;  // set this to take advantage of more cores on your machine//
   open_spiel::german_whist_foregame::vectorNa tablebase =
-  open_spiel::german_whist_foregame::BuildTablebase(hard_threads);
+      open_spiel::german_whist_foregame::BuildTablebase(hard_threads);
   std::random_device rd;
   int num_samples = 100;
   if (open_spiel::german_whist_foregame::TestTablebase(num_samples, rd(),
-    tablebase)) {
+                                                       tablebase)) {
     std::cout << "Tablebase accurate" << std::endl;
-    } else {
-      std::cout << "Tablebase inaccurate" << std::endl;
-    }
-    std::cout << "Starting Saving Tablebase" << std::endl;
+  } else {
+    std::cout << "Tablebase inaccurate" << std::endl;
+  }
+  std::cout << "Starting Saving Tablebase" << std::endl;
   open_spiel::german_whist_foregame::StoreTTable(
-    absl::GetFlag(FLAGS_output_path), tablebase);
+      absl::GetFlag(FLAGS_output_path), tablebase);
   std::cout << "Finished Saving Tablebase" << std::endl;
 }

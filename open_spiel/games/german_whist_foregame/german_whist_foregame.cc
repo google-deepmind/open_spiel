@@ -1,5 +1,6 @@
 
 #include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
+
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
@@ -13,10 +14,6 @@
 #endif
 namespace open_spiel {
 namespace german_whist_foregame {
-
-//TODO REFACTOR HIDEOUS ENDGAME KEY CODE//
-
-constexpr std::array<std::array<uint32_t,33>,33>BIN_COEFFS_LUT = BinCoeffsLUT<32>();
 
 uint32_t tzcnt_u32(uint32_t a) { return __builtin_ctz(a); }
 uint64_t tzcnt_u64(uint64_t a) { return __builtin_ctzll(a); }
@@ -47,11 +44,6 @@ uint64_t pext_u64(uint64_t x, uint64_t m) {
 #endif
 }
 
-bool Triple::operator<(const Triple& triple) const {
-  return (length < triple.length) ||
-         (length == triple.length && sig < triple.sig);
-}
-
 inline int CardRank(int card, int suit) {
   uint64_t card_mask = ((uint64_t)1 << card);
   card_mask = (card_mask >> (suit * kNumRanks));
@@ -74,12 +66,13 @@ std::string CardString(int card) {
 std::vector<uint32_t> GenQuads(int size_endgames) {
   // Generates Suit splittings for endgames of a certain size//
   std::vector<uint32_t> v;
-  for (char i = 0; i <= std::min(size_endgames * 2, kNumRanks); ++i) {
+  for (uint8_t i = 0; i <= std::min(size_endgames * 2, kNumRanks); ++i) {
     int sum = size_endgames * 2 - i;
-    for (char j = 0; j <= std::min(sum, kNumRanks); ++j) {
-      for (char k = std::max((int)j, sum - j - kNumRanks);
+    for (uint8_t j = 0; j <= std::min(sum, kNumRanks); ++j) {
+      for (uint8_t k = static_cast<uint8_t>( std::max(static_cast<int>(j),
+                                                     sum - j - kNumRanks));
            k <= std::min(sum - j, kNumRanks); ++k) {
-        char l = sum - j - k;
+        uint8_t l = static_cast<uint8_t>(sum - j - k);
         if (l < k) {
           break;
         } else {
@@ -97,14 +90,14 @@ std::vector<uint32_t> GenQuads(int size_endgames) {
 }
 
 uint32_t Colex(uint32_t cards) {
-  //sum NCR(S[i],i+1)
+  // sum NCR(S[i],i+1)
   uint32_t out = 0;
-  #pragma unroll
-  for(uint32_t i =0;i<32;++i){
-    uint32_t mask = (1<<i)-1;
-    uint32_t count = popcnt_u32(cards&mask);
+#pragma unroll
+  for (uint32_t i = 0; i < 32; ++i) {
+    uint32_t mask = (1 << i) - 1;
+    uint32_t count = popcnt_u32(cards & mask);
     uint32_t ind = tzcnt_u32(cards);
-    uint32_t val =((cards>>i)&0b1)?BIN_COEFFS_LUT[i][count + 1]:0;
+    uint32_t val = ((cards >> i) & 0b1) ? BIN_COEFFS_LUT[i][count + 1] : 0;
     out += val;
   }
   return out;
@@ -120,8 +113,10 @@ void GenSuitRankingsRel(uint32_t size,
 }
 
 vectorNa::vectorNa(uint32_t suit_splits, uint32_t card_combs, uint8_t val) {
-  data = std::vector<uint8_t>(((card_combs*suit_splits)>>1) +((card_combs*suit_splits)&0b1), val);
-  inner_size = card_combs>>1;
+  data = std::vector<uint8_t>(
+      ((card_combs * suit_splits) >> 1) + ((card_combs * suit_splits) & 0b1),
+      val);
+  inner_size = card_combs >> 1;
 }
 vectorNa::vectorNa() {
   data = {};
@@ -130,35 +125,30 @@ vectorNa::vectorNa() {
 uint32_t vectorNa::size() const { return data.size(); }
 uint32_t vectorNa::GetInnerSize() const { return inner_size; }
 uint8_t const& vectorNa::operator[](uint32_t idx) const { return data[idx]; }
-uint8_t vectorNa::GetChar(uint32_t idx) const {
-  return data[idx];
-}
-void vectorNa::SetChar(uint32_t idx,uint8_t value) {
-  data[idx] = value;
-}
+uint8_t vectorNa::GetChar(uint32_t idx) const { return data[idx]; }
+void vectorNa::SetChar(uint32_t idx, uint8_t value) { data[idx] = value; }
 uint8_t vectorNa::Get(uint32_t suit_idx, uint32_t card_idx) const {
-  uint32_t idx = suit_idx*2*inner_size+(card_idx);
-  uint8_t val = data[idx>>1];
-  uint8_t uval = (val&u_sel_mask)>>u_shift;
-  uint8_t lval = (val&l_sel_mask)>>l_shift;
-  uint8_t ret = (idx&0b1)?uval:lval;
+  uint32_t idx = suit_idx * 2 * inner_size + (card_idx);
+  uint8_t val = data[idx >> 1];
+  uint8_t uval = (val & u_sel_mask) >> u_shift;
+  uint8_t lval = (val & l_sel_mask) >> l_shift;
+  uint8_t ret = (idx & 0b1) ? uval : lval;
   return ret;
 }
 void vectorNa::Set(uint32_t suit_idx, uint32_t card_idx, uint8_t value) {
-  uint32_t idx = suit_idx*2*inner_size+(card_idx);
-  uint32_t real_idx = idx>>1;
-  uint32_t u = idx&0b1;
+  uint32_t idx = suit_idx * 2 * inner_size + (card_idx);
+  uint32_t real_idx = idx >> 1;
+  uint32_t u = idx & 0b1;
   uint8_t s_val = data[real_idx];
-  s_val = (u)?(s_val&u_del_mask):(s_val&l_del_mask);
-  s_val= (u)?(s_val|(value<<u_shift)):(s_val|(value<<l_shift));
-  data[real_idx]=s_val;
+  s_val = (u) ? (s_val & u_del_mask) : (s_val & l_del_mask);
+  s_val = (u) ? (s_val | (value << u_shift)) : (s_val | (value << l_shift));
+  data[real_idx] = s_val;
   return;
 }
-vectorNa InitialiseTTable(int size
-                          ) {
+vectorNa InitialiseTTable(int size) {
   // initialises TTable for a certain depth//
   uint32_t suit_size = GenQuads(size).size();
-  return vectorNa(suit_size,BIN_COEFFS_LUT[2 * size][size], 0);
+  return vectorNa(suit_size, BIN_COEFFS_LUT[2 * size][size], 0);
 }
 vectorNa LoadTTable(const std::string filename, int depth) {
   // loads solution from a text file into a vector for use//
@@ -174,14 +164,13 @@ vectorNa LoadTTable(const std::string filename, int depth) {
     file.close();
     return v;
   } else {
-    uint8_t c;
+    char c;
     for (int i = 0; i < v.size(); ++i) {
-        file.get(c);
-        v.SetChar(i, c);
+      file.get(c);
+      v.SetChar(i, static_cast<uint8_t>(c));
     }
     file.close();
-    std::cout << "Tablebase Loaded"
-              << "\n";
+    std::cout << "Tablebase Loaded\n";
     return v;
   }
 }
@@ -190,21 +179,20 @@ vectorNa LoadTTable(const std::string filename, int depth) {
 
 namespace {  // namespace
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"german_whist_foregame",
-    /*long_name=*/"german_whist_foregame",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/false,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/false,
-    {{"ttable_path", GameParameter(std::string(""))}}
+const GameType kGameType{/*short_name=*/"german_whist_foregame",
+                         /*long_name=*/"german_whist_foregame",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/false,
+                         {{"ttable_path", GameParameter(std::string(""))}}
 
 };
 
@@ -216,7 +204,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
 GWhistFGame::GWhistFGame(const GameParameters& params)
-: Game(kGameType, params) {
+    : Game(kGameType, params) {
   std::string ttable_path = ParameterValue<std::string>("ttable_path");
   std::unordered_map<uint32_t, uint32_t> temp;
   GenSuitRankingsRel(13, &temp);
@@ -250,49 +238,44 @@ bool GWhistFState::Trick(int lead, int follow) const {
          (lead_suit != follow_suit && follow_suit != trump_);
 }
 bool GWhistFState::IsTerminal() const { return (popcnt_u64(deck_) == 0); }
-uint64_t GWhistFState::EndgameKey(int player_to_move) const {
-  // generates a 64 bit unsigned int where the first 32 are the suit ownerships
-  // from the perspective of the opponent using canonical rankings// example: if
-  // Spade suit is to_move = A3, opp =2, suit = 0b100 least significant part of
-  // first 32 bits is the trump suit, then the remaining suits ascending length
-  // order.
+
+std::pair<uint32_t, uint32_t> GWhistFState::EndgameKey(
+    int player_to_move) const {
+  // Generates Endgame Key for accessing Endgame Tablebase//
   uint64_t cards_in_play = hands_[0] | hands_[1];
-  std::vector<Triple> suit_lengths = {};
   int opp = (player_to_move == 0) ? 1 : 0;
-  // sort trump suits by length,then sig//
-  for (int i = 0; i < kNumSuits; ++i) {
-    if (i != trump_) {
-      uint64_t sig =
-          pext_u64(hands_[opp] & kSuitMasks[i], cards_in_play & kSuitMasks[i]);
-      suit_lengths.push_back(
-          Triple{i, popcnt_u64(kSuitMasks[i] & cards_in_play), sig});
-    }
+  using suit_info = std::tuple<bool, uint64_t, uint64_t, uint8_t>;
+  std::vector<suit_info> suit_infos = {
+      {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+  for (uint8_t i = 0; i < kNumSuits; ++i) {
+    bool is_trump = (i == trump_);
+    uint64_t active_suit_cards = kSuitMasks[i] & cards_in_play;
+    uint64_t suit_length = popcnt_u64(active_suit_cards);
+    uint64_t suit_sig =
+        pext_u64(hands_[opp] & kSuitMasks[i], active_suit_cards);
+    uint8_t suit_idx = i;
+    suit_infos[i] = {is_trump, suit_length, suit_sig, suit_idx};
   }
-  std::sort(suit_lengths.begin(), suit_lengths.end());
-  std::array<uint64_t, kNumSuits> hand0;
-  std::array<uint64_t, kNumSuits> hand1;
-  hand0[0] = pext_u64(hands_[0], kSuitMasks[trump_]);
-  hand1[0] = pext_u64(hands_[1], kSuitMasks[trump_]);
-  for (int i = 0; i < kNumSuits - 1; ++i) {
-    hand0[i + 1] = pext_u64(hands_[0], kSuitMasks[suit_lengths[i].index]);
-    hand1[i + 1] = pext_u64(hands_[1], kSuitMasks[suit_lengths[i].index]);
+  auto custom_cmp = [&](const suit_info& lhs, const suit_info& rhs) {
+    const auto& [t1, l1, s1, i1] = lhs;
+    const auto& [t2, l2, s2, i2] = rhs;
+    return std::tie(t2, l1, i1) < std::tie(t1, l2, i2);
+  };
+  std::sort(suit_infos.begin(), suit_infos.end(), custom_cmp);
+  uint32_t bitpacked_suit_lengths = 0;
+  uint32_t card_mask = 0;
+  uint32_t total_cards = 0;
+  for (uint32_t i = 0; i < kNumSuits; ++i) {
+    uint32_t suit_length = (uint32_t)std::get<1>(suit_infos[i]);
+    bitpacked_suit_lengths =
+        (bitpacked_suit_lengths | (suit_length << (4 * i)));
+    card_mask =
+        (card_mask) | (((uint32_t)std::get<2>(suit_infos[i])) << (total_cards));
+    total_cards += suit_length;
   }
-  std::array<uint64_t, 2> hands_shuffled = {0, 0};
-  for (int i = 0; i < kNumSuits; ++i) {
-    hands_shuffled[0] = hands_shuffled[0] | (hand0[i] << (kNumRanks * i));
-    hands_shuffled[1] = hands_shuffled[1] | (hand1[i] << (kNumRanks * i));
-  }
-  uint64_t suit_sig = 0;
-  suit_sig = popcnt_u64(kSuitMasks[trump_] & cards_in_play);
-  for (int i = 0; i < kNumSuits - 1; ++i) {
-    suit_sig = suit_sig | ((uint64_t)suit_lengths[i].length << (4 * (i + 1)));
-  }
-  suit_sig = (suit_sig << 32);
-  cards_in_play = hands_shuffled[0] | hands_shuffled[1];
-  uint64_t cards = pext_u64(hands_shuffled[opp], cards_in_play);
-  uint64_t key = cards | suit_sig;
-  return key;
+  return {card_mask, bitpacked_suit_lengths};
 }
+
 std::vector<double> GWhistFState::Returns() const {
   if (IsTerminal()) {
     std::vector<double> out = {0, 0};
@@ -301,12 +284,10 @@ std::vector<double> GWhistFState::Returns() const {
     int player_to_move = (lead_win) ? history_[move_number_ - 3].player
                                     : history_[move_number_ - 2].player;
     int opp = (player_to_move == 0) ? 1 : 0;
-    uint64_t key = EndgameKey(player_to_move);
-    uint32_t cards = (key & bzhi_u64(~0, 32));
-    uint32_t colex = Colex(cards);
-    uint32_t suits = (key & (~0 ^ bzhi_u64(~0, 32))) >> 32;
-    uint32_t suit_rank = suit_ranks_->at(suits);
-    char value = ttable_->Get(suit_rank,colex);
+    std::pair<uint32_t, uint32_t> key = EndgameKey(player_to_move);
+    uint32_t colex = Colex(key.first);
+    uint32_t suit_rank = suit_ranks_->at(key.second);
+    uint8_t value = ttable_->Get(suit_rank, colex);
     out[player_to_move] = 2 * value - kNumRanks;
     out[opp] = -out[player_to_move];
     return out;

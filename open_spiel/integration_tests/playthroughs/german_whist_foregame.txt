@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "german_whist_foregame"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = []
+GameType.parameter_specification = ["ttable_path"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 52
 PolicyTensorShape() = [52]
 MaxChanceOutcomes() = 52
-GetParameters() = {}
+GetParameters() = {ttable_path=}
 NumPlayers() = 2
 MinUtility() = -13.0
 MaxUtility() = 13.0
