@@ -21,6 +21,8 @@ on:
         required: false
         default: 'No name specified'
 
+permissions:
+  contents: read
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
