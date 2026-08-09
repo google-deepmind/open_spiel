@@ -81,8 +81,8 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:  ${{ matrix.OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL }}
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: julia-actions/setup-julia@v1
+    - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+    - uses: julia-actions/setup-julia@ac0d62164df5a47de404f4e96ce86a1a28a28d56 # v1
       with:
         version: 1.8
     - name: Ad-hoc fix
