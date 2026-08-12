@@ -123,6 +123,8 @@ class PreferenceProfile(object):
     # For now support only integral weights (counts). Makes some things easier,
     # like N(x,y) and the margin matrices can be integers. Should be easy to
     # extend if we need to.
+    if isinstance(vote, WeightedVote):
+      weight = vote.weight
     assert isinstance(weight, int)
     assert weight > 0
     if isinstance(vote, WeightedVote):

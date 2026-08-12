@@ -59,6 +59,15 @@ class BaseTest(absltest.TestCase):
     self.assertLen(profile.votes, 3)
     self.assertEqual(profile.total_weight(), 6)
 
+  def test_weighted_vote_validates_weight(self):
+    for weight in [0, -1, 1.5]:
+      with self.subTest(weight=weight):
+        with self.assertRaises(AssertionError):
+          base.PreferenceProfile([base.WeightedVote(weight, ["a", "b"])])
+
+    profile = base.PreferenceProfile([base.WeightedVote(2, ["a", "b"])])
+    self.assertEqual(profile.total_weight(), 2)
+
   def test_preference_profile_incremental_group(self):
     # Create a weighted preference profile from preferences:
     #
