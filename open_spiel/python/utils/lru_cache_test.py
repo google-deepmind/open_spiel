@@ -74,5 +74,14 @@ class LruCacheTest(absltest.TestCase):
     self.assertEqual(cache.get(19), "19")
     self.assertEqual(cache.make(19, lambda: "20"), "19")
 
+  def test_make_with_zero_size(self):
+    cache = lru_cache.LRUCache(0)
+
+    self.assertEqual(cache.make(1, lambda: "first"), "first")
+    self.assertEqual(cache.make(1, lambda: "second"), "second")
+
+    self.assertEmpty(cache)
+    self.assertEqual(cache.info().misses, 2)
+
 if __name__ == "__main__":
   absltest.main()
