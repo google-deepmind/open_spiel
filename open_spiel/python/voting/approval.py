@@ -54,5 +54,5 @@ class ApprovalVoting(base.AbstractVotingMethod):
     sorted_scores = sorted(scores.items(), key=lambda item: item[1],
                            reverse=True)
     outcome = base.RankOutcome()
-    outcome.unpack_from(sorted_scores)
+    outcome.unpack_from(sorted_scores)  # pyrefly: ignore[bad-argument-type]
     return outcome

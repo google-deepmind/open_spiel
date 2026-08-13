@@ -106,7 +106,7 @@ class PreferenceProfile(object):
   def _register_alternatives_from_votes(self):
     for vote in self._votes:
       for alternative in vote:
-        self._register_alternative(alternative)
+        self._register_alternative(alternative)  # pyrefly: ignore[bad-argument-type]
 
   def add_vote(
       self, vote: Union[PreferenceList, WeightedVote], weight: int = 1
@@ -359,9 +359,9 @@ class RankOutcome(object):
   """Basic object for outcomes of the voting methods."""
 
   def __init__(self, rankings=None, scores=None):
-    self._rankings: List[AlternativeId] = rankings
-    self._scores: List[float] = scores
-    self._rank_dict: Dict[AlternativeId, int] = None
+    self._rankings: List[AlternativeId] = rankings  # pyrefly: ignore[bad-assignment]
+    self._scores: List[float] = scores  # pyrefly: ignore[bad-assignment]
+    self._rank_dict: Dict[AlternativeId, int] = None  # pyrefly: ignore[bad-assignment]
     if self._rankings is not None:
       self.make_rank_dict()
 
@@ -369,7 +369,7 @@ class RankOutcome(object):
       self, ranked_alternatives_and_scores: List[Tuple[AlternativeId, float]]
   ):
     """A rank outcome that comes packed as (alternative id, score) tuples."""
-    self._rankings, self._scores = zip(*ranked_alternatives_and_scores)
+    self._rankings, self._scores = zip(*ranked_alternatives_and_scores)  # pyrefly: ignore[bad-assignment]
     self._rankings = list(self._rankings)
     self._scores = list(self._scores)
     self.make_rank_dict()

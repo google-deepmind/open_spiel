@@ -27,7 +27,7 @@ class CopelandVotingTest(absltest.TestCase):
 
   def test_copeland_basic_run(self):
     votes = [["a", "b", "c"], ["a", "c", "b"], ["b", "a", "c"]]
-    profile = base.PreferenceProfile(votes=votes)
+    profile = base.PreferenceProfile(votes=votes)  # pyrefly: ignore[bad-argument-type]
     method = copeland.CopelandVoting()
     outcome = method.run_election(profile)
     self.assertListEqual(outcome.ranking, ["a", "b", "c"])

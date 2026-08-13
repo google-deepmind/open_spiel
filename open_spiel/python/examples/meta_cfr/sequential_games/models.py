@@ -100,7 +100,7 @@ class RNNModel(hk.RNNCore):
       if isinstance(layer, hk.RNNCore):
         x, curr_state[k] = layer(x, prev_state[k])
       else:
-        x = layer(x)
+        x = layer(x)  # pyrefly: ignore[not-callable]
     return x, tuple(curr_state)
 
   def initial_state(self, batch_size: Optional[int]) -> Any:
@@ -183,7 +183,7 @@ class OptimizerModel:
   def initialize_optimizer_model(self):
     """Initializes the optax optimizer and neural network model."""
     lr_scheduler_fn = self.lr_scheduler(self.initial_learning_rate)
-    opt_init, self.opt_update = optax.chain(
+    opt_init, self.opt_update = optax.chain(  # pyrefly: ignore[bad-assignment]
         optax.scale_by_adam(), optax.scale_by_schedule(lr_scheduler_fn),
         optax.scale(-self.initial_learning_rate))
 
@@ -193,5 +193,5 @@ class OptimizerModel:
 
     dummy_input = np.zeros(shape=[self.batch_size, 1, input_size])
 
-    self.net_params = self._net_init(self.rng, dummy_input)
-    self.opt_state = opt_init(self.net_params)
+    self.net_params = self._net_init(self.rng, dummy_input)  # pyrefly: ignore[bad-assignment]
+    self.opt_state = opt_init(self.net_params)  # pyrefly: ignore[bad-argument-type, bad-assignment]

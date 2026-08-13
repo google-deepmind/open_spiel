@@ -386,12 +386,12 @@ class LiarsPokerObserver:
       if iig_obs_type.perfect_recall:
         # One-hot encodings for players' moves at every round.
         total_possible_rounds = hand_length * num_digits * num_players
-        pieces.append((
+        pieces.append((  # pyrefly: ignore[bad-argument-type]
             "bid_history",
             total_possible_rounds * num_players,
             (total_possible_rounds, num_players),
         ))
-        pieces.append((
+        pieces.append((  # pyrefly: ignore[bad-argument-type]
             "challenge_history",
             total_possible_rounds * num_players,
             (total_possible_rounds, num_players),

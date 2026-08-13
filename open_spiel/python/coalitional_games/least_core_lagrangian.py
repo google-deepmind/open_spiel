@@ -196,7 +196,7 @@ class CoreOptimization(CoreSolver):
 
     params = optax.apply_updates(params, updates)
 
-    params = jnp.clip(params, 0, np.inf)
+    params = jnp.clip(params, 0, np.inf)  # pyrefly: ignore[bad-argument-type]
     scale = self.grand_coalition_value / jnp.sum(params)
     params = params * scale
 
@@ -287,7 +287,7 @@ class CoreOptimization(CoreSolver):
         logging.debug('Evaluating...')
         estimated_loss = payoff_evaluation(
             self.cvc,
-            current_payoff,
+            current_payoff,  # pyrefly: ignore[bad-argument-type]
             self.epsilon,
             evaluation_iterations,
         )

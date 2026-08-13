@@ -38,7 +38,7 @@ class BaseTest(absltest.TestCase):
         ["a", "c", "d", "b"],
         ["d", "b", "c", "a"]
     ]
-    profile = base.PreferenceProfile(votes=votes)
+    profile = base.PreferenceProfile(votes=votes)  # pyrefly: ignore[bad-argument-type]
     self.assertLen(profile.votes, 4)
     self.assertEqual(profile.total_weight(), 4)
 

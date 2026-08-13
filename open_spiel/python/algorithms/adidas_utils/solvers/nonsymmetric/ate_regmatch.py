@@ -78,7 +78,7 @@ class Solver(object):
       unregularized exploitability (stochastic estimate)
       tsallis regularized exploitability (stochastic estimate)
     """
-    return gradients(*params, payoff_matrices, self.num_players, self.p)
+    return gradients(*params, payoff_matrices, self.num_players, self.p)  # pyrefly: ignore[bad-argument-count]
 
   def exploitability(self, dist, payoff_matrices):
     """Compute and return tsallis entropy regularized exploitability.
