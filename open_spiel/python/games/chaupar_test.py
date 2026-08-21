@@ -42,6 +42,16 @@ class ChauparShellScoreTest(absltest.TestCase):
       scores = chaupar._shell_scores(num_shells)
       self.assertNotIn(1, scores.values())
 
+  def test_true_extreme_throw_is_not_high_for_non_default_shell_counts(self):
+    """Regression test: the "all shells up" throw (k == num_shells) must
+    not be treated as "high", mirroring the verified 7-shell table, where
+    k=7 scores 14 -- notably excluded from the high set {10, 25, 30}."""
+    for num_shells in (5, 6, 8, 9):
+      game = pyspiel.load_game("python_chaupar", {"num_shells": num_shells})
+      scores = game._shell_scores
+      self.assertNotIn(scores[0], game._high_throws)
+      self.assertNotIn(scores[num_shells], game._high_throws)
+
 
 class ChauparTest(parameterized.TestCase):
 
@@ -152,6 +162,25 @@ class ChauparTest(parameterized.TestCase):
     state.apply_action(0)
     # Landing on a safe square must not capture the opponent's piece there.
     self.assertNotEqual(state._positions[1][0], chaupar._NOT_STARTED)
+    self.assertFalse(state._has_captured[0])
+
+  def test_two_stacked_opponent_pieces_form_an_uncapturable_block(self):
+    """Two of the same opponent's pieces stacked on one non-safe square
+    form a "block": landing there does not capture either piece."""
+    game = pyspiel.load_game("python_chaupar", {"players": 2})
+    state = game.new_initial_state()
+    target_square = 5
+    self.assertNotIn(target_square, chaupar._SAFE_SQUARES)
+    rel = (target_square - state._arm_offset[1]) % chaupar._SHARED_TRACK_LENGTH
+    state._positions[1][0] = rel
+    state._positions[1][1] = rel  # A second P1 piece stacked on the same
+    state._positions[0][0] = 0    # square as the first.
+    state._current_player = 0
+    state._current_roll = target_square - state._arm_offset[0]
+    state._awaiting_chance = False
+    state.apply_action(0)
+    self.assertEqual(state._positions[1][0], rel)
+    self.assertEqual(state._positions[1][1], rel)
     self.assertFalse(state._has_captured[0])
 
   def test_cannot_enter_home_column_before_capturing(self):

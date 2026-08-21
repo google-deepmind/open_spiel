@@ -104,18 +104,22 @@ _GAME_TYPE = pyspiel.GameType(
 def _shell_scores(num_shells):
   """Returns {shells_up: throw_value} for an arbitrary shell count, using
   the same construction principle as the documented 7-shell table (Wikipedia,
-  sourced): the two extremes (all down, all up) and the near-extremes get
-  the traditionally-cited jackpot-style values, scaled sensibly; the middle
-  values equal the number of shells up. This exactly reproduces the verified
-  7-shell table and generalizes it for other shell counts."""
+  sourced): the low extreme (all down) and the two near-extremes just short
+  of "all up" get the traditionally-cited jackpot-style values; the true
+  high extreme (all up) gets its own special-but-not-highest value (in the
+  7-shell table, k=7 scores 14, notably less than k=6's 30); the remaining
+  middle values equal the number of shells up. This exactly reproduces the
+  verified 7-shell table and generalizes its shape for other shell counts.
+  Callers must derive the "high" (entry-eligible) throw set from the two
+  near-extremes {1, num_shells-2, num_shells-1}, *not* including the true
+  extremes {0, num_shells} -- see ChauparGame.__init__."""
   if num_shells == 7:
     return dict(_SHELL_SCORES_7)
   scores = {k: k for k in range(num_shells + 1)}
   scores[0] = num_shells
   scores[1] = num_shells + 3
   scores[num_shells] = 2 * num_shells
-  if num_shells - 1 >= 2:
-    scores[num_shells - 1] = 5 * num_shells
+  scores[num_shells - 1] = 5 * num_shells
   return scores
 
 
@@ -136,11 +140,10 @@ class ChauparGame(pyspiel.Game):
 
     self._num_shells = num_shells
     self._shell_scores = _shell_scores(num_shells)
-    self._max_throw = max(self._shell_scores.values())
     self._high_throws = (
         _HIGH_THROWS if num_shells == 7 else
         frozenset(v for k, v in self._shell_scores.items()
-                   if k in (1, num_shells - 1, num_shells)))
+                   if k in (1, num_shells - 2, num_shells - 1)))
 
     if num_players == 2:
       self._arm_of_player = [0, 2]
@@ -323,6 +326,13 @@ class ChauparState(pyspiel.State):
           hit = [j for j, qpos in enumerate(self._positions[q])
                  if qpos != _NOT_STARTED and qpos < _SHARED_TRACK_LENGTH and
                  self._abs_position(q, qpos) == abs_pos]
+          # Exactly one piece of q's is captured; two or more of the same
+          # opponent's pieces stacked on one (non-safe) square form a
+          # "block" that cannot be captured, per the traditional rule that
+          # a block of 2+ same-owner pieces is safe (see e.g. the
+          # "castle"/block convention common across the Pachisi family).
+          # Passage through a block is still allowed here, unlike some
+          # variants that also treat a block as impassable.
           if len(hit) == 1:
             self._positions[q][hit[0]] = _NOT_STARTED
             self._has_captured[p] = True
