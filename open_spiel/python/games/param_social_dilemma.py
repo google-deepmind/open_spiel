@@ -183,24 +183,36 @@ class ParamSocialDilemmaGame(pyspiel.Game):
           "specified in payoff_regimes")
     self._payoff_change_prob = float(params["payoff_change_prob"])
     self._reward_noise_std = float(params["reward_noise_std"])
+    if self._reward_noise_std < 0:
+      raise ValueError(
+          f"reward_noise_std must be >= 0, got {self._reward_noise_std}")
     self._termination_probability = float(params["termination_probability"])
     self._pgg_endowment = float(params["pgg_endowment"])
     self._pgg_multiplier = float(params["pgg_multiplier"])
-    if self._payoff_kind == "public_goods" and not (
-        1 < self._pgg_multiplier < num_players):
-      raise ValueError(
-          "pgg_multiplier must satisfy 1 < pgg_multiplier < players for "
-          "public_goods to be a genuine social dilemma (otherwise "
-          "contributing is either worthless or individually dominant), got "
-          f"pgg_multiplier={self._pgg_multiplier} with players={num_players}")
+    if self._payoff_kind == "public_goods":
+      if self._pgg_endowment <= 0:
+        raise ValueError(
+            f"pgg_endowment must be > 0, got {self._pgg_endowment}")
+      if not 1 < self._pgg_multiplier < num_players:
+        raise ValueError(
+            "pgg_multiplier must satisfy 1 < pgg_multiplier < players for "
+            "public_goods to be a genuine social dilemma (otherwise "
+            "contributing is either worthless or individually dominant), "
+            f"got pgg_multiplier={self._pgg_multiplier} with "
+            f"players={num_players}")
 
-    max_noise = (
-        max(_NOISE_LEVELS) * self._reward_noise_std / 2.0
-        if self._reward_noise_std else 0.0)
+    max_noise = max(_NOISE_LEVELS) * self._reward_noise_std / 2.0
     if self._payoff_kind == "linear":
-      max_round_payoff = float(np.max(self._payoff_regimes[:, 0]))
-      min_round_payoff = float(np.min(self._payoff_regimes[:, 3]))
+      # Bound over every value that can appear in the linear interpolation
+      # (not just T and S): payoff_regimes isn't validated to follow the
+      # canonical T > R > P > S ordering, so any of the four columns could
+      # be the true per-round extreme for a user-supplied regime.
+      max_round_payoff = float(np.max(self._payoff_regimes))
+      min_round_payoff = float(np.min(self._payoff_regimes))
     else:
+      # Valid (per the pgg_endowment/pgg_multiplier checks above) only for
+      # positive endowment, which is what makes k=N-1 the max and k=0 the
+      # min below -- both payoffs are increasing in the cooperator count.
       e, m = self._pgg_endowment, self._pgg_multiplier
       max_round_payoff = e * (1 + m * (num_players - 1) / num_players)
       min_round_payoff = m * e / num_players
@@ -359,7 +371,8 @@ class ParamSocialDilemmaState(pyspiel.State):
       for i, a in enumerate(actions):
         other_cooperators = num_cooperators - (
             1 if a == Action.COOPERATE else 0)
-        frac = other_cooperators / (n - 1) if n > 1 else 0.0
+        # n is always >= _MIN_PLAYERS == 2, so n - 1 is never zero.
+        frac = other_cooperators / (n - 1)
         if a == Action.DEFECT:
           self._rewards[i] = punishment + (temptation - punishment) * frac
         else:

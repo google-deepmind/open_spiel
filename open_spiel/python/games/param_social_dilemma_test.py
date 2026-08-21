@@ -206,6 +206,44 @@ class ParamSocialDilemmaTest(parameterized.TestCase):
       pyspiel.load_game("python_param_social_dilemma", {
           "payoff_kind": "public_goods", "dynamic_payoffs": True})
 
+  def test_negative_reward_noise_std_rejected(self):
+    """Regression test: a negative std previously slipped past the noise-
+    phase's `> 0` activation guard while still (via a separate truthy
+    check) shrinking the reported utility bounds inward, so a legitimate
+    (unperturbed) reward could fall outside them. A negative standard
+    deviation is nonsensical anyway, so it's rejected outright now."""
+    with self.assertRaises(ValueError):
+      pyspiel.load_game(
+          "python_param_social_dilemma", {"reward_noise_std": -4.0})
+
+  def test_negative_pgg_endowment_rejected(self):
+    """Regression test: a negative endowment flips which cooperator-count
+    extreme (k=0 vs k=N-1) actually produces the max/min per-round payoff,
+    which the bounds computation didn't account for. Rejected outright."""
+    with self.assertRaises(ValueError):
+      pyspiel.load_game("python_param_social_dilemma", {
+          "payoff_kind": "public_goods", "players": 4,
+          "pgg_endowment": -10.0})
+
+  def test_utility_bounds_hold_for_non_canonical_payoff_regimes(self):
+    """Regression test: min_utility()/max_utility() for payoff_kind="linear"
+    used to be computed from just T (max) and S (min) across regimes,
+    silently assuming every regime follows the canonical T > R > P > S
+    ordering. payoff_regimes is never validated to follow that ordering, so
+    a regime where R exceeds T (unusual, but not prevented) could make the
+    true achievable reward exceed the reported bound."""
+    game = pyspiel.load_game(
+        "python_param_social_dilemma", {
+            "players": 2, "payoff_regimes": "1 10 1 0",  # T=1, R=10, P=1, S=0
+            "termination_probability": 0.0,
+        })
+    state = game.new_initial_state()
+    for _ in range(1050):  # 1050 * 10 > max_game_length(9999) * old max(=1).
+      state.apply_actions([param_social_dilemma.Action.COOPERATE,
+                            param_social_dilemma.Action.COOPERATE])
+      state.apply_action(0)  # Continue.
+    self.assertLessEqual(state.returns()[0], game.max_utility())
+
   def test_public_goods_free_rider_advantage_grows_with_n(self):
     """The point of public_goods mode: unlike linear mode, a defector's edge
     over a cooperator (holding everyone else's behavior fixed at cooperate)
