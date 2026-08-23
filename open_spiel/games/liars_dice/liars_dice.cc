@@ -16,9 +16,15 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <functional>
+#include <memory>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace liars_dice {
@@ -420,6 +426,32 @@ void LiarsDiceState::ObservationTensor(Player player,
 
 std::unique_ptr<State> LiarsDiceState::Clone() const {
   return std::unique_ptr<State>(new LiarsDiceState(*this));
+}
+
+std::unique_ptr<State> LiarsDiceState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  if (IsTerminal() || IsChanceNode()) {
+    return Clone();
+  }
+  std::unique_ptr<State> state = game_->NewInitialState();
+  int chance_idx = 0;
+  for (Player p = 0; p < num_players_; ++p) {
+    for (int d = 0; d < num_dice_[p]; ++d) {
+      if (p == player_id) {
+        state->ApplyAction(history_[chance_idx].action);
+      } else {
+        Action sampled_action =
+            SampleAction(state->ChanceOutcomes(), rng()).first;
+        state->ApplyAction(sampled_action);
+      }
+      chance_idx++;
+    }
+  }
+  SPIEL_CHECK_GE(state->CurrentPlayer(), 0);
+  for (size_t i = total_num_dice_; i < history_.size(); ++i) {
+    state->ApplyAction(history_[i].action);
+  }
+  return state;
 }
 
 std::pair<int, int> LiarsDiceState::UnrankBid(int bidnum) const {

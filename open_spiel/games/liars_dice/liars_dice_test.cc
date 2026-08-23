@@ -25,12 +25,30 @@ void BasicLiarsDiceTests() {
   testing::LoadGameTest("liars_dice");
   testing::ChanceOutcomesTest(*LoadGame("liars_dice"));
   testing::RandomSimTest(*LoadGame("liars_dice"), 50);
+  testing::ResampleInfostateTest(*LoadGame("liars_dice"), 50);
+  testing::ResampleInfostateTest(
+      *LoadGame("liars_dice", {{"numdice", GameParameter(2)}}), 50);
+  testing::ResampleInfostateTest(
+      *LoadGame("liars_dice", {{"numdice", GameParameter(3)},
+                               {"dice_sides", GameParameter(4)}}),
+      50);
+  testing::ResampleInfostateTest(
+      *LoadGame(
+          "liars_dice",
+          {{"bidding_rule",
+            GameParameter(std::string("reset-quantity"))}}),
+      50);
 }
 
 void ImperfectRecallLiarsDiceTests() {
   testing::LoadGameTest("liars_dice_ir");
   testing::ChanceOutcomesTest(*LoadGame("liars_dice_ir"));
   testing::RandomSimTest(*LoadGame("liars_dice_ir"), 50);
+  testing::ResampleInfostateTest(*LoadGame("liars_dice_ir"), 50);
+  testing::ResampleInfostateTest(
+      *LoadGame("liars_dice_ir", {{"numdice", GameParameter(2)},
+                                  {"dice_sides", GameParameter(5)}}),
+      50);
 }
 
 }  // namespace
