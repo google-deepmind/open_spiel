@@ -185,8 +185,7 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
 
 std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
   return {
-    "dou_dizhu",  // https://github.com/google-deepmind/open_spiel/issues/1358
-    "quoridor"    // https://github.com/google-deepmind/open_spiel/issues/1349
+    "dou_dizhu"  // https://github.com/google-deepmind/open_spiel/issues/1358
   };
 }
 

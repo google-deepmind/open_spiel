@@ -14,7 +14,10 @@
 
 """Python spiel example."""
 
-
+# pylint: disable=g-unsafe-pickle-load
+# Note: This is an open-source project that makes use of pickle as a widely-used
+# default serialization library for Python. These tests need to work externally
+# and they run on GitHub Actions CI.
 import pickle
 
 from absl import app
@@ -48,7 +51,6 @@ SPIEL_ACTION_STRUCTS_ONLY_GAMES_LIST = [
 # or while there are any known issues with the game causing test failures.
 SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = [
     "dou_dizhu",  # https://github.com/google-deepmind/open_spiel/issues/1358
-    "quoridor",  # https://github.com/google-deepmind/open_spiel/issues/1349
 ]
 
 # A list of games to exclude testing pickle serialization of the 'game type'
