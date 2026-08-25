@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.voting.base."""
-
 from absl.testing import absltest
 
 import numpy as np
@@ -58,6 +56,15 @@ class BaseTest(absltest.TestCase):
     profile = base.PreferenceProfile(votes=votes)
     self.assertLen(profile.votes, 3)
     self.assertEqual(profile.total_weight(), 6)
+
+  def test_weighted_vote_validates_weight(self):
+    for weight in [0, -1]:  # fractional weights like 1.5 won't pass type checks
+      with self.subTest(weight=weight):
+        with self.assertRaises(AssertionError):
+          base.PreferenceProfile([base.WeightedVote(weight, ["a", "b"])])
+
+    profile = base.PreferenceProfile([base.WeightedVote(2, ["a", "b"])])
+    self.assertEqual(profile.total_weight(), 2)
 
   def test_preference_profile_incremental_group(self):
     # Create a weighted preference profile from preferences:
