@@ -586,7 +586,7 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 DarkChessGame::DarkChessGame(const GameParameters& params)
