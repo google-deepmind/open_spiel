@@ -29,7 +29,7 @@ namespace open_spiel::dynamic_routing {
 std::unique_ptr<DynamicRoutingData> DynamicRoutingData::Create(
     DynamicRoutingDataName name) {
   std::unique_ptr<DynamicRoutingData> data =
-      absl::make_unique<DynamicRoutingData>();
+      std::make_unique<DynamicRoutingData>();
   switch (name) {
     case DynamicRoutingDataName::kLine: {
       absl::flat_hash_map<std::string, std::vector<std::string>>
@@ -39,9 +39,8 @@ std::unique_ptr<DynamicRoutingData> DynamicRoutingData::Create(
                             {"D", {"aft_D"}},
                             {"aft_D", {}}};
       data->network_ = Network::Create(adjacency_list);
-      data->od_demand_ =
-          absl::make_unique<std::vector<OriginDestinationDemand>>(std::vector{
-              OriginDestinationDemand("bef_O->O", "D->aft_D", 0, 100)});
+      data->od_demand_ = std::make_unique<std::vector<OriginDestinationDemand>>(
+          std::vector{OriginDestinationDemand("bef_O->O", "D->aft_D", 0, 100)});
       return data;
     }
     case DynamicRoutingDataName::kBraess: {
@@ -70,7 +69,7 @@ std::unique_ptr<DynamicRoutingData> DynamicRoutingData::Create(
           Network::Create(adjacency_list, node_position, bpr_a_coefficient,
                           bpr_b_coefficient, capacity, free_flow_travel_time);
       data->od_demand_ =
-          absl::make_unique<std::vector<OriginDestinationDemand>>(std::vector{
+          std::make_unique<std::vector<OriginDestinationDemand>>(std::vector{
               OriginDestinationDemand("O->A", "D->E", 0, kBraessNumPlayer)});
       return data;
     }
