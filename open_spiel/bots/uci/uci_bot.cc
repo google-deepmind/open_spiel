@@ -142,13 +142,13 @@ std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
 }
 
 void UCIBot::Restart() {
-  ponder_move_ = absl::nullopt;
+  ponder_move_ = std::nullopt;
   was_ponder_hit_ = false;
   UciNewGame();
 }
 
 void UCIBot::RestartAt(const State& state) {
-  ponder_move_ = absl::nullopt;
+  ponder_move_ = std::nullopt;
   was_ponder_hit_ = false;
   auto chess_state = down_cast<const chess::ChessState&>(state);
   PositionFromState(chess_state);
@@ -294,7 +294,7 @@ std::pair<std::string, absl::optional<std::string>> UCIBot::ReadBestMove(
     std::istringstream response_line(response);
     std::string token;
     std::string move_str;
-    absl::optional<std::string> ponder_str = absl::nullopt;
+    absl::optional<std::string> ponder_str = std::nullopt;
     response_line >> std::skipws;
     while (response_line >> token) {
       if (token == "bestmove") {
