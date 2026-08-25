@@ -61,6 +61,8 @@ class LRUCache(object):
     except KeyError:
       self._misses += 1
       val = fn()
+      if not self._max_size:
+        return val
       if len(self._data) >= self._max_size:
         self._data.popitem(False)
     self._data[key] = val  # Insert/reinsert it at the back.
