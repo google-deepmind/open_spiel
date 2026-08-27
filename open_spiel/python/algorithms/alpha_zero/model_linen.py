@@ -16,7 +16,7 @@
 
 import functools
 import os
-from collections.abc import Any, Callable, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence
 import warnings
 
 import chex

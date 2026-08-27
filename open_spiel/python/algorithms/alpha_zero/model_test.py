@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import itertools
-from collections.abc import Any
+from typing import Any
 
 from absl.testing import absltest
 from absl.testing import parameterized

@@ -16,7 +16,7 @@
 
 import json
 import os
-from collections.abc import Callable, Any
+from typing import Callable, Any
 
 import jax
 import jax.numpy as jnp
