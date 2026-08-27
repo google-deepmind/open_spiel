@@ -15,7 +15,7 @@
 """A model based on nnx."""
 
 import os
-from typing import Callable, Optional, Sequence
+from collections.abc import Callable, Optional, Sequence
 import warnings
 
 import chex

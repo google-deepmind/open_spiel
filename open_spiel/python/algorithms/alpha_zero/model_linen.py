@@ -16,7 +16,7 @@
 
 import functools
 import os
-from typing import Any, Callable, Optional, Sequence
+from collections.abc import Any, Callable, Optional, Sequence
 import warnings
 
 import chex
@@ -317,7 +317,7 @@ class Model:
       flat_params = traverse_util.flatten_dict(params)
       flat_mask = {
           path: not ((path[-1] == "bias") or ("BatchNorm_0" in path))
-          for path in flat_params.keys()
+          for path in flat_params
       }
       return traverse_util.unflatten_dict(flat_mask)
 
@@ -511,7 +511,7 @@ class Model:
 
     return step
 
-  def load_checkpoint(self, step: int | str, device: str = None) -> None:
+  def load_checkpoint(self, step: int | str, device: str | None = None) -> None:
     """Loads a checkpoint of the model."""
     target = self._state
     path = os.path.join(self._path, f"checkpoint-{step}")

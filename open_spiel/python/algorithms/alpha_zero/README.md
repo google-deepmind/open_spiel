@@ -10,6 +10,7 @@ The code is arranged as follows:
 ```bash
 .
 ├── alpha_zero.py # main script
+├── alpha_zero_legacy.py # main script using multiprocessing (DEPRECATED)
 ├── analysis.py # experiments' results plotting
 ├── evaluator.py # mcts evaluator
 ├── export_model.py # model conversion util (ONNX/JIT are supported)
