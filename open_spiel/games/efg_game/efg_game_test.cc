@@ -96,7 +96,7 @@ void EFGGameSimpleForkFromData() {
 
 void EFGGameCommasFromFile() {
   absl::optional<std::string> file = FindFile(kCommasFilename, 2);
-  if (file != absl::nullopt) {
+  if (file != std::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -114,7 +114,7 @@ void EFGGameCommasFromFile() {
 
 void EFGGameSimTestsSampleFromFile() {
   absl::optional<std::string> file = FindFile(kSampleFilename, 2);
-  if (file != absl::nullopt) {
+  if (file != std::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -125,7 +125,7 @@ void EFGGameSimTestsSampleFromFile() {
 
 void EFGGameSimTestsKuhnFromFile() {
   absl::optional<std::string> file = FindFile(kKuhnFilename, 2);
-  if (file != absl::nullopt) {
+  if (file != std::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -144,7 +144,7 @@ void EFGGameSimTestsKuhnFromFile() {
 
 void EFGGameSimTestsLeducFromFile() {
   absl::optional<std::string> file = FindFile(kLeducFilename, 2);
-  if (file != absl::nullopt) {
+  if (file != std::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -163,7 +163,7 @@ void EFGGameSimTestsLeducFromFile() {
 
 void EFGGameSimTestsSignalingFromFile() {
   absl::optional<std::string> file = FindFile(kSignalingFilename, 2);
-  if (file != absl::nullopt) {
+  if (file != std::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -185,7 +185,7 @@ void EFGGameSimTestsExtendedFromFile() {
                                 kExtendedMPFilename,
                                 kExtendedShapleysFilename}) {
     absl::optional<std::string> file = FindFile(filename, 2);
-    if (file != absl::nullopt) {
+    if (file != std::nullopt) {
       std::cout << "Found file: " << file.value() << "; running sim test.";
       std::shared_ptr<const Game> game =
           LoadGame("efg_game", {{"filename", GameParameter(file.value())}});

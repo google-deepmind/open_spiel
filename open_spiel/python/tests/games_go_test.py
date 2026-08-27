@@ -105,6 +105,21 @@ class GamesGoTest(absltest.TestCase):
         games_and_states[0][0], 1, games_and_states[0][1], serialize=False
     )
 
+  def test_struct_dict_constructor(self):
+    """Test constructing GoStateStruct from a Python dict."""
+    game = pyspiel.load_game("go")
+    state = game.new_initial_state()
+    state.apply_action(0)  # Black plays a1
+    state_dict = json.loads(state.to_json())
+    state_struct = go.GoStateStruct(state_dict)
+    self.assertEqual(state_struct.current_player, "W")
+    self.assertEqual(state_struct.board_grid[0][0]["a1"], "B")
+
+  def test_game_class_attr(self):
+    """Test that GoGame has a StateStruct class attribute."""
+    game = pyspiel.load_game("go")
+    self.assertIs(game.StateStruct, go.GoStateStruct)
+
 
 if __name__ == "__main__":
   absltest.main()

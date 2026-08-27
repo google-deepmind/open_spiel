@@ -184,7 +184,9 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
 }
 
 std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
-  return {"quoridor"};
+  return {
+    "dou_dizhu"  // https://github.com/google-deepmind/open_spiel/issues/1358
+  };
 }
 
 std::vector<GameType> GameRegisterer::RegisteredGames() {
@@ -513,6 +515,7 @@ Status State::ApplyActionStruct(const ActionStruct& action_struct) {
   }
   return OkStatus();
 }
+
 
 std::vector<int> State::LegalActionsMask(Player player) const {
   int length = (player == kChancePlayerId) ? game_->MaxChanceOutcomes()

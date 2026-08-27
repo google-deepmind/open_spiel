@@ -43,7 +43,7 @@ void MDPNode::IncTransitionWeight(Action a, MDPNode *child, double weight) {
 }
 
 MDP::MDP() : terminal_node_uid_(0), num_nonterminal_nodes_(0) {
-  node_map_[kRootKey] = absl::make_unique<MDPNode>(std::string(kRootKey));
+  node_map_[kRootKey] = std::make_unique<MDPNode>(std::string(kRootKey));
   node_map_[kRootKey]->add_weight(1.0);
 }
 
@@ -336,7 +336,7 @@ TabularBestResponseMDPInfo TabularBestResponseMDP::ComputeBestResponses() {
   // Initialize IS-MDPs for each player, if necessary.
   if (mdps_.empty()) {
     for (Player p = 0; p < num_players_; p++) {
-      mdps_.push_back(absl::make_unique<MDP>());
+      mdps_.push_back(std::make_unique<MDP>());
     }
   }
 
@@ -365,7 +365,7 @@ TabularBestResponseMDP::ComputeBestResponse(Player max_player) {
 
   if (mdps_.empty()) {
     mdps_.resize(num_players_);
-    mdps_[max_player] = absl::make_unique<MDP>();
+    mdps_[max_player] = std::make_unique<MDP>();
   }
 
   std::vector<MDPNode*> parent_nodes(num_players_, nullptr);

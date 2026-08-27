@@ -57,6 +57,17 @@ class StatusWithValue : public Status {
 Status OkStatus();
 Status ErrorStatus(const std::string& message);
 
+template <typename T>
+StatusWithValue<T> OkStatusWithValue(const T& value) {
+  return StatusWithValue<T>(StatusValue::kOk, "", value);
+}
+
+template <typename T>
+StatusWithValue<T> ErrorStatusWithValue(const std::string message,
+                                        const T& value) {
+  return StatusWithValue<T>(StatusValue::kError, message, value);
+}
+
 std::ostream& operator<<(std::ostream& os, const Status& status);
 
 }  // namespace open_spiel

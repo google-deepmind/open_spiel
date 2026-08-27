@@ -257,7 +257,7 @@ absl::optional<double> EFGGame::UtilitySum() const {
   if (constant_sum_)
     return util_sum_;
   else
-    return absl::nullopt;
+    return std::nullopt;
 }
 
 double EFGGame::MaxUtility() const { return max_util_.value(); }

@@ -60,10 +60,10 @@ class FixedPoint(object):
     # temperature is specified.
     player_ids = list(range(self._game.num_players()))
     if self._temperature is None:
-      self._policy = greedy_policy.GreedyPolicy(self._game, player_ids,
+      self._policy = greedy_policy.GreedyPolicy(self._game, player_ids,  # pyrefly: ignore[bad-assignment]
                                                 br_value)
     else:
-      self._policy = softmax_policy.SoftmaxPolicy(self._game, player_ids,
+      self._policy = softmax_policy.SoftmaxPolicy(self._game, player_ids,  # pyrefly: ignore[bad-assignment]
                                                   self._temperature, br_value)
 
     self._distribution = distribution.DistributionPolicy(

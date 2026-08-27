@@ -475,7 +475,7 @@ def _linear(
     status = prob.status
 
     # Distribution.
-    dist = np.reshape(x.value, num_actions)
+    dist = np.reshape(x.value, num_actions)  # pyrefly: ignore[no-matching-overload]
 
     # Other.
     val = reward.value
@@ -571,7 +571,7 @@ def _qp_cce(
 
     val = cost.value
     x = x_repeated.value
-    dist = np.reshape(x, num_actions)
+    dist = np.reshape(x, num_actions)  # pyrefly: ignore[no-matching-overload]
   else:
     cost_value = 0.0
     val = 1 - 1 / num_dists
@@ -668,7 +668,7 @@ def _qp_ce(
 
     val = cost.value
     x = x_repeated.value
-    dist = np.reshape(x, num_actions)
+    dist = np.reshape(x, num_actions)  # pyrefly: ignore[no-matching-overload]
   else:
     cost_value = 0.0
     val = 1 - 1 / num_dists
@@ -1473,7 +1473,7 @@ def run_loop(game,
    eval_meta_values,
    train_meta_gaps,
    eval_meta_gaps,
-   checkpoint) = initialize_callback(*values, game)
+   checkpoint) = initialize_callback(*values, game)  # pyrefly: ignore[bad-argument-count]
 
   # Run JPSRO.
   while iteration <= iterations:

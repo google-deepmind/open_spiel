@@ -405,7 +405,7 @@ void GinRummyState::ApplyFirstUpcardAction(Action action) {
     SPIEL_CHECK_TRUE(pass_on_first_upcard_[0] && pass_on_first_upcard_[1]);
     prev_upcard_ = upcard_;
     discard_pile_.push_back(upcard_.value());
-    upcard_ = absl::nullopt;
+    upcard_ = std::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -437,7 +437,7 @@ void GinRummyState::ApplyDrawAction(Action action) {
     // longer in play and goes to the top of the discard pile.
     prev_upcard_ = upcard_;
     if (upcard_.has_value()) discard_pile_.push_back(upcard_.value());
-    upcard_ = absl::nullopt;
+    upcard_ = std::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -813,7 +813,7 @@ void GinRummyState::UpcardToHand(Player player) {
   int card = upcard_.value();
   hands_[player].push_back(card);
   known_cards_[player][card] = true;
-  upcard_ = absl::nullopt;
+  upcard_ = std::nullopt;
 }
 
 void GinRummyState::RemoveFromHand(Player player, Action card) {
@@ -979,7 +979,8 @@ std::unique_ptr<State> GinRummyState::ResampleFromInfostate(
   }
 
   // Shuffle the sample pool.
-  std::shuffle(sample_pool.begin(), sample_pool.end(), std::mt19937(rng()));
+  std::mt19937 shuffle_rng(rng() * std::mt19937::max());
+  std::shuffle(sample_pool.begin(), sample_pool.end(), shuffle_rng);
 
   // Clear opponent's hand and stock in the new state.
   new_state->hands_[opponent].clear();

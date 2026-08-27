@@ -59,7 +59,7 @@ def main(_):
   # dqn a3c ddqn prior-ddqn dueling-ddqn distrib-dqn noisy-dqn rainbow
 
   game_names = []
-  profile = base.PreferenceProfile(alternatives=dataset.agent_names)
+  profile = base.PreferenceProfile(alternatives=dataset.agent_names)  # pyrefly: ignore[bad-argument-type]
   for game_name, scores in dataset.table_data.items():
     profile.add_vote_from_values(scores)
     game_names.append(game_name)

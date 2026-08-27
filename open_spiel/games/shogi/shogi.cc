@@ -117,7 +117,7 @@ Player ShogiState::CurrentPlayer() const {
 }
 
 Action ShogiState::ParseMoveToAction(const std::string& move_str) const {
-  absl::optional<Move> move = Board().ParseMove(move_str);
+  std::optional<Move> move = Board().ParseMove(move_str);
   if (!move.has_value()) {
     return kInvalidAction;
   }
@@ -331,7 +331,7 @@ ShogiState::ExtractSFenAndMaybeMoves() const {
   return std::make_pair(initial_sfen, move_lans);
 }
 
-absl::optional<std::vector<double>> ShogiState::MaybeFinalReturns() const {
+std::optional<std::vector<double>> ShogiState::MaybeFinalReturns() const {
   if (IsRepetitionEnd()) {
     // Perpetual check repetition could occur either with a player giving
     // check again or with the other player escaping to the same position.
@@ -371,7 +371,7 @@ absl::optional<std::vector<double>> ShogiState::MaybeFinalReturns() const {
   if (Board().KingInEnemyCamp(just_moved) && Board().KingInEnemyCamp(on_move)) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::string ShogiState::Serialize() const {

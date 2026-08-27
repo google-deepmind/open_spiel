@@ -75,7 +75,7 @@ def cce_br(game, policies, weights, mus, nus, rewards=None):
   del policies
   pol, val = get_joint_br(game, weights, mus)
   cce_gap_value = None
-  if len(rewards) > 0:  # pylint: disable=g-explicit-length-test
+  if len(rewards) > 0:  # pylint: disable=g-explicit-length-test  # pyrefly: ignore[bad-argument-type]
     deviation_value = val.value(game.new_initial_states()[0])
     on_policy_value = np.sum(weights * np.sum(rewards * nus, axis=1))
     cce_gap_value = deviation_value - on_policy_value
@@ -123,7 +123,7 @@ def ce_br(game, policies, weights, mus, nus, rewards=None):
       new_br_val = new_val.value(game.new_initial_states()[0])
 
       # Evaluate CE-Gap
-      if len(rewards) > 0:  # pylint: disable=g-explicit-length-test
+      if len(rewards) > 0:  # pylint: disable=g-explicit-length-test  # pyrefly: ignore[bad-argument-type]
         on_policy_value = np.sum(
             np.array(rewards)[:, policy_index] * pol_weights)
         ce_gap_value += pol_proba * (new_br_val - on_policy_value)
@@ -169,7 +169,7 @@ def partial_ce_br(game, policies, weights, mus, nus, rewards=None):
     new_br_val = new_val.value(game.new_initial_states()[0])
 
     # Evaluate CE-Gap
-    if len(rewards) > 0:  # pylint: disable=g-explicit-length-test
+    if len(rewards) > 0:  # pylint: disable=g-explicit-length-test  # pyrefly: ignore[bad-argument-type]
       on_policy_value = np.sum(np.array(rewards)[:, policy_index] * pol_weights)
       ce_gap_value = (new_br_val - on_policy_value)
     new_policies.append(new_pol)

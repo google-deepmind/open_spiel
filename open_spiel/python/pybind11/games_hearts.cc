@@ -46,14 +46,15 @@ void DefReadWriteHeartsFields(py::class_<T, Args...>& c) {
 void init_pyspiel_games_hearts(py::module& m) {
   py::module_ hearts = m.def_submodule("hearts");
 
-  py::class_<hearts::HeartsStateStruct, open_spiel::StateStruct>
-      state_struct_class(hearts, "HeartsStateStruct");
-  state_struct_class.def(py::init<>()).def(py::init<std::string>());
+  auto state_struct_class =
+      bind_spiel_struct<hearts::HeartsStateStruct, open_spiel::StateStruct>(
+          hearts, "HeartsStateStruct");
   DefReadWriteHeartsFields(state_struct_class);
 
-  py::class_<hearts::HeartsObservationStruct, open_spiel::ObservationStruct>
-      obs_struct_class(hearts, "HeartsObservationStruct");
-  obs_struct_class.def(py::init<>()).def(py::init<std::string>());
+  auto obs_struct_class =
+      bind_spiel_struct<hearts::HeartsObservationStruct,
+                        open_spiel::ObservationStruct>(
+          hearts, "HeartsObservationStruct");
   DefReadWriteHeartsFields(obs_struct_class);
   obs_struct_class.def_readwrite(
       "observing_player", &hearts::HeartsObservationStruct::observing_player);
@@ -86,5 +87,8 @@ void init_pyspiel_games_hearts(py::module& m) {
             return std::dynamic_pointer_cast<HeartsGame>(
                 std::const_pointer_cast<Game>(LoadGame(data)));
           }));
+
+  game_class.attr("StateStruct") = state_struct_class;
+  game_class.attr("ObservationStruct") = obs_struct_class;
 }
 }  // namespace open_spiel

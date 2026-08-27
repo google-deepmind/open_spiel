@@ -684,7 +684,7 @@ absl::optional<double> LaserTagGame::UtilitySum() const {
   if (zero_sum_)
     return 0;
   else
-    return absl::nullopt;
+    return std::nullopt;
 }
 
 std::vector<int> LaserTagGame::ObservationTensorShape() const {

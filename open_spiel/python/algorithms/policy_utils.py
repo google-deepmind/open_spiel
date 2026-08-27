@@ -55,7 +55,7 @@ def policy_to_dict(player_policy,
     }
   tabular_policy = dict()
   for state in all_states:
-    information_state = state_to_information_state[state]
+    information_state = state_to_information_state[state]  # pyrefly: ignore[unsupported-operation]
     tabular_policy[information_state] = list(
         player_policy.action_probabilities(all_states[state]).items())
   return tabular_policy

@@ -46,7 +46,7 @@ class FileLogger(object):
   def close(self):
     if self._fd:
       self._fd.close()
-      self._fd = None
+      self._fd = None  # pyrefly: ignore[bad-assignment]
 
   def __del__(self):
     self.close()

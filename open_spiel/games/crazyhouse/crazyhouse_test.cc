@@ -46,7 +46,7 @@ void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
   std::shared_ptr<const Game> game = LoadGame("crazyhouse");
   CrazyhouseState state(game, fen);
   Player player = state.CurrentPlayer();
-  absl::optional<Move> maybe_move = state.Board().ParseSANMove(move_san);
+  std::optional<Move> maybe_move = state.Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
   Action action = MoveToAction(*maybe_move, state.BoardSize());
   state.ApplyAction(action);
@@ -56,13 +56,13 @@ void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
 }
 
 void ApplySANMove(const char* move_san, CrazyhouseState* state) {
-  absl::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
+  std::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
   state->ApplyAction(MoveToAction(*maybe_move, state->BoardSize()));
 }
 
 void ApplyLANMove(const char* move_lan, CrazyhouseState* state, bool chess960) {
-  absl::optional<Move> maybe_move =
+  std::optional<Move> maybe_move =
       state->Board().ParseLANMove(move_lan, chess960);
   SPIEL_CHECK_TRUE(maybe_move);
   state->ApplyAction(MoveToAction(*maybe_move, state->BoardSize()));

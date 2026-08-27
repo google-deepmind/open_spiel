@@ -627,7 +627,7 @@ class ChatGameState(pyspiel.State):
 
   @property
   def prompt_actions(self) -> OrderedDict[str, List[str]]:
-    return self._prompt_actions
+    return self._prompt_actions  # pyrefly: ignore[bad-return]
 
 
 class ChatGameObserverBase:
@@ -663,13 +663,13 @@ class ChatGameObserverBase:
     if iig_obs_type.public_info:
       if iig_obs_type.perfect_recall:
         max_msgs = MAX_PLAYERS * MAX_NUM_REPLIES
-        pieces.append(('scenario_prompt',
+        pieces.append(('scenario_prompt',  # pyrefly: ignore[bad-argument-type]
                        LLM_LENGTH_MESSAGE_CHARS,
                        (LLM_LENGTH_MESSAGE_CHARS)))
-        pieces.append(('senders',
+        pieces.append(('senders',  # pyrefly: ignore[bad-argument-type]
                        max_msgs * MAX_PLAYERS,
                        (max_msgs, MAX_PLAYERS)))
-        pieces.append(('receivers',
+        pieces.append(('receivers',  # pyrefly: ignore[bad-argument-type]
                        max_msgs * MAX_PLAYERS,
                        (max_msgs, MAX_PLAYERS)))
         # record prompt actions as lossless tokenization since we do not know
@@ -678,10 +678,10 @@ class ChatGameObserverBase:
         # on the policy network side. for now, we assume the prompt action is at
         # most LLM_LENGTH_MESSAGE_CHARS subwords. we also assume everyone can
         # see everyone's actions.
-        pieces.append(('prompt_actions',
+        pieces.append(('prompt_actions',  # pyrefly: ignore[bad-argument-type]
                        max_msgs * LLM_LENGTH_MESSAGE_CHARS,
                        (max_msgs, LLM_LENGTH_MESSAGE_CHARS)))
-        pieces.append(('messages',
+        pieces.append(('messages',  # pyrefly: ignore[bad-argument-type]
                        max_msgs * LLM_LENGTH_MESSAGE_CHARS,
                        (max_msgs, LLM_LENGTH_MESSAGE_CHARS)))
       else:
@@ -1057,7 +1057,7 @@ class BaseChatGame(pyspiel.Game):
             self._num_prompt_actions = list(self._num_prompt_actions)
           self._num_prompt_actions[i] = len(action_list)
       else:
-        examples = self._examples_prompt_actions[action_key]
+        examples = self._examples_prompt_actions[action_key]  # pyrefly: ignore[unsupported-operation]
         action_list = self.generate_prompts(action_key,
                                             examples,
                                             self._num_prompt_actions[i],
@@ -1103,7 +1103,7 @@ class BaseChatGame(pyspiel.Game):
             self._num_private_info = list(self._num_private_info)
           self._num_private_info[i] = len(info_list)
       else:
-        examples = self._examples_private_info[info_key]
+        examples = self._examples_private_info[info_key]  # pyrefly: ignore[unsupported-operation]
         info_list = self.generate_prompts(info_key,
                                           examples,
                                           self._num_private_info[i],
@@ -1155,7 +1155,7 @@ class BaseChatGame(pyspiel.Game):
     wrapped_scenarios = []
     for s in scenarios:
       scenario_header_unformatted = self._header.w_opts + s.msg
-      s_asdict = dataclasses.asdict(s)
+      s_asdict = dataclasses.asdict(s)  # pyrefly: ignore[bad-argument-type]
       scenario_header = scenario_header_unformatted.format(**s_asdict,
                                                            others=ALL_PLAYERS)
       wrapped_scenarios.append(scenario_header)
@@ -1334,7 +1334,7 @@ class BaseChatGame(pyspiel.Game):
 
     given_names = player_names
     given_private_info = private_info
-    scenario_class = self._examples_scenarios[0].__class__
+    scenario_class = self._examples_scenarios[0].__class__  # pyrefly: ignore[unsupported-operation]
     initial_scenario = scenario_class(msg=scenario_prompt,
                                       sender=sender,
                                       receiver=receiver,

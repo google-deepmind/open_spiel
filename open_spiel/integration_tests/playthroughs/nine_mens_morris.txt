@@ -795,8 +795,8 @@ ObservationTensor(1):
 ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◉  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [73, 175, 261, 303, 329, 423, 425, 427, 571, 573]
-StringLegalActions() = ["Move 2 -> 1", "Move 6 -> 7", "Move 9 -> 21", "Move 11 -> 15", "Move 12 -> 17", "Move 16 -> 15", "Move 16 -> 17", "Move 16 -> 19", "Move 22 -> 19", "Move 22 -> 21"]
+LegalActions() = [73, 175, 240, 261, 303, 329, 423, 425, 427, 571, 573]
+StringLegalActions() = ["Move 2 -> 1", "Move 6 -> 7", "Move 9 -> 0", "Move 9 -> 21", "Move 11 -> 15", "Move 12 -> 17", "Move 16 -> 15", "Move 16 -> 17", "Move 16 -> 19", "Move 22 -> 19", "Move 22 -> 21"]
 
 # Apply action "Move 2 -> 1"
 action: 73
@@ -969,8 +969,8 @@ ObservationTensor(1):
 ◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [50, 52, 100, 179, 261, 325, 423, 573]
-StringLegalActions() = ["Move 1 -> 2", "Move 1 -> 4", "Move 3 -> 4", "Move 6 -> 11", "Move 9 -> 21", "Move 12 -> 13", "Move 16 -> 15", "Move 22 -> 21"]
+LegalActions() = [48, 50, 52, 100, 179, 240, 261, 325, 423, 573]
+StringLegalActions() = ["Move 1 -> 0", "Move 1 -> 2", "Move 1 -> 4", "Move 3 -> 4", "Move 6 -> 11", "Move 9 -> 0", "Move 9 -> 21", "Move 12 -> 13", "Move 16 -> 15", "Move 22 -> 21"]
 
 # Apply action "Move 6 -> 11"
 action: 179
@@ -1143,8 +1143,8 @@ ObservationTensor(1):
 ◉◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◉◉◯  ◯◯◯◯◯◯◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [50, 52, 267, 273, 325, 400, 448, 496, 502, 517, 537, 550, 590, 598]
-StringLegalActions() = ["Move 1 -> 2", "Move 1 -> 4", "Move 10 -> 3", "Move 10 -> 9", "Move 12 -> 13", "Move 15 -> 16", "Move 17 -> 16", "Move 19 -> 16", "Move 19 -> 22", "Move 20 -> 13", "Move 21 -> 9", "Move 21 -> 22", "Move 23 -> 14", "Move 23 -> 22"]
+LegalActions() = [48, 50, 52, 267, 273, 325, 400, 448, 496, 502, 517, 537, 550, 590, 598]
+StringLegalActions() = ["Move 1 -> 0", "Move 1 -> 2", "Move 1 -> 4", "Move 10 -> 3", "Move 10 -> 9", "Move 12 -> 13", "Move 15 -> 16", "Move 17 -> 16", "Move 19 -> 16", "Move 19 -> 22", "Move 20 -> 13", "Move 21 -> 9", "Move 21 -> 22", "Move 23 -> 14", "Move 23 -> 22"]
 
 # Apply action "Move 15 -> 16"
 action: 400

@@ -20,18 +20,52 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
 namespace py = ::pybind11;
+
+// Generic dict-backed SpielStruct wrappers.
+// These allow Python games to return plain dicts that get wrapped as proper
+// SpielStruct subclasses, enabling JSON serialization without requiring
+// Python-side C++ struct subclassing.
+class DictStateStruct : public StateStruct {
+ public:
+  explicit DictStateStruct(nlohmann::json data) : data_(std::move(data)) {}
+  nlohmann::json to_json_base() const override { return data_; }
+
+ private:
+  nlohmann::json data_;
+};
+
+class DictActionStruct : public ActionStruct {
+ public:
+  explicit DictActionStruct(nlohmann::json data) : data_(std::move(data)) {}
+  nlohmann::json to_json_base() const override { return data_; }
+
+ private:
+  nlohmann::json data_;
+};
+
+class DictObservationStruct : public ObservationStruct {
+ public:
+  explicit DictObservationStruct(nlohmann::json data)
+      : data_(std::move(data)) {}
+  nlohmann::json to_json_base() const override { return data_; }
+
+ private:
+  nlohmann::json data_;
+};
 
 // Trampoline for using Python-defined games from C++.
 class PyGame : public Game, public py::trampoline_self_life_support {
@@ -42,6 +76,8 @@ class PyGame : public Game, public py::trampoline_self_life_support {
   // Implementation of the Game API.
   std::unique_ptr<State> NewInitialState() const override;
   std::unique_ptr<State> NewInitialState(const std::string& str) const override;
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const override;
   std::unique_ptr<State> NewInitialStateForPopulation(
       int population) const override;
   int MaxChanceNodesInHistory() const override;
@@ -102,6 +138,17 @@ class PyState : public State, public py::trampoline_self_life_support {
   ActionsAndProbs ChanceOutcomes() const override;
   std::string Serialize() const override;
   int MeanFieldPopulation() const override;
+
+  // SpielStruct API overrides.
+  // These forward to Python methods (_to_struct, _action_to_struct, etc.)
+  // and wrap the returned dicts as generic Dict*Struct objects.
+  std::unique_ptr<StateStruct> ToStruct() const override;
+  std::unique_ptr<ActionStruct> ActionToStruct(Player player,
+                                               Action action_id) const override;
+  std::vector<Action> StructToActions(
+      const ActionStruct& action_struct) const override;
+  std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const override;
 
   // Python-specific details.
   void Deserialize(const std::string& str);

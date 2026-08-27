@@ -269,9 +269,14 @@ std::vector<Action> QuoridorState::LegalActions() const {
     }
   }
 
-  // If no action is possible add 'pass' action to list of moves
+  // If no action is possible add 'pass' action to list of moves. Pawn
+  // actions are encoded relative to base_for_relative_, so the pass (stay in
+  // place) is the base itself: ActionToMove maps it back to the pawn's
+  // current position. Pushing the absolute cell id here instead would be
+  // decoded as a relative move and teleport the pawn (or index off the
+  // board).
   if (moves.empty()) {
-    moves.push_back(cur.xy);
+    moves.push_back(base_for_relative_.xy);
   }
 
   std::sort(moves.begin(), moves.end());
@@ -613,14 +618,15 @@ void QuoridorState::ObservationTensor(Player player,
 
 void QuoridorState::DoApplyAction(Action action) {
   Move move = ActionToMove(action);
+  // Check validity before reading board_[move.xy]: an invalid move's xy can
+  // lie outside the board_ array.
+  SPIEL_CHECK_TRUE(move.IsValid());
   // If players is forced to pass it is valid to stay in place, on a field where
   // there is already a player
   if (board_[move.xy] != current_player_) {
     SPIEL_CHECK_EQ(board_[move.xy], kPlayerNone);
   }
   SPIEL_CHECK_EQ(outcome_, kPlayerNone);
-
-  SPIEL_CHECK_TRUE(move.IsValid());
 
   if (move.IsWall()) {
     Offset offset = (move.IsHorizontalWall() ? Offset(1, 0) : Offset(0, 1));

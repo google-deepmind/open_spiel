@@ -193,7 +193,7 @@ void TestHistoryContainsActions(const Game& game,
 void CheckReturnsSum(const Game& game, const State& state) {
   std::vector<double> returns = state.Returns();
   double rsum = std::accumulate(returns.begin(), returns.end(), 0.0);
-  absl::optional<double> utility_sum = game.UtilitySum();
+  std::optional<double> utility_sum = game.UtilitySum();
 
   switch (game.GetType().utility) {
     case GameType::Utility::kZeroSum: {

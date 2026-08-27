@@ -34,7 +34,7 @@ class Solver(updates.Solver):
     if temperature < 0.:
       raise ValueError('temperature must be non-negative')
     self.temperature = temperature
-    self.lrs = lrs
+    self.lrs = lrs  # pyrefly: ignore[bad-assignment]
     self.num_estimates = 2
 
     if temperature > 0:
@@ -42,9 +42,9 @@ class Solver(updates.Solver):
     else:
       self.eps = 0.
     if euclidean:
-      self.update = lambda *args: self.euc_descent_step(*args, eps=self.eps)
+      self.update = lambda *args: self.euc_descent_step(*args, eps=self.eps)  # pyrefly: ignore[bad-assignment]
     else:
-      self.update = lambda *args: self.mirror_descent_step(*args, eps=self.eps)
+      self.update = lambda *args: self.mirror_descent_step(*args, eps=self.eps)  # pyrefly: ignore[bad-assignment]
 
   def init_vars(self, num_strats, num_players):
     """Initialize solver parameters."""
@@ -68,7 +68,7 @@ class Solver(updates.Solver):
       unregularized exploitability (stochastic estimate)
       shannon regularized exploitability (stochastic estimate)
     """
-    return gradients(*params, payoff_matrices, self.num_players,
+    return gradients(*params, payoff_matrices, self.num_players,  # pyrefly: ignore[bad-argument-count]
                      self.temperature, self.proj_grad)
 
   def exploitability(self, params, payoff_matrices):

@@ -17,8 +17,10 @@
 #include <memory>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/time/clock.h"
+#include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
@@ -166,6 +168,29 @@ void MCTSTest_GarbageCollect() {
   SPIEL_CHECK_TRUE(root->outcome.size() == 2 ||
                    root->explore_count == 1000000);
 }
+void MCTSTest_WallClockTimeLimit() {
+  auto game = LoadGame("tic_tac_toe");
+  auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
+  double max_wall_clock_time = 0.1;  // 100 ms
+  int max_simulations = 10000000;
+  algorithms::MCTSBot bot(
+      *game, evaluator, UCT_C, max_simulations,
+      /*max_memory_mb=*/100,
+      /*solve=*/false,
+      /*seed=*/42,
+      /*verbose=*/false, algorithms::ChildSelectionPolicy::UCT,
+      /*dirichlet_alpha=*/0.0,
+      /*dirichlet_epsilon=*/0.0,
+      /*dont_return_chance_node=*/false, max_wall_clock_time);
+
+  absl::Time start = absl::Now();
+  std::unique_ptr<algorithms::SearchNode> root =
+      bot.MCTSearch(*game->NewInitialState());
+  double duration = absl::ToDoubleSeconds(absl::Now() - start);
+
+  SPIEL_CHECK_GT(root->explore_count, 0);
+  SPIEL_CHECK_LE(duration, max_wall_clock_time * 5.0);  // Generous buffer
+}
 
 }  // namespace
 }  // namespace open_spiel
@@ -180,4 +205,5 @@ int main(int argc, char** argv) {
   open_spiel::MCTSTest_SolveLoss();
   open_spiel::MCTSTest_SolveWin();
   open_spiel::MCTSTest_GarbageCollect();
+  open_spiel::MCTSTest_WallClockTimeLimit();
 }

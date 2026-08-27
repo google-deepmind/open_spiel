@@ -18,16 +18,17 @@
 #include <string>
 #include <utility>
 
+#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::tic_tac_toe::CellState;
+using open_spiel::tic_tac_toe::TicTacToeGame;
 using open_spiel::tic_tac_toe::TicTacToeObservationStruct;
 using open_spiel::tic_tac_toe::TicTacToeState;
 using open_spiel::tic_tac_toe::TicTacToeStateStruct;
@@ -43,22 +44,27 @@ void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
   tic_tac_toe.attr("NUM_CELLS") = &tic_tac_toe::kNumCells;
 
   // Use bind_spiel_struct helper for standard constructors
-  bind_spiel_struct<TicTacToeStateStruct, open_spiel::StateStruct>(
-      tic_tac_toe, "TicTacToeStateStruct")
-      .def_readwrite("current_player", &TicTacToeStateStruct::current_player)
-      .def_readwrite("board", &TicTacToeStateStruct::board);
+  auto state_struct_class =
+      bind_spiel_struct<TicTacToeStateStruct, open_spiel::StateStruct>(
+          tic_tac_toe, "TicTacToeStateStruct")
+          .def_readwrite("current_player",
+                         &TicTacToeStateStruct::current_player)
+          .def_readwrite("board", &TicTacToeStateStruct::board);
 
-  bind_spiel_struct<TicTacToeObservationStruct, open_spiel::ObservationStruct>(
-      tic_tac_toe, "TicTacToeObservationStruct")
-      .def_readwrite("current_player",
-                     &TicTacToeObservationStruct::current_player)
-      .def_readwrite("board", &TicTacToeObservationStruct::board);
+  auto obs_struct_class =
+      bind_spiel_struct<TicTacToeObservationStruct,
+                        open_spiel::ObservationStruct>(
+          tic_tac_toe, "TicTacToeObservationStruct")
+          .def_readwrite("current_player",
+                         &TicTacToeObservationStruct::current_player)
+          .def_readwrite("board", &TicTacToeObservationStruct::board);
 
   using open_spiel::tic_tac_toe::TicTacToeActionStruct;
-  bind_spiel_struct<TicTacToeActionStruct, open_spiel::ActionStruct>(
-      tic_tac_toe, "TicTacToeActionStruct")
-      .def_readwrite("row", &TicTacToeActionStruct::row)
-      .def_readwrite("col", &TicTacToeActionStruct::col);
+  auto action_struct_class =
+      bind_spiel_struct<TicTacToeActionStruct, open_spiel::ActionStruct>(
+          tic_tac_toe, "TicTacToeActionStruct")
+          .def_readwrite("row", &TicTacToeActionStruct::row)
+          .def_readwrite("col", &TicTacToeActionStruct::col);
 
   py::enum_<CellState>(tic_tac_toe, "CellState")
       .value("EMPTY", CellState::kEmpty)
@@ -84,4 +90,19 @@ void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
             return dynamic_cast<TicTacToeState*>(
                 game_and_state.second.release());
           }));
+
+  auto tic_tac_toe_game =
+      py::classh<TicTacToeGame, Game>(tic_tac_toe, "TicTacToeGame")
+          // Pickle support
+          .def(py::pickle(
+              [](std::shared_ptr<const TicTacToeGame> game) {  // __getstate__
+                return game->ToString();
+              },
+              [](const std::string& data) {  // __setstate__
+                return std::dynamic_pointer_cast<TicTacToeGame>(
+                    std::const_pointer_cast<Game>(LoadGame(data)));
+              }));
+  tic_tac_toe_game.attr("StateStruct") = state_struct_class;
+  tic_tac_toe_game.attr("ObservationStruct") = obs_struct_class;
+  tic_tac_toe_game.attr("ActionStruct") = action_struct_class;
 }
