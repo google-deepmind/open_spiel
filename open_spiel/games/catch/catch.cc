@@ -20,7 +20,9 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
@@ -58,7 +60,8 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
-std::string StateToString(CellState state) {
+// Maps CellState to a single-character string for ToString().
+std::string CellStateToString(CellState state) {
   switch (state) {
     case CellState::kEmpty:
       return ".";
@@ -72,7 +75,37 @@ std::string StateToString(CellState state) {
   }
 }
 
+// Maps the action id to the human-readable direction string used in
+// CatchActionStruct.
+std::string ActionIdToDirection(Action action_id) {
+  switch (action_id) {
+    case kLeft:
+      return "left";
+    case kStay:
+      return "stay";
+    case kRight:
+      return "right";
+    default:
+      SpielFatalError(absl::StrCat("Out of range action: ", action_id));
+      return "This will never return.";
+  }
+}
+
+// Inverse of ActionIdToDirection.
+Action DirectionToActionId(const std::string& direction) {
+  if (direction == "left") return kLeft;
+  if (direction == "stay") return kStay;
+  if (direction == "right") return kRight;
+  SpielFatalError(absl::StrCat("Invalid direction string: '", direction,
+                               "'. Expected 'left', 'stay', or 'right'."));
+  return kStay;  // unreachable
+}
+
 }  // namespace
+
+// ---------------------------------------------------------------------------
+// CatchState
+// ---------------------------------------------------------------------------
 
 CatchState::CatchState(std::shared_ptr<const Game> game) : State(game) {
   const CatchGame& parent_game = static_cast<const CatchGame&>(*game);
@@ -80,7 +113,52 @@ CatchState::CatchState(std::shared_ptr<const Game> game) : State(game) {
   num_columns_ = parent_game.NumColumns();
 }
 
-int CatchState::CurrentPlayer() const {
+// Construct a CatchState from a typed CatchStateStruct.
+// Validation rules mirror those of TicTacToeState::TicTacToeState(…, struct).
+CatchState::CatchState(std::shared_ptr<const Game> game,
+                       const CatchStateStruct& state_struct)
+    : State(game) {
+  const CatchGame& parent_game = static_cast<const CatchGame&>(*game);
+  num_rows_ = parent_game.NumRows();
+  num_columns_ = parent_game.NumColumns();
+
+  const int br = state_struct.ball_row;
+  const int bc = state_struct.ball_col;
+  const int pc = state_struct.paddle_col;
+
+  if (br == -1 && bc == -1 && pc == -1) {
+    // Pre-chance node: all fields must be -1.
+    initialized_ = false;
+    ball_row_ = -1;
+    ball_col_ = -1;
+    paddle_col_ = -1;
+  } else {
+    // Post-chance node: validate each field individually.
+    if (br < 0 || br >= num_rows_) {
+      SpielFatalError(absl::StrFormat(
+          "Invalid ball_row %d: must be in [0, %d).", br, num_rows_));
+    }
+    if (bc < 0 || bc >= num_columns_) {
+      SpielFatalError(absl::StrFormat(
+          "Invalid ball_col %d: must be in [0, %d).", bc, num_columns_));
+    }
+    if (pc < 0 || pc >= num_columns_) {
+      SpielFatalError(absl::StrFormat(
+          "Invalid paddle_col %d: must be in [0, %d).", pc, num_columns_));
+    }
+
+    initialized_ = true;
+    ball_row_ = br;
+    ball_col_ = bc;
+    paddle_col_ = pc;
+  }
+
+  // Store the JSON of this starting state for serialization support
+  // (mirrors the pattern used in TicTacToeState and ConnectFourState).
+  starting_state_str_ = this->ToJson();
+}
+
+Player CatchState::CurrentPlayer() const {
   if (!initialized_) return kChancePlayerId;
   if (IsTerminal()) return kTerminalPlayerId;
   return 0;
@@ -120,14 +198,15 @@ std::string CatchState::ActionToString(Player player, Action action_id) const {
     return absl::StrCat("Initialized ball to ", action_id);
   SPIEL_CHECK_EQ(player, 0);
   switch (action_id) {
-    case 0:
+    case kLeft:
       return "LEFT";
-    case 1:
+    case kStay:
       return "STAY";
-    case 2:
+    case kRight:
       return "RIGHT";
     default:
       SpielFatalError("Out of range action");
+      return "This will never return.";
   }
 }
 
@@ -135,7 +214,7 @@ std::string CatchState::ToString() const {
   std::string str;
   for (int r = 0; r < num_rows_; ++r) {
     for (int c = 0; c < num_columns_; ++c) {
-      absl::StrAppend(&str, StateToString(BoardAt(r, c)));
+      absl::StrAppend(&str, CellStateToString(BoardAt(r, c)));
     }
     absl::StrAppend(&str, "\n");
   }
@@ -191,6 +270,47 @@ void CatchState::DoApplyAction(Action move) {
         std::min(std::max(paddle_col_ + direction, 0), num_columns_ - 1);
   }
 }
+
+// ---------------------------------------------------------------------------
+// OpenSpiel 2.0 struct API
+// ---------------------------------------------------------------------------
+
+std::unique_ptr<StateStruct> CatchState::ToStruct() const {
+  auto rv = std::make_unique<CatchStateStruct>();
+  rv->ball_row = ball_row_;
+  rv->ball_col = ball_col_;
+  rv->paddle_col = paddle_col_;
+  return rv;
+}
+
+// The observation for a single-player perfect-information game is the full
+// state. We follow the same pattern as TicTacToeState: delegate to ToJson().
+std::unique_ptr<ObservationStruct> CatchState::ToObservationStruct(
+    Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return std::make_unique<CatchObservationStruct>(this->ToJson());
+}
+
+std::unique_ptr<ActionStruct> CatchState::ActionToStruct(
+    Player player, Action action_id) const {
+  // Chance actions (ball column selection) are not represented as
+  // CatchActionStruct because they don't have a semantic direction.
+  SPIEL_CHECK_EQ(player, 0);
+  auto action_struct = std::make_unique<CatchActionStruct>();
+  action_struct->direction = ActionIdToDirection(action_id);
+  return action_struct;
+}
+
+std::vector<Action> CatchState::StructToActions(
+    const ActionStruct& action_struct) const {
+  const auto* a = SafeActionCast<CatchActionStruct>(action_struct);
+  return {DirectionToActionId(a->direction)};
+}
+
+// ---------------------------------------------------------------------------
+// CatchGame
+// ---------------------------------------------------------------------------
 
 CatchGame::CatchGame(const GameParameters& params)
     : Game(kGameType, params),

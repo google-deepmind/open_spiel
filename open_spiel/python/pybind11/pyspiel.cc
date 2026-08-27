@@ -22,6 +22,8 @@
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
@@ -51,10 +53,12 @@
 #include "open_spiel/python/pybind11/games_connect_four.h"
 #include "open_spiel/python/pybind11/games_crazy_eights.h"
 #include "open_spiel/python/pybind11/games_crazyhouse.h"
+#include "open_spiel/python/pybind11/games_crossword.h"
 #include "open_spiel/python/pybind11/games_dots_and_boxes.h"
 #include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
 #include "open_spiel/python/pybind11/games_go.h"
+#include "open_spiel/python/pybind11/games_go_fish.h"
 #include "open_spiel/python/pybind11/games_gomoku.h"
 #include "open_spiel/python/pybind11/games_hearts.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
@@ -73,6 +77,7 @@
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/python/pybind11/python_games.h"
 #include "open_spiel/python/pybind11/utils.h"
+#include "open_spiel/python/pybind11/utils_trajectories.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -98,7 +103,7 @@
 #include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
-#define PYSPIEL_VERSION "1.6.13"
+#define PYSPIEL_VERSION "2.0.2"
 
 // Flags governing Open Spiel behaviour
 ABSL_FLAG(bool, log_exceptions_to_stderr, true,
@@ -213,7 +218,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<std::string, std::string, GameType::Dynamics,
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
-                    bool, bool, bool, GameParameters, bool, bool>(),
+                    bool, bool, bool, GameParameters, bool, bool, bool>(),
            py::arg("short_name"), py::arg("long_name"), py::arg("dynamics"),
            py::arg("chance_mode"), py::arg("information"), py::arg("utility"),
            py::arg("reward_model"), py::arg("max_num_players"),
@@ -224,7 +229,8 @@ PYBIND11_MODULE(pyspiel, m) {
            py::arg("provides_observation_tensor"),
            py::arg("parameter_specification") = GameParameters(),
            py::arg("default_loadable") = true,
-           py::arg("provides_factored_observation_string") = false)
+           py::arg("provides_factored_observation_string") = false,
+           py::arg("action_structs_only") = false)
       .def(py::init<const GameType&>())
       .def_readonly("short_name", &GameType::short_name)
       .def_readonly("long_name", &GameType::long_name)
@@ -249,6 +255,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("provides_factored_observation_string",
                     &GameType::provides_factored_observation_string)
       .def_readonly("is_concrete", &GameType::is_concrete)
+      .def_readonly("action_structs_only", &GameType::action_structs_only)
       .def("pretty_print",
            [](const GameType& value) { return GameTypeToString(value); })
       .def("__repr__",
@@ -301,7 +308,7 @@ PYBIND11_MODULE(pyspiel, m) {
                     int>(),
            py::arg("num_distinct_actions"), py::arg("max_chance_outcomes"),
            py::arg("num_players"), py::arg("min_utility"),
-           py::arg("max_utility"), py::arg("utility_sum") = absl::nullopt,
+           py::arg("max_utility"), py::arg("utility_sum") = std::nullopt,
            py::arg("max_game_length"))
       .def(py::init<const GameInfo&>())
       .def_readonly("num_distinct_actions", &GameInfo::num_distinct_actions)
@@ -314,6 +321,9 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<SpielStruct> spiel_struct(m, "SpielStruct");
   spiel_struct.def("to_json", &SpielStruct::ToJson);
+  spiel_struct.def("to_dict", [](const SpielStruct& self) {
+    return self.to_json_base();
+  });
 
   py::class_<StateStruct, SpielStruct>(m, "StateStruct");
 
@@ -333,6 +343,13 @@ PYBIND11_MODULE(pyspiel, m) {
   py::class_<State::PlayerAction> player_action(m, "PlayerAction");
   player_action.def_readonly("player", &State::PlayerAction::player)
       .def_readonly("action", &State::PlayerAction::action);
+
+  py::classh<ActionStructSampler> action_struct_sampler(
+      m, "ActionStructSampler");
+  // Constructor arguments: a State and an rng seed.
+  action_struct_sampler.def(py::init<const State*, int>())
+      // Returns a unique_ptr<ActionStruct>.
+      .def("sample_action_struct", &ActionStructSampler::SampleActionStruct);
 
   // https://github.com/pybind/pybind11/blob/smart_holder/README_smart_holder.rst
   py::classh<State, PyState> state(m, "State");
@@ -373,6 +390,7 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::unique_ptr<ActionStruct>(State::*)(Action) const) &
                State::ActionToStruct)
       .def("struct_to_actions", &State::StructToActions)
+      .def("get_action_struct_sampler", &State::GetActionStructSampler)
       .def(
           "actions_to_struct",
           [](const State& state, Player player,
@@ -463,16 +481,17 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("num_distinct_actions", &Game::NumDistinctActions)
       .def("new_initial_states", &Game::NewInitialStates)
       .def("new_initial_state",
-           (std::unique_ptr<State>(open_spiel::Game::*)() const)
-           &Game::NewInitialState)
-      .def("new_initial_state",
-           (std::unique_ptr<State>(open_spiel::Game::*)(
-                                   const std::string&) const)
-           &Game::NewInitialState)
-      .def("new_initial_state",
-           (std::unique_ptr<State>(open_spiel::Game::*)(
-                                   const nlohmann::json&) const)
-           &Game::NewInitialState)
+           (std::unique_ptr<State> (open_spiel::Game::*)() const) &
+               Game::NewInitialState)
+      .def("new_initial_state", (std::unique_ptr<State> (open_spiel::Game::*)(
+                                    const std::string&) const) &
+                                    Game::NewInitialState)
+      .def("new_initial_state", (std::unique_ptr<State> (open_spiel::Game::*)(
+                                    const nlohmann::json&) const) &
+                                    Game::NewInitialState)
+      .def("new_initial_state", (std::unique_ptr<State> (open_spiel::Game::*)(
+                                    const StateStruct&) const) &
+                                    Game::NewInitialState)
       .def("new_initial_state_for_population",
            &Game::NewInitialStateForPopulation)
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
@@ -493,6 +512,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("action_to_string", &Game::ActionToString)
+      // action_struct_spec (no arguments), return {spec, example}
+      .def("action_struct_spec", &Game::ActionStructSpec)
       .def("max_chance_nodes_in_history", &Game::MaxChanceNodesInHistory)
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)
@@ -505,7 +526,7 @@ PYBIND11_MODULE(pyspiel, m) {
            })
       .def("make_observer",
            [](std::shared_ptr<const Game> game, const GameParameters& params) {
-             return game->MakeObserver(absl::nullopt, params);
+             return game->MakeObserver(std::nullopt, params);
            })
       .def("__str__", &Game::ToString)
       .def("__repr__", &Game::ToString)
@@ -834,6 +855,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_catch(m);
   init_pyspiel_games_chess(m);
   init_pyspiel_games_crazyhouse(m);
+  init_pyspiel_games_crossword(m);
   init_pyspiel_games_colored_trails(m);
   init_pyspiel_games_connect_four(m);
   init_pyspiel_games_crazy_eights(m);
@@ -841,6 +863,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_euchre(m);
   init_pyspiel_games_gin_rummy(m);
   init_pyspiel_games_go(m);
+  init_pyspiel_games_go_fish(m);
   init_pyspiel_games_gomoku(m);
   init_pyspiel_games_hearts(m);
   init_pyspiel_games_kuhn_poker(m);
@@ -856,6 +879,7 @@ PYBIND11_MODULE(pyspiel, m) {
   bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
+  init_pyspiel_utils_trajectories(m);       // Trajectories utilities.
   init_pyspiel_infostate_tree(
       m);  // Infostate-Tree and associated classes (Id etc.)
 

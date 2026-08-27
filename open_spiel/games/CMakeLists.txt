@@ -26,6 +26,8 @@ set(GAME_SOURCES
   bridge/bridge_scoring.h
   bridge/bridge_uncontested_bidding.cc
   bridge/bridge_uncontested_bidding.h
+  capture_the_flag/capture_the_flag.cc
+  capture_the_flag/capture_the_flag.h
   catch/catch.cc
   catch/catch.h
   checkers/checkers.cc
@@ -64,6 +66,11 @@ set(GAME_SOURCES
   crazyhouse/crazyhouse_common.h
   cribbage/cribbage.cc
   cribbage/cribbage.h
+  crossword/crossword.cc
+  crossword/crossword.h
+  crossword/crossword_default_puzzle.h
+  crossword/crossword_board.cc
+  crossword/crossword_board.h
   cursor_go/cursor_go.cc
   cursor_go/cursor_go.h
   dark_chess/dark_chess.cc
@@ -102,6 +109,8 @@ set(GAME_SOURCES
   go/go_board.h
   go/sgf_game_loader.cc
   go/sgf_game_loader.h
+  go_fish/go_fish.cc
+  go_fish/go_fish.h
   gomoku/gomoku.cc
   gomoku/gomoku.h
   gomoku/gomoku_grid.h
@@ -202,6 +211,8 @@ set(GAME_SOURCES
   skat/skat.h
   snake/snake.cc
   snake/snake.h
+  social_deduction/social_deduction.cc
+  social_deduction/social_deduction.h
   solitaire/solitaire.cc
   solitaire/solitaire.h
   spades/spades.cc
@@ -375,6 +386,10 @@ add_executable(bridge_test bridge/bridge_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(bridge_test bridge_test)
 
+add_executable(capture_the_flag_test capture_the_flag/capture_the_flag_test.cc
+               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
+add_test(capture_the_flag_test capture_the_flag_test)
+
 add_executable(catch_test catch/catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(catch_test catch_test)
@@ -438,6 +453,10 @@ add_test(crazy_eights_test crazy_eights_test)
 add_executable(cribbage_test cribbage/cribbage_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(cribbage_test cribbage_test)
+
+add_executable(crossword_test crossword/crossword_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crossword_test crossword_test)
 
 add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -524,6 +543,10 @@ add_test(sgf_game_loader_test sgf_game_loader_test)
 add_executable(phantom_go_test phantom_go/phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(phantom_go_test phantom_go_test)
+
+add_executable(go_fish_test go_fish/go_fish_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(go_fish_test go_fish_test)
 
 add_executable(gomoku_test gomoku/gomoku_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -698,6 +721,10 @@ add_test(skat_test skat_test)
 add_executable(snake_test snake/snake_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(snake_test snake_test)
+
+add_executable(social_deduction_test social_deduction/social_deduction_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(social_deduction_test social_deduction_test)
 
 add_executable(solitaire_test solitaire/solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

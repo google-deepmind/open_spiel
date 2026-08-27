@@ -128,29 +128,16 @@ struct HeartsStructContents {
                                  hearts_broken);
 };
 
-struct HeartsStateStruct : StateStruct, HeartsStructContents {
-  HeartsStateStruct() = default;
-  explicit HeartsStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
+SPIEL_DEFINE_STRUCT(HeartsStateStruct, StateStruct, HeartsStructContents);
 
-  nlohmann::json to_json_base() const override { return *this; }
-};
-
-struct HeartsObservationStruct : ObservationStruct, HeartsStructContents {
-  HeartsObservationStruct() = default;
-  explicit HeartsObservationStruct(const std::string& json_str) {
-    nlohmann::json data = nlohmann::json::parse(json_str);
-    data.get_to(static_cast<HeartsStructContents&>(*this));
-    observing_player = data.value("observing_player", -1);
-  }
-  nlohmann::json to_json_base() const override {
-    nlohmann::json j = static_cast<const HeartsStructContents&>(*this);
-    j["observing_player"] = observing_player;
-    return j;
-  }
+struct HeartsObservationExtras {
   int observing_player = -1;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
+      HeartsObservationExtras, observing_player);
 };
+
+SPIEL_DEFINE_STRUCT_WITH_EXTRAS(HeartsObservationStruct, ObservationStruct,
+                                HeartsStructContents, HeartsObservationExtras);
 
 // State of a single trick.
 class Trick {

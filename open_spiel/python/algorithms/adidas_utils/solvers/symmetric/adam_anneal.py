@@ -89,7 +89,7 @@ class Solver(object):
       unregularized exploitability (stochastic estimate)
       shannon entropy regularized exploitability (stochastic estimate)
     """
-    return self.gradients(*params, payoff_matrices, self.num_players,
+    return self.gradients(*params, payoff_matrices, self.num_players,  # pyrefly: ignore[bad-argument-count]
                           self.temperature, self.proj_grad)
 
   def exploitability(self, params, payoff_matrices):

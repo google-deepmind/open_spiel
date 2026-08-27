@@ -87,7 +87,7 @@ class NashRandomSearch(regret_minimizer.RegretMinimizer):
     per_policy_reward = 0.0
     for _ in range(self._value_estimation_n):
       per_policy_reward += np.array(
-          [self._value_estimator(pi, mu, self._game) for pi in self._policies]
+          [self._value_estimator(pi, mu, self._game) for pi in self._policies]  # pyrefly: ignore[bad-argument-type]
       )
     per_policy_reward /= self._value_estimation_n
     on_policy_reward = np.sum(per_policy_reward * nu)
@@ -97,10 +97,10 @@ class NashRandomSearch(regret_minimizer.RegretMinimizer):
     x = np.random.normal(size=len(self._policies))
     return softmax(x)
 
-  def step_for(self, T):  # pylint: disable=invalid-name
+  def step_for(self, T):  # pylint: disable=invalid-name  # pyrefly: ignore[bad-override]
     self.step(T)
 
-  def step(self, T):  # pylint: disable=invalid-name
+  def step(self, T):  # pylint: disable=invalid-name  # pyrefly: ignore[bad-override]
     best_nu = np.ones(len(self._policies)) / len(self._policies)
     nu = best_nu
     n = 0
@@ -121,7 +121,7 @@ class NashRandomSearch(regret_minimizer.RegretMinimizer):
     self._nu_weights = [1.0]
     self._exploitability = exploitability
 
-  def compute_average_regret(self):
+  def compute_average_regret(self):  # pyrefly: ignore[bad-override]
     return self._exploitability
 
   def reset(self, policies):

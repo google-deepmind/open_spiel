@@ -30,7 +30,7 @@ AFCEState::AFCEState(std::shared_ptr<const Game> game,
       mu_(mu),
       rec_index_(-1),
       defected_(game->NumPlayers(), 0),
-      defection_infoset_(game->NumPlayers(), absl::nullopt),
+      defection_infoset_(game->NumPlayers(), std::nullopt),
       recommendation_seq_(game->NumPlayers(), std::vector<Action>({})) {}
 
 Player AFCEState::CurrentPlayer() const {

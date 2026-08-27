@@ -77,14 +77,16 @@ class ISMCTSBot : public Bot {
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
             int max_simulations, int max_world_samples,
             ISMCTSFinalPolicyType final_policy_type,
-            bool use_observation_string, bool allow_inconsistent_action_sets);
+            bool use_observation_string, bool allow_inconsistent_action_sets,
+            double max_wall_clock_time = -1);
 
   // An IS-MCTS with sensible defaults.
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
-            int max_simulations)
+            int max_simulations, double max_wall_clock_time = -1)
       : ISMCTSBot(seed, evaluator, uct_c, max_simulations,
                   kUnlimitedNumWorldSamples,
-                  ISMCTSFinalPolicyType::kNormalizedVisitCount, false, false) {}
+                  ISMCTSFinalPolicyType::kNormalizedVisitCount, false, false,
+                  max_wall_clock_time) {}
 
   Action Step(const State& state) override;
 
@@ -144,6 +146,7 @@ class ISMCTSBot : public Bot {
 
   const double uct_c_;
   const int max_simulations_;
+  const double max_wall_clock_time_;
   const int max_world_samples_;
   const ISMCTSFinalPolicyType final_policy_type_;
   const bool use_observation_string_;

@@ -18,8 +18,8 @@
 #include <string>
 #include <utility>
 
-#include "open_spiel/games/connect_four/connect_four.h"
 #include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
+#include "open_spiel/games/connect_four/connect_four.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 
@@ -27,6 +27,7 @@ namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::connect_four::ConnectFourActionStruct;
+using open_spiel::connect_four::ConnectFourGame;
 using open_spiel::connect_four::ConnectFourGameParams;
 using open_spiel::connect_four::ConnectFourObservationStruct;
 using open_spiel::connect_four::ConnectFourState;
@@ -55,20 +56,21 @@ void open_spiel::init_pyspiel_games_connect_four(py::module& m) {
       connect_four, "ConnectFourObservationStruct");
   DefReadWriteConnectFourFields(obs_struct_class);
 
-  bind_spiel_struct<ConnectFourActionStruct, open_spiel::ActionStruct>(
-      connect_four, "ConnectFourActionStruct")
-      .def_readwrite("column", &ConnectFourActionStruct::column);
+  auto action_struct_class =
+      bind_spiel_struct<ConnectFourActionStruct, open_spiel::ActionStruct>(
+          connect_four, "ConnectFourActionStruct")
+          .def_readwrite("column", &ConnectFourActionStruct::column);
 
-  py::class_<ConnectFourGameParams, open_spiel::GameParametersStruct>(
-      connect_four, "ConnectFourGameParams")
-      .def(py::init<>())
-      .def_readwrite("game_name", &ConnectFourGameParams::game_name)
-      .def_readwrite("rows", &ConnectFourGameParams::rows)
-      .def_readwrite("columns", &ConnectFourGameParams::columns)
-      .def_readwrite("x_in_row", &ConnectFourGameParams::x_in_row)
-      .def_readwrite("egocentric_obs_tensor",
-                     &ConnectFourGameParams::egocentric_obs_tensor)
-      .def("to_json", &ConnectFourGameParams::ToJson);
+  auto game_params_cls =
+      bind_spiel_struct<ConnectFourGameParams,
+                        open_spiel::GameParametersStruct>(
+          connect_four, "ConnectFourGameParams")
+          .def_readwrite("game_name", &ConnectFourGameParams::game_name)
+          .def_readwrite("rows", &ConnectFourGameParams::rows)
+          .def_readwrite("columns", &ConnectFourGameParams::columns)
+          .def_readwrite("x_in_row", &ConnectFourGameParams::x_in_row)
+          .def_readwrite("egocentric_obs_tensor",
+                         &ConnectFourGameParams::egocentric_obs_tensor);
 
   py::classh<ConnectFourState, State>(connect_four, "ConnectFourState")
       // Pickle support
@@ -82,4 +84,20 @@ void open_spiel::init_pyspiel_games_connect_four(py::module& m) {
             return dynamic_cast<ConnectFourState*>(
                 game_and_state.second.release());
           }));
+
+  auto connect_four_game =
+      py::classh<ConnectFourGame, Game>(connect_four, "ConnectFourGame")
+          // Pickle support
+          .def(py::pickle(
+              [](std::shared_ptr<const ConnectFourGame> game) {  // __getstate__
+                return game->ToString();
+              },
+              [](const std::string& data) {  // __setstate__
+                return std::dynamic_pointer_cast<ConnectFourGame>(
+                    std::const_pointer_cast<Game>(LoadGame(data)));
+              }));
+  connect_four_game.attr("StateStruct") = state_struct_class;
+  connect_four_game.attr("ObservationStruct") = obs_struct_class;
+  connect_four_game.attr("ActionStruct") = action_struct_class;
+  connect_four_game.attr("GameParametersStruct") = game_params_cls;
 }

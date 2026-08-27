@@ -19,6 +19,9 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -62,12 +65,44 @@ enum class CellState {
   kPaddle,
 };
 
+// ---------------------------------------------------------------------------
+// Struct layer (OpenSpiel 2.0 architecture)
+// ---------------------------------------------------------------------------
+
+// Shared contents for both CatchStateStruct and CatchObservationStruct.
+// The three integers fully characterise a post-chance-node Catch state.
+// ball_row == -1 signals that the chance node has not yet been resolved
+// (i.e. the game is still at the initial chance node).
+struct CatchStructContents {
+  int ball_row;    // -1 before the chance action is taken, 0-based otherwise
+  int ball_col;    // -1 before the chance action is taken, 0-based otherwise
+  int paddle_col;  // -1 before the chance action is taken, 0-based otherwise
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(CatchStructContents, ball_row, ball_col,
+                                 paddle_col);
+};
+
+// State and Observation structs using SPIEL_DEFINE_STRUCT macro.
+SPIEL_DEFINE_STRUCT(CatchStateStruct, StateStruct, CatchStructContents);
+SPIEL_DEFINE_STRUCT(CatchObservationStruct, ObservationStruct,
+                    CatchStructContents);
+
+// Action struct: encodes the paddle direction as a semantic name.
+struct CatchActionStruct : public ActionStruct {
+  // "left" / "stay" / "right"
+  std::string direction;
+  SPIEL_STRUCT_BOILERPLATE(CatchActionStruct, direction);
+};
+
 class CatchGame;
 
 // State of an in-play game.
 class CatchState : public State {
  public:
-  CatchState(std::shared_ptr<const Game> game);
+  explicit CatchState(std::shared_ptr<const Game> game);
+  // Construct from a CatchStateStruct (enables JSON round-trips and
+  // NewInitialState(json)).
+  CatchState(std::shared_ptr<const Game> game,
+             const CatchStateStruct& state_struct);
   CatchState(const CatchState&) = default;
 
   Player CurrentPlayer() const override;
@@ -87,6 +122,15 @@ class CatchState : public State {
   int ball_col() const { return ball_col_; }
   int paddle_col() const { return paddle_col_; }
 
+  // OpenSpiel 2.0 struct API overrides.
+  std::unique_ptr<StateStruct> ToStruct() const override;
+  std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const override;
+  std::unique_ptr<ActionStruct> ActionToStruct(Player player,
+                                               Action action_id) const override;
+  std::vector<Action> StructToActions(
+      const ActionStruct& action_struct) const override;
+
  protected:
   void DoApplyAction(Action move) override;
 
@@ -103,9 +147,24 @@ class CatchState : public State {
 class CatchGame : public Game {
  public:
   explicit CatchGame(const GameParameters& params);
+
+  using Game::NewInitialState;
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new CatchState(shared_from_this()));
   }
+  // Construct a state from a typed struct (useful for testing and tooling).
+  std::unique_ptr<State> NewInitialState(
+      const CatchStateStruct& state_struct) const {
+    return std::unique_ptr<State>(
+        new CatchState(shared_from_this(), state_struct));
+  }
+  // Construct a state from a JSON object (satisfies the Game base-class
+  // virtual, enabling the generic NewInitialState(string) path).
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const override {
+    return NewInitialState(CatchStateStruct(json));
+  }
+
   std::vector<int> ObservationTensorShape() const override {
     return {num_rows_, num_columns_};
   }

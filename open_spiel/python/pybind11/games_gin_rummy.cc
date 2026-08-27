@@ -17,7 +17,6 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/gin_rummy/gin_rummy.h"
@@ -100,15 +99,16 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .value("GAME_OVER", gin_rummy::Phase::kGameOver)
       .export_values();
 
-  py::class_<gin_rummy::GinRummyStateStruct, open_spiel::StateStruct>
-      state_struct_class(gin_rummy, "GinRummyStateStruct");
-  state_struct_class.def(py::init<>()).def(py::init<std::string>());
+  auto state_struct_class =
+      bind_spiel_struct<gin_rummy::GinRummyStateStruct,
+                        open_spiel::StateStruct>(
+          gin_rummy, "GinRummyStateStruct");
   DefReadWriteGinRummyFields(state_struct_class);
 
-  py::class_<gin_rummy::GinRummyObservationStruct,
-             open_spiel::ObservationStruct>
-      obs_struct_class(gin_rummy, "GinRummyObservationStruct");
-  obs_struct_class.def(py::init<>()).def(py::init<std::string>());
+  auto obs_struct_class =
+      bind_spiel_struct<gin_rummy::GinRummyObservationStruct,
+                        open_spiel::ObservationStruct>(
+          gin_rummy, "GinRummyObservationStruct");
   DefReadWriteGinRummyFields(obs_struct_class);
   obs_struct_class.def_readwrite(
       "observing_player",
@@ -145,7 +145,7 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
                 game_and_state.second.release());
           }));
 
-  py::classh<GinRummyGame, Game>(m, "GinRummyGame")
+  auto gin_rummy_game = py::classh<GinRummyGame, Game>(m, "GinRummyGame")
       .def("oklahoma", &GinRummyGame::Oklahoma)
       .def("knock_card", &GinRummyGame::KnockCard)
       // Pickle support
@@ -157,6 +157,8 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
             return std::dynamic_pointer_cast<GinRummyGame>(
                 std::const_pointer_cast<Game>(LoadGame(data)));
           }));
+  gin_rummy_game.attr("StateStruct") = state_struct_class;
+  gin_rummy_game.attr("ObservationStruct") = obs_struct_class;
 
   py::class_<GinRummyUtils>(gin_rummy, "GinRummyUtils")
       .def(py::init<int, int, int>())

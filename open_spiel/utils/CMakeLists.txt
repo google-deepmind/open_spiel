@@ -24,6 +24,8 @@ add_library (utils OBJECT
   thread.h
   thread.cc
   threaded_queue.h
+  trajectories.h
+  trajectories.cc
 )
 target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -91,3 +93,7 @@ add_test(tensor_view_test tensor_view_test)
 add_executable(threaded_queue_test threaded_queue_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(threaded_queue_test threaded_queue_test)
+
+add_executable(util_trajectories_test trajectories_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(util_trajectories_test util_trajectories_test)

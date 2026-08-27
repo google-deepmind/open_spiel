@@ -31,7 +31,7 @@ class EloTest(parameterized.TestCase):
         base.WeightedVote(2, ["C", "A", "B"]),
         base.WeightedVote(1, ["B", "C", "A"]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     ratings_map = elo.compute_ratings_from_preference_profile(profile)
     self.assertAlmostEqual(ratings_map["C"], ratings_map["A"])
     self.assertLess(ratings_map["B"], ratings_map["C"])
@@ -52,7 +52,7 @@ class EloTest(parameterized.TestCase):
         base.WeightedVote(2, [2, 0, 1]),
         base.WeightedVote(1, [1, 2, 0]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     ratings_map = elo.compute_ratings_from_preference_profile(profile)
     # Make sure alteratives with integer keys are in the ratings map.
     for alt in alternatives:

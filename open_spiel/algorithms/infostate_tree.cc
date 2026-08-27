@@ -525,7 +525,7 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
 SequenceId InfostateTree::empty_sequence() const {
   return root().sequence_id();
 }
-absl::optional<DecisionId> InfostateTree::DecisionIdForSequence(
+std::optional<DecisionId> InfostateTree::DecisionIdForSequence(
     const SequenceId& sequence_id) const {
   SPIEL_DCHECK_TRUE(sequence_id.BelongsToTree(this));
   InfostateNode* node = sequences_.at(sequence_id.id());
@@ -536,7 +536,7 @@ absl::optional<DecisionId> InfostateTree::DecisionIdForSequence(
     return node->parent_->decision_id();
   }
 }
-absl::optional<InfostateNode*> InfostateTree::DecisionForSequence(
+std::optional<InfostateNode*> InfostateTree::DecisionForSequence(
     const SequenceId& sequence_id) const {
   SPIEL_DCHECK_TRUE(sequence_id.BelongsToTree(this));
   InfostateNode* node = sequences_.at(sequence_id.id());

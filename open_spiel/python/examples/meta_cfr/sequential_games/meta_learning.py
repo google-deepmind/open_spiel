@@ -175,7 +175,7 @@ def compute_next_policy(infostates: typing.InfostateMapping,
         np.expand_dims(np.array(batched_input), axis=1))
     batched_net_output = utils.get_network_output_batched(  # pytype: disable=wrong-arg-types  # jnp-type
         net_apply, net_params,
-        batched_input_jnp,
+        batched_input_jnp,  # pyrefly: ignore[bad-argument-type]
         relevant_illegal_action, key)
     for i, infostate in enumerate(output_mapping):
       net_output = jnp.squeeze(batched_net_output[i])
@@ -446,7 +446,7 @@ class MetaCFRRegretAgent:
           batch = next(data_loader)
           cfvalues, infoset = zip(*batch)
           cfvalues = np.array(list(cfvalues), dtype=object)
-          cfvalues = utils.mask(cfvalues, infoset, len(self._all_actions),
+          cfvalues = utils.mask(cfvalues, infoset, len(self._all_actions),  # pyrefly: ignore[bad-argument-type]
                                 FLAGS.batch_size)
           self.optimize_infoset(cfvalues, infoset, self._infostate_map,  # pytype: disable=wrong-arg-types
                                 self._rng)

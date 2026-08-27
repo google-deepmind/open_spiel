@@ -327,7 +327,7 @@ class AverageNetworkFictitiousPlay(object):
       if self._logging_fn and (step + 1) % self._eval_every == 0:
         self._logging_fn(
             self._fp_iteration, step, {
-                f'avg_agent{i}/loss': float(agent.loss)
+                f'avg_agent{i}/loss': float(agent.loss)  # pyrefly: ignore[bad-argument-type]
                 for i, agent in enumerate(self._avg_rl_agents)
             })
 

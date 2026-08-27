@@ -83,15 +83,7 @@ struct GoStateStruct : StateStruct {
   bool is_terminal;
   std::string winner;
 
-  GoStateStruct() = default;
-  explicit GoStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override {
-    return *this;
-  }
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(
+  SPIEL_STRUCT_BOILERPLATE(
       GoStateStruct, board_size, komi, current_player, move_number,
       previous_move_a1, board_grid, is_terminal, winner);
 };

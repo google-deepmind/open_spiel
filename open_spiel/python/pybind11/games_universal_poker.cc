@@ -33,9 +33,8 @@ void open_spiel::init_pyspiel_games_universal_poker(py::module& m) {
   sub.def("load_universal_poker_from_acpc_gamedef",
           &universal_poker::LoadUniversalPokerGameFromACPCGamedef);
 
-  py::class_<UniversalPokerStateStruct, StateStruct>(
+  bind_spiel_struct<UniversalPokerStateStruct, StateStruct>(
       sub, "UniversalPokerStateStruct")
-      .def(py::init<>())
       .def_readwrite("acpc_state", &UniversalPokerStateStruct::acpc_state)
       .def_readwrite("current_player",
                      &UniversalPokerStateStruct::current_player)

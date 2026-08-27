@@ -153,7 +153,7 @@ def compute_best_response_values(infostate: InfostateNode) -> float:
   for action in infostate_actions:
     action_values[action] = 0
     for child in infostate.children[action].values():
-      action_values[action] += compute_best_response_values(child)
+      action_values[action] += compute_best_response_values(child)  # pyrefly: ignore[unsupported-operation]
   return max(action_values.values())
 
 
@@ -179,7 +179,7 @@ def compute_best_response_policy(infostate: InfostateNode) -> float:
   for action in infostate_actions:
     action_values[action] = 0
     for child in infostate.children[action].values():
-      action_values[action] += compute_best_response_policy(child)
+      action_values[action] += compute_best_response_policy(child)  # pyrefly: ignore[unsupported-operation]
 
   infostate.policy = {action: 0 for action in infostate.get_actions()}
   max_action_value = max(action_values.values())
@@ -212,12 +212,12 @@ def compute_counterfactual_values(infostate: InfostateNode) -> float:
   action_values = {action: 0 for action in infostate_actions}
   for action in infostate_actions:
     for child in infostate.children[action].values():
-      action_values[action] += compute_counterfactual_values(child)
+      action_values[action] += compute_counterfactual_values(child)  # pyrefly: ignore[unsupported-operation]
   infostate.counterfactual_action_values = action_values
   counterfactual_value = 0
   for action in infostate_actions:
     counterfactual_value += infostate.policy[action] * action_values[action]
-  infostate.counterfactual_value = counterfactual_value
+  infostate.counterfactual_value = counterfactual_value  # pyrefly: ignore[bad-assignment]
   return counterfactual_value
 
 

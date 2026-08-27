@@ -515,7 +515,7 @@ def sweep_pi_vs_epsilon(payoff_tables,
                                use_inf_alpha=True, inf_alpha_eps=epsilon)
       epsilon_pi_hist[epsilon] = pi
       # Stop when pi converges
-      if num_iters > min_iters and np.allclose(pi, pi_prev):
+      if num_iters > min_iters and np.allclose(pi, pi_prev):  # pyrefly: ignore[bad-argument-type]
         break
 
       epsilon *= epsilon_mult_factor
@@ -655,7 +655,7 @@ def sweep_pi_vs_alpha(payoff_tables,
       num_iters += 1
       alpharank_succeeded_once = True
     except ValueError as _:
-      if warm_start_alpha is not None and not alpharank_succeeded_once:
+      if warm_start_alpha is not None and not alpharank_succeeded_once:  # pyrefly: ignore[unbound-name]
         # When warm_start_alpha is used, there's a chance that
         # the initial warm_start_alpha is too large and causes exceptions due to
         # the Markov transition matrix being reducible. So keep decreasing until
@@ -684,9 +684,9 @@ def sweep_pi_vs_alpha(payoff_tables,
         legend_sort_clusters=legend_sort_clusters)
 
   if return_alpha:
-    return pi, alpha
+    return pi, alpha  # pyrefly: ignore[unbound-name]
   else:
-    return pi
+    return pi  # pyrefly: ignore[unbound-name]
 
 
 def compute_and_report_alpharank(payoff_tables,

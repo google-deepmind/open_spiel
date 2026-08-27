@@ -81,7 +81,7 @@ def main(argv: Sequence[str]) -> None:
         game_tree, FLAGS.meta_learner_training_epochs)
 
   print("Evaluation seed:", random_seeds_eval)
-  print("Meta_cfr agent:", meta_cfr_vals)
+  print("Meta_cfr agent:", meta_cfr_vals)  # pyrefly: ignore[unbound-name]
   print("cfr_plus agent:", cfr_plus_vals)
   print("cfr agent:", cfr_vals)
 

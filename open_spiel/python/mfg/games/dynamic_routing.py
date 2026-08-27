@@ -339,7 +339,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
     od_demand = self.get_game().od_demand
     dist = [
         self.state_to_str(  # pylint:disable=g-complex-comprehension
-            self._vehicle_location,
+            self._vehicle_location,  # pyrefly: ignore[bad-argument-type]
             self._current_time_step,
             player_id=pyspiel.PlayerId.MEAN_FIELD,
             waiting_time=waiting_time,
@@ -419,7 +419,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
     if self._waiting_time > 0:
       return [dynamic_routing_utils.NO_POSSIBLE_ACTION]
     _, end_section_node = dynamic_routing_utils._nodes_from_road_section(  # pylint:disable=protected-access
-        self._vehicle_location)
+        self._vehicle_location)  # pyrefly: ignore[bad-argument-type]
     successors = self.get_game().network.get_successors(end_section_node)
     if self.get_game().perform_sanity_checks:
       if not successors:

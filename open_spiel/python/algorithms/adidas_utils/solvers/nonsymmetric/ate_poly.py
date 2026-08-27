@@ -95,7 +95,7 @@ class Solver(object):
       unregularized exploitability (stochastic estimate)
       tsallis regularized exploitability (stochastic estimate)
     """
-    return self.gradients(*params, payoff_matrices, self.p, self.proj_grad)
+    return self.gradients(*params, payoff_matrices, self.p, self.proj_grad)  # pyrefly: ignore[bad-argument-count]
 
   def exploitability(self, params, payoff_matrices):
     """Compute and return tsallis entropy regularized exploitability.
@@ -182,10 +182,10 @@ class Solver(object):
     grad_y = self.init_polymatrix(self.num_strats, self.num_players)
     unreg_exp = []
     reg_exp = []
-    for i in range(self.num_players):
+    for i in range(self.num_players):  # pyrefly: ignore[bad-argument-type]
 
       nabla_i = np.zeros_like(dist[i])
-      for j in range(self.num_players):
+      for j in range(self.num_players):  # pyrefly: ignore[bad-argument-type]
         if j == i:
           continue
         if i < j:
@@ -198,7 +198,7 @@ class Solver(object):
           grad_y[(j, i)][1] = hess_i_ij_from_y.T - hess_i_ij.T
 
         nabla_ij = hess_i_ij_from_y.dot(dist[j])
-        nabla_i += nabla_ij / float(self.num_players - 1)
+        nabla_i += nabla_ij / float(self.num_players - 1)  # pyrefly: ignore[unsupported-operation]
 
       if p > 0:
         power = 1. / float(p)
@@ -234,10 +234,10 @@ class Solver(object):
 
     # then construct exploitability gradient
     grad_dist = []
-    for i in range(self.num_players):
+    for i in range(self.num_players):  # pyrefly: ignore[bad-argument-type]
 
       grad_dist_i = -policy_gradient[i]
-      for j in range(self.num_players):
+      for j in range(self.num_players):  # pyrefly: ignore[bad-argument-type]
         if j == i:
           continue
         if i < j:

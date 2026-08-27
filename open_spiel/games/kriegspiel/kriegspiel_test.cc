@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -30,6 +34,164 @@ void BasicKriegspielTests(int board_size) {
   testing::RandomSimTest(*LoadGame("kriegspiel", params), 20);
 }
 
+// Regression test: verifies that the kAllPlayers observation tensor
+// produces distinct tensor names for each player's private info.
+//
+// Before the fix, the kAllPlayers branch in KriegspielObserver::WriteTensor
+// used the observing player's color for both players' tensor prefixes,
+// causing the second player's data to silently overwrite the first.
+void AllPlayersObservationTensorTest() {
+  // Load the game and create initial state.
+  auto game = LoadGame("kriegspiel");
+  SPIEL_CHECK_TRUE(game != nullptr);
+  auto state = game->NewInitialState();
+  SPIEL_CHECK_TRUE(state != nullptr);
+
+  // Create an observer with kAllPlayers private info (the buggy path).
+  IIGObservationType obs_type{/*public_info=*/true,
+                              /*perfect_recall=*/false,
+                              /*private_info=*/PrivateInfoType::kAllPlayers};
+  auto observer = game->MakeObserver(obs_type, {});
+  SPIEL_CHECK_TRUE(observer != nullptr);
+
+  // Use TrackingVectorAllocator to capture tensor names and data.
+  TrackingVectorAllocator allocator;
+  observer->WriteTensor(*state, /*player=*/0, &allocator);
+
+  // Inspect the tensor names produced by the allocator.
+  auto tensors = allocator.tensors_info();
+  SPIEL_CHECK_GT(tensors.size(), 0);
+
+  // Count how many tensor names contain "black" vs "white" prefixes.
+  // After the fix, we expect BOTH colors to appear, because the
+  // kAllPlayers path should write private info for player 0 (black)
+  // AND player 1 (white).
+  int black_count = 0;
+  int white_count = 0;
+  for (const auto& tensor : tensors) {
+    const std::string& name = tensor.name();
+    if (name.find("black") != std::string::npos) {
+      ++black_count;
+    }
+    if (name.find("white") != std::string::npos) {
+      ++white_count;
+    }
+  }
+
+  // CRITICAL ASSERTION: Both colors must be present.
+  // Before the fix, one of these would be 0 because both players'
+  // tensors shared the same prefix (the observer's color).
+  SPIEL_CHECK_GT(black_count, 0);
+  SPIEL_CHECK_GT(white_count, 0);
+
+  // Also verify from player 1's perspective — the result should be
+  // the same: both colors present regardless of who is observing.
+  TrackingVectorAllocator allocator_p1;
+  observer->WriteTensor(*state, /*player=*/1, &allocator_p1);
+  auto tensors_p1 = allocator_p1.tensors_info();
+
+  int black_count_p1 = 0;
+  int white_count_p1 = 0;
+  for (const auto& tensor : tensors_p1) {
+    const std::string& name = tensor.name();
+    if (name.find("black") != std::string::npos) {
+      ++black_count_p1;
+    }
+    if (name.find("white") != std::string::npos) {
+      ++white_count_p1;
+    }
+  }
+
+  SPIEL_CHECK_GT(black_count_p1, 0);
+  SPIEL_CHECK_GT(white_count_p1, 0);
+
+  // The number of tensors per color should be equal for both observers.
+  SPIEL_CHECK_EQ(black_count, black_count_p1);
+  SPIEL_CHECK_EQ(white_count, white_count_p1);
+}
+
+// Test InformationStateString properties:
+//   1. Non-empty (always != "")
+//   2. Player-aware (different player → different string)
+//   3. Perfect recall (string grows monotonically with each action)
+void InformationStateStringTest() {
+  GameParameters params;
+  params["board_size"] = GameParameter(4);
+  auto game = LoadGame("kriegspiel", params);
+  SPIEL_CHECK_TRUE(game != nullptr);
+  auto state = game->NewInitialState();
+  SPIEL_CHECK_TRUE(state != nullptr);
+
+  // Property 1 & 2 at the initial state.
+  std::string info_p0 = state->InformationStateString(0);
+  std::string info_p1 = state->InformationStateString(1);
+  SPIEL_CHECK_FALSE(info_p0.empty());   // non-empty
+  SPIEL_CHECK_FALSE(info_p1.empty());   // non-empty
+  SPIEL_CHECK_NE(info_p0, info_p1);     // player-aware (player prefix differs)
+
+  // Play several moves and verify all properties hold throughout.
+  int steps = 0;
+  while (!state->IsTerminal() && steps < 10) {
+    auto legal = state->LegalActions();
+    SPIEL_CHECK_FALSE(legal.empty());
+    state->ApplyAction(legal[0]);
+    steps++;
+
+    std::string new_info_p0 = state->InformationStateString(0);
+    std::string new_info_p1 = state->InformationStateString(1);
+
+    // Property 1: always non-empty.
+    SPIEL_CHECK_FALSE(new_info_p0.empty());
+    SPIEL_CHECK_FALSE(new_info_p1.empty());
+
+    // Property 2: always player-aware.
+    SPIEL_CHECK_NE(new_info_p0, new_info_p1);
+
+    // Perfect recall: both players' info states grow with each action
+    // (both hear every umpire message).
+    SPIEL_CHECK_GT(new_info_p0.size(), info_p0.size());
+    SPIEL_CHECK_GT(new_info_p1.size(), info_p1.size());
+
+    info_p0 = new_info_p0;
+    info_p1 = new_info_p1;
+  }
+}
+
+// Test ObservationString properties:
+//   - Always non-empty (includes board view even before the first move)
+//   - Player-aware (different players see different pieces)
+//   - Includes umpire message after moves
+//   - Different from InformationStateString (snapshot vs full history)
+void ObservationStringTest() {
+  GameParameters params;
+  params["board_size"] = GameParameter(4);
+  auto game = LoadGame("kriegspiel", params);
+  auto state = game->NewInitialState();
+
+  // Non-empty even before any move (contains own piece positions).
+  std::string obs_p0 = state->ObservationString(0);
+  std::string obs_p1 = state->ObservationString(1);
+  SPIEL_CHECK_FALSE(obs_p0.empty());
+  SPIEL_CHECK_FALSE(obs_p1.empty());
+
+  // Player-aware: different players see different pieces.
+  SPIEL_CHECK_NE(obs_p0, obs_p1);
+
+  // Apply the first legal move.
+  auto legal = state->LegalActions();
+  state->ApplyAction(legal[0]);
+
+  // Observation changes after a move (umpire message changes).
+  std::string new_obs_p0 = state->ObservationString(0);
+  SPIEL_CHECK_FALSE(new_obs_p0.empty());
+  SPIEL_CHECK_NE(obs_p0, new_obs_p0);
+
+  // Observation is different from InformationStateString
+  // (observation is a snapshot, info state is the full history).
+  std::string info = state->InformationStateString(0);
+  SPIEL_CHECK_NE(new_obs_p0, info);
+}
+
 }  // namespace
 }  // namespace kriegspiel
 }  // namespace open_spiel
@@ -37,4 +199,7 @@ void BasicKriegspielTests(int board_size) {
 int main(int argc, char** argv) {
   open_spiel::kriegspiel::BasicKriegspielTests(/*board_size=*/4);
   open_spiel::kriegspiel::BasicKriegspielTests(/*board_size=*/8);
+  open_spiel::kriegspiel::AllPlayersObservationTensorTest();
+  open_spiel::kriegspiel::InformationStateStringTest();
+  open_spiel::kriegspiel::ObservationStringTest();
 }

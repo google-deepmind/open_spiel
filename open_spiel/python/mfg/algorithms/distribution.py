@@ -75,7 +75,7 @@ class DistributionPolicy(tabular_distribution.TabularDistribution):
 
     while type_from_states(current_states) != pyspiel.StateType.TERMINAL:
       new_states, new_distribution = self._one_forward_step(
-          current_states, current_distribution, self._policy)
+          current_states, current_distribution, self._policy)  # pyrefly: ignore[bad-argument-type]
       _check_distribution_sum(new_distribution, self.game.num_players())
       current_distribution = new_distribution
       current_states = new_states

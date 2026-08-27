@@ -32,7 +32,7 @@ AFCCEState::AFCCEState(std::shared_ptr<const Game> game,
       defect_action_(defect_action),
       rec_index_(-1),
       defected_(game->NumPlayers(), 0),
-      defection_infoset_(game->NumPlayers(), absl::nullopt),
+      defection_infoset_(game->NumPlayers(), std::nullopt),
       recommendation_seq_(game->NumPlayers(), std::vector<Action>({})) {}
 
 Player AFCCEState::CurrentPlayer() const {

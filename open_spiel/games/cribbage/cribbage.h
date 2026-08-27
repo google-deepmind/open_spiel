@@ -102,6 +102,7 @@ class CribbageState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
+  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
@@ -150,6 +151,10 @@ class CribbageState : public State {
   std::vector<bool> passed_;
   Player last_played_player_;  // Last player to have played a card.
   int current_sum_ = -1;
+
+  // Records the phase at each step of history_, so InformationStateString can
+  // determine which actions are public (play phase) vs private (card phase).
+  std::vector<Phase> phase_history_;
 
   void NextRound();
 };

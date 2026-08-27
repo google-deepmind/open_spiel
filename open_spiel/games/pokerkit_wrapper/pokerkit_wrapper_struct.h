@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -84,24 +84,14 @@ struct PokerkitStateStruct : StateStruct {
   int pot_size = 0;
   std::vector<int> starting_stacks = {};
 
-  PokerkitStateStruct() = default;
-  explicit PokerkitStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override {
-    nlohmann::json j = *this;
-    return j;
-  }
-
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(PokerkitStateStruct, observation,
-                                 legal_actions, current_player, is_terminal,
-                                 stacks, bets, board_cards, hole_cards, pots,
-                                 burn_cards, mucked_cards,
-                                 per_player_phh_actions,
-                                 per_player_acpc_logs, blinds, betting_history,
-                                 player_contributions,
-                                 pot_size, starting_stacks);
+  SPIEL_STRUCT_BOILERPLATE(PokerkitStateStruct, observation,
+                           legal_actions, current_player, is_terminal,
+                           stacks, bets, board_cards, hole_cards, pots,
+                           burn_cards, mucked_cards,
+                           per_player_phh_actions,
+                           per_player_acpc_logs, blinds, betting_history,
+                           player_contributions,
+                           pot_size, starting_stacks);
 };
 
 }  // namespace pokerkit_wrapper

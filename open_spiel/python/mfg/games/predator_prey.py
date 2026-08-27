@@ -523,7 +523,7 @@ class MFGPredatorPreyState(pyspiel.State):
     eps = 1e-25
     densities = np.array(
         [
-            self.get_pos_proba(self._pos, population)
+            self.get_pos_proba(self._pos, population)  # pyrefly: ignore[bad-argument-type]
             for population in range(self.num_players())
         ],
         dtype=np.float64,

@@ -166,7 +166,7 @@ class MCTSBot : public Bot {
       int seed, bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT,
       double dirichlet_alpha = 0, double dirichlet_epsilon = 0,
-      bool dont_return_chance_node = false);
+      bool dont_return_chance_node = false, double max_wall_clock_time = -1);
   ~MCTSBot() = default;
 
   void Restart() override {}
@@ -204,6 +204,7 @@ class MCTSBot : public Bot {
 
   double uct_c_;
   int max_simulations_;
+  double max_wall_clock_time_;
   int max_nodes_;  // Max nodes allowed in the tree
   int nodes_;  // Nodes used in the tree.
   int gc_limit_;

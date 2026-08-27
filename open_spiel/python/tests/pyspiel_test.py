@@ -47,6 +47,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "bridge",
     "bridge_uncontested_bidding",
     "cached_tree",
+    "capture_the_flag",
     "catch",
     "chat_game",  # python game locating in python/games/chat_games/
     "checkers",
@@ -63,6 +64,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "crazy_eights",
     "crazyhouse",
     "cribbage",
+    "crossword",
     "cursor_go",
     "dark_chess",
     "dark_hex",
@@ -76,6 +78,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "first_sealed_auction",
     "gin_rummy",
     "go",
+    "go_fish",
     "gomoku",
     "goofspiel",
     "havannah",
@@ -138,6 +141,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "python_mfg_dynamic_routing",
     "python_mfg_periodic_aversion",
     "python_mfg_predator_prey",
+    "python_pursuit_evasion",
     "python_kuhn_poker",
     "python_team_dominoes",
     "python_tic_tac_toe",
@@ -151,6 +155,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "shogi",
     "skat",
     "snake",
+    "social_deduction",
     "start_at",
     "solitaire",
     "spades",
@@ -439,6 +444,10 @@ class PyspielTest(parameterized.TestCase):
     json_str = action_struct.to_json()
     self.assertIn('"row":', json_str)
     self.assertIn('"col":', json_str)
+    json_dict = action_struct.to_dict()
+    self.assertIsInstance(json_dict, dict)
+    self.assertIn("row", json_dict)
+    self.assertIn("col", json_dict)
 
     # Test StructToActions
     self.assertEqual([action], state.struct_to_actions(action_struct))
@@ -450,6 +459,9 @@ class PyspielTest(parameterized.TestCase):
     self.assertIsInstance(state_struct, pyspiel.StateStruct)
     json_str = state_struct.to_json()
     self.assertIn('"board":', json_str)
+    json_dict = state_struct.to_dict()
+    self.assertIsInstance(json_dict, dict)
+    self.assertIn("board", json_dict)
 
     # Test ObservationStruct
     observation_struct = state.to_observation_struct()
@@ -458,6 +470,9 @@ class PyspielTest(parameterized.TestCase):
     self.assertIsInstance(observation_struct, pyspiel.ObservationStruct)
     json_str = observation_struct.to_json()
     self.assertIn('"board":', json_str)
+    json_dict = observation_struct.to_dict()
+    self.assertIsInstance(json_dict, dict)
+    self.assertIn("board", json_dict)
 
 
 class StructApiTest(absltest.TestCase):
@@ -716,6 +731,66 @@ class StructApiTest(absltest.TestCase):
     s = self.ttt.TicTacToeStateStruct(d)
     self.assertEqual(s.current_player, "o")
     self.assertEqual(s.board[0], "x")
+
+  # ===== Game Struct Type Property Tests =====
+
+  def test_game_action_struct_property(self):
+    """Test that game.ActionStruct returns the correct type."""
+    self.assertIs(self.game.ActionStruct, self.ttt.TicTacToeActionStruct)
+
+  def test_game_state_struct_property(self):
+    """Test that game.StateStruct returns the correct type."""
+    self.assertIs(self.game.StateStruct, self.ttt.TicTacToeStateStruct)
+
+  def test_game_observation_struct_property(self):
+    """Test that game.ObservationStruct returns the correct type."""
+    self.assertIs(
+        self.game.ObservationStruct, self.ttt.TicTacToeObservationStruct
+    )
+
+  def test_game_action_struct_constructor(self):
+    """Test constructing ActionStruct via game.ActionStruct(json/dict)."""
+    action_json = '{"row": 1, "col": 2}'
+    action_struct = self.game.ActionStruct(action_json)
+    self.assertIsInstance(action_struct, pyspiel.ActionStruct)
+    self.assertEqual(action_struct.row, 1)
+    self.assertEqual(action_struct.col, 2)
+
+    action_dict = {"row": 0, "col": 1}
+    action_struct_2 = self.game.ActionStruct(action_dict)
+    self.assertIsInstance(action_struct_2, pyspiel.ActionStruct)
+    self.assertEqual(action_struct_2.row, 0)
+    self.assertEqual(action_struct_2.col, 1)
+
+  def test_game_state_struct_constructor(self):
+    """Test constructing StateStruct via game.StateStruct(json)."""
+    json_str = self.ref_state.to_json()
+    state_struct = self.game.StateStruct(json_str)
+    self.assertIsInstance(state_struct, pyspiel.StateStruct)
+    self.assertEqual(state_struct.current_player, "o")
+
+  def test_game_state_struct_dict_constructor(self):
+    """Test constructing StateStruct via game.StateStruct(dict)."""
+    d = {
+        "current_player": "x",
+        "board": [".", ".", ".", ".", ".", ".", ".", ".", "."],
+    }
+    state_struct = self.game.StateStruct(d)
+    self.assertEqual(state_struct.current_player, "x")
+
+  def test_game_struct_round_trip(self):
+    """Test round-trip: state -> JSON -> game.StateStruct -> JSON."""
+    original_json = self.ref_state.to_json()
+    state_struct = self.game.StateStruct(original_json)
+    round_trip_json = state_struct.to_json()
+    self.assertEqual(original_json, round_trip_json)
+
+  def test_connect_four_game_struct_properties(self):
+    """Test struct properties on a different game (connect_four)."""
+    game = pyspiel.load_game("connect_four")
+    # Construct an action struct via the game object
+    action_struct = game.ActionStruct('{"column": 3}')
+    self.assertEqual(action_struct.column, 3)
 
 
 class LoadGameFromJsonTest(absltest.TestCase):
