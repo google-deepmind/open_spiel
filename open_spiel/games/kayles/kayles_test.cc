@@ -19,10 +19,20 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
 namespace kayles {
 namespace {
+
+namespace testing = open_spiel::testing;
+
+void BasicKaylesTests() {
+  testing::LoadGameTest("kayles");
+  testing::NoChanceOutcomesTest(*LoadGame("kayles"));
+  testing::RandomSimTest(*LoadGame("kayles"), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("kayles"), 100);
+}
 
 void InitialLegalActionsTest() {
   std::shared_ptr<const Game> game =
@@ -71,6 +81,28 @@ void UndoPairTest() {
   SPIEL_CHECK_EQ(state->LegalActions(), initial_actions);
 }
 
+void ObservationTensorTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("kayles", {{"row_length", GameParameter(3)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(4);  // Remove pins 1 and 2.
+  std::vector<float> observation(6);
+
+  state->ObservationTensor(0, &observation);
+
+  SPIEL_CHECK_EQ(observation,
+                 std::vector<float>({0, 1, 1, 1, 0, 0}));
+}
+
+void ActionStringsTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("kayles", {{"row_length", GameParameter(5)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+
+  SPIEL_CHECK_EQ(state->ActionToString(0, 1), "remove pin 2");
+  SPIEL_CHECK_EQ(state->ActionToString(0, 6), "remove pins 2-3");
+}
+
 }  // namespace
 }  // namespace kayles
 }  // namespace open_spiel
@@ -80,4 +112,7 @@ int main(int argc, char** argv) {
   open_spiel::kayles::PairRemovalTest();
   open_spiel::kayles::LastMoveWinsTest();
   open_spiel::kayles::UndoPairTest();
+  open_spiel::kayles::ObservationTensorTest();
+  open_spiel::kayles::ActionStringsTest();
+  open_spiel::kayles::BasicKaylesTests();
 }

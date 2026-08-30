@@ -22,6 +22,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace kayles {
@@ -77,7 +78,13 @@ std::vector<Action> KaylesState::LegalActions() const {
 }
 
 std::string KaylesState::ActionToString(Player player, Action action) const {
-  return absl::StrCat("action ", action);
+  const bool removes_pair = action >= row_length_;
+  const int first_pin = removes_pair ? action - row_length_ : action;
+  SPIEL_CHECK_GE(first_pin, 0);
+  SPIEL_CHECK_LT(first_pin, row_length_);
+  return removes_pair
+             ? absl::StrCat("remove pins ", first_pin + 1, "-", first_pin + 2)
+             : absl::StrCat("remove pin ", first_pin + 1);
 }
 
 std::string KaylesState::ToString() const {
@@ -109,7 +116,12 @@ std::string KaylesState::ObservationString(Player player) const {
 
 void KaylesState::ObservationTensor(Player player,
                                     absl::Span<float> values) const {
-  std::fill(values.begin(), values.end(), 0.0);
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  TensorView<2> view(values, {2, row_length_}, true);
+  for (int pin = 0; pin < row_length_; ++pin) {
+    view[{pins_[pin] ? 1 : 0, pin}] = 1.0;
+  }
 }
 
 void KaylesState::DoApplyAction(Action action) {
