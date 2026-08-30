@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "open_spiel/game_parameters.h"
@@ -33,10 +34,50 @@ void InitialLegalActionsTest() {
                  std::vector<Action>({0, 1, 2, 3, 4, 5, 6, 7, 8}));
 }
 
+void PairRemovalTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("kayles", {{"row_length", GameParameter(5)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+
+  state->ApplyAction(6);  // Remove the pair beginning at pin 1.
+
+  SPIEL_CHECK_EQ(state->ToString(), "P1: |..||");
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({0, 3, 4, 8}));
+}
+
+void LastMoveWinsTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("kayles", {{"row_length", GameParameter(2)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+
+  state->ApplyAction(2);
+
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>());
+  SPIEL_CHECK_EQ(state->Returns(), std::vector<double>({1.0, -1.0}));
+}
+
+void UndoPairTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("kayles", {{"row_length", GameParameter(4)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  const std::string initial_state = state->ToString();
+  const std::vector<Action> initial_actions = state->LegalActions();
+
+  state->ApplyAction(5);
+  state->UndoAction(0, 5);
+
+  SPIEL_CHECK_EQ(state->ToString(), initial_state);
+  SPIEL_CHECK_EQ(state->LegalActions(), initial_actions);
+}
+
 }  // namespace
 }  // namespace kayles
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::kayles::InitialLegalActionsTest();
+  open_spiel::kayles::PairRemovalTest();
+  open_spiel::kayles::LastMoveWinsTest();
+  open_spiel::kayles::UndoPairTest();
 }

@@ -63,6 +63,7 @@ KaylesState::KaylesState(std::shared_ptr<const Game> game, int row_length)
     : State(game), row_length_(row_length), pins_(row_length, true) {}
 
 std::vector<Action> KaylesState::LegalActions() const {
+  if (IsTerminal()) return {};
   std::vector<Action> actions;
   for (int pin = 0; pin < row_length_; ++pin) {
     if (pins_[pin]) actions.push_back(pin);
@@ -79,11 +80,24 @@ std::string KaylesState::ActionToString(Player player, Action action) const {
   return absl::StrCat("action ", action);
 }
 
-std::string KaylesState::ToString() const { return ""; }
+std::string KaylesState::ToString() const {
+  std::string result = absl::StrCat("P", current_player_, ": ");
+  for (bool standing : pins_) {
+    absl::StrAppend(&result, standing ? "|" : ".");
+  }
+  return result;
+}
 
-bool KaylesState::IsTerminal() const { return false; }
+bool KaylesState::IsTerminal() const {
+  return std::none_of(pins_.begin(), pins_.end(),
+                      [](bool standing) { return standing; });
+}
 
-std::vector<double> KaylesState::Returns() const { return {0.0, 0.0}; }
+std::vector<double> KaylesState::Returns() const {
+  if (!IsTerminal()) return {0.0, 0.0};
+  return current_player_ == 0 ? std::vector<double>{-1.0, 1.0}
+                              : std::vector<double>{1.0, -1.0};
+}
 
 std::string KaylesState::InformationStateString(Player player) const {
   return HistoryString();
@@ -99,11 +113,28 @@ void KaylesState::ObservationTensor(Player player,
 }
 
 void KaylesState::DoApplyAction(Action action) {
-  SpielFatalError("Kayles moves are not implemented yet.");
+  const bool removes_pair = action >= row_length_;
+  const int first_pin = removes_pair ? action - row_length_ : action;
+  SPIEL_CHECK_GE(first_pin, 0);
+  SPIEL_CHECK_LT(first_pin, row_length_);
+  SPIEL_CHECK_TRUE(pins_[first_pin]);
+  pins_[first_pin] = false;
+  if (removes_pair) {
+    SPIEL_CHECK_LT(first_pin + 1, row_length_);
+    SPIEL_CHECK_TRUE(pins_[first_pin + 1]);
+    pins_[first_pin + 1] = false;
+  }
+  current_player_ = 1 - current_player_;
 }
 
 void KaylesState::UndoAction(Player player, Action action) {
-  SpielFatalError("Kayles undo is not implemented yet.");
+  const bool removes_pair = action >= row_length_;
+  const int first_pin = removes_pair ? action - row_length_ : action;
+  pins_[first_pin] = true;
+  if (removes_pair) pins_[first_pin + 1] = true;
+  current_player_ = player;
+  history_.pop_back();
+  --move_number_;
 }
 
 std::unique_ptr<State> KaylesState::Clone() const {
