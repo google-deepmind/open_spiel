@@ -14,15 +14,56 @@
 
 #include "open_spiel/algorithms/minimax.h"
 
-#include <algorithm>  // std::max
+#include <algorithm>  // std::find, std::max
 #include <limits>
 #include <memory>
+#include <random>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace algorithms {
+
+Action BestActions::Single() const {
+  return this->actions.empty() ? kInvalidAction : this->actions[0];
+}
+
+Action BestActions::SampleUniformly(std::mt19937& rng) const {
+  if (this->actions.empty()) {
+    return kInvalidAction;
+  }
+
+  std::uniform_int_distribution<int> dist(0, this->actions.size() - 1);
+  return this->actions[dist(rng)];
+}
+
+size_t BestActions::Size() const { return this->actions.size(); }
+
+bool BestActions::ContainsAction(Action action) const {
+  return std::find(this->actions.begin(), this->actions.end(), action) !=
+         this->actions.end();
+}
+
+bool BestActions::Equals(const std::vector<Action>& action_list) const {
+  if (this->actions.size() != action_list.size()) {
+    return false;
+  }
+
+  for (Action action : action_list) {
+    if (!this->ContainsAction(action)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void BestActions::Clear() { this->actions.clear(); }
+
+void BestActions::Add(Action action) { this->actions.push_back(action); }
+
 namespace {
 
 // An alpha-beta algorithm.
@@ -48,7 +89,7 @@ namespace {
 //   The optimal value of the sub-game starting in state (given alpha/beta).
 double _alpha_beta(State* state, int depth, double alpha, double beta,
                    std::function<double(const State&)> value_function,
-                   Player maximizing_player, Action* best_action,
+                   Player maximizing_player, BestActions* best_actions,
                    bool use_undo) {
   if (state->IsTerminal()) {
     return state->PlayerReturn(maximizing_player);
@@ -64,9 +105,12 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
     return value_function(*state);
   }
 
+  const double kInf = std::numeric_limits<double>::infinity();
+  const bool is_root = best_actions != nullptr;
+
   Player player = state->CurrentPlayer();
   if (player == maximizing_player) {
-    double value = -std::numeric_limits<double>::infinity();
+    double value = -kInf;
 
     for (Action action : state->LegalActions()) {
       double child_value = 0;
@@ -87,12 +131,16 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
 
       if (child_value > value) {
         value = child_value;
-        if (best_action != nullptr) {
-          *best_action = action;
+        if (is_root) {
+          best_actions->Clear();
+          best_actions->Add(action);
         }
+      } else if (is_root && child_value == value) {
+        best_actions->Add(action);
       }
 
-      alpha = std::max(alpha, value);
+      alpha = is_root ? std::max(alpha, std::nextafter(value, -kInf))
+                      : std::max(alpha, value);
       if (alpha >= beta) {
         break;  // beta cut-off
       }
@@ -121,12 +169,16 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
 
       if (child_value < value) {
         value = child_value;
-        if (best_action != nullptr) {
-          *best_action = action;
+        if (is_root) {
+          best_actions->Clear();
+          best_actions->Add(action);
         }
+      } else if (is_root && child_value == value) {
+        best_actions->Add(action);
       }
 
-      beta = std::min(beta, value);
+      beta = is_root ? std::min(beta, std::nextafter(value, kInf))
+                     : std::min(beta, value);
       if (alpha >= beta) {
         break;  // alpha cut-off
       }
@@ -153,7 +205,8 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
 //   The optimal value of the sub-game starting in state.
 double _expectiminimax(const State* state, int depth,
                        std::function<double(const State&)> value_function,
-                       Player maximizing_player, Action* best_action) {
+                       Player maximizing_player, BestActions* best_actions,
+                       double tolerance) {
   if (state->IsTerminal()) {
     return state->PlayerReturn(maximizing_player);
   }
@@ -168,58 +221,68 @@ double _expectiminimax(const State* state, int depth,
     return value_function(*state);
   }
 
+  const bool is_root = best_actions != nullptr;
+
+  // in root, store the true action values for each action
+  std::vector<std::pair<Action, double>> action_values;
+
   Player player = state->CurrentPlayer();
+  double value;
   if (state->IsChanceNode()) {
-    double value = 0;
+    value = 0;
     for (const auto& actionprob : state->ChanceOutcomes()) {
       std::unique_ptr<State> child_state = state->Child(actionprob.first);
-      double child_value =
-          _expectiminimax(child_state.get(), depth, value_function,
-                          maximizing_player, /*best_action=*/nullptr);
+      double child_value = _expectiminimax(child_state.get(), depth,
+                                           value_function, maximizing_player,
+                                           /*best_action=*/nullptr, tolerance);
       value += actionprob.second * child_value;
     }
-    return value;
   } else if (player == maximizing_player) {
-    double value = -std::numeric_limits<double>::infinity();
+    value = -std::numeric_limits<double>::infinity();
 
     for (Action action : state->LegalActions()) {
       std::unique_ptr<State> child_state = state->Child(action);
       double child_value = _expectiminimax(child_state.get(),
                                            /*depth=*/depth - 1, value_function,
                                            maximizing_player,
-                                           /*best_action=*/nullptr);
+                                           /*best_action=*/nullptr, tolerance);
 
-      if (child_value > value) {
-        value = child_value;
-        if (best_action != nullptr) {
-          *best_action = action;
-        }
+      value = std::max(value, child_value);
+
+      if (is_root) {
+        action_values.push_back({action, child_value});
       }
     }
-    return value;
   } else {
-    double value = std::numeric_limits<double>::infinity();
+    value = std::numeric_limits<double>::infinity();
 
     for (Action action : state->LegalActions()) {
       std::unique_ptr<State> child_state = state->Child(action);
       double child_value = _expectiminimax(child_state.get(),
                                            /*depth=*/depth - 1, value_function,
                                            maximizing_player,
-                                           /*best_action=*/nullptr);
+                                           /*best_action=*/nullptr, tolerance);
 
-      if (child_value < value) {
-        value = child_value;
-        if (best_action != nullptr) {
-          *best_action = action;
-        }
+      value = std::min(value, child_value);
+      if (is_root) {
+        action_values.push_back({action, child_value});
       }
     }
-    return value;
   }
+
+  if (is_root) {
+    for (const auto& [a, v] : action_values) {
+      if (std::abs(v - value) <= tolerance) {
+        best_actions->Add(a);
+      }
+    }
+  }
+
+  return value;
 }
 }  // namespace
 
-std::pair<double, Action> AlphaBetaSearch(
+std::pair<double, BestActions> AlphaBetaSearch(
     const Game& game, const State* state,
     std::function<double(const State&)> value_function, int depth_limit,
     Player maximizing_player, bool use_undo) {
@@ -246,16 +309,16 @@ std::pair<double, Action> AlphaBetaSearch(
   }
 
   double infinity = std::numeric_limits<double>::infinity();
-  Action best_action = kInvalidAction;
-  double value = _alpha_beta(
-      search_root.get(), /*depth=*/depth_limit, /*alpha=*/-infinity,
-      /*beta=*/infinity, value_function, maximizing_player, &best_action,
-      use_undo);
+  BestActions best_actions = BestActions();
+  double value =
+      _alpha_beta(search_root.get(), /*depth=*/depth_limit, /*alpha=*/-infinity,
+                  /*beta=*/infinity, value_function, maximizing_player,
+                  &best_actions, use_undo);
 
-  return {value, best_action};
+  return {value, best_actions};
 }
 
-std::pair<double, Action> ExpectiminimaxSearch(
+std::pair<double, BestActions> ExpectiminimaxSearch(
     const Game& game, const State* state,
     std::function<double(const State&)> value_function, int depth_limit,
     Player maximizing_player) {
@@ -282,12 +345,12 @@ std::pair<double, Action> ExpectiminimaxSearch(
     maximizing_player = search_root->CurrentPlayer();
   }
 
-  Action best_action = kInvalidAction;
+  BestActions best_actions = BestActions();
   double value =
       _expectiminimax(search_root.get(), /*depth=*/depth_limit, value_function,
-                      maximizing_player, &best_action);
+                      maximizing_player, &best_actions, 1e-9);
 
-  return {value, best_action};
+  return {value, best_actions};
 }
 
 }  // namespace algorithms
