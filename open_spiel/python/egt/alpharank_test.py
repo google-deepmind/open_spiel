@@ -14,6 +14,8 @@
 
 """Tests for open_spiel.python.egt.alpharank."""
 
+from unittest import mock
+
 from absl.testing import absltest
 
 # pylint: disable=g-import-not-at-top
@@ -91,6 +93,43 @@ class AlphaRankTest(absltest.TestCase):
     # Ensure both cases match
     np.testing.assert_array_almost_equal(c1, c2)
     np.testing.assert_array_almost_equal(rhos1, rhos2)
+
+  def test_sweep_pi_vs_alpha_recovers_from_failed_first_compute(self):
+    """Sweep should retry rather than crash when the first compute() fails."""
+    payoff_tables = [np.asarray([[0., 1., -1.], [-1., 0., 1.], [1., -1., 0.]])]
+    calls = {"n": 0}
+
+    def fake_compute(*args, **kwargs):
+      calls["n"] += 1
+      if calls["n"] == 1:
+        # E.g. a reducible Markov chain at the warm-start alpha.
+        raise ValueError("Expected 1 stationary distribution, but found 2")
+      pi = np.asarray([1. / 3, 1. / 3, 1. / 3])
+      return None, None, pi, None, None
+
+    with mock.patch.object(alpharank, "compute", side_effect=fake_compute):
+      pi = alpharank.sweep_pi_vs_alpha(payoff_tables, m=20)
+    np.testing.assert_allclose(pi, [1. / 3, 1. / 3, 1. / 3])
+    self.assertGreater(calls["n"], 1)
+
+  def test_sweep_pi_vs_alpha_recovers_from_failure_after_one_success(self):
+    """Sweep should not index past the collected pi history."""
+    payoff_tables = [np.asarray([[0., 1., -1.], [-1., 0., 1.], [1., -1., 0.]])]
+    calls = {"n": 0}
+
+    def fake_compute(*args, **kwargs):
+      calls["n"] += 1
+      if calls["n"] == 2:
+        # Second compute fails, when there is only one successful iteration.
+        raise ValueError("array must not contain infs or NaNs")
+      pi = np.asarray([1. / 3, 1. / 3, 1. / 3])
+      return None, None, pi, None, None
+
+    with mock.patch.object(alpharank, "compute", side_effect=fake_compute):
+      pi = alpharank.sweep_pi_vs_alpha(
+          payoff_tables, m=20, warm_start_alpha=100.0)
+    np.testing.assert_allclose(pi, [1. / 3, 1. / 3, 1. / 3])
+    self.assertGreater(calls["n"], 2)
 
 
 if __name__ == "__main__":
