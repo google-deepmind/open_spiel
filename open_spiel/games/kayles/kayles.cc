@@ -22,7 +22,6 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace kayles {
@@ -42,7 +41,10 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    {{"row_length", GameParameter(kDefaultRowLength)}}};
+    /*parameter_specification=*/
+    {
+        {"row_length", GameParameter(kDefaultRowLength)},
+    }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new KaylesGame(params));
@@ -78,10 +80,13 @@ std::vector<Action> KaylesState::LegalActions() const {
 }
 
 std::string KaylesState::ActionToString(Player player, Action action) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   const bool removes_pair = action >= row_length_;
   const int first_pin = removes_pair ? action - row_length_ : action;
   SPIEL_CHECK_GE(first_pin, 0);
   SPIEL_CHECK_LT(first_pin, row_length_);
+  if (removes_pair) SPIEL_CHECK_LT(first_pin + 1, row_length_);
   return removes_pair
              ? absl::StrCat("remove pins ", first_pin + 1, "-", first_pin + 2)
              : absl::StrCat("remove pin ", first_pin + 1);
@@ -107,10 +112,14 @@ std::vector<double> KaylesState::Returns() const {
 }
 
 std::string KaylesState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
 std::string KaylesState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
@@ -118,21 +127,25 @@ void KaylesState::ObservationTensor(Player player,
                                     absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  TensorView<2> view(values, {2, row_length_}, true);
+  SPIEL_CHECK_EQ(values.size(), kNumPlayers + 1 + row_length_);
+  std::fill(values.begin(), values.end(), 0.0);
+  values[current_player_] = 1.0;
+  values[kNumPlayers] = IsTerminal() ? 1.0 : 0.0;
   for (int pin = 0; pin < row_length_; ++pin) {
-    view[{pins_[pin] ? 1 : 0, pin}] = 1.0;
+    values[kNumPlayers + 1 + pin] = pins_[pin] ? 1.0 : 0.0;
   }
 }
 
 void KaylesState::DoApplyAction(Action action) {
+  SPIEL_CHECK_FALSE(IsTerminal());
   const bool removes_pair = action >= row_length_;
   const int first_pin = removes_pair ? action - row_length_ : action;
   SPIEL_CHECK_GE(first_pin, 0);
   SPIEL_CHECK_LT(first_pin, row_length_);
+  if (removes_pair) SPIEL_CHECK_LT(first_pin + 1, row_length_);
   SPIEL_CHECK_TRUE(pins_[first_pin]);
   pins_[first_pin] = false;
   if (removes_pair) {
-    SPIEL_CHECK_LT(first_pin + 1, row_length_);
     SPIEL_CHECK_TRUE(pins_[first_pin + 1]);
     pins_[first_pin + 1] = false;
   }

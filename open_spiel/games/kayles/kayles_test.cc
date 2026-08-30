@@ -91,7 +91,23 @@ void ObservationTensorTest() {
   state->ObservationTensor(0, &observation);
 
   SPIEL_CHECK_EQ(observation,
-                 std::vector<float>({0, 1, 1, 1, 0, 0}));
+                 std::vector<float>({0, 1, 0, 1, 0, 0}));
+}
+
+void ObservationTensorIncludesTurnTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("kayles", {{"row_length", GameParameter(3)}});
+  std::unique_ptr<State> pair_state = game->NewInitialState();
+  std::unique_ptr<State> singles_state = game->NewInitialState();
+  // One move removes pins 0 and 1, leaving player 1's turn.
+  pair_state->ApplyAction(3);
+  singles_state->ApplyAction(0);
+  singles_state->ApplyAction(1);  // Two moves: same pins, player 0's turn.
+
+  SPIEL_CHECK_EQ(pair_state->ObservationString(0).substr(4),
+                 singles_state->ObservationString(0).substr(4));
+  SPIEL_CHECK_NE(pair_state->ObservationTensor(0),
+                 singles_state->ObservationTensor(0));
 }
 
 void ActionStringsTest() {
@@ -113,6 +129,7 @@ int main(int argc, char** argv) {
   open_spiel::kayles::LastMoveWinsTest();
   open_spiel::kayles::UndoPairTest();
   open_spiel::kayles::ObservationTensorTest();
+  open_spiel::kayles::ObservationTensorIncludesTurnTest();
   open_spiel::kayles::ActionStringsTest();
   open_spiel::kayles::BasicKaylesTests();
 }

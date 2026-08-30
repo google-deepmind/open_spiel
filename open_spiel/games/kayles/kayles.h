@@ -26,6 +26,10 @@
 namespace open_spiel {
 namespace kayles {
 
+// Kayles starts with a row of pins. Players alternate removing either one pin
+// or two adjacent standing pins, and the player who makes the final move wins.
+// Single-pin actions use IDs [0, row_length), while two-pin actions use IDs
+// [row_length, 2 * row_length - 1).
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultRowLength = 10;
 
@@ -72,7 +76,8 @@ class KaylesGame : public Game {
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {2, row_length_};
+    // Current player, terminal flag, and standing pins.
+    return {kNumPlayers + 1 + row_length_};
   }
   int MaxGameLength() const override { return row_length_; }
 
