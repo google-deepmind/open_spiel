@@ -14,6 +14,8 @@
 
 """Tests for graph pursuit-evasion."""
 
+import pickle
+
 from absl.testing import absltest
 import numpy as np
 
@@ -26,13 +28,40 @@ class GraphPursuitEvasionTest(absltest.TestCase):
 
   def test_registered_game_passes_random_simulation(self):
     game = pyspiel.load_game("python_graph_pursuit_evasion")
-    pyspiel.random_sim_test(game, num_sims=20, serialize=False, verbose=False)
+    pyspiel.random_sim_test(game, num_sims=20, serialize=True, verbose=False)
+
+  def test_game_serialization_round_trip(self):
+    game = pyspiel.load_game("python_graph_pursuit_evasion")
+
+    restored_game = pickle.loads(pickle.dumps(game))
+
+    self.assertEqual(str(restored_game), str(game))
+    self.assertEqual(restored_game.get_parameters(), game.get_parameters())
+
+  def test_custom_parameters_load_and_serialize(self):
+    game = pyspiel.load_game(
+        "python_graph_pursuit_evasion("
+        "edge_types=walk;rail,"
+        "evader_edge_types=rail,"
+        "evader_start=2,"
+        "graph=0-1:walk;0-2:rail;1-2:walk,"
+        "max_rounds=4,"
+        "pursuer_edge_types=walk,"
+        "pursuer_start=0,"
+        "reveal_interval=2)"
+    )
+
+    restored_game = pickle.loads(pickle.dumps(game))
+
+    self.assertEqual(str(restored_game), str(game))
+    self.assertEqual(restored_game.get_parameters()["edge_types"], "walk;rail")
+    self.assertEqual(restored_game.get_parameters()["max_rounds"], 4)
 
   def test_typed_edges_restrict_each_player(self):
     game = graph_pursuit_evasion.GraphPursuitEvasionGame(
         {
-            "graph": "0-1:walk,0-2:rail,1-2:walk",
-            "edge_types": "walk,rail",
+            "graph": "0-1:walk;0-2:rail;1-2:walk",
+            "edge_types": "walk;rail",
             "pursuer_edge_types": "walk",
             "evader_edge_types": "rail",
             "pursuer_start": 0,
@@ -53,7 +82,7 @@ class GraphPursuitEvasionTest(absltest.TestCase):
   def test_pursuer_wins_on_capture(self):
     game = graph_pursuit_evasion.GraphPursuitEvasionGame(
         {
-            "graph": "0-1:taxi,1-2:taxi",
+            "graph": "0-1:taxi;1-2:taxi",
             "edge_types": "taxi",
             "pursuer_edge_types": "taxi",
             "evader_edge_types": "taxi",
@@ -79,10 +108,10 @@ class GraphPursuitEvasionTest(absltest.TestCase):
   def test_evader_position_hidden_until_reveal_round(self):
     game = graph_pursuit_evasion.GraphPursuitEvasionGame(
         {
-            "graph": "0-1:taxi,1-2:bus,2-3:taxi",
-            "edge_types": "taxi,bus",
-            "pursuer_edge_types": "taxi,bus",
-            "evader_edge_types": "taxi,bus",
+            "graph": "0-1:taxi;1-2:bus;2-3:taxi",
+            "edge_types": "taxi;bus",
+            "pursuer_edge_types": "taxi;bus",
+            "evader_edge_types": "taxi;bus",
             "pursuer_start": 0,
             "evader_start": 2,
             "reveal_interval": 2,

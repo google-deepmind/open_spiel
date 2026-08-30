@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 17
 PolicyTensorShape() = [17]
 MaxChanceOutcomes() = 0
-GetParameters() = {edge_types=taxi,bus,rail,evader_edge_types=taxi,bus,rail,evader_start=3,graph=0-1:taxi,1-2:bus,2-3:rail,3-4:taxi,4-5:bus,5-0:rail,1-4:taxi,2-5:bus,max_rounds=12,pursuer_edge_types=taxi,bus,rail,pursuer_start=0,reveal_interval=3}
+GetParameters() = {edge_types=taxi;bus;rail,evader_edge_types=taxi;bus;rail,evader_start=3,graph=0-1:taxi;1-2:bus;2-3:rail;3-4:taxi;4-5:bus;5-0:rail;1-4:taxi;2-5:bus,max_rounds=12,pursuer_edge_types=taxi;bus;rail,pursuer_start=0,reveal_interval=3}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -31,7 +31,7 @@ ObservationTensorShape() = player: [2], own_position: [6], known_opponent_positi
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 19
 MaxGameLength() = 24
-ToString() = "python_graph_pursuit_evasion(edge_types=taxi,bus,rail,evader_edge_types=taxi,bus,rail,evader_start=3,graph=0-1:taxi,1-2:bus,2-3:rail,3-4:taxi,4-5:bus,5-0:rail,1-4:taxi,2-5:bus,max_rounds=12,pursuer_edge_types=taxi,bus,rail,pursuer_start=0,reveal_interval=3)"
+ToString() = "python_graph_pursuit_evasion(edge_types=taxi;bus;rail,evader_edge_types=taxi;bus;rail,evader_start=3,graph=0-1:taxi;1-2:bus;2-3:rail;3-4:taxi;4-5:bus;5-0:rail;1-4:taxi;2-5:bus,max_rounds=12,pursuer_edge_types=taxi;bus;rail,pursuer_start=0,reveal_interval=3)"
 
 # State 0
 # Pursuer: 0, Evader: 3, Last reveal: 3, Round: 0/12

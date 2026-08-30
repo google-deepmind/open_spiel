@@ -34,12 +34,12 @@ _PURSUER = 0
 _EVADER = 1
 _DEFAULT_PARAMS = {
     "graph": (
-        "0-1:taxi,1-2:bus,2-3:rail,3-4:taxi,4-5:bus,5-0:rail,"
-        "1-4:taxi,2-5:bus"
+        "0-1:taxi;1-2:bus;2-3:rail;3-4:taxi;4-5:bus;5-0:rail;"
+        "1-4:taxi;2-5:bus"
     ),
-    "edge_types": "taxi,bus,rail",
-    "pursuer_edge_types": "taxi,bus,rail",
-    "evader_edge_types": "taxi,bus,rail",
+    "edge_types": "taxi;bus;rail",
+    "pursuer_edge_types": "taxi;bus;rail",
+    "evader_edge_types": "taxi;bus;rail",
     "pursuer_start": 0,
     "evader_start": 3,
     "max_rounds": 12,
@@ -74,7 +74,7 @@ class Move:
 
 
 def _parse_names(value, parameter):
-  names = tuple(name.strip() for name in str(value).split(",") if name.strip())
+  names = tuple(name.strip() for name in str(value).split(";") if name.strip())
   if not names:
     raise ValueError(f"{parameter} must contain at least one name")
   if len(set(names)) != len(names):
@@ -85,7 +85,7 @@ def _parse_names(value, parameter):
 def _parse_graph(value, edge_type_to_id):
   moves = set()
   nodes = set()
-  for encoded_edge in str(value).split(","):
+  for encoded_edge in str(value).split(";"):
     encoded_edge = encoded_edge.strip()
     if not encoded_edge:
       continue
