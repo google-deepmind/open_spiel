@@ -23,6 +23,9 @@ if(Python3_VERSION VERSION_LESS "3.8.0")
     "Python found ${Python3_VERSION} < 3.8.0")
 endif()
 
+# MKL_SERVICE_FORCE_INTEL: "1"                                               
+# MKL_DEBUG_CPU_TYPE: "5"
+
 # List of all Python bindings to add to pyspiel.
 include_directories (../pybind11_abseil ../../pybind11/include)
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
@@ -401,6 +404,9 @@ else()
   set(PYBIN $ENV{PYBIN})
 endif()
 
+#   MKL_SERVICE_FORCE_INTEL: "1"                                               
+#      MKL_DEBUG_CPU_TYPE: "5"
+
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   if (NOT (OPEN_SPIEL_BUILDING_WHEEL AND ${py_test_file} IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS))
@@ -412,7 +418,9 @@ foreach(py_test_file IN LISTS PYTHON_TESTS)
     #  from open_spiel.python import rl_environment.
     set_property(TEST python/${py_test_file}
         PROPERTY ENVIRONMENT
-        PYTHONPATH=${OPEN_SPIEL_PYTHONPATH}
+        PYTHONPATH=${OPEN_SPIEL_PYTHONPATH};
+        MKL_SERVICE_FORCE_INTEL="1";
+        MKL_DEBUG_CPU_TYPE="5";
         TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
   endif()
 endforeach(py_test_file)
