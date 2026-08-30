@@ -638,7 +638,6 @@ def sweep_pi_vs_alpha(payoff_tables,
 
   if warm_start_alpha is not None:
     alpha = warm_start_alpha
-    alpharank_succeeded_once = False
   else:
     alpha = 1e-4  # Reasonable default for most games, can be user-overridden
 
@@ -653,17 +652,18 @@ def sweep_pi_vs_alpha(payoff_tables,
         break
       alpha *= alpha_mult_factor
       num_iters += 1
-      alpharank_succeeded_once = True
     except ValueError as _:
-      if warm_start_alpha is not None and not alpharank_succeeded_once:  # pyrefly: ignore[unbound-name]
-        # When warm_start_alpha is used, there's a chance that
-        # the initial warm_start_alpha is too large and causes exceptions due to
-        # the Markov transition matrix being reducible. So keep decreasing until
-        # a single success occurs.
+      if num_iters == 0:
+        # No successful compute yet: the current alpha puts the Markov chain
+        # in a reducible (or numerically degenerate) regime, so walk alpha down
+        # until the first compute succeeds.
         alpha /= 2
-      elif not np.allclose(pi_list[:, -1], pi_list[:, -2], rtol, atol):
+      elif num_iters < 2 or not np.allclose(pi_list[:, -1], pi_list[:, -2],
+                                            rtol, atol):
         # Sweep stopped due to multiple stationary distributions, but pi had
-        # not converged due to the alpha scaling being too large.
+        # not converged due to the alpha scaling being too large. Before the
+        # second success there is nothing to compare against, so treat pi as
+        # not converged and shrink the step.
         alpha /= alpha_mult_factor
         alpha_mult_factor = (alpha_mult_factor + 1.) / 2.
         alpha *= alpha_mult_factor
