@@ -137,7 +137,7 @@ jobs:
           source ./venv/bin/activate
           ./open_spiel/scripts/test_wheel.sh full `pwd` python
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.NAME }}
           path: |
@@ -158,12 +158,12 @@ jobs:
       OPEN_SPIEL_BUILDING_WHEEL: ON
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
         with:
           submodules: recursive
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -216,7 +216,7 @@ jobs:
         shell: pwsh
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
         with:
           name: artifact-windows-py${{ matrix.python-version }}
           path: dist/*.whl
