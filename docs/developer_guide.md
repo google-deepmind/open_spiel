@@ -85,12 +85,14 @@ games and any special considerations are noted in the steps.
     example). Note: Python games cannot be tested using `ConsolePlayTest`,
     however both C++ and Python games can also be tested on the console using
     `open_spiel/python/examples/mcts_example` with human players.
-9.  Run your code through a linter so it conforms to Google's
-    [style guides](https://google.github.io/styleguide/). For C++ use
-    [cpplint](https://pypi.org/project/cpplint/). For Python, use
-    [pylint](https://pypi.org/project/pylint/) with the
-    [pylintrc from the Google style guide](https://google.github.io/styleguide/pyguide.html).
-    There is also [YAPF](https://github.com/google/yapf/) for Python as well.
+9.  Run your code through the repository's optional developer tooling so it
+    conforms to Google's [style guides](https://google.github.io/styleguide/).
+    Install the hooks with `pip install pre-commit` followed by `pre-commit
+    install`; see `.pre-commit-config.yaml`. Formatting settings are also
+    provided but are not run by the hooks:
+    [pyink](https://github.com/google/pyink) for Python (`[tool.pyink]` in
+    `pyproject.toml`) and clang-format for C++ (`.clang-format`). For C++ you
+    can additionally use [cpplint](https://pypi.org/project/cpplint/).
 10. Once done, rebuild and rerun the tests to ensure everything passes
     (including your new game’s test!).
 11. Add a playthrough file to catch regressions:

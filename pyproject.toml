@@ -66,3 +66,62 @@ include = ["open_spiel*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.so", "*.pyd", "*.dll"]
+
+# ---------------------------------------------------------------------------
+# Developer tooling. See .pre-commit-config.yaml for how to opt in.
+# ---------------------------------------------------------------------------
+
+# Linting, via the ruff hook in .pre-commit-config.yaml.
+#
+# This rule set is deliberately narrow: it covers real defects (syntax errors,
+# undefined names, invalid comparisons, misleading indentation) and no
+# stylistic opinions. It is green on the repository as of this commit, so it
+# requires no reformatting and will only ever fire on newly introduced
+# problems. Codes E9/F63/F7/F82 are the set used by the GitHub Actions Python
+# starter workflow and by optax, chex and mctx; the indentation and whitespace
+# codes are the set used by JAX.
+[tool.ruff]
+line-length = 80
+indent-width = 2
+preview = true  # required: E112/E113/E115/E117/E225/E251 no-op without it
+exclude = [".git", "build", "__pycache__", "*.ipynb"]
+
+[tool.ruff.lint]
+select = [
+    "E9",    # syntax / IO errors -- the file does not parse
+    "F63",   # invalid comparisons (e.g. `is` against a literal)
+    "F7",    # misplaced statements (`break`/`continue` outside a loop)
+    "F82",   # undefined names, and locals used before assignment
+    "E101",  # indentation mixes tabs and spaces
+    "E112",  # expected an indented block
+    "E113",  # unexpectedly indented
+    "E115",  # expected an indented block (comment)
+    "E117",  # over-indented
+    "E225",  # missing whitespace around operator
+    "E227",  # missing whitespace around bitwise/shift operator
+    "E228",  # missing whitespace around modulo operator
+    "E251",  # unexpected spaces around keyword/parameter equals
+    "W605",  # invalid escape sequence in a string
+]
+
+# Formatting. NOT enforced and NOT run by any hook -- we include the config so
+# that external contributors can optionally, but easily, match the formatting
+# used inside Google. These settings mirror those published for AlphaFold.
+#
+# Note that pyink output varies between releases; pin `pyink==24.10.1` if you
+# want to reproduce what Google-internal formatting currently produces.
+[tool.pyink]
+line-length = 80
+unstable = true
+target-version = []
+pyink-indentation = 2
+pyink-use-majority-quotes = true
+pyink-annotation-pragmas = [
+    "noqa",
+    "pylint:",
+    "type: ignore",
+    "pytype:",
+    "mypy:",
+    "pyright:",
+    "pyre-",
+]

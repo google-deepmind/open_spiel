@@ -1,0 +1,38 @@
+# Optional developer tooling. Nothing here runs automatically in CI; these
+# hooks only run on your machine, and only after you opt in with:
+#
+#     pip install pre-commit
+#     pre-commit install
+#
+# Run them over the whole repo at any time with:
+#
+#     pre-commit run --all-files
+#
+# Update the pinned hook versions with:
+#
+#     pre-commit autoupdate
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: check-ast
+  - id: check-merge-conflict
+  - id: check-toml
+  - id: check-yaml
+  - id: end-of-file-fixer
+    files: \.(py|md)$
+  - id: trailing-whitespace
+    files: \.(py|md)$
+  - id: debug-statements
+    files: \.py$
+  - id: mixed-line-ending
+    args: [--fix=lf]
+
+# Linting. The rule set in pyproject.toml is deliberately narrow -- it is
+# green on the repository as it stands today, so enabling it costs no
+# reformatting and flags only genuine defects in new code.
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.16.3
+  hooks:
+  - id: ruff

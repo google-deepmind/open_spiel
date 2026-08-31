@@ -1,0 +1,10 @@
+# Run manually to reformat a file:
+#   clang-format -i --style=file <file>
+#
+# OpenSpiel follows the Google C++ style guide:
+#   https://google.github.io/styleguide/cppguide.html
+#
+# Not run automatically. Note that clang-format output changes between LLVM
+# major versions; 18.x was used when this file was added.
+BasedOnStyle: Google
+DerivePointerAlignment: false
