@@ -401,9 +401,6 @@ else()
   set(PYBIN $ENV{PYBIN})
 endif()
 
-#   MKL_SERVICE_FORCE_INTEL: "1"                                               
-#      MKL_DEBUG_CPU_TYPE: "5"
-
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   if (NOT (OPEN_SPIEL_BUILDING_WHEEL AND ${py_test_file} IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS))
