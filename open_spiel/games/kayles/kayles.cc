@@ -1,0 +1,170 @@
+// Copyright 2026 DeepMind Technologies Limited
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "open_spiel/games/kayles/kayles.h"
+
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel_utils.h"
+
+namespace open_spiel {
+namespace kayles {
+namespace {
+
+const GameType kGameType{
+    /*short_name=*/"kayles",
+    /*long_name=*/"Kayles",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kPerfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/kNumPlayers,
+    /*min_num_players=*/kNumPlayers,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {
+        {"row_length", GameParameter(kDefaultRowLength)},
+    }};
+
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new KaylesGame(params));
+}
+
+REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
+}  // namespace
+
+KaylesGame::KaylesGame(const GameParameters& params)
+    : Game(kGameType, params),
+      row_length_(ParameterValue<int>("row_length")) {
+  SPIEL_CHECK_GT(row_length_, 0);
+}
+
+KaylesState::KaylesState(std::shared_ptr<const Game> game, int row_length)
+    : State(game), row_length_(row_length), pins_(row_length, true) {}
+
+std::vector<Action> KaylesState::LegalActions() const {
+  if (IsTerminal()) return {};
+  std::vector<Action> actions;
+  for (int pin = 0; pin < row_length_; ++pin) {
+    if (pins_[pin]) actions.push_back(pin);
+  }
+  for (int pin = 0; pin + 1 < row_length_; ++pin) {
+    if (pins_[pin] && pins_[pin + 1]) {
+      actions.push_back(row_length_ + pin);
+    }
+  }
+  return actions;
+}
+
+std::string KaylesState::ActionToString(Player player, Action action) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  const bool removes_pair = action >= row_length_;
+  const int first_pin = removes_pair ? action - row_length_ : action;
+  SPIEL_CHECK_GE(first_pin, 0);
+  SPIEL_CHECK_LT(first_pin, row_length_);
+  if (removes_pair) SPIEL_CHECK_LT(first_pin + 1, row_length_);
+  return removes_pair
+             ? absl::StrCat("remove pins ", first_pin + 1, "-", first_pin + 2)
+             : absl::StrCat("remove pin ", first_pin + 1);
+}
+
+std::string KaylesState::ToString() const {
+  std::string result = absl::StrCat("P", current_player_, ": ");
+  for (bool standing : pins_) {
+    absl::StrAppend(&result, standing ? "|" : ".");
+  }
+  return result;
+}
+
+bool KaylesState::IsTerminal() const {
+  return std::none_of(pins_.begin(), pins_.end(),
+                      [](bool standing) { return standing; });
+}
+
+std::vector<double> KaylesState::Returns() const {
+  if (!IsTerminal()) return {0.0, 0.0};
+  return current_player_ == 0 ? std::vector<double>{-1.0, 1.0}
+                              : std::vector<double>{1.0, -1.0};
+}
+
+std::string KaylesState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return HistoryString();
+}
+
+std::string KaylesState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return ToString();
+}
+
+void KaylesState::ObservationTensor(Player player,
+                                    absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  SPIEL_CHECK_EQ(values.size(), kNumPlayers + 1 + row_length_);
+  std::fill(values.begin(), values.end(), 0.0);
+  values[current_player_] = 1.0;
+  values[kNumPlayers] = IsTerminal() ? 1.0 : 0.0;
+  for (int pin = 0; pin < row_length_; ++pin) {
+    values[kNumPlayers + 1 + pin] = pins_[pin] ? 1.0 : 0.0;
+  }
+}
+
+void KaylesState::DoApplyAction(Action action) {
+  SPIEL_CHECK_FALSE(IsTerminal());
+  const bool removes_pair = action >= row_length_;
+  const int first_pin = removes_pair ? action - row_length_ : action;
+  SPIEL_CHECK_GE(first_pin, 0);
+  SPIEL_CHECK_LT(first_pin, row_length_);
+  if (removes_pair) SPIEL_CHECK_LT(first_pin + 1, row_length_);
+  SPIEL_CHECK_TRUE(pins_[first_pin]);
+  pins_[first_pin] = false;
+  if (removes_pair) {
+    SPIEL_CHECK_TRUE(pins_[first_pin + 1]);
+    pins_[first_pin + 1] = false;
+  }
+  current_player_ = 1 - current_player_;
+}
+
+void KaylesState::UndoAction(Player player, Action action) {
+  const bool removes_pair = action >= row_length_;
+  const int first_pin = removes_pair ? action - row_length_ : action;
+  pins_[first_pin] = true;
+  if (removes_pair) pins_[first_pin + 1] = true;
+  current_player_ = player;
+  history_.pop_back();
+  --move_number_;
+}
+
+std::unique_ptr<State> KaylesState::Clone() const {
+  return std::unique_ptr<State>(new KaylesState(*this));
+}
+
+}  // namespace kayles
+}  // namespace open_spiel

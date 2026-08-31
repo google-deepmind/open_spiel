@@ -1,0 +1,184 @@
+game: kayles
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Kayles"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["row_length"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "kayles"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 19
+PolicyTensorShape() = [19]
+MaxChanceOutcomes() = 0
+GetParameters() = {row_length=10}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [13]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 13
+MaxGameLength() = 10
+ToString() = "kayles()"
+
+# State 0
+# P0: ||||||||||
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = "P0: ||||||||||"
+ObservationString(1) = "P0: ||||||||||"
+ObservationTensor(0): ◉◯◯◉◉◉◉◉◉◉◉◉◉
+ObservationTensor(1): ◉◯◯◉◉◉◉◉◉◉◉◉◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+StringLegalActions() = ["remove pin 1", "remove pin 2", "remove pin 3", "remove pin 4", "remove pin 5", "remove pin 6", "remove pin 7", "remove pin 8", "remove pin 9", "remove pin 10", "remove pins 1-2", "remove pins 2-3", "remove pins 3-4", "remove pins 4-5", "remove pins 5-6", "remove pins 6-7", "remove pins 7-8", "remove pins 8-9", "remove pins 9-10"]
+
+# Apply action "remove pins 8-9"
+action: 17
+
+# State 1
+# P1: |||||||..|
+IsTerminal() = False
+History() = [17]
+HistoryString() = "17"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "17"
+InformationStateString(1) = "17"
+ObservationString(0) = "P1: |||||||..|"
+ObservationString(1) = "P1: |||||||..|"
+ObservationTensor(0): ◯◉◯◉◉◉◉◉◉◉◯◯◉
+ObservationTensor(1): ◯◉◯◉◉◉◉◉◉◉◯◯◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15]
+StringLegalActions() = ["remove pin 1", "remove pin 2", "remove pin 3", "remove pin 4", "remove pin 5", "remove pin 6", "remove pin 7", "remove pin 10", "remove pins 1-2", "remove pins 2-3", "remove pins 3-4", "remove pins 4-5", "remove pins 5-6", "remove pins 6-7"]
+
+# Apply action "remove pins 2-3"
+action: 11
+
+# State 2
+# P0: |..||||..|
+IsTerminal() = False
+History() = [17, 11]
+HistoryString() = "17, 11"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "17, 11"
+InformationStateString(1) = "17, 11"
+ObservationString(0) = "P0: |..||||..|"
+ObservationString(1) = "P0: |..||||..|"
+ObservationTensor(0): ◉◯◯◉◯◯◉◉◉◉◯◯◉
+ObservationTensor(1): ◉◯◯◉◯◯◉◉◉◉◯◯◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 3, 4, 5, 6, 9, 13, 14, 15]
+StringLegalActions() = ["remove pin 1", "remove pin 4", "remove pin 5", "remove pin 6", "remove pin 7", "remove pin 10", "remove pins 4-5", "remove pins 5-6", "remove pins 6-7"]
+
+# Apply action "remove pins 4-5"
+action: 13
+
+# State 3
+# P1: |....||..|
+IsTerminal() = False
+History() = [17, 11, 13]
+HistoryString() = "17, 11, 13"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "17, 11, 13"
+InformationStateString(1) = "17, 11, 13"
+ObservationString(0) = "P1: |....||..|"
+ObservationString(1) = "P1: |....||..|"
+ObservationTensor(0): ◯◉◯◉◯◯◯◯◉◉◯◯◉
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◉◉◯◯◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 5, 6, 9, 15]
+StringLegalActions() = ["remove pin 1", "remove pin 6", "remove pin 7", "remove pin 10", "remove pins 6-7"]
+
+# Apply action "remove pin 7"
+action: 6
+
+# State 4
+# P0: |....|...|
+IsTerminal() = False
+History() = [17, 11, 13, 6]
+HistoryString() = "17, 11, 13, 6"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "17, 11, 13, 6"
+InformationStateString(1) = "17, 11, 13, 6"
+ObservationString(0) = "P0: |....|...|"
+ObservationString(1) = "P0: |....|...|"
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◉◯◯◯◉
+ObservationTensor(1): ◉◯◯◉◯◯◯◯◉◯◯◯◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 5, 9]
+StringLegalActions() = ["remove pin 1", "remove pin 6", "remove pin 10"]
+
+# Apply action "remove pin 6"
+action: 5
+
+# State 5
+# P1: |........|
+IsTerminal() = False
+History() = [17, 11, 13, 6, 5]
+HistoryString() = "17, 11, 13, 6, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "17, 11, 13, 6, 5"
+InformationStateString(1) = "17, 11, 13, 6, 5"
+ObservationString(0) = "P1: |........|"
+ObservationString(1) = "P1: |........|"
+ObservationTensor(0): ◯◉◯◉◯◯◯◯◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 9]
+StringLegalActions() = ["remove pin 1", "remove pin 10"]
+
+# Apply action "remove pin 10"
+action: 9
+
+# State 6
+# Apply action "remove pin 1"
+action: 0
+
+# State 7
+# P1: ..........
+IsTerminal() = True
+History() = [17, 11, 13, 6, 5, 9, 0]
+HistoryString() = "17, 11, 13, 6, 5, 9, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "17, 11, 13, 6, 5, 9, 0"
+InformationStateString(1) = "17, 11, 13, 6, 5, 9, 0"
+ObservationString(0) = "P1: .........."
+ObservationString(1) = "P1: .........."
+ObservationTensor(0): ◯◉◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯
+Rewards() = [1, -1]
+Returns() = [1, -1]
