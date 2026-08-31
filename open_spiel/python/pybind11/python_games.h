@@ -108,6 +108,8 @@ class PyGame : public Game, public py::trampoline_self_life_support {
   // Used to implement the old observation API.
   mutable std::shared_ptr<Observer> default_observer_;
   mutable std::shared_ptr<Observer> info_state_observer_;
+  mutable absl::optional<std::vector<int>> observation_tensor_shape_;
+  mutable absl::optional<std::vector<int>> information_state_tensor_shape_;
 };
 
 // Trampoline for using Python-defined states from C++.
