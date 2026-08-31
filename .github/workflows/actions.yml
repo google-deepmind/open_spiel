@@ -13,8 +13,13 @@ on:
         required: false
         default: 'build_and_test (manual)'
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    permissions:
+      contents: write
     strategy:
       matrix:
         include:
@@ -79,6 +84,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0

@@ -20,10 +20,15 @@ on:
         required: false
         default: 'No name specified'
 
+permissions:
+  contents: read
+
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }} ${{ matrix.NAME }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         include:
@@ -84,7 +89,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
-
+        with:
+          persist-credentials: false
+      
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
 
       - name: Install
@@ -146,6 +153,8 @@ jobs:
 
   # Windows wheel builds - separate job due to different build process (no cibuildwheel)
   build_windows_wheels:
+    permissions:
+      contents: write
     name: Build wheels on Windows Python ${{ matrix.python-version }}
     runs-on: windows-latest
     timeout-minutes: 90
@@ -160,6 +169,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
         with:
+          persist-credentials: false
           submodules: recursive
 
       - name: Set up Python ${{ matrix.python-version }}
