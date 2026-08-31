@@ -160,8 +160,13 @@ DouDizhuState::OriginalDeal() const {
     deal[((i - 1 + first_player_) % kNumPlayers)]
         [CardToRank(history_[i].action - kDealingActionBase)]++;
 
-  for (int i = 0; i < kNumCardsLeftOver; ++i)
-    deal[dizhu_][cards_left_over_[i]]++;
+  // If everybody passed during the auction there is no dizhu, so the
+  // left-over cards were never dealt to anybody. Indexing deal with
+  // kInvalidPlayer writes outside the array.
+  if (dizhu_ != kInvalidPlayer) {
+    for (int i = 0; i < kNumCardsLeftOver; ++i)
+      deal[dizhu_][cards_left_over_[i]]++;
+  }
   return deal;
 }
 
