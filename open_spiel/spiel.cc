@@ -184,9 +184,7 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
 }
 
 std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
-  return {
-    "dou_dizhu"  // https://github.com/google-deepmind/open_spiel/issues/1358
-  };
+  return {};
 }
 
 std::vector<GameType> GameRegisterer::RegisteredGames() {

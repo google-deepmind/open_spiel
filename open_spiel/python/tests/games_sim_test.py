@@ -49,9 +49,7 @@ SPIEL_ACTION_STRUCTS_ONLY_GAMES_LIST = [
 # A list of games to exclude from the general simulation tests. This should
 # remain empty, but it is helpful to use while a game is under construction,
 # or while there are any known issues with the game causing test failures.
-SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = [
-    "dou_dizhu",  # https://github.com/google-deepmind/open_spiel/issues/1358
-]
+SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = []
 
 # A list of games to exclude testing pickle serialization of the 'game type'
 # during general simulation tests (without entirely excluding them from the
