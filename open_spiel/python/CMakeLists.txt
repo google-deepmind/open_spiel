@@ -376,11 +376,8 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
       examples/mcp_tool_server/tools_test.py
-      # The following two tests are failing on Github Actions CI.
-      # Disabled temporarily while we investigate a fix. See 
-      # https://github.com/google-deepmind/open_spiel/issues/1600 for details.
-      # coalitional_games/least_core_lp_test.py
-      # coalitional_games/wvg_test.py
+      coalitional_games/least_core_lp_test.py
+      coalitional_games/wvg_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py
