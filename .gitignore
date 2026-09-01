@@ -61,6 +61,7 @@ Manifest.toml
 # IDE
 .idea/
 .vscode/
+.vs/
 *~
 
 # Visual Studio generated files
