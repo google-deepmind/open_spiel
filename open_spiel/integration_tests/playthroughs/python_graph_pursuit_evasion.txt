@@ -1,0 +1,244 @@
+game: python_graph_pursuit_evasion
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Python Graph Pursuit-Evasion"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["edge_types", "evader_edge_types", "evader_start", "graph", "max_rounds", "pursuer_edge_types", "pursuer_start", "reveal_interval"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "python_graph_pursuit_evasion"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 17
+PolicyTensorShape() = [17]
+MaxChanceOutcomes() = 0
+GetParameters() = {edge_types=taxi;bus;rail,evader_edge_types=taxi;bus;rail,evader_start=3,graph=0-1:taxi;1-2:bus;2-3:rail;3-4:taxi;4-5:bus;5-0:rail;1-4:taxi;2-5:bus,max_rounds=12,pursuer_edge_types=taxi;bus;rail,pursuer_start=0,reveal_interval=3}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+InformationStateTensorShape() = player: [2], own_position: [6], known_opponent_position: [6], last_evader_edge_type: [4], round_progress: [1]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 19
+ObservationTensorShape() = player: [2], own_position: [6], known_opponent_position: [6], last_evader_edge_type: [4], round_progress: [1]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 19
+MaxGameLength() = 24
+ToString() = "python_graph_pursuit_evasion(edge_types=taxi;bus;rail,evader_edge_types=taxi;bus;rail,evader_start=3,graph=0-1:taxi;1-2:bus;2-3:rail;3-4:taxi;4-5:bus;5-0:rail;1-4:taxi;2-5:bus,max_rounds=12,pursuer_edge_types=taxi;bus;rail,pursuer_start=0,reveal_interval=3)"
+
+# State 0
+# Pursuer: 0, Evader: 3, Last reveal: 3, Round: 0/12
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "start:pursuer=0,evader=3"
+InformationStateString(1) = "start:pursuer=0,evader=3"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).own_position: ◉◯◯◯◯◯
+InformationStateTensor(0).known_opponent_position: ◯◯◯◉◯◯
+InformationStateTensor(0).last_evader_edge_type: ◉◯◯◯
+InformationStateTensor(0).round_progress: ◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).own_position: ◯◯◯◉◯◯
+InformationStateTensor(1).known_opponent_position: ◉◯◯◯◯◯
+InformationStateTensor(1).last_evader_edge_type: ◉◯◯◯
+InformationStateTensor(1).round_progress: ◯
+ObservationString(0) = "player=0 own=0 known_opponent=3 last_evader_edge=none round=0"
+ObservationString(1) = "player=1 own=3 known_opponent=0 last_evader_edge=none round=0"
+PublicObservationString() = "player=0 own=0 known_opponent=3 last_evader_edge=none round=0"
+PrivateObservationString(0) = "player=0 own=0 known_opponent=3 last_evader_edge=none round=0"
+PrivateObservationString(1) = "player=1 own=3 known_opponent=0 last_evader_edge=none round=0"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).own_position: ◉◯◯◯◯◯
+ObservationTensor(0).known_opponent_position: ◯◯◯◉◯◯
+ObservationTensor(0).last_evader_edge_type: ◉◯◯◯
+ObservationTensor(0).round_progress: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).own_position: ◯◯◯◉◯◯
+ObservationTensor(1).known_opponent_position: ◉◯◯◯◯◯
+ObservationTensor(1).last_evader_edge_type: ◉◯◯◯
+ObservationTensor(1).round_progress: ◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 16]
+StringLegalActions() = ["Pursuer moves 0->1 by taxi", "Pursuer moves 0->5 by rail", "Pursuer waits"]
+
+# Apply action "Pursuer waits"
+action: 16
+
+# State 1
+# Pursuer: 0, Evader: 3, Last reveal: 3, Round: 0/12
+IsTerminal() = False
+History() = [16]
+HistoryString() = "16"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "start:pursuer=0,evader=3 | P:wait@0"
+InformationStateString(1) = "start:pursuer=0,evader=3 | P:wait@0"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).own_position: ◉◯◯◯◯◯
+InformationStateTensor(0).known_opponent_position: ◯◯◯◉◯◯
+InformationStateTensor(0).last_evader_edge_type: ◉◯◯◯
+InformationStateTensor(0).round_progress: ◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).own_position: ◯◯◯◉◯◯
+InformationStateTensor(1).known_opponent_position: ◉◯◯◯◯◯
+InformationStateTensor(1).last_evader_edge_type: ◉◯◯◯
+InformationStateTensor(1).round_progress: ◯
+ObservationString(0) = "player=0 own=0 known_opponent=3 last_evader_edge=none round=0"
+ObservationString(1) = "player=1 own=3 known_opponent=0 last_evader_edge=none round=0"
+PublicObservationString() = "player=0 own=0 known_opponent=3 last_evader_edge=none round=0"
+PrivateObservationString(0) = "player=0 own=0 known_opponent=3 last_evader_edge=none round=0"
+PrivateObservationString(1) = "player=1 own=3 known_opponent=0 last_evader_edge=none round=0"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).own_position: ◉◯◯◯◯◯
+ObservationTensor(0).known_opponent_position: ◯◯◯◉◯◯
+ObservationTensor(0).last_evader_edge_type: ◉◯◯◯
+ObservationTensor(0).round_progress: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).own_position: ◯◯◯◉◯◯
+ObservationTensor(1).known_opponent_position: ◉◯◯◯◯◯
+ObservationTensor(1).last_evader_edge_type: ◉◯◯◯
+ObservationTensor(1).round_progress: ◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [8, 9, 16]
+StringLegalActions() = ["Evader moves 3->2 by rail", "Evader moves 3->4 by taxi", "Evader waits"]
+
+# Apply action "Evader moves 3->4 by taxi"
+action: 9
+
+# State 2
+# Pursuer: 0, Evader: 4, Last reveal: 3, Round: 1/12
+IsTerminal() = False
+History() = [16, 9]
+HistoryString() = "16, 9"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "start:pursuer=0,evader=3 | P:wait@0 | E:taxi"
+InformationStateString(1) = "start:pursuer=0,evader=3 | P:wait@0 | E:taxi:3->4"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).own_position: ◉◯◯◯◯◯
+InformationStateTensor(0).known_opponent_position: ◯◯◯◉◯◯
+InformationStateTensor(0).last_evader_edge_type: ◯◉◯◯
+InformationStateTensor(0).round_progress = [0.08333]
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).own_position: ◯◯◯◯◉◯
+InformationStateTensor(1).known_opponent_position: ◉◯◯◯◯◯
+InformationStateTensor(1).last_evader_edge_type: ◯◉◯◯
+InformationStateTensor(1).round_progress = [0.08333]
+ObservationString(0) = "player=0 own=0 known_opponent=3 last_evader_edge=taxi round=1"
+ObservationString(1) = "player=1 own=4 known_opponent=0 last_evader_edge=taxi round=1"
+PublicObservationString() = "player=0 own=0 known_opponent=3 last_evader_edge=taxi round=1"
+PrivateObservationString(0) = "player=0 own=0 known_opponent=3 last_evader_edge=taxi round=1"
+PrivateObservationString(1) = "player=1 own=4 known_opponent=0 last_evader_edge=taxi round=1"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).own_position: ◉◯◯◯◯◯
+ObservationTensor(0).known_opponent_position: ◯◯◯◉◯◯
+ObservationTensor(0).last_evader_edge_type: ◯◉◯◯
+ObservationTensor(0).round_progress = [0.08333]
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).own_position: ◯◯◯◯◉◯
+ObservationTensor(1).known_opponent_position: ◉◯◯◯◯◯
+ObservationTensor(1).last_evader_edge_type: ◯◉◯◯
+ObservationTensor(1).round_progress = [0.08333]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 16]
+StringLegalActions() = ["Pursuer moves 0->1 by taxi", "Pursuer moves 0->5 by rail", "Pursuer waits"]
+
+# Apply action "Pursuer moves 0->1 by taxi"
+action: 0
+
+# State 3
+# Pursuer: 1, Evader: 4, Last reveal: 3, Round: 1/12
+IsTerminal() = False
+History() = [16, 9, 0]
+HistoryString() = "16, 9, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "start:pursuer=0,evader=3 | P:wait@0 | E:taxi | P:taxi:0->1"
+InformationStateString(1) = "start:pursuer=0,evader=3 | P:wait@0 | E:taxi:3->4 | P:taxi:0->1"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).own_position: ◯◉◯◯◯◯
+InformationStateTensor(0).known_opponent_position: ◯◯◯◉◯◯
+InformationStateTensor(0).last_evader_edge_type: ◯◉◯◯
+InformationStateTensor(0).round_progress = [0.08333]
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).own_position: ◯◯◯◯◉◯
+InformationStateTensor(1).known_opponent_position: ◯◉◯◯◯◯
+InformationStateTensor(1).last_evader_edge_type: ◯◉◯◯
+InformationStateTensor(1).round_progress = [0.08333]
+ObservationString(0) = "player=0 own=1 known_opponent=3 last_evader_edge=taxi round=1"
+ObservationString(1) = "player=1 own=4 known_opponent=1 last_evader_edge=taxi round=1"
+PublicObservationString() = "player=0 own=1 known_opponent=3 last_evader_edge=taxi round=1"
+PrivateObservationString(0) = "player=0 own=1 known_opponent=3 last_evader_edge=taxi round=1"
+PrivateObservationString(1) = "player=1 own=4 known_opponent=1 last_evader_edge=taxi round=1"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).own_position: ◯◉◯◯◯◯
+ObservationTensor(0).known_opponent_position: ◯◯◯◉◯◯
+ObservationTensor(0).last_evader_edge_type: ◯◉◯◯
+ObservationTensor(0).round_progress = [0.08333]
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).own_position: ◯◯◯◯◉◯
+ObservationTensor(1).known_opponent_position: ◯◉◯◯◯◯
+ObservationTensor(1).last_evader_edge_type: ◯◉◯◯
+ObservationTensor(1).round_progress = [0.08333]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [10, 11, 12, 16]
+StringLegalActions() = ["Evader moves 4->1 by taxi", "Evader moves 4->3 by taxi", "Evader moves 4->5 by bus", "Evader waits"]
+
+# Apply action "Evader moves 4->1 by taxi"
+action: 10
+
+# State 4
+# Pursuer: 1, Evader: 1, Last reveal: 3, Round: 2/12
+IsTerminal() = True
+History() = [16, 9, 0, 10]
+HistoryString() = "16, 9, 0, 10"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "start:pursuer=0,evader=3 | P:wait@0 | E:taxi | P:taxi:0->1 | E:taxi"
+InformationStateString(1) = "start:pursuer=0,evader=3 | P:wait@0 | E:taxi:3->4 | P:taxi:0->1 | E:taxi:4->1"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).own_position: ◯◉◯◯◯◯
+InformationStateTensor(0).known_opponent_position: ◯◯◯◉◯◯
+InformationStateTensor(0).last_evader_edge_type: ◯◉◯◯
+InformationStateTensor(0).round_progress = [0.16667]
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).own_position: ◯◉◯◯◯◯
+InformationStateTensor(1).known_opponent_position: ◯◉◯◯◯◯
+InformationStateTensor(1).last_evader_edge_type: ◯◉◯◯
+InformationStateTensor(1).round_progress = [0.16667]
+ObservationString(0) = "player=0 own=1 known_opponent=3 last_evader_edge=taxi round=2"
+ObservationString(1) = "player=1 own=1 known_opponent=1 last_evader_edge=taxi round=2"
+PublicObservationString() = "player=0 own=1 known_opponent=3 last_evader_edge=taxi round=2"
+PrivateObservationString(0) = "player=0 own=1 known_opponent=3 last_evader_edge=taxi round=2"
+PrivateObservationString(1) = "player=1 own=1 known_opponent=1 last_evader_edge=taxi round=2"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).own_position: ◯◉◯◯◯◯
+ObservationTensor(0).known_opponent_position: ◯◯◯◉◯◯
+ObservationTensor(0).last_evader_edge_type: ◯◉◯◯
+ObservationTensor(0).round_progress = [0.16667]
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).own_position: ◯◉◯◯◯◯
+ObservationTensor(1).known_opponent_position: ◯◉◯◯◯◯
+ObservationTensor(1).last_evader_edge_type: ◯◉◯◯
+ObservationTensor(1).round_progress = [0.16667]
+Rewards() = [1, -1]
+Returns() = [1, -1]
