@@ -12,16 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_ALGORITHMS_MINMAX_H_
-#define OPEN_SPIEL_ALGORITHMS_MINMAX_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_MINIMAX_H_
+#define OPEN_SPIEL_ALGORITHMS_MINIMAX_H_
 
 #include <memory>
+#include <random>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
 namespace algorithms {
+
+// The actions that achieve the optimal value at the search root, in
+// legal-action order. Empty only when the search root is terminal.
+class BestActions {
+ private:
+  std::vector<Action> actions;
+
+ public:
+  // The first optimal action, which is the one the search returned before tie
+  // collection was added. kInvalidAction when the set is empty.
+  Action Single() const;
+
+  // A uniformly drawn optimal action, kInvalidAction when the set is empty.
+  Action SampleUniformly(std::mt19937& rng) const;
+
+  size_t Size() const;
+  bool ContainsAction(Action action) const;
+
+  // Set equality: same size and same members, ignoring order.
+  bool Equals(const std::vector<Action>& action_list) const;
+
+  void Clear();
+  void Add(Action action);
+};
 
 // Solves deterministic, 2-players, perfect-information 0-sum game.
 //
@@ -37,12 +63,12 @@ namespace algorithms {
 //   maximizing_player_id: The id of the MAX player. The other player is assumed
 //     to be MIN. Passing in kInvalidPlayer will set this to the search root's
 //     current player.
-
+//   collect_actions: collect all actions that achieve the best value.
 //   Returns:
 //     A pair of the value of the game for the maximizing player when both
-//     players play optimally, along with the action that achieves this value.
+//     players play optimally, along with the actions that achieve this value.
 
-std::pair<double, Action> AlphaBetaSearch(
+std::pair<double, BestActions> AlphaBetaSearch(
     const Game& game, const State* state,
     std::function<double(const State&)> value_function, int depth_limit,
     Player maximizing_player, bool use_undo = true);
@@ -66,7 +92,7 @@ std::pair<double, Action> AlphaBetaSearch(
 //     A pair of the value of the game for the maximizing player when both
 //     players play optimally, along with the action that achieves this value.
 
-std::pair<double, Action> ExpectiminimaxSearch(
+std::pair<double, BestActions> ExpectiminimaxSearch(
     const Game& game, const State* state,
     std::function<double(const State&)> value_function, int depth_limit,
     Player maximizing_player);
@@ -74,4 +100,4 @@ std::pair<double, Action> ExpectiminimaxSearch(
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_ALGORITHMS_MINMAX_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_MINIMAX_H_

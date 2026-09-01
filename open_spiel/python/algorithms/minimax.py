@@ -21,10 +21,41 @@ See for example https://en.wikipedia.org/wiki/Alpha-beta_pruning
 """
 
 import pyspiel
+import numpy as np
 
 
-def _alpha_beta(state, depth, alpha, beta, value_function,
-                maximizing_player_id):
+class BestActions:
+
+  def __init__(self):
+    self.actions: list[int] = []
+
+  def single(self) -> int:
+    return self.actions[0] if self.actions else -1
+
+  def sample_uniformly(self, rng: np.random.RandomState) -> int:
+    return rng.choice(self.actions) if self.actions else -1
+
+  def __len__(self) -> int:
+    return len(self.actions)
+
+  def __contains__(self, other_action: int) -> bool:
+    return other_action in self.actions
+
+  def __eq__(self, other_actions: list[int]) -> bool:
+    if len(self.actions) != len(other_actions):
+      return False
+
+    return all(action in self.actions for action in other_actions)
+
+  def clear(self):
+    self.actions.clear()
+
+  def add(self, action: int):
+    self.actions.append(action)
+
+
+def _alpha_beta(state, depth, alpha, beta, value_function, maximizing_player_id,
+                is_root):
   """An alpha-beta algorithm.
 
   Implements a min-max algorithm with alpha-beta pruning.
@@ -61,36 +92,54 @@ def _alpha_beta(state, depth, alpha, beta, value_function,
   if depth == 0:
     return value_function(state), None
 
+  best_actions = BestActions()
   player = state.current_player()
-  best_action = -1
+
   if player == maximizing_player_id:
     value = -float("inf")
     for action in state.legal_actions():
       child_state = state.clone()
       child_state.apply_action(action)
       child_value, _ = _alpha_beta(child_state, depth - 1, alpha, beta,
-                                   value_function, maximizing_player_id)
+                                   value_function, maximizing_player_id, False)
       if child_value > value:
         value = child_value
-        best_action = action
-      alpha = max(alpha, value)
+        if is_root:
+          best_actions.clear()
+          best_actions.add(action)
+      elif is_root and child_value == value:
+        best_actions.add(action)
+
+      alpha = max(alpha, np.nextafter(value, -np.inf)) if is_root else max(
+          alpha, value)
+
       if alpha >= beta:
         break  # beta cut-off
-    return value, best_action
+
+    return value, best_actions
   else:
     value = float("inf")
     for action in state.legal_actions():
       child_state = state.clone()
       child_state.apply_action(action)
       child_value, _ = _alpha_beta(child_state, depth - 1, alpha, beta,
-                                   value_function, maximizing_player_id)
+                                   value_function, maximizing_player_id, False)
+
       if child_value < value:
         value = child_value
-        best_action = action
-      beta = min(beta, value)
+        if is_root:
+          best_actions.clear()
+          best_actions.add(action)
+      elif is_root and child_value == value:
+        best_actions.add(action)
+
+      beta = min(beta, np.nextafter(value, np.inf)) if is_root else min(
+          beta, value)
+
       if alpha >= beta:
         break  # alpha cut-off
-    return value, best_action
+
+    return value, best_actions
 
 
 def alpha_beta_search(game,
@@ -146,10 +195,16 @@ def alpha_beta_search(game,
       alpha=-float("inf"),
       beta=float("inf"),
       value_function=value_function,
-      maximizing_player_id=maximizing_player_id)
+      maximizing_player_id=maximizing_player_id,
+      is_root=True,
+  )
 
 
-def expectiminimax(state, depth, value_function, maximizing_player_id):
+def expectiminimax(state,
+                   depth,
+                   value_function,
+                   maximizing_player_id,
+                   is_root=True):
   """Runs expectiminimax until the specified depth.
 
   See https://en.wikipedia.org/wiki/Expectiminimax for details.
@@ -173,34 +228,57 @@ def expectiminimax(state, depth, value_function, maximizing_player_id):
   if depth == 0:
     return value_function(state), None
 
+  action_values: list[tuple[int, float]] = []
+
+  player = state.current_player()
   if state.is_chance_node():
     value = 0
     for outcome, prob in state.chance_outcomes():
       child_state = state.clone()
       child_state.apply_action(outcome)
-      child_value, _ = expectiminimax(child_state, depth, value_function,
-                                      maximizing_player_id)
+      child_value, _ = expectiminimax(
+          child_state,
+          depth,
+          value_function,
+          maximizing_player_id,
+          is_root=False)
       value += prob * child_value
     return value, None
-  elif state.current_player() == maximizing_player_id:
+  elif player == maximizing_player_id:
     value = -float("inf")
     for action in state.legal_actions():
       child_state = state.clone()
       child_state.apply_action(action)
-      child_value, _ = expectiminimax(child_state, depth - 1, value_function,
-                                      maximizing_player_id)
-      if child_value > value:
-        value = child_value
-        best_action = action
-    return value, best_action
+      child_value, _ = expectiminimax(
+          child_state,
+          depth - 1,
+          value_function,
+          maximizing_player_id,
+          is_root=False)
+      value = max(value, child_value)
+      if is_root:
+        action_values.append((action, child_value))
   else:
     value = float("inf")
     for action in state.legal_actions():
       child_state = state.clone()
       child_state.apply_action(action)
-      child_value, _ = expectiminimax(child_state, depth - 1, value_function,
-                                      maximizing_player_id)
-      if child_value < value:
-        value = child_value
-        best_action = action
-    return value, best_action
+      child_value, _ = expectiminimax(
+          child_state,
+          depth - 1,
+          value_function,
+          maximizing_player_id,
+          is_root=False)
+      value = min(value, child_value)
+      if is_root:
+        action_values.append((action, child_value))
+
+  if not is_root:
+    return value, None
+
+  best_actions = BestActions()
+  for a, v in action_values:
+    if np.abs(value - v) <= 1e-9:
+      best_actions.add(a)
+
+  return value, best_actions
