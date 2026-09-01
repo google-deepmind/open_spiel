@@ -350,6 +350,7 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       pytorch/dqn_pytorch_test.py
       pytorch/boltzmann_dqn_pytorch_test.py
       pytorch/nfsp_pytorch_test.py
+      pytorch/nash_pg_pytorch_test.py
       pytorch/deep_cfr_pytorch_test.py
       pytorch/escher_test.py
       pytorch/losses/rl_losses_pytorch_test.py
