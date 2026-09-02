@@ -13,6 +13,7 @@ Welcome to OpenSpiel's documentation!
    :maxdepth: 2
 
    concepts
+   bots_and_agents
    api_reference
    algorithms
    games
