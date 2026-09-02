@@ -317,7 +317,7 @@ class Model:
       flat_params = traverse_util.flatten_dict(params)
       flat_mask = {
           path: not ((path[-1] == "bias") or ("BatchNorm_0" in path))
-          for path in flat_params.keys()
+          for path in flat_params
       }
       return traverse_util.unflatten_dict(flat_mask)
 
@@ -447,9 +447,13 @@ class Model:
     observation = jnp.asarray(observation, dtype=jnp.float32)
     legals_mask = jnp.asarray(legals_mask, dtype=jnp.bool)
 
-    # @jax.jit  # --- with it the model is much slower than without...
+    # ATOMIC SNAPSHOT
+    state = self._state
+    params = state.params
+    batch_stats = state.batch_stats
+
     def _predict(params, batch_stats, observation: chex.Array):
-      policy_logits, value = self._state.apply_fn(
+      policy_logits, value = state.apply_fn(
           {"params": params, "batch_stats": batch_stats},
           observation,
           training=False,
@@ -464,7 +468,7 @@ class Model:
       return value, policy
 
     value, policy = _predict(
-        self._state.params, self._state.batch_stats, observation
+        params, batch_stats, observation
     )
 
     return value, policy
@@ -507,7 +511,7 @@ class Model:
 
     return step
 
-  def load_checkpoint(self, step: int | str, device: str = None) -> None:
+  def load_checkpoint(self, step: int | str, device: str | None = None) -> None:
     """Loads a checkpoint of the model."""
     target = self._state
     path = os.path.join(self._path, f"checkpoint-{step}")
