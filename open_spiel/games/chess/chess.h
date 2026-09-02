@@ -269,6 +269,8 @@ class ChessGame : public Game {
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 
+  int MaxSerializationLength() const override;
+
   bool IsChess960() const { return chess960_; }
 
   std::string Chess960LookupFEN(int index) const {
