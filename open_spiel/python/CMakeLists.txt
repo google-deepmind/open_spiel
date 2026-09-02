@@ -356,6 +356,7 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       pytorch/policy_gradient_pytorch_test.py
       pytorch/ppo_pytorch_test.py
       pytorch/neurd_pytorch_test.py
+      pytorch/nash_pg_pytorch_test.py
   )
 endif()
 
