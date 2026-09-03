@@ -68,10 +68,11 @@ class BoltzmannQLearner(tabular_qlearner.QLearner):
     probs = np.zeros(self._num_actions)
 
     if temperature > 0.0:
-      probs += [
-          np.exp((1 / temperature) * self._q_values[info_state][i])
-          for i in range(self._num_actions)
-      ]
+      logits = np.array(
+          [self._q_values[info_state][a] / temperature for a in legal_actions])
+      # Subtract the max so large Q-values or a small temperature cannot
+      # overflow the exponential.
+      probs[legal_actions] = np.exp(logits - np.max(logits))
       probs /= np.sum(probs)
     else:
       # Temperature = 0 causes normal greedy action selection

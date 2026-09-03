@@ -17,6 +17,7 @@ from absl.testing import absltest
 import numpy as np
 
 from open_spiel.python import rl_environment
+from open_spiel.python import rl_tools
 from open_spiel.python.algorithms import boltzmann_tabular_qlearner
 import pyspiel
 
@@ -60,6 +61,40 @@ class BoltzmannQlearnerTest(absltest.TestCase):
           time_step = env.step([agent_output.action])
           total_eval_reward += time_step.rewards[0]
       self.assertGreaterEqual(total_eval_reward, 250)
+
+  def test_softmax_ignores_illegal_actions(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    env = rl_environment.Environment(game=game)
+    agent = boltzmann_tabular_qlearner.BoltzmannQLearner(
+        1, game.num_distinct_actions())
+
+    time_step = env.reset()
+    time_step = env.step([4])  # Player 0 takes the center; it is now illegal.
+    legal_actions = time_step.observations["legal_actions"][1]
+    self.assertNotIn(4, legal_actions)
+
+    agent_output = agent.step(time_step)
+    self.assertIn(agent_output.action, legal_actions)
+    self.assertEqual(agent_output.probs[4], 0.0)
+    self.assertAlmostEqual(np.sum(agent_output.probs[legal_actions]), 1.0)
+
+  def test_softmax_is_stable_for_large_q_values(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    env = rl_environment.Environment(game=game)
+    agent = boltzmann_tabular_qlearner.BoltzmannQLearner(
+        0, game.num_distinct_actions(),
+        temperature_schedule=rl_tools.ConstantSchedule(1e-3))
+
+    time_step = env.reset()
+    info_state = str(time_step.observations["info_state"][0])
+    legal_actions = time_step.observations["legal_actions"][0]
+    for action in legal_actions:
+      agent._q_values[info_state][action] = 1e6 * (action + 1)
+
+    agent_output = agent.step(time_step)
+    self.assertTrue(np.all(np.isfinite(agent_output.probs)))
+    self.assertAlmostEqual(np.sum(agent_output.probs), 1.0)
+    self.assertIn(agent_output.action, legal_actions)
 
 
 if __name__ == "__main__":
