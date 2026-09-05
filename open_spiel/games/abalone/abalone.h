@@ -149,7 +149,7 @@ std::pair<open_spiel::Action, float> AllAbaloneMoves_ABSpiel(
     std::vector<std::pair<open_spiel::Action, float>>* all_moves = nullptr);
 
 std::pair<Action, std::vector<std::pair<Action, float>>> AbaloneAB(
-    const State& state, int depth);
+    const State& state, int depth, int seed = -1);
 
 }  // namespace abalone
 }  // namespace open_spiel

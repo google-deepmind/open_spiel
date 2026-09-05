@@ -37,8 +37,11 @@ void init_pyspiel_games_abalone(::pybind11::module& m) {
     &abalone::AbaloneAB,
     py::arg("state"),
     py::arg("depth"),
+    py::arg("seed") = -1,
     "Run alpha-beta search and return the best action id, along with the "
-    "list of all evaluated (action, value) pairs.");
+    "list of all evaluated (action, value) pairs. Pass seed >= 0 for a "
+    "reproducible search (same seed and state yield the same result); "
+    "seed < 0 (the default) keeps the legacy non-reproducible behavior.");
 }
 
 }  // namespace open_spiel

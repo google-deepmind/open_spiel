@@ -501,11 +501,11 @@ ActionsAndProbs AbaloneEvaluator::Prior(const State& state) {
 }
 
 std::pair<Action, std::vector<std::pair<Action, float>>> AbaloneAB(
-    const State& state, int depth) {
+    const State& state, int depth, int seed) {
   if (const auto* stt = dynamic_cast<const abalone::AbaloneState*>(&state)) {
     std::vector<std::pair<abalone_core::core_Action, float>> core_all_moves;
     auto best_move = abalone_core::AlphaBeta(
-        stt->core_state_, depth, -1.f, 1.f, &core_all_moves);
+        stt->core_state_, depth, -1.f, 1.f, &core_all_moves, seed);
     std::vector<std::pair<Action, float>> all_moves;
     all_moves.reserve(core_all_moves.size());
     for (const auto& [action, value] : core_all_moves) {

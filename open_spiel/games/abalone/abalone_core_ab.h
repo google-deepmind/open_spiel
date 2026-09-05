@@ -36,10 +36,15 @@ int Heuristic(const core_state& _state, CellState _player);
 
 // @return best move with associated value (i.e., the current state's
 // value)
+// @param _seed  seed for the action-order shuffle. >= 0 makes the search
+//   fully reproducible (a fresh local RNG is seeded each call); < 0 (the
+//   default) keeps the legacy behavior of a process-wide static RNG whose
+//   state advances across calls.
 std::pair<core_Action, float> AlphaBeta(
     const core_state& _state, int _depth,
     float _alpha = -1.f, float _beta = 1.f,
-    std::vector<std::pair<core_Action, float>>* _all_moves = nullptr);
+    std::vector<std::pair<core_Action, float>>* _all_moves = nullptr,
+    int _seed = -1);
 
 }  // namespace abalone_core
 

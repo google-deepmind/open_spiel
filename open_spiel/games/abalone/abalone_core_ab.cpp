@@ -126,7 +126,7 @@ float _AlphaBeta(float _alpha, float _beta, const core_state& _state,
 
 std::pair<core_Action, float> AlphaBeta(
     const core_state& _state, int _depth, float _alpha, float _beta,
-    std::vector<std::pair<core_Action, float>>* _all_moves) {
+    std::vector<std::pair<core_Action, float>>* _all_moves, int _seed) {
   float score = -1.f - 0.001f;
   Move best_move;
 
@@ -134,8 +134,16 @@ std::pair<core_Action, float> AlphaBeta(
 
   std::array<core_Action, kActionMax> actions;
   std::iota(actions.begin(), actions.end(), static_cast<core_Action>(0));
-  static std::minstd_rand rng;
-  std::shuffle(actions.begin(), actions.end(), rng);
+  // A seeded RNG (_seed >= 0) is local to this call, making the search fully
+  // reproducible. The legacy static RNG (_seed < 0) persists across calls,
+  // so consecutive searches differ but the first one is deterministic.
+  if (_seed >= 0) {
+    std::minstd_rand local_rng(static_cast<uint32_t>(_seed));
+    std::shuffle(actions.begin(), actions.end(), local_rng);
+  } else {
+    static std::minstd_rand static_rng;
+    std::shuffle(actions.begin(), actions.end(), static_rng);
+  }
 
   for (auto action_it = actions.begin();
        action_it != actions.end(); ++action_it) {

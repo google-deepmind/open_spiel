@@ -190,6 +190,36 @@ void RandomBoardTest() {
                               &after->board_[0][0]));
 }
 
+void AlphaBetaSeedTest() {
+  // A seeded search (seed >= 0) must be reproducible: the same state and
+  // seed yield the same best action and the same (action, value) list,
+  // even across separate game instances. The legacy mode (seed < 0) uses
+  // a process-wide static RNG and is not required to be reproducible here.
+  auto game = LoadGame("abalone");
+  auto state = game->NewInitialState();
+
+  auto run = [&]() {
+    return AbaloneAB(*state, kSearchDepthAbalone, /*seed=*/42);
+  };
+  auto r1 = run();
+  auto r2 = run();
+  // Same best action.
+  SPIEL_CHECK_EQ(r1.first, r2.first);
+  // Same evaluated move list (same length, same actions, same values).
+  SPIEL_CHECK_EQ(r1.second.size(), r2.second.size());
+  for (std::size_t i = 0; i < r1.second.size(); ++i) {
+    SPIEL_CHECK_EQ(r1.second[i].first, r2.second[i].first);
+    SPIEL_CHECK_FLOAT_EQ(r1.second[i].second, r2.second[i].second);
+  }
+
+  // Reproducible across a fresh game instance.
+  auto game2 = LoadGame("abalone");
+  auto state2 = game2->NewInitialState();
+  auto r3 = AbaloneAB(*state2, kSearchDepthAbalone, /*seed=*/42);
+  SPIEL_CHECK_EQ(r1.first, r3.first);
+  SPIEL_CHECK_EQ(r1.second.size(), r3.second.size());
+}
+
 std::pair<open_spiel::Action, float> _LogABSpiel(
     std::unique_ptr<State>& state) {
   auto max_move = AllAbaloneMoves_ABSpiel(state, kSearchDepthAbalone);
@@ -429,6 +459,7 @@ int main(int argc, char** argv) {
   open_spiel::abalone::RewardAbaloneTest();
   open_spiel::abalone::DrawPenaltyTest();
   open_spiel::abalone::RandomBoardTest();
+  open_spiel::abalone::AlphaBetaSeedTest();
   open_spiel::abalone::StringAbaloneTests();
   open_spiel::abalone::DatasetTest();
 }
