@@ -412,7 +412,7 @@ foreach(py_test_file IN LISTS PYTHON_TESTS)
     #  from open_spiel.python import rl_environment.
     set_property(TEST python/${py_test_file}
         PROPERTY ENVIRONMENT
-        PYTHONPATH=${OPEN_SPIEL_PYTHONPATH}
+        PYTHONPATH=${OPEN_SPIEL_PYTHONPATH};
         TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
   endif()
 endforeach(py_test_file)
