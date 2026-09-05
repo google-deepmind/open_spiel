@@ -108,6 +108,88 @@ void DrawPenaltyTest() {
   }
 }
 
+// Count marbles of a player on the core board.
+static int CountMarbles(const abalone_core::core_state& stt,
+                        abalone_core::CellState p) {
+  return std::count(&stt.board_[0][0],
+                    &stt.board_[0][0] +
+                        sizeof(stt.board_) / sizeof(stt.board_[0][0]), p);
+}
+
+void RandomBoardTest() {
+  // Same seed -> identical boards.
+  auto g1 = LoadGame("abalone(board=random-symmetric,seed=42)");
+  auto s1 = g1->NewInitialState();
+  auto g2 = LoadGame("abalone(board=random-symmetric,seed=42)");
+  auto s2 = g2->NewInitialState();
+  auto* c1 = &static_cast<AbaloneState*>(s1.get())->core_state_;
+  auto* c2 = &static_cast<AbaloneState*>(s2.get())->core_state_;
+  SPIEL_CHECK_TRUE(std::equal(&c1->board_[0][0],
+                              &c1->board_[0][0] +
+                                  sizeof(c1->board_) / sizeof(c1->board_[0][0]),
+                              &c2->board_[0][0]));
+
+  // kMarblesPerPlayer marbles per player, all on valid (non-Invalid) cells.
+  SPIEL_CHECK_EQ(CountMarbles(*c1, abalone_core::CellState::Player0),
+                 abalone_core::kMarblesPerPlayer);
+  SPIEL_CHECK_EQ(CountMarbles(*c1, abalone_core::CellState::Player1),
+                 abalone_core::kMarblesPerPlayer);
+  for (int r = 0; r < abalone_core::kNumRows; ++r) {
+    for (int c = 0; c < abalone_core::kNumCols; ++c) {
+      if (abalone_core::VALID_BOARD[r][c] == abalone_core::CellState::Invalid)
+        SPIEL_CHECK_EQ(c1->board_[r][c], abalone_core::CellState::Invalid);
+      else
+        SPIEL_CHECK_TRUE(c1->board_[r][c] == abalone_core::CellState::Empty ||
+                         c1->board_[r][c] == abalone_core::CellState::Player0 ||
+                         c1->board_[r][c] == abalone_core::CellState::Player1);
+    }
+  }
+
+  // Central symmetry: board[r][c] is the opposite player at the 180-degree
+  // rotated cell (kNumRows-1-r, kNumCols-1-c), except the self-symmetric
+  // center which must be empty.
+  auto opposite = [](abalone_core::CellState s) {
+    if (s == abalone_core::CellState::Player0) return abalone_core::CellState::Player1;
+    if (s == abalone_core::CellState::Player1) return abalone_core::CellState::Player0;
+    return s;
+  };
+  for (int r = 0; r < abalone_core::kNumRows; ++r) {
+    for (int c = 0; c < abalone_core::kNumCols; ++c) {
+      int sr = abalone_core::kNumRows - 1 - r;
+      int sc = abalone_core::kNumCols - 1 - c;
+      if (r == sr && c == sc)
+        SPIEL_CHECK_EQ(c1->board_[r][c], abalone_core::CellState::Empty);
+      else
+        SPIEL_CHECK_EQ(c1->board_[sr][sc], opposite(c1->board_[r][c]));
+    }
+  }
+
+  // Different seeds -> (almost surely) different boards.
+  auto g3 = LoadGame("abalone(board=random-symmetric,seed=7)");
+  auto s3 = g3->NewInitialState();
+  auto* c3 = &static_cast<AbaloneState*>(s3.get())->core_state_;
+  SPIEL_CHECK_FALSE(std::equal(&c1->board_[0][0],
+                               &c1->board_[0][0] +
+                                   sizeof(c1->board_) / sizeof(c1->board_[0][0]),
+                               &c3->board_[0][0]));
+
+  // A random board must still produce a playable game: random sims + a
+  // couple of legal moves applied + Undo round-trip.
+  testing::RandomSimTest(*g1, 20);
+  auto st = g1->NewInitialState();
+  auto before = static_cast<AbaloneState*>(st.get())->core_state_;
+  auto legal = st->LegalActions();
+  SPIEL_CHECK_FALSE(legal.empty());
+  st->ApplyAction(legal[0]);
+  st->UndoAction(0, legal[0]);
+  auto* after = &static_cast<AbaloneState*>(st.get())->core_state_;
+  SPIEL_CHECK_TRUE(std::equal(&before.board_[0][0],
+                              &before.board_[0][0] +
+                                  sizeof(before.board_) /
+                                      sizeof(before.board_[0][0]),
+                              &after->board_[0][0]));
+}
+
 std::pair<open_spiel::Action, float> _LogABSpiel(
     std::unique_ptr<State>& state) {
   auto max_move = AllAbaloneMoves_ABSpiel(state, kSearchDepthAbalone);
@@ -298,13 +380,13 @@ void DatasetTest() {
         static_cast<abalone::AbaloneState*>(state.get())->core_state_;
     game_result res = std::get<3>(scenario);
     auto board_balls_P0 =
-        14 - std::count(&core_state.board_[0][0],
+        abalone_core::kMarblesPerPlayer - std::count(&core_state.board_[0][0],
                         &core_state.board_[0][0] +
                         sizeof(core_state.board_) /
                         sizeof(core_state.board_[0][0]),
                         abalone_core::CellState::Player1);
     auto board_balls_P1 =
-        14 - std::count(&core_state.board_[0][0],
+        abalone_core::kMarblesPerPlayer - std::count(&core_state.board_[0][0],
                         &core_state.board_[0][0] +
                         sizeof(core_state.board_) /
                         sizeof(core_state.board_[0][0]),
@@ -346,6 +428,7 @@ int main(int argc, char** argv) {
   open_spiel::abalone::BasicAbaloneTests();
   open_spiel::abalone::RewardAbaloneTest();
   open_spiel::abalone::DrawPenaltyTest();
+  open_spiel::abalone::RandomBoardTest();
   open_spiel::abalone::StringAbaloneTests();
   open_spiel::abalone::DatasetTest();
 }

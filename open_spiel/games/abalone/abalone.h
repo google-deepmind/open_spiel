@@ -30,7 +30,12 @@
 // the opponent's marbles.
 // Parameters:
 //  "marbles_to_win"   int    marble count to remove from board (default = 6)
-//  "board"            string initial board setup (default = "classic")
+//  "board"            string initial board setup. One of "classic",
+//                            "belgian-daisy", or "random-symmetric"
+//                            (randomly places kMarblesPerPlayer marbles
+//                            per player on valid cells, with Player1's
+//                            marbles the 180-degree rotation of Player0's,
+//                            seeded by "seed") (default = "classic")
 //  "invert"           bool   invert player positions (default = false)
 //  "marble_advantage" bool   if the game reaches the move limit without a
 //                            winner, the winner is the player who has
@@ -40,6 +45,8 @@
 //                            fewer marbles receives -draw_penalty and the
 //                            other +draw_penalty. No penalty when marbles
 //                            are equal. Zero-sum (default = 0.0)
+//  "seed"             int    seed for the "random-symmetric" board. -1
+//                            means seed by wall-clock time (default = -1)
 
 namespace open_spiel {
 
@@ -117,6 +124,7 @@ class AbaloneGame : public Game {
   double m_draw_penalty;
   std::string m_init_board;
   bool m_init_invert;  // invert the positions of player 1 and player 2
+  int m_seed;          // seed for the "random-symmetric" board (-1 = time)
 };
 
 inline std::ostream& operator<<(std::ostream& stream,

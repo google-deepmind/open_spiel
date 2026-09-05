@@ -166,7 +166,7 @@ std::tuple<bool, CellState> core_state::Eval(
     }
   }
   auto min_balls = std::min(ballCount[0], ballCount[1]);
-  if (min_balls <= 14 - _marbles_to_win) {
+  if (min_balls <= kMarblesPerPlayer - _marbles_to_win) {
     if (ballCount[1] == min_balls)
       return std::make_tuple(true, CellState::Player0);
     if (ballCount[0] == min_balls)

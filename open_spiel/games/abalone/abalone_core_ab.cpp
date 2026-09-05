@@ -56,8 +56,8 @@ int Heuristic(const core_state& _state, CellState _player) {
   }
 
   CellState opponent = CellState(1 - _player);
-  return (scoreCount[_player] * RFactor + (14 - ballCount[opponent]) * BFactor
-      - scoreCount[opponent] * RFactor - (14 - ballCount[_player]) * BFactor);
+  return (scoreCount[_player] * RFactor + (kMarblesPerPlayer - ballCount[opponent]) * BFactor
+      - scoreCount[opponent] * RFactor - (kMarblesPerPlayer - ballCount[_player]) * BFactor);
 }
 
 // Default values (see header): alpha = -1 (worst case), beta = 1 (best

@@ -15,7 +15,9 @@
 #include "open_spiel/games/abalone/abalone.h"
 
 #include <algorithm>
+#include <ctime>
 #include <memory>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -24,6 +26,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 #include "open_spiel/games/abalone/abalone_core_ab.h"
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 
 
 namespace open_spiel {
@@ -51,7 +54,8 @@ const GameType kGameType{
       {"marble_advantage", GameParameter(abalone_core::kMarbleAdvantage)},
       {"draw_penalty", GameParameter(abalone_core::kDrawPenalty)},
       {"board", GameParameter(abalone_core::kDefaultBoard)},
-      {"invert", GameParameter(abalone_core::kInvertBoard)}
+      {"invert", GameParameter(abalone_core::kInvertBoard)},
+      {"seed", GameParameter(abalone_core::kDefaultSeed)}
     }  // no parameters
 };
 
@@ -116,11 +120,73 @@ std::string AbaloneState::ActionToString(Player player,
 
 void AbaloneState::ResetBoard() {
   const auto &up_game = static_cast<const AbaloneGame&>(*this->game_);
-  auto init_board = abalone_core::ABALONE_INIT_CLASSIC;
+
+  // `init_board` points to the chosen starting layout. For the fixed layouts
+  // it points directly at the static board (no copy, no pointer arithmetic
+  // across rows). For the random layout it points at a locally built board.
+  abalone_core::CellState random_board[abalone_core::kNumRows]
+                                      [abalone_core::kNumCols];
+  const abalone_core::CellState (*init_board)[abalone_core::kNumCols];
   if (up_game.m_init_board.compare("classic") == 0) {
     init_board = abalone_core::ABALONE_INIT_CLASSIC;
   } else if (up_game.m_init_board.compare("belgian-daisy") == 0) {
     init_board = abalone_core::ABALONE_INIT_BELGIAN_DAISY;
+  } else if (up_game.m_init_board.compare("random-symmetric") == 0) {
+    // Randomly place kMarblesPerPlayer marbles per player, with Player1's
+    // marbles the 180-degree rotation (r,c) -> (kNumRows-1-r,
+    // kNumCols-1-c) of Player0's, so the position is symmetric (fair to
+    // both players, like "classic" and "belgian-daisy"). A fresh RNG is
+    // seeded from the game's seed each time ResetBoard runs, so the same
+    // seed always yields the same board (and UndoAction, which replays
+    // history from ResetBoard, reproduces it consistently).
+    int seed = up_game.m_seed;
+    if (seed < 0) seed = static_cast<int>(std::time(0));
+    std::mt19937 rng(seed);
+
+    // Start from VALID_BOARD (valid cells Empty, off-board Invalid),
+    // copied row by row to avoid pointer arithmetic across rows.
+    for (int r = 0; r < abalone_core::kNumRows; ++r) {
+      for (int c = 0; c < abalone_core::kNumCols; ++c)
+        random_board[r][c] = abalone_core::VALID_BOARD[r][c];
+    }
+
+    // Build the 30 symmetric pairs of valid cells, skipping the single
+    // self-symmetric cell (the center, which maps to itself). Each pair is
+    // stored once, using its smaller (row-major) member as the canonical
+    // representative.
+    using Coord = abalone_core::Coordinate;
+    std::vector<std::pair<Coord, Coord>> pairs;
+    for (int r = 0; r < abalone_core::kNumRows; ++r) {
+      for (int c = 0; c < abalone_core::kNumCols; ++c) {
+        if (abalone_core::VALID_BOARD[r][c] ==
+            abalone_core::CellState::Invalid)
+          continue;
+        Coord here{r, c};
+        Coord sym{abalone_core::kNumRows - 1 - r,
+                  abalone_core::kNumCols - 1 - c};
+        if (here == sym) continue;  // center, skip
+        // keep each pair once, by its row-major smaller member
+        if (here.m_row < sym.m_row ||
+            (here.m_row == sym.m_row && here.m_column < sym.m_column))
+          pairs.push_back({here, sym});
+      }
+    }
+    // 30 pairs available; 14 needed, so it always fits.
+    std::shuffle(pairs.begin(), pairs.end(), rng);
+
+    for (int i = 0; i < abalone_core::kMarblesPerPlayer; ++i) {
+      const auto& [p0, p1] = pairs[i];
+      // Randomly decide which half of the pair goes to Player0 so the
+      // symmetric layout is not biased toward one side of the board.
+      if (absl::Uniform<int>(rng, 0, 2) == 0) {
+        random_board[p0.m_row][p0.m_column] = abalone_core::CellState::Player0;
+        random_board[p1.m_row][p1.m_column] = abalone_core::CellState::Player1;
+      } else {
+        random_board[p0.m_row][p0.m_column] = abalone_core::CellState::Player1;
+        random_board[p1.m_row][p1.m_column] = abalone_core::CellState::Player0;
+      }
+    }
+    init_board = random_board;
   } else {
     SpielFatalError(
         absl::StrCat("board init not found: ", up_game.m_init_board));
@@ -245,10 +311,10 @@ std::vector<double> AbaloneState::Returns() const {
   }
 
   const auto &up_game = static_cast<const AbaloneGame&>(*GetGame());
-  if (ballCount[0] <= 14 - up_game.m_marbles_to_win) {
+  if (ballCount[0] <= abalone_core::kMarblesPerPlayer - up_game.m_marbles_to_win) {
     return {-1.0, 1.0};
   }
-  if (ballCount[1] <= 14 - up_game.m_marbles_to_win) {
+  if (ballCount[1] <= abalone_core::kMarblesPerPlayer - up_game.m_marbles_to_win) {
     return {1.0, -1.0};
     // (ballCount[0]>ballCount[1])
     // if (ballCount[1]>ballCount[0])
@@ -256,7 +322,7 @@ std::vector<double> AbaloneState::Returns() const {
   }
   // return {0.0, 0.0};
   const double marble_reward = up_game.m_marble_reward;
-  auto marble_balance = (14-ballCount[1])-(14-ballCount[0]);
+  auto marble_balance = (abalone_core::kMarblesPerPlayer-ballCount[1])-(abalone_core::kMarblesPerPlayer-ballCount[0]);
   double base = marble_balance * marble_reward;
 
   // Draw penalty: applied only on an actual draw (terminal via move limit
@@ -353,6 +419,7 @@ AbaloneGame::AbaloneGame(const GameParameters& params)
   m_init_board = ParameterValue<std::string>("board");
   m_init_invert = ParameterValue<bool>("invert");
   m_marble_advantage = ParameterValue<bool>("marble_advantage");
+  m_seed = ParameterValue<int>("seed");
 }
 
 std::pair<open_spiel::Action, float> AllAbaloneMoves_ABSpiel(

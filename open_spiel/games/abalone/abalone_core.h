@@ -63,6 +63,11 @@ constexpr bool kInvertBoard = false;
 // The player with the most marbles wins at the end of the game (instead
 // of a draw).
 constexpr bool kMarbleAdvantage = false;
+// Marbles each player starts with (standard Abalone uses 14).
+constexpr int kMarblesPerPlayer = 14;
+// Default seed for the random board. -1 means seed by wall-clock time, so
+// each game gets a different random board (follows the tarok convention).
+constexpr int kDefaultSeed = -1;
 
 // State of a cell.
 enum CellState : int8_t {
