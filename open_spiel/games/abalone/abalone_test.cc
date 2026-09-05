@@ -53,6 +53,61 @@ void RewardAbaloneTest() {
   SPIEL_CHECK_EQ(returns[1], 0.0);
 }
 
+// Force a draw (game reaches the move limit with no winner) by directly
+// marking the core state as drawn, optionally with unequal marble counts.
+static void ForceDraw(AbaloneState* ab, bool remove_one_p1_marble) {
+  ab->core_state_.Reset(abalone_core::ABALONE_INIT_CLASSIC);
+  if (remove_one_p1_marble)
+    ab->core_state_.board_[8][8] = abalone_core::CellState::Empty;
+  // outcome_ == Empty is the signal set by Eval on a move-limit draw.
+  ab->core_state_.outcome_ = abalone_core::CellState::Empty;
+}
+
+void DrawPenaltyTest() {
+  // Default draw_penalty = 0: a draw returns {0, 0} regardless of marbles.
+  {
+    auto game = LoadGame("abalone");
+    auto state = game->NewInitialState();
+    auto* ab = static_cast<AbaloneState*>(state.get());
+    ForceDraw(ab, /*remove_one_p1_marble=*/true);  // 14 vs 13
+    SPIEL_CHECK_TRUE(ab->IsTerminal());
+    auto ret = ab->Returns();
+    SPIEL_CHECK_EQ(ret[0], 0.0);
+    SPIEL_CHECK_EQ(ret[1], 0.0);
+  }
+  // draw_penalty=0.5: the player with fewer marbles is penalized (zero-sum).
+  {
+    auto game = LoadGame("abalone(draw_penalty=0.5)");
+    auto state = game->NewInitialState();
+    auto* ab = static_cast<AbaloneState*>(state.get());
+    ForceDraw(ab, /*remove_one_p1_marble=*/true);  // P0=14, P1=13
+    SPIEL_CHECK_TRUE(ab->IsTerminal());
+    auto ret = ab->Returns();
+    SPIEL_CHECK_EQ(ret[0], 0.5);   // P0 (more marbles) rewarded
+    SPIEL_CHECK_EQ(ret[1], -0.5);  // P1 (fewer marbles) penalized
+  }
+  // Equal marble counts on a draw: no penalty (cannot break a tie in zero-sum).
+  {
+    auto game = LoadGame("abalone(draw_penalty=0.5)");
+    auto state = game->NewInitialState();
+    auto* ab = static_cast<AbaloneState*>(state.get());
+    ForceDraw(ab, /*remove_one_p1_marble=*/false);  // 14 vs 14
+    SPIEL_CHECK_TRUE(ab->IsTerminal());
+    auto ret = ab->Returns();
+    SPIEL_CHECK_EQ(ret[0], 0.0);
+    SPIEL_CHECK_EQ(ret[1], 0.0);
+  }
+  // A non-terminal state never incurs the draw penalty.
+  {
+    auto game = LoadGame("abalone(draw_penalty=0.5)");
+    auto state = game->NewInitialState();
+    SPIEL_CHECK_TRUE(!state->IsTerminal());
+    auto ret = state->Returns();
+    SPIEL_CHECK_EQ(ret[0], 0.0);
+    SPIEL_CHECK_EQ(ret[1], 0.0);
+  }
+}
+
 std::pair<open_spiel::Action, float> _LogABSpiel(
     std::unique_ptr<State>& state) {
   auto max_move = AllAbaloneMoves_ABSpiel(state, kSearchDepthAbalone);
@@ -290,6 +345,7 @@ void StringAbaloneTests() {
 int main(int argc, char** argv) {
   open_spiel::abalone::BasicAbaloneTests();
   open_spiel::abalone::RewardAbaloneTest();
+  open_spiel::abalone::DrawPenaltyTest();
   open_spiel::abalone::StringAbaloneTests();
   open_spiel::abalone::DatasetTest();
 }

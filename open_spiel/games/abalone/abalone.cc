@@ -49,6 +49,7 @@ const GameType kGameType{
       {"marbles_to_win", GameParameter(abalone_core::kMarblesToWin)},
       {"marble_reward", GameParameter(abalone_core::kMarbleReward)},
       {"marble_advantage", GameParameter(abalone_core::kMarbleAdvantage)},
+      {"draw_penalty", GameParameter(abalone_core::kDrawPenalty)},
       {"board", GameParameter(abalone_core::kDefaultBoard)},
       {"invert", GameParameter(abalone_core::kInvertBoard)}
     }  // no parameters
@@ -256,7 +257,20 @@ std::vector<double> AbaloneState::Returns() const {
   // return {0.0, 0.0};
   const double marble_reward = up_game.m_marble_reward;
   auto marble_balance = (14-ballCount[1])-(14-ballCount[0]);
-  return {marble_balance*marble_reward, -marble_balance*marble_reward};
+  double base = marble_balance * marble_reward;
+
+  // Draw penalty: applied only on an actual draw (terminal via move limit
+  // with no winner). Kept zero-sum: the player with fewer marbles is
+  // penalized. No penalty on equal marble counts (cannot break a true tie
+  // in a zero-sum fashion) or on non-terminal states.
+  double penalty = 0.0;
+  if (IsTerminal() && up_game.m_draw_penalty != 0.0) {
+    if (ballCount[0] > ballCount[1])
+      penalty = up_game.m_draw_penalty;
+    else if (ballCount[1] > ballCount[0])
+      penalty = -up_game.m_draw_penalty;
+  }
+  return {base + penalty, -base - penalty};
 }
 
 std::string AbaloneState::InformationStateString(Player player) const {
@@ -335,6 +349,7 @@ AbaloneGame::AbaloneGame(const GameParameters& params)
     : Game(kGameType, params) {
   m_marbles_to_win = ParameterValue<int>("marbles_to_win");
   m_marble_reward = ParameterValue<double>("marble_reward");
+  m_draw_penalty = ParameterValue<double>("draw_penalty");
   m_init_board = ParameterValue<std::string>("board");
   m_init_invert = ParameterValue<bool>("invert");
   m_marble_advantage = ParameterValue<bool>("marble_advantage");

@@ -51,6 +51,11 @@ constexpr int kHistoryMax = 200;  // a game can't last longer than this
 // blitz: 4).
 constexpr int kMarblesToWin = 6;
 constexpr double kMarbleReward = 0.0;  // check: kMarblesToWin*kMarbleReward<1
+// Penalty applied on a draw (game reaches the move limit with no winner):
+// the player with fewer marbles receives -kDrawPenalty and the other
+// +kDrawPenalty (zero-sum). No penalty when marbles are equal. Check:
+// |marble_balance*kMarbleReward| + kDrawPenalty < 1.
+constexpr double kDrawPenalty = 0.0;
 constexpr int kCellStates = 2 + kNumPlayers;  // empty, invalid, and players
 const char kDefaultBoard[] = "classic";  // default board to play
 // Invert the positions of player 1 and player 2.

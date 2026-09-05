@@ -35,6 +35,11 @@
 //  "marble_advantage" bool   if the game reaches the move limit without a
 //                            winner, the winner is the player who has
 //                            removed the most marbles (default = false)
+//  "draw_penalty"     double penalty applied on a draw (game reaches the
+//                            move limit with no winner): the player with
+//                            fewer marbles receives -draw_penalty and the
+//                            other +draw_penalty. No penalty when marbles
+//                            are equal. Zero-sum (default = 0.0)
 
 namespace open_spiel {
 
@@ -109,6 +114,7 @@ class AbaloneGame : public Game {
   int m_marbles_to_win;
   bool m_marble_advantage;
   double m_marble_reward;
+  double m_draw_penalty;
   std::string m_init_board;
   bool m_init_invert;  // invert the positions of player 1 and player 2
 };
