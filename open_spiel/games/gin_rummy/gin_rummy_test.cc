@@ -730,6 +730,45 @@ void TestStructs() {
                  GinRummyObservationStruct(obs_json).ToJson());
 }
 
+
+// Regression test: ResampleFromInfostate must not hand the knocker the
+// defender's actual cards during the layoff phase, where only the knocker's
+// hand is public.
+void ResampleFromInfostateHidesDefenderHandTest() {
+  std::shared_ptr<const Game> game = LoadGame("gin_rummy");
+  std::unique_ptr<State> state = game->NewInitialState();
+  // Same deal as GameplayTest3: Player0 knocks, Player1 defends.
+  std::vector<Action> initial_actions = {
+      10, 11, 12, 22, 35, 48, 13, 26, 1, 40, 9,  8,
+      3,  16, 29, 42, 4,  17, 30, 43, 0, 52, 55, 1};
+  for (Action action : initial_actions) state->ApplyAction(action);
+  // Player0 lays its melds and passes, moving the hand into the Layoff phase.
+  for (Action action : {59, 101, 131, 54}) state->ApplyAction(action);
+
+  GinRummyState* gr_state = static_cast<GinRummyState*>(state.get());
+  SPIEL_CHECK_TRUE(gr_state->Knocked()[0]);
+  SPIEL_CHECK_FALSE(gr_state->Knocked()[1]);
+  const std::vector<int> defender_hand = gr_state->Hands()[1];
+
+  UniformProbabilitySampler sampler;
+  int num_resampled_hands = 0;
+  for (int i = 0; i < 10; ++i) {
+    std::unique_ptr<State> resampled = state->ResampleFromInfostate(0, sampler);
+    GinRummyState* resampled_state =
+        static_cast<GinRummyState*>(resampled.get());
+    // The resampled state must stay consistent with what the knocker knows.
+    SPIEL_CHECK_EQ(state->ObservationString(0),
+                   resampled->ObservationString(0));
+    SPIEL_CHECK_EQ(resampled_state->Hands()[0], gr_state->Hands()[0]);
+    SPIEL_CHECK_EQ(resampled_state->Hands()[1].size(), defender_hand.size());
+    SPIEL_CHECK_EQ(resampled_state->CurrentPlayer(), state->CurrentPlayer());
+    if (resampled_state->Hands()[1] != defender_hand) ++num_resampled_hands;
+  }
+  // The defender has not knocked, so its hand is private and the knocker must
+  // not simply be handed the cards actually held.
+  SPIEL_CHECK_GT(num_resampled_hands, 0);
+}
+
 }  // namespace
 }  // namespace gin_rummy
 }  // namespace open_spiel
@@ -748,6 +787,7 @@ int main(int argc, char** argv) {
   open_spiel::gin_rummy::DeckSizeTests();
   open_spiel::gin_rummy::ResampleFromInfostateTest();
   open_spiel::gin_rummy::ResampleFromInfostateKnownCardsTest();
+  open_spiel::gin_rummy::ResampleFromInfostateHidesDefenderHandTest();
   open_spiel::gin_rummy::TestStructs();
   std::cout << "Gin rummy tests passed!" << std::endl;
 }
