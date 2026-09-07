@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
@@ -111,6 +112,24 @@ std::string ColumnLabel(int column) {
 
 std::string SquareLabel(int rows, int row, int column) {
   return absl::StrCat(ColumnLabel(column), RowLabel(rows, row));
+}
+
+CellState StringToCellState(const std::string& str) {
+  if (str == ".") return CellState::kEmpty;
+  if (str == "x") return CellState::kBlack;
+  if (str == "o") return CellState::kWhite;
+  SpielFatalError(absl::StrCat("Unknown cell state: ", str));
+}
+
+// Same order as kDirRowOffsets and kDirColumnOffsets.
+constexpr std::array<absl::string_view, kNumDirections> kDirNames = {
+    {"up", "right", "down", "left"}};
+
+int DirectionFromName(const std::string& name) {
+  for (int direction = 0; direction < kNumDirections; direction++) {
+    if (name == kDirNames[direction]) return direction;
+  }
+  SpielFatalError(absl::StrCat("Unknown direction: ", name));
 }
 }  // namespace
 
@@ -374,6 +393,116 @@ KonaneGame::KonaneGame(const GameParameters& params)
 
 int KonaneGame::NumDistinctActions() const {
   return rows_ * columns_ * (1 + kNumDirections * max_jumps_);
+}
+
+KonaneState::KonaneState(std::shared_ptr<const Game> game,
+                         const KonaneStateStruct& state_struct)
+    : KonaneState(game, state_struct.rows, state_struct.columns) {
+  const int num_cells = rows_ * columns_;
+  if (state_struct.board.size() != num_cells) {
+    SpielFatalError(absl::StrCat("Board has ", state_struct.board.size(),
+                                 " cells, expected ", num_cells));
+  }
+  if (state_struct.num_moves < 0) {
+    SpielFatalError(absl::StrCat("Negative move count: ",
+                                 state_struct.num_moves));
+  }
+  for (int cell = 0; cell < num_cells; cell++) {
+    board_[cell] = StringToCellState(state_struct.board[cell]);
+  }
+  current_player_ = StateToPlayer(StringToCellState(
+      state_struct.current_player));
+  num_moves_ = state_struct.num_moves;
+  // A player with no jump available has lost, which is how DoApplyAction
+  // decides the outcome once the opening removals are done.
+  if (num_moves_ >= 2 && JumpActions().empty()) {
+    outcome_ = 1 - current_player_;
+  }
+}
+
+void KonaneState::FillStructContents(KonaneStructContents* contents) const {
+  contents->current_player = StateToString(PlayerToState(current_player_));
+  contents->rows = rows_;
+  contents->columns = columns_;
+  contents->num_moves = num_moves_;
+  contents->board.clear();
+  contents->board.reserve(board_.size());
+  for (const CellState& cell : board_) {
+    contents->board.push_back(StateToString(cell));
+  }
+}
+
+std::unique_ptr<StateStruct> KonaneState::ToStruct() const {
+  auto state_struct = std::make_unique<KonaneStateStruct>();
+  FillStructContents(state_struct.get());
+  return state_struct;
+}
+
+std::unique_ptr<ObservationStruct> KonaneState::ToObservationStruct(
+    Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  // Konane is a perfect information game: both players see the whole board.
+  auto observation = std::make_unique<KonaneObservationStruct>();
+  FillStructContents(observation.get());
+  return observation;
+}
+
+std::unique_ptr<ActionStruct> KonaneState::ActionToStruct(
+    Player player, Action action_id) const {
+  SPIEL_CHECK_GE(action_id, 0);
+  SPIEL_CHECK_LT(action_id, game_->NumDistinctActions());
+  auto action_struct = std::make_unique<KonaneActionStruct>();
+  if (action_id < rows_ * columns_) {
+    action_struct->row = action_id / columns_;
+    action_struct->column = action_id % columns_;
+    action_struct->direction = "";
+    action_struct->num_jumps = 0;
+    return action_struct;
+  }
+  const std::vector<int> values = UnrankActionMixedBase(
+      action_id - rows_ * columns_,
+      {rows_, columns_, kNumDirections, max_jumps_});
+  action_struct->row = values[0];
+  action_struct->column = values[1];
+  action_struct->direction = std::string(kDirNames[values[2]]);
+  action_struct->num_jumps = values[3] + 1;
+  return action_struct;
+}
+
+std::vector<Action> KonaneState::StructToActions(
+    const ActionStruct& action_struct) const {
+  const KonaneActionStruct* move =
+      SafeActionCast<KonaneActionStruct>(action_struct);
+  if (!InBounds(move->row, move->column)) {
+    SpielFatalError(absl::StrCat("Square (", move->row, ", ", move->column,
+                                 ") is not on the board"));
+  }
+  if (move->direction.empty()) {
+    if (move->num_jumps != 0) {
+      SpielFatalError("A removal cannot jump; leave num_jumps at zero");
+    }
+    return {move->row * columns_ + move->column};
+  }
+  if (move->num_jumps < 1 || move->num_jumps > max_jumps_) {
+    SpielFatalError(absl::StrCat("A jump captures between 1 and ", max_jumps_,
+                                 " stones, got ", move->num_jumps));
+  }
+  return {rows_ * columns_ +
+          RankActionMixedBase({rows_, columns_, kNumDirections, max_jumps_},
+                              {move->row, move->column,
+                               DirectionFromName(move->direction),
+                               move->num_jumps - 1})};
+}
+
+std::unique_ptr<State> KonaneGame::NewInitialState(
+    const KonaneStateStruct& state_struct) const {
+  if (state_struct.rows != rows_ || state_struct.columns != columns_) {
+    SpielFatalError(absl::StrCat("Board is ", state_struct.rows, "x",
+                                 state_struct.columns, ", but the game is ",
+                                 rows_, "x", columns_));
+  }
+  return std::make_unique<KonaneState>(shared_from_this(), state_struct);
 }
 
 }  // namespace konane

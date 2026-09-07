@@ -17,10 +17,12 @@
 #include <algorithm>
 #include <memory>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
@@ -191,6 +193,104 @@ void ChainedJumpTest() {
 }
 
 // The player with no legal move loses.
+// Every legal action must survive a trip through its struct, in both the
+// opening removals and ordinary jumping play.
+void ActionStructRoundTripTest() {
+  std::shared_ptr<const Game> game = LoadGame("konane(rows=6,columns=6)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::mt19937 rng(93);
+  int removals_seen = 0;
+  int jumps_seen = 0;
+  while (!state->IsTerminal()) {
+    const KonaneState* konane_state =
+        down_cast<const KonaneState*>(state.get());
+    for (Action action : state->LegalActions()) {
+      std::unique_ptr<ActionStruct> action_struct =
+          konane_state->ActionToStruct(state->CurrentPlayer(), action);
+      const auto* move =
+          SafeActionCast<KonaneActionStruct>(*action_struct);
+      if (move->direction.empty()) {
+        ++removals_seen;
+        SPIEL_CHECK_EQ(move->num_jumps, 0);
+      } else {
+        ++jumps_seen;
+        SPIEL_CHECK_GE(move->num_jumps, 1);
+      }
+      const std::vector<Action> actions =
+          konane_state->StructToActions(*action_struct);
+      SPIEL_CHECK_EQ(actions.size(), 1);
+      SPIEL_CHECK_EQ(actions[0], action);
+    }
+    const std::vector<Action> legal = state->LegalActions();
+    std::uniform_int_distribution<int> dis(0, legal.size() - 1);
+    state->ApplyAction(legal[dis(rng)]);
+  }
+  SPIEL_CHECK_GT(removals_seen, 0);
+  SPIEL_CHECK_GT(jumps_seen, 0);
+}
+
+// A position must survive a trip through its JSON, including whether it is
+// terminal, and both players must observe the same thing.
+void StateStructRoundTripTest() {
+  std::shared_ptr<const Game> game = LoadGame("konane(rows=4,columns=4)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  // The board starts full, with stones alternating along each row.
+  SPIEL_CHECK_EQ(
+      state->ToJson(),
+      "{\"board\":[\"x\",\"o\",\"x\",\"o\",\"o\",\"x\",\"o\","
+      "\"x\",\"x\",\"o\",\"x\",\"o\",\"o\",\"x\",\"o\","
+      "\"x\"],\"columns\":4,\"current_player\":\"x\","
+      "\"num_moves\":0,\"rows\":4}");
+
+  std::mt19937 rng(17);
+  while (true) {
+    const KonaneState* konane_state =
+        down_cast<const KonaneState*>(state.get());
+    std::unique_ptr<StateStruct> state_struct = konane_state->ToStruct();
+    SPIEL_CHECK_EQ(state_struct->ToJson(), konane_state->ToJson());
+
+    // Konane is a perfect information game.
+    SPIEL_CHECK_EQ(konane_state->ToObservationStruct(0)->ToJson(),
+                   konane_state->ToObservationStruct(1)->ToJson());
+    SPIEL_CHECK_EQ(konane_state->ToObservationStruct(0)->ToJson(),
+                   state_struct->ToJson());
+
+    std::unique_ptr<State> restored =
+        game->NewInitialState(nlohmann::json::parse(state_struct->ToJson()));
+    SPIEL_CHECK_EQ(restored->ToString(), state->ToString());
+    SPIEL_CHECK_EQ(restored->ToJson(), state_struct->ToJson());
+    SPIEL_CHECK_EQ(restored->IsTerminal(), state->IsTerminal());
+    SPIEL_CHECK_EQ(restored->CurrentPlayer(), state->CurrentPlayer());
+    if (state->IsTerminal()) {
+      SPIEL_CHECK_EQ(restored->Returns(), state->Returns());
+      break;
+    }
+    SPIEL_CHECK_EQ(restored->LegalActions(), state->LegalActions());
+    const std::vector<Action> legal = state->LegalActions();
+    std::uniform_int_distribution<int> dis(0, legal.size() - 1);
+    state->ApplyAction(legal[dis(rng)]);
+  }
+}
+
+// The struct API can drive the game: applying an action struct is the same as
+// applying the action it names.
+void ApplyActionStructTest() {
+  std::shared_ptr<const Game> game = LoadGame("konane(rows=4,columns=4)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  const Action removal = state->LegalActions().front();
+  std::unique_ptr<ActionStruct> removal_struct =
+      down_cast<const KonaneState*>(state.get())
+          ->ActionToStruct(state->CurrentPlayer(), removal);
+
+  std::unique_ptr<State> by_struct = game->NewInitialState();
+  SPIEL_CHECK_TRUE(by_struct->ApplyActionStruct(*removal_struct).ok());
+  state->ApplyAction(removal);
+  SPIEL_CHECK_EQ(by_struct->ToString(), state->ToString());
+
+  // The same removal cannot be played twice: that square is empty now.
+  SPIEL_CHECK_FALSE(by_struct->ValidateActionStruct(*removal_struct).ok());
+}
+
 void TerminalTest() {
   std::shared_ptr<const Game> game = LoadGame("konane(rows=2,columns=2)");
   std::unique_ptr<State> state = game->NewInitialState();
@@ -213,4 +313,7 @@ int main(int argc, char** argv) {
   open_spiel::konane::FirstJumpTest();
   open_spiel::konane::ChainedJumpTest();
   open_spiel::konane::TerminalTest();
+  open_spiel::konane::ActionStructRoundTripTest();
+  open_spiel::konane::StateStructRoundTripTest();
+  open_spiel::konane::ApplyActionStructTest();
 }

@@ -19,6 +19,10 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/spiel.h"
 
 // Konane (Hawaiian checkers).
@@ -52,9 +56,44 @@ enum class CellState {
   kWhite,  // Represented by 'o'; player 1.
 };
 
+// Struct/JSON representation of a position. The board is listed row by row
+// from the top, using the same characters as ToString(): "." for an empty
+// square, "x" for a black stone and "o" for a white one. Konane is a perfect
+// information game, so an observation carries the same contents as the state.
+// "current_player" is the player to move, and stays set at a terminal state.
+// "num_moves" is needed to tell the two opening removals from ordinary play.
+struct KonaneStructContents {
+  std::string current_player;
+  int rows;
+  int columns;
+  int num_moves;
+  std::vector<std::string> board;
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(KonaneStructContents, current_player, rows,
+                                 columns, num_moves, board);
+};
+
+SPIEL_DEFINE_STRUCT(KonaneStateStruct, StateStruct, KonaneStructContents);
+SPIEL_DEFINE_STRUCT(KonaneObservationStruct, ObservationStruct,
+                    KonaneStructContents);
+
+// Konane has two kinds of move. The two opening moves remove a stone from
+// (row, column), and leave "direction" empty and "num_jumps" zero. Every later
+// move jumps the stone at (row, column) in one direction, capturing
+// "num_jumps" stones. Directions are "up", "right", "down" and "left".
+struct KonaneActionStruct : public ActionStruct {
+  int row;
+  int column;
+  std::string direction;
+  int num_jumps;
+  SPIEL_STRUCT_BOILERPLATE(KonaneActionStruct, row, column, direction,
+                           num_jumps);
+};
+
 class KonaneState : public State {
  public:
   KonaneState(std::shared_ptr<const Game> game, int rows, int columns);
+  KonaneState(std::shared_ptr<const Game> game,
+              const KonaneStateStruct& state_struct);
   KonaneState(const KonaneState&) = default;
 
   Player CurrentPlayer() const override {
@@ -72,6 +111,13 @@ class KonaneState : public State {
     return std::unique_ptr<State>(new KonaneState(*this));
   }
   std::vector<Action> LegalActions() const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
+  std::unique_ptr<ObservationStruct> ToObservationStruct(
+      Player player) const override;
+  std::unique_ptr<ActionStruct> ActionToStruct(
+      Player player, Action action_id) const override;
+  std::vector<Action> StructToActions(
+      const ActionStruct& action_struct) const override;
 
   bool InBounds(int row, int column) const {
     return row >= 0 && row < rows_ && column >= 0 && column < columns_;
@@ -87,6 +133,8 @@ class KonaneState : public State {
   void DoApplyAction(Action action) override;
 
  private:
+  void FillStructContents(KonaneStructContents* contents) const;
+
   // The two opening moves remove a stone rather than jumping with one.
   bool IsRemovalPhase() const { return num_moves_ < 2; }
   std::vector<Action> FirstRemovalActions() const;
@@ -106,8 +154,15 @@ class KonaneGame : public Game {
  public:
   explicit KonaneGame(const GameParameters& params);
   int NumDistinctActions() const override;
+  using Game::NewInitialState;
   std::unique_ptr<State> NewInitialState() const override {
     return std::make_unique<KonaneState>(shared_from_this(), rows_, columns_);
+  }
+  std::unique_ptr<State> NewInitialState(
+      const KonaneStateStruct& state_struct) const;
+  std::unique_ptr<State> NewInitialState(
+      const nlohmann::json& json) const override {
+    return NewInitialState(KonaneStateStruct(json));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
