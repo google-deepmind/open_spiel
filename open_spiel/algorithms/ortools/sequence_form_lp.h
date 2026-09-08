@@ -23,7 +23,7 @@
 
 #include "open_spiel/algorithms/infostate_tree.h"
 #include "open_spiel/policy.h"
-#include "ortools/linear_solver/linear_solver.h"
+#include "third_party/ortools/ortools/linear_solver/linear_solver.h"
 
 // An implementation of a sequence-form linear program for computing Nash
 // equilibria in sequential games, based on [1]. The implementation constructs
