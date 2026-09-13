@@ -111,4 +111,9 @@ void open_spiel::init_pyspiel_games_crossword(py::module& m) {
 
   // clue_id(clue: Clue) -> str
   crossword.def("clue_id", &crossword::ClueId, py::arg("clue"));
+
+  // create_game_from_crossword_string(crossword_string: str) -> Game
+  crossword.def("create_game_from_crossword_string",
+                &crossword::CreateGameFromCrosswordString,
+                py::arg("crossword_string"));
 }

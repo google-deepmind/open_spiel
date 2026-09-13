@@ -159,6 +159,37 @@ class GamesCrosswordTest(absltest.TestCase):
     print(state)
     self.assertEqual(state.returns()[0], 3)
 
+  def test_create_game_from_crossword_string(self):
+    puzzle_contents = """
+Title: Default crossword puzzle.
+Author: OpenSpiel authors
+Copyright: © 2026 OpenSpiel authors
+Date: 2025-06-05
+
+
+GO#A
+ARID
+M#TA
+EDAM
+
+A1. Ancient board game with black and white stones ~ GO
+A4. Dry, like a desert ~ ARID
+A7. Teaching assistant ~ TA
+A8. Dutch cheese ~ EDAM
+
+D1. Chess is an example of a board ____ ~ GAME
+D2. Disjunction (logical operator) ~ OR
+D3. Popular optimizer ~ ADAM
+D6. Invitation to Apply, abbreviated ~ ITA
+"""
+    game = crossword.create_game_from_crossword_string(puzzle_contents)
+    state = game.new_initial_state()
+    self.assertFalse(state.is_chance_node())
+    action_struct = game.ActionStruct("A1", "GO")
+    status = state.apply_action_struct(action_struct)
+    self.assertTrue(status.ok())
+    self.assertEqual(state.returns()[0], 1)
+
   def test_bad_json_action(self):
     game = pyspiel.load_game("crossword")
     state = game.new_initial_state()
