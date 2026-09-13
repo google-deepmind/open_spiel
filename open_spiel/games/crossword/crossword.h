@@ -161,6 +161,11 @@ class CrosswordGame : public Game {
  public:
   explicit CrosswordGame(const GameParameters& params);
 
+  // Constructs a game whose single puzzle is the given crossword string
+  // (in xd format), rather than one loaded from puzzles_root.
+  CrosswordGame(const GameParameters& params,
+                const std::string& puzzle_string);
+
   int NumDistinctActions() const override;
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1.0; }
@@ -192,6 +197,11 @@ class CrosswordGame : public Game {
     return word_set_;
   }
 
+  // The puzzle used when no puzzles_root is set (i.e. num_puzzles() == 0).
+  const std::string& single_puzzle_contents() const {
+    return single_puzzle_contents_;
+  }
+
   std::unique_ptr<State> DeserializeState(const std::string& str) const
       override;
 
@@ -201,9 +211,15 @@ class CrosswordGame : public Game {
 
   std::string puzzles_root_;
   std::string word_list_file_;
+  std::string single_puzzle_contents_;
   absl::flat_hash_set<std::string> word_set_;
   std::vector<std::string> puzzle_files_;
 };
+
+// Creates a crossword game whose single puzzle is the given crossword
+// string (in xd format), e.g. kDefaultPuzzleContents.
+std::shared_ptr<const Game> CreateGameFromCrosswordString(
+    const std::string& crossword_string);
 
 }  // namespace crossword
 }  // namespace open_spiel

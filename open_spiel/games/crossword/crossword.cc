@@ -93,7 +93,7 @@ CrosswordState::CrosswordState(std::shared_ptr<const Game> game)
   } else {
     // Otherwise, we start with a default preset puzzle.
     StatusWithValue<CrosswordBoard> result =
-        ParseCrosswordFromString(kDefaultPuzzleContents);
+        ParseCrosswordFromString(parent_game_.single_puzzle_contents());
     SPIEL_CHECK_TRUE(result.ok());
     current_player_ = 0;
     board_ = result.value();
@@ -536,13 +536,32 @@ CrosswordGame::CrosswordGame(const GameParameters& params)
       puzzles_root_(ParameterValue<std::string>("puzzles_root",
                                                 kDefaultPuzzlesRoot)),
       word_list_file_(ParameterValue<std::string>("word_list_file",
-                                                  kDefaultWordListFile)) {
+                                                  kDefaultWordListFile)),
+      single_puzzle_contents_(kDefaultPuzzleContents) {
+  ParseWordList();
+  BuildPuzzleFileList();
+}
+
+CrosswordGame::CrosswordGame(const GameParameters& params,
+                             const std::string& puzzle_string)
+    : Game(kGameType, params),
+      puzzles_root_(ParameterValue<std::string>("puzzles_root",
+                                                kDefaultPuzzlesRoot)),
+      word_list_file_(ParameterValue<std::string>("word_list_file",
+                                                  kDefaultWordListFile)),
+      single_puzzle_contents_(puzzle_string) {
   ParseWordList();
   BuildPuzzleFileList();
 }
 
 int CrosswordGame::NumDistinctActions() const {
   return 0;
+}
+
+std::shared_ptr<const Game> CreateGameFromCrosswordString(
+    const std::string& crossword_string) {
+  return std::shared_ptr<const Game>(
+      new CrosswordGame(GameParameters{}, crossword_string));
 }
 
 }  // namespace crossword
