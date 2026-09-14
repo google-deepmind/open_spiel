@@ -126,6 +126,7 @@ class LinearProgram:
     self._var_list: list[_Variable] = []
     self._leq_cons_list: list[_Constraint] = []
     self._eq_cons_list: list[_Constraint] = []
+    self._status = None  # cvxpy status of the most recent solve()
 
   def add_or_reuse_variable(self, label, lb=None, ub=None):
     """Adds a variable to this LP, or reuses one if the label exists.
@@ -204,19 +205,30 @@ class LinearProgram:
   def get_num_cons(self):
     return len(self._leq_cons_list), len(self._eq_cons_list)
 
+  def get_status(self):
+    """Returns the cvxpy status of the most recent solve(), or None."""
+    return self._status
+
   def solve(self,
             solver=DEFAULT_SOLVER,
-            solver_kwargs=DEFAULT_SOLVER_KWARGS, **kwargs) -> dict:
+            solver_kwargs=DEFAULT_SOLVER_KWARGS, **kwargs):
     """Solves the LP.
 
     Args:
-      solver: the solver to use ('blas', 'lapack', 'glpk'). Defaults to None,
-        which then uses the cvxopt internal default.
+      solver: the cvxpy solver to use. Defaults to ECOS.
       solver_kwargs: additional keyword arguments to pass to the solver.
       **kwargs: additional keyword arguments to pass to the solver.
 
     Returns:
-      The solution as a dict of var label -> value, one for each variable.
+      The solution as a numpy array with one entry per variable, indexed by
+      variable id (see `get_var_id`), or None if the LP is infeasible or
+      unbounded. Callers such as `is_dominated` rely on None meaning exactly
+      that: the LP has no solution, as opposed to the solver having failed.
+
+    Raises:
+      cvxpy.SolverError: if the solver is unavailable or fails to run. This is
+        deliberately not turned into None, since a solver failure says nothing
+        about whether the LP has a solution.
     """
     # From http://cvxopt.org/userguide/coneprog.html#linear-programming,
     # CVXOPT uses the formulation:
@@ -317,16 +329,13 @@ class LinearProgram:
       raise TypeError("Wrong objective type.")
 
     problem = cp.Problem(objective, constraints)
-    try:
-      kwargs_ = dict(solver_kwargs, **kwargs)
-      kwargs_["solver"] = solver
-      problem.solve(**kwargs_)
-      value = x.value
-    except cp.SolverError as e:
-      print(f"Something went wrong, as of {e}")
-      value = None
-
-    return value
+    kwargs_ = dict(solver_kwargs, **kwargs)
+    kwargs_["solver"] = solver
+    problem.solve(**kwargs_)
+    self._status = problem.status
+    if self._status in cp.settings.INF_OR_UNB:
+      return None
+    return x.value
 
 
 def solve_zero_sum_matrix_game(game):
@@ -382,6 +391,9 @@ def solve_zero_sum_matrix_game(game):
   for r in range(num_rows):
     lp0.set_cons_coeff(num_cols + 1, r, 1.0)
   sol = lp0.solve()
+  if sol is None:
+    raise RuntimeError(
+        f"LP for player 0 has no solution (status: {lp0.get_status()}).")
   p0_sol = sol[:-1]
   p0_sol_val = sol[-1]
 
@@ -401,6 +413,9 @@ def solve_zero_sum_matrix_game(game):
   for c in range(num_cols):
     lp1.set_cons_coeff(num_rows + 1, c, 1.0)
   sol = lp1.solve()
+  if sol is None:
+    raise RuntimeError(
+        f"LP for player 1 has no solution (status: {lp1.get_status()}).")
   p1_sol = sol[:-1]
   p1_sol_val = sol[-1]
 
