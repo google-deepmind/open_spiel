@@ -96,7 +96,6 @@ class CrosswordDuelState : public State {
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
-  std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
@@ -130,7 +129,13 @@ class CrosswordDuelState : public State {
   const std::vector<char>& rack(Player player) const {
     return racks_[player];
   }
-  const std::vector<int>& scores() const { return scores_; }
+
+  // The players' raw point totals (Scrabble-style scoring). Note this is
+  // distinct from Returns(), which reports the zero-sum game outcome
+  // (win/loss/draw) derived from these totals.
+  const std::vector<int>& GetScores() const { return scores_; }
+  int GetScore(Player player) const { return scores_[player]; }
+
   int bag_size() const { return bag_.size(); }
 
  protected:
@@ -151,7 +156,6 @@ class CrosswordDuelState : public State {
   std::vector<std::vector<char>> racks_;
   std::vector<char> bag_;
   std::vector<int> scores_;
-  std::vector<int> reward_;
   std::vector<std::string> serialized_history_;
 
   Player current_player_ = kChancePlayerId;
@@ -174,8 +178,8 @@ class CrosswordDuelGame : public Game {
 
   int NumDistinctActions() const override { return 0; }
   int NumPlayers() const override { return kNumPlayers; }
-  double MinUtility() const override { return -300.0; }
-  double MaxUtility() const override { return 300.0; }
+  double MinUtility() const override { return -1.0; }
+  double MaxUtility() const override { return 1.0; }
   int MaxGameLength() const override { return kMaxGameLength; }
 
   std::unique_ptr<State> NewInitialState() const override {

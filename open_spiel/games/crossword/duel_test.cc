@@ -133,7 +133,8 @@ void TestCrosswordDuelGameManualPlayAndSerialization() {
   const auto& duel_action =
       down_cast<const CrosswordDuelActionStruct&>(*action);
   if (!duel_action.pass) {
-    SPIEL_CHECK_GT(state->Returns()[0], 0);
+    auto* duel_state_after = down_cast<CrosswordDuelState*>(state.get());
+    SPIEL_CHECK_GT(duel_state_after->GetScore(0), 0);
   }
 
   // Drain any refill chance node triggered by the move.

@@ -57,8 +57,8 @@ const GameType kGameType{
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kExplicitStochastic,
     GameType::Information::kImperfectInformation,
-    GameType::Utility::kGeneralSum,
-    GameType::RewardModel::kRewards,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
     /*max_num_players=*/kNumPlayers,
     /*min_num_players=*/kNumPlayers,
     /*provides_information_state_string=*/false,
@@ -93,7 +93,6 @@ CrosswordDuelState::CrosswordDuelState(std::shared_ptr<const Game> game)
   board_state_.assign(board_.num_rows() * board_.num_cols(), kEmptyCell);
   racks_.assign(kNumPlayers, {});
   scores_.assign(kNumPlayers, 0);
-  reward_.assign(kNumPlayers, 0);
   bag_ = board_.BuildTileBag();
 
   drawing_player_ = 0;
@@ -172,9 +171,7 @@ void CrosswordDuelState::AdvanceOrEnd(Player mover) {
   if (racks_[mover].empty() && bag_.empty()) {
     int bonus = RackValue(other);
     scores_[mover] += bonus;
-    reward_[mover] += bonus;
     scores_[other] -= bonus;
-    reward_[other] -= bonus;
     game_over_ = true;
   } else {
     current_player_ = other;
@@ -186,9 +183,6 @@ void CrosswordDuelState::DoApplyAction(Action action) {
   SPIEL_CHECK_TRUE(IsChanceNode());
   SPIEL_CHECK_GE(action, 0);
   SPIEL_CHECK_LT(action, 26);
-
-  reward_[0] = 0;
-  reward_[1] = 0;
 
   char letter = 'A' + static_cast<char>(action);
   auto it = std::find(bag_.begin(), bag_.end(), letter);
@@ -471,8 +465,6 @@ Status CrosswordDuelState::ApplyActionStruct(
   }
   const auto& a = down_cast<const CrosswordDuelActionStruct&>(action_struct);
 
-  reward_[0] = 0;
-  reward_[1] = 0;
   num_actions_++;
   serialized_history_.push_back(absl::StrCat(kActionPrefix, a.ToJson()));
 
@@ -482,7 +474,6 @@ Status CrosswordDuelState::ApplyActionStruct(
       for (Player p = 0; p < kNumPlayers; ++p) {
         int penalty = RackValue(p);
         scores_[p] -= penalty;
-        reward_[p] -= penalty;
       }
       game_over_ = true;
     } else {
@@ -493,7 +484,6 @@ Status CrosswordDuelState::ApplyActionStruct(
 
   int score = ComputeScoreAndApply(a, mover);
   scores_[mover] += score;
-  reward_[mover] = score;
   consecutive_passes_ = 0;
 
   int rack_size = racks_[mover].size();
@@ -676,12 +666,17 @@ bool CrosswordDuelState::IsTerminal() const {
   return game_over_ || num_actions_ >= kMaxGameLength;
 }
 
-std::vector<double> CrosswordDuelState::Rewards() const {
-  return {static_cast<double>(reward_[0]), static_cast<double>(reward_[1])};
-}
-
 std::vector<double> CrosswordDuelState::Returns() const {
-  return {static_cast<double>(scores_[0]), static_cast<double>(scores_[1])};
+  if (!IsTerminal()) {
+    return {0.0, 0.0};
+  }
+  if (scores_[0] > scores_[1]) {
+    return {1.0, -1.0};
+  } else if (scores_[1] > scores_[0]) {
+    return {-1.0, 1.0};
+  } else {
+    return {0.0, 0.0};
+  }
 }
 
 std::string CrosswordDuelState::ObservationString(Player player) const {
