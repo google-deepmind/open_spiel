@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/games/crossword/duel.h"
 #include "open_spiel/games/crossword/duel_default_board.h"
@@ -42,6 +43,29 @@ namespace crossword_duel {
 namespace {
 
 constexpr int kSeed = 42397719;
+
+// Applies the chance action that draws the given letter. Fails if that
+// letter is not currently available in the bag.
+void ApplyForcedChanceLetter(State* state, char letter) {
+  std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+  Action action = letter - 'A';
+  bool found = false;
+  for (const auto& [outcome_action, prob] : outcomes) {
+    if (outcome_action == action) {
+      found = true;
+      break;
+    }
+  }
+  SPIEL_CHECK_TRUE(found);
+  state->ApplyAction(action);
+}
+
+// Applies an arbitrary (don't-care) chance outcome, used to fill out the
+// remainder of a deal/draw once the letters we care about have been forced.
+void ApplyAnyChanceLetter(State* state) {
+  std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+  state->ApplyAction(outcomes[0].first);
+}
 
 void TestCrosswordDuelGameDefaultWordList() {
   std::shared_ptr<const Game> game = LoadGame("crossword_duel");
@@ -96,6 +120,70 @@ void TestCrosswordDuelGameDealAndFirstMove() {
   SPIEL_CHECK_TRUE(status.ok());
 
   std::cout << "Initial state:\n" << state->ToString() << "\n";
+}
+
+// Forces both racks (via the dealing chance nodes) so that player 0 is
+// guaranteed to hold C/A/T and player 1 is guaranteed to hold B/E/A/R, then
+// checks: (1) a known-legal placement of CAT at the start cell validates as
+// legal; (2) extending the board with a letter the mover's rack doesn't have
+// is rejected specifically for insufficient tiles; and (3) an otherwise-legal
+// word placed away from the board's only tile is rejected specifically for
+// not connecting to an existing tile.
+void TestCrosswordDuelGameLegalAndIllegalPlacements() {
+  std::shared_ptr<const Game> game = LoadGame("crossword_duel");
+  std::unique_ptr<State> state = game->NewInitialState();
+  auto* duel_state = down_cast<CrosswordDuelState*>(state.get());
+
+  std::vector<char> forced_p0 = {'C', 'A', 'T'};
+  std::vector<char> forced_p1 = {'B', 'E', 'A', 'R'};
+  size_t p0_idx = 0, p1_idx = 0;
+  while (state->IsChanceNode()) {
+    bool dealing_to_p0 = duel_state->rack(0).size() < kRackSize;
+    std::vector<char>& forced = dealing_to_p0 ? forced_p0 : forced_p1;
+    size_t& idx = dealing_to_p0 ? p0_idx : p1_idx;
+    if (idx < forced.size()) {
+      ApplyForcedChanceLetter(state.get(), forced[idx]);
+      idx++;
+    } else {
+      ApplyAnyChanceLetter(state.get());
+    }
+  }
+  SPIEL_CHECK_EQ(duel_state->rack(0).size(), kRackSize);
+  SPIEL_CHECK_EQ(duel_state->rack(1).size(), kRackSize);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+
+  // (1) CAT across the start cell (7, 7) is a legal opening move.
+  CrosswordDuelActionStruct legal_action(7, 7, "across", "CAT");
+  Status status = state->ValidateActionStruct(legal_action);
+  SPIEL_CHECK_TRUE(status.ok());
+  status = state->ApplyActionStruct(legal_action);
+  SPIEL_CHECK_TRUE(status.ok());
+  SPIEL_CHECK_EQ(duel_state->CharAt(7, 7), 'C');
+  SPIEL_CHECK_EQ(duel_state->CharAt(7, 8), 'A');
+  SPIEL_CHECK_EQ(duel_state->CharAt(7, 9), 'T');
+
+  // Drain the refill chance node(s) triggered by player 0's move.
+  while (state->IsChanceNode()) {
+    ApplyAnyChanceLetter(state.get());
+  }
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+
+  // (2) Extending "CAT" into "CATX" needs an 'X' tile that player 1's rack
+  // (B/E/A/R + filler) does not have. This placement touches the existing
+  // "CAT" tiles, so the failure is specifically about the missing tile,
+  // not connectivity.
+  CrosswordDuelActionStruct not_enough_tiles(7, 7, "across", "CATX");
+  status = state->ValidateActionStruct(not_enough_tiles);
+  SPIEL_CHECK_FALSE(status.ok());
+  SPIEL_CHECK_TRUE(absl::StrContains(status.message(), "Not enough"));
+
+  // (3) "BEAR" is spellable from player 1's rack, but placed far from the
+  // only tiles on the board (CAT, around row/col 7), so it fails for not
+  // connecting to any existing tile.
+  CrosswordDuelActionStruct not_connected(0, 0, "across", "BEAR");
+  status = state->ValidateActionStruct(not_connected);
+  SPIEL_CHECK_FALSE(status.ok());
+  SPIEL_CHECK_TRUE(absl::StrContains(status.message(), "connect"));
 }
 
 // Manually drives a short game using CAT/DOG/GOAT from the default word list,
@@ -194,6 +282,7 @@ int main(int argc, char** argv) {
   open_spiel::crossword_duel::TestCrosswordDuelGameDefaultWordList();
   open_spiel::crossword_duel::TestCreateCrosswordDuelGame();
   open_spiel::crossword_duel::TestCrosswordDuelGameDealAndFirstMove();
+  open_spiel::crossword_duel::TestCrosswordDuelGameLegalAndIllegalPlacements();
   open_spiel::crossword_duel::TestCrosswordDuelGameManualPlayAndSerialization();
   open_spiel::crossword_duel::TestCrosswordDuelGameRandomSim("");
 

@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstring>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -41,8 +42,8 @@ namespace open_spiel {
 namespace crossword_duel {
 namespace {
 
-constexpr absl::string_view kChancePrefix = "ChanceOutcome: ";
-constexpr absl::string_view kActionPrefix = "DuelAction: ";
+constexpr const char* kChancePrefix = "ChanceOutcome: ";
+constexpr const char* kActionPrefix = "CrosswordDuelAction: ";
 
 // Used when the game parameter `word_list_file` is empty. Kept short and
 // well within the tile bag's letter budget for the default board.
@@ -728,10 +729,10 @@ std::unique_ptr<State> CrosswordDuelGame::DeserializeState(
     if (absl::StartsWith(line, kChancePrefix)) {
       int outcome = kInvalidAction;
       SPIEL_CHECK_TRUE(
-          absl::SimpleAtoi(line.substr(kChancePrefix.size()), &outcome));
+          absl::SimpleAtoi(line.substr(strlen(kChancePrefix)), &outcome));
       state->ApplyAction(outcome);
     } else if (absl::StartsWith(line, kActionPrefix)) {
-      std::string json_str = std::string(line.substr(kActionPrefix.size()));
+      std::string json_str = std::string(line.substr(strlen(kActionPrefix)));
       CrosswordDuelActionStruct action_struct(json_str);
       state->ApplyActionStruct(action_struct);
     }

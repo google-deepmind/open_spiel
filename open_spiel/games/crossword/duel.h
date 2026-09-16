@@ -28,7 +28,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/status.h"
 
-// CrosswordDuel: a 2-player clone of Scrabble, played as a standalone
+// CrosswordDuel: a 2-player word-placement game, played as a standalone
 // ActionStruct-only game (see the documentation for these types of games in
 // spiel.h, under the `action_structs_only` field of GameType, and the
 // Crossword game for another example -- this game is implemented separately
@@ -130,8 +130,8 @@ class CrosswordDuelState : public State {
     return racks_[player];
   }
 
-  // The players' raw point totals (Scrabble-style scoring). Note this is
-  // distinct from Returns(), which reports the zero-sum game outcome
+  // The players' raw point totals (letter-value based scoring). Note this
+  // is distinct from Returns(), which reports the zero-sum game outcome
   // (win/loss/draw) derived from these totals.
   const std::vector<int>& GetScores() const { return scores_; }
   int GetScore(Player player) const { return scores_[player]; }

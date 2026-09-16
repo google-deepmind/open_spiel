@@ -21,7 +21,7 @@
 #include "open_spiel/utils/status.h"
 
 // Static (parameter-independent) board layout and tile economy for the
-// CrosswordDuel game: a 2-player word-placement game played like Scrabble.
+// CrosswordDuel game: a 2-player word-placement game.
 // See duel_default_board.h for the file format this parses.
 
 namespace open_spiel {
