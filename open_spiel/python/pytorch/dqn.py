@@ -631,20 +631,20 @@ class DQN(rl_agent.AbstractAgent):
     """Load checkpoint/trained model and optimizer.
 
     Args:
-      data_path: pathlib.Path for saving model. It can be relative or absolute,
+      data_path: pathlib.Path for loading model. It can be relative or absolute,
         but filename should be included. For example: q_network.pt or
         /path/to/q_network.pt
-      load_optimiser: bool, whether to learn the optimiser's state of not.
+      load_optimiser: bool, whether to load the optimiser's state or not.
         Defaults to True.
     """
     checkpoint = torch.load(
         data_path, weights_only=True, map_location=self._device
     )
-    self._q_network.load_state_dict(checkpoint["model_state_dict"])
-    self._target_q_network.load_state_dict(checkpoint["model_state_dict"])
+    self._q_network.load_state_dict(checkpoint["model"])
+    self._target_q_network.load_state_dict(checkpoint["model"])
 
     if load_optimiser:
-      self._optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+      self._optimizer.load_state_dict(checkpoint["optimiser"])
 
     self._iteration = checkpoint["iteration"]
     self._last_loss_value = checkpoint["last_loss_value"]
