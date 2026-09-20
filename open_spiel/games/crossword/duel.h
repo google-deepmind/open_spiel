@@ -130,6 +130,8 @@ class CrosswordDuelState : public State {
     return racks_[player];
   }
 
+  int ChanceOutcomeForLetter(char c) const;
+
   // The players' raw point totals (letter-value based scoring). Note this
   // is distinct from Returns(), which reports the zero-sum game outcome
   // (win/loss/draw) derived from these totals.

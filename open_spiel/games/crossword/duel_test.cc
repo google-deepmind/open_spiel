@@ -63,8 +63,32 @@ void ApplyForcedChanceLetter(State* state, char letter) {
 // Applies an arbitrary (don't-care) chance outcome, used to fill out the
 // remainder of a deal/draw once the letters we care about have been forced.
 void ApplyAnyChanceLetter(State* state) {
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
   std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
   state->ApplyAction(outcomes[0].first);
+}
+
+void ApplyAnyChanceLetters(State* state, int repetitions) {
+  for (int i = 0; i < repetitions; ++i) {
+    ApplyAnyChanceLetter(state);
+  }
+}
+
+void SetupRack(CrosswordDuelState* state, const std::string& rack) {
+  for (char c : rack) {
+    SPIEL_CHECK_TRUE(state->IsChanceNode());
+    state->ApplyAction(state->ChanceOutcomeForLetter(c));
+  }
+}
+
+void CheckAndApplyAction(State* state,
+                         int row, int col, const std::string& direction,
+                         const std::string& word) {
+  CrosswordDuelActionStruct action(row, col, direction, word);
+  Status status = state->ValidateActionStruct(action);
+  SPIEL_CHECK_TRUE(status.ok());
+  status = state->ApplyActionStruct(action);
+  SPIEL_CHECK_TRUE(status.ok());
 }
 
 void TestCrosswordDuelGameDefaultWordList() {
@@ -272,6 +296,45 @@ void TestCreateCrosswordDuelGameRandomSim(const std::string& word_list_file) {
   testing::SimulateRandomGame(game, kSeed);
 }
 
+void TestMultiWords(const std::string& word_list_file) {
+  // BITE
+  //  CONE
+  // MEND
+  if (word_list_file == "") {
+    std::cerr << "TestMultiWords requires a word list. Skipping." << std::endl;
+  }
+  std::string game_string =
+    absl::StrCat("crossword_duel(word_list_file=", word_list_file, ")");
+  std::shared_ptr<const Game> game = LoadGame(game_string);
+  std::unique_ptr<State> state = game->NewInitialState();
+  CrosswordDuelState* duel_state =
+      dynamic_cast<CrosswordDuelState*>(state.get());
+  SPIEL_CHECK_TRUE(state != nullptr);
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+
+  SetupRack(duel_state, "CONEBTE");
+  SetupRack(duel_state, "ICEMEND");
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  CheckAndApplyAction(duel_state, 7, 7, "across", "CONE");
+  ApplyAnyChanceLetters(duel_state, 4);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  CheckAndApplyAction(duel_state, 6, 7, "down", "ICE");
+  ApplyAnyChanceLetters(duel_state, 2);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  CheckAndApplyAction(duel_state, 6, 6, "across", "BITE");
+  ApplyAnyChanceLetters(duel_state, 3);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  CheckAndApplyAction(duel_state, 8, 6, "across", "MEND");
+  ApplyAnyChanceLetters(duel_state, 3);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  std::cout << duel_state->ToString() << std::endl;
+}
+
 }  // namespace
 }  // namespace crossword_duel
 }  // namespace open_spiel
@@ -291,6 +354,7 @@ int main(int argc, char** argv) {
     open_spiel::crossword_duel::TestCrosswordDuelGameRandomSim(word_list_file);
     open_spiel::crossword_duel::TestCreateCrosswordDuelGameRandomSim(
         word_list_file);
+    open_spiel::crossword_duel::TestMultiWords(word_list_file);
   } else {
     std::cerr << "No word_list_file specified. Skipping the random "
               << "simulations with a real dictionary. Pass "

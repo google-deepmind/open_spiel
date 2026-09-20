@@ -128,13 +128,20 @@ int CrosswordDuelState::RackValue(Player player) const {
   return total;
 }
 
+
+int CrosswordDuelState::ChanceOutcomeForLetter(char c) const {
+  SPIEL_CHECK_TRUE(c >= 'A');
+  SPIEL_CHECK_TRUE(c <= 'Z');
+  return c - 'A';
+}
+
 std::vector<std::pair<Action, double>> CrosswordDuelState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   std::array<int, 26> counts{};
   int total = 0;
   for (char c : bag_) {
-    counts[c - 'A']++;
+    counts[ChanceOutcomeForLetter(c)]++;
     total++;
   }
   SPIEL_CHECK_GT(total, 0);
