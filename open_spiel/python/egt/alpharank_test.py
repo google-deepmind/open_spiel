@@ -131,6 +131,41 @@ class AlphaRankTest(absltest.TestCase):
     np.testing.assert_allclose(pi, [1. / 3, 1. / 3, 1. / 3])
     self.assertGreater(calls["n"], 2)
 
+  def test_sweep_pi_vs_alpha_gives_up_on_repeated_failures(self):
+    """A compute() that never succeeds should raise, not shrink alpha forever."""
+    payoff_tables = [np.asarray([[0., 1., -1.], [-1., 0., 1.], [1., -1., 0.]])]
+    calls = {"n": 0}
+
+    def fake_compute(*args, **kwargs):
+      calls["n"] += 1
+      # E.g. a payoff table with infs/NaNs in it: no alpha will fix this.
+      raise ValueError("array must not contain infs or NaNs")
+
+    with mock.patch.object(alpharank, "compute", side_effect=fake_compute):
+      with self.assertRaises(RuntimeError):
+        alpharank.sweep_pi_vs_alpha(
+            payoff_tables, m=20, warm_start_alpha=100.0)
+    self.assertLess(calls["n"], 1000)
+
+  def test_sweep_pi_vs_alpha_gives_up_after_some_successes(self):
+    """Same, but the failures start once a few iterations have gone through."""
+    payoff_tables = [np.asarray([[0., 1., -1.], [-1., 0., 1.], [1., -1., 0.]])]
+    calls = {"n": 0}
+
+    def fake_compute(*args, **kwargs):
+      calls["n"] += 1
+      if calls["n"] > 2:
+        raise ValueError("array must not contain infs or NaNs")
+      # Not converged, so the sweep keeps going after these two.
+      pi = np.asarray([0.2 + 0.01 * calls["n"], 0.3, 0.47])
+      return None, None, pi, None, None
+
+    with mock.patch.object(alpharank, "compute", side_effect=fake_compute):
+      with self.assertRaises(RuntimeError):
+        alpharank.sweep_pi_vs_alpha(
+            payoff_tables, m=20, warm_start_alpha=10.0)
+    self.assertLess(calls["n"], 1000)
+
 
 if __name__ == "__main__":
   absltest.main()
