@@ -60,6 +60,9 @@ class NFSPTest(absltest.TestCase):
         min_buffer_size_to_learn=4,
         batch_size=4,
         learn_every=10,
+        # Sync the inner target network: otherwise it keeps the initial
+        # weights a fresh agent also has, as NFSP does not forward its seed.
+        update_target_network_every=20,
         optimizer_str="adam",
     )
     agents = [
@@ -87,6 +90,10 @@ class NFSPTest(absltest.TestCase):
         (restored_agent._avg_network, agent._avg_network),
         (restored_agent._optimizer, agent._optimizer),
         (restored_agent._rl_agent._q_network, agent._rl_agent._q_network),
+        (
+            restored_agent._rl_agent._target_q_network,
+            agent._rl_agent._target_q_network,
+        ),
         (restored_agent._rl_agent._optimizer, agent._rl_agent._optimizer),
     ]:
       torch.testing.assert_close(restored.state_dict(), original.state_dict())

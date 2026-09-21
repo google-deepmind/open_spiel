@@ -175,9 +175,10 @@ class DQNTest(absltest.TestCase):
     torch.testing.assert_close(
         restored_agent._q_network.state_dict(), agent._q_network.state_dict()
     )
+    # The target network lags the online one, so it must be restored separately.
     torch.testing.assert_close(
         restored_agent._target_q_network.state_dict(),
-        agent._q_network.state_dict(),
+        agent._target_q_network.state_dict(),
     )
     torch.testing.assert_close(
         restored_agent._optimizer.state_dict(), agent._optimizer.state_dict()

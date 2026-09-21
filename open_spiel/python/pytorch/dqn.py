@@ -609,7 +609,7 @@ class DQN(rl_agent.AbstractAgent):
       )
 
   def save(self, data_path: pathlib.Path, save_optimiser: bool = True) -> None:
-    """Save checkpoint/trained model and optimizer.
+    """Save checkpoint/trained model, target network and optimizer.
 
     Args:
       data_path: pathlib.Path for saving model. It can be relative or absolute,
@@ -622,13 +622,14 @@ class DQN(rl_agent.AbstractAgent):
         "iteration": self._iteration,
         "last_loss_value": self._last_loss_value,
         "model": self._q_network.state_dict(),
+        "target_model": self._target_q_network.state_dict(),
     }
     if save_optimiser:
       checkpoint.update({"optimiser": self._optimizer.state_dict()})
     torch.save(checkpoint, data_path)
 
   def load(self, data_path: pathlib.Path, load_optimiser: bool = True) -> None:
-    """Load checkpoint/trained model and optimizer.
+    """Load checkpoint/trained model, target network and optimizer.
 
     Args:
       data_path: pathlib.Path for loading model. It can be relative or absolute,
@@ -641,7 +642,10 @@ class DQN(rl_agent.AbstractAgent):
         data_path, weights_only=True, map_location=self._device
     )
     self._q_network.load_state_dict(checkpoint["model"])
-    self._target_q_network.load_state_dict(checkpoint["model"])
+    # Checkpoints saved before the target network was stored lack its state.
+    self._target_q_network.load_state_dict(
+        checkpoint.get("target_model", checkpoint["model"])
+    )
 
     if load_optimiser:
       self._optimizer.load_state_dict(checkpoint["optimiser"])
