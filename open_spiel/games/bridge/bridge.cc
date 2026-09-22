@@ -616,7 +616,7 @@ void BridgeState::WriteObservationTensor(Player player,
     int last_bid = 0;
     for (int i = kNumCards; i < history_.size(); ++i) {
       int this_call = history_[i].action - kBiddingActionBase;
-      int relative_bidder = (i + kNumPlayers - player) % kNumPlayers;
+      int relative_bidder = (i + dealer_ + kNumPlayers - player) % kNumPlayers;
       if (last_bid == 0 && this_call == kPass) ptr[relative_bidder] = 1;
       if (this_call == kDouble) {
         ptr[kNumPlayers + (last_bid - kFirstBid) * kNumPlayers * 3 +
