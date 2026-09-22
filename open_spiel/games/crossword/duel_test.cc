@@ -82,7 +82,7 @@ void SetupRack(CrosswordDuelState* state, const std::string& rack) {
 }
 
 void CheckAndApplyAction(State* state,
-                         int row, int col, const std::string& direction,
+                         int row, int col, Direction direction,
                          const std::string& word) {
   CrosswordDuelActionStruct action(row, col, direction, word);
   Status status = state->ValidateActionStruct(action);
@@ -134,11 +134,11 @@ void TestCrosswordDuelGameDealAndFirstMove() {
 
   // A word not covering the start cell should be rejected as the first move.
   Status status = state->ValidateActionStruct(
-      CrosswordDuelActionStruct(0, 0, "across", "AB"));
+      CrosswordDuelActionStruct(0, 0, Direction::kAcross, "AB"));
   SPIEL_CHECK_FALSE(status.ok());
 
   // A pass is always legal (direction/word are irrelevant when pass=true).
-  CrosswordDuelActionStruct pass_action(0, 0, "across", "X");
+  CrosswordDuelActionStruct pass_action(0, 0, Direction::kAcross, "X");
   pass_action.pass = true;
   status = state->ValidateActionStruct(pass_action);
   SPIEL_CHECK_TRUE(status.ok());
@@ -177,7 +177,7 @@ void TestCrosswordDuelGameLegalAndIllegalPlacements() {
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
 
   // (1) CAT across the start cell (7, 7) is a legal opening move.
-  CrosswordDuelActionStruct legal_action(7, 7, "across", "CAT");
+  CrosswordDuelActionStruct legal_action(7, 7, Direction::kAcross, "CAT");
   Status status = state->ValidateActionStruct(legal_action);
   SPIEL_CHECK_TRUE(status.ok());
   status = state->ApplyActionStruct(legal_action);
@@ -196,7 +196,8 @@ void TestCrosswordDuelGameLegalAndIllegalPlacements() {
   // (B/E/A/R + filler) does not have. This placement touches the existing
   // "CAT" tiles, so the failure is specifically about the missing tile,
   // not connectivity.
-  CrosswordDuelActionStruct not_enough_tiles(7, 7, "across", "CATX");
+  CrosswordDuelActionStruct not_enough_tiles(7, 7, Direction::kAcross,
+                                             "CATX");
   status = state->ValidateActionStruct(not_enough_tiles);
   SPIEL_CHECK_FALSE(status.ok());
   SPIEL_CHECK_TRUE(absl::StrContains(status.message(), "Not enough"));
@@ -204,7 +205,7 @@ void TestCrosswordDuelGameLegalAndIllegalPlacements() {
   // (3) "BEAR" is spellable from player 1's rack, but placed far from the
   // only tiles on the board (CAT, around row/col 7), so it fails for not
   // connecting to any existing tile.
-  CrosswordDuelActionStruct not_connected(0, 0, "across", "BEAR");
+  CrosswordDuelActionStruct not_connected(0, 0, Direction::kAcross, "BEAR");
   status = state->ValidateActionStruct(not_connected);
   SPIEL_CHECK_FALSE(status.ok());
   SPIEL_CHECK_TRUE(absl::StrContains(status.message(), "connect"));
@@ -316,19 +317,19 @@ void TestMultiWords(const std::string& word_list_file) {
   SetupRack(duel_state, "ICEMEND");
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
-  CheckAndApplyAction(duel_state, 7, 7, "across", "CONE");
+  CheckAndApplyAction(duel_state, 7, 7, Direction::kAcross, "CONE");
   ApplyAnyChanceLetters(duel_state, 4);
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
-  CheckAndApplyAction(duel_state, 6, 7, "down", "ICE");
+  CheckAndApplyAction(duel_state, 6, 7, Direction::kDown, "ICE");
   ApplyAnyChanceLetters(duel_state, 2);
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
-  CheckAndApplyAction(duel_state, 6, 6, "across", "BITE");
+  CheckAndApplyAction(duel_state, 6, 6, Direction::kAcross, "BITE");
   ApplyAnyChanceLetters(duel_state, 3);
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
-  CheckAndApplyAction(duel_state, 8, 6, "across", "MEND");
+  CheckAndApplyAction(duel_state, 8, 6, Direction::kAcross, "MEND");
   ApplyAnyChanceLetters(duel_state, 3);
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);

@@ -246,12 +246,16 @@ class GamesCrosswordDuelTest(absltest.TestCase):
 
     # A word not covering the start cell should be rejected as first move.
     status = state.validate_action_struct(
-        crossword_duel.CrosswordDuelActionStruct(0, 0, "across", "AB")
+        crossword_duel.CrosswordDuelActionStruct(
+            0, 0, crossword_duel.Direction.ACROSS, "AB"
+        )
     )
     self.assertFalse(status.ok())
 
     # A pass is always legal (direction/word are irrelevant when pass=true).
-    pass_action = crossword_duel.CrosswordDuelActionStruct(0, 0, "across", "X")
+    pass_action = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, "X"
+    )
     pass_action.pass_ = True
     status = state.validate_action_struct(pass_action)
     self.assertTrue(status.ok())
@@ -289,8 +293,9 @@ class GamesCrosswordDuelTest(absltest.TestCase):
     self.assertEqual(state.current_player(), 0)
 
     # (1) CAT across the start cell (7, 7) is a legal opening move.
-    legal_action = crossword_duel.CrosswordDuelActionStruct(7, 7, "across",
-                                                            "CAT")
+    legal_action = crossword_duel.CrosswordDuelActionStruct(
+        7, 7, crossword_duel.Direction.ACROSS, "CAT"
+    )
     status = state.validate_action_struct(legal_action)
     self.assertTrue(status.ok())
     status = state.apply_action_struct(legal_action)
@@ -307,7 +312,7 @@ class GamesCrosswordDuelTest(absltest.TestCase):
     # (2) Extending "CAT" into "CATX" needs an 'X' tile that player 1's rack
     # (B/E/A/R + filler) does not have.
     not_enough_tiles = crossword_duel.CrosswordDuelActionStruct(
-        7, 7, "across", "CATX"
+        7, 7, crossword_duel.Direction.ACROSS, "CATX"
     )
     status = state.validate_action_struct(not_enough_tiles)
     self.assertFalse(status.ok())
@@ -315,8 +320,9 @@ class GamesCrosswordDuelTest(absltest.TestCase):
 
     # (3) "BEAR" is spellable from player 1's rack, but placed far from the
     # only tiles on the board.
-    not_connected = crossword_duel.CrosswordDuelActionStruct(0, 0, "across",
-                                                              "BEAR")
+    not_connected = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, "BEAR"
+    )
     status = state.validate_action_struct(not_connected)
     self.assertFalse(status.ok())
     self.assertIn("connect", status.message())
@@ -328,7 +334,7 @@ class GamesCrosswordDuelTest(absltest.TestCase):
     )
     self.assertEqual(action.row, 7)
     self.assertEqual(action.col, 7)
-    self.assertEqual(action.direction, "across")
+    self.assertEqual(action.direction, crossword_duel.Direction.ACROSS)
     self.assertEqual(action.word, "CAT")
     self.assertFalse(action.pass_)
 

@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/utils/status.h"
 
 // Static (parameter-independent) board layout and tile economy for the
@@ -31,6 +32,13 @@ enum class Direction {
   kAcross,
   kDown,
 };
+
+// Serializes/deserializes Direction to/from the JSON strings "across" and
+// "down" (used by CrosswordDuelActionStruct's JSON (de)serialization).
+NLOHMANN_JSON_SERIALIZE_ENUM(Direction, {
+  {Direction::kAcross, "across"},
+  {Direction::kDown, "down"},
+})
 
 enum class BonusType {
   kNone,

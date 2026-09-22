@@ -81,10 +81,6 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
-std::string DirectionToString(Direction direction) {
-  return direction == Direction::kAcross ? "across" : "down";
-}
-
 }  // namespace
 
 CrosswordDuelState::CrosswordDuelState(std::shared_ptr<const Game> game)
@@ -258,15 +254,7 @@ Status CrosswordDuelState::ValidateActionStruct(
                                     " letters: ", a.word));
   }
 
-  std::string direction_str = absl::AsciiStrToLower(a.direction);
-  Direction direction;
-  if (direction_str == "across") {
-    direction = Direction::kAcross;
-  } else if (direction_str == "down") {
-    direction = Direction::kDown;
-  } else {
-    return ErrorStatus(absl::StrCat("Unknown direction: ", a.direction));
-  }
+  Direction direction = a.direction;
 
   int row = a.row;
   int col = a.col;
@@ -377,9 +365,7 @@ Status CrosswordDuelState::ValidateActionStruct(
 int CrosswordDuelState::ComputeScoreAndApply(
     const CrosswordDuelActionStruct& a, Player mover) {
   std::string word = absl::AsciiStrToUpper(a.word);
-  Direction direction = (absl::AsciiStrToLower(a.direction) == "across")
-                            ? Direction::kAcross
-                            : Direction::kDown;
+  Direction direction = a.direction;
   int row = a.row;
   int col = a.col;
 
@@ -530,7 +516,7 @@ CrosswordDuelActionStructSampler::SampleActionStruct() {
     std::cerr << "Word set is empty, cannot sample action. "
               << "Passing.\n";
     auto pass = std::make_unique<CrosswordDuelActionStruct>(
-        0, 0, "across", "");
+        0, 0, Direction::kAcross, "");
     pass->pass = true;
     return pass;
   }
@@ -596,8 +582,8 @@ CrosswordDuelActionStructSampler::SampleActionStruct() {
   }
 
   auto make_pass = []() {
-    auto pass = std::make_unique<CrosswordDuelActionStruct>(0, 0, "across",
-                                                            "");
+    auto pass = std::make_unique<CrosswordDuelActionStruct>(
+        0, 0, Direction::kAcross, "");
     pass->pass = true;
     return pass;
   };
@@ -622,7 +608,7 @@ CrosswordDuelActionStructSampler::SampleActionStruct() {
         anchor_col - (direction == Direction::kAcross ? offset : 0);
 
     auto candidate = std::make_unique<CrosswordDuelActionStruct>(
-        row, col, DirectionToString(direction), word);
+        row, col, direction, word);
     if (state_->ValidateActionStruct(*candidate).ok()) {
       return candidate;
     }

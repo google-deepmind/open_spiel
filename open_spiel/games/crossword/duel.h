@@ -67,11 +67,11 @@ class CrosswordDuelGame;
 struct CrosswordDuelActionStruct : public ActionStruct {
   int row = -1;
   int col = -1;
-  std::string direction;  // "across" or "down". Ignored when pass = true.
+  Direction direction = Direction::kAcross;  // Ignored when pass = true.
   std::string word;       // Ignored when pass = true.
   bool pass = false;
 
-  CrosswordDuelActionStruct(int _row, int _col, const std::string& _direction,
+  CrosswordDuelActionStruct(int _row, int _col, Direction _direction,
                             const std::string& _word)
       : row(_row), col(_col), direction(_direction), word(_word) {}
 

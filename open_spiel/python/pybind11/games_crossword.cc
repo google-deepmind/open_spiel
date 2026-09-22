@@ -146,7 +146,7 @@ void open_spiel::init_pyspiel_games_crossword(py::module& m) {
       bind_spiel_struct<CrosswordDuelActionStruct, ActionStruct>(
           crossword_duel, "CrosswordDuelActionStruct")
       .def(py::init<const std::string&>(), py::arg("json_str"))
-      .def(py::init<int, int, const std::string&, const std::string&>(),
+      .def(py::init<int, int, DuelDirection, const std::string&>(),
             py::arg("row"), py::arg("col"), py::arg("direction"),
             py::arg("word"))
       .def_readwrite("row", &CrosswordDuelActionStruct::row)
