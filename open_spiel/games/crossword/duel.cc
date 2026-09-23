@@ -643,7 +643,7 @@ std::string CrosswordDuelState::ToString() const {
   for (int r = 0; r < board_.num_rows(); ++r) {
     for (int c = 0; c < board_.num_cols(); ++c) {
       char ch = CharAt(r, c);
-      result.push_back(ch == kEmptyCell ? '.' : ch);
+      result.push_back(ch == kEmptyCell ? board_.BonusCharAt(r, c) : ch);
       result.push_back(' ');
     }
     absl::StrAppend(&result, "\n");
@@ -683,7 +683,7 @@ std::string CrosswordDuelState::ObservationString(Player player) const {
   for (int r = 0; r < board_.num_rows(); ++r) {
     for (int c = 0; c < board_.num_cols(); ++c) {
       char ch = CharAt(r, c);
-      result.push_back(ch == kEmptyCell ? '.' : ch);
+      result.push_back(ch == kEmptyCell ? board_.BonusCharAt(r, c) : ch);
       result.push_back(' ');
     }
     absl::StrAppend(&result, "\n");

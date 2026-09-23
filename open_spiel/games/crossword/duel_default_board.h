@@ -22,10 +22,10 @@ namespace crossword_duel {
 //
 // Tiles:
 //   's' - starting location
-//   'd' - double letter
-//   'D' - double word
-//   't' - tripple letter
-//   'T' - tripple word
+//   '2' - double letter
+//   '@' - double word
+//   '3' - tripple letter
+//   '#' - tripple word
 //
 // The board layout is followed by a blank line and then tile distribution
 // where '*' is the blank tile, in this format:
@@ -34,21 +34,21 @@ namespace crossword_duel {
 
 
 inline constexpr const char* kDuelDefaultBoard = R"duel(
-t...T..d..T...t
-.d...t...t...d.
-..D...d.d...D..
-...t...D...t...
-T...D.d.d.D...T
-.t...t...t...t.
-..d...d.d...d..
-d..D...s...D..d
-..d...d.d...d..
-.t...t...t...t.
-T...D.d.d.D...T
-...t...D...t...
-..D...d.d...D..
-.d...t...t...d.
-t...T..d..T...t
+3...#..2..#...3
+.2...3...3...2.
+..@...2.2...@..
+...3...@...3...
+#...@.2.2.@...#
+.3...3...3...3.
+..2...2.2...2..
+2..@...s...@..2
+..2...2.2...2..
+.3...3...3...3.
+#...@.2.2.@...#
+...3...@...3...
+..@...2.2...@..
+.2...3...3...2.
+3...#..2..#...3
 
 A 9 1
 B 2 3

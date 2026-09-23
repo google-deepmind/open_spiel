@@ -463,9 +463,9 @@ add_executable(crossword_test crossword/crossword_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(crossword_test crossword_test)
 
-add_executable(duel_test crossword/duel_test.cc ${OPEN_SPIEL_OBJECTS}
+add_executable(crossword_duel_test crossword/duel_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
-add_test(duel_test duel_test)
+add_test(crossword_duel_test crossword_duel_test)
 
 add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

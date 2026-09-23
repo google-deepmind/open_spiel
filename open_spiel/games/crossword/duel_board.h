@@ -40,6 +40,14 @@ NLOHMANN_JSON_SERIALIZE_ENUM(Direction, {
   {Direction::kDown, "down"},
 })
 
+// Raw layout characters used in the board file format.
+inline constexpr char kNormalCellChar = '.';
+inline constexpr char kStartCellChar = 's';
+inline constexpr char kDoubleLetterChar = '2';
+inline constexpr char kDoubleWordChar = '@';
+inline constexpr char kTripleLetterChar = '3';
+inline constexpr char kTripleWordChar = '#';
+
 enum class BonusType {
   kNone,
   kDoubleLetter,
@@ -64,6 +72,10 @@ class CrosswordDuelBoard {
   bool InBounds(int row, int col) const;
   BonusType BonusAt(int row, int col) const;
   bool IsStartCell(int row, int col) const;
+
+  // Returns the layout character for the bonus at (row, col), or
+  // kNormalCellChar if the cell has no bonus.
+  char BonusCharAt(int row, int col) const;
 
   // Returns the point value of `letter` according to the tile distribution,
   // or 0 if the letter does not appear in it.
@@ -93,8 +105,8 @@ class CrosswordDuelBoard {
   int num_rows_ = -1;
   int num_cols_ = -1;
 
-  // Raw layout characters: '.' (normal), 's' (start), 'd'/'D' (double
-  // letter/word), 't'/'T' (triple letter/word).
+  // Raw layout characters: '.' (normal), 's' (start), '2'/'@' (double
+  // letter/word), '3'/'#' (triple letter/word).
   std::vector<char> cells_;
 
   std::vector<TileInfo> tile_distribution_;

@@ -50,21 +50,36 @@ BonusType CrosswordDuelBoard::BonusAt(int row, int col) const {
     return BonusType::kNone;
   }
   switch (RawCellAt(row, col)) {
-    case 'd':
+    case kDoubleLetterChar:
       return BonusType::kDoubleLetter;
-    case 'D':
+    case kDoubleWordChar:
       return BonusType::kDoubleWord;
-    case 't':
+    case kTripleLetterChar:
       return BonusType::kTripleLetter;
-    case 'T':
+    case kTripleWordChar:
       return BonusType::kTripleWord;
     default:
       return BonusType::kNone;
   }
 }
 
+char CrosswordDuelBoard::BonusCharAt(int row, int col) const {
+  switch (BonusAt(row, col)) {
+    case BonusType::kDoubleLetter:
+      return kDoubleLetterChar;
+    case BonusType::kDoubleWord:
+      return kDoubleWordChar;
+    case BonusType::kTripleLetter:
+      return kTripleLetterChar;
+    case BonusType::kTripleWord:
+      return kTripleWordChar;
+    default:
+      return kNormalCellChar;
+  }
+}
+
 bool CrosswordDuelBoard::IsStartCell(int row, int col) const {
-  return InBounds(row, col) && RawCellAt(row, col) == 's';
+  return InBounds(row, col) && RawCellAt(row, col) == kStartCellChar;
 }
 
 int CrosswordDuelBoard::LetterValue(char letter) const {

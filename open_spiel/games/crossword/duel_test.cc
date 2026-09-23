@@ -81,6 +81,14 @@ void SetupRack(CrosswordDuelState* state, const std::string& rack) {
   }
 }
 
+void CheckInvalidAction(State* state,
+                        int row, int col, Direction direction,
+                        const std::string& word) {
+  CrosswordDuelActionStruct action(row, col, direction, word);
+  Status status = state->ValidateActionStruct(action);
+  SPIEL_CHECK_FALSE(status.ok());
+}
+
 void CheckAndApplyAction(State* state,
                          int row, int col, Direction direction,
                          const std::string& word) {
@@ -317,18 +325,32 @@ void TestMultiWords(const std::string& word_list_file) {
   SetupRack(duel_state, "ICEMEND");
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  // invalid: missing letter
+  CheckInvalidAction(duel_state, 7, 7, Direction::kAcross, "BORE");
+  // invalid: not on starting square
+  CheckInvalidAction(duel_state, 6, 7, Direction::kAcross, "CONE");
   CheckAndApplyAction(duel_state, 7, 7, Direction::kAcross, "CONE");
   ApplyAnyChanceLetters(duel_state, 4);
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  // invalid: not a word
+  CheckInvalidAction(duel_state, 6, 7, Direction::kDown, "DCE");
+  // invalid: missing a letter
+  CheckInvalidAction(duel_state, 6, 7, Direction::kDown, "ICY");
+  // invalid: second letter has to be a C for 6,7 down
+  CheckInvalidAction(duel_state, 6, 7, Direction::kDown, "DICE");
   CheckAndApplyAction(duel_state, 6, 7, Direction::kDown, "ICE");
   ApplyAnyChanceLetters(duel_state, 2);
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  // invalid: words
+  CheckInvalidAction(duel_state, 6, 6, Direction::kAcross, "TIBE");
   CheckAndApplyAction(duel_state, 6, 6, Direction::kAcross, "BITE");
   ApplyAnyChanceLetters(duel_state, 3);
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  // invalid: words
+  CheckInvalidAction(duel_state, 8, 6, Direction::kAcross, "DEMN");
   CheckAndApplyAction(duel_state, 8, 6, Direction::kAcross, "MEND");
   ApplyAnyChanceLetters(duel_state, 3);
 
