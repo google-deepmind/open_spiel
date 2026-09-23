@@ -338,6 +338,20 @@ class GamesCrosswordDuelTest(absltest.TestCase):
     self.assertEqual(action.word, "CAT")
     self.assertFalse(action.pass_)
 
+  def test_action_struct_from_dict(self):
+    action = crossword_duel.CrosswordDuelActionStruct({
+        "row": 3,
+        "col": 5,
+        "direction": "down",
+        "word": "DOG",
+        "pass": False,
+    })
+    self.assertEqual(action.row, 3)
+    self.assertEqual(action.col, 5)
+    self.assertEqual(action.direction, crossword_duel.Direction.DOWN)
+    self.assertEqual(action.word, "DOG")
+    self.assertFalse(action.pass_)
+
   def test_default_random_sim(self):
     # Only 10 words in the default word list, so most random games end
     # quickly via consecutive passes.
