@@ -156,6 +156,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     # meta trainer api, so has to be passed as a function instead of a string.
     if not meta_strategy_method or meta_strategy_method == "alpharank":
       meta_strategy_method = utils.alpharank_strategy
+    if meta_strategy_method == "ssd":
+      meta_strategy_method = utils.ssd_strategy
 
     print("Sampling from marginals : {}".format(sample_from_marginals))
     self.sample_from_marginals = sample_from_marginals

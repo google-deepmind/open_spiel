@@ -380,6 +380,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       coalitional_games/wvg_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py
+      egt/ssd_test.py
       egt/visualization_test.py
       games/kuhn_poker_test.py
       voting/maximal_lotteries_test.py

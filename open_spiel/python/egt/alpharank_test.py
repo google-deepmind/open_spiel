@@ -60,6 +60,29 @@ class AlphaRankTest(absltest.TestCase):
         hpts, m=m, alpha=alpha, use_local_selection_model=False)
     np.testing.assert_array_almost_equal(pi_hpts, expected_pi, decimal=4)
 
+  def test_fixation_probability_is_numerically_stable(self):
+    m = 10
+    for u in [-3., -0.5, 1e-3, 0.5, 3.]:
+      self.assertAlmostEqual(
+          alpharank._fermi_fixation_probability(u, m),
+          (1 - np.exp(-u)) / (1 - np.exp(-m * u)))
+    self.assertAlmostEqual(alpharank._fermi_fixation_probability(0., m), 1 / m)
+    # A strongly disadvantageous mutant almost never fixates and a strongly
+    # beneficial one almost always does, without overflowing.
+    self.assertAlmostEqual(alpharank._fermi_fixation_probability(-1e3, m), 0.)
+    self.assertAlmostEqual(alpharank._fermi_fixation_probability(1e3, m), 1.)
+
+  def test_sparse_stationary_distribution(self):
+    game = pyspiel.load_matrix_game("matrix_rpsw")
+    payoff_tables = utils.game_payoffs_array(game)
+    for use_inf_alpha in [False, True]:
+      _, _, pi_dense, _, _ = alpharank.compute(
+          payoff_tables, m=20, alpha=0.1, use_inf_alpha=use_inf_alpha)
+      _, _, pi_sparse, _, _ = alpharank.compute(
+          payoff_tables, m=20, alpha=0.1, use_inf_alpha=use_inf_alpha,
+          use_sparse=True)
+      np.testing.assert_array_almost_equal(pi_dense, pi_sparse)
+
   def test_constant_sum_transition_matrix(self):
     """Tests closed-form transition matrix computation for constant-sum case."""
 
