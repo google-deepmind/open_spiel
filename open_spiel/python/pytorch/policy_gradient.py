@@ -461,7 +461,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     return pi_loss
 
   def get_weights(self):
-    variables = [m.weight for m in self._net_torso.model]
+    variables = [m[0].weight for m in self._net_torso.model]
     variables.append(self._policy_logits_layer.weight)
     if self._loss_class.__name__ == "BatchA2CLoss":
       variables.append(self._baseline_layer.weight)
@@ -485,27 +485,14 @@ class PolicyGradient(rl_agent.AbstractAgent):
     _ = self._kwargs.pop("self", None)
     copied_object = PolicyGradient(**self._kwargs)
 
-    net_torso = getattr(copied_object, "_net_torso")
-    policy_logits_layer = getattr(copied_object, "_policy_logits_layer")
-    if hasattr(copied_object, "_q_values_layer"):
-      q_values_layer = getattr(copied_object, "_q_values_layer")
-    if hasattr(copied_object, "_baseline_layer"):
-      baseline_layer = getattr(copied_object, "_baseline_layer")
-
     if copy_weights:
+      copied_object.policy_logits_network.load_state_dict(
+          self.policy_logits_network.state_dict())
+      copied_object._critic_network.load_state_dict(
+          self._critic_network.state_dict())
+
       with torch.no_grad():
-        for layer in net_torso.model:
-          layer.weight *= (1 + sigma * torch.randn(layer.weight.shape))
-
-        policy_logits_layer.weight *= (
-            1 + sigma * torch.randn(policy_logits_layer.weight.shape))
-
-        if hasattr(copied_object, "_q_values_layer"):
-          q_values_layer.weight *= (
-              1 + sigma * torch.randn(q_values_layer.weight.shape))
-
-        if hasattr(copied_object, "_baseline_layer"):
-          baseline_layer.weight *= (
-              1 + sigma * torch.randn(baseline_layer.weight.shape))
+        for w in copied_object.get_weights():
+          w *= 1 + sigma * torch.randn_like(w)
 
     return copied_object
