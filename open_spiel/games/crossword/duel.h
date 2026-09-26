@@ -67,9 +67,13 @@ class CrosswordDuelGame;
 struct CrosswordDuelActionStruct : public ActionStruct {
   int row = -1;
   int col = -1;
-  Direction direction = Direction::kAcross;  // Ignored when pass = true.
-  std::string word;       // Ignored when pass = true.
+  Direction direction = Direction::kAcross;  // Ignored when pass or discard
+                                             // is true.
+  std::string word;       // Ignored when pass or discard is true.
   bool pass = false;
+  bool discard = false;
+  std::string discard_tiles;  // Tiles from the rack to put back in the bag
+                              // and redraw. Only used when discard = true.
 
   CrosswordDuelActionStruct(int _row, int _col, Direction _direction,
                             const std::string& _word)
@@ -77,7 +81,7 @@ struct CrosswordDuelActionStruct : public ActionStruct {
 
   std::string ToString() const { return ToJson(); }
   SPIEL_STRUCT_BOILERPLATE(CrosswordDuelActionStruct, row, col, direction,
-                           word, pass);
+                           word, pass, discard, discard_tiles);
 };
 
 class CrosswordDuelActionStructSampler : public ActionStructSampler {
@@ -85,6 +89,17 @@ class CrosswordDuelActionStructSampler : public ActionStructSampler {
   explicit CrosswordDuelActionStructSampler(const State* state, int rng_seed)
       : ActionStructSampler(state, rng_seed) {}
   std::unique_ptr<ActionStruct> SampleActionStruct() override;
+
+ private:
+  // Partitions the game's word list by length (index i holds all words of
+  // length i), so a chosen line's candidate words can be scanned without
+  // rescanning the whole dictionary. Built lazily on first use and cached
+  // for the sampler's lifetime (the word list never changes mid-game).
+  void BuildWordsByLengthIfNeeded(
+      const absl::flat_hash_set<std::string>& word_set, int max_length);
+
+  std::vector<std::vector<std::string>> words_by_length_;
+  bool words_by_length_built_ = false;
 };
 
 class CrosswordDuelState : public State {
@@ -191,9 +206,11 @@ class CrosswordDuelGame : public Game {
   std::pair<std::string, std::string> ActionStructSpec() const override {
     return std::make_pair(
         "{\"row\": int, \"col\": int, \"direction\": string, "
-        "\"word\": string, \"pass\": bool}",
+        "\"word\": string, \"pass\": bool, \"discard\": bool, "
+        "\"discard_tiles\": string}",
         "{\"row\": 7, \"col\": 7, \"direction\": \"across\", "
-        "\"word\": \"CAT\", \"pass\": false}");
+        "\"word\": \"CAT\", \"pass\": false, \"discard\": false, "
+        "\"discard_tiles\": \"\"}");
   }
 
   const CrosswordDuelBoard& board() const { return board_; }

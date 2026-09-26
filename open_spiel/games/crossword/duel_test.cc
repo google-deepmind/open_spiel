@@ -219,6 +219,91 @@ void TestCrosswordDuelGameLegalAndIllegalPlacements() {
   SPIEL_CHECK_TRUE(absl::StrContains(status.message(), "connect"));
 }
 
+// Regression test for the game's termination rules: it must end only via two
+// consecutive passes or a player emptying their rack -- never merely because
+// the tile bag has run out. Uses a tiny custom board whose tile bag holds
+// exactly 2*kRackSize tiles, so the bag is emptied by the initial deal alone;
+// a normal placement made after that must neither trigger a chance/draw node
+// nor end the game, as long as the mover's rack still has tiles left.
+void TestCrosswordDuelGameBagEmptyDoesNotEndGame() {
+  const std::string kTinyBoard =
+      ".....\n"
+      ".....\n"
+      "..s..\n"
+      ".....\n"
+      ".....\n"
+      "\n"
+      "C 1 1\n"
+      "A 1 1\n"
+      "T 1 1\n"
+      "Z 11 1\n";
+  std::shared_ptr<const Game> game = CreateCrosswordDuelGame(kTinyBoard, "");
+  std::unique_ptr<State> state = game->NewInitialState();
+  auto* duel_state = down_cast<CrosswordDuelState*>(state.get());
+
+  // Force player 0's rack to contain C, A, T; every other draw (for either
+  // player) will be Z, the only letter left in the bag once C/A/T are gone,
+  // so the bag ends up fully drained (0 tiles) right after the initial deal.
+  std::vector<char> forced_p0 = {'C', 'A', 'T'};
+  size_t p0_idx = 0;
+  while (state->IsChanceNode()) {
+    bool dealing_to_p0 = duel_state->rack(0).size() < kRackSize;
+    if (dealing_to_p0 && p0_idx < forced_p0.size()) {
+      ApplyForcedChanceLetter(state.get(), forced_p0[p0_idx]);
+      p0_idx++;
+    } else {
+      ApplyAnyChanceLetter(state.get());
+    }
+  }
+  SPIEL_CHECK_EQ(duel_state->rack(0).size(), kRackSize);
+  SPIEL_CHECK_EQ(duel_state->rack(1).size(), kRackSize);
+  SPIEL_CHECK_EQ(duel_state->bag_size(), 0);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+
+  // Player 0 plays CAT at the start cell using 3 of their 7 tiles. Even
+  // though the bag is already empty (so no refill is possible), player 0's
+  // rack still has 4 tiles left, so this move must NOT end the game.
+  CrosswordDuelActionStruct cat_action(2, 2, Direction::kAcross, "CAT");
+  Status status = state->ApplyActionStruct(cat_action);
+  SPIEL_CHECK_TRUE(status.ok());
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  SPIEL_CHECK_EQ(duel_state->bag_size(), 0);
+  SPIEL_CHECK_EQ(duel_state->rack(0).size(), kRackSize - 3);
+  SPIEL_CHECK_FALSE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+}
+
+// Regression test: two consecutive passes end the game even when the tile
+// bag is still mostly full, confirming that pass-based termination does not
+// depend on the bag's contents.
+void TestCrosswordDuelGamePassesEndGameRegardlessOfBag() {
+  std::shared_ptr<const Game> game = LoadGame("crossword_duel");
+  std::unique_ptr<State> state = game->NewInitialState();
+  auto* duel_state = down_cast<CrosswordDuelState*>(state.get());
+  std::mt19937 rng(kSeed);
+
+  while (state->IsChanceNode()) {
+    std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+    Action action = SampleAction(outcomes, rng).first;
+    state->ApplyAction(action);
+  }
+  SPIEL_CHECK_GT(duel_state->bag_size(), 0);
+  SPIEL_CHECK_FALSE(state->IsTerminal());
+
+  CrosswordDuelActionStruct pass_action(0, 0, Direction::kAcross, "");
+  pass_action.pass = true;
+
+  Status status = state->ApplyActionStruct(pass_action);
+  SPIEL_CHECK_TRUE(status.ok());
+  SPIEL_CHECK_FALSE(state->IsTerminal());
+
+  status = state->ApplyActionStruct(pass_action);
+  SPIEL_CHECK_TRUE(status.ok());
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_GT(duel_state->bag_size(), 0);
+}
+
 // Manually drives a short game using CAT/DOG/GOAT from the default word list,
 // forcing both racks so the moves are guaranteed to be legal, in order to
 // exercise scoring, board mutation, and serialization round-tripping without
@@ -244,7 +329,7 @@ void TestCrosswordDuelGameManualPlayAndSerialization() {
   // the first move must be built entirely from the rack. Rather than search
   // for a fit ourselves (which may legitimately not exist), reuse the
   // game's own ActionStructSampler, which already handles the
-  // found-nothing-so-pass case the same way real play would.
+  // found-nothing-so-pass/discard case the same way real play would.
   std::unique_ptr<ActionStructSampler> sampler =
       state->GetActionStructSampler(kSeed);
   std::unique_ptr<ActionStruct> action = sampler->SampleActionStruct();
@@ -253,7 +338,7 @@ void TestCrosswordDuelGameManualPlayAndSerialization() {
   SPIEL_CHECK_TRUE(status.ok());
   const auto& duel_action =
       down_cast<const CrosswordDuelActionStruct&>(*action);
-  if (!duel_action.pass) {
+  if (!duel_action.pass && !duel_action.discard) {
     auto* duel_state_after = down_cast<CrosswordDuelState*>(state.get());
     SPIEL_CHECK_GT(duel_state_after->GetScore(0), 0);
   }
@@ -303,6 +388,47 @@ void TestCreateCrosswordDuelGameRandomSim(const std::string& word_list_file) {
   SPIEL_CHECK_TRUE(duel_game != nullptr);
   std::cout << "num_words: " << duel_game->num_words() << "\n";
   testing::SimulateRandomGame(game, kSeed);
+}
+
+// Plays a single random game to completion, printing the state before each
+// player move along with the chosen action, and the returns at the end.
+// Chance nodes (tile draws) are sampled silently to keep the output readable.
+void TestCrosswordDuelGameVerboseRandomSim(const std::string& word_list_file) {
+  std::string game_string = "crossword_duel";
+  if (!word_list_file.empty()) {
+    game_string =
+        absl::StrCat("crossword_duel(word_list_file=", word_list_file, ")");
+  }
+  std::shared_ptr<const Game> game = LoadGame(game_string);
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::unique_ptr<ActionStructSampler> sampler =
+      state->GetActionStructSampler(kSeed);
+  std::mt19937 rng(kSeed);
+
+  int move_num = 0;
+  while (!state->IsTerminal()) {
+    if (state->IsChanceNode()) {
+      std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+      Action action = SampleAction(outcomes, rng).first;
+      state->ApplyAction(action);
+      continue;
+    }
+    Player player = state->CurrentPlayer();
+    std::unique_ptr<ActionStruct> action = sampler->SampleActionStruct();
+    SPIEL_CHECK_TRUE(action != nullptr);
+    std::cout << "Move " << move_num << ", player " << player << ":\n"
+              << state->ToString() << "\n"
+              << "Chosen action: " << action->ToJson() << "\n\n";
+    Status status = state->ApplyActionStruct(*action);
+    SPIEL_CHECK_TRUE(status.ok());
+    ++move_num;
+  }
+
+  std::cout << "Terminal state:\n" << state->ToString() << "\n";
+  std::vector<double> returns = state->Returns();
+  std::cout << "Returns:";
+  for (double r : returns) std::cout << " " << r;
+  std::cout << "\n";
 }
 
 void TestMultiWords(const std::string& word_list_file) {
@@ -369,6 +495,8 @@ int main(int argc, char** argv) {
   open_spiel::crossword_duel::TestCreateCrosswordDuelGame();
   open_spiel::crossword_duel::TestCrosswordDuelGameDealAndFirstMove();
   open_spiel::crossword_duel::TestCrosswordDuelGameLegalAndIllegalPlacements();
+  open_spiel::crossword_duel::TestCrosswordDuelGameBagEmptyDoesNotEndGame();
+  open_spiel::crossword_duel::TestCrosswordDuelGamePassesEndGameRegardlessOfBag();
   open_spiel::crossword_duel::TestCrosswordDuelGameManualPlayAndSerialization();
   open_spiel::crossword_duel::TestCrosswordDuelGameRandomSim("");
 
@@ -378,6 +506,8 @@ int main(int argc, char** argv) {
     open_spiel::crossword_duel::TestCreateCrosswordDuelGameRandomSim(
         word_list_file);
     open_spiel::crossword_duel::TestMultiWords(word_list_file);
+    open_spiel::crossword_duel::TestCrosswordDuelGameVerboseRandomSim(
+        word_list_file);
   } else {
     std::cerr << "No word_list_file specified. Skipping the random "
               << "simulations with a real dictionary. Pass "

@@ -248,6 +248,30 @@ Status CrosswordDuelState::ValidateActionStruct(
     return OkStatus();
   }
 
+  if (a.discard) {
+    std::string tiles = absl::AsciiStrToUpper(a.discard_tiles);
+    if (tiles.empty()) {
+      return ErrorStatus(
+          "Discard must specify at least one tile to exchange.");
+    }
+    if (static_cast<int>(bag_.size()) < static_cast<int>(tiles.size())) {
+      return ErrorStatus(
+          "Not enough tiles left in the bag to exchange that many.");
+    }
+    absl::flat_hash_map<char, int> rack_counts;
+    for (char c : racks_[mover]) rack_counts[c]++;
+    absl::flat_hash_map<char, int> needed;
+    for (char c : tiles) needed[c]++;
+    for (const auto& [letter, count] : needed) {
+      if (rack_counts[letter] < count) {
+        return ErrorStatus(absl::StrCat("Not enough '",
+                                        std::string(1, letter),
+                                        "' tiles in rack to discard."));
+      }
+    }
+    return OkStatus();
+  }
+
   std::string word = absl::AsciiStrToUpper(a.word);
   if (word.size() < kMinWordLength) {
     return ErrorStatus(absl::StrCat("Word must be at least ", kMinWordLength,
@@ -476,6 +500,21 @@ Status CrosswordDuelState::ApplyActionStruct(
     return OkStatus();
   }
 
+  if (a.discard) {
+    std::string tiles = absl::AsciiStrToUpper(a.discard_tiles);
+    for (char c : tiles) {
+      auto it = std::find(racks_[mover].begin(), racks_[mover].end(), c);
+      SPIEL_CHECK_TRUE(it != racks_[mover].end());
+      racks_[mover].erase(it);
+      bag_.push_back(c);
+    }
+    consecutive_passes_ = 0;
+    drawing_player_ = mover;
+    tiles_needed_ = static_cast<int>(tiles.size());
+    current_player_ = kChancePlayerId;
+    return OkStatus();
+  }
+
   int score = ComputeScoreAndApply(a, mover);
   scores_[mover] += score;
   consecutive_passes_ = 0;
@@ -503,6 +542,19 @@ std::string CrosswordDuelState::ActionToString(Player player,
                   "This game uses action structs only.");
 }
 
+void CrosswordDuelActionStructSampler::BuildWordsByLengthIfNeeded(
+    const absl::flat_hash_set<std::string>& word_set, int max_length) {
+  if (words_by_length_built_) return;
+  words_by_length_.assign(max_length + 1, {});
+  for (const std::string& w : word_set) {
+    if (static_cast<int>(w.size()) >= kMinWordLength &&
+        static_cast<int>(w.size()) <= max_length) {
+      words_by_length_[w.size()].push_back(w);
+    }
+  }
+  words_by_length_built_ = true;
+}
+
 std::unique_ptr<ActionStruct>
 CrosswordDuelActionStructSampler::SampleActionStruct() {
   const auto* duel_state = down_cast<const CrosswordDuelState*>(state_);
@@ -512,75 +564,6 @@ CrosswordDuelActionStructSampler::SampleActionStruct() {
   const CrosswordDuelBoard& board = parent_game->board();
   Player mover = state_->CurrentPlayer();
 
-  if (word_set.empty()) {
-    std::cerr << "Word set is empty, cannot sample action. "
-              << "Passing.\n";
-    auto pass = std::make_unique<CrosswordDuelActionStruct>(
-        0, 0, Direction::kAcross, "");
-    pass->pass = true;
-    return pass;
-  }
-
-  std::vector<std::pair<int, int>> anchors;
-  bool board_empty = duel_state->IsBoardEmpty();
-  if (board_empty) {
-    for (int r = 0; r < board.num_rows(); ++r) {
-      for (int c = 0; c < board.num_cols(); ++c) {
-        if (board.IsStartCell(r, c)) anchors.push_back({r, c});
-      }
-    }
-  } else {
-    static const int dr[4] = {-1, 1, 0, 0};
-    static const int dc[4] = {0, 0, -1, 1};
-    for (int r = 0; r < board.num_rows(); ++r) {
-      for (int c = 0; c < board.num_cols(); ++c) {
-        if (duel_state->CharAt(r, c) != kEmptyCell) continue;
-        for (int k = 0; k < 4; ++k) {
-          int nr = r + dr[k];
-          int nc = c + dc[k];
-          if (board.InBounds(nr, nc) &&
-              duel_state->CharAt(nr, nc) != kEmptyCell) {
-            anchors.push_back({r, c});
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  // Pre-filter the word list by rough rack feasibility before validating
-  // candidates -- with real dictionaries (10^5+ words) a plain uniform
-  // sample almost never lands on a word the rack can actually spell, so the
-  // sampler would degenerate into passing every turn. `excess` is the number
-  // of a word's letters (by multiset) that are NOT covered by the rack; on
-  // an empty board every letter must come from the rack (excess must be 0),
-  // while on a non-empty board some letters may be supplied by tiles already
-  // on the board, so a small slack is allowed.
-  constexpr int kMaxExcessLetters = 6;
-  const std::vector<char>& rack = duel_state->rack(mover);
-  std::array<int, 26> rack_counts{};
-  for (char c : rack) rack_counts[c - 'A']++;
-  int max_excess = board_empty ? 0 : kMaxExcessLetters;
-
-  std::vector<std::string> candidate_words;
-  std::array<int, 26> word_counts{};
-  for (const std::string& w : word_set) {
-    if (w.size() < kMinWordLength || w.size() > board.num_rows()) continue;
-    if (board_empty && w.size() > rack.size()) continue;
-
-    word_counts.fill(0);
-    for (char c : w) word_counts[c - 'A']++;
-    int excess = 0;
-    for (int i = 0; i < 26 && excess <= max_excess; ++i) {
-      if (word_counts[i] > rack_counts[i]) {
-        excess += word_counts[i] - rack_counts[i];
-      }
-    }
-    if (excess <= max_excess) {
-      candidate_words.push_back(w);
-    }
-  }
-
   auto make_pass = []() {
     auto pass = std::make_unique<CrosswordDuelActionStruct>(
         0, 0, Direction::kAcross, "");
@@ -588,31 +571,155 @@ CrosswordDuelActionStructSampler::SampleActionStruct() {
     return pass;
   };
 
-  if (anchors.empty() || candidate_words.empty()) {
+  if (word_set.empty()) {
+    std::cerr << "Word set is empty, cannot sample action. "
+              << "Passing.\n";
     return make_pass();
   }
 
-  constexpr int kMaxAttempts = 3000;
-  for (int attempt = 0; attempt < kMaxAttempts; ++attempt) {
-    const auto& [anchor_row, anchor_col] =
-        anchors[absl::Uniform<int>(rng_, 0, anchors.size())];
+  const int num_rows = board.num_rows();
+  const int num_cols = board.num_cols();
+  const int max_word_length = std::max(num_rows, num_cols);
+  BuildWordsByLengthIfNeeded(word_set, max_word_length);
+
+  const bool board_empty = duel_state->IsBoardEmpty();
+  const std::vector<char>& rack = duel_state->rack(mover);
+  std::array<int, 26> rack_counts{};
+  for (char c : rack) rack_counts[c - 'A']++;
+
+  // Try up to kMaxLineAttempts random lines. For each, cycle through the
+  // (randomly ordered) word list looking for a word of that exact length
+  // that both matches the letters already fixed on the board within the
+  // line and is spellable from the rack; the first such word that also
+  // passes full validation (which additionally checks cross words against
+  // the dictionary) is returned immediately.
+  constexpr int kMaxLineAttempts = 25;
+  for (int line_attempt = 0; line_attempt < kMaxLineAttempts;) {
     Direction direction = absl::Uniform<int>(rng_, 0, 2) == 0
                               ? Direction::kAcross
                               : Direction::kDown;
-    const std::string& word =
-        candidate_words[absl::Uniform<int>(rng_, 0, candidate_words.size())];
-    int offset = absl::Uniform<int>(rng_, 0, static_cast<int>(word.size()));
-    int row =
-        anchor_row - (direction == Direction::kDown ? offset : 0);
-    int col =
-        anchor_col - (direction == Direction::kAcross ? offset : 0);
+    int line_len_dim = (direction == Direction::kAcross) ? num_cols
+                                                          : num_rows;
+    int cross_len_dim = (direction == Direction::kAcross) ? num_rows
+                                                           : num_cols;
+    int cross = absl::Uniform<int>(rng_, 0, cross_len_dim);
+    int start = absl::Uniform<int>(rng_, 0, line_len_dim);
+    int max_len = line_len_dim - start;
+    if (max_len < kMinWordLength) continue;
+    int length = absl::Uniform<int>(rng_, kMinWordLength, max_len + 1);
 
-    auto candidate = std::make_unique<CrosswordDuelActionStruct>(
-        row, col, direction, word);
-    if (state_->ValidateActionStruct(*candidate).ok()) {
-      return candidate;
+    int row = (direction == Direction::kAcross) ? cross : start;
+    int col = (direction == Direction::kAcross) ? start : cross;
+
+    // The line must be maximal: no existing tile immediately before the
+    // start or immediately after the end.
+    int before_r = row - (direction == Direction::kDown ? 1 : 0);
+    int before_c = col - (direction == Direction::kAcross ? 1 : 0);
+    if (board.InBounds(before_r, before_c) &&
+        duel_state->CharAt(before_r, before_c) != kEmptyCell) {
+      continue;
+    }
+    int end_r = row + (direction == Direction::kDown ? length : 0);
+    int end_c = col + (direction == Direction::kAcross ? length : 0);
+    if (board.InBounds(end_r, end_c) &&
+        duel_state->CharAt(end_r, end_c) != kEmptyCell) {
+      continue;
+    }
+
+    // Build the fixed-letter pattern along the line and check that the line
+    // qualifies as an anchor: it must contain (or be adjacent to) an
+    // existing tile, or, on an empty board, cover the start cell.
+    std::string pattern(length, kEmptyCell);
+    bool touches_existing = false;
+    bool covers_start = false;
+    for (int i = 0; i < length; ++i) {
+      int r = row + (direction == Direction::kDown ? i : 0);
+      int c = col + (direction == Direction::kAcross ? i : 0);
+      char existing = duel_state->CharAt(r, c);
+      pattern[i] = existing;
+      if (existing != kEmptyCell) {
+        touches_existing = true;
+        continue;
+      }
+      if (board.IsStartCell(r, c)) covers_start = true;
+      int pr1 = r + (direction == Direction::kAcross ? -1 : 0);
+      int pc1 = c + (direction == Direction::kAcross ? 0 : -1);
+      int pr2 = r + (direction == Direction::kAcross ? 1 : 0);
+      int pc2 = c + (direction == Direction::kAcross ? 0 : 1);
+      if ((board.InBounds(pr1, pc1) &&
+           duel_state->CharAt(pr1, pc1) != kEmptyCell) ||
+          (board.InBounds(pr2, pc2) &&
+           duel_state->CharAt(pr2, pc2) != kEmptyCell)) {
+        touches_existing = true;
+      }
+    }
+    if (board_empty) {
+      if (!covers_start) continue;
+    } else if (!touches_existing) {
+      continue;
+    }
+
+    // Only count it as an attempt if we get this far.
+    line_attempt++;
+
+    if (length >= static_cast<int>(words_by_length_.size())) continue;
+    const std::vector<std::string>& words_of_length =
+        words_by_length_[length];
+    if (words_of_length.empty()) continue;
+
+    std::vector<const std::string*> candidates;
+    candidates.reserve(words_of_length.size());
+    for (const std::string& w : words_of_length) candidates.push_back(&w);
+    std::shuffle(candidates.begin(), candidates.end(), rng_);
+
+    for (const std::string* word_ptr : candidates) {
+      const std::string& word = *word_ptr;
+      bool pattern_ok = true;
+      std::array<int, 26> needed{};
+      for (int i = 0; i < length; ++i) {
+        if (pattern[i] != kEmptyCell && pattern[i] != word[i]) {
+          pattern_ok = false;
+          break;
+        }
+        if (pattern[i] == kEmptyCell) needed[word[i] - 'A']++;
+      }
+      if (!pattern_ok) continue;
+
+      bool affordable = true;
+      for (int i = 0; i < 26; ++i) {
+        if (needed[i] > rack_counts[i]) {
+          affordable = false;
+          break;
+        }
+      }
+      if (!affordable) continue;
+
+      auto candidate = std::make_unique<CrosswordDuelActionStruct>(
+          row, col, direction, word);
+      if (state_->ValidateActionStruct(*candidate).ok()) {
+        return candidate;
+      }
     }
   }
+
+  // No legal word placement found after kMaxLineAttempts random lines.
+  // Prefer discarding tiles (exchanging them for new ones from the bag)
+  // over passing outright.
+  if (!rack.empty() && duel_state->bag_size() > 0) {
+    int num_to_discard = std::min<int>(rack.size(), duel_state->bag_size());
+    std::vector<char> shuffled_rack(rack.begin(), rack.end());
+    std::shuffle(shuffled_rack.begin(), shuffled_rack.end(), rng_);
+    std::string discard_tiles(shuffled_rack.begin(),
+                              shuffled_rack.begin() + num_to_discard);
+    auto discard = std::make_unique<CrosswordDuelActionStruct>(
+        0, 0, Direction::kAcross, "");
+    discard->discard = true;
+    discard->discard_tiles = discard_tiles;
+    if (state_->ValidateActionStruct(*discard).ok()) {
+      return discard;
+    }
+  }
+
   return make_pass();
 }
 

@@ -330,13 +330,15 @@ class GamesCrosswordDuelTest(absltest.TestCase):
   def test_action_struct_from_json(self):
     action = crossword_duel.CrosswordDuelActionStruct(
         '{"row": 7, "col": 7, "direction": "across", "word": "CAT", '
-        '"pass": false}'
+        '"pass": false, "discard": false, "discard_tiles": ""}'
     )
     self.assertEqual(action.row, 7)
     self.assertEqual(action.col, 7)
     self.assertEqual(action.direction, crossword_duel.Direction.ACROSS)
     self.assertEqual(action.word, "CAT")
     self.assertFalse(action.pass_)
+    self.assertFalse(action.discard)
+    self.assertEqual(action.discard_tiles, "")
 
   def test_action_struct_from_dict(self):
     action = crossword_duel.CrosswordDuelActionStruct({
@@ -345,12 +347,70 @@ class GamesCrosswordDuelTest(absltest.TestCase):
         "direction": "down",
         "word": "DOG",
         "pass": False,
+        "discard": False,
+        "discard_tiles": "",
     })
     self.assertEqual(action.row, 3)
     self.assertEqual(action.col, 5)
     self.assertEqual(action.direction, crossword_duel.Direction.DOWN)
     self.assertEqual(action.word, "DOG")
     self.assertFalse(action.pass_)
+    self.assertFalse(action.discard)
+    self.assertEqual(action.discard_tiles, "")
+
+  def test_discard_tiles(self):
+    # Forces player 0's rack to hold known letters, then discards some of
+    # them and checks: (1) the discarded tiles leave the rack and go back
+    # into the bag; (2) a chance node is triggered to redraw the same
+    # number of tiles; (3) after redrawing, the rack is back to 7 tiles;
+    # and (4) discarding a letter not in the rack is rejected.
+    game = pyspiel.load_game("crossword_duel")
+    state = game.new_initial_state()
+
+    forced_p0 = list("CAT")
+    i0 = 0
+    while state.is_chance_node():
+      dealing_to_p0 = len(state.rack(0)) < 7
+      if dealing_to_p0 and i0 < len(forced_p0):
+        self.apply_forced_chance_letter(state, forced_p0[i0])
+        i0 += 1
+      else:
+        self.apply_any_chance_letter(state)
+    self.assertLen(state.rack(0), 7)
+    self.assertEqual(state.current_player(), 0)
+
+    bag_size_before = state.bag_size()
+
+    # Discarding a letter not in the rack should be rejected.
+    illegal_discard = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, ""
+    )
+    illegal_discard.discard = True
+    illegal_discard.discard_tiles = "Z" * 8
+    status = state.validate_action_struct(illegal_discard)
+    self.assertFalse(status.ok())
+
+    discard_action = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, ""
+    )
+    discard_action.discard = True
+    discard_action.discard_tiles = "CAT"
+    status = state.validate_action_struct(discard_action)
+    self.assertTrue(status.ok())
+    status = state.apply_action_struct(discard_action)
+    self.assertTrue(status.ok())
+
+    self.assertLen(state.rack(0), 4)
+    # The 3 discarded tiles go back into the bag immediately; they come back
+    # out again as the redraw chance nodes are resolved below.
+    self.assertEqual(state.bag_size(), bag_size_before + 3)
+    self.assertTrue(state.is_chance_node())
+
+    while state.is_chance_node():
+      self.apply_any_chance_letter(state)
+    self.assertLen(state.rack(0), 7)
+    self.assertEqual(state.bag_size(), bag_size_before)
+    self.assertEqual(state.current_player(), 1)
 
   def test_default_random_sim(self):
     # Only 10 words in the default word list, so most random games end

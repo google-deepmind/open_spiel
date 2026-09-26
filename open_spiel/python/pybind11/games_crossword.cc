@@ -155,6 +155,9 @@ void open_spiel::init_pyspiel_games_crossword(py::module& m) {
       .def_readwrite("word", &CrosswordDuelActionStruct::word)
       // "pass" is a reserved keyword in Python, so it is exposed as "pass_".
       .def_readwrite("pass_", &CrosswordDuelActionStruct::pass)
+      .def_readwrite("discard", &CrosswordDuelActionStruct::discard)
+      .def_readwrite("discard_tiles",
+                     &CrosswordDuelActionStruct::discard_tiles)
       .def("to_string", &CrosswordDuelActionStruct::ToString)
       .def("__str__", &CrosswordDuelActionStruct::ToString);
 
