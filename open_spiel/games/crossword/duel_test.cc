@@ -488,26 +488,26 @@ void TestMultiWords(const std::string& word_list_file) {
 }  // namespace crossword_duel
 }  // namespace open_spiel
 
+namespace cd = open_spiel::crossword_duel;
+
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   open_spiel::Init(argv[0], &argc, &argv, false);
-  open_spiel::crossword_duel::TestCrosswordDuelGameDefaultWordList();
-  open_spiel::crossword_duel::TestCreateCrosswordDuelGame();
-  open_spiel::crossword_duel::TestCrosswordDuelGameDealAndFirstMove();
-  open_spiel::crossword_duel::TestCrosswordDuelGameLegalAndIllegalPlacements();
-  open_spiel::crossword_duel::TestCrosswordDuelGameBagEmptyDoesNotEndGame();
-  open_spiel::crossword_duel::TestCrosswordDuelGamePassesEndGameRegardlessOfBag();
-  open_spiel::crossword_duel::TestCrosswordDuelGameManualPlayAndSerialization();
-  open_spiel::crossword_duel::TestCrosswordDuelGameRandomSim("");
+  cd::TestCrosswordDuelGameDefaultWordList();
+  cd::TestCreateCrosswordDuelGame();
+  cd::TestCrosswordDuelGameDealAndFirstMove();
+  cd::TestCrosswordDuelGameLegalAndIllegalPlacements();
+  cd::TestCrosswordDuelGameBagEmptyDoesNotEndGame();
+  cd::TestCrosswordDuelGamePassesEndGameRegardlessOfBag();
+  cd::TestCrosswordDuelGameManualPlayAndSerialization();
+  cd::TestCrosswordDuelGameRandomSim("");
 
   std::string word_list_file = absl::GetFlag(FLAGS_word_list_file);
   if (!word_list_file.empty()) {
-    open_spiel::crossword_duel::TestCrosswordDuelGameRandomSim(word_list_file);
-    open_spiel::crossword_duel::TestCreateCrosswordDuelGameRandomSim(
-        word_list_file);
-    open_spiel::crossword_duel::TestMultiWords(word_list_file);
-    open_spiel::crossword_duel::TestCrosswordDuelGameVerboseRandomSim(
-        word_list_file);
+    cd::TestCrosswordDuelGameRandomSim(word_list_file);
+    cd::TestCreateCrosswordDuelGameRandomSim(word_list_file);
+    cd::TestMultiWords(word_list_file);
+    cd::TestCrosswordDuelGameVerboseRandomSim(word_list_file);
   } else {
     std::cerr << "No word_list_file specified. Skipping the random "
               << "simulations with a real dictionary. Pass "
