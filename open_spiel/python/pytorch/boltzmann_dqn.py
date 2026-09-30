@@ -67,15 +67,18 @@ class BoltzmannDQN(dqn.DQN):
     )
     q_values = network(info_state).detach().squeeze(0)
 
-    illegal_actions_mask = torch.logical_not(
-        torch.BoolTensor(legal_actions, device=self._device)
+    illegal_actions_mask = torch.ones(
+        self._num_actions, dtype=torch.bool, device=self._device
     )
-    legal_q_values = q_values.masked_fill(
+    illegal_actions_mask[legal_actions] = False
+    # Apply temperature and subtract the maximum value for numerical stability.
+    temp = q_values / self._temperature
+    # The penalty is applied after the coefficients, as a zero coefficient would
+    # otherwise cancel it and leave illegal actions with a non-zero probability.
+    logits = (coeff * temp).masked_fill(
         illegal_actions_mask, dqn.ILLEGAL_ACTION_LOGITS_PENALTY
     )
-    # Apply temperature and subtract the maximum value for numerical stability.
-    temp = legal_q_values / self._temperature
-    probs = F.softmax(coeff * temp, -1).detach().cpu().numpy()
+    probs = F.softmax(logits, -1).detach().cpu().numpy()
     action = np.random.choice(np.arange(self._num_actions), p=probs)
     return action, probs
 
