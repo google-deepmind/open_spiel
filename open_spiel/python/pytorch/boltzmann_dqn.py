@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Boltzmann DQN agent implemented in JAX.
+"""Boltzmann DQN agent implemented in PyTorch.
 
 This algorithm is a variation of DQN that uses a softmax policy directly with
 the unregularized action-value function. See https://arxiv.org/abs/2102.01585.
@@ -29,7 +29,7 @@ from open_spiel.python.pytorch import dqn
 
 
 class BoltzmannDQN(dqn.DQN):
-  """Boltzmann DQN implementation in JAX."""
+  """Boltzmann DQN implementation in PyTorch."""
 
   def __init__(self, *args, eta: float = 1.0, **kwargs):
     """Initializes the Boltzmann DQN agent.
