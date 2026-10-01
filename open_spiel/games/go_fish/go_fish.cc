@@ -256,7 +256,7 @@ void GoFishState::DoApplyAction(Action move_id) {
     bool hit = phase_ == kFish && rank == last_ask_;
     --pool_[rank];
     player_cards_[current_player_][rank] += 1;
-    Event event(current_player_, kInvalidPlayer, rank, 1, -1);
+    Event event(current_player_, rank, -1, hit);
     for (int rank0 = 0; rank0 < ranks_; ++rank0) {
       if (player_was_asked_[current_player_][rank0]) {
         drawn_since_was_asked_[current_player_][rank0] += 1;
