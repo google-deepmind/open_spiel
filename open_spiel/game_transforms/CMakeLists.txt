@@ -7,6 +7,8 @@ add_library (game_transforms OBJECT
   coop_to_1p.h
   efg_writer.cc
   efg_writer.h
+  extra_info_game.cc
+  extra_info_game.h
   misere.cc
   misere.h
   normal_form_extensive_game.cc
@@ -41,6 +43,13 @@ add_executable(misere_test
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(misere_test misere_test)
+
+
+add_executable(extra_info_game_test
+               extra_info_game_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(extra_info_game_test extra_info_game_test)
 
 add_executable(add_noise_test
                add_noise_test.cc

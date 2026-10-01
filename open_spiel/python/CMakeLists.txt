@@ -63,6 +63,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_connect_four.h
   pybind11/games_dots_and_boxes.cc
   pybind11/games_dots_and_boxes.h
+  pybind11/games_extra_info.cc
+  pybind11/games_extra_info.h
   pybind11/games_euchre.cc
   pybind11/games_euchre.h
   pybind11/games_gin_rummy.cc
@@ -295,6 +297,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_crazyhouse_test.py
   tests/games_crossword_test.py
   tests/games_euchre_test.py
+  tests/games_extra_info_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
   tests/games_gomoku_test.py

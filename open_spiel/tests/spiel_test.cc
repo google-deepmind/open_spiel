@@ -344,7 +344,7 @@ void ConcreteGamesTest() {
   // Note: not intended to be an exhaustive list.
   std::vector<std::string> non_concrete_game_names = {
       "add_noise",     "cached_tree",
-      "coop_to_1p",    "efg_game",
+      "coop_to_1p",    "efg_game", "extra_info",
       "misere",        "normal_form_extensive_game",
       "repeated_game", "restricted_nash_response",
       "start_at",      "turn_based_simultaneous_game",
