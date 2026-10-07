@@ -112,6 +112,11 @@ def _simplex_projection(updated_strategy, gamma=0.0):
   """
 
   n = len(updated_strategy)
+  if n * gamma > 1:
+    raise ValueError("gamma is too large for the number of actions.")
+  if n * gamma == 1:
+    # Every component is fixed when the lower bounds use all probability mass.
+    return np.full(n, gamma)
   idx = np.arange(1, n + 1)
   u = np.sort(updated_strategy)[::-1]
   u_tmp = (1 - np.cumsum(u) - (n - idx) * gamma) / idx
