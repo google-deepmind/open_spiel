@@ -313,6 +313,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
+  utils/stats_test.py
   voting/approval_test.py
   voting/base_test.py
   voting/borda_test.py
