@@ -33,6 +33,8 @@ std::string Status::ToString() const {
       return "OkStatus";
     case StatusValue::kError:
       return "ErrorStatus: " + message_;
+    default:
+      return "UnknownStatus";
   }
 }
 

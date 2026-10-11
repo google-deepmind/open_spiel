@@ -27,10 +27,14 @@ works with that (e.g. CFR algorithms). It is likely to be poor if the algorithm
 relies on processing and updating states as it goes, e.g., MCTS.
 """
 
+from typing import Any
+
 import numpy as np
 
 from open_spiel.python.observation import IIGObserverForPublicInfoGame
 import pyspiel
+
+JsonDict = dict[str, Any]
 
 _NUM_PLAYERS = 2
 _NUM_ROWS = 3
@@ -67,9 +71,14 @@ class TicTacToeGame(pyspiel.Game):
   def __init__(self, params=None):
     super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
 
-  def new_initial_state(self):
-    """Returns a state corresponding to the start of a game."""
-    return TicTacToeState(self)
+  def new_initial_state(self, state=None):
+    """Returns a state corresponding to the start of a game.
+
+    Args:
+      state: None for a fresh initial state, a dict (from to_dict), or a
+        StateStruct (from to_struct) to reconstruct a state.
+    """
+    return TicTacToeState(self, state=state)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns an object used for observing game state."""
@@ -83,13 +92,72 @@ class TicTacToeGame(pyspiel.Game):
 class TicTacToeState(pyspiel.State):
   """A python version of the Tic-Tac-Toe state."""
 
-  def __init__(self, game):
+  def __init__(
+      self,
+      game: TicTacToeGame,
+      state: pyspiel.StateStruct | JsonDict | None = None,
+  ) -> None:
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
     self._cur_player = 0
     self._player0_score = 0.0
     self._is_terminal = False
     self.board = np.full((_NUM_ROWS, _NUM_COLS), ".")
+
+    if state is None:
+      return
+
+    if isinstance(state, pyspiel.StateStruct):
+      state = state.to_dict()
+    board = state["board"]
+    if len(board) != _NUM_CELLS:
+      raise ValueError(
+          f"Invalid board size: expected {_NUM_CELLS}, got {len(board)}"
+      )
+    char_map = {".": ".", "x": "x", "o": "o", "empty": "."}
+    for i, cell in enumerate(board):
+      self.board[_coord(i)] = char_map.get(cell, cell)
+    num_x = sum(1 for c in self.board.ravel() if c == "x")
+    num_o = sum(1 for c in self.board.ravel() if c == "o")
+    if num_x < num_o or num_x > num_o + 1:
+      raise ValueError(f"Invalid board: x={num_x}, o={num_o}")
+    self._cur_player = 0 if num_x == num_o else 1
+
+    x_wins = _has_line(self.board, "x")
+    o_wins = _has_line(self.board, "o")
+
+    if x_wins and o_wins:
+      raise ValueError("Invalid board state: both players have a line.")
+
+    if x_wins:
+      if num_x != num_o + 1:
+        raise ValueError(
+            "Invalid board state: x has a line, but number of pieces is "
+            f"inconsistent, got x={num_x}, o={num_o}"
+        )
+      self._is_terminal = True
+      self._player0_score = 1.0
+    elif o_wins:
+      if num_x != num_o:
+        raise ValueError(
+            "Invalid board state: o has a line, but number of pieces is "
+            f"inconsistent, got x={num_x}, o={num_o}"
+        )
+      self._is_terminal = True
+      self._player0_score = -1.0
+    elif all(self.board.ravel() != "."):
+      self._is_terminal = True
+
+    if "current_player" in state:
+      if self._is_terminal:
+        expected_player_str = "Terminal"
+      else:
+        expected_player_str = "x" if self._cur_player == 0 else "o"
+      if state["current_player"] != expected_player_str:
+        raise ValueError(
+            f"Invalid current player: expected {expected_player_str}, "
+            f"got {state['current_player']}"
+        )
 
   # OpenSpiel (PySpiel) API functions are below. This is the standard set that
   # should be implemented by every perfect-information sequential-move game.
@@ -130,6 +198,38 @@ class TicTacToeState(pyspiel.State):
     """String for debug purposes. No particular semantics are required."""
     return _board_to_string(self.board)
 
+  # SpielStruct API methods (optional). These return plain Python dicts that
+  # the C++ trampoline wraps as DictStateStruct / DictActionStruct /
+  # DictObservationStruct objects, enabling JSON serialization and the
+  # full struct-based action API (validate_action_struct, apply_action_struct).
+
+  def _to_struct(self):
+    """Returns a dict representation of the state."""
+    cell_names = {".": ".", "x": "x", "o": "o"}
+    if self.is_terminal():
+      current_player_str = "Terminal"
+    else:
+      current_player_str = "x" if self._cur_player == 0 else "o"
+    return {
+        "current_player": current_player_str,
+        "board": [cell_names[self.board[_coord(i)]] for i in range(_NUM_CELLS)],
+    }
+
+  def _action_to_struct(self, player, action):
+    """Converts an action integer to a dict with row/col fields."""
+    del player  # Unused.
+    row, col = _coord(action)
+    return {"row": row, "col": col}
+
+  def _struct_to_actions(self, action_dict):
+    """Converts an action dict back to a list of integer actions."""
+    return [action_dict["row"] * _NUM_COLS + action_dict["col"]]
+
+  def _to_observation_struct(self, player):
+    """Returns a dict observation from the perspective of `player`."""
+    del player  # Unused.
+    return self._to_struct()
+
 
 class BoardObserver:
   """Observer, conforming to the PyObserver interface (see observation.py)."""
@@ -166,19 +266,27 @@ class BoardObserver:
 # Helper functions for game details.
 
 
-def _line_value(line):
-  """Checks a possible line, returning the winning symbol if any."""
-  if all(line == "x") or all(line == "o"):
-    return line[0]
+def _has_line(board, player):
+  """Checks if the player has a line."""
+  return (
+      all(board[0] == player)
+      or all(board[1] == player)
+      or all(board[2] == player)
+      or all(board[:, 0] == player)
+      or all(board[:, 1] == player)
+      or all(board[:, 2] == player)
+      or all(board.diagonal() == player)
+      or all(np.fliplr(board).diagonal() == player)
+  )
 
 
 def _line_exists(board):
   """Checks if a line exists, returns "x" or "o" if so, and None otherwise."""
-  return (_line_value(board[0]) or _line_value(board[1]) or
-          _line_value(board[2]) or _line_value(board[:, 0]) or
-          _line_value(board[:, 1]) or _line_value(board[:, 2]) or
-          _line_value(board.diagonal()) or
-          _line_value(np.fliplr(board).diagonal()))
+  if _has_line(board, "x"):
+    return "x"
+  if _has_line(board, "o"):
+    return "o"
+  return None
 
 
 def _coord(move):

@@ -213,6 +213,7 @@ std::vector<Action> TarokState::LegalActions() const {
     case GamePhase::kFinished:
       return {};
   }
+  SpielFatalError("Unknown phase");
 }
 
 std::vector<Action> TarokState::LegalActionsInBidding() const {
@@ -336,7 +337,7 @@ std::vector<Action> TarokState::TakeSuitFromPlayerCardsInNegativeContracts(
     return {kPagatAction};
   }
 
-  absl::optional<Action> action_to_beat = ActionToBeatInNegativeContracts(suit);
+  std::optional<Action> action_to_beat = ActionToBeatInNegativeContracts(suit);
   std::vector<Action> actions;
 
   if (action_to_beat) {
@@ -371,7 +372,7 @@ std::vector<Action> TarokState::TakeSuitFromPlayerCardsInNegativeContracts(
     return actions;
 }
 
-absl::optional<Action> TarokState::ActionToBeatInNegativeContracts(
+std::optional<Action> TarokState::ActionToBeatInNegativeContracts(
     CardSuit suit) const {
   // there are two cases where no card has to be beaten; the player is following
   // a colour suit and there is already at least one tarok in trick_cards_ or
@@ -442,6 +443,7 @@ std::string TarokState::ActionToString(Player player, Action action_id) const {
     case GamePhase::kFinished:
       return "";
   }
+  SpielFatalError("Unknown phase");
 }
 
 std::string TarokState::CardActionToString(Action action_id) const {
@@ -1032,6 +1034,7 @@ std::string GamePhaseToString(const GamePhase& game_phase) {
     case GamePhase::kFinished:
       return "Finished";
   }
+  SpielFatalError("Unknown phase");
 }
 
 }  // namespace tarok

@@ -68,14 +68,14 @@ class OptimizerModel:
 
   def get_optimizer_model(self):
     schedule_fn = self.lr_scheduler(self.learning_rate)
-    opt_init, self.opt_update = optax.chain(
+    opt_init, self.opt_update = optax.chain(  # pyrefly: ignore[bad-assignment]
         optax.scale_by_adam(), optax.scale_by_schedule(schedule_fn),
         optax.scale(-self.learning_rate))
     rng = jax.random.PRNGKey(10)
     dummy_input = np.random.normal(
         loc=0, scale=10., size=(FLAGS.batch_size, 1, FLAGS.num_actions))
-    self.net_params = self._net_init(rng, dummy_input)
-    self.opt_state = opt_init(self.net_params)
+    self.net_params = self._net_init(rng, dummy_input)  # pyrefly: ignore[bad-assignment]
+    self.opt_state = opt_init(self.net_params)  # pyrefly: ignore[bad-argument-type, bad-assignment]
 
 
 class MetaSelfplayAgent:
@@ -95,7 +95,7 @@ class MetaSelfplayAgent:
     self.regret_sum = jnp.zeros(shape=[FLAGS.batch_size, 1, FLAGS.num_actions])
 
   def initial_policy(self):
-    x = self.net_apply(self.net_params, None, self.regret_sum)
+    x = self.net_apply(self.net_params, None, self.regret_sum)  # pyrefly: ignore[not-callable]
     self.last_policy = jax.nn.softmax(x)
     self.step += 1
     return self.last_policy
@@ -103,9 +103,9 @@ class MetaSelfplayAgent:
   def next_policy(self, last_values):
     value = jnp.matmul(self.last_policy, last_values)
     curren_regret = jnp.transpose(last_values, [0, 2, 1]) - value
-    self.regret_sum += curren_regret
+    self.regret_sum += curren_regret  # pyrefly: ignore[unsupported-operation]
 
-    x = self.net_apply(self.net_params, None, self.regret_sum / (self.step + 1))
+    x = self.net_apply(self.net_params, None, self.regret_sum / (self.step + 1))  # pyrefly: ignore[not-callable]
     self.last_policy = jax.nn.softmax(x)
     self.step += 1
     return self.last_policy
@@ -124,9 +124,9 @@ class MetaSelfplayAgent:
           has_aux=False)(optimizer.net_params, optimizer.net_apply,
                          batch_payoff, self.training_epochs)
 
-      updates, optimizer.opt_state = optimizer.opt_update(
+      updates, optimizer.opt_state = optimizer.opt_update(  # pyrefly: ignore[not-callable]
           grads, optimizer.opt_state)
-      optimizer.net_params = optax.apply_updates(optimizer.net_params, updates)
+      optimizer.net_params = optax.apply_updates(optimizer.net_params, updates)  # pyrefly: ignore[bad-argument-type, bad-assignment]
 
     self.net_apply = optimizer.net_apply
     self.net_params = optimizer.net_params

@@ -140,6 +140,7 @@ class KriegspielState : public State {
   bool IsTerminal() const override { return MaybeFinalReturns().has_value(); }
 
   std::vector<double> Returns() const override;
+  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;

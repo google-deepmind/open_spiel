@@ -100,4 +100,4 @@ def solve_least_core_lp(
   _ = prob.solve(solver=cp.SCS, eps=1e-6)
   # The optimal value for x is stored in `x.value`.
 
-  return x.value, e.value
+  return x.value, e.value  # pyrefly: ignore[bad-return]

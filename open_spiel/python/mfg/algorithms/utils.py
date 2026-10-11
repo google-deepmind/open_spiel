@@ -69,7 +69,7 @@ class MergedPolicy(policy_std.Policy):
     for a in legal:
       merged_pi = 0.0
       norm_merged_pi = 0.0
-      for p, d, w in zip(self._policies, self._distributions, self._weights):
+      for p, d, w in zip(self._policies, self._distributions, self._weights):  # pyrefly: ignore[bad-argument-type]
         merged_pi += w * d(state) * p(state)[a]
         norm_merged_pi += w * d(state)
       if norm_merged_pi > 0.0:

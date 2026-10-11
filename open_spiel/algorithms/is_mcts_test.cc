@@ -17,6 +17,8 @@
 #include <random>
 
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/time/clock.h"
+#include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
@@ -97,6 +99,31 @@ void ISMCTS_LeducObservationTest() {
       algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount, true, true);
   PlayGame(*game, bot.get(), &rng);
 }
+void ISMCTSTest_WallClockTimeLimit() {
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
+  auto evaluator =
+      std::make_shared<algorithms::RandomRolloutEvaluator>(1, kSeed);
+  double max_wall_clock_time = 0.1;  // 100 ms
+  int max_simulations = 10000000;
+
+  algorithms::ISMCTSBot bot(kSeed, evaluator, 5.0, max_simulations,
+                            max_wall_clock_time);
+
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::mt19937 rng(kSeed);
+  while (state->IsChanceNode()) {
+    Action chosen_action =
+        SampleAction(state->ChanceOutcomes(), absl::Uniform(rng, 0.0, 1.0))
+            .first;
+    state->ApplyAction(chosen_action);
+  }
+
+  absl::Time start = absl::Now();
+  bot.RunSearch(*state);
+  double duration = absl::ToDoubleSeconds(absl::Now() - start);
+
+  SPIEL_CHECK_LE(duration, max_wall_clock_time * 5.0);
+}
 
 }  // namespace
 }  // namespace open_spiel
@@ -105,4 +132,5 @@ int main(int argc, char** argv) {
   open_spiel::ISMCTS_BasicPlayGameTest_Kuhn();
   open_spiel::ISMCTS_BasicPlayGameTest_Leduc();
   open_spiel::ISMCTS_LeducObservationTest();
+  open_spiel::ISMCTSTest_WallClockTimeLimit();
 }

@@ -33,6 +33,8 @@ void BasicColoredTrailsTests() {
 
   // Game creation and legal actions are fairly heavy, so only run 1 sim.
   testing::RandomSimTest(*LoadGame("colored_trails"), 1);
+
+  testing::ResampleInfostateTest(*LoadGame("colored_trails"), /*num_sims=*/10);
 }
 
 }  // namespace

@@ -50,7 +50,7 @@ void BasicAntichessTests() {
 }
 
 void ApplySANMove(const char* move_san, AntichessState* state) {
-  absl::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
+  std::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
   state->ApplyAction(antichess::MoveToAction(*maybe_move));
 }

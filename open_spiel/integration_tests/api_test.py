@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.integration_tests.api."""
-
 import enum
 import re
 import unittest
@@ -37,10 +35,17 @@ flags.DEFINE_string("test_only_games", ".*",
 
 _ALL_GAMES = pyspiel.registered_games()
 
-_GAMES_TO_TEST = set([g.short_name for g in _ALL_GAMES if g.default_loadable])
+_GAMES_TO_TEST = set(
+    [
+        g.short_name
+        for g in _ALL_GAMES
+        if g.default_loadable and not g.action_structs_only
+    ]
+)
 
 _GAMES_NOT_UNDER_TEST = [
-    g.short_name for g in _ALL_GAMES if not g.default_loadable
+    g.short_name for g in _ALL_GAMES if (not g.default_loadable or
+                                         g.action_structs_only)
 ]
 
 _GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK = set(["bridge_uncontested_bidding"])

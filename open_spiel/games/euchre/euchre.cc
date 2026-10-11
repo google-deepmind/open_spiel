@@ -596,7 +596,7 @@ void EuchreState::ApplyBiddingAction(int action) {
 void EuchreState::ApplyDiscardAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
   discard_ = card;
-  holder_[card] = absl::nullopt;
+  holder_[card] = std::nullopt;
   phase_ = Phase::kGoAlone;
   current_player_ = declarer_;
 }
@@ -652,7 +652,7 @@ void EuchreState::ApplyGoAloneAction(int action) {
 
 void EuchreState::ApplyPlayAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
-  holder_[card] = absl::nullopt;
+  holder_[card] = std::nullopt;
   if (num_cards_played_ % num_active_players_ == 0) {
     CurrentTrick() = Trick(current_player_, trump_suit_, card);
   } else {

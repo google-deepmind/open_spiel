@@ -16,7 +16,7 @@
 
 from typing import Any
 
-import jax
+import jax  # pyrefly: ignore[missing-import]
 import numpy as np
 
 from open_spiel.python.algorithms import mcts

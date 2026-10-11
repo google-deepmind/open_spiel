@@ -539,7 +539,7 @@ class MFGCrowdAvoidanceState(pyspiel.State):
       return [0.0] * self.num_players()
     densities = np.array(
         [
-            self.get_pos_proba(self._pos, population)
+            self.get_pos_proba(self._pos, population)  # pyrefly: ignore[bad-argument-type]
             for population in range(self.num_players())
         ],
         dtype=np.float64,
@@ -547,10 +547,10 @@ class MFGCrowdAvoidanceState(pyspiel.State):
     rew = -self.coef_congestion * np.dot(self.congestion_matrix, densities)
     # Rewards for target positions.
     rew[0] += self.coef_target * np.array_equal(
-        self._pos, self.target_positions[0]
+        self._pos, self.target_positions[0]  # pyrefly: ignore[bad-argument-type]
     )
     rew[1] += self.coef_target * np.array_equal(
-        self._pos, self.target_positions[1]
+        self._pos, self.target_positions[1]  # pyrefly: ignore[bad-argument-type]
     )
     return list(rew)
 

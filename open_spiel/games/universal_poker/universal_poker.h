@@ -86,15 +86,7 @@ struct UniversalPokerStateStruct : StateStruct {
   std::vector<std::string> best_five_card_hands;
   std::vector<double> odds;
 
-  UniversalPokerStateStruct() = default;
-  explicit UniversalPokerStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override {
-    return *this;
-  }
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(
+  SPIEL_STRUCT_BOILERPLATE(
       UniversalPokerStateStruct, acpc_state, current_player, blinds,
       betting_history, player_contributions, pot_size, starting_stacks,
       player_hands, board_cards, best_hand_rank_types,

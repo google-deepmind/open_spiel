@@ -233,5 +233,16 @@ class GamesTicTacToeTest(parameterized.TestCase):
     )
     self.assertEmpty(state_after_serialization.history())
 
+  def test_state_struct_constructor(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    state = game.new_initial_state()
+    for action in [0, 3, 1, 4, 5, 6, 2]:
+      state_struct = state.to_struct()
+      # get a clone by using the new_initial_state(state_struct) constructor
+      state_clone = game.new_initial_state(state_struct)
+      self.assertEqual(str(state), str(state_clone))
+      state.apply_action(action)
+
+
 if __name__ == "__main__":
   absltest.main()

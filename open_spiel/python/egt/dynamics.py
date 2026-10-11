@@ -164,7 +164,7 @@ class MultiPopulationDynamics(object):
       fitness = np.moveaxis(self.payoff_tensor[i], i, 0)
       # marginalize out all other populations
       for i_ in set(range(n)) - {i}:
-        fitness = np.tensordot(states[i_], fitness, axes=[0, 1])
+        fitness = np.tensordot(states[i_], fitness, axes=[0, 1])  # pyrefly: ignore[no-matching-overload]
       dstates[i] = self.dynamics[i](states[i], fitness)
 
     return np.concatenate(dstates)

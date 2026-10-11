@@ -40,6 +40,11 @@ _AVAILABLE_GAMES = set(pyspiel.registered_names())
 # Run `generate_new_playthrough.sh $GAME` to add a playthrough.
 _MISSING_GAMES = set(["nfg_game", "efg_game", "restricted_nash_response"])
 
+# These games only support action structs and are not supported by the
+# playthroughs yet, so we exclude them from the test for now.
+_ACTION_STRUCT_ONLY_GAMES = set(["crossword"])
+
+
 # Regex to find the game name in a playthrough. This will return the name of the
 # transform for wrapped games, e.g. goofspiel --> turn_based_simultaneous_game
 _SHORTNAME = r'^GameType\.short_name = "(.*)"$'
@@ -96,7 +101,7 @@ class PlaythroughTest(absltest.TestCase):
     basenames = set(os.listdir(path))
     missing_games = set(_AVAILABLE_GAMES) - set(_MISSING_GAMES) - set(
         _playthrough_match(os.path.join(path, basename), _SHORTNAME)[1]
-        for basename in basenames)
+        for basename in basenames) - set(_ACTION_STRUCT_ONLY_GAMES)
     self.assertEmpty(
         missing_games,
         msg="These games do not have playthroughs."

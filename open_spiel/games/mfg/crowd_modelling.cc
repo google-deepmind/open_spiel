@@ -273,7 +273,7 @@ std::unique_ptr<State> CrowdModellingGame::DeserializeState(
     SPIEL_CHECK_TRUE(absl::SimpleAtod(v, &parsed_weight));
     distribution.push_back(parsed_weight);
   }
-  return absl::make_unique<CrowdModellingState>(
+  return std::make_unique<CrowdModellingState>(
       shared_from_this(), size_, horizon_, current_player, is_chance_init, x, t,
       last_action, return_value, distribution);
 }

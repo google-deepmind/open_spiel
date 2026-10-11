@@ -213,7 +213,7 @@ const GameType kGameType{
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
-  return absl::make_unique<UniversalPokerGame>(params);
+  return std::make_unique<UniversalPokerGame>(params);
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -595,7 +595,7 @@ std::string UniversalPokerState::ObservationString(Player player) const {
 }
 
 std::unique_ptr<State> UniversalPokerState::Clone() const {
-  return absl::make_unique<UniversalPokerState>(*this);
+  return std::make_unique<UniversalPokerState>(*this);
 }
 
 
@@ -1118,7 +1118,7 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   logic::CardSet fresh_deck(/*num_suits=*/acpc_game_->NumSuitsDeck(),
                             /*num_ranks=*/acpc_game_->NumRanksDeck());
   for (uint8_t card : is_cards.ToCardArray()) fresh_deck.RemoveCard(card);
-  auto dist = absl::make_unique<HistoryDistribution>();
+  auto dist = std::make_unique<HistoryDistribution>();
 
   const std::vector<uint8_t> deck_cards = fresh_deck.ToCardArray();
   const int deck_size = deck_cards.size();
@@ -1293,7 +1293,7 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
 }
 
 std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
-  return absl::make_unique<UniversalPokerState>(shared_from_this());
+  return std::make_unique<UniversalPokerState>(shared_from_this());
 }
 
 std::vector<int> UniversalPokerGame::InformationStateTensorShape() const {

@@ -44,14 +44,14 @@ void TestNodesFromRoadSection() {
 }
 
 void TestVehicleInstanciation1() {
-  auto vehicle = absl::make_unique<Vehicle>("O->A", "B->D");
+  auto vehicle = std::make_unique<Vehicle>("O->A", "B->D");
   SPIEL_CHECK_EQ(vehicle->origin, "O->A");
   SPIEL_CHECK_EQ(vehicle->destination, "B->D");
   SPIEL_CHECK_FLOAT_EQ(vehicle->departure_time, 0);
 }
 
 void TestVehicleInstanciation2() {
-  auto vehicle = absl::make_unique<Vehicle>("O->A", "B->D", 10.5);
+  auto vehicle = std::make_unique<Vehicle>("O->A", "B->D", 10.5);
   SPIEL_CHECK_EQ(vehicle->origin, "O->A");
   SPIEL_CHECK_EQ(vehicle->destination, "B->D");
   SPIEL_CHECK_FLOAT_EQ(vehicle->departure_time, 10.5);
@@ -59,7 +59,7 @@ void TestVehicleInstanciation2() {
 
 void TestOdDemandInstanciation1() {
   auto od_demand =
-      absl::make_unique<OriginDestinationDemand>("O->A", "B->D", 0, 30);
+      std::make_unique<OriginDestinationDemand>("O->A", "B->D", 0, 30);
   SPIEL_CHECK_EQ(od_demand->vehicle.origin, "O->A");
   SPIEL_CHECK_EQ(od_demand->vehicle.destination, "B->D");
   SPIEL_CHECK_FLOAT_EQ(od_demand->vehicle.departure_time, 0);
@@ -68,7 +68,7 @@ void TestOdDemandInstanciation1() {
 
 void TestOdDemandInstanciation2() {
   auto od_demand =
-      absl::make_unique<OriginDestinationDemand>("O->A", "B->D", 10.5, 43.2);
+      std::make_unique<OriginDestinationDemand>("O->A", "B->D", 10.5, 43.2);
   SPIEL_CHECK_EQ(od_demand->vehicle.origin, "O->A");
   SPIEL_CHECK_EQ(od_demand->vehicle.destination, "B->D");
   SPIEL_CHECK_FLOAT_EQ(od_demand->vehicle.departure_time, 10.5);

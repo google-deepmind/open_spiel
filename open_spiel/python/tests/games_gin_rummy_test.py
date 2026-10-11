@@ -159,6 +159,44 @@ class GamesGinRummyTest(absltest.TestCase):
             json.loads(gin_rummy.GinRummyObservationStruct(obs_json).to_json()),
             sort_keys=True))
 
+  def test_struct_dict_constructor(self):
+    """Test constructing structs from Python dicts."""
+    game = pyspiel.load_game('gin_rummy')
+    state = game.new_initial_state()
+    # Deal 21 cards (10 each + 1 upcard).
+    actions = [
+        # deal p0
+        21, 39, 43, 28, 44, 12, 30, 31, 16, 37,
+        # deal p1
+        6, 34, 24, 7, 45, 23, 14, 18, 8, 50,
+        # upcard
+        32
+    ]
+    for action in actions:
+      state.apply_action(action)
+
+    # Test dict constructor for StateStruct
+    state_dict = json.loads(state.to_json())
+    state_struct = gin_rummy.GinRummyStateStruct(state_dict)
+    self.assertEqual(state_struct.phase, 'FirstUpcard')
+    self.assertEqual(state_struct.current_player, 'Player_0')
+    self.assertEqual(state_struct.stock_size, 31)
+
+    # Test dict constructor for ObservationStruct
+    obs_struct = state.to_observation_struct(0)
+    obs_dict = json.loads(obs_struct.to_json())
+    obs_struct2 = gin_rummy.GinRummyObservationStruct(obs_dict)
+    self.assertEqual(obs_struct2.observing_player, 0)
+    self.assertEqual(obs_struct2.phase, obs_struct.phase)
+
+  def test_game_class_attrs(self):
+    """Test that game class has struct type attributes."""
+    game = pyspiel.load_game('gin_rummy')
+    self.assertIs(game.StateStruct,
+                  gin_rummy.GinRummyStateStruct)
+    self.assertIs(game.ObservationStruct,
+                  gin_rummy.GinRummyObservationStruct)
+
 
 if __name__ == '__main__':
   absltest.main()

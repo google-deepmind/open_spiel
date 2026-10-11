@@ -55,6 +55,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_crazyhouse.h
   pybind11/games_crazy_eights.cc
   pybind11/games_crazy_eights.h
+  pybind11/games_crossword.cc
+  pybind11/games_crossword.h
   pybind11/games_colored_trails.cc
   pybind11/games_colored_trails.h
   pybind11/games_connect_four.cc
@@ -67,6 +69,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_gin_rummy.h
   pybind11/games_go.cc
   pybind11/games_go.h
+  pybind11/games_go_fish.cc
+  pybind11/games_go_fish.h
   pybind11/games_gomoku.cc
   pybind11/games_gomoku.h
   pybind11/games_hearts.cc
@@ -107,6 +111,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/python_policy.h
   pybind11/utils.cc
   pybind11/utils.h
+  pybind11/utils_trajectories.cc
+  pybind11/utils_trajectories.h
 )
 
 if (OPEN_SPIEL_BUILD_WITH_ACPC)
@@ -136,12 +142,30 @@ endif()
 add_library(pyspiel MODULE ${PYTHON_BINDINGS} ${OPEN_SPIEL_OBJECTS})
 target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
 
+# Explicitly link against Python and Abseil libraries. This is required on
+# Windows as symbols must be resolved at link time.
+if (WIN32)
+  target_link_libraries(pyspiel PRIVATE Python3::Module)
+endif()
+target_link_libraries(pyspiel PRIVATE
+  absl::algorithm
+  absl::flags
+  absl::flags_parse
+  absl::flat_hash_map
+  absl::optional
+  absl::random_random
+  absl::str_format
+  absl::strings
+  absl::time
+)
+
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")
 if (WIN32)
   # Python does not seem able to import the module without this change.
   set_target_properties(pyspiel PROPERTIES SUFFIX ".pyd")
 endif()
+
 
 
 # Detect the Python ML frameworks.
@@ -246,6 +270,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/heuristics_test.py
   games/liars_poker_test.py
   games/pokerkit_wrapper_test.py
+  games/pursuit_evasion_test.py
   games/team_dominoes_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
@@ -268,6 +293,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_connect_four_test.py
   tests/games_crazy_eights_test.py
   tests/games_crazyhouse_test.py
+  tests/games_crossword_test.py
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_go_test.py
@@ -283,6 +309,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/sampled_stochastic_games_test.py
   tests/sgf_reader_test.py
   tests/tensor_game_utils_test.py
+  tests/utils_trajectories_test.py
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
@@ -333,7 +360,7 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
 endif()
 
 # Add miscellaneous Python tests if enabled.
-# These require extra dependencies like cvxopt, nashpy, or matplotlib
+# These require extra dependencies like cvxopt, nashpy, matplotlib, etc.
 if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/adidas_test.py
@@ -348,6 +375,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/stackelberg_lp_test.py
       algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
+      examples/mcp_tool_server/tools_test.py
       coalitional_games/least_core_lp_test.py
       coalitional_games/wvg_test.py
       egt/alpharank_test.py
@@ -384,7 +412,7 @@ foreach(py_test_file IN LISTS PYTHON_TESTS)
     #  from open_spiel.python import rl_environment.
     set_property(TEST python/${py_test_file}
         PROPERTY ENVIRONMENT
-        PYTHONPATH=${OPEN_SPIEL_PYTHONPATH}
+        PYTHONPATH=${OPEN_SPIEL_PYTHONPATH};
         TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
   endif()
 endforeach(py_test_file)

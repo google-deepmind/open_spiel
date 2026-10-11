@@ -96,7 +96,7 @@ class DoubleOracleSolver(object):
       # transpose to move player to leading dimension
       payoffs = np.transpose(payoffs, [player, opponent])
       avg_payoffs = (payoffs @ subgame_solution[opponent]).squeeze()
-      best_response[player] = np.argmax(avg_payoffs)
+      best_response[player] = np.argmax(avg_payoffs)  # pyrefly: ignore[unsupported-operation]
       best_response_utility[player] = avg_payoffs[best_response[player]]
 
     if self.enforce_symmetry:

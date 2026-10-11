@@ -72,7 +72,7 @@ class Solver(object):
       unregularized exploitability (stochastic estimate)
       solver exploitability (stochastic estimate) - NaN
     """
-    return gradients(*params, payoff_matrices, self.num_players)
+    return gradients(*params, payoff_matrices, self.num_players)  # pyrefly: ignore[bad-argument-count]
 
   def exploitability(self, params, payoff_matrices):
     """Regret matching does not minimize any exploitability so return NaN.

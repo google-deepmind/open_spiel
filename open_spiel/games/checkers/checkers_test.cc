@@ -68,7 +68,7 @@ void BasicCheckersTests() {
       10);
 
   auto observer = LoadGame("checkers")
-                      ->MakeObserver(absl::nullopt,
+                      ->MakeObserver(std::nullopt,
                                      GameParametersFromString("single_tensor"));
   testing::RandomSimTestCustomObserver(*LoadGame("checkers"), observer);
 }

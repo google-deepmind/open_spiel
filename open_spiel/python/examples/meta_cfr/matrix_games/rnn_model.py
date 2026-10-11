@@ -37,7 +37,7 @@ class RNNModel(hk.RNNCore):
       if isinstance(layer, hk.RNNCore):
         x, curr_state[k] = layer(x, prev_state[k])
       else:
-        x = layer(x)
+        x = layer(x)  # pyrefly: ignore[not-callable]
     return x, tuple(curr_state)
 
   def initial_state(self, batch_size: Optional[int]):

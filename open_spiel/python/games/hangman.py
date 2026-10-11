@@ -85,7 +85,7 @@ class HangmanGame(pyspiel.Game):
         max_chance_outcomes=1,
         num_players=1,
         min_utility=(LOSS_REWARD +
-                     self._max_num_incorrect_guesses * INCORRECT_GUESS_REWARD),
+                     self._max_num_incorrect_guesses * INCORRECT_GUESS_REWARD),  # pyrefly: ignore[unsupported-operation]
         max_utility=WIN_REWARD + _MAX_NUM_GUESSES * CORRECT_GUESS_REWARD,
         max_game_length=_MAX_NUM_GUESSES,
     )
@@ -109,7 +109,7 @@ class HangmanGame(pyspiel.Game):
   def new_initial_state(self, word: str | None = None):
     """Returns a state corresponding to the start of a game."""
     assert self._word_list_len > 0, "Must set a word list"
-    return HangmanState(self, self._word_list, self._max_num_incorrect_guesses,
+    return HangmanState(self, self._word_list, self._max_num_incorrect_guesses,  # pyrefly: ignore[bad-argument-type]
                         word)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
@@ -209,7 +209,7 @@ class HangmanState(pyspiel.State):
     else:
       actions = []
       for i, c in enumerate(_VALID_LETTERS):
-        if c not in self._letters_guessed:
+        if c not in self._letters_guessed:  # pyrefly: ignore[not-iterable]
           actions.append(i)
     return actions
 
@@ -229,9 +229,9 @@ class HangmanState(pyspiel.State):
       self._letters_guessed.append(letter)
       # 2. Iterate over the letters in the word to see if any are revealed.
       num_letters_revealed = 0
-      for i, c in enumerate(self._word):
-        if self._letters_revealed[i] == _UNREVEALED_CHARACTER and c == letter:
-          self._letters_revealed[i] = letter
+      for i, c in enumerate(self._word):  # pyrefly: ignore[bad-argument-type]
+        if self._letters_revealed[i] == _UNREVEALED_CHARACTER and c == letter:  # pyrefly: ignore[unsupported-operation]
+          self._letters_revealed[i] = letter  # pyrefly: ignore[unsupported-operation]
           num_letters_revealed += 1
       # 3. Update the number of letters revealed and number of guesses.
       self._num_guesses += 1
@@ -239,10 +239,10 @@ class HangmanState(pyspiel.State):
       # 4. Update the reward stepwise reward.
       if num_letters_revealed > 0:
         # Correct guess.
-        self._reward = CORRECT_GUESS_REWARD
+        self._reward = CORRECT_GUESS_REWARD  # pyrefly: ignore[bad-assignment]
       else:
         self._num_incorrect_guesses += 1
-        self._reward = INCORRECT_GUESS_REWARD
+        self._reward = INCORRECT_GUESS_REWARD  # pyrefly: ignore[bad-assignment]
       # 5. Update terminal and bonus rewards (if terminal).
       if (self._num_guesses >= _MAX_NUM_GUESSES or
           self._num_incorrect_guesses >= self._max_num_incorrect_guesses or
@@ -250,9 +250,9 @@ class HangmanState(pyspiel.State):
         self._is_terminal = True
         # Add the win/loss bonuses.
         if num_letters_revealed > 0:
-          self._reward += WIN_REWARD
+          self._reward += WIN_REWARD  # pyrefly: ignore[bad-assignment]
         else:
-          self._reward += LOSS_REWARD
+          self._reward += LOSS_REWARD  # pyrefly: ignore[bad-assignment]
       # 6. Finally, update the return.
       self._return += self._reward
 

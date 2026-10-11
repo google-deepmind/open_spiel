@@ -33,6 +33,9 @@ This example is inspired by the paper (Iwasa and Fujita, "Prediction of Nash
 Bargaining Solution in Negotiation Dialogue", 2018).
 """
 
+import os
+import tempfile
+
 from absl import app
 from absl import flags
 import numpy as np
@@ -43,8 +46,11 @@ import pyspiel
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("data_file", None, "Lewis et al. '17 data set file")
-flags.DEFINE_string("instances_file", "/tmp/instances.txt",
-                    "Filename for the temp instances database file.")
+flags.DEFINE_string(
+    "instances_file",
+    os.path.join(tempfile.gettempdir(), "instances.txt"),
+    "Filename for the temp instances database file.",
+)
 
 
 class Instance(object):

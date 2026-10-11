@@ -102,7 +102,7 @@ class Solver(object):
       unregularized exploitability (stochastic estimate)
       shannon entropy regularized exploitability (stochastic estimate)
     """
-    return self.gradients(*params, payoff_matrices, self.num_players,
+    return self.gradients(*params, payoff_matrices, self.num_players,  # pyrefly: ignore[bad-argument-count]
                           self.temperature, self.proj_grad)
 
   def exploitability(self, params, payoff_matrices):
@@ -228,7 +228,7 @@ class Solver(object):
 
     new_logits = optax.apply_updates(logits, opt_updates)
 
-    new_dist = [logits_to_dist(logits) for logits in new_logits]
+    new_dist = [logits_to_dist(logits) for logits in new_logits]  # pyrefly: ignore[not-iterable]
     new_dist = [np.array(dist_i) for dist_i in new_dist]
 
     lr_y = self.lrs[1]

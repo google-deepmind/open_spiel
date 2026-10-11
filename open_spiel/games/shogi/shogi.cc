@@ -92,18 +92,12 @@ void AddScalarPlane(T val, T min, T max,
   double normalized_val = static_cast<double>(val - min) / (max - min);
   for (int i = 0; i < kNumSquares; ++i) *value_it++ = normalized_val;
 }
-
-// Adds a binary scalar plane.
-void AddBinaryPlane(bool val, absl::Span<float>::iterator& value_it) {
-  AddScalarPlane<int>(val ? 1 : 0, 0, 1, value_it);
-}
 }  // namespace
 
-ShogiState::ShogiState(std::shared_ptr<const Game> game) : State(game) {
-  auto maybe_board = ShogiBoard::BoardFromSFEN(kDefaultStandardSFEN);
-  SPIEL_CHECK_TRUE(maybe_board.has_value());
-  start_board_ = *maybe_board;
-  current_board_ = start_board_;
+ShogiState::ShogiState(std::shared_ptr<const Game> game)
+    : State(game),
+      start_board_(ShogiBoard::BoardFromSFEN(kDefaultStandardSFEN).value()),
+      current_board_(start_board_) {
   repetitions_[current_board_.HashValue()] = 1;
 }
 
@@ -123,7 +117,7 @@ Player ShogiState::CurrentPlayer() const {
 }
 
 Action ShogiState::ParseMoveToAction(const std::string& move_str) const {
-  absl::optional<Move> move = Board().ParseMove(move_str);
+  std::optional<Move> move = Board().ParseMove(move_str);
   if (!move.has_value()) {
     return kInvalidAction;
   }
@@ -337,9 +331,9 @@ ShogiState::ExtractSFenAndMaybeMoves() const {
   return std::make_pair(initial_sfen, move_lans);
 }
 
-absl::optional<std::vector<double>> ShogiState::MaybeFinalReturns() const {
+std::optional<std::vector<double>> ShogiState::MaybeFinalReturns() const {
   if (IsRepetitionEnd()) {
-    // Perpetual check repetion could occur either with a player giving
+    // Perpetual check repetition could occur either with a player giving
     // check again or with the other player escaping to the same position.
     // Either way checking player loses.
     if ((check_count_[0] >= 6) || (check_count_[1] >= 6)) {
@@ -377,7 +371,7 @@ absl::optional<std::vector<double>> ShogiState::MaybeFinalReturns() const {
   if (Board().KingInEnemyCamp(just_moved) && Board().KingInEnemyCamp(on_move)) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 std::string ShogiState::Serialize() const {

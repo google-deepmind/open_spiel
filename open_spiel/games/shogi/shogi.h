@@ -159,7 +159,7 @@ class ShogiState : public State {
   std::string Serialize() const override;
 
   // Shogi ends the game at the 4th position of a position.
-  // If the repetetion was a result of perpetual check,
+  // If the repetition was a result of perpetual check,
   // the checking player loses.
   bool IsRepetitionEnd() const;
 
@@ -211,6 +211,7 @@ class ShogiState : public State {
   // hash again, so we use a custom passthrough hasher.
   class PassthroughHash {
    public:
+    PassthroughHash() = default;
     std::size_t operator()(uint64_t x) const {
       return static_cast<std::size_t>(x);
     }

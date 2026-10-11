@@ -25,14 +25,15 @@ Python. Algorithms and tools are written both in C++ and Python.
 To try OpenSpiel in Google Colaboratory, please refer to `open_spiel/colabs` subdirectory or start [here](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/install_open_spiel.ipynb).
 
 <p align="center">
-  <img src="docs/_static/OpenSpielB.png" alt="OpenSpiel visual asset">
+  <img src="docs/_static/OpenSpielC.png" alt="OpenSpiel visual asset" width="800px">
 </p>
 
 # Index
 
 Please choose among the following options:
 
-*   [Installing OpenSpiel](docs/install.md)
+*   [Installing OpenSpiel](docs/install.md) (for Linux and MacOS; see separate
+    [Windows Installation](docs/windows.md) instructions.)
 *   [Introduction to OpenSpiel](docs/intro.md)
 *   [API Overview and First Example](docs/concepts.md)
 *   [API Reference](docs/api_reference.md)

@@ -16,12 +16,11 @@
 #define OPEN_SPIEL_GAMES_REPEATED_POKERKIT_STRUCT_H_
 
 #include <map>
-#include <string>
 #include <vector>
 
-#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/games/pokerkit_wrapper/pokerkit_wrapper_struct.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace repeated_pokerkit {
@@ -51,22 +50,12 @@ struct RepeatedPokerkitStateStruct : StateStruct {
   int bring_in = kInvalidBlindBetSizeOrBringIn;
   std::vector<std::vector<float>> hand_returns = {};
 
-  RepeatedPokerkitStateStruct() = default;
-  explicit RepeatedPokerkitStateStruct(const std::string& json_str) {
-    nlohmann::json::parse(json_str).get_to(*this);
-  }
-
-  nlohmann::json to_json_base() const override {
-    nlohmann::json j = *this;
-    return j;
-  }
-
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(RepeatedPokerkitStateStruct,
-                                 pokerkit_state_struct, hand_number,
-                                 is_terminal, stacks, dealer, seat_to_player,
-                                 player_to_seat, small_blind, big_blind,
-                                 small_bet_size, big_bet_size, bring_in,
-                                 hand_returns);
+  SPIEL_STRUCT_BOILERPLATE(RepeatedPokerkitStateStruct,
+                           pokerkit_state_struct, hand_number,
+                           is_terminal, stacks, dealer, seat_to_player,
+                           player_to_seat, small_blind, big_blind,
+                           small_bet_size, big_bet_size, bring_in,
+                           hand_returns);
 };
 
 }  // namespace repeated_pokerkit

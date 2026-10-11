@@ -51,7 +51,7 @@ class KemenyYoungVoting(base.AbstractVotingMethod):
       alternatives: List[base.AlternativeId],
       permutation: Tuple[base.AlternativeId, ...]) -> List[base.AlternativeId]:
     assert len(permutation) == len(alternatives)
-    return [alternatives[permutation[i]] for i in range(len(alternatives))]
+    return [alternatives[permutation[i]] for i in range(len(alternatives))]  # pyrefly: ignore[bad-index]
 
   def run_election(self, profile: base.PreferenceProfile) -> base.RankOutcome:
     assert self.is_valid_profile(profile)
@@ -68,8 +68,8 @@ class KemenyYoungVoting(base.AbstractVotingMethod):
         best_score = total_score
         best_score_array = scores
         best_permutation = permutation
-    best_ranking = self._permutation_to_ranking(alternatives, best_permutation)
+    best_ranking = self._permutation_to_ranking(alternatives, best_permutation)  # pyrefly: ignore[bad-argument-type]
     outcome = base.RankOutcome(rankings=best_ranking,
-                               scores=list(best_score_array))
+                               scores=list(best_score_array))  # pyrefly: ignore[bad-argument-type]
     return outcome
 

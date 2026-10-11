@@ -86,10 +86,10 @@ class Solver(object):
       tsallis regularized exploitability (stochastic estimate)
     """
     if self.cheap:
-      return cheap_gradients(self.random, *params, payoff_matrices,
+      return cheap_gradients(self.random, *params, payoff_matrices,  # pyrefly: ignore[bad-argument-count]
                              self.num_players, self.p, self.proj_grad)
     else:
-      return gradients(*params, payoff_matrices, self.num_players, self.p,
+      return gradients(*params, payoff_matrices, self.num_players, self.p,  # pyrefly: ignore[bad-argument-count]
                        self.proj_grad)
 
   def exploitability(self, params, payoff_matrices):

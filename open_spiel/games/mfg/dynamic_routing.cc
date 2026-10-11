@@ -440,7 +440,7 @@ ActionsAndProbs MeanFieldRoutingGameState::ChanceOutcomes() const {
 }
 
 std::unique_ptr<State> MeanFieldRoutingGameState::Clone() const {
-  return absl::make_unique<MeanFieldRoutingGameState>(*this);
+  return std::make_unique<MeanFieldRoutingGameState>(*this);
 }
 
 std::string MeanFieldRoutingGameState::Serialize() const {

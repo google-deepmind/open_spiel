@@ -34,7 +34,7 @@ class KemenyYoungTest(absltest.TestCase):
         base.WeightedVote(17,
                           ["Knoxville", "Chattanooga", "Nashville", "Memphis"]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = kemeny_young.KemenyYoungVoting()
     outcome = method.run_election(profile)
     self.assertListEqual(outcome.ranking,
@@ -49,7 +49,7 @@ class KemenyYoungTest(absltest.TestCase):
         base.WeightedVote(2, ["C", "A", "B"]),
         base.WeightedVote(1, ["B", "C", "A"]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = kemeny_young.KemenyYoungVoting()
     outcome = method.run_election(profile)
     self.assertListEqual(outcome.ranking, ["C", "A", "B"])

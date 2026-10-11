@@ -38,8 +38,8 @@ class BasicStats(object):
       self._min = val
     if self._max < val:
       self._max = val
-    self._sum += val
-    self._sum_sq += val**2
+    self._sum += val  # pyrefly: ignore[bad-assignment]
+    self._sum_sq += val**2  # pyrefly: ignore[bad-assignment]
 
   @property
   def num(self):
@@ -135,12 +135,12 @@ class StatCounter:
     self._min = math.inf
 
   def add(self, value: float):
-    self._sum = self._sum + value
+    self._sum = self._sum + value  # pyrefly: ignore[bad-assignment]
     self._n += 1
 
     delta = value - self._mean
-    self._mean = self._sum / self._n
-    self._m2 = self._m2 + delta*(value - self._mean)
+    self._mean = self._sum / self._n  # pyrefly: ignore[bad-assignment]
+    self._m2 = self._m2 + delta*(value - self._mean)  # pyrefly: ignore[bad-assignment]
 
     self._min = min(self._min, value)
     self._max = max(self._max, value)

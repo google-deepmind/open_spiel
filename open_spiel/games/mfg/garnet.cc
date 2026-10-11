@@ -380,7 +380,7 @@ std::unique_ptr<State> GarnetGame::DeserializeState(
     SPIEL_CHECK_TRUE(absl::SimpleAtod(v, &parsed_weight));
     distribution.push_back(parsed_weight);
   }
-  return absl::make_unique<GarnetState>(
+  return std::make_unique<GarnetState>(
       shared_from_this(), size_, horizon_, seed_, num_action_,
       num_chance_action_, sparsity_factor_, eta_, current_player,
       is_chance_init, x, t, last_action, return_value, distribution);

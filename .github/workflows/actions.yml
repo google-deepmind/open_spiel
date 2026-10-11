@@ -13,11 +13,23 @@ on:
         required: false
         default: 'build_and_test (manual)'
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    permissions:
+      contents: write
     strategy:
       matrix:
         include:
+        - os: ubuntu-26.04
+          OS_PYTHON_VERSION: "3.14"
+          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: ubuntu-24.04
           OS_PYTHON_VERSION: "3.14"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
@@ -46,13 +58,6 @@ jobs:
           OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: ubuntu-24.04
-          OS_PYTHON_VERSION: "3.11"
-          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: macos-14
           OS_PYTHON_VERSION: "3.11"
           TRAVIS_USE_NOX: 0
@@ -76,17 +81,14 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:  ${{ matrix.OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL }}
 
     steps:
-      
-      - name: Checkout
-        uses: actions/checkout@v6
 
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v2
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
         with:
-          version: '1.8'
+          persist-credentials: false
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: ${{ matrix.OS_PYTHON_VERSION }}
 

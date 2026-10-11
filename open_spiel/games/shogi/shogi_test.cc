@@ -15,7 +15,6 @@
 
 #include "open_spiel/games/shogi/shogi.h"
 
-#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <random>
@@ -23,12 +22,10 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/shogi/shogi_board.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -53,7 +50,7 @@ void CheckUndo(const char* sfen, const char* move_lan, const char* sfen_after) {
   std::shared_ptr<const Game> game = LoadGame("shogi");
   ShogiState state(game, sfen);
   Player player = state.CurrentPlayer();
-  absl::optional<Move> maybe_move = state.Board().ParseLANMove(move_lan);
+  std::optional<Move> maybe_move = state.Board().ParseLANMove(move_lan);
   SPIEL_CHECK_TRUE(maybe_move);
   Action action = MoveToAction(*maybe_move);
   state.ApplyAction(action);
@@ -233,6 +230,21 @@ void MoveConversionTests() {
   }
 }
 
+void SFENRoundTripPromotedRookTest() {
+  // Regression test: PieceTypeToString returned "+R" (uppercase) for both
+  // Black and White promoted rooks, causing White promoted rooks to be
+  // serialized incorrectly in SFEN. A round-trip through ToSFEN→BoardFromSFEN
+  // would flip the White promoted rook to Black.
+  std::shared_ptr<const Game> game = LoadGame("shogi");
+  // Position with a White promoted rook (+r) at 8h.
+  const std::string sfen =
+      "lnsgkgsnl/7b1/ppppppppp/9/9/9/"
+      "PPPPPPPPP/1+r5R1/LNSGKGSNL b - 1";
+  ShogiState state(game, sfen);
+  std::string round_tripped = state.Board().ToSFEN();
+  SPIEL_CHECK_EQ(sfen, round_tripped);
+}
+
 void SerializaitionTests() {
   auto game = LoadGame("shogi");
 
@@ -259,6 +271,7 @@ void SerializaitionTests() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::shogi::SFENRoundTripPromotedRookTest();
   open_spiel::shogi::BasicShogiTests();
   open_spiel::shogi::UndoTests();
   open_spiel::shogi::ObservationTensorTests();

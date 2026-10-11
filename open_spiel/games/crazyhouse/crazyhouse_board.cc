@@ -87,7 +87,7 @@ std::string ColorToString(Color c) {
   }
 }
 
-absl::optional<PieceType> PieceTypeFromChar(char c) {
+std::optional<PieceType> PieceTypeFromChar(char c) {
   switch (toupper(c)) {
     case 'P':
       return PieceType::kPawn;
@@ -111,7 +111,7 @@ absl::optional<PieceType> PieceTypeFromChar(char c) {
       return PieceType::kQueenP;
     default:
       std::cerr << "Invalid piece type: " << c << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
   }
 }
 
@@ -211,13 +211,13 @@ std::string Piece::ToString() const {
                                 : absl::AsciiStrToLower(base);
 }
 
-absl::optional<Square> SquareFromString(const std::string& s) {
+std::optional<Square> SquareFromString(const std::string& s) {
   if (s.size() != 2) return kInvalidSquare;
 
   auto file = ParseFile(s[0]);
   auto rank = ParseRank(s[1]);
   if (file && rank) return Square{*file, *rank};
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 bool IsLongDiagonal(const crazyhouse::Square& from_sq,
@@ -261,7 +261,7 @@ std::string Move::ToLAN(bool chess960, const CrazyhouseBoard* board_ptr) const {
     // <king position> <rook position> it is castling with.
     SPIEL_CHECK_TRUE(board_ptr != nullptr);
     Color to_play = board_ptr->ToPlay();
-    absl::optional<Square> maybe_rook_sq =
+    std::optional<Square> maybe_rook_sq =
         board_ptr->MaybeCastlingRookSquare(to_play, castle_dir);
     SPIEL_CHECK_TRUE(maybe_rook_sq.has_value());
     return absl::StrCat(SquareToString(from),
@@ -446,7 +446,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
   board_.fill(kEmptyPiece);
 }
 
-/*static*/ absl::optional<CrazyhouseBoard> CrazyhouseBoard::BoardFromFEN(
+/*static*/ std::optional<CrazyhouseBoard> CrazyhouseBoard::BoardFromFEN(
     const std::string& fen, int board_size, bool king_in_check_allowed,
     bool allow_pass_move, int insanity, bool sticky_promotions,
     bool king_of_hill) {
@@ -459,7 +459,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     auto rb = fen_copy.find(']', lb);
     if (rb == std::string::npos) {
       std::cerr << "Malformed pocket section in FEN: " << fen << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
     pocket_section = fen_copy.substr(lb + 1, rb - lb - 1);
     fen_copy.erase(lb, rb - lb + 1);
@@ -483,7 +483,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
 
   if (fen_parts.size() != 6 && fen_parts.size() != 4) {
     std::cerr << "Invalid FEN: " << fen << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   std::string& piece_configuration = fen_parts[0];
@@ -509,7 +509,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     for (char c : rank) {
       if (current_x >= board_size) {
         std::cerr << "Too many things on FEN rank: " << rank << std::endl;
-        return absl::nullopt;
+        return std::nullopt;
       }
 
       if (c >= '1' && c <= '8') {
@@ -518,7 +518,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
         auto piece_type = PieceTypeFromChar(c);
         if (!piece_type) {
           std::cerr << "Invalid piece type in FEN: " << c << std::endl;
-          return absl::nullopt;
+          return std::nullopt;
         }
 
         Color color = isupper(c) ? Color::kWhite : Color::kBlack;
@@ -536,7 +536,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     board.SetToPlay(Color::kWhite);
   } else {
     std::cerr << "Invalid side to move in FEN: " << side_to_move << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   // Castling rights are done differently in standard FEN versus shredder FEN.
@@ -603,7 +603,7 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     if (!maybe_ep_square) {
       std::cerr << "Invalid en passant square in FEN: " << ep_square
                 << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
     // Only set the en-passant square if it's being threatened. This is to
     // prevent changing the hash of the board for the purposes of the
@@ -620,11 +620,11 @@ CrazyhouseBoard::CrazyhouseBoard(int board_size, bool king_in_check_allowed,
     for (char pc : pocket_section) {
       bool white = std::isupper(pc);
       char uc = std::toupper(pc);
-      absl::optional<PieceType> opt = PieceTypeFromChar(uc);
+      std::optional<PieceType> opt = PieceTypeFromChar(uc);
       PieceType pptype = *opt;
       if (!opt) {
         std::cerr << "Invalid pocket char in FEN: " << pc << std::endl;
-        return absl::nullopt;
+        return std::nullopt;
       }
       if (white) {
         board.AddToPocket(Color::kWhite, pptype, 1);
@@ -1037,8 +1037,8 @@ bool CrazyhouseBoard::HasSufficientMaterial() const {
   return dark_bishop_exists && light_bishop_exists;
 }
 
-absl::optional<Move> CrazyhouseBoard::ParseMove(const std::string& move,
-                                                bool chess960) const {
+std::optional<Move> CrazyhouseBoard::ParseMove(const std::string& move,
+                                               bool chess960) const {
   // First see if they are in the long form -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
   // SAN moves will never have this form because an SAN move that starts with
@@ -1054,10 +1054,10 @@ absl::optional<Move> CrazyhouseBoard::ParseMove(const std::string& move,
     return san_move;
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
-absl::optional<Move> CrazyhouseBoard::ParseSANMove(
+std::optional<Move> CrazyhouseBoard::ParseSANMove(
     const std::string& move_str) const {
   std::string move = move_str;
   auto drop_move = ParseDropMove(move);
@@ -1065,7 +1065,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
     return drop_move;
   }
 
-  if (move.empty()) return absl::nullopt;
+  if (move.empty()) return std::nullopt;
 
   if (absl::StartsWith(move, "O-O-O")) {
     // Queenside / left castling.
@@ -1078,7 +1078,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
     });
     if (candidates.size() == 1) return candidates[0];
     std::cerr << "Invalid O-O-O" << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   if (absl::StartsWith(move, "O-O")) {
@@ -1092,13 +1092,13 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
     });
     if (candidates.size() == 1) return candidates[0];
     std::cerr << "Invalid O-O" << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   auto move_annotation = SplitAnnotations(move);
   move = move_annotation.first;
   if (move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   auto annotation = move_annotation.second;
@@ -1111,7 +1111,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
     auto maybe_piece_type = PieceTypeFromChar(move[0]);
     if (!maybe_piece_type) {
       std::cerr << "Invalid piece type: " << move[0] << std::endl;
-      return absl::nullopt;
+      return std::nullopt;
     }
     piece_type = *maybe_piece_type;
     move = std::string(absl::ClippedSubstr(move, 1));
@@ -1120,7 +1120,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
   // A move always ends with the destination square.
   if (move.size() < 2) {
     std::cerr << "Missing destination square" << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
   auto destination = std::string(absl::ClippedSubstr(move, move.size() - 2));
   move = move.substr(0, move.size() - 2);
@@ -1131,7 +1131,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
   if (!dest_file || !dest_rank) {
     std::cerr << "Failed to parse destination square: " << destination
               << std::endl;
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   Square destination_square{*dest_file, *dest_rank};
@@ -1144,7 +1144,7 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
 
   // If necessary, source rank and/or file are also included for
   // disambiguation.
-  absl::optional<int8_t> source_file, source_rank;
+  std::optional<int8_t> source_file, source_rank;
   if (!move.empty()) {
     source_file = ParseFile(move[0]);
     if (source_file) {
@@ -1159,17 +1159,17 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
   }
 
   if (!move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
 
   // Pawn promations are annotated with =Q to indicate the promotion type.
-  absl::optional<PieceType> promotion_type;
+  std::optional<PieceType> promotion_type;
   if (!annotation.empty() && annotation[0] == '=') {
     if (annotation.size() < 2) {
-      return absl::nullopt;
+      return std::nullopt;
     }
     auto maybe_piece = PieceTypeFromChar(annotation[1]);
-    if (!maybe_piece) return absl::optional<Move>();
+    if (!maybe_piece) return std::optional<Move>();
     promotion_type = maybe_piece;
   }
 
@@ -1189,13 +1189,13 @@ absl::optional<Move> CrazyhouseBoard::ParseSANMove(
   if (candidates.size() == 1) return candidates[0];
   std::cerr << "expected exactly one matching move, got " << candidates.size()
             << std::endl;
-  return absl::optional<Move>();
+  return std::optional<Move>();
 }
 
-absl::optional<Move> CrazyhouseBoard::ParseDropMove(
+std::optional<Move> CrazyhouseBoard::ParseDropMove(
     const std::string& move) const {
   if (move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
   if (move.size() == 4 && move[1] == '@') {
     char pc = move[0];
@@ -1205,20 +1205,20 @@ absl::optional<Move> CrazyhouseBoard::ParseDropMove(
     // Validate square
     if (file < 'a' || file >= ('a' + board_size_) || rank < '1' ||
         rank >= ('1' + board_size_)) {
-      return absl::nullopt;
+      return std::nullopt;
     }
 
     // Parse piece type
-    absl::optional<PieceType> opt = PieceTypeFromChar(pc);
-    if (!opt) return absl::nullopt;
+    std::optional<PieceType> opt = PieceTypeFromChar(pc);
+    if (!opt) return std::nullopt;
 
     PieceType ptype = *opt;
 
     // Disallow illegal drops
-    if (ptype == PieceType::kKing) return absl::nullopt;
+    if (ptype == PieceType::kKing) return std::nullopt;
 
     auto to = SquareFromString(move.substr(2, 2));
-    if (!to) return absl::nullopt;
+    if (!to) return std::nullopt;
 
     // Construct drop move
     Move drop;
@@ -1229,13 +1229,13 @@ absl::optional<Move> CrazyhouseBoard::ParseDropMove(
     return drop;
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
-absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
-                                                   bool chess960) const {
+std::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
+                                                  bool chess960) const {
   if (move.empty()) {
-    return absl::nullopt;
+    return std::nullopt;
   }
   auto drop_move = ParseDropMove(move);
   if (drop_move) {
@@ -1250,23 +1250,23 @@ absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
         move[1] >= ('1' + board_size_) || move[2] < 'a' ||
         move[2] >= ('a' + board_size_) || move[3] < '1' ||
         move[3] >= ('1' + board_size_)) {
-      return absl::nullopt;
+      return std::nullopt;
     }
 
     if (move.size() == 5 && move[4] != 'q' && move[4] != 'r' &&
         move[4] != 'b' && move[4] != 'n') {
-      return absl::nullopt;
+      return std::nullopt;
     }
 
     auto from = SquareFromString(move.substr(0, 2));
     auto to = SquareFromString(std::string(absl::ClippedSubstr(move, 2, 2)));
     if (from && to) {
-      absl::optional<PieceType> promotion_type;
+      std::optional<PieceType> promotion_type;
       if (move.size() == 5) {
         promotion_type = PieceTypeFromChar(move[4]);
         if (!promotion_type) {
           std::cerr << "Invalid promotion type" << std::endl;
-          return absl::nullopt;
+          return std::nullopt;
         }
       }
 
@@ -1331,7 +1331,7 @@ absl::optional<Move> CrazyhouseBoard::ParseLANMove(const std::string& move,
       return candidates[0];
     }
   } else {
-    return absl::nullopt;
+    return std::nullopt;
   }
   SpielFatalError("All conditionals failed; this is a bug.");
 }
@@ -1410,23 +1410,23 @@ void CrazyhouseBoard::ApplyMove(const Move& move) {
   if (moving_piece.type == PieceType::kRook) {
     if (castling_rights_[ToInt(to_play_)].left_castle.has_value() &&
         *castling_rights_[ToInt(to_play_)].left_castle == move.from) {
-      SetCastlingRight(to_play_, CastlingDirection::kLeft, absl::nullopt);
+      SetCastlingRight(to_play_, CastlingDirection::kLeft, std::nullopt);
     } else if (castling_rights_[ToInt(to_play_)].right_castle.has_value() &&
                *castling_rights_[ToInt(to_play_)].right_castle == move.from) {
-      SetCastlingRight(to_play_, CastlingDirection::kRight, absl::nullopt);
+      SetCastlingRight(to_play_, CastlingDirection::kRight, std::nullopt);
     }
   }
   if (destination_piece.type == PieceType::kRook) {
     if (castling_rights_[ToInt(OppColor(to_play_))].left_castle.has_value() &&
         *castling_rights_[ToInt(OppColor(to_play_))].left_castle == move.to) {
       SetCastlingRight(OppColor(to_play_), CastlingDirection::kLeft,
-                       absl::nullopt);
+                       std::nullopt);
     } else if (castling_rights_[ToInt(OppColor(to_play_))]
                    .right_castle.has_value() &&
                *castling_rights_[ToInt(OppColor(to_play_))].right_castle ==
                    move.to) {
       SetCastlingRight(OppColor(to_play_), CastlingDirection::kRight,
-                       absl::nullopt);
+                       std::nullopt);
     }
   }
 
@@ -1462,8 +1462,8 @@ void CrazyhouseBoard::ApplyMove(const Move& move) {
   }
 
   if (moving_piece.type == PieceType::kKing) {
-    SetCastlingRight(to_play_, CastlingDirection::kLeft, absl::nullopt);
-    SetCastlingRight(to_play_, CastlingDirection::kRight, absl::nullopt);
+    SetCastlingRight(to_play_, CastlingDirection::kLeft, std::nullopt);
+    SetCastlingRight(to_play_, CastlingDirection::kRight, std::nullopt);
   }
 
   // 2. En-passant
@@ -1960,7 +1960,7 @@ std::string CrazyhouseBoard::ToUnicodeString() const {
 
 char CrazyhouseBoard::ShredderCastlingRightChar(Color color,
                                                 CastlingDirection dir) const {
-  absl::optional<Square> maybe_rook_sq = MaybeCastlingRookSquare(color, dir);
+  std::optional<Square> maybe_rook_sq = MaybeCastlingRookSquare(color, dir);
   if (!maybe_rook_sq.has_value()) {
     return '-';
   }
@@ -2220,7 +2220,7 @@ void CrazyhouseBoard::set_square(Square sq, Piece piece) {
   board_[position] = piece;
 }
 
-absl::optional<Square> CrazyhouseBoard::MaybeCastlingRookSquare(
+std::optional<Square> CrazyhouseBoard::MaybeCastlingRookSquare(
     Color side, CastlingDirection direction) const {
   switch (direction) {
     case CastlingDirection::kLeft:
@@ -2249,7 +2249,7 @@ int ToInt(CastlingDirection direction) {
 
 void CrazyhouseBoard::SetCastlingRight(
     Color side, CastlingDirection direction,
-    absl::optional<Square> maybe_rook_square) {
+    std::optional<Square> maybe_rook_square) {
   static const ZobristTableU64<2, 2, 2> kZobristValues(/*seed=*/876387212);
 
   // Remove old value from hash (note that we only use bool for castling rights,

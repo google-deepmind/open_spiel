@@ -39,14 +39,14 @@ class Solver(updates.Solver):
     if temperature < 0.:
       raise ValueError('temperature must be non-negative')
     self.temperature = temperature
-    self.lrs = lrs
+    self.lrs = lrs  # pyrefly: ignore[bad-assignment]
     self.num_estimates = 2
 
     if temperature > 0:
       self.eps = np.exp(-1 / temperature)  # ensure dist[i] >= eps / dim(dist)
     else:
       self.eps = 0.
-    self.update = lambda *args: self.descent_step(*args, eps=self.eps)
+    self.update = lambda *args: self.descent_step(*args, eps=self.eps)  # pyrefly: ignore[bad-assignment]
 
     self.opt = optax.adam(learning_rate=lrs[0])
     self.opt_state = self.opt.init(jnp.zeros(1))
@@ -107,7 +107,7 @@ class Solver(updates.Solver):
 
     new_logits = optax.apply_updates(logits, opt_updates)
 
-    new_dist = [logits_to_dist(logits) for logits in new_logits]
+    new_dist = [logits_to_dist(logits) for logits in new_logits]  # pyrefly: ignore[not-iterable]
     new_dist = [np.array(dist_i) for dist_i in new_dist]
 
     return (new_dist,)
@@ -125,7 +125,7 @@ class Solver(updates.Solver):
       unregularized exploitability (stochastic estimate)
       shannon regularized exploitability (stochastic estimate)
     """
-    return gradients(*params, payoff_matrices, self.num_players,
+    return gradients(*params, payoff_matrices, self.num_players,  # pyrefly: ignore[bad-argument-count]
                      self.temperature, self.proj_grad)
 
   def exploitability(self, params, payoff_matrices):

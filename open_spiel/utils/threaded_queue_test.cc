@@ -26,7 +26,7 @@ void TestThreadedQueue() {
   ThreadedQueue<int> q(4);
 
   auto CheckPopEq = [&q](int expected) {
-    absl::optional<int> v = q.Pop();
+    std::optional<int> v = q.Pop();
     SPIEL_CHECK_TRUE(v);
     SPIEL_CHECK_EQ(*v, expected);
   };

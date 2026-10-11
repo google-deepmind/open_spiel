@@ -51,7 +51,7 @@ class SchulzeTest(absltest.TestCase):
         base.WeightedVote(2, ["C", "A", "B"]),
         base.WeightedVote(1, ["B", "C", "A"])
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = schulze.SchulzeVoting()
     outcome = method.run_election(profile)
     self.assertListEqual(outcome.ranking, ["C", "A", "B"])

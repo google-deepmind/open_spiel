@@ -20,7 +20,9 @@ https://openreview.net/forum?id=gQnJ7ODIAx
 """
 
 import copy
+import os
 import sys
+import tempfile
 import time
 
 from absl import app
@@ -44,7 +46,7 @@ FLAGS = flags.FLAGS
 # Training parameters
 flags.DEFINE_string(
     "checkpoint_dir",
-    "/tmp/dqn_test",
+    os.path.join(tempfile.gettempdir(), "dqn_test"),
     "Directory to save/load the agent models.",
 )
 flags.DEFINE_integer(

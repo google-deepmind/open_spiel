@@ -15,6 +15,7 @@
 #include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
 
 #include "open_spiel/games/pokerkit_wrapper/pokerkit_wrapper_struct.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 
 namespace py = ::pybind11;
@@ -24,10 +25,8 @@ using open_spiel::pokerkit_wrapper::PokerkitStateStruct;
 void open_spiel::bind_pokerkit_state_struct(py::module& m) {
   py::module_ pokerkit_wrapper = m.def_submodule("pokerkit_wrapper");
 
-  py::class_<PokerkitStateStruct, open_spiel::StateStruct>(
+  bind_spiel_struct<PokerkitStateStruct, open_spiel::StateStruct>(
       pokerkit_wrapper, "PokerkitStateStruct")
-      .def(py::init<>())  // Default constructor.
-      .def("to_json_base", &PokerkitStateStruct::to_json_base)
       .def_readwrite("observation", &PokerkitStateStruct::observation)
       .def_readwrite("legal_actions", &PokerkitStateStruct::legal_actions)
       .def_readwrite("current_player", &PokerkitStateStruct::current_player)

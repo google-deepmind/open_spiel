@@ -221,7 +221,9 @@ class ISMCTSBot(pyspiel.Bot):
       return self._resampler_cb(state, state.current_player())
     else:
       return state.resample_from_infostate(
-          state.current_player(), pyspiel.UniformProbabilitySampler(0., 1.))
+          state.current_player(),
+          pyspiel.UniformProbabilitySampler(
+              self._random_state.randint(np.iinfo(np.int32).max), 0., 1.))
 
   def create_new_node(self, state):
     infostate_key = self.get_state_key(state)

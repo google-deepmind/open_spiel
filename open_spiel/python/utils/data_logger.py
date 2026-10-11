@@ -38,7 +38,7 @@ class DataLoggerJsonLines:
     if hasattr(self, "_fd") and self._fd is not None:
       self._fd.flush()
       self._fd.close()
-      self._fd = None
+      self._fd = None  # pyrefly: ignore[bad-assignment]
 
   def flush(self):
     self._fd.flush()

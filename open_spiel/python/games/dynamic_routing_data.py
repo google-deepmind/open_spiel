@@ -413,7 +413,7 @@ def create_sioux_falls_network():
       bpr_a_coefficient=bpr_a_coeff,
       bpr_b_coefficient={k: 4 for k in bpr_a_coeff},
       capacity={k: 1 for k in bpr_a_coeff},
-      free_flow_travel_time=free_flow_travel_time)
+      free_flow_travel_time=free_flow_travel_time)  # pyrefly: ignore[bad-argument-type]
 
 
 SIOUX_FALLS_NETWORK = create_sioux_falls_network()

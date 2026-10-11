@@ -44,15 +44,28 @@ void init_pyspiel_observer(py::module& m) {
       .def_property_readonly(
           "shape",
           [](const SpanTensor& tensor) { return tensor.info().vector_shape(); })
-      .def_property_readonly("data",
-                             [](const SpanTensor& tensor) {
-                               // absl::Span requires pybind11_abseil which
-                               // open spiel forbids. Thus copy the data
-                               // and expose a vector through pybind.
-                               std::vector<float> data(tensor.data().begin(),
-                                                       tensor.data().end());
-                               return data;
-                             })
+      .def_property_readonly(
+          "data",
+          [](const SpanTensor& tensor) {
+            // Expose the raw data as a zero-copy numpy array.
+            // We use a dummy capsule to ensure Pybind11 doesn't
+            // try to free the memory, as SpanTensor doesn't own it.
+            std::vector<py::ssize_t> shape;
+            for (int dim : tensor.info().shape()) {
+              shape.push_back(dim);
+            }
+            std::vector<py::ssize_t> strides;
+            if (!shape.empty()) {
+              strides.resize(shape.size());
+              strides.back() = sizeof(float);
+              for (int i = static_cast<int>(shape.size()) - 2; i >= 0; --i) {
+                strides[i] = strides[i + 1] * shape[i + 1];
+              }
+            }
+            py::capsule dummy(tensor.data().data(), [](void*) {});
+            return py::array_t<float>(shape, strides, tensor.data().data(),
+                                      dummy);
+          })
       .def("__str__", &SpanTensor::DebugString);
 
   // C++ Observation, intended only for the Python Observation class, not
