@@ -22,6 +22,11 @@ from open_spiel.python.utils import stats
 
 class SlidingWindowAccumulatorTest(parameterized.TestCase):
 
+  @parameterized.parameters(0, -1)
+  def test_rejects_non_positive_window_size(self, window_size):
+    with self.assertRaisesRegex(ValueError, "max_window_size must be positive"):
+      stats.SlidingWindowAccumulator(window_size)
+
   def test_empty(self):
     accumulator = stats.SlidingWindowAccumulator(3)
     self.assertEqual(accumulator.mean(), 0)
