@@ -151,6 +151,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "repeated_leduc_poker",
     "rbc",
     "restricted_nash_response",
+    "seep",
     "sheriff",
     "shogi",
     "skat",

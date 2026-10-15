@@ -201,6 +201,8 @@ set(GAME_SOURCES
   quoridor/quoridor.h
   rbc/rbc.cc
   rbc/rbc.h
+  seep/seep.cc
+  seep/seep.h
   sheriff/sheriff.cc
   sheriff/sheriff.h
   shogi/shogi.cc
@@ -705,6 +707,10 @@ add_test(rbc_test rbc_test)
 add_executable(repeated_leduc_poker_test leduc_poker/repeated_leduc_poker_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(repeated_leduc_poker_test repeated_leduc_poker_test)
+
+add_executable(seep_test seep/seep_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(seep_test seep_test)
 
 add_executable(sheriff_test sheriff/sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
