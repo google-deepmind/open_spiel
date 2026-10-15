@@ -1948,7 +1948,7 @@ std::string CrazyhouseBoard::ToUnicodeString() const {
     for (int8_t file = 0; file < board_size_; ++file) {
       out += at(Square{file, rank}).ToUnicode();
     }
-    out += "\n";
+    out += '\n';
   }
   out += ' ';
   for (int8_t file = 0; file < board_size_; ++file) {

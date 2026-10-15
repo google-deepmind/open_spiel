@@ -91,14 +91,14 @@ std::string DeepSeaState::ToString() const {
   for (int r = 0; r < size_ + 1; ++r) {
     for (int c = 0; c < size_ + 1; ++c) {
       if (player_row_ == r && player_col_ == c) {
-        str += "x";
+        str += 'x';
       } else if (r < size_ && c <= r) {
         str += action_mapping_[r * size_ + c] ? 'R' : 'L';
       } else {
-        str += ".";
+        str += '.';
       }
     }
-    str += "\n";
+    str += '\n';
   }
   return str;
 }

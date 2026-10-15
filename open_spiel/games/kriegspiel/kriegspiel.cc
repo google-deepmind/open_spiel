@@ -467,7 +467,7 @@ std::string KriegspielUmpireMessage::ToString() const {
     msg += pawn_tries == 1 ? "1 pawn try"
                            : std::to_string(pawn_tries) + " pawn tries";
   }
-  msg += ".";
+  msg += '.';
   return msg;
 }
 
