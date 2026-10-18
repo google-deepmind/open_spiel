@@ -14,9 +14,12 @@
 
 #include "open_spiel/algorithms/alpha_zero_torch/vpnet.h"
 
+#include <atomic>
 #include <iostream>
 #include <memory>
+#include <random>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -196,6 +199,73 @@ void TestModelLearnsOptimal(
   SPIEL_CHECK_LT(losses.back().Policy(), 0.1);
 }
 
+// Learning is unaffected by Inference running on the same model, as AlphaZero's
+// inference threads do while the learner trains on a shared device. Two copies
+// of one model learn from the same batches, one alone, one while another thread
+// calls Inference on it without pause; their losses must match at every step.
+// (Learn uses training mode, Inference evaluation mode: a mode switched during
+// a step changes how the batch norms normalise, and so changes the losses.)
+void TestLearnUnaffectedByConcurrentInference(const std::string& nn_model) {
+  std::cout << "TestLearnUnaffectedByConcurrentInference: " << nn_model
+            << std::endl;
+  torch::set_num_threads(1);  // The same results for the same inputs.
+  std::shared_ptr<const Game> game = LoadGame("connect_four");
+  std::string tmp_dir = open_spiel::file::GetTmpDir();
+  std::string filename = absl::StrCat("open_spiel_vpnet_test_concurrent_",
+                                      nn_model, ".pb");
+  SPIEL_CHECK_TRUE(CreateGraphDef(*game, /*learning_rate=*/0.01,
+                                  /*weight_decay=*/0.0001, tmp_dir, filename,
+                                  nn_model, /*nn_width=*/32, /*nn_depth=*/2));
+  VPNetModel alone(*game, tmp_dir, filename, "/cpu:0");
+  VPNetModel beside(*game, tmp_dir, filename, "/cpu:0");
+  std::string checkpoint = alone.SaveCheckpoint(/*step=*/987654);
+  beside.LoadCheckpoint(checkpoint);
+
+  // Batches of positions from random games, with uniform policy targets.
+  std::mt19937 rng(1);
+  std::vector<std::vector<VPNetModel::TrainInputs>> batches(6);
+  for (auto& batch : batches) {
+    while (batch.size() < 256) {
+      std::unique_ptr<State> state = game->NewInitialState();
+      while (!state->IsTerminal() && batch.size() < 256) {
+        std::vector<Action> legal_actions = state->LegalActions();
+        ActionsAndProbs policy;
+        for (Action action : legal_actions) {
+          policy.push_back({action, 1.0 / legal_actions.size()});
+        }
+        batch.push_back({legal_actions, state->ObservationTensor(), policy,
+                         rng() % 2 == 0 ? 1.0 : -1.0});
+        state->ApplyAction(legal_actions[rng() % legal_actions.size()]);
+      }
+    }
+  }
+  std::vector<VPNetModel::InferenceInputs> probe;
+  for (int i = 0; i < 8; ++i) {
+    probe.push_back({batches[0][i].legal_actions, batches[0][i].observations});
+  }
+
+  for (int step = 0; step < batches.size(); ++step) {
+    VPNetModel::LossInfo expected = alone.Learn(batches[step]);
+    std::atomic<bool> stop(false);
+    std::atomic<int> calls(0);
+    std::thread inference([&]() {
+      while (!stop) {
+        beside.Inference(probe);
+        ++calls;
+      }
+    });
+    while (calls == 0) std::this_thread::yield();
+    VPNetModel::LossInfo loss = beside.Learn(batches[step]);
+    stop = true;
+    inference.join();
+    std::cout << absl::StrFormat(
+        "%d: value %.6f alone, %.6f beside inference; policy %.6f, %.6f\n",
+        step, expected.Value(), loss.Value(), expected.Policy(), loss.Policy());
+    SPIEL_CHECK_FLOAT_NEAR(loss.Value(), expected.Value(), 1e-6);
+    SPIEL_CHECK_FLOAT_NEAR(loss.Policy(), expected.Policy(), 1e-6);
+  }
+}
+
 }  // namespace
 }  // namespace torch_az
 }  // namespace algorithms
@@ -213,4 +283,7 @@ int main(int argc, char** argv) {
   auto train_inputs = open_spiel::algorithms::torch_az::SolveGame();
   open_spiel::algorithms::torch_az::TestModelLearnsOptimal("resnet",
                                                            train_inputs);
+
+  open_spiel::algorithms::torch_az::TestLearnUnaffectedByConcurrentInference(
+      "resnet");
 }

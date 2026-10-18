@@ -18,9 +18,11 @@
 #include <torch/torch.h>
 
 #include <nop/structure.h>
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/algorithms/alpha_zero_torch/model.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -150,6 +152,11 @@ class VPNetModel {
   Model model_;
   torch::optim::Adam model_optimizer_;
   torch::Device torch_device_;
+
+  // Inference may run on other threads while Learn changes the model (AlphaZero
+  // on a shared device): Inference holds this shared, Learn exclusively; the
+  // model is in evaluation mode outside Learn. A pointer keeps it movable.
+  std::unique_ptr<absl::Mutex> mutex_ = std::make_unique<absl::Mutex>();
 };
 
 }  // namespace torch_az
