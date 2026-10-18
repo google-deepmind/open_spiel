@@ -36,6 +36,10 @@
 //
 // Parameters:
 //       "chess960"    bool      is it a Fischer Random game?  (default: false)
+//       "egocentric_obs_tensor" bool  observer's pieces and castling rights first
+//                                   (default: false)
+// Egocentric observations keep absolute board coordinates and the absolute
+// side-to-move plane (black = 0, white = 1). Other planes are unchanged.
 //
 
 namespace open_spiel {
@@ -64,6 +68,7 @@ inline const std::vector<int>& ObservationTensorShape() {
 }
 
 constexpr bool kDefaultChess960 = false;
+constexpr bool kDefaultEgocentricObsTensor = false;
 
 // Returns a list of all possible starting positions in chess960.
 std::vector<std::string> Chess960StartingPositions();
@@ -270,6 +275,7 @@ class ChessGame : public Game {
       const std::string& str) const override;
 
   bool IsChess960() const { return chess960_; }
+  bool IsEgocentric() const { return egocentric_obs_tensor_; }
 
   std::string Chess960LookupFEN(int index) const {
     SPIEL_CHECK_GE(index, 0);
@@ -279,6 +285,7 @@ class ChessGame : public Game {
 
  private:
   bool chess960_;
+  bool egocentric_obs_tensor_;
   std::vector<std::string> initial_fens_;  // Used for chess960.
 };
 
