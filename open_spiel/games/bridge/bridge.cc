@@ -651,7 +651,7 @@ std::vector<double> BridgeState::PublicObservationTensor() const {
   auto bidding = ptr + 2 * kNumPlayers;  // initial and recent passes
   int last_bid = 0;
   for (int i = kNumCards; i < history_.size(); ++i) {
-    const int player = i % kNumPlayers;
+    const int player = (i - kNumCards + dealer_) % kNumPlayers;
     const int this_call = history_[i].action - kBiddingActionBase;
     if (this_call == kPass) {
       if (last_bid == 0) ptr[player] = 1;  // Leading passes

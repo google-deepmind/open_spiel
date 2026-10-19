@@ -16,6 +16,7 @@
 
 #include <random>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
 #include "open_spiel/games/bridge/bridge_uncontested_bidding.h"
@@ -336,6 +337,37 @@ void ResampleFromAllPlayerPerspectives() {
   }
 }
 
+void PublicDealerTests() {
+  for (int dealer = 0; dealer < kNumPlayers; ++dealer) {
+    auto game = LoadGame(absl::StrCat(
+        "bridge(use_double_dummy_result=false,dealer=", dealer, ")"));
+    auto state = game->NewInitialState();
+    for (int card = 0; card < kNumCards; ++card) state->ApplyAction(card);
+
+    SPIEL_CHECK_EQ(state->CurrentPlayer(), dealer);
+    state->ApplyAction(kBiddingActionBase);
+    state->ApplyAction(kBiddingActionBase + kNumOtherCalls);
+    state->ApplyAction(kBiddingActionBase + 1);
+    state->ApplyAction(kBiddingActionBase + 2);
+
+    auto* bridge_state = dynamic_cast<const BridgeState*>(state.get());
+    SPIEL_CHECK_TRUE(bridge_state != nullptr);
+    auto obs = bridge_state->PublicObservationTensor();
+
+    const int hdr = 2 * kNumVulnerabilities;
+    const int bid = hdr + 2 * kNumPlayers;
+    for (int p = 0; p < kNumPlayers; ++p) {
+      SPIEL_CHECK_EQ(obs[hdr + p], p == dealer ? 1 : 0);
+      SPIEL_CHECK_EQ(obs[hdr + kNumPlayers + p], 0);
+      SPIEL_CHECK_EQ(obs[bid + p], p == (dealer + 1) % kNumPlayers ? 1 : 0);
+      SPIEL_CHECK_EQ(obs[bid + kNumPlayers + p],
+                     p == (dealer + 2) % kNumPlayers ? 1 : 0);
+      SPIEL_CHECK_EQ(obs[bid + 2 * kNumPlayers + p],
+                     p == (dealer + 3) % kNumPlayers ? 1 : 0);
+    }
+  }
+}
+
 }  // namespace
 }  // namespace bridge
 }  // namespace open_spiel
@@ -354,4 +386,5 @@ int main(int argc, char** argv) {
   open_spiel::bridge::ResampleAtOpeningLead();
   open_spiel::bridge::ResampleMidTrick();
   open_spiel::bridge::ResampleFromAllPlayerPerspectives();
+  open_spiel::bridge::PublicDealerTests();
 }
