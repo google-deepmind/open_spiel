@@ -183,11 +183,7 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
   return GameTypesToShortNames(RegisteredGames());
 }
 
-std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
-  return {
-    "dou_dizhu"  // https://github.com/google-deepmind/open_spiel/issues/1358
-  };
-}
+std::vector<std::string> GameRegisterer::GamesWithKnownIssues() { return {}; }
 
 std::vector<GameType> GameRegisterer::RegisteredGames() {
   std::vector<GameType> games;
