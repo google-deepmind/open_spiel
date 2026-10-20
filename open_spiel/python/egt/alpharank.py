@@ -634,17 +634,22 @@ def sweep_pi_vs_alpha(payoff_tables,
   pi_list = np.empty((num_profiles, 0))
   alpha_list = []
   num_iters = 0
+  num_failed_attempts = 0
   alpha_mult_factor = 2.
+  # Retrying only helps while alpha is in a regime compute() can recover from.
+  # Cap the failures in a row so a payoff table that always blows up (e.g.
+  # non-finite payoffs) raises instead of shrinking alpha forever.
+  max_failed_attempts = 64
 
   if warm_start_alpha is not None:
     alpha = warm_start_alpha
-    alpharank_succeeded_once = False
   else:
     alpha = 1e-4  # Reasonable default for most games, can be user-overridden
 
   while 1:
     try:
       _, _, pi, _, _ = compute(payoff_tables, alpha=alpha, m=m)
+      num_failed_attempts = 0
       pi_list = np.append(pi_list, np.reshape(pi, (-1, 1)), axis=1)
       alpha_list.append(alpha)
       # Stop when pi converges
@@ -653,17 +658,27 @@ def sweep_pi_vs_alpha(payoff_tables,
         break
       alpha *= alpha_mult_factor
       num_iters += 1
-      alpharank_succeeded_once = True
-    except ValueError as _:
-      if warm_start_alpha is not None and not alpharank_succeeded_once:  # pyrefly: ignore[unbound-name]
-        # When warm_start_alpha is used, there's a chance that
-        # the initial warm_start_alpha is too large and causes exceptions due to
-        # the Markov transition matrix being reducible. So keep decreasing until
-        # a single success occurs.
+    except ValueError as value_error:
+      num_failed_attempts += 1
+      if num_failed_attempts > max_failed_attempts:
+        raise RuntimeError(
+            'AlphaRank stationary distribution not found after {} failed '
+            'attempts of the pi_vs_alpha sweep (last alpha={}).'.format(
+                num_failed_attempts, alpha
+            )
+        ) from value_error
+      if num_iters == 0:
+        # No successful compute yet: the current alpha puts the Markov chain
+        # in a reducible (or numerically degenerate) regime, so walk alpha down
+        # until the first compute succeeds.
         alpha /= 2
-      elif not np.allclose(pi_list[:, -1], pi_list[:, -2], rtol, atol):
+      elif num_iters < 2 or not np.allclose(
+          pi_list[:, -1], pi_list[:, -2], rtol, atol
+      ):
         # Sweep stopped due to multiple stationary distributions, but pi had
-        # not converged due to the alpha scaling being too large.
+        # not converged due to the alpha scaling being too large. Before the
+        # second success there is nothing to compare against, so treat pi as
+        # not converged and shrink the step.
         alpha /= alpha_mult_factor
         alpha_mult_factor = (alpha_mult_factor + 1.) / 2.
         alpha *= alpha_mult_factor
