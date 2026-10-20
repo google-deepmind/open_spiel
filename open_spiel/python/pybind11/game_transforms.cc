@@ -23,6 +23,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/game_transforms/cached_tree.h"
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
+#include "open_spiel/game_transforms/extra_info_game.h"
 #include "open_spiel/game_transforms/repeated_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/python/pybind11/pybind11.h"  // NOLINT
@@ -62,6 +63,18 @@ void init_pyspiel_game_transforms(py::module& m) {
         py::overload_cast<const std::string&, const GameParameters&>(
             &CreateRepeatedGame),
         "Creates a repeated game from a stage game.");
+
+  m.def(
+      "create_extra_info_game",
+      [](std::shared_ptr<const Game> game, const GameParameters& params) {
+        return CreateExtraInfoGame(*game, params);
+      },
+      "Creates an extra info game from a wrapped game.");
+
+  m.def("create_extra_info_game",
+        py::overload_cast<const std::string&, const GameParameters&>(
+            &CreateRepeatedGame),
+        "Creates an extra info game from a wrapped game.");
 
   m.def("convert_to_cached_tree",
         [](std::shared_ptr<const Game> game) {
