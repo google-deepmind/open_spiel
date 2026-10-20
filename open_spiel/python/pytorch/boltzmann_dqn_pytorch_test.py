@@ -63,7 +63,27 @@ class DQNTest(absltest.TestCase):
     # This will use the soft-max actions.
     policy = rl_agent_policy.RLAgentPolicy(game, agent, 0, False)
     probs = policy.action_probabilities(game.new_initial_state())
-    self.assertAlmostEqual(probs[0], 0.51, places=2)
+    self.assertAlmostEqual(probs[0], 0.50, places=2)
+
+  def test_illegal_actions_have_zero_probability(self):
+    # Folding is illegal on the opening decision node of Leduc poker, so the
+    # legal actions are [1, 2] while the game has three distinct actions.
+    game = pyspiel.load_game("leduc_poker")
+    env = rl_environment.Environment(game=game)
+    agent = boltzmann_dqn.BoltzmannDQN(
+        0,
+        state_representation_size=game.information_state_tensor_shape()[0],
+        num_actions=game.num_distinct_actions(),
+        hidden_layers_sizes=[16],
+        replay_buffer_capacity=100,
+        batch_size=5,
+        eta=5.0,
+    )
+
+    # This uses the soft-max actions, normalized by the previous Q-network.
+    probs = agent.step(env.reset(), is_evaluation=True).probs
+    self.assertEqual(probs[0], 0.0)
+    self.assertAlmostEqual(sum(probs), 1.0, places=5)
 
 
 if __name__ == "__main__":
