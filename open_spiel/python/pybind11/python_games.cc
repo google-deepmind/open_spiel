@@ -351,10 +351,13 @@ std::vector<int> TensorShape(const TrackingVectorAllocator& allocator) {
 }  // namespace
 
 std::vector<int> PyGame::InformationStateTensorShape() const {
-  TrackingVectorAllocator allocator;
-  auto state = NewInitialState();
-  info_state_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
-  return TensorShape(allocator);
+  if (!information_state_tensor_shape_.has_value()) {
+    TrackingVectorAllocator allocator;
+    auto state = NewInitialState();
+    info_state_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
+    information_state_tensor_shape_ = TensorShape(allocator);
+  }
+  return *information_state_tensor_shape_;
 }
 
 void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
@@ -366,10 +369,13 @@ void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
 }
 
 std::vector<int> PyGame::ObservationTensorShape() const {
-  TrackingVectorAllocator allocator;
-  auto state = NewInitialState();
-  default_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
-  return TensorShape(allocator);
+  if (!observation_tensor_shape_.has_value()) {
+    TrackingVectorAllocator allocator;
+    auto state = NewInitialState();
+    default_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
+    observation_tensor_shape_ = TensorShape(allocator);
+  }
+  return *observation_tensor_shape_;
 }
 
 py::dict PyDict(const State& state) {
