@@ -85,6 +85,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_pokerkit_wrapper.h
   pybind11/games_repeated_pokerkit.cc
   pybind11/games_repeated_pokerkit.h
+  pybind11/games_seep.cc
+  pybind11/games_seep.h
   pybind11/games_shogi.cc
   pybind11/games_shogi.h
   pybind11/games_spades.cc
@@ -300,6 +302,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_gomoku_test.py
   tests/games_hearts_test.py
   tests/games_repeated_poker_test.py
+  tests/games_seep_test.py
   tests/games_sim_test.py
   tests/games_tic_tac_toe_test.py
   tests/games_universal_poker_test.py

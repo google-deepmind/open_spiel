@@ -66,6 +66,7 @@
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_pokerkit_wrapper.h"
 #include "open_spiel/python/pybind11/games_repeated_pokerkit.h"
+#include "open_spiel/python/pybind11/games_seep.h"
 #include "open_spiel/python/pybind11/games_shogi.h"
 #include "open_spiel/python/pybind11/games_spades.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
@@ -869,6 +870,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_kuhn_poker(m);
   init_pyspiel_games_leduc_poker(m);
   init_pyspiel_games_negotiation(m);
+  init_pyspiel_games_seep(m);
   init_pyspiel_games_shogi(m);
   init_pyspiel_games_spades(m);
   init_pyspiel_games_tarok(m);

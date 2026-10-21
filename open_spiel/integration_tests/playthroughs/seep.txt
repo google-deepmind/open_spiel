@@ -1,0 +1,983 @@
+game: seep
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Seep"
+GameType.max_num_players = 4
+GameType.min_num_players = 4
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "seep"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 2917
+PolicyTensorShape() = [2917]
+MaxChanceOutcomes() = 52
+GetParameters() = {}
+NumPlayers() = 4
+MinUtility() = -300.0
+MaxUtility() = 300.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [242]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 242
+MaxGameLength() = 49
+ToString() = "seep()"
+
+# State 0
+# Phase: DealInitial | CurrentPlayer: -1 | Bid: 0 | Floor: []
+# P0 Hand: []
+# P1 Hand: []
+# P2 Hand: []
+# P3 Hand: []
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":0,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(1) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(2) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(3) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+ObservationString(0) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":0,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(3): ◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0,0.0192308), (1,0.0192308), (2,0.0192308), (3,0.0192308), (4,0.0192308), (5,0.0192308), (6,0.0192308), (7,0.0192308), (8,0.0192308), (9,0.0192308), (10,0.0192308), (11,0.0192308), (12,0.0192308), (13,0.0192308), (14,0.0192308), (15,0.0192308), (16,0.0192308), (17,0.0192308), (18,0.0192308), (19,0.0192308), (20,0.0192308), (21,0.0192308), (22,0.0192308), (23,0.0192308), (24,0.0192308), (25,0.0192308), (26,0.0192308), (27,0.0192308), (28,0.0192308), (29,0.0192308), (30,0.0192308), (31,0.0192308), (32,0.0192308), (33,0.0192308), (34,0.0192308), (35,0.0192308), (36,0.0192308), (37,0.0192308), (38,0.0192308), (39,0.0192308), (40,0.0192308), (41,0.0192308), (42,0.0192308), (43,0.0192308), (44,0.0192308), (45,0.0192308), (46,0.0192308), (47,0.0192308), (48,0.0192308), (49,0.0192308), (50,0.0192308), (51,0.0192308)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["Deal:AC", "Deal:AD", "Deal:AH", "Deal:AS", "Deal:2C", "Deal:2D", "Deal:2H", "Deal:2S", "Deal:3C", "Deal:3D", "Deal:3H", "Deal:3S", "Deal:4C", "Deal:4D", "Deal:4H", "Deal:4S", "Deal:5C", "Deal:5D", "Deal:5H", "Deal:5S", "Deal:6C", "Deal:6D", "Deal:6H", "Deal:6S", "Deal:7C", "Deal:7D", "Deal:7H", "Deal:7S", "Deal:8C", "Deal:8D", "Deal:8H", "Deal:8S", "Deal:9C", "Deal:9D", "Deal:9H", "Deal:9S", "Deal:TC", "Deal:TD", "Deal:TH", "Deal:TS", "Deal:JC", "Deal:JD", "Deal:JH", "Deal:JS", "Deal:QC", "Deal:QD", "Deal:QH", "Deal:QS", "Deal:KC", "Deal:KD", "Deal:KH", "Deal:KS"]
+
+# Apply action "Deal:7S"
+action: 27
+
+# State 1
+# Phase: DealInitial | CurrentPlayer: -1 | Bid: 0 | Floor: []
+# P0 Hand: [7S]
+# P1 Hand: []
+# P2 Hand: []
+# P3 Hand: []
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27]
+HistoryString() = "27"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[["7S"],[],[],[]],"observing_player":0,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(1) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(2) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(3) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+ObservationString(0) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[["7S"],[],[],[]],"observing_player":0,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":0,"current_player":-1,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"DealInitial","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(3): ◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0,0.0196078), (1,0.0196078), (2,0.0196078), (3,0.0196078), (4,0.0196078), (5,0.0196078), (6,0.0196078), (7,0.0196078), (8,0.0196078), (9,0.0196078), (10,0.0196078), (11,0.0196078), (12,0.0196078), (13,0.0196078), (14,0.0196078), (15,0.0196078), (16,0.0196078), (17,0.0196078), (18,0.0196078), (19,0.0196078), (20,0.0196078), (21,0.0196078), (22,0.0196078), (23,0.0196078), (24,0.0196078), (25,0.0196078), (26,0.0196078), (28,0.0196078), (29,0.0196078), (30,0.0196078), (31,0.0196078), (32,0.0196078), (33,0.0196078), (34,0.0196078), (35,0.0196078), (36,0.0196078), (37,0.0196078), (38,0.0196078), (39,0.0196078), (40,0.0196078), (41,0.0196078), (42,0.0196078), (43,0.0196078), (44,0.0196078), (45,0.0196078), (46,0.0196078), (47,0.0196078), (48,0.0196078), (49,0.0196078), (50,0.0196078), (51,0.0196078)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["Deal:AC", "Deal:AD", "Deal:AH", "Deal:AS", "Deal:2C", "Deal:2D", "Deal:2H", "Deal:2S", "Deal:3C", "Deal:3D", "Deal:3H", "Deal:3S", "Deal:4C", "Deal:4D", "Deal:4H", "Deal:4S", "Deal:5C", "Deal:5D", "Deal:5H", "Deal:5S", "Deal:6C", "Deal:6D", "Deal:6H", "Deal:6S", "Deal:7C", "Deal:7D", "Deal:7H", "Deal:8C", "Deal:8D", "Deal:8H", "Deal:8S", "Deal:9C", "Deal:9D", "Deal:9H", "Deal:9S", "Deal:TC", "Deal:TD", "Deal:TH", "Deal:TS", "Deal:JC", "Deal:JD", "Deal:JH", "Deal:JS", "Deal:QC", "Deal:QD", "Deal:QH", "Deal:QS", "Deal:KC", "Deal:KD", "Deal:KH", "Deal:KS"]
+
+# Apply action "Deal:JD"
+action: 41
+
+# State 2
+# Apply action "Deal:5H"
+action: 18
+
+# State 3
+# Apply action "Deal:9C"
+action: 32
+
+# State 4
+# Phase: Bid | CurrentPlayer: 0 | Bid: 0 | Floor: []
+# P0 Hand: [5H 7S 9C JD]
+# P1 Hand: []
+# P2 Hand: []
+# P3 Hand: []
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32]
+HistoryString() = "27, 41, 18, 32"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[["5H","7S","9C","JD"],[],[],[]],"observing_player":0,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(1) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(2) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+InformationStateString(3) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: []"
+ObservationString(0) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[["5H","7S","9C","JD"],[],[],[]],"observing_player":0,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":0,"current_player":0,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"Bid","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(3): ◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [0, 2]
+StringLegalActions() = ["Bid:9", "Bid:11"]
+
+# Apply action "Bid:11"
+action: 2
+
+# State 5
+# Apply action "Deal:QH"
+action: 46
+
+# State 6
+# Apply action "Deal:2H"
+action: 6
+
+# State 7
+# Apply action "Deal:AC"
+action: 0
+
+# State 8
+# Apply action "Deal:6S"
+action: 23
+
+# State 9
+# Phase: Play | CurrentPlayer: 0 | Bid: 11 | Floor: [AC 2H 6S QH]
+# P0 Hand: [5H 7S 9C JD]
+# P1 Hand: []
+# P2 Hand: []
+# P3 Hand: []
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[["5H","7S","9C","JD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11]"
+InformationStateString(1) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[[],[],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11]"
+InformationStateString(2) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[[],[],[],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11]"
+InformationStateString(3) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[[],[],[],[]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11]"
+ObservationString(0) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[["5H","7S","9C","JD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[[],[],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[[],[],[],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":0,"floor_piles":["AC","2H","6S","QH"],"hands":[[],[],[],[]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(3): ◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [1045, 1829, 2301]
+StringLegalActions() = ["5H:Build11", "9C:Build11", "JD:Throw"]
+
+# Apply action "5H:Build11"
+action: 1045
+
+# State 10
+# Apply action "Deal:2S"
+action: 7
+
+# State 11
+# Apply action "Deal:QD"
+action: 45
+
+# State 12
+# Apply action "Deal:9S"
+action: 35
+
+# State 13
+# Apply action "Deal:7H"
+action: 26
+
+# State 14
+# Apply action "Deal:3S"
+action: 11
+
+# State 15
+# Apply action "Deal:4C"
+action: 12
+
+# State 16
+# Apply action "Deal:8D"
+action: 29
+
+# State 17
+# Apply action "Deal:7D"
+action: 25
+
+# State 18
+# Apply action "Deal:9H"
+action: 34
+
+# State 19
+# Apply action "Deal:8H"
+action: 30
+
+# State 20
+# Apply action "Deal:KS"
+action: 51
+
+# State 21
+# Apply action "Deal:3C"
+action: 8
+
+# State 22
+# Apply action "Deal:KD"
+action: 49
+
+# State 23
+# Apply action "Deal:5C"
+action: 16
+
+# State 24
+# Apply action "Deal:4H"
+action: 14
+
+# State 25
+# Apply action "Deal:TS"
+action: 39
+
+# State 26
+# Apply action "Deal:QC"
+action: 44
+
+# State 27
+# Apply action "Deal:AH"
+action: 2
+
+# State 28
+# Apply action "Deal:JS"
+action: 43
+
+# State 29
+# Apply action "Deal:2C"
+action: 4
+
+# State 30
+# Apply action "Deal:3H"
+action: 10
+
+# State 31
+# Apply action "Deal:4S"
+action: 15
+
+# State 32
+# Apply action "Deal:2D"
+action: 5
+
+# State 33
+# Apply action "Deal:6H"
+action: 22
+
+# State 34
+# Apply action "Deal:8S"
+action: 31
+
+# State 35
+# Apply action "Deal:KC"
+action: 48
+
+# State 36
+# Apply action "Deal:5S"
+action: 19
+
+# State 37
+# Apply action "Deal:6C"
+action: 20
+
+# State 38
+# Apply action "Deal:JC"
+action: 40
+
+# State 39
+# Apply action "Deal:QS"
+action: 47
+
+# State 40
+# Apply action "Deal:8C"
+action: 28
+
+# State 41
+# Apply action "Deal:TC"
+action: 36
+
+# State 42
+# Apply action "Deal:5D"
+action: 17
+
+# State 43
+# Apply action "Deal:9D"
+action: 33
+
+# State 44
+# Apply action "Deal:AS"
+action: 3
+
+# State 45
+# Apply action "Deal:TD"
+action: 37
+
+# State 46
+# Apply action "Deal:KH"
+action: 50
+
+# State 47
+# Apply action "Deal:JH"
+action: 42
+
+# State 48
+# Apply action "Deal:3D"
+action: 9
+
+# State 49
+# Apply action "Deal:6D"
+action: 21
+
+# State 50
+# Apply action "Deal:AD"
+action: 1
+
+# State 51
+# Apply action "Deal:TH"
+action: 38
+
+# State 52
+# Apply action "Deal:4D"
+action: 13
+
+# State 53
+# Apply action "Deal:7C"
+action: 24
+
+# State 54
+# Phase: Play | CurrentPlayer: 1 | Bid: 11 | Floor: [AC 2H 11[5H,6S] QH]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JD JS QC KD]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H 8S 9S QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TC TD JC QS]
+# P3 Hand: [AD 3C 3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11]"
+InformationStateString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","8S","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11]"
+InformationStateString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","JC","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11]"
+InformationStateString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[[],[],[],["AD","3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11]"
+ObservationString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","8S","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","JC","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["AC","2H","11[5H,6S]","QH"],"hands":[[],[],[],["AD","3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [293, 333, 405, 445, 573, 845, 1069, 1125, 1141, 1237, 1253, 1461, 1477, 1741, 1757, 1965, 2005, 2533, 2573, 2701]
+StringLegalActions() = ["2D:Capture", "2D:Build13", "2S:Capture", "2S:Build13", "3H:Capture", "4S:Throw", "5S:Throw", "6C:Throw", "6C:Build9", "6H:Throw", "6H:Build9", "7H:Throw", "7H:Build9", "8S:Throw", "8S:Build9", "9S:Throw", "9S:Build12", "QD:Capture", "QD:Build13", "KC:Capture"]
+
+# Apply action "8S:Build9"
+action: 1757
+
+# State 55
+# Phase: Play | CurrentPlayer: 2 | Bid: 11 | Floor: [2H 9[AC,8S] 11[5H,6S] QH]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JD JS QC KD]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H 9S QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TC TD JC QS]
+# P3 Hand: [AD 3C 3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9]"
+InformationStateString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9]"
+InformationStateString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","JC","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9]"
+InformationStateString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[[],[],[],["AD","3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9]"
+ObservationString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","JC","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["2H","9[AC,8S]","11[5H,6S]","QH"],"hands":[[],[],[],["AD","3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 0.0, 0.06, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [173, 197, 213, 621, 661, 677, 957, 1405, 1421, 1573, 1597, 1629, 1653, 1861, 1885, 2021, 2061, 2077, 2117, 2253, 2277, 2645]
+StringLegalActions() = ["AS:Throw", "AS:Build10", "AS:Build12", "3S:Throw", "3S:Build12", "4C:Throw", "5D:Throw", "7D:Throw", "7D:Build9", "8C:Throw", "8C:Build10", "8D:Throw", "8D:Build10", "9D:Capture", "9D:Build11", "TC:Throw", "TC:Build12", "TD:Throw", "TD:Build12", "JC:Capture", "JC:Build11", "QS:Capture"]
+
+# Apply action "JC:Build11"
+action: 2277
+
+# State 56
+# Phase: Play | CurrentPlayer: 3 | Bid: 11 | Floor: [11P[AC,2H,5H,6S,8S,JC] QH]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JD JS QC KD]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H 9S QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TC TD QS]
+# P3 Hand: [AD 3C 3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationStateString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11]"
+InformationStateString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11]"
+InformationStateString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11]"
+InformationStateString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[[],[],[],["AD","3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11]"
+ObservationString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","QH"],"hands":[[],[],[],["AD","3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [61, 109, 453, 509, 733, 1181, 1349, 1685, 1909, 2133, 2365, 2805, 2861]
+StringLegalActions() = ["AD:Throw", "AD:Build13", "3C:Throw", "3D:Throw", "4D:Throw", "6D:Throw", "7C:Throw", "8H:Throw", "9H:Throw", "TH:Throw", "JH:Capture", "KH:Throw", "KS:Throw"]
+
+# Apply action "AD:Build13"
+action: 109
+
+# State 57
+# Phase: Play | CurrentPlayer: 0 | Bid: 11 | Floor: [11P[AC,2H,5H,6S,8S,JC] 13[AD,QH]]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JD JS QC KD]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H 9S QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TC TD QS]
+# P3 Hand: [3C 3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 0 card pts, 0 seeps, 0 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13]"
+InformationStateString(1) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13]"
+InformationStateString(2) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13]"
+InformationStateString(3) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13]"
+ObservationString(0) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC","KD"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":0,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]","13[AD,QH]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[0,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 1.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 1.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 1.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 1.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [117, 229, 789, 901, 1517, 1797, 2189, 2309, 2333, 2421, 2445, 2469, 2757]
+StringLegalActions() = ["AH:Throw", "2C:Throw", "4H:Throw", "5C:Throw", "7S:Throw", "9C:Throw", "TS:Throw", "JD:Capture", "JD:Build11", "JS:Capture", "JS:Build11", "QC:Throw", "KD:Capture"]
+
+# Apply action "KD:Capture"
+action: 2757
+
+# State 58
+# Phase: Play | CurrentPlayer: 1 | Bid: 11 | Floor: [11P[AC,2H,5H,6S,8S,JC]]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JD JS QC]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H 9S QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TC TD QS]
+# P3 Hand: [3C 3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 1 card pts, 0 seeps, 1 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture]"
+InformationStateString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture]"
+InformationStateString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture]"
+InformationStateString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture]"
+ObservationString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","9S","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [285, 397, 565, 845, 1069, 1125, 1237, 1461, 1965, 2525, 2693]
+StringLegalActions() = ["2D:Throw", "2S:Throw", "3H:Throw", "4S:Throw", "5S:Throw", "6C:Throw", "6H:Throw", "7H:Throw", "9S:Throw", "QD:Throw", "KC:Throw"]
+
+# Apply action "9S:Throw"
+action: 1965
+
+# State 59
+# Phase: Play | CurrentPlayer: 2 | Bid: 11 | Floor: [9S 11P[AC,2H,5H,6S,8S,JC]]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JD JS QC]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TC TD QS]
+# P3 Hand: [3C 3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 1 card pts, 0 seeps, 1 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw]"
+InformationStateString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw]"
+InformationStateString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw]"
+InformationStateString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw]"
+ObservationString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TC","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [173, 197, 621, 661, 677, 957, 1405, 1573, 1629, 1861, 2021, 2077, 2637]
+StringLegalActions() = ["AS:Throw", "AS:Build10", "3S:Throw", "3S:Build12", "4C:Throw", "5D:Throw", "7D:Throw", "8C:Throw", "8D:Throw", "9D:Capture", "TC:Throw", "TD:Throw", "QS:Throw"]
+
+# Apply action "TC:Throw"
+action: 2021
+
+# State 60
+# Phase: Play | CurrentPlayer: 3 | Bid: 11 | Floor: [9S TC 11P[AC,2H,5H,6S,8S,JC]]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JD JS QC]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TD QS]
+# P3 Hand: [3C 3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 1 card pts, 0 seeps, 1 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationStateString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw]"
+InformationStateString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw]"
+InformationStateString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw]"
+InformationStateString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw]"
+ObservationString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JD","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["9S","TC","11P[AC,2H,5H,6S,8S,JC]"],"hands":[[],[],[],["3C","3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[1,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 1.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 1.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 1.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 1.0, 0.0, 0.0, 1.0, 1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [453, 501, 509, 557, 733, 781, 1181, 1349, 1685, 1917, 2141, 2365, 2805, 2861]
+StringLegalActions() = ["3C:Throw", "3C:Build13", "3D:Throw", "3D:Build13", "4D:Throw", "4D:Build13", "6D:Throw", "7C:Throw", "8H:Throw", "9H:Capture", "TH:Capture", "JH:Capture", "KH:Throw", "KS:Throw"]
+
+# Apply action "3C:Build13"
+action: 501
+
+# State 61
+# Apply action "JD:Capture"
+action: 2309
+
+# State 62
+# Phase: Play | CurrentPlayer: 1 | Bid: 11 | Floor: [9S 13[3C,TC]]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JS QC]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H QD KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TD QS]
+# P3 Hand: [3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 16 card pts, 0 seeps, 16 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture]"
+InformationStateString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture]"
+InformationStateString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture]"
+InformationStateString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[[],[],[],["3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture]"
+ObservationString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","QD","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["9S","13[3C,TC]"],"hands":[[],[],[],["3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [285, 397, 565, 605, 845, 893, 1069, 1125, 1237, 1461, 2525, 2701, 2741]
+StringLegalActions() = ["2D:Throw", "2S:Throw", "3H:Throw", "3H:Build12", "4S:Throw", "4S:Build13", "5S:Throw", "6C:Throw", "6H:Throw", "7H:Throw", "QD:Throw", "KC:Capture", "KC:Build13"]
+
+# Apply action "QD:Throw"
+action: 2525
+
+# State 63
+# Phase: Play | CurrentPlayer: 2 | Bid: 11 | Floor: [9S QD 13[3C,TC]]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JS QC]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D 9D TD QS]
+# P3 Hand: [3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 16 card pts, 0 seeps, 16 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw]"
+InformationStateString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw]"
+InformationStateString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw]"
+InformationStateString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[[],[],[],["3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw]"
+ObservationString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","9D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["9S","QD","13[3C,TC]"],"hands":[[],[],[],["3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[16,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [173, 197, 621, 661, 677, 957, 1405, 1573, 1629, 1861, 2077, 2645]
+StringLegalActions() = ["AS:Throw", "AS:Build10", "3S:Throw", "3S:Build12", "4C:Throw", "5D:Throw", "7D:Throw", "8C:Throw", "8D:Throw", "9D:Capture", "TD:Throw", "QS:Capture"]
+
+# Apply action "9D:Capture"
+action: 1861
+
+# State 64
+# Phase: Play | CurrentPlayer: 3 | Bid: 11 | Floor: [QD 13[3C,TC]]
+# P0 Hand: [AH 2C 4H 5C 7S 9C TS JS QC]
+# P1 Hand: [2D 2S 3H 4S 5S 6C 6H 7H KC]
+# P2 Hand: [AS 3S 4C 5D 7D 8C 8D TD QS]
+# P3 Hand: [3D 4D 6D 7C 8H 9H TH JH KH KS]
+# Team 0 (P0,P2): 25 card pts, 0 seeps, 25 total | Team 1 (P1,P3): 0 card pts, 0 seeps, 0 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationStateString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture]"
+InformationStateString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture]"
+InformationStateString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture]"
+InformationStateString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[[],[],[],["3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture]"
+ObservationString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[["AH","2C","4H","5C","7S","9C","TS","JS","QC"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[[],["2D","2S","3H","4S","5S","6C","6H","7H","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[[],[],["AS","3S","4C","5D","7D","8C","8D","TD","QS"],[]],"observing_player":2,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["QD","13[3C,TC]"],"hands":[[],[],[],["3D","4D","6D","7C","8H","9H","TH","JH","KH","KS"]],"observing_player":3,"phase":"Play","team_card_points":[25,0],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [509, 733, 1181, 1349, 1685, 1909, 2133, 2357, 2813, 2853, 2869, 2909]
+StringLegalActions() = ["3D:Throw", "4D:Throw", "6D:Throw", "7C:Throw", "8H:Throw", "9H:Throw", "TH:Throw", "JH:Throw", "KH:Capture", "KH:Build13", "KS:Capture", "KS:Build13"]
+
+# Apply action "4D:Throw"
+action: 733
+
+# State 65
+# Apply action "7S:Throw"
+action: 1517
+
+# State 66
+# Apply action "6C:Build13"
+action: 1173
+
+# State 67
+# Apply action "AS:Throw"
+action: 173
+
+# State 68
+# Apply action "6D:Throw"
+action: 1181
+
+# State 69
+# Apply action "5C:Build10"
+action: 925
+
+# State 70
+# Apply action "4S:Throw"
+action: 845
+
+# State 71
+# Apply action "TD:Capture"
+action: 2085
+
+# State 72
+# Apply action "9H:Throw"
+action: 1909
+
+# State 73
+# Apply action "QC:Capture"
+action: 2477
+
+# State 74
+# Apply action "7H:Throw"
+action: 1461
+
+# State 75
+# Apply action "8C:Throw"
+action: 1573
+
+# State 76
+# Apply action "3D:Build10"
+action: 533
+
+# State 77
+# Apply action "2C:Build11"
+action: 261
+
+# State 78
+# Apply action "3H:Build13"
+action: 613
+
+# State 79
+# Apply action "5D:Throw"
+action: 957
+
+# State 80
+# Apply action "TH:Throw"
+action: 2133
+
+# State 81
+# Apply action "TS:Capture"
+action: 2197
+
+# State 82
+# Apply action "2S:Throw"
+action: 397
+
+# State 83
+# Apply action "3S:Throw"
+action: 621
+
+# State 84
+# Apply action "KH:Capture:1"
+action: 2814
+
+# State 85
+# Apply action "JS:Capture"
+action: 2421
+
+# State 86
+# Apply action "6H:Throw"
+action: 1237
+
+# State 87
+# Apply action "QS:Throw"
+action: 2637
+
+# State 88
+# Apply action "KS:Throw"
+action: 2861
+
+# State 89
+# Phase: Play | CurrentPlayer: 0 | Bid: 11 | Floor: [5D 6H QS KS]
+# P0 Hand: [AH 4H 9C]
+# P1 Hand: [2D 5S KC]
+# P2 Hand: [4C 7D 8D]
+# P3 Hand: [7C 8H JH]
+# Team 0 (P0,P2): 57 card pts, 0 seeps, 57 total | Team 1 (P1,P3): 12 card pts, 0 seeps, 12 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[["AH","4H","9C"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw]"
+InformationStateString(1) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[[],["2D","5S","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw]"
+InformationStateString(2) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[[],[],["4C","7D","8D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw]"
+InformationStateString(3) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[[],[],[],["7C","8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw]"
+ObservationString(0) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[["AH","4H","9C"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[[],["2D","5S","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[[],[],["4C","7D","8D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":0,"floor_piles":["5D","6H","QS","KS"],"hands":[[],[],[],["7C","8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [117, 789, 805, 1797]
+StringLegalActions() = ["AH:Throw", "4H:Throw", "4H:Build9", "9C:Throw"]
+
+# Apply action "4H:Build9"
+action: 805
+
+# State 90
+# Apply action "2D:Throw"
+action: 285
+
+# State 91
+# Apply action "4C:Throw"
+action: 677
+
+# State 92
+# Apply action "7C:Build11"
+action: 1381
+
+# State 93
+# Apply action "9C:Throw"
+action: 1797
+
+# State 94
+# Phase: Play | CurrentPlayer: 1 | Bid: 11 | Floor: [6H 9C 11P[2D,4C,4H,5D,7C] QS KS]
+# P0 Hand: [AH]
+# P1 Hand: [5S KC]
+# P2 Hand: [7D 8D]
+# P3 Hand: [8H JH]
+# Team 0 (P0,P2): 57 card pts, 0 seeps, 57 total | Team 1 (P1,P3): 12 card pts, 0 seeps, 12 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[["AH"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw]"
+InformationStateString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[[],["5S","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw]"
+InformationStateString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[[],[],["7D","8D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw]"
+InformationStateString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[[],[],[],["8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw]"
+ObservationString(0) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[["AH"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[[],["5S","KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[[],[],["7D","8D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":1,"floor_piles":["6H","9C","11P[2D,4C,4H,5D,7C]","QS","KS"],"hands":[[],[],[],["8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [1069, 1101, 2701]
+StringLegalActions() = ["5S:Throw", "5S:Build11", "KC:Capture"]
+
+# Apply action "5S:Build11"
+action: 1101
+
+# State 95
+# Phase: Play | CurrentPlayer: 2 | Bid: 11 | Floor: [9C 11P[2D,4C,4H,5D,5S,6H,7C] QS KS]
+# P0 Hand: [AH]
+# P1 Hand: [KC]
+# P2 Hand: [7D 8D]
+# P3 Hand: [8H JH]
+# Team 0 (P0,P2): 57 card pts, 0 seeps, 57 total | Team 1 (P1,P3): 12 card pts, 0 seeps, 12 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797, 1101]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797, 1101"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[["AH"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11]"
+InformationStateString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],["KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11]"
+InformationStateString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],["7D","8D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11]"
+InformationStateString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],[],["8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11]"
+ObservationString(0) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[["AH"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],["KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],["7D","8D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":2,"floor_piles":["9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],[],["8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [1405, 1629]
+StringLegalActions() = ["7D:Throw", "8D:Throw"]
+
+# Apply action "8D:Throw"
+action: 1629
+
+# State 96
+# Phase: Play | CurrentPlayer: 3 | Bid: 11 | Floor: [8D 9C 11P[2D,4C,4H,5D,5S,6H,7C] QS KS]
+# P0 Hand: [AH]
+# P1 Hand: [KC]
+# P2 Hand: [7D]
+# P3 Hand: [8H JH]
+# Team 0 (P0,P2): 57 card pts, 0 seeps, 57 total | Team 1 (P1,P3): 12 card pts, 0 seeps, 12 total
+IsTerminal() = False
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797, 1101, 1629]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797, 1101, 1629"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationStateString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[["AH"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw]"
+InformationStateString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],["KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw]"
+InformationStateString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],["7D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw]"
+InformationStateString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],[],["8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw]"
+ObservationString(0) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[["AH"],[],[],[]],"observing_player":0,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],["KC"],[],[]],"observing_player":1,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],["7D"],[]],"observing_player":2,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":3,"floor_piles":["8D","9C","11P[2D,4C,4H,5D,5S,6H,7C]","QS","KS"],"hands":[[],[],[],["8H","JH"]],"observing_player":3,"phase":"Play","team_card_points":[57,12],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.05, 1.0, 0.0, 0.12, 1.0, 0.0, 0.13, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.57, 0.0, 0.12, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
+LegalActions() = [1693, 2365]
+StringLegalActions() = ["8H:Capture", "JH:Capture"]
+
+# Apply action "8H:Capture"
+action: 1693
+
+# State 97
+# Apply action "AH:Throw"
+action: 117
+
+# State 98
+# Apply action "KC:Capture"
+action: 2701
+
+# State 99
+# Apply action "7D:Throw"
+action: 1405
+
+# State 100
+# Apply action "JH:Capture"
+action: 2365
+
+# State 101
+# Phase: GameOver | CurrentPlayer: -4 | Bid: 11 | Floor: []
+# P0 Hand: []
+# P1 Hand: []
+# P2 Hand: []
+# P3 Hand: []
+# Team 0 (P0,P2): 57 card pts, 0 seeps, 57 total | Team 1 (P1,P3): 43 card pts, 0 seeps, 43 total
+IsTerminal() = True
+History() = [27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797, 1101, 1629, 1693, 117, 2701, 1405, 2365]
+HistoryString() = "27, 41, 18, 32, 2, 46, 6, 0, 23, 1045, 7, 45, 35, 26, 11, 12, 29, 25, 34, 30, 51, 8, 49, 16, 14, 39, 44, 2, 43, 4, 10, 15, 5, 22, 31, 48, 19, 20, 40, 47, 28, 36, 17, 33, 3, 37, 50, 42, 9, 21, 1, 38, 13, 24, 1757, 2277, 109, 2757, 1965, 2021, 501, 2309, 2525, 1861, 733, 1517, 1173, 173, 1181, 925, 845, 2085, 1909, 2477, 1461, 1573, 533, 261, 613, 957, 2133, 2197, 397, 621, 2814, 2421, 1237, 2637, 2861, 805, 285, 677, 1381, 1797, 1101, 1629, 1693, 117, 2701, 1405, 2365"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":0,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw P3:8H:Capture P0:AH:Throw P1:KC:Capture P2:7D:Throw P3:JH:Capture]"
+InformationStateString(1) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw P3:8H:Capture P0:AH:Throw P1:KC:Capture P2:7D:Throw P3:JH:Capture]"
+InformationStateString(2) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw P3:8H:Capture P0:AH:Throw P1:KC:Capture P2:7D:Throw P3:JH:Capture]"
+InformationStateString(3) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}\nPublicMoves: [P0:Bid:11 P0:5H:Build11 P1:8S:Build9 P2:JC:Build11 P3:AD:Build13 P0:KD:Capture P1:9S:Throw P2:TC:Throw P3:3C:Build13 P0:JD:Capture P1:QD:Throw P2:9D:Capture P3:4D:Throw P0:7S:Throw P1:6C:Build13 P2:AS:Throw P3:6D:Throw P0:5C:Build10 P1:4S:Throw P2:TD:Capture P3:9H:Throw P0:QC:Capture P1:7H:Throw P2:8C:Throw P3:3D:Build10 P0:2C:Build11 P1:3H:Build13 P2:5D:Throw P3:TH:Throw P0:TS:Capture P1:2S:Throw P2:3S:Throw P3:KH:Capture:1 P0:JS:Capture P1:6H:Throw P2:QS:Throw P3:KS:Throw P0:4H:Build9 P1:2D:Throw P2:4C:Throw P3:7C:Build11 P0:9C:Throw P1:5S:Build11 P2:8D:Throw P3:8H:Capture P0:AH:Throw P1:KC:Capture P2:7D:Throw P3:JH:Capture]"
+ObservationString(0) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":0,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}"
+ObservationString(1) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":1,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}"
+ObservationString(2) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":2,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}"
+ObservationString(3) = "{"bid_value":11,"current_player":-4,"floor_piles":[],"hands":[[],[],[],[]],"observing_player":3,"phase":"GameOver","team_card_points":[57,43],"team_seeps":[0,0]}"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.57, 0.0, 0.43, 0.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.57, 0.0, 0.43, 0.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.57, 0.0, 0.43, 0.0]
+ObservationTensor(3) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.57, 0.0, 0.43, 0.0]
+Rewards() = [14, -14, 14, -14]
+Returns() = [14, -14, 14, -14]
