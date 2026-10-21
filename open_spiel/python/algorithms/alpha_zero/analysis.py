@@ -81,7 +81,7 @@ def sub_sample(data, count):
 
 
 def smooth(data, count):
-  for k in data.keys():
+  for k in data:
     if not isinstance(k, str) or not k.startswith("time_"):
       data[k] = data[k].rolling(max(1, len(data) // count)).mean()
   return data
@@ -291,7 +291,7 @@ def main(argv):
   data = load_jsonl_data(os.path.join(FLAGS.path, "learner.jsonl"))
 
   print("config:")
-  print_columns(sorted("{}: {}\n".format(k, v) for k, v in config.items()))
+  print_columns(sorted(f"{k}: {v}\n" for k, v in config.items()))
   print("data keys:")
   try:
     print_columns(sorted(data[0].keys()))
@@ -301,9 +301,9 @@ def main(argv):
   print(
       "\ntraining time:", datetime.timedelta(seconds=int(data[-1]["time_rel"]))
   )
-  print("training steps: %d" % (data[-1]["step"]))
-  print("total states: %d" % (data[-1]["total_states"]))
-  print("total trajectories: %d\n" % (data[-1]["total_trajectories"]))
+  print(f"training steps: {(data[-1]['step'])}")
+  print(f"total states: {(data[-1]['total_states'])}")
+  print(f"total trajectories: {(data[-1]['total_trajectories'])}\n")
 
   try:
     plot_data(config, data)
