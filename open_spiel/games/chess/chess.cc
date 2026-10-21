@@ -592,5 +592,17 @@ int ChessGame::MaxChanceOutcomes() const {
   }
 }
 
+int ChessGame::MaxSerializationLength() const {
+  // "FEN: " + fen + "\n" + StrJoin(history, "\n") + "\n"
+  // Max FEN length is approximately 100 characters.
+  // Max history length is MaxHistoryLength().
+  // Each action is up to 5 digits (NumDistinctActions() ~ 4674).
+  int max_fen_len = 100;
+  int max_history_len = MaxHistoryLength();
+  int max_action_len = 5;  // log10(4674) + 1
+  return std::strlen("FEN: ") + max_fen_len + 1 +
+         max_history_len * (max_action_len + 1) + 1;
+}
+
 }  // namespace chess
 }  // namespace open_spiel
