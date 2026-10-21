@@ -893,8 +893,11 @@ std::unique_ptr<ObservationStruct> GinRummyState::ToObservationStruct(
   obs_struct->observing_player = player;
 
   Player opponent = 1 - player;
+  // A hand becomes public only when its owner knocks (the knocker lays the
+  // hand face up) or at game end. The defender's hand stays private while
+  // they lay off, so the Layoff phase alone must not reveal it: during that
+  // phase the observer may be the knocker and the opponent the defender.
   bool hide_opponent_hand = !obs_struct->knocked[opponent] &&
-                            obs_struct->phase != "Layoff" &&
                             obs_struct->phase != "GameOver";
 
   if (hide_opponent_hand) {

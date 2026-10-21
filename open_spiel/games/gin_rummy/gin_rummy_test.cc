@@ -730,6 +730,48 @@ void TestStructs() {
                  GinRummyObservationStruct(obs_json).ToJson());
 }
 
+// The observation struct must not reveal a hand whose owner has not knocked.
+// During the Layoff phase the observer may be the knocker and the opponent the
+// defender, whose remaining cards are still private.
+void ObservationStructHidesDefenderHandTest() {
+  std::shared_ptr<const Game> game = LoadGame("gin_rummy");
+  std::unique_ptr<State> state = game->NewInitialState();
+  // Same deal as GameplayTest3: Player0 knocks, Player1 defends.
+  std::vector<Action> initial_actions = {
+      10, 11, 12, 22, 35, 48, 13, 26, 1, 40, 9,  8,
+      3,  16, 29, 42, 4,  17, 30, 43, 0, 52, 55, 1};
+  for (auto action : initial_actions) state->ApplyAction(action);
+  // Player0 lays its melds and passes, moving the hand into the Layoff phase.
+  for (Action action : {59, 101, 131, 54}) state->ApplyAction(action);
+
+  GinRummyState* gr_state = static_cast<GinRummyState*>(state.get());
+  auto knocker_obs = gr_state->ToObservationStruct(0);
+  auto* knocker_view =
+      static_cast<GinRummyObservationStruct*>(knocker_obs.get());
+  SPIEL_CHECK_EQ(knocker_view->phase, "Layoff");
+  SPIEL_CHECK_TRUE(knocker_view->knocked[0]);
+  SPIEL_CHECK_FALSE(knocker_view->knocked[1]);
+
+  // The defender has not knocked, so the knocker must not see its cards.
+  for (const std::string& card : knocker_view->hands[1]) {
+    SPIEL_CHECK_EQ(card, "XX");
+  }
+  SPIEL_CHECK_EQ(knocker_view->deadwood[1], -1);
+
+  // The knocker laid its hand face up, so the defender still sees it, and
+  // each player always sees its own cards.
+  auto defender_obs = gr_state->ToObservationStruct(1);
+  auto* defender_view =
+      static_cast<GinRummyObservationStruct*>(defender_obs.get());
+  SPIEL_CHECK_FALSE(defender_view->hands[0].empty());
+  for (const std::string& card : defender_view->hands[0]) {
+    SPIEL_CHECK_NE(card, "XX");
+  }
+  for (const std::string& card : defender_view->hands[1]) {
+    SPIEL_CHECK_NE(card, "XX");
+  }
+}
+
 }  // namespace
 }  // namespace gin_rummy
 }  // namespace open_spiel
@@ -749,5 +791,6 @@ int main(int argc, char** argv) {
   open_spiel::gin_rummy::ResampleFromInfostateTest();
   open_spiel::gin_rummy::ResampleFromInfostateKnownCardsTest();
   open_spiel::gin_rummy::TestStructs();
+  open_spiel::gin_rummy::ObservationStructHidesDefenderHandTest();
   std::cout << "Gin rummy tests passed!" << std::endl;
 }
