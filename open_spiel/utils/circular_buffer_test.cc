@@ -15,6 +15,7 @@
 #include "open_spiel/utils/circular_buffer.h"
 
 #include <random>
+#include <vector>
 
 #include "open_spiel/spiel_utils.h"
 
@@ -65,7 +66,21 @@ void TestCircularBuffer() {
   SPIEL_CHECK_LE(sample[0], 18);
 }
 
+// Once the buffer is full, a slot holds the new element's storage, not the
+// storage of the largest element it held before.
+void TestReplacedElementsDoNotKeepOldStorage() {
+  CircularBuffer<std::vector<int>> buffer(1);
+  buffer.Add(std::vector<int>(1000, 1));
+  std::vector<int> small(3, 2);
+  buffer.Add(small);
+  SPIEL_CHECK_TRUE(buffer[0] == small);
+  SPIEL_CHECK_LT(buffer[0].capacity(), 1000);
+}
+
 }  // namespace
 }  // namespace open_spiel
 
-int main(int argc, char** argv) { open_spiel::TestCircularBuffer(); }
+int main(int argc, char** argv) {
+  open_spiel::TestCircularBuffer();
+  open_spiel::TestReplacedElementsDoNotKeepOldStorage();
+}

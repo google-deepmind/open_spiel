@@ -30,6 +30,7 @@ namespace {
 
 const char* kSimpleSerializationFilename = "simple_buffer_data.nop";
 const char* kComplexSerializationFilename = "complex_buffer_data.nop";
+const char* kCapacitySerializationFilename = "capacity_buffer_data.nop";
 
 struct TestStruct {
   std::vector<Action> action_vector;
@@ -146,6 +147,23 @@ void TestComplexSerializableCircularBufferSerialization() {
   SPIEL_CHECK_TRUE(file::Remove(filename));
 }
 
+// A loaded element does not keep spare capacity from being read element by
+// element.
+void TestLoadedElementsDoNotKeepSpareCapacity() {
+  std::string filename =
+      file::GetTmpDir() + "/" + kCapacitySerializationFilename;
+  SerializableCircularBuffer<std::vector<float>> original_buffer(1);
+  original_buffer.Add(std::vector<float>(1025, 1.0f));
+  original_buffer.SaveBuffer(filename);
+
+  SerializableCircularBuffer<std::vector<float>> new_buffer(1);
+  new_buffer.LoadBuffer(filename);
+
+  SPIEL_CHECK_TRUE(original_buffer.Data() == new_buffer.Data());
+  SPIEL_CHECK_LT(2 * new_buffer[0].capacity(), 3 * new_buffer[0].size());
+  SPIEL_CHECK_TRUE(file::Remove(filename));
+}
+
 }  // namespace
 }  // namespace open_spiel
 
@@ -154,4 +172,5 @@ int main(int argc, char** argv) {
   open_spiel::TestSerializableCircularBuffer();
   open_spiel::TestSimpleSerializableCircularBufferSerialization();
   open_spiel::TestComplexSerializableCircularBufferSerialization();
+  open_spiel::TestLoadedElementsDoNotKeepSpareCapacity();
 }
