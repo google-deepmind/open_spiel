@@ -1,0 +1,237 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  The Setup panel's sections: Game options, a card of parameter rows, and
+  Position, a card of the controls that replace the position.
+*/
+
+.setup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 14px 16px;
+}
+
+.setup__notice {
+  margin: 0;
+  padding: 12px;
+  color: var(--color-text-secondary);
+}
+
+.setup-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+}
+
+.setup-card__title {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.setup-card__description {
+  margin: 4px 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.setup-card__header > .setup-card__description:first-child {
+  margin-top: 0;
+}
+
+.setup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setup-form__problem {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+/* A parameter: its label on the left, its control on the right, and its
+   description and notice on full-width lines beneath. */
+.setup-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--color-surface-sunken);
+}
+
+.setup-field__label {
+  min-width: 120px;
+  font-weight: 500;
+}
+
+.setup-field__checkbox {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.setup-field__description {
+  width: 100%;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.setup-field__notice {
+  width: 100%;
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.setup-input {
+  flex: 1;
+  box-sizing: border-box;
+  min-width: 120px;
+  max-width: 100%;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+/* A list never shrinks below its longest option; it wraps instead. */
+select.setup-input {
+  flex: 1 0 auto;
+}
+
+textarea.setup-input {
+  width: 100%;
+  font-family: var(--font-family-monospace);
+  resize: vertical;
+}
+
+.setup-input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.setup-values {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.setup-values__value {
+  flex: 1;
+  min-width: 120px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.setup-position__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.setup-set-state {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.setup-set-state:has(.setup-set-state__panel) {
+  flex-basis: 100%;
+}
+
+.setup-set-state > .button {
+  align-self: flex-start;
+}
+
+.setup-set-state__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.setup-set-state__label {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.setup-set-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.setup-set-state__applied {
+  color: var(--color-success);
+  font-size: 12px;
+}
+
+.setup-set-state__problem {
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+/* The reset confirmation, placed by its control under the Reset button. */
+.setup-confirm {
+  position: fixed;
+  /* Above the dock's overlays, --dv-overlay-z-index in dock.css. */
+  z-index: 1000;
+  box-sizing: border-box;
+  width: 280px;
+  padding: 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.setup-confirm__warning {
+  margin-bottom: 10px;
+}
+
+.setup-confirm__warning strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.setup-confirm__warning p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}

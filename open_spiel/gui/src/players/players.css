@@ -1,0 +1,317 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  The Players panel: a header, then the seat list in its own scroll, so a
+  seat editor's save bar can stick to its top edge, or to its bottom edge
+  when the scroll is short.
+*/
+
+.players {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  padding: 14px 16px 0;
+}
+
+.players__title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.players__status {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.players__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.players__seats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0 0 12px;
+  list-style: none;
+}
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+  container-type: inline-size;
+}
+
+/* A fixed two-column header (details | actions), so Settings sits in the
+   same place for every seat whatever its label's length. */
+.seat__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: start;
+}
+
+/* A narrow card stacks every seat the same way: actions under details. */
+@container (max-width: 260px) {
+  .seat__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.seat__details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.seat__name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.seat__controller {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.seat__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.seat__chevron {
+  padding: 4px 8px;
+  border: none;
+  background: var(--color-none);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 12px;
+}
+
+.seat__chevron:enabled:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.seat__chevron:hover:enabled:not([aria-disabled='true']) {
+  color: var(--color-text);
+}
+
+.seat__failure {
+  color: var(--color-danger);
+}
+
+.seat__failure p {
+  margin: 0;
+}
+
+.seat__failure-message {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.seat__settings[hidden] {
+  display: none;
+}
+
+.seat__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px;
+}
+
+.seat__summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.seat__summary-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 13px;
+}
+
+.seat__summary-row dt {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.seat__summary-row dt::after {
+  content: ':';
+}
+
+.seat__summary-row dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.seat__summary-json {
+  margin: 4px 0 0;
+  padding: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-sunken);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.seat-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The controller row: the same label | control grid as the settings form. */
+.seat-editor__field {
+  display: grid;
+  grid-template-columns: minmax(90px, min(140px, 40%)) minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: center;
+}
+
+.seat-editor__field-label {
+  font-size: 13px;
+}
+
+.seat-editor__controller-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.seat-editor__controller-row > select {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.seat-editor__autoplay {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.seat-editor__unavailable {
+  grid-column: 2;
+  margin: 0;
+  color: var(--color-warning);
+  font-size: 13px;
+}
+
+.seat-editor__json {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.seat-editor__json textarea {
+  min-height: 140px;
+  padding: 10px;
+  font-family: var(--font-family-monospace);
+  font-size: 13px;
+  resize: vertical;
+}
+
+.seat-editor__error {
+  margin: 0;
+  color: var(--color-danger);
+}
+
+/* Save and Reset, at the top and at the bottom of an open seat editor. The
+   top bar sticks to the seat list's scroll, or the bottom one when the
+   scroll is short, where two pinned bars would cover each other. */
+.seat-editor__save-bar {
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  background: var(--color-surface-raised);
+}
+
+.seat-editor__save-bar--top {
+  position: sticky;
+  top: 0;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.seat-editor__save-bar--bottom {
+  padding: 10px 0 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.players__scroll--short .seat-editor__save-bar--top {
+  position: static;
+}
+
+.players__scroll--short .seat-editor__save-bar--bottom {
+  position: sticky;
+  bottom: 0;
+  padding: 6px 0;
+}
+
+.seat-editor__state {
+  margin-right: auto;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.seat-editor__state[data-changed='true'] {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.seat-editor__unsaved-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--color-warning);
+  vertical-align: middle;
+}
+
+.seat-editor__save-bar .button {
+  white-space: nowrap;
+}

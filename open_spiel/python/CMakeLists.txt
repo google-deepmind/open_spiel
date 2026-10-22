@@ -273,6 +273,37 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/pursuit_evasion_test.py
   games/team_dominoes_test.py
   games/tic_tac_toe_test.py
+  gui/api_test.py
+  gui/catalogue_test.py
+  gui/cli_test.py
+  gui/contract_test.py
+  gui/controller_settings_test.py
+  gui/controllers_test.py
+  gui/errors_test.py
+  gui/fake_session_test.py
+  gui/frame_checks_test.py
+  gui/frame_test.py
+  gui/games_smoke_test.py
+  gui/gil_safety_test.py
+  gui/health_report_test.py
+  gui/health_test.py
+  gui/information_test.py
+  gui/loader_test.py
+  gui/plies_test.py
+  gui/request_test.py
+  gui/schema_test.py
+  gui/seats_test.py
+  gui/server_test.py
+  gui/session_history_test.py
+  gui/session_test.py
+  gui/static_test.py
+  gui/store_test.py
+  gui/sweep_all_test.py
+  gui/sweep_census_test.py
+  gui/sweep_exceptions_test.py
+  gui/sweep_test.py
+  gui/views_test.py
+  gui/wire_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/mirror_descent_test.py
   mfg/algorithms/greedy_policy_test.py

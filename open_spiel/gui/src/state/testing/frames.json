@@ -1,0 +1,2071 @@
+{
+  "kuhn_poker/0/0": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": 0,
+        "label": "Pass",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 1
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [-2.0, 2.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": "",
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": "",
+    "omniscient": false,
+    "ply": 0,
+    "returns": null,
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "chance",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 0
+    }
+  },
+  "kuhn_poker/0/3": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": 0,
+        "label": "Pass",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 1
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [-2.0, 2.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": "0p",
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": "011",
+    "omniscient": false,
+    "ply": 3,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "seat",
+      "seat": 1
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 0
+    }
+  },
+  "kuhn_poker/0/live": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": 0,
+        "label": "Pass",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 1
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [-2.0, 2.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": "0pbb",
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": "022",
+    "omniscient": false,
+    "ply": 5,
+    "returns": [-2.0, 2.0],
+    "rewards": [-2.0, 2.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "terminal",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 0
+    }
+  },
+  "kuhn_poker/1/0": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      }
+    ],
+    "information_state_text": "",
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": "",
+    "omniscient": false,
+    "ply": 0,
+    "returns": null,
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "chance",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 1
+    }
+  },
+  "kuhn_poker/1/3": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      }
+    ],
+    "information_state_text": "2p",
+    "legal_actions": [],
+    "num_plies": 5,
+    "observation_text": "211",
+    "omniscient": false,
+    "ply": 3,
+    "returns": null,
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "seat",
+      "seat": 1
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 1
+    }
+  },
+  "kuhn_poker/1/live": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      }
+    ],
+    "information_state_text": "2pbb",
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": "222",
+    "omniscient": false,
+    "ply": 5,
+    "returns": [-2.0, 2.0],
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "terminal",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 1
+    }
+  },
+  "kuhn_poker/oracle/0": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 0,
+        "label": "Deal:0",
+        "rewards": [0.0, 0.0],
+        "seat": null
+      },
+      {
+        "action": 2,
+        "label": "Deal:2",
+        "rewards": [0.0, 0.0],
+        "seat": null
+      },
+      {
+        "action": 0,
+        "label": "Pass",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [-2.0, 2.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": [],
+    "num_plies": 5,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 0,
+    "returns": null,
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": 1,
+      "turn_based": false
+    },
+    "state_text": "",
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "chance",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "oracle",
+      "seat": null
+    }
+  },
+  "kuhn_poker/oracle/3": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 0,
+        "label": "Deal:0",
+        "rewards": [0.0, 0.0],
+        "seat": null
+      },
+      {
+        "action": 2,
+        "label": "Deal:2",
+        "rewards": [0.0, 0.0],
+        "seat": null
+      },
+      {
+        "action": 0,
+        "label": "Pass",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [-2.0, 2.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": [],
+    "num_plies": 5,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 3,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": 1,
+      "turn_based": false
+    },
+    "state_text": "0 2 p",
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "seat",
+      "seat": 1
+    },
+    "viewer": {
+      "kind": "oracle",
+      "seat": null
+    }
+  },
+  "kuhn_poker/oracle/live": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 0,
+        "label": "Deal:0",
+        "rewards": [0.0, 0.0],
+        "seat": null
+      },
+      {
+        "action": 2,
+        "label": "Deal:2",
+        "rewards": [0.0, 0.0],
+        "seat": null
+      },
+      {
+        "action": 0,
+        "label": "Pass",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 1,
+        "label": "Bet",
+        "rewards": [-2.0, 2.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": [],
+    "num_plies": 5,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 5,
+    "returns": [-2.0, 2.0],
+    "rewards": [-2.0, 2.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": 1,
+      "turn_based": false
+    },
+    "state_text": "0 2 pbb",
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "terminal",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "oracle",
+      "seat": null
+    }
+  },
+  "kuhn_poker/spectator/0": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 1
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": null,
+    "omniscient": false,
+    "ply": 0,
+    "returns": null,
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "chance",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "spectator",
+      "seat": null
+    }
+  },
+  "kuhn_poker/spectator/3": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 1
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": null,
+    "omniscient": false,
+    "ply": 3,
+    "returns": null,
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "seat",
+      "seat": 1
+    },
+    "viewer": {
+      "kind": "spectator",
+      "seat": null
+    }
+  },
+  "kuhn_poker/spectator/live": {
+    "chance_outcomes": null,
+    "contract_version": 2,
+    "history": [
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": null
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 1
+      },
+      {
+        "action": null,
+        "label": null,
+        "rewards": null,
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": null,
+    "num_plies": 5,
+    "observation_text": null,
+    "omniscient": false,
+    "ply": 5,
+    "returns": [-2.0, 2.0],
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "kuhn_poker",
+      "hides_information": true,
+      "id": "kuhn-poker",
+      "num_seats": 2,
+      "parameters": {
+        "players": 2
+      },
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": null,
+    "status": "terminal",
+    "struct": null,
+    "to_move": {
+      "kind": "terminal",
+      "seat": null
+    },
+    "viewer": {
+      "kind": "spectator",
+      "seat": null
+    }
+  },
+  "tic_tac_toe/0/2": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 4,
+        "label": "x(1,1)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 0,
+        "label": "o(0,0)",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 8,
+        "label": "x(2,2)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": "4, 0",
+    "legal_actions": [],
+    "num_plies": 3,
+    "observation_text": "o..\n.x.\n...",
+    "omniscient": true,
+    "ply": 2,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "max_simulations": {
+                "default": 1000,
+                "description": "Simulations per move, each ending in a random rollout.",
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "solve": {
+                "default": true,
+                "description": "Whether proven wins and losses are backed up the search tree.",
+                "type": "boolean"
+              },
+              "uct_c": {
+                "default": 2.0,
+                "description": "The exploration constant of the UCT selection rule.",
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "label": "MCTS",
+          "name": "mcts",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "tic_tac_toe",
+      "hides_information": false,
+      "id": "tic-tac-toe",
+      "num_seats": 2,
+      "parameters": {},
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": "o..\n.x.\n...",
+    "status": "playing",
+    "struct": {
+      "board": ["o", ".", ".", ".", "x", ".", ".", ".", "."],
+      "current_player": "x"
+    },
+    "to_move": {
+      "kind": "seat",
+      "seat": 0
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 0
+    }
+  },
+  "tic_tac_toe/0/live": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 4,
+        "label": "x(1,1)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 0,
+        "label": "o(0,0)",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 8,
+        "label": "x(2,2)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": "4, 0, 8",
+    "legal_actions": [
+      {
+        "id": 1,
+        "label": "o(0,1)"
+      },
+      {
+        "id": 2,
+        "label": "o(0,2)"
+      },
+      {
+        "id": 3,
+        "label": "o(1,0)"
+      },
+      {
+        "id": 5,
+        "label": "o(1,2)"
+      },
+      {
+        "id": 6,
+        "label": "o(2,0)"
+      },
+      {
+        "id": 7,
+        "label": "o(2,1)"
+      }
+    ],
+    "num_plies": 3,
+    "observation_text": "o..\n.x.\n..x",
+    "omniscient": true,
+    "ply": 3,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "max_simulations": {
+                "default": 1000,
+                "description": "Simulations per move, each ending in a random rollout.",
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "solve": {
+                "default": true,
+                "description": "Whether proven wins and losses are backed up the search tree.",
+                "type": "boolean"
+              },
+              "uct_c": {
+                "default": 2.0,
+                "description": "The exploration constant of the UCT selection rule.",
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "label": "MCTS",
+          "name": "mcts",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "tic_tac_toe",
+      "hides_information": false,
+      "id": "tic-tac-toe",
+      "num_seats": 2,
+      "parameters": {},
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": "o..\n.x.\n..x",
+    "status": "playing",
+    "struct": {
+      "board": ["o", ".", ".", ".", "x", ".", ".", ".", "x"],
+      "current_player": "o"
+    },
+    "to_move": {
+      "kind": "seat",
+      "seat": 1
+    },
+    "viewer": {
+      "kind": "seat",
+      "seat": 0
+    }
+  },
+  "tic_tac_toe/oracle/2": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 4,
+        "label": "x(1,1)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 0,
+        "label": "o(0,0)",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 8,
+        "label": "x(2,2)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": [],
+    "num_plies": 3,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 2,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "max_simulations": {
+                "default": 1000,
+                "description": "Simulations per move, each ending in a random rollout.",
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "solve": {
+                "default": true,
+                "description": "Whether proven wins and losses are backed up the search tree.",
+                "type": "boolean"
+              },
+              "uct_c": {
+                "default": 2.0,
+                "description": "The exploration constant of the UCT selection rule.",
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "label": "MCTS",
+          "name": "mcts",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "tic_tac_toe",
+      "hides_information": false,
+      "id": "tic-tac-toe",
+      "num_seats": 2,
+      "parameters": {},
+      "seed": 1,
+      "turn_based": false
+    },
+    "state_text": "o..\n.x.\n...",
+    "status": "playing",
+    "struct": {
+      "board": ["o", ".", ".", ".", "x", ".", ".", ".", "."],
+      "current_player": "x"
+    },
+    "to_move": {
+      "kind": "seat",
+      "seat": 0
+    },
+    "viewer": {
+      "kind": "oracle",
+      "seat": null
+    }
+  },
+  "tic_tac_toe/oracle/live": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 4,
+        "label": "x(1,1)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 0,
+        "label": "o(0,0)",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 8,
+        "label": "x(2,2)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": [
+      {
+        "id": 1,
+        "label": "o(0,1)"
+      },
+      {
+        "id": 2,
+        "label": "o(0,2)"
+      },
+      {
+        "id": 3,
+        "label": "o(1,0)"
+      },
+      {
+        "id": 5,
+        "label": "o(1,2)"
+      },
+      {
+        "id": 6,
+        "label": "o(2,0)"
+      },
+      {
+        "id": 7,
+        "label": "o(2,1)"
+      }
+    ],
+    "num_plies": 3,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 3,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "max_simulations": {
+                "default": 1000,
+                "description": "Simulations per move, each ending in a random rollout.",
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "solve": {
+                "default": true,
+                "description": "Whether proven wins and losses are backed up the search tree.",
+                "type": "boolean"
+              },
+              "uct_c": {
+                "default": 2.0,
+                "description": "The exploration constant of the UCT selection rule.",
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "label": "MCTS",
+          "name": "mcts",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "tic_tac_toe",
+      "hides_information": false,
+      "id": "tic-tac-toe",
+      "num_seats": 2,
+      "parameters": {},
+      "seed": 1,
+      "turn_based": false
+    },
+    "state_text": "o..\n.x.\n..x",
+    "status": "playing",
+    "struct": {
+      "board": ["o", ".", ".", ".", "x", ".", ".", ".", "x"],
+      "current_player": "o"
+    },
+    "to_move": {
+      "kind": "seat",
+      "seat": 1
+    },
+    "viewer": {
+      "kind": "oracle",
+      "seat": null
+    }
+  },
+  "tic_tac_toe/oracle/new": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [],
+    "information_state_text": null,
+    "legal_actions": [
+      {
+        "id": 0,
+        "label": "x(0,0)"
+      },
+      {
+        "id": 1,
+        "label": "x(0,1)"
+      },
+      {
+        "id": 2,
+        "label": "x(0,2)"
+      },
+      {
+        "id": 3,
+        "label": "x(1,0)"
+      },
+      {
+        "id": 4,
+        "label": "x(1,1)"
+      },
+      {
+        "id": 5,
+        "label": "x(1,2)"
+      },
+      {
+        "id": 6,
+        "label": "x(2,0)"
+      },
+      {
+        "id": 7,
+        "label": "x(2,1)"
+      },
+      {
+        "id": 8,
+        "label": "x(2,2)"
+      }
+    ],
+    "num_plies": 0,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 0,
+    "returns": null,
+    "rewards": null,
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "max_simulations": {
+                "default": 1000,
+                "description": "Simulations per move, each ending in a random rollout.",
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "solve": {
+                "default": true,
+                "description": "Whether proven wins and losses are backed up the search tree.",
+                "type": "boolean"
+              },
+              "uct_c": {
+                "default": 2.0,
+                "description": "The exploration constant of the UCT selection rule.",
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "label": "MCTS",
+          "name": "mcts",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "tic_tac_toe",
+      "hides_information": false,
+      "id": "tic-tac-toe-new",
+      "num_seats": 2,
+      "parameters": {},
+      "seed": 1,
+      "turn_based": false
+    },
+    "state_text": "...\n...\n...",
+    "status": "playing",
+    "struct": {
+      "board": [".", ".", ".", ".", ".", ".", ".", ".", "."],
+      "current_player": "x"
+    },
+    "to_move": {
+      "kind": "seat",
+      "seat": 0
+    },
+    "viewer": {
+      "kind": "oracle",
+      "seat": null
+    }
+  },
+  "tic_tac_toe/spectator/2": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 4,
+        "label": "x(1,1)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 0,
+        "label": "o(0,0)",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 8,
+        "label": "x(2,2)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": [],
+    "num_plies": 3,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 2,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "max_simulations": {
+                "default": 1000,
+                "description": "Simulations per move, each ending in a random rollout.",
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "solve": {
+                "default": true,
+                "description": "Whether proven wins and losses are backed up the search tree.",
+                "type": "boolean"
+              },
+              "uct_c": {
+                "default": 2.0,
+                "description": "The exploration constant of the UCT selection rule.",
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "label": "MCTS",
+          "name": "mcts",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "tic_tac_toe",
+      "hides_information": false,
+      "id": "tic-tac-toe",
+      "num_seats": 2,
+      "parameters": {},
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": "o..\n.x.\n...",
+    "status": "playing",
+    "struct": {
+      "board": ["o", ".", ".", ".", "x", ".", ".", ".", "."],
+      "current_player": "x"
+    },
+    "to_move": {
+      "kind": "seat",
+      "seat": 0
+    },
+    "viewer": {
+      "kind": "spectator",
+      "seat": null
+    }
+  },
+  "tic_tac_toe/spectator/live": {
+    "chance_outcomes": [],
+    "contract_version": 2,
+    "history": [
+      {
+        "action": 4,
+        "label": "x(1,1)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      },
+      {
+        "action": 0,
+        "label": "o(0,0)",
+        "rewards": [0.0, 0.0],
+        "seat": 1
+      },
+      {
+        "action": 8,
+        "label": "x(2,2)",
+        "rewards": [0.0, 0.0],
+        "seat": 0
+      }
+    ],
+    "information_state_text": null,
+    "legal_actions": [
+      {
+        "id": 1,
+        "label": "o(0,1)"
+      },
+      {
+        "id": 2,
+        "label": "o(0,2)"
+      },
+      {
+        "id": 3,
+        "label": "o(1,0)"
+      },
+      {
+        "id": 5,
+        "label": "o(1,2)"
+      },
+      {
+        "id": 6,
+        "label": "o(2,0)"
+      },
+      {
+        "id": 7,
+        "label": "o(2,1)"
+      }
+    ],
+    "num_plies": 3,
+    "observation_text": null,
+    "omniscient": true,
+    "ply": 3,
+    "returns": null,
+    "rewards": [0.0, 0.0],
+    "seats": [
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 0
+      },
+      {
+        "autoplay": false,
+        "config": {},
+        "controller": "human",
+        "failure": null,
+        "seat": 1
+      }
+    ],
+    "session": {
+      "chance_policy": "auto",
+      "controllers": [
+        {
+          "config_schema": {},
+          "label": "Human",
+          "name": "human",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {},
+          "label": "Random",
+          "name": "random",
+          "unavailable_reason": null
+        },
+        {
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "max_simulations": {
+                "default": 1000,
+                "description": "Simulations per move, each ending in a random rollout.",
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "solve": {
+                "default": true,
+                "description": "Whether proven wins and losses are backed up the search tree.",
+                "type": "boolean"
+              },
+              "uct_c": {
+                "default": 2.0,
+                "description": "The exploration constant of the UCT selection rule.",
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "label": "MCTS",
+          "name": "mcts",
+          "unavailable_reason": null
+        }
+      ],
+      "game": "tic_tac_toe",
+      "hides_information": false,
+      "id": "tic-tac-toe",
+      "num_seats": 2,
+      "parameters": {},
+      "seed": null,
+      "turn_based": false
+    },
+    "state_text": "o..\n.x.\n..x",
+    "status": "playing",
+    "struct": {
+      "board": ["o", ".", ".", ".", "x", ".", ".", ".", "x"],
+      "current_player": "o"
+    },
+    "to_move": {
+      "kind": "seat",
+      "seat": 1
+    },
+    "viewer": {
+      "kind": "spectator",
+      "seat": null
+    }
+  }
+}

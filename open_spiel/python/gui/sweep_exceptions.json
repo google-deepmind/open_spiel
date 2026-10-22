@@ -1,0 +1,118 @@
+{
+  "add_noise": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameters 'game' and 'epsilon' have no default."
+  },
+  "bridge_uncontested_bidding": {
+    "kind": "unavailable",
+    "reason": "The deal is drawn from a generator the game holds, not from the history, so the history does not rebuild its positions."
+  },
+  "cached_tree": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  },
+  "chinese_checkers": {
+    "kind": "backend",
+    "reason": "Random play does not reach the end of the game within the sweep's ply cap.",
+    "outcome": "unfinished"
+  },
+  "coop_to_1p": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its parameter 'game' is a nested game, which cannot be set here."
+  },
+  "crossword": {
+    "kind": "unavailable",
+    "reason": "Its actions are structs only, so it lists no legal action ids."
+  },
+  "efg_game": {
+    "kind": "unavailable",
+    "reason": "It reads a game file, and its default file is not installed."
+  },
+  "laser_tag": {
+    "kind": "backend",
+    "reason": "Random play does not reach the end of the game within the sweep's ply cap.",
+    "outcome": "unfinished"
+  },
+  "match": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  },
+  "mfg_crowd_modelling": {
+    "kind": "unavailable",
+    "reason": "A mean-field game: its states describe a population, not seats a person can play."
+  },
+  "mfg_crowd_modelling_2d": {
+    "kind": "unavailable",
+    "reason": "A mean-field game: its states describe a population, not seats a person can play."
+  },
+  "mfg_dynamic_routing": {
+    "kind": "unavailable",
+    "reason": "A mean-field game: its states describe a population, not seats a person can play."
+  },
+  "mfg_garnet": {
+    "kind": "unavailable",
+    "reason": "A mean-field game: its states describe a population, not seats a person can play."
+  },
+  "misere": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  },
+  "negotiation": {
+    "kind": "unavailable",
+    "reason": "The item pool and utilities are drawn from a generator the game holds, not from the history, so the history does not rebuild its positions."
+  },
+  "nfg_game": {
+    "kind": "unavailable",
+    "reason": "It reads a game file or string, and has no default."
+  },
+  "normal_form_extensive_game": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  },
+  "python_iterated_prisoners_dilemma": {
+    "kind": "backend",
+    "reason": "It hides information but provides neither observation nor information-state strings, so no seat can be shown its view.",
+    "outcome": "error"
+  },
+  "python_repeated_pokerkit": {
+    "kind": "unavailable",
+    "reason": "Its parameter 'pokerkit_game_params' is a nested game, which cannot be set here."
+  },
+  "repeated_game": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameters 'game' and 'num_repetitions' have no default."
+  },
+  "repeated_poker": {
+    "kind": "unavailable",
+    "reason": "Its required parameter 'max_num_hands' has no default."
+  },
+  "restricted_nash_response": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  },
+  "shogi": {
+    "kind": "backend",
+    "reason": "Random play does not reach the end of the game within the sweep's ply cap.",
+    "outcome": "unfinished"
+  },
+  "start_at": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  },
+  "stones_and_gems": {
+    "kind": "unavailable",
+    "reason": "Chance outcomes are sampled inside the state, so positions cannot be rebuilt from the history."
+  },
+  "tarok": {
+    "kind": "unavailable",
+    "reason": "The deal is drawn from a generator the game holds, not from the history, so the history does not rebuild its positions."
+  },
+  "turn_based_simultaneous_game": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  },
+  "zerosum": {
+    "kind": "unavailable",
+    "reason": "A wrapper: its required parameter 'game' has no default."
+  }
+}

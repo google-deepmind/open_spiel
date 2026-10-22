@@ -1,0 +1,99 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  The design tokens: every colour the client draws with, in both themes. The
+  rest of the stylesheets refer to these names and never to a colour (checked
+  by npm run lint:style). The light theme is the default; <html
+  data-theme="dark"> selects the dark one. npm run contrast checks that every
+  text colour reaches 4.5:1, and every other mark 3:1, on every surface; the
+  colours it checks are opaque hex values.
+*/
+
+:root {
+  /* Backgrounds: the page, a panel or control raised above it, a well. */
+  --color-surface: #ffffff;
+  --color-surface-raised: #f5f6f8;
+  --color-surface-sunken: #eceef2;
+
+  /* Borders: dividers, and the outline that marks a control's edge. */
+  --color-border: #d3d8e0;
+  --color-border-strong: #7b8494;
+
+  /* Text, from the most to the least prominent; all three are body text. */
+  --color-text: #16191f;
+  --color-text-secondary: #394150;
+  --color-text-muted: #535b6b;
+
+  /* The selected or primary control, and the text drawn on it. */
+  --color-accent: #2456d3;
+  --color-on-accent: #ffffff;
+
+  /* A tint of the accent behind accent or body text: the current row. */
+  --color-accent-soft: #e3eafb;
+
+  /* The keyboard focus ring. */
+  --color-focus: #b4410e;
+
+  /* Text that reports an outcome. */
+  --color-success: #17663a;
+  --color-warning: #8a4b00;
+  --color-danger: #b42318;
+
+  /* The overlay that marks where a dragged panel will land. */
+  --color-drop-target: rgb(36 86 211 / 0.2);
+
+  /* No colour: a divider that shows only while it is dragged. */
+  --color-none: transparent;
+
+  /* The shadow that lifts a notice off the board under it. */
+  --color-shadow: rgb(0 0 0 / 0.22);
+
+  --radius: 6px;
+  /* The corners of a card: inset content and the text a panel shows. */
+  --radius-card: 12px;
+  --font-family: system-ui, sans-serif;
+  --font-family-monospace: ui-monospace, monospace;
+  --font-size: 14px;
+}
+
+:root[data-theme='dark'] {
+  --color-surface: #16191e;
+  --color-surface-raised: #1e2229;
+  --color-surface-sunken: #101216;
+
+  --color-border: #323844;
+  --color-border-strong: #788396;
+
+  --color-text: #eef1f5;
+  --color-text-secondary: #c5cbd5;
+  --color-text-muted: #a1a9b7;
+
+  --color-accent: #8eaefc;
+  --color-on-accent: #0d1526;
+
+  --color-accent-soft: #1f2a44;
+
+  --color-focus: #f2b33d;
+
+  --color-success: #5fd38d;
+  --color-warning: #f0b545;
+  --color-danger: #ff8f85;
+
+  --color-drop-target: rgb(142 174 252 / 0.2);
+
+  --color-shadow: rgb(0 0 0 / 0.6);
+}

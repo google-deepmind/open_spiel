@@ -16,6 +16,7 @@ Welcome to OpenSpiel's documentation!
    api_reference
    algorithms
    games
+   Playing games in a browser<gui>
 
 .. toctree:: :caption: Evaluation
    :maxdepth: 2

@@ -63,9 +63,12 @@ Documentation = "https://openspiel.readthedocs.io/"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["open_spiel*"]
+# The GUI's browser client, and the npm packages a client build installs.
+exclude = ["open_spiel.gui", "open_spiel.gui.*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.so", "*.pyd", "*.dll"]
+"open_spiel.python.gui" = ["*.json"]
 
 # ---------------------------------------------------------------------------
 # Developer tooling. See .pre-commit-config.yaml for how to opt in.

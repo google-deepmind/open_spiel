@@ -1,0 +1,51 @@
+{
+  "name": "open-spiel-gui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Browser front end for the OpenSpiel GUI server.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.22.2"
+  },
+  "scripts": {
+    "build": "vite build",
+    "check": "npm run format:check && npm run lint && npm run lint:style && npm run contrast && npm run typecheck",
+    "contrast": "node scripts/contrast_check.ts",
+    "dev": "vite",
+    "e2e": "npm run build && playwright test",
+    "e2e:list": "playwright test --list",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "generate:contract": "node scripts/generate_contract.ts",
+    "lint": "eslint --max-warnings 0 .",
+    "smoke:session": "node scripts/smoke_session.ts",
+    "smoke:setup": "node scripts/smoke_setup.ts",
+    "lint:style": "node scripts/style_lint.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dockview": "4.13.1",
+    "dockview-core": "4.13.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@playwright/test": "1.64.1",
+    "@types/node": "22.20.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "jsdom": "30.1.3",
+    "prettier": "3.9.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2",
+    "vite": "7.3.7",
+    "vitest": "4.1.12"
+  }
+}

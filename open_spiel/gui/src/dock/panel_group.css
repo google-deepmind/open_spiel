@@ -1,0 +1,98 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  Panel groups: a strip of inner tabs over one section at a time. The group
+  itself never scrolls; a section scrolls inside its pane.
+*/
+
+.panel-group {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panel-group__bar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 7px 12px 6px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* At most two rows of tabs; more scroll inside the strip. */
+.panel-group__tabs {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-height: calc(2 * 30px + 6px);
+  overflow-y: auto;
+}
+
+.panel-group__from {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.panel-group__dock {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.panel-group__note {
+  margin: 12px 16px;
+  color: var(--color-text-secondary);
+}
+
+.panel-group__pane {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+.panel-group__pane[hidden] {
+  display: none;
+}
+
+/* A section with no frame of its own takes the group's inset. */
+.panel-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 14px 16px;
+}
+
+/* A section's footer, such as History's replay control, under its pane. */
+.panel-group__footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid var(--color-border);
+}
