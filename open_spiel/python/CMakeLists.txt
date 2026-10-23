@@ -47,6 +47,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_blackjack.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
+  pybind11/games_catan.cc
+  pybind11/games_catan.h
   pybind11/games_catch.cc
   pybind11/games_catch.h
   pybind11/games_chess.cc
