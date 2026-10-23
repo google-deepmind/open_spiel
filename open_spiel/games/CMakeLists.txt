@@ -28,6 +28,8 @@ set(GAME_SOURCES
   bridge/bridge_uncontested_bidding.h
   capture_the_flag/capture_the_flag.cc
   capture_the_flag/capture_the_flag.h
+  catan/catan.cc
+  catan/catan.h
   catch/catch.cc
   catch/catch.h
   checkers/checkers.cc
@@ -389,6 +391,10 @@ add_test(bridge_test bridge_test)
 add_executable(capture_the_flag_test capture_the_flag/capture_the_flag_test.cc
                ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
 add_test(capture_the_flag_test capture_the_flag_test)
+
+add_executable(catan_test catan/catan_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(catan_test catan_test)
 
 add_executable(catch_test catch/catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

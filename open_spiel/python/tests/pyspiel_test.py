@@ -48,6 +48,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "bridge_uncontested_bidding",
     "cached_tree",
     "capture_the_flag",
+    "catan",
     "catch",
     "chat_game",  # python game locating in python/games/chat_games/
     "checkers",

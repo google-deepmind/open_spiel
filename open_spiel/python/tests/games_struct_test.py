@@ -44,7 +44,8 @@ SEED = 87126
 # Games known to implement the struct API. Guards against the discovery below
 # silently returning nothing, which would turn this test into a no-op.
 EXPECTED_STRUCT_GAMES = frozenset(
-    ["catch", "connect_four", "gin_rummy", "go", "hearts", "tic_tac_toe"]
+    ["catan", "catch", "connect_four", "gin_rummy", "go", "hearts",
+     "tic_tac_toe"]
 )
 
 
