@@ -1,0 +1,15 @@
+# Data files.
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+filegroup(
+    name = "response_graph_ucb_data",
+    srcs = [
+        "response_graph_ucb/soccer.txt",
+    ],
+)

@@ -1,0 +1,150 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Bazel module for OpenSpiel.
+
+Usage: `bazel test //open_spiel/...`. CMake (`install.sh` + `cmake`) and
+`pip install .` remain supported and do not need Bazel.
+
+Optional dependencies are off by default (like the CMake build) and are enabled
+with flags, e.g. `--//open_spiel:build_with_acpc`. Their sources are only
+downloaded when a target that needs them is built.
+"""
+
+module(name = "open_spiel")
+
+# Keep in sync with OPEN_SPIEL_ABSL_VERSION in install.sh (CMake build).
+bazel_dep(name = "abseil-cpp", version = "20250814.1")
+bazel_dep(name = "bazel_skylib", version = "1.9.2")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
+bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.2")
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "pybind11_abseil", version = "202402.0")
+
+# The BCR release of pybind11_abseil uses native cc rules, which Bazel 9 removed.
+archive_override(
+    module_name = "pybind11_abseil",
+    integrity = "sha256-yAbBVxP0SfGOb815Amix7ggM1a+eeNK/wbPLQBo9XJE=",
+    strip_prefix = "pybind11_abseil-c19861bb14c5b09d4edffa55af207e3abf6ff97b",
+    urls = ["https://github.com/pybind/pybind11_abseil/archive/c19861bb14c5b09d4edffa55af207e3abf6ff97b.tar.gz"],
+)
+bazel_dep(name = "pybind11_bazel", version = "3.0.3")
+bazel_dep(name = "rules_cc", version = "0.2.27")
+bazel_dep(name = "rules_license", version = "1.0.0")
+
+# The pybind11 headers repo created by pybind11_bazel (used by pybind11_json).
+# pybind11_bazel has no public extension that exposes it, so this uses the
+# extension its own MODULE.bazel uses; recheck it when bumping pybind11_bazel.
+pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
+use_repo(pybind11_configure, "pybind11")
+
+# Python toolchain, pip dependencies and Python rule shims.
+include("//bazel/python:python.MODULE.bazel")
+
+# GAMUT (--//open_spiel:build_with_gamut) needs a Java runtime and the GAMUT jar
+# at run time and has no Bazel repository here; its targets are skipped unless
+# the flag is set.
+
+# C++ dependencies that do not ship Bazel files. Overlay BUILD files live in
+# bazel/third_party. The include prefixes match the vendored layout used by
+# install.sh / CMake, so the same #include lines work with both build systems.
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+local_prebuilt_repository = use_repo_rule("//bazel/third_party:local_prebuilt.bzl", "local_prebuilt_repository")
+
+http_archive(
+    name = "dds",
+    build_file = "//bazel/third_party:dds.BUILD",
+    sha256 = "059f5a0a5f782c39a5d6ff82e956df3e89b8ebd0d8e81a9ac77ad1482bc09d61",
+    strip_prefix = "dds-091ea94358a4016d4fb6069dea5c452cdc98d0bd",
+    urls = ["https://github.com/jblespiau/dds/archive/091ea94358a4016d4fb6069dea5c452cdc98d0bd.tar.gz"],
+)
+
+http_archive(
+    name = "pybind11_json",
+    build_file = "//bazel/third_party:pybind11_json.BUILD",
+    sha256 = "6c1b5973e9afd788ea3d9f59e142cdf022e8331a482c192bc4d23a406bfdbb77",
+    strip_prefix = "pybind11_json-d0bf434be9d287d73a963ff28745542daf02c08f",
+    urls = ["https://github.com/pybind/pybind11_json/archive/d0bf434be9d287d73a963ff28745542daf02c08f.tar.gz"],
+)
+
+# --//open_spiel:build_with_acpc
+http_archive(
+    name = "acpc",
+    build_file = "//bazel/third_party:acpc.BUILD",
+    sha256 = "e471630c2611ea19db871ea994baba18e5a1304b3a55de82902844eaabc6dd4a",
+    strip_prefix = "project_acpc_server-6ae3e6ec59b66139a9bd444ff7ba3c40271a565a",
+    urls = ["https://github.com/jblespiau/project_acpc_server/archive/6ae3e6ec59b66139a9bd444ff7ba3c40271a565a.tar.gz"],
+)
+
+# --//open_spiel:build_with_hanabi
+http_archive(
+    name = "hanabi",
+    build_file = "//bazel/third_party:hanabi.BUILD",
+    sha256 = "6946afa634cbe3f079a5d2f32438c8d9ff1113835afdccae3c7f108168f40db0",
+    strip_prefix = "hanabi-learning-environment-54e79594f4b6fb40ebb3004289c6db0e34a8b5fb",
+    urls = ["https://github.com/google-deepmind/hanabi-learning-environment/archive/54e79594f4b6fb40ebb3004289c6db0e34a8b5fb.tar.gz"],
+)
+
+# --//open_spiel:build_with_libnop
+http_archive(
+    name = "libnop",
+    build_file = "//bazel/third_party:libnop.BUILD",
+    sha256 = "c377bfc07e0029bcd2da23597b9dc668c2450508f57b612fdae0542e097a4f63",
+    strip_prefix = "libnop-35e800d81f28c632956c5a592e3cbe8085ecd430",
+    urls = ["https://github.com/google/libnop/archive/35e800d81f28c632956c5a592e3cbe8085ecd430.tar.gz"],
+)
+
+# --//open_spiel:build_with_roshambo
+http_archive(
+    name = "roshambo",
+    build_file = "//bazel/third_party:roshambo.BUILD",
+    sha256 = "413c9cdb00708bfc62c6fdde0ccb0e5f2a51adcbade38792305c54cde217176c",
+    strip_prefix = "roshambo-d93aff026d1a1fd1dda733f01cc4cc224fd678d7",
+    urls = ["https://github.com/jhtschultz/roshambo/archive/d93aff026d1a1fd1dda733f01cc4cc224fd678d7.tar.gz"],
+)
+
+# --//open_spiel:build_with_xinxin
+http_archive(
+    name = "xinxin",
+    build_file = "//bazel/third_party:xinxin.BUILD",
+    sha256 = "3b0d17053bfd546bdb20f1733f3dc5f872a68f2c38f61b0f0e3d7335b9c1df26",
+    strip_prefix = "hearts-6ba11548af49d3953f989f50b318ee4f4c1b91f7",
+    urls = ["https://github.com/nathansttt/hearts/archive/6ba11548af49d3953f989f50b318ee4f4c1b91f7.tar.gz"],
+)
+
+# --//open_spiel:build_with_libtorch. Uses the precompiled libtorch that
+# install.sh downloads (OPEN_SPIEL_BUILD_WITH_LIBTORCH=ON).
+local_prebuilt_repository(
+    name = "libtorch",
+    build_file = "//bazel/third_party:libtorch.BUILD",
+    path = "open_spiel/libtorch/libtorch",
+    targets = [
+        "libtorch",
+        "torch_headers",
+    ],
+)
+
+# --//open_spiel:build_with_ortools. Uses the precompiled OR-Tools that
+# install.sh downloads (OPEN_SPIEL_BUILD_WITH_ORTOOLS=ON).
+local_prebuilt_repository(
+    name = "ortools",
+    build_file = "//bazel/third_party:ortools.BUILD",
+    path = "open_spiel/ortools",
+    targets = [
+        "linear_solver_glop",
+        "linear_solver_lib",
+        "ortools",
+    ],
+)

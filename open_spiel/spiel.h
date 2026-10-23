@@ -24,15 +24,15 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/base/thread_annotations.h"
-#include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/algorithm/container.h"
+#include "absl/base/thread_annotations.h"
+#include "absl/random/bit_gen_ref.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/synchronization/mutex.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/utils/nlohmann_json.h"  // IWYU pragma: keep
 #include "open_spiel/utils/status.h"
 #include "open_spiel/game_parameters.h"

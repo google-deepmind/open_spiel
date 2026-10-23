@@ -1,0 +1,29 @@
+# Bazel settings for OpenSpiel. See MODULE.bazel.
+
+build --cxxopt=-std=c++20 --host_cxxopt=-std=c++20
+# Several game tests take minutes without optimizations (like the CMake build,
+# compile optimized by default; use `-c dbg` for debugging).
+build --compilation_mode=opt
+build --enable_platform_specific_config
+# Every Python package has a real __init__.py. Without this, rules_python adds
+# empty generated __init__.py files to some runfiles trees, which can be written
+# through the runfiles symlinks and truncate the real files in the checkout.
+build --incompatible_default_to_explicit_init_py
+build:macos --macos_minimum_os=11.0 --host_macos_minimum_os=11.0
+test --test_output=errors
+
+# Enable all optional C++ dependencies that Bazel can fetch by itself.
+build:optional --//open_spiel:build_with_acpc
+build:optional --//open_spiel:build_with_hanabi
+build:optional --//open_spiel:build_with_libnop
+build:optional --//open_spiel:build_with_roshambo
+build:optional --//open_spiel:build_with_xinxin
+
+# Python dependency groups (default off, like OPEN_SPIEL_ENABLE_* in
+# scripts/python_extra_deps.sh). Targets needing a disabled group are skipped.
+common:jax --//bazel/python:enable_jax
+common:pytorch --//bazel/python:enable_pytorch
+common:python_misc --//bazel/python:enable_python_misc
+
+# Allow per-user overrides.
+try-import %workspace%/user.bazelrc

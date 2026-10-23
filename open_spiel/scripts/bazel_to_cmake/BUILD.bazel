@@ -1,0 +1,78 @@
+# Generates the per-package CMakeLists.txt files from the BUILD files.
+# Run ../generate_cmake.sh after editing any BUILD file.
+
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "build_file",
+    srcs = ["build_file.py"],
+    deps = [":export_rules"],
+)
+
+pytype_strict_library(
+    name = "export_rules",
+    srcs = ["export_rules.py"],
+)
+
+pytype_strict_library(
+    name = "label_map",
+    srcs = ["label_map.py"],
+)
+
+pytype_strict_library(
+    name = "generator",
+    srcs = ["generator.py"],
+    deps = [
+        ":build_file",
+        ":export_rules",
+        ":label_map",
+    ],
+)
+
+# Command line entry point, run by ../generate_cmake.sh with plain python3.
+pytype_strict_library(
+    name = "bazel_to_cmake",
+    srcs = ["bazel_to_cmake.py"],
+    deps = [
+        ":generator",
+    ],
+)
+
+py_test(
+    name = "build_file_test",
+    srcs = ["build_file_test.py"],
+    deps = [
+        ":build_file",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "generator_test",
+    srcs = ["generator_test.py"],
+    deps = [
+        ":bazel_to_cmake",
+        ":export_rules",
+        ":generator",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "label_map_test",
+    srcs = ["label_map_test.py"],
+    deps = [
+        ":label_map",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+

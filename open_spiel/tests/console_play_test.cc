@@ -18,10 +18,10 @@
 #include <memory>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "absl/algorithm/container.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_join.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

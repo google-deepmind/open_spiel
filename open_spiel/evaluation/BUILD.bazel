@@ -1,0 +1,56 @@
+# Description:
+#   General agent evaluation algorithms.
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "soft_condorcet_optimization",
+    srcs = ["soft_condorcet_optimization.cc"],
+    hdrs = ["soft_condorcet_optimization.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "soft_condorcet_optimization_test",
+    srcs = ["soft_condorcet_optimization_test.cc"],
+    deps = [
+        ":soft_condorcet_optimization",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "elo",
+    srcs = ["elo.cc"],
+    hdrs = ["elo.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "elo_test",
+    srcs = ["elo_test.cc"],
+    deps = [
+        ":elo",
+        "//open_spiel",
+    ],
+)

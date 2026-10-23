@@ -1,0 +1,335 @@
+# Transforms of games - take in a game and create a new one based on it.
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "game_wrapper",
+    hdrs = ["game_wrapper.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "game_transforms",
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":add_noise",
+        ":coop_to_1p",
+        ":misere",
+        ":normal_form_extensive_game",
+        ":restricted_nash_response",
+        ":start_at",
+        ":turn_based_simultaneous_game",
+        ":zerosum",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "add_noise",
+    srcs = ["add_noise.cc"],
+    hdrs = ["add_noise.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":game_wrapper",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "add_noise_test",
+    srcs = ["add_noise_test.cc"],
+    deps = [
+        ":add_noise",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games:all_games",
+    ],
+)
+
+cc_library(
+    name = "cached_tree",
+    srcs = ["cached_tree.cc"],
+    hdrs = ["cached_tree.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":game_wrapper",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "cached_tree_test",
+    srcs = ["cached_tree_test.cc"],
+    deps = [
+        ":cached_tree",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:cfr",
+        "//open_spiel/algorithms:expected_returns",
+        "//open_spiel/algorithms:tabular_exploitability",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_library(
+    name = "turn_based_simultaneous_game",
+    srcs = ["turn_based_simultaneous_game.cc"],
+    hdrs = ["turn_based_simultaneous_game.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "turn_based_simultaneous_game_test",
+    srcs = ["turn_based_simultaneous_game_test.cc"],
+    deps = [
+        ":turn_based_simultaneous_game",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:cfr",
+        "//open_spiel/algorithms:expected_returns",
+        "//open_spiel/games:all_games",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_library(
+    name = "misere",
+    srcs = ["misere.cc"],
+    hdrs = ["misere.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":game_wrapper",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "misere_test",
+    srcs = ["misere_test.cc"],
+    deps = [
+        ":misere",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games:all_games",
+    ],
+)
+
+cc_library(
+    name = "start_at",
+    srcs = ["start_at.cc"],
+    hdrs = ["start_at.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":game_wrapper",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "start_at_test",
+    srcs = ["start_at_test.cc"],
+    deps = [
+        ":start_at",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games:all_games",
+    ],
+)
+
+cc_library(
+    name = "coop_to_1p",
+    srcs = ["coop_to_1p.cc"],
+    hdrs = ["coop_to_1p.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":game_wrapper",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "coop_to_1p_test",
+    srcs = ["coop_to_1p_test.cc"],
+    deps = [
+        ":coop_to_1p",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games:all_games",
+    ],
+)
+
+cc_library(
+    name = "normal_form_extensive_game",
+    srcs = ["normal_form_extensive_game.cc"],
+    hdrs = ["normal_form_extensive_game.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+        "//open_spiel/algorithms:deterministic_policy",
+        "//open_spiel/algorithms:expected_returns",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "normal_form_extensive_game_test",
+    srcs = ["normal_form_extensive_game_test.cc"],
+    deps = [
+        ":normal_form_extensive_game",
+        "//open_spiel",
+        "//open_spiel/games:all_games",
+    ],
+)
+
+cc_library(
+    name = "efg_writer",
+    srcs = ["efg_writer.cc"],
+    hdrs = ["efg_writer.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "efg_writer_test",
+    srcs = ["efg_writer_test.cc"],
+    deps = [
+        ":efg_writer",
+        ":turn_based_simultaneous_game",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games:all_games",
+        "//open_spiel/utils:file",
+    ],
+)
+
+cc_library(
+    name = "repeated_game",
+    srcs = ["repeated_game.cc"],
+    hdrs = ["repeated_game.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "repeated_game_test",
+    srcs = ["repeated_game_test.cc"],
+    deps = [
+        ":repeated_game",
+        "@abseil-cpp//absl/algorithm:container",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games:all_games",  # build_cleaner: keep
+    ],
+)
+
+cc_library(
+    name = "restricted_nash_response",
+    srcs = ["restricted_nash_response.cc"],
+    hdrs = ["restricted_nash_response.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":game_wrapper",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "zerosum",
+    srcs = ["zerosum.cc"],
+    hdrs = ["zerosum.h"],
+    deps = [
+        ":game_wrapper",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "restricted_nash_response_test",
+    srcs = ["restricted_nash_response_test.cc"],
+    tags = ["notap"],  # Remove when fixed.
+    deps = [
+        ":restricted_nash_response",
+        ":turn_based_simultaneous_game",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:cfr",
+        "//open_spiel/games:all_games",
+    ],
+)
+
+cc_test(
+    name = "zerosum_test",
+    srcs = ["zerosum_test.cc"],
+    deps = [
+        ":zerosum",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games/oh_hell",
+    ],
+)

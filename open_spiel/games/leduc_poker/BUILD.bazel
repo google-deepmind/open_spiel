@@ -1,0 +1,64 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "leduc_poker",
+    srcs = ["leduc_poker.cc"],
+    hdrs = ["leduc_poker.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "leduc_poker_test",
+    srcs = ["leduc_poker_test.cc"],
+    deps = [
+        ":leduc_poker",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "repeated_leduc_poker",
+    srcs = ["repeated_leduc_poker.cc"],
+    hdrs = ["repeated_leduc_poker.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":leduc_poker",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "repeated_leduc_poker_test",
+    srcs = ["repeated_leduc_poker_test.cc"],
+    deps = [
+        ":leduc_poker",
+        ":repeated_leduc_poker",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

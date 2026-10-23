@@ -14,7 +14,7 @@
 
 #include "open_spiel/algorithms/corr_dist/efcce.h"
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/strings/str_format.h"
 #include "open_spiel/spiel_globals.h"
 
 namespace open_spiel {

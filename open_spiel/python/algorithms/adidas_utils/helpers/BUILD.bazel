@@ -1,0 +1,49 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "helpers",
+    srcs = glob(["*.py"]),
+    deps = [
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "misc",
+    srcs = ["misc.py"],
+    deps = [
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "simplex",
+    srcs = ["simplex.py"],
+    deps = [
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "simplex_test",
+    srcs = ["simplex_test.py"],
+    deps = [
+        ":simplex",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)

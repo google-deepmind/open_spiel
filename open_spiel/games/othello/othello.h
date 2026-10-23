@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"  // for c_fill
+#include "absl/algorithm/container.h"  // for c_fill
 #include "open_spiel/spiel.h"
 
 // Simple game of Othello:

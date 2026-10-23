@@ -19,8 +19,8 @@
 #include <vector>
 
 #include "open_spiel/evaluation/soft_condorcet_optimization.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/cast.h"
+#include "pybind11/pybind11.h"
 
 namespace py = ::pybind11;
 using open_spiel::evaluation::FenchelYoungOptimizer;

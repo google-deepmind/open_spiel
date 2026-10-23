@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/algorithms/fsicfr.h"
 #include "open_spiel/algorithms/tabular_best_response_mdp.h"
 #include "open_spiel/games/liars_dice/liars_dice.h"

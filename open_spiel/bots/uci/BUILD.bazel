@@ -1,0 +1,84 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files([
+    "CMakeLists.txt",
+    "uci_bot_test.cc",
+])
+
+cc_library(
+    name = "uci_bot",
+    srcs = ["uci_bot.cc"],
+    hdrs = ["uci_bot.h"],
+    copts = ["-fexceptions"],
+    data = [
+    ],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        # Uses POSIX process APIs (fork, pipes, ioctl).
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/chess:chess_board",
+        "//open_spiel/utils:file",
+    ],
+)
+
+cc_binary(
+    name = "random_uci_bot",
+    srcs = ["random_uci_bot.cc"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        # Uses POSIX process APIs (fork, pipes, ioctl).
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/games/chess",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_test(
+    name = "uci_bot_test",
+    srcs = [
+        "uci_bot_test.cc",
+    ],
+    args = [
+        "--binary=open_spiel/bots/uci/random_uci_bot",
+    ],
+    data = [":random_uci_bot"],
+    target_compatible_with = select({
+        # Uses POSIX process APIs (fork, pipes, ioctl).
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":uci_bot",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/algorithms:evaluate_bots",
+        "//open_spiel/games/chess",
+        "//open_spiel/utils:init",
+    ],
+)

@@ -22,6 +22,22 @@ use GitHub pull requests for this purpose. Consult
 [GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
 information on using pull requests.
 
+## Build files
+
+The Bazel `BUILD.bazel` files are the source of truth for the C++ build. The
+per-package `CMakeLists.txt` files (and `open_spiel/targets.cmake`) are
+generated from them; do not edit those by hand. After changing any
+`BUILD.bazel` file, regenerate them and include the result in your pull
+request:
+
+```shell
+open_spiel/scripts/generate_cmake.sh
+```
+
+This needs only Python 3.9 or later (no Bazel). Continuous integration runs
+`open_spiel/scripts/generate_cmake.sh --check` and fails if the generated files
+are out of date.
+
 ## Community Guidelines
 
 This project follows [Google's Open Source Community

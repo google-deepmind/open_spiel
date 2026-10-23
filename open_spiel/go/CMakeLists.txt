@@ -20,7 +20,8 @@ set(GO_API_FILES ${GO_API_FILES}
 )
 
 # Note: needs to be SHARED rather than MODULE to work on MacOS
-add_library(gospiel SHARED ${GO_BINDINGS} ${OPEN_SPIEL_OBJECTS})
+add_library(gospiel SHARED ${GO_BINDINGS})
+target_link_libraries(gospiel PRIVATE open_spiel_full)
 
 # Copy the files keeping the directories intact
 foreach(go_api_file IN LISTS GO_API_FILES)

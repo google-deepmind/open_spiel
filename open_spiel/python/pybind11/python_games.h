@@ -23,8 +23,8 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/types/optional.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/pybind11.h"

@@ -15,9 +15,9 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_TABULAR_Q_LEARNING_H_
 #define OPEN_SPIEL_ALGORITHMS_TABULAR_Q_LEARNING_H_
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/random/random.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/random/distributions.h"
+#include "absl/random/random.h"
 #include "open_spiel/algorithms/get_all_states.h"
 #include "open_spiel/spiel.h"
 

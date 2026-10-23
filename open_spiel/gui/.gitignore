@@ -1,0 +1,5 @@
+dist/
+node_modules/
+e2e-server.log
+playwright-report/
+test-results/

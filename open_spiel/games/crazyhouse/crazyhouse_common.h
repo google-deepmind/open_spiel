@@ -22,7 +22,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "absl/random/uniform_int_distribution.h"
 
 namespace open_spiel {
 namespace crazyhouse_common {

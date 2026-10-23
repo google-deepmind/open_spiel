@@ -1,0 +1,35 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "repeated_pokerkit_struct",
+    hdrs = ["repeated_pokerkit_struct.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+        "//open_spiel/games/pokerkit_wrapper:pokerkit_wrapper_struct",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "repeated_pokerkit_struct_test",
+    srcs = ["repeated_pokerkit_struct_test.cc"],
+    deps = [
+        ":repeated_pokerkit_struct",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/games/pokerkit_wrapper:pokerkit_wrapper_struct",
+        "//open_spiel/utils:init",
+    ],
+)

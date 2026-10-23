@@ -14,7 +14,7 @@
 
 #include "open_spiel/games/dou_dizhu/dou_dizhu_utils.h"
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/strings/str_format.h"
 
 namespace open_spiel {
 namespace dou_dizhu {

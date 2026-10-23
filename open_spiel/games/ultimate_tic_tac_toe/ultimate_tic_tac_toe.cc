@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"

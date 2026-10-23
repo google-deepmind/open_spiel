@@ -1,0 +1,112 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "repeated_poker",
+    srcs = ["repeated_poker.cc"],
+    hdrs = ["repeated_poker.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_acpc_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":universal_poker",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@acpc",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/games/universal_poker/acpc_cpp:acpc_game",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "repeated_poker_test",
+    srcs = ["repeated_poker_test.cc"],
+    deps = [
+        ":repeated_poker",
+        ":universal_poker",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_library(
+    name = "universal_poker",
+    srcs = ["universal_poker.cc"],
+    hdrs = ["universal_poker.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_acpc_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@acpc",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/games/universal_poker/acpc_cpp:acpc_game",
+        "//open_spiel/games/universal_poker/logic:card_set",
+        "//open_spiel/games/universal_poker/logic:gamedef",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "universal_poker_test",
+    size = "medium",
+    srcs = ["universal_poker_test.cc"],
+    args = [
+        "--subgames_data_dir=open_spiel/games/universal_poker/endgames",
+    ],
+    data = [
+        "endgames/subgame1.txt",
+        "endgames/subgame2.txt",
+        "endgames/subgame3.txt",
+        "endgames/subgame4.txt",
+    ],
+    deps = [
+        ":universal_poker",
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/time",
+        "@acpc",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:evaluate_bots",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:init",
+    ],
+)

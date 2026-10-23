@@ -15,8 +15,8 @@
 #include <ostream>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "open_spiel/algorithms/tabular_best_response_mdp.h"
 #include "open_spiel/algorithms/external_sampling_mccfr.h"
 #include "open_spiel/algorithms/outcome_sampling_mccfr.h"

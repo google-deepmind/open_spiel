@@ -14,7 +14,7 @@
 
 #include "open_spiel/games/stones_and_gems/stones_and_gems.h"
 
-#include "open_spiel/abseil-cpp/absl/container/node_hash_map.h"
+#include "absl/container/node_hash_map.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 #include "unordered_map"

@@ -1,0 +1,38 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "hanabi",
+    srcs = ["hanabi.cc"],
+    hdrs = ["hanabi.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_hanabi_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel",
+        "@hanabi//:hanabi",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "hanabi_test",
+    srcs = ["hanabi_test.cc"],
+    deps = [
+        ":hanabi",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

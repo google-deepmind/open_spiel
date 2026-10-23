@@ -49,11 +49,14 @@ games and any special considerations are noted in the steps.
 2.  Copy the header and source: `tic_tac_toe.h`, `tic_tac_toe.cc`, and
     `tic_tac_toe_test.cc` to `new_game.h`, `new_game.cc`, and `new_game_test.cc`
     (or `tic_tac_toe.py` and `tic_tac_toe_test.py`).
-3.  Configure CMake:
-    *   If you are working with C++: add the new game’s source files to
-        `open_spiel/games/CMakeLists.txt`.
-    *   If you are working with C++: add the new game’s test target to
-        `open_spiel/games/CMakeLists.txt`.
+3.  Configure the build:
+    *   If you are working with C++: add a `BUILD.bazel` file for the new game,
+        with a `cc_library` for its sources and a `cc_test` for its test (copy
+        `open_spiel/games/tic_tac_toe/BUILD.bazel`), and add the library to
+        `all_games` in `open_spiel/games/BUILD.bazel`. Then run
+        `open_spiel/scripts/generate_cmake.sh` to regenerate the
+        `CMakeLists.txt` files from the `BUILD.bazel` files (never edit the
+        generated files by hand; CI fails if they are out of date).
     *   If you are working with Python: add the test to
         `open_spiel/python/CMakeLists.txt` and import it in
         `open_spiel/python/games/__init__.py`
@@ -129,8 +132,12 @@ When you add a new conditional dependency, you need to touch:
 -   the root CMakeLists.txt to add the option, with an OFF default
 -   add the option to `scripts/global_variables.sh`
 -   change `install.sh` to make sure the dependency is installed
--   use constructs like `if (${OPEN_SPIEL_BUILD_WITH_HANABI})` in CMake to
-    optionally add the targets to build.
+-   `open_spiel/cmake/dependencies.cmake` to define a CMake target for the
+    dependency, and the label table of `scripts/bazel_to_cmake` to map the
+    dependency's Bazel label to it
+-   the root `BUILD.bazel` to add a `build_with_<name>` flag, used in
+    `select()` by the targets that need the dependency; the generated
+    `CMakeLists.txt` files turn these into `if (OPEN_SPIEL_BUILD_WITH_<NAME>)`.
 
 ## Debugging tools
 

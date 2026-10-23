@@ -1,0 +1,72 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "bridge_scoring",
+    srcs = ["bridge_scoring.cc"],
+    hdrs = ["bridge_scoring.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "bridge",
+    srcs = ["bridge.cc"],
+    hdrs = ["bridge.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":bridge_scoring",
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/base:core_headers",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/synchronization",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@dds//:dds",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "bridge_uncontested_bidding",
+    srcs = ["bridge_uncontested_bidding.cc"],
+    hdrs = ["bridge_uncontested_bidding.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":bridge_scoring",
+        "@dds//:dds",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "bridge_test",
+    timeout = "long",
+    srcs = ["bridge_test.cc"],
+    deps = [
+        ":bridge",
+        ":bridge_scoring",
+        ":bridge_uncontested_bidding",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

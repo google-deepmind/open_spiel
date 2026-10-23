@@ -1,0 +1,297 @@
+# Description:
+#   A general extensive-form games library.
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel/python:py_library.bzl", "py_library")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("@rules_license//rules:license.bzl", "license")
+
+package(
+    default_applicable_licenses = [":license"],
+    default_visibility = ["//visibility:public"],
+)
+
+license(
+    name = "license",
+    package_name = "open_spiel",
+)
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+exports_files([
+    "CMakeLists.txt",
+    "scripts/python_extra_deps.sh",
+    "targets.cmake",
+])
+
+
+# Optional dependencies. Each `build_with_<x>` flag mirrors the CMake option
+# OPEN_SPIEL_BUILD_WITH_<X>; targets use the `build_with_<x>_enabled` config
+# settings in select() / target_compatible_with. Enable one with e.g.
+# `--//open_spiel:build_with_acpc`.
+_OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT = [
+]
+
+# Build with the Universal Poker (ACPC) library.
+bool_flag(
+    name = "build_with_acpc",
+    build_setting_default = "acpc" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_acpc_enabled",
+    flag_values = {":build_with_acpc": "true"},
+)
+
+# Build with the GAMUT game generator.
+bool_flag(
+    name = "build_with_gamut",
+    build_setting_default = "gamut" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_gamut_enabled",
+    flag_values = {":build_with_gamut": "true"},
+)
+
+# Build with the Hanabi learning environment.
+bool_flag(
+    name = "build_with_hanabi",
+    build_setting_default = "hanabi" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_hanabi_enabled",
+    flag_values = {":build_with_hanabi": "true"},
+)
+
+# Build with libnop (serialization).
+bool_flag(
+    name = "build_with_libnop",
+    build_setting_default = "libnop" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_libnop_enabled",
+    flag_values = {":build_with_libnop": "true"},
+)
+
+# Build with LibTorch (C++ PyTorch).
+bool_flag(
+    name = "build_with_libtorch",
+    build_setting_default = "libtorch" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_libtorch_enabled",
+    flag_values = {":build_with_libtorch": "true"},
+)
+
+# Build with OR-Tools.
+bool_flag(
+    name = "build_with_ortools",
+    build_setting_default = "ortools" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_ortools_enabled",
+    flag_values = {":build_with_ortools": "true"},
+)
+
+# Build with the RoShamBo bots.
+bool_flag(
+    name = "build_with_roshambo",
+    build_setting_default = "roshambo" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_roshambo_enabled",
+    flag_values = {":build_with_roshambo": "true"},
+)
+
+# Build with the xinxin Hearts bot.
+bool_flag(
+    name = "build_with_xinxin",
+    build_setting_default = "xinxin" in _OPTIONAL_DEPENDENCIES_ON_BY_DEFAULT,
+)
+
+config_setting(
+    name = "build_with_xinxin_enabled",
+    flag_values = {":build_with_xinxin": "true"},
+)
+
+cc_library(
+    name = "open_spiel",
+    srcs = [
+        "action_view.cc",
+        "canonical_game_strings.cc",
+        "game_parameters.cc",
+        "matrix_game.cc",
+        "observer.cc",
+        "policy.cc",
+        "simultaneous_move_game.cc",
+        "spiel.cc",
+        "spiel_bots.cc",
+        "spiel_utils.cc",
+        "tensor_game.cc",
+    ],
+    hdrs = [
+        "action_view.h",
+        "canonical_game_strings.h",
+        "game_parameters.h",
+        "matrix_game.h",
+        "normal_form_game.h",
+        "observer.h",
+        "policy.h",
+        "simultaneous_move_game.h",
+        "spiel.h",
+        "spiel_bots.h",
+        "spiel_globals.h",
+        "spiel_utils.h",
+        "tensor_game.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/base:core_headers",
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/container:inlined_vector",
+        "@abseil-cpp//absl/container:node_hash_map",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/random:bit_gen_ref",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/synchronization",
+        "@abseil-cpp//absl/time",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@nlohmann_json//:json",
+        "//open_spiel/utils:nlohmann_json",
+        "//open_spiel/utils:serialization",
+        "//open_spiel/utils:status",
+        "//open_spiel/utils:usage_logging",
+    ],
+    alwayslink = 1,
+)
+
+# OpenSpiel with a small number of test games.
+cc_library(
+    name = "standard_games",
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":open_spiel",
+        "//open_spiel/games",
+    ],
+    alwayslink = 1,
+)
+
+# OpenSpiel with all the officially supported games.
+cc_library(
+    name = "all_games",
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":open_spiel",
+        "//open_spiel/games:all_games",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "action_struct_tests",
+    srcs = ["tests/action_struct_tests.cc"],
+    hdrs = ["tests/action_struct_tests.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":open_spiel",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/utils:status",
+    ],
+)
+
+cc_library(
+    name = "basic_tests",
+    srcs = [
+        "tests/basic_tests.cc",
+    ],
+    hdrs = [
+        "tests/basic_tests.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":open_spiel",
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+    ],
+)
+
+cc_library(
+    name = "console_play_test",
+    srcs = [
+        "tests/console_play_test.cc",
+    ],
+    hdrs = [
+        "tests/console_play_test.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":open_spiel",
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/strings",
+    ],
+)
+
+cc_test(
+    name = "spiel_test",
+    size = "medium",
+    srcs = [
+        "tests/spiel_test.cc",
+    ],
+    deps = [
+        ":all_games",
+        ":basic_tests",
+        ":open_spiel",
+        "@abseil-cpp//absl/strings",
+        "@nlohmann_json//:json",
+        "//open_spiel/utils:nlohmann_json",
+    ],
+)
+
+cc_test(
+    name = "action_view_test",
+    size = "medium",
+    srcs = [
+        "tests/action_view_test.cc",
+    ],
+    deps = [
+        ":open_spiel",
+        ":standard_games",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+py_library(
+    name = "__init__",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)

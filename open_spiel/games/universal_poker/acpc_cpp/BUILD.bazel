@@ -1,0 +1,43 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "acpc_game",
+    srcs = [
+        "acpc_game.cc",
+    ],
+    hdrs = [
+        "acpc_game.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_acpc_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//open_spiel:__subpackages__"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/types:span",
+        "@acpc",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "acpc_game_test",
+    srcs = ["acpc_game_test.cc"],
+    deps = [
+        ":acpc_game",
+    ],
+)

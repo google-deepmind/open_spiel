@@ -24,6 +24,12 @@ PYBIN=`which $PYBIN`
 
 source ./open_spiel/scripts/python_extra_deps.sh $PYBIN
 
+# No JAX release supports this Python version (python_extra_deps.sh leaves the
+# list empty), so skip installing JAX and running the JAX tests.
+if [[ -z "$OPEN_SPIEL_PYTHON_JAX_DEPS" ]]; then
+  export OPEN_SPIEL_ENABLE_JAX="OFF"
+fi
+
 ${PYBIN} -m venv ./venv
 source ./venv/bin/activate
 

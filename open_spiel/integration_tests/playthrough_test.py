@@ -25,6 +25,19 @@ import pyspiel
 
 _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
+
+def _data_dir() -> str:
+  """Returns the playthroughs directory under $TEST_SRCDIR.
+
+  Bazel keeps the main repository's runfiles in a `_main` subdirectory.
+  """
+  test_srcdir = os.environ.get("TEST_SRCDIR", "")
+  path = os.path.join(test_srcdir, _DATA_DIR)
+  if not os.path.isdir(path):
+    path = os.path.join(test_srcdir, "_main", _DATA_DIR)
+  return path
+
+
 _OPTIONAL_GAMES = frozenset([
     "hanabi",
     "python_pokerkit_wrapper",
@@ -96,8 +109,7 @@ class PlaythroughTest(absltest.TestCase):
 
   def test_all_games_tested(self):
     """Verify that every game is present in the playthroughs."""
-    test_srcdir = os.environ.get("TEST_SRCDIR", "")
-    path = os.path.join(test_srcdir, _DATA_DIR)
+    path = _data_dir()
     basenames = set(os.listdir(path))
     missing_games = set(_AVAILABLE_GAMES) - set(_MISSING_GAMES) - set(
         _playthrough_match(os.path.join(path, basename), _SHORTNAME)[1]
@@ -110,8 +122,7 @@ class PlaythroughTest(absltest.TestCase):
 
 def _add_tests():
   """Adds a test for each playthrough to the test class (above)."""
-  test_srcdir = os.environ.get("TEST_SRCDIR", "")
-  path = os.path.join(test_srcdir, _DATA_DIR)
+  path = _data_dir()
   basenames = sorted(os.listdir(path))
   if len(basenames) < 40:
     raise ValueError(f"Playthroughs are missing from {path}")

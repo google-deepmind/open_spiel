@@ -1,0 +1,93 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "lp_solver",
+    srcs = ["lp_solver.cc"],
+    hdrs = ["lp_solver.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_ortools_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/algorithms:corr_dist",
+        "@ortools//:linear_solver_glop",
+        "@ortools//:linear_solver_lib",
+    ],
+)
+
+cc_test(
+    name = "lp_solver_test",
+    srcs = ["lp_solver_test.cc"],
+    deps = [
+        ":lp_solver",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/algorithms:corr_dist",
+        "//open_spiel/algorithms:matrix_game_utils",
+        "//open_spiel/games/matrix_games",
+    ],
+)
+
+cc_library(
+    name = "sequence_form_lp",
+    srcs = ["sequence_form_lp.cc"],
+    hdrs = ["sequence_form_lp.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_ortools_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "@abseil-cpp//absl/container:btree",
+        "//open_spiel",
+        "//open_spiel/algorithms:infostate_tree",
+        "@ortools//:linear_solver_glop",
+        "@ortools//:linear_solver_lib",
+    ],
+)
+
+cc_test(
+    name = "sequence_form_lp_test",
+    srcs = ["sequence_form_lp_test.cc"],
+    deps = [
+        ":sequence_form_lp",
+        "//open_spiel",
+        "//open_spiel/algorithms:tabular_exploitability",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/matrix_games",
+    ],
+)
+
+cc_binary(
+    name = "simple_lp_solver_example",
+    srcs = ["simple_lp_solver_example.cc"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_ortools_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel",
+        "@ortools//:linear_solver_glop",
+        "@ortools//:linear_solver_lib",
+    ],
+)

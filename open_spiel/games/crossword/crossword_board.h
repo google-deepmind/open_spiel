@@ -18,7 +18,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_map.h"
 #include "open_spiel/utils/status.h"
 
 namespace open_spiel {

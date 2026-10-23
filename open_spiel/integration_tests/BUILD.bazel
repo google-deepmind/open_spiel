@@ -1,0 +1,68 @@
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+licenses(["notice"])
+
+exports_files(glob(["playthroughs/*"]))
+
+py_test(
+    name = "playthrough_test",
+    size = "medium",
+    srcs = ["playthrough_test.py"],
+    data = glob(["playthroughs/*"]),
+    shard_count = 3,
+    deps = [
+        "//open_spiel/python/algorithms:generate_playthrough",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "api_test_lib",
+    testonly = 1,
+    srcs = ["api_test.py"],
+    strict_deps = True,
+    visibility = [
+        "//open_spiel:__subpackages__",
+    ],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/algorithms:sample_some_states",
+        "//open_spiel/python/games",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "api_test",
+    timeout = "long",
+    srcs = ["api_test.py"],
+    shard_count = 20,
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/algorithms:sample_some_states",
+        "//open_spiel/python/games",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)

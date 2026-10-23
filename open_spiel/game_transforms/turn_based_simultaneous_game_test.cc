@@ -17,8 +17,8 @@
 #include <random>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/random/uniform_int_distribution.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/observer.h"

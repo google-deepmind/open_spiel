@@ -17,8 +17,8 @@
 #include <cstdint>
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/hash/hash.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/hash/hash.h"
+#include "absl/time/time.h"
 #include "open_spiel/utils/stats.h"
 
 namespace open_spiel {
