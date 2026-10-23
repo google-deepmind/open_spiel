@@ -25,7 +25,7 @@ E.g. on Ubuntu or Debian:
 
 ```bash
 # Check to see if you have the necessary tools for building OpenSpiel:
-cmake --version        # Must be >= 3.17
+cmake --version        # Must be >= 3.21
 clang++ --version      # Must be >= 7.0.0
 python3-config --help
 

@@ -11,7 +11,8 @@ set(RUST_API_FILES
 )
 
 # Note: needs to be SHARED rather than MODULE to work on MacOS
-add_library(rust_spiel SHARED ${RUST_BINDINGS} ${OPEN_SPIEL_OBJECTS})
+add_library(rust_spiel SHARED ${RUST_BINDINGS})
+target_link_libraries(rust_spiel PRIVATE open_spiel_full)
 
 # Copy the files keeping the directories intact
 foreach(rust_api_file IN LISTS RUST_API_FILES)
