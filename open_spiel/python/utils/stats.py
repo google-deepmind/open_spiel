@@ -95,19 +95,18 @@ class SlidingWindowAccumulator(object):
   """A utility object to compute the mean of a sliding window of values."""
 
   def __init__(self, max_window_size: int):
+    if max_window_size <= 0:
+      raise ValueError("max_window_size must be positive")
     self._max_window_size = max_window_size
-    self._index = -1
+    self._index = 0
     self._values = []
 
   def add(self, value: float):
     if len(self._values) < self._max_window_size:
       self._values.append(value)
-      self._index += 1
     else:
       self._values[self._index] = value
-      self._index += 1
-      if self._index >= self._max_window_size:
-        self._index = 0
+      self._index = (self._index + 1) % self._max_window_size
 
   def mean(self):
     if not self._values:
