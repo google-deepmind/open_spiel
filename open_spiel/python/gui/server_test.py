@@ -296,7 +296,8 @@ class ServerTest(absltest.TestCase):
     self.assertEqual(status, http.HTTPStatus.METHOD_NOT_ALLOWED)
 
   def test_names_the_build_command_when_the_client_is_not_built(self) -> None:
-    self.server.client = static.ClientFiles(pathlib.Path("/nonexistent"))
+    missing = pathlib.Path(self.create_tempdir().full_path) / "missing"
+    self.server.client = static.ClientFiles(missing)
     status, _, content = self.request("GET", "/")
     self.assertEqual(status, http.HTTPStatus.NOT_FOUND)
     self.assertIn(b"npm run build", content)

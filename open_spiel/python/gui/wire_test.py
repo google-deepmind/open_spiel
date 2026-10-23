@@ -60,6 +60,21 @@ class ParseTest(absltest.TestCase):
     with self.assertRaisesRegex(wire.DecodeError, "nests too deeply"):
       wire.parse(b"[" * 100000)
 
+  def test_refuses_a_body_one_level_past_the_nesting_cap(self) -> None:
+    depth = wire.MAX_NESTING + 1
+    with self.assertRaisesRegex(wire.DecodeError, "nests too deeply"):
+      wire.parse(b"[" * depth + b"]" * depth)
+
+  def test_parses_a_body_at_the_nesting_cap(self) -> None:
+    depth = wire.MAX_NESTING
+    self.assertIsInstance(wire.parse(b"[" * depth + b"]" * depth), list)
+
+  def test_does_not_count_brackets_inside_strings(self) -> None:
+    text = '["' + "[" * (wire.MAX_NESTING + 1) + '\\"{"]'
+    self.assertEqual(
+        wire.parse(text.encode()), ["[" * (wire.MAX_NESTING + 1) + '"{']
+    )
+
   def test_refuses_non_finite_numbers(self) -> None:
     for literal in (b"NaN", b"Infinity", b"-Infinity"):
       with self.subTest(literal=literal):

@@ -24,6 +24,7 @@ import dataclasses
 import enum
 import json
 import math
+import re
 import types
 import typing
 from typing import Any, TypeVar
@@ -31,6 +32,15 @@ from typing import Any, TypeVar
 from open_spiel.python.gui import errors
 
 _T = TypeVar("_T")
+
+# The deepest a request body may nest arrays and objects. Requests nest only a
+# few levels; the explicit cap refuses deeper bodies on every Python version,
+# where relying on `json`'s RecursionError depends on the interpreter's stack.
+MAX_NESTING = 64
+
+_TOO_DEEP = "The body nests too deeply."
+_STRING = re.compile(r'"(?:[^"\\]|\\.)*"')
+_BRACKET = re.compile(r"[\[\]{}]")
 
 _SCALAR_NAMES: dict[object, str] = {
     bool: "a boolean",
@@ -59,13 +69,38 @@ def parse(body: bytes) -> object:
       holds an integer longer than Python converts, or nests too deeply.
   """
   try:
-    return json.loads(body.decode("utf-8"), parse_constant=_refuse_constant)
+    text = body.decode("utf-8")
+    if _nesting_depth(text) > MAX_NESTING:
+      raise DecodeError(_TOO_DEEP)
+    return json.loads(text, parse_constant=_refuse_constant)
   except RecursionError as error:
-    raise DecodeError("The body nests too deeply.") from error
+    raise DecodeError(_TOO_DEEP) from error
   except ValueError as error:
     # Covers UnicodeDecodeError, json.JSONDecodeError and the integer digit
     # limit, which json reports as a plain ValueError.
     raise DecodeError(f"The body is not JSON: {error}") from error
+
+
+def _nesting_depth(text: str) -> int:
+  """Returns how deeply arrays and objects nest in JSON `text`.
+
+  Brackets inside strings do not count. The count does not check that the
+  text is JSON; `json.loads` does that.
+
+  Args:
+    text: The JSON text.
+
+  Returns:
+    The greatest number of arrays and objects open at once.
+  """
+  depth = deepest = 0
+  for bracket in _BRACKET.findall(_STRING.sub("", text)):
+    if bracket in "[{":
+      depth += 1
+      deepest = max(deepest, depth)
+    else:
+      depth -= 1
+  return deepest
 
 
 def _refuse_constant(name: str) -> float:
