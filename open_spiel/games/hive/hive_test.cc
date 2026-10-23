@@ -17,8 +17,8 @@
 #include <memory>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/games/hive/hive_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

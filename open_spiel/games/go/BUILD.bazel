@@ -1,0 +1,76 @@
+# Description:
+#   Go implementation details.
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "go",
+    srcs = [
+        "go.cc",
+        "sgf_game_loader.cc",
+    ],
+    hdrs = [
+        "go.h",
+        "sgf_game_loader.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":go_board",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:sgf_reader",
+        "//open_spiel/utils:status",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "go_test",
+    srcs = ["go_test.cc"],
+    deps = [
+        ":go",
+        ":go_board",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "go_board",
+    srcs = ["go_board.cc"],
+    hdrs = ["go_board.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/games/chess:chess_common",
+    ],
+)
+
+cc_test(
+    name = "sgf_game_loader_test",
+    srcs = ["sgf_game_loader_test.cc"],
+    deps = [
+        ":go",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:sgf_reader",
+    ],
+)

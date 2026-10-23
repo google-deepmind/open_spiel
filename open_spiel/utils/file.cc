@@ -19,7 +19,7 @@
 
 #include <cstdlib>
 #include <system_error>  // NOLINT: only used externally.
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "absl/strings/string_view.h"
 
 #ifdef _WIN32
 // https://stackoverflow.com/a/42906151

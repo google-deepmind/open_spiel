@@ -1,0 +1,135 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "app",
+    srcs = ["app.py"],
+    deps = [
+        "@py_deps//absl:app",
+    ],
+)
+
+pytype_strict_library(
+    name = "data_logger",
+    srcs = ["data_logger.py"],
+    deps = select({
+        "//conditions:default": [":gfile"],
+    }),
+)
+
+# Plain-Python gfile replacement used by the open-source build.
+pytype_strict_library(
+    name = "gfile",
+    srcs = ["gfile.py"],
+)
+
+pytype_strict_library(
+    name = "file_logger",
+    srcs = ["file_logger.py"],
+)
+
+
+py_test(
+    name = "file_logger_test",
+    srcs = ["file_logger_test.py"],
+    deps = [
+        ":file_logger",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "lru_cache",
+    srcs = ["lru_cache.py"],
+)
+
+pytype_strict_library(
+    name = "spawn",
+    srcs = ["spawn.py"],
+)
+
+pytype_strict_library(
+    name = "stats",
+    srcs = ["stats.py"],
+)
+
+pytype_strict_library(
+    name = "file_utils",
+    srcs = ["file_utils.py"],
+)
+
+py_test(
+    name = "lru_cache_test",
+    srcs = ["lru_cache_test.py"],
+    deps = [
+        ":lru_cache",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "replay_buffer",
+    srcs = ["replay_buffer.py"],
+)
+
+pytype_strict_library(
+    name = "shared_value",
+    srcs = ["shared_value.py"],
+)
+
+pytype_strict_library(
+    name = "reservoir_buffer",
+    srcs = ["reservoir_buffer.py"],
+    deps = ["@py_deps//numpy"],
+)
+
+py_test(
+    name = "replay_buffer_test",
+    srcs = ["replay_buffer_test.py"],
+    deps = [
+        ":replay_buffer",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "spawn_test",
+    srcs = ["spawn_test.py"],
+    deps = [
+        "@py_deps//absl/testing:absltest",
+    ] + select({
+        "//conditions:default": [":spawn"],
+    }),
+)
+
+pytype_strict_library(
+    name = "metrics",
+    srcs = ["metrics.py"],
+    deps = ["@py_deps//clu/metric_writers"],
+)
+
+py_test(
+    name = "metrics_test",
+    srcs = ["metrics_test.py"],
+    deps = [
+        ":metrics",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_library(
+    name = "training",
+    srcs = ["training.py"],
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+    ],
+)

@@ -45,9 +45,9 @@
 #include <vector>
 #include <map>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/strings/str_format.h"
 
 namespace open_spiel {
 namespace oh_hell {

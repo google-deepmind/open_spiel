@@ -15,9 +15,9 @@
 #include <memory>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/strings/str_format.h"
 #include "open_spiel/algorithms/value_iteration.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

@@ -16,9 +16,9 @@
 #include <random>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/strings/str_format.h"
 #include "open_spiel/spiel.h"
 
 ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");

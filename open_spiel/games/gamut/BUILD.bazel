@@ -1,0 +1,77 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel/python:py_test.bzl", "py_test")
+load("//bazel/python:pybind.bzl", "pybind_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "gamut",
+    srcs = ["gamut.cc"],
+    hdrs = ["gamut.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_gamut_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/synchronization",
+        "//open_spiel",
+        "//open_spiel/games/nfg_game",
+        "//open_spiel/utils:file",
+    ],
+)
+
+cc_test(
+    name = "gamut_test",
+    srcs = ["gamut_test.cc"],
+    data = [
+    ],
+    tags = ["not_run:arm"],
+    deps = [
+        ":gamut",
+        "//open_spiel",
+        "//open_spiel/utils:init",
+    ],
+)
+
+pybind_library(
+    name = "gamut_pybind11",
+    srcs = ["gamut_pybind11.cc"],
+    hdrs = ["gamut_pybind11.h"],
+    deps = [
+        ":gamut",
+        "//open_spiel",
+        "//open_spiel/python/pybind11",
+    ],
+)
+
+py_test(
+    name = "py_gamut_test",
+    srcs = ["gamut_test.py"],
+    data = [
+    ],
+    main = "gamut_test.py",
+    tags = ["not_run:arm"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_gamut_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)

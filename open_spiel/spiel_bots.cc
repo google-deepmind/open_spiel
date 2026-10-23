@@ -22,14 +22,14 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/random/random.h"
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/random/distributions.h"
+#include "absl/random/random.h"
+#include "absl/random/uniform_int_distribution.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/string_view.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"

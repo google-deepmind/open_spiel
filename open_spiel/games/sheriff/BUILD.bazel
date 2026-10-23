@@ -1,0 +1,39 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "sheriff",
+    srcs = ["sheriff.cc"],
+    hdrs = ["sheriff.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "sheriff_test",
+    srcs = ["sheriff_test.cc"],
+    deps = [
+        ":sheriff",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:expected_returns",
+        "//open_spiel/algorithms:get_all_states",
+        "//open_spiel/algorithms:tabular_exploitability",
+    ],
+)

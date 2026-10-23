@@ -1,0 +1,78 @@
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "rl_environment",
+    srcs = ["rl_environment.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "impala",
+    srcs = ["impala.py"],
+    strict_deps = True,
+    deps = [
+        ":rl_environment",
+        "//open_spiel/python:rl_agent",
+        "@py_deps//chex",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//jax/example_libraries:optimizers",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//rlax",
+        "@py_deps//tree",
+    ],
+)
+
+py_test(
+    name = "impala_jax_test",
+    srcs = ["impala_jax_test.py"],
+    deps = [
+        ":impala",
+        ":rl_environment",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "poprl_main",
+    srcs = ["poprl_main.py"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_roshambo_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":impala",
+        ":rl_environment",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_tools",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "//open_spiel/python/jax:boltzmann_dqn",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/jax:policy_gradient",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)

@@ -43,7 +43,7 @@
 // partner). There will thus be 26 turns for declarer, and 13 turns for each
 // of the defenders during the play.
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
 #include "open_spiel/spiel.h"

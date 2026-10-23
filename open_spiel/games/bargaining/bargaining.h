@@ -21,8 +21,8 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/types/span.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/game_parameters.h"

@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/algorithm/container.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/observer.h"

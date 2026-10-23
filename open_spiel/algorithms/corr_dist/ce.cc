@@ -14,7 +14,7 @@
 
 #include "open_spiel/algorithms/corr_dist/ce.h"
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/strings/str_format.h"
 #include "open_spiel/algorithms/corr_dist/efcce.h"
 #include "open_spiel/algorithms/get_all_infostates.h"
 #include "open_spiel/policy.h"

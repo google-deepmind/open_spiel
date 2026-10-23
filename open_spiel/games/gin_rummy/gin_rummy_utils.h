@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 
 namespace open_spiel {
 namespace gin_rummy {

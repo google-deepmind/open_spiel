@@ -20,7 +20,7 @@
 
 #include "open_spiel/games/dots_and_boxes/dots_and_boxes.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/pybind11.h"
 
 
 namespace py = ::pybind11;

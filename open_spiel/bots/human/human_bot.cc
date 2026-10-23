@@ -22,8 +22,8 @@
 #include <unordered_map>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/numbers.h"
 
 namespace open_spiel {
 namespace {

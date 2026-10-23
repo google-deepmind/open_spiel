@@ -1,0 +1,43 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "phantom_go",
+    srcs = [
+        "phantom_go.cc",
+        "phantom_go_board.cc",
+    ],
+    hdrs = [
+        "phantom_go.h",
+        "phantom_go_board.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/games/chess:chess_common",
+        "//open_spiel/games/go",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "phantom_go_test",
+    srcs = ["phantom_go_test.cc"],
+    deps = [
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games/phantom_go",
+    ],
+)

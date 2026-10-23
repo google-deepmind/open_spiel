@@ -15,7 +15,7 @@
 #include "open_spiel/utils/nlohmann_json.h"  // IWYU pragma: keep
 #include <optional>
 
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

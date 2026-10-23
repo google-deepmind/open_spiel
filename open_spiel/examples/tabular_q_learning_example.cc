@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_map.h"
 #include "open_spiel/algorithms/tabular_q_learning.h"
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel.h"

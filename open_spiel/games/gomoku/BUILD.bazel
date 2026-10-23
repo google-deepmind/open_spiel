@@ -1,0 +1,44 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "gomoku",
+    srcs = ["gomoku.cc"],
+    hdrs = ["gomoku.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":gomoku_grid",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "gomoku_test",
+    srcs = ["gomoku_test.cc"],
+    deps = [
+        ":gomoku",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "gomoku_grid",
+    hdrs = ["gomoku_grid.h"],
+    deps = ["//open_spiel"],
+)

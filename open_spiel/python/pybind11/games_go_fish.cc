@@ -20,9 +20,9 @@
 
 #include "open_spiel/games/go_fish/go_fish.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
+#include "pybind11/cast.h"
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
 
 namespace py = ::pybind11;
 using open_spiel::Game;

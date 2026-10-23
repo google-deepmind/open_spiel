@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/init.h"
 

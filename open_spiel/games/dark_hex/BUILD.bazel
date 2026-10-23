@@ -1,0 +1,36 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "dark_hex",
+    srcs = ["dark_hex.cc"],
+    hdrs = ["dark_hex.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/games/hex",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "dark_hex_test",
+    srcs = ["dark_hex_test.cc"],
+    deps = [
+        ":dark_hex",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

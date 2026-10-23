@@ -1,0 +1,142 @@
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "rcfr",
+    srcs = ["rcfr.py"],
+    strict_deps = True,
+    deps = [
+        ":deep_cfr",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_library(
+    name = "dqn",
+    srcs = ["dqn.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "boltzmann_dqn",
+    srcs = ["boltzmann_dqn.py"],
+    strict_deps = True,
+    deps = [
+        ":dqn",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "boltzmann_dqn_pytorch_test",
+    size = "small",
+    srcs = ["boltzmann_dqn_pytorch_test.py"],
+    deps = [
+        ":boltzmann_dqn",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "deep_cfr",
+    srcs = ["deep_cfr.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "escher",
+    srcs = ["escher.py"],
+    strict_deps = True,
+    deps = [
+        ":deep_cfr",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "rl_losses",
+    srcs = ["losses/rl_losses.py"],
+    strict_deps = True,
+    deps = ["@py_deps//torch:pytorch"],
+)
+
+py_library(
+    name = "policy_gradient",
+    srcs = ["policy_gradient.py"],
+    strict_deps = True,
+    deps = [
+        ":rl_losses",
+        "//open_spiel/python:rl_agent",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "policy_gradient_pytorch_test",
+    size = "small",
+    srcs = ["policy_gradient_pytorch_test.py"],
+    deps = [
+        ":policy_gradient",
+        ":rl_losses",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+# Currently tests are disabled, as our version of PyTorch
+# is too old. So we currently only test these via the
+# CMake tests.
+# TODO(author5): re-enable test when PyTorch is upgraded.
+# py_strict_test(
+#    name = "rcfr_pytorch_test",
+#    srcs = ["rcfr_pytorch_test.py"],
+#    python_version = "PY3",
+#    deps = [
+#        ":rcfr",
+#        "//open_spiel/python/pybind11:pyspiel",
+#        "@py_deps//absl/testing:absltest",
+#        "@py_deps//absl/testing:parameterized",
+#        "@py_deps//numpy",
+#        "@py_deps//torch:pytorch",
+#    ],
+#)

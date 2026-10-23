@@ -1,0 +1,67 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "lines_of_action",
+    srcs = ["lines_of_action.cc"],
+    hdrs = ["lines_of_action.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/utils:tensor_view",
+    ],
+    alwayslink = 1,
+)
+
+filegroup(
+    name = "test_game_files",
+    srcs = [
+        "test_games/appendix_E_game1.txt",
+        "test_games/appendix_E_game2.txt",
+        "test_games/appendix_E_game3.txt",
+        "test_games/appendix_E_game4.txt",
+        "test_games/appendix_E_game5.txt",
+        "test_games/appendix_E_game6.txt",
+        "test_games/appendix_E_game7.txt",
+        "test_games/appendix_F_game1_incomplete.txt",
+        "test_games/appendix_F_game2.txt",
+        "test_games/appendix_F_game3.txt",
+        "test_games/appendix_F_game4.txt",
+        "test_games/appendix_F_game5.txt",
+        "test_games/appendix_F_game6.txt",
+        "test_games/appendix_F_game7.txt",
+        "test_games/appendix_F_game8.txt",
+        "test_games/shortest_game.txt",
+    ],
+)
+
+cc_test(
+    name = "lines_of_action_test",
+    srcs = ["lines_of_action_test.cc"],
+    data = [":test_game_files"],
+    deps = [
+        ":lines_of_action",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:init",
+    ],
+)

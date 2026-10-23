@@ -15,8 +15,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/games/colored_trails/colored_trails.h"
 #include "open_spiel/utils/file.h"
 

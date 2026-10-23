@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_map.h"
 
 namespace open_spiel {
 namespace evaluation {

@@ -19,9 +19,9 @@
 #include <random>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/random/random.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/random/distributions.h"
+#include "absl/random/random.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 

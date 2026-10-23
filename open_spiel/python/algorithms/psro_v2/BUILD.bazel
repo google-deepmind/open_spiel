@@ -1,0 +1,135 @@
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "rl_oracle",
+    srcs = ["rl_oracle.py"],
+    strict_deps = True,
+    deps = [
+        ":optimization_oracle",
+        ":utils",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "psro_v2",
+    srcs = ["psro_v2.py"],
+    strict_deps = True,
+    deps = [
+        ":abstract_meta_trainer",
+        ":strategy_selectors",
+        ":utils",
+        "//open_spiel/python:policy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "strategy_selectors",
+    srcs = ["strategy_selectors.py"],
+    strict_deps = True,
+    deps = ["@py_deps//numpy"],
+)
+
+py_library(
+    name = "abstract_meta_trainer",
+    srcs = ["abstract_meta_trainer.py"],
+    strict_deps = True,
+    deps = [
+        ":meta_strategies",
+        ":strategy_selectors",
+        ":utils",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "meta_strategies",
+    srcs = ["meta_strategies.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/algorithms:lp_solver",
+        "//open_spiel/python/algorithms:projected_replicator_dynamics",
+        "//open_spiel/python/algorithms:regret_matching",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "optimization_oracle",
+    srcs = ["optimization_oracle.py"],
+    strict_deps = True,
+    deps = ["@py_deps//numpy"],
+)
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/algorithms:policy_aggregator",
+        "//open_spiel/python/algorithms:policy_aggregator_joint",
+        "//open_spiel/python/egt:alpharank",
+        "//open_spiel/python/egt:utils",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "strategy_selectors_test",
+    srcs = ["strategy_selectors_test.py"],
+    deps = [
+        ":strategy_selectors",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "best_response_oracle_test",
+    srcs = ["best_response_oracle_test.py"],
+    deps = [
+        ":best_response_oracle",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:best_response",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "best_response_oracle",
+    srcs = ["best_response_oracle.py"],
+    strict_deps = True,
+    deps = [
+        ":optimization_oracle",
+        ":utils",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:best_response",
+        "//open_spiel/python/algorithms:policy_utils",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_library(
+    name = "rl_policy",
+    srcs = ["rl_policy.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/jax:policy_gradient",
+    ],
+)

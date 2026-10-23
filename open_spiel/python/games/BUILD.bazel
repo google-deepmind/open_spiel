@@ -1,0 +1,462 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_contrib_test", "pytype_strict_library")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "ant_foraging",
+    srcs = ["ant_foraging.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "ant_foraging_test",
+    srcs = ["ant_foraging_test.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/python_ant_foraging.txt",
+    ],
+    deps = [
+        ":ant_foraging",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "block_dominoes",
+    srcs = ["block_dominoes.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "block_dominoes_test",
+    srcs = ["block_dominoes_test.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/python_block_dominoes.txt",
+    ],
+    deps = [
+        ":block_dominoes",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "data",
+    srcs = ["data.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_test(
+    name = "data_test",
+    size = "small",
+    srcs = ["data_test.py"],
+    deps = [
+        ":data",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "tic_tac_toe",
+    srcs = ["tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "tic_tac_toe_test",
+    srcs = ["tic_tac_toe_test.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/python_tic_tac_toe.txt",
+        "//open_spiel/integration_tests:playthroughs/tic_tac_toe.txt",
+    ],
+    deps = [
+        ":tic_tac_toe",
+        "//open_spiel/python:observation",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "hangman",
+    srcs = ["hangman.py"],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "hangman_test",
+    srcs = ["hangman_test.py"],
+    deps = [
+        ":hangman",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "heuristics",
+    srcs = ["heuristics.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "heuristics_test",
+    srcs = ["heuristics_test.py"],
+    deps = [
+        ":heuristics",
+        "//open_spiel/python/algorithms:minimax",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "kuhn_poker",
+    srcs = ["kuhn_poker.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "kuhn_poker_test",
+    srcs = ["kuhn_poker_test.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/kuhn_poker_2p.txt",
+        "//open_spiel/integration_tests:playthroughs/python_kuhn_poker.txt",
+    ],
+    deps = [
+        ":kuhn_poker",
+        "//open_spiel/python:observation",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/algorithms:sequence_form_lp",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "pokerkit_wrapper",
+    srcs = ["pokerkit_wrapper.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+        "@py_deps//pokerkit",
+    ],
+)
+
+py_test(
+    name = "pokerkit_wrapper_test",
+    srcs = ["pokerkit_wrapper_test.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/python_pokerkit_wrapper_acpc_style.txt",
+    ],
+    deps = [
+        ":pokerkit_wrapper",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//pokerkit",
+    ],
+)
+
+py_library(
+    name = "repeated_pokerkit",
+    srcs = [
+        "repeated_pokerkit.py",
+    ],
+    strict_deps = True,
+    deps = [
+        ":pokerkit_wrapper",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+        "@py_deps//pokerkit",
+    ],
+)
+
+py_test(
+    name = "repeated_pokerkit_test",
+    timeout = "long",  # allow for taking up to 15 minutes
+    srcs = ["repeated_pokerkit_test.py"],
+    deps = [
+        ":pokerkit_wrapper",
+        ":repeated_pokerkit",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//pokerkit",
+    ],
+)
+
+py_library(
+    name = "iterated_prisoners_dilemma",
+    srcs = ["iterated_prisoners_dilemma.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "iterated_prisoners_dilemma_test",
+    srcs = ["iterated_prisoners_dilemma_test.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/kuhn_poker_2p.txt",
+        "//open_spiel/integration_tests:playthroughs/python_kuhn_poker.txt",
+    ],
+    deps = [
+        ":iterated_prisoners_dilemma",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "dynamic_routing_utils",
+    srcs = ["dynamic_routing_utils.py"],
+    strict_deps = True,
+)
+
+py_test(
+    name = "dynamic_routing_utils_test",
+    srcs = ["dynamic_routing_utils_test.py"],
+    deps = [
+        ":dynamic_routing_utils",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "dynamic_routing",
+    srcs = ["dynamic_routing.py"],
+    strict_deps = True,
+    deps = [
+        ":dynamic_routing_data",
+        "//open_spiel/python:observation",
+        "//open_spiel/python/games:dynamic_routing_utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "dynamic_routing_test",
+    srcs = ["dynamic_routing_test.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/python_dynamic_routing.txt",
+    ],
+    deps = [
+        ":dynamic_routing",
+        ":dynamic_routing_utils",
+        ":games",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:cfr",
+        "//open_spiel/python/algorithms:expected_game_score",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/algorithms:external_sampling_mccfr",
+        "//open_spiel/python/algorithms:outcome_sampling_mccfr",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "dynamic_routing_to_mean_field_game",
+    srcs = ["dynamic_routing_to_mean_field_game.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/games:dynamic_routing",
+        "//open_spiel/python/games:dynamic_routing_utils",
+        "//open_spiel/python/mfg/games:dynamic_routing",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_test(
+    name = "dynamic_routing_to_mean_field_game_test",
+    srcs = ["dynamic_routing_to_mean_field_game_test.py"],
+    deps = [
+        ":dynamic_routing_to_mean_field_game",
+        ":games",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:expected_game_score",
+        "//open_spiel/python/mfg/algorithms:mirror_descent",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "liars_poker_test",
+    srcs = ["liars_poker_test.py"],
+    deps = [
+        ":liars_poker",
+        "//open_spiel/python:observation",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "chat_game_test",
+    srcs = ["chat_game_test.py"],
+    deps = [
+        ":chat_game",
+        "//open_spiel/python/games/chat_games/configs",
+        "//open_spiel/python/games/chat_games/utils:test_utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "team_dominoes",
+    srcs = ["team_dominoes.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "team_dominoes_test",
+    srcs = ["team_dominoes_test.py"],
+    deps = [
+        ":team_dominoes",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "pursuit_evasion",
+    srcs = ["pursuit_evasion.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "pursuit_evasion_test",
+    srcs = ["pursuit_evasion_test.py"],
+    deps = [
+        ":pursuit_evasion",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "games",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+    deps = [
+        ":ant_foraging",
+        ":block_dominoes",
+        ":chat_game",
+        ":dynamic_routing",
+        ":hangman",
+        ":iterated_prisoners_dilemma",
+        ":kuhn_poker",
+        ":liars_poker",
+        ":pokerkit_wrapper",  # build_cleaner:keep
+        ":pursuit_evasion",
+        ":repeated_pokerkit",  # build_cleaner:keep
+        ":team_dominoes",
+        ":tic_tac_toe",
+    ],
+)
+
+pytype_strict_library(
+    name = "dynamic_routing_data",
+    srcs = ["dynamic_routing_data.py"],
+    deps = [":dynamic_routing_utils"],
+)
+
+pytype_strict_library(
+    name = "liars_poker",
+    srcs = ["liars_poker.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "chat_game",
+    srcs = ["chat_game.py"],
+    deps = [
+        "//open_spiel/python/games/chat_games:chat_game_base",
+        "//open_spiel/python/games/chat_games/configs",
+        "//open_spiel/python/games/chat_games/envs/observations",
+        "//open_spiel/python/games/chat_games/envs/payoffs",
+        "//open_spiel/python/games/chat_games/envs/termination",
+        "//open_spiel/python/games/chat_games/envs/utils",
+        "//open_spiel/python/games/chat_games/utils:test_utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)

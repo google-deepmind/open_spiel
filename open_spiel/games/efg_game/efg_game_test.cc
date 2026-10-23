@@ -17,7 +17,7 @@
 #include <cstdlib>
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/games/efg_game/efg_game_data.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

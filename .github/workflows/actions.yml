@@ -107,3 +107,56 @@ jobs:
         run: |
           python3 --version
           ./open_spiel/scripts/ci_script.sh
+
+  # The per-package CMakeLists.txt files are generated from the BUILD.bazel
+  # files. Fail if a change to a BUILD.bazel file was not followed by
+  # regenerating them.
+  generated_cmake_up_to_date:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Regenerate CMakeLists.txt files
+        run: bash ./open_spiel/scripts/generate_cmake.sh
+
+      - name: Check that generated files are up to date
+        run: |
+          git status --porcelain
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git diff
+            echo "Generated CMake files are stale: run ./open_spiel/scripts/generate_cmake.sh and commit the result."
+            exit 1
+          fi
+
+  bazel:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
+        with:
+          persist-credentials: false
+
+      # bazelisk is preinstalled as `bazel` on GitHub-hosted runners; it reads
+      # the Bazel version from .bazelversion.
+      - name: Bazel version
+        run: bazel version
+
+      - name: Build and test
+        run: bazel test --keep_going //open_spiel/...
+
+      - name: Build and test (optional C++ dependencies)
+        run: bazel test --keep_going --config=optional //open_spiel/...

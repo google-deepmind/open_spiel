@@ -1,0 +1,51 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "distribution",
+    srcs = ["distribution.py"],
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+pytype_strict_library(
+    name = "tabular_distribution",
+    srcs = ["tabular_distribution.py"],
+    deps = [
+        ":distribution",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    deps = [
+        ":distribution",
+    ] + select({
+        "//conditions:default": ["//open_spiel/python/utils:gfile"],
+    }),
+)
+
+pytype_strict_library(
+    name = "value",
+    srcs = ["value.py"],
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+pytype_strict_library(
+    name = "mfg",
+    srcs = ["__init__.py"],
+    deps = [
+        ":distribution",
+        ":tabular_distribution",
+        ":utils",
+        ":value",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)

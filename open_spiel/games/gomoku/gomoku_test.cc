@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/types/span.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"

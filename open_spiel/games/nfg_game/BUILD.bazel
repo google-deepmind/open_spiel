@@ -1,0 +1,52 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+filegroup(
+    name = "nfg_files",
+    srcs = [
+        "games/matching_pennies_3p.nfg",
+        "games/sample.nfg",
+    ],
+)
+
+cc_library(
+    name = "nfg_game",
+    srcs = ["nfg_game.cc"],
+    hdrs = ["nfg_game.h"],
+    copts = ["-fexceptions"],
+    data = [":nfg_files"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "nfg_game_test",
+    srcs = ["nfg_game_test.cc"],
+    data = [":nfg_files"],
+    deps = [
+        ":nfg_game",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:matrix_game_utils",
+        "//open_spiel/algorithms:nfg_writer",
+        "//open_spiel/algorithms:tensor_game_utils",
+        "//open_spiel/games/blotto",
+        "//open_spiel/games/matrix_games",
+        "//open_spiel/utils:init",
+    ],
+)

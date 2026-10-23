@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "absl/memory/memory.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {

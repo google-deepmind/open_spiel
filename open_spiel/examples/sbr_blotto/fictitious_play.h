@@ -17,9 +17,9 @@
 
 #include <random>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
-#include "open_spiel/abseil-cpp/absl/random/uniform_real_distribution.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/random/uniform_int_distribution.h"
+#include "absl/random/uniform_real_distribution.h"
+#include "absl/time/time.h"
 #include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"

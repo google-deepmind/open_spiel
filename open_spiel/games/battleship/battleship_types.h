@@ -15,9 +15,9 @@
 #ifndef OPEN_SPIEL_GAMES_BATTLESHIP_TYPES_H_
 #define OPEN_SPIEL_GAMES_BATTLESHIP_TYPES_H_
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/types/variant.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/types/variant.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {

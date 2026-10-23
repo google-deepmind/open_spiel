@@ -1,0 +1,35 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_binary", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_binary(
+    name = "analysis",
+    srcs = ["analysis.py"],
+    deps = [
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//matplotlib",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//numpy",
+        "@py_deps//pandas",
+    ] + select({
+        "//conditions:default": ["//open_spiel/python/utils:gfile"],
+    }),
+)
+
+pytype_strict_library(
+    name = "evaluator",
+    srcs = ["evaluator.py"],
+    deps = [
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:lru_cache",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)

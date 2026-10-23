@@ -1,0 +1,128 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_contrib_test", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "coalitional_game",
+    srcs = ["coalitional_game.py"],
+    deps = [
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "basic_games",
+    srcs = ["basic_games.py"],
+    deps = [
+        ":coalitional_game",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "deon_larson20_games",
+    srcs = ["deon_larson20_games.py"],
+    deps = [":basic_games"],
+)
+
+pytype_strict_library(
+    name = "least_core_lp",
+    srcs = ["least_core_lp.py"],
+    deps = [
+        ":coalitional_game",
+        "@py_deps//cvxpy",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "least_core_lp_test",
+    srcs = ["least_core_lp_test.py"],
+    deps = [
+        ":basic_games",
+        ":least_core_lp",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "shapley_values",
+    srcs = ["shapley_values.py"],
+    deps = [
+        ":coalitional_game",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "shapley_values_test",
+    srcs = ["shapley_values_test.py"],
+    deps = [
+        ":basic_games",
+        ":deon_larson20_games",
+        ":shapley_values",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "util",
+    srcs = ["util.py"],
+    deps = [
+        ":coalitional_game",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "wvg",
+    srcs = ["wvg.py"],
+    deps = [
+        ":coalitional_game",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "least_core_lagrangian",
+    srcs = ["least_core_lagrangian.py"],
+    deps = [
+        ":coalitional_game",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "wvg_test",
+    srcs = ["wvg_test.py"],
+    deps = [
+        ":least_core_lp",
+        ":shapley_values",
+        ":wvg",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "least_core_lagrangian_test",
+    srcs = ["least_core_lagrangian_test.py"],
+    deps = [
+        ":basic_games",
+        ":least_core_lagrangian",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//ml_collections/config_dict",
+        "@py_deps//numpy",
+    ],
+)

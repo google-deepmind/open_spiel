@@ -1,0 +1,37 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "stones_and_gems",
+    srcs = ["stones_and_gems.cc"],
+    hdrs = ["stones_and_gems.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/utils:tensor_view",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "stones_and_gems_test",
+    srcs = ["stones_and_gems_test.cc"],
+    deps = [
+        ":stones_and_gems",
+        "@abseil-cpp//absl/container:node_hash_map",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

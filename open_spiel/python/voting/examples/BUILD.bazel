@@ -1,0 +1,84 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_binary", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "atari_datasets",
+    srcs = ["atari_datasets.py"],
+    data = [
+        "atari_agent57_table.txt",
+        "atari_muesli_table11.txt",
+        "atari_rainbow_table5.txt",
+        "atari_rainbow_table6.txt",
+    ],
+    deps = [
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_binary(
+    name = "atari",
+    srcs = ["atari.py"],
+    deps = [
+        ":atari_datasets",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/voting:approval",
+        "//open_spiel/python/voting:base",
+        "//open_spiel/python/voting:borda",
+        "//open_spiel/python/voting:copeland",
+        "//open_spiel/python/voting:kemeny_young",
+        "//open_spiel/python/voting:maximal_lotteries",
+        "//open_spiel/python/voting:plurality",
+        "//open_spiel/python/voting:ranked_pairs",
+        "//open_spiel/python/voting:schulze",
+        "//open_spiel/python/voting:soft_condorcet_optimization",
+        "//open_spiel/python/voting:stv",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_binary(
+    name = "chatbot_arena",
+    srcs = ["chatbot_arena.py"],
+    deps = [
+        "//open_spiel/python/algorithms:nash_averaging",
+        "//open_spiel/python/voting",
+        "//open_spiel/python/voting:approval",
+        "//open_spiel/python/voting:base",
+        "//open_spiel/python/voting:borda",
+        "//open_spiel/python/voting:copeland",
+        "//open_spiel/python/voting:kemeny_young",
+        "//open_spiel/python/voting:maximal_lotteries",
+        "//open_spiel/python/voting:plurality",
+        "//open_spiel/python/voting:ranked_pairs",
+        "//open_spiel/python/voting:schulze",
+        "//open_spiel/python/voting:stv",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+        "@py_deps//pandas",
+        "@py_deps//pyarrow",  # build_cleaner: keep
+        "@py_deps//pygraphviz",
+    ] + select({
+        "//conditions:default": ["//open_spiel/python/utils:gfile"],
+    }),
+)
+
+pytype_strict_binary(
+    name = "example",
+    srcs = ["example.py"],
+    deps = [
+        "//open_spiel/python/voting:base",
+        "//open_spiel/python/voting:copeland",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)

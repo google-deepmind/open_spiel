@@ -14,9 +14,9 @@
 
 #include "open_spiel/games/crazy_eights/crazy_eights.h"
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/string_view.h"
 
 namespace open_spiel {
 namespace crazy_eights {

@@ -1,0 +1,42 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "pimc_bot",
+    srcs = ["pimc_bot.cc"],
+    hdrs = ["pimc_bot.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/algorithms:maxn",
+        "//open_spiel/algorithms:minimax",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/gin_rummy",
+    ],
+)
+
+cc_test(
+    name = "pimc_bot_test",
+    srcs = ["pimc_bot_test.cc"],
+    deps = [
+        ":pimc_bot",
+        "//open_spiel",
+        "//open_spiel/game_transforms:repeated_game",
+        "//open_spiel/games/gin_rummy",
+        "//open_spiel/games/hearts",  # build-cleaner: keep
+        "//open_spiel/games/leduc_poker",  # build-cleaner: keep
+    ],
+)

@@ -22,7 +22,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/games/hive/hive_board.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"

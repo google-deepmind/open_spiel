@@ -1,0 +1,232 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "crowd_modelling",
+    srcs = ["crowd_modelling.py"],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "crowd_modelling_test",
+    srcs = ["crowd_modelling_test.py"],
+    deps = [
+        ":crowd_modelling",
+        "//open_spiel/games/mfg:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "predator_prey",
+    srcs = ["predator_prey.py"],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:shared_value",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "predator_prey_test",
+    srcs = ["predator_prey_test.py"],
+    deps = [
+        ":predator_prey",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "dynamic_routing",
+    srcs = ["dynamic_routing.py"],
+    data = [
+        "//open_spiel/integration_tests:playthroughs/python_mfg_dynamic_routing.txt",
+    ],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/games:dynamic_routing_data",
+        "//open_spiel/python/games:dynamic_routing_utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "linear_quadratic",
+    srcs = ["linear_quadratic.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytype_strict_library(
+    name = "crowd_modelling_2d",
+    srcs = ["crowd_modelling_2d.py"],
+)
+
+pytype_strict_library(
+    name = "periodic_aversion",
+    srcs = ["periodic_aversion.py"],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytype_strict_library(
+    name = "crowd_avoidance",
+    srcs = ["crowd_avoidance.py"],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:shared_value",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "factory",
+    srcs = ["factory.py"],
+    deps = [
+        ":crowd_modelling_2d",
+        ":dynamic_routing",
+        ":games",
+        ":predator_prey",
+        "//open_spiel/python/games:dynamic_routing_data",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_test(
+    name = "dynamic_routing_test",
+    srcs = ["dynamic_routing_test.py"],
+    deps = [
+        ":dynamic_routing",
+        ":factory",
+        ":games",
+        "//open_spiel/python:observation",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/games",
+        "//open_spiel/python/games:dynamic_routing_utils",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:mirror_descent",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "linear_quadratic_test",
+    srcs = ["linear_quadratic_test.py"],
+    deps = [
+        ":linear_quadratic",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "crowd_modelling_2d_test",
+    srcs = ["crowd_modelling_2d_test.py"],
+    deps = [
+        ":crowd_modelling_2d",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "factory_test",
+    srcs = ["factory_test.py"],
+    deps = [
+        ":factory",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "periodic_aversion_test",
+    srcs = ["periodic_aversion_test.py"],
+    deps = [
+        ":periodic_aversion",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "crowd_avoidance_test",
+    srcs = ["crowd_avoidance_test.py"],
+    deps = [
+        ":crowd_avoidance",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "normal_form_game_test",
+    srcs = ["normal_form_game_test.py"],
+    deps = [
+        ":normal_form_game",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "games",
+    srcs = ["__init__.py"],
+    deps = [
+        ":crowd_avoidance",
+        ":crowd_modelling",
+        ":dynamic_routing",
+        ":linear_quadratic",
+        ":periodic_aversion",
+        ":predator_prey",
+    ],
+)
+
+pytype_strict_library(
+    name = "normal_form_game",
+    srcs = ["normal_form_game.py"],
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)

@@ -1,0 +1,689 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_binary", "pytype_strict_contrib_test", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "gui",
+    srcs = ["__init__.py"],
+)
+
+pytype_strict_library(
+    name = "api",
+    srcs = ["api.py"],
+    deps = [
+        ":catalogue",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":health",
+        ":request",
+        ":store",
+        ":wire",
+    ],
+)
+
+pytype_strict_library(
+    name = "catalogue",
+    srcs = ["catalogue.py"],
+    deps = [
+        ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "cli",
+    srcs = ["cli.py"],
+    deps = [
+        ":api",
+        ":health_report",
+        ":loader",
+        ":server",
+        ":static",
+        ":store",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "contract",
+    srcs = ["contract.py"],
+)
+
+pytype_strict_library(
+    name = "controller_settings",
+    srcs = ["controller_settings.py"],
+    deps = [
+        ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "controllers",
+    srcs = ["controllers.py"],
+    deps = [
+        ":contract",
+        ":controller_settings",
+        ":errors",
+        ":gil_safety",
+        ":information",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "errors",
+    srcs = ["errors.py"],
+    deps = [
+        ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "fake_session",
+    srcs = ["fake_session.py"],
+    deps = [
+        ":contract",
+        ":errors",
+        ":frame",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "frame",
+    srcs = ["frame.py"],
+    deps = [
+        ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "frame_checks",
+    srcs = ["frame_checks.py"],
+    deps = [
+        ":contract",
+        ":frame",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "gil_safety",
+    srcs = ["gil_safety.py"],
+    deps = [
+        "//open_spiel/python/games:tic_tac_toe",  # build_cleaner: keep; imported by a probe subprocess.
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "health",
+    srcs = ["health.py"],
+    deps = [
+        ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "health_report",
+    srcs = ["health_report.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":gil_safety",
+        ":health",
+    ],
+)
+
+pytype_strict_library(
+    name = "information",
+    srcs = ["information.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "loader",
+    srcs = ["loader.py"],
+    deps = [
+        ":catalogue",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":information",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "plies",
+    srcs = ["plies.py"],
+    deps = [
+        ":contract",
+        ":errors",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "request",
+    srcs = ["request.py"],
+    deps = [
+        ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "schema",
+    srcs = ["schema.py"],
+    data = [
+        "contract.schema.json",
+    ],
+    deps = [
+        ":catalogue",
+        ":contract",
+        ":errors",
+        ":frame",
+        ":health",
+        ":request",
+        "@py_deps//absl:app",
+    ],
+)
+
+pytype_strict_library(
+    name = "seats",
+    srcs = ["seats.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "server",
+    srcs = ["server.py"],
+    deps = [
+        ":api",
+        ":contract",
+        ":errors",
+        ":static",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "session",
+    srcs = ["session.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":frame",
+        ":loader",
+        ":plies",
+        ":request",
+        ":seats",
+        ":views",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "static",
+    srcs = ["static.py"],
+)
+
+pytype_strict_library(
+    name = "store",
+    srcs = ["store.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":session",
+    ],
+)
+
+pytype_strict_library(
+    name = "sweep",
+    srcs = ["sweep.py"],
+    deps = [
+        ":contract",
+        ":errors",
+        ":frame",
+        ":frame_checks",
+    ],
+)
+
+pytype_strict_library(
+    name = "sweep_all",
+    srcs = ["sweep_all.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":loader",
+        ":session",
+        ":sweep",
+        ":sweep_census",
+        ":sweep_exceptions",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "sweep_census",
+    srcs = ["sweep_census.py"],
+    deps = [
+        ":sweep",
+        ":sweep_exceptions",
+    ],
+)
+
+pytype_strict_library(
+    name = "sweep_exceptions",
+    srcs = ["sweep_exceptions.py"],
+    data = [
+        "sweep_exceptions.json",
+    ],
+    deps = [
+        ":sweep",
+    ],
+)
+
+pytype_strict_library(
+    name = "views",
+    srcs = ["views.py"],
+    deps = [
+        ":contract",
+        ":frame",
+        ":loader",
+        ":plies",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "wire",
+    srcs = ["wire.py"],
+    deps = [
+        ":errors",
+    ],
+)
+
+pytype_strict_binary(
+    name = "gui_server",
+    srcs = ["__main__.py"],
+    main = "__main__.py",
+    deps = [
+        ":cli",
+        "@py_deps//absl:app",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "api_test",
+    srcs = ["api_test.py"],
+    deps = [
+        ":api",
+        ":catalogue",
+        ":contract",
+        ":controllers",
+        ":health",
+        ":request",
+        ":store",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "catalogue_test",
+    srcs = ["catalogue_test.py"],
+    deps = [
+        ":catalogue",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "cli_test",
+    srcs = ["cli_test.py"],
+    data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
+    deps = [
+        ":cli",
+        ":static",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "contract_test",
+    srcs = ["contract_test.py"],
+    deps = [
+        ":contract",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "controller_settings_test",
+    srcs = ["controller_settings_test.py"],
+    deps = [
+        ":controller_settings",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "controllers_test",
+    srcs = ["controllers_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":gil_safety",
+        "//open_spiel/python/games:hangman",
+        "//open_spiel/python/games:tic_tac_toe",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "errors_test",
+    srcs = ["errors_test.py"],
+    deps = [
+        ":contract",
+        ":errors",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "fake_session_test",
+    srcs = ["fake_session_test.py"],
+    deps = [
+        ":contract",
+        ":fake_session",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "frame_checks_test",
+    srcs = ["frame_checks_test.py"],
+    deps = [
+        ":contract",
+        ":fake_session",
+        ":frame",
+        ":frame_checks",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "frame_test",
+    srcs = ["frame_test.py"],
+    deps = [
+        ":contract",
+        ":frame",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "games_smoke_test",
+    srcs = ["games_smoke_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":frame_checks",
+        ":session",
+        ":sweep",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "gil_safety_test",
+    srcs = ["gil_safety_test.py"],
+    deps = [
+        ":gil_safety",
+        "//open_spiel/python/games:iterated_prisoners_dilemma",
+        "//open_spiel/python/games:tic_tac_toe",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "health_report_test",
+    srcs = ["health_report_test.py"],
+    deps = [
+        ":contract",
+        ":health_report",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "health_test",
+    srcs = ["health_test.py"],
+    deps = [
+        ":contract",
+        ":health",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "information_test",
+    srcs = ["information_test.py"],
+    deps = [
+        ":information",
+        "//open_spiel/python/games:hangman",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "loader_test",
+    srcs = ["loader_test.py"],
+    deps = [
+        ":catalogue",
+        ":contract",
+        ":loader",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "plies_test",
+    srcs = ["plies_test.py"],
+    deps = [
+        ":contract",
+        ":plies",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "request_test",
+    srcs = ["request_test.py"],
+    deps = [
+        ":contract",
+        ":request",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "schema_test",
+    srcs = ["schema_test.py"],
+    deps = [
+        ":catalogue",
+        ":contract",
+        ":errors",
+        ":frame",
+        ":health",
+        ":request",
+        ":schema",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "seats_test",
+    srcs = ["seats_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":seats",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "server_test",
+    srcs = ["server_test.py"],
+    deps = [
+        ":api",
+        ":catalogue",
+        ":contract",
+        ":controllers",
+        ":health",
+        ":server",
+        ":static",
+        ":store",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "session_history_test",
+    srcs = ["session_history_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":plies",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "session_test",
+    srcs = ["session_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":loader",
+        ":request",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "static_test",
+    srcs = ["static_test.py"],
+    deps = [
+        ":static",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "store_test",
+    srcs = ["store_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":store",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "sweep_all_test",
+    srcs = ["sweep_all_test.py"],
+    deps = [
+        ":sweep_all",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "sweep_census_test",
+    srcs = ["sweep_census_test.py"],
+    deps = [
+        ":fake_session",
+        ":sweep",
+        ":sweep_census",
+        ":sweep_exceptions",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "sweep_exceptions_test",
+    srcs = ["sweep_exceptions_test.py"],
+    deps = [
+        ":sweep",
+        ":sweep_exceptions",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "sweep_test",
+    srcs = ["sweep_test.py"],
+    deps = [
+        ":fake_session",
+        ":sweep",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "views_test",
+    srcs = ["views_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":loader",
+        ":views",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "wire_test",
+    srcs = ["wire_test.py"],
+    deps = [
+        ":contract",
+        ":request",
+        ":wire",
+        "@py_deps//absl/testing:absltest",
+    ],
+)

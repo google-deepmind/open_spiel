@@ -1,0 +1,1176 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "action_value",
+    srcs = [
+        "action_value.py",
+    ],
+    strict_deps = False,
+    deps = ["@py_deps//numpy"],
+)
+
+py_test(
+    name = "action_value_test",
+    srcs = [
+        "action_value_test.py",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":action_value",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "action_value_vs_best_response",
+    srcs = ["action_value_vs_best_response.py"],
+    strict_deps = True,
+    deps = [
+        ":action_value",
+        ":get_all_states",
+        ":policy_utils",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_test(
+    name = "action_value_vs_best_response_test",
+    srcs = ["action_value_vs_best_response_test.py"],
+    deps = [
+        ":action_value_vs_best_response",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "adidas",
+    srcs = ["adidas.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/algorithms/adidas_utils/helpers",
+        "//open_spiel/python/algorithms/adidas_utils/helpers/nonsymmetric",
+        "//open_spiel/python/algorithms/adidas_utils/helpers/symmetric",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "adidas_test",
+    srcs = ["adidas_test.py"],
+    deps = [
+        ":adidas",
+        "//open_spiel/python/algorithms/adidas_utils/games",
+        "//open_spiel/python/algorithms/adidas_utils/solvers/nonsymmetric",
+        "//open_spiel/python/algorithms/adidas_utils/solvers/symmetric",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "async_mcts",
+    srcs = ["async_mcts.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "async_mcts_test",
+    srcs = ["async_mcts_test.py"],
+    deps = [
+        ":async_mcts",
+        ":evaluate_bots",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "best_response",
+    srcs = ["best_response.py"],
+    strict_deps = True,
+    deps = [
+        ":get_all_states",
+        ":noisy_policy",
+        ":policy_utils",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "best_response_test",
+    srcs = ["best_response_test.py"],
+    deps = [
+        ":best_response",
+        ":expected_game_score",
+        ":get_all_states",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "elo",
+    srcs = ["elo.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "elo_test",
+    srcs = ["elo_test.py"],
+    deps = [
+        ":elo",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "get_all_states",
+    srcs = ["get_all_states.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_test(
+    name = "get_all_states_test",
+    srcs = ["get_all_states_test.py"],
+    deps = [
+        ":get_all_states",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "infostate_tree_test",
+    srcs = ["infostate_tree_test.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "matrix_nash",
+    srcs = ["matrix_nash.py"],
+    strict_deps = True,
+    deps = [
+        "@py_deps//nashpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "sample_some_states",
+    srcs = ["sample_some_states.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_test(
+    name = "sample_some_states_test",
+    srcs = ["sample_some_states_test.py"],
+    deps = [
+        ":sample_some_states",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "value_iteration",
+    srcs = ["value_iteration.py"],
+    strict_deps = True,
+    deps = [
+        ":get_all_states",
+        ":lp_solver",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_test(
+    name = "value_iteration_test",
+    srcs = ["value_iteration_test.py"],
+    deps = [
+        ":value_iteration",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "mcts",
+    srcs = ["mcts.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "mcts_test",
+    srcs = ["mcts_test.py"],
+    deps = [
+        ":evaluate_bots",
+        ":mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "ismcts",
+    srcs = ["ismcts.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "ismcts_test",
+    srcs = ["ismcts_test.py"],
+    deps = [
+        ":ismcts",
+        ":mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "ismcts_agent_test",
+    srcs = ["ismcts_agent_test.py"],
+    deps = [
+        ":ismcts",
+        ":mcts",
+        ":mcts_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "mcts_agent",
+    srcs = ["mcts_agent.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "mcts_agent_test",
+    srcs = ["mcts_agent_test.py"],
+    deps = [
+        ":mcts",
+        ":mcts_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "minimax",
+    srcs = ["minimax.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_test(
+    name = "minimax_test",
+    srcs = ["minimax_test.py"],
+    deps = [
+        ":minimax",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "minimax_solver_test",
+    srcs = ["minimax_solver_test.py"],
+    deps = [
+        ":minimax_solver",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "nash_averaging",
+    srcs = ["nash_averaging.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/egt:utils",
+        "@py_deps//cvxpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "nash_averaging_test",
+    srcs = ["nash_averaging_test.py"],
+    deps = [
+        ":nash_averaging",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "cfr",
+    srcs = ["cfr.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//attr",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "cfr_test",
+    srcs = ["cfr_test.py"],
+    deps = [
+        ":cfr",
+        ":expected_game_score",
+        ":exploitability",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "efr",
+    srcs = ["efr.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//attr",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+py_test(
+    name = "efr_test",
+    srcs = ["efr_test.py"],
+    deps = [
+        ":efr",
+        ":expected_game_score",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "cfr_br",
+    srcs = ["cfr_br.py"],
+    strict_deps = True,
+    deps = [
+        ":cfr",
+        ":exploitability",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "cfr_br_test",
+    srcs = ["cfr_br_test.py"],
+    deps = [
+        ":cfr_br",
+        ":expected_game_score",
+        ":exploitability",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "mccfr",
+    srcs = ["mccfr.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "external_sampling_mccfr",
+    srcs = ["external_sampling_mccfr.py"],
+    strict_deps = True,
+    deps = [
+        ":mccfr",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "external_sampling_mccfr_test",
+    srcs = ["external_sampling_mccfr_test.py"],
+    deps = [
+        ":exploitability",
+        ":external_sampling_mccfr",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "outcome_sampling_mccfr",
+    srcs = ["outcome_sampling_mccfr.py"],
+    strict_deps = True,
+    deps = [
+        ":mccfr",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "outcome_sampling_mccfr_test",
+    srcs = ["outcome_sampling_mccfr_test.py"],
+    deps = [
+        ":exploitability",
+        ":outcome_sampling_mccfr",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "expected_game_score",
+    srcs = ["expected_game_score.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "expected_game_score_test",
+    srcs = ["expected_game_score_test.py"],
+    deps = [
+        ":expected_game_score",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "minimax_solver",
+    srcs = ["minimax_solver.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "tabular_qlearner",
+    srcs = ["tabular_qlearner.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_tools",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "tabular_qlearner_test",
+    srcs = ["tabular_qlearner_test.py"],
+    deps = [
+        ":tabular_qlearner",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python:rl_tools",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:stats",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "tabular_multiagent_qlearner",
+    srcs = ["tabular_multiagent_qlearner.py"],
+    strict_deps = True,
+    deps = [
+        ":jpsro",
+        ":stackelberg_lp",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_tools",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//nashpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "tabular_multiagent_qlearner_test",
+    srcs = ["tabular_multiagent_qlearner_test.py"],
+    deps = [
+        ":tabular_multiagent_qlearner",
+        ":tabular_qlearner",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "wolf_phc",
+    srcs = ["wolf_phc.py"],
+    strict_deps = True,
+    deps = [
+        ":projected_replicator_dynamics",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_tools",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "wolf_phc_test",
+    srcs = ["wolf_phc_test.py"],
+    deps = [
+        ":tabular_qlearner",
+        ":wolf_phc",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "exploitability",
+    srcs = ["exploitability.py"],
+    strict_deps = True,
+    deps = [
+        ":best_response",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "exploitability_test",
+    srcs = ["exploitability_test.py"],
+    shard_count = 6,
+    deps = [
+        ":exploitability",
+        ":policy_utils",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/games:data",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "generate_playthrough",
+    srcs = ["generate_playthrough.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:observation",
+        "//open_spiel/python/games",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "generate_playthrough_test",
+    srcs = ["generate_playthrough_test.py"],
+    deps = [
+        ":generate_playthrough",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "fictitious_play",
+    srcs = ["fictitious_play.py"],
+    strict_deps = True,
+    deps = [
+        ":exploitability",
+        "//open_spiel/python:policy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "fictitious_play_test",
+    srcs = ["fictitious_play_test.py"],
+    deps = [
+        ":expected_game_score",
+        ":exploitability",
+        ":fictitious_play",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "gambit",
+    srcs = ["gambit.py"],
+    strict_deps = True,
+)
+
+py_test(
+    name = "gambit_test",
+    size = "small",
+    srcs = ["gambit_test.py"],
+    deps = [
+        ":gambit",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "random_agent",
+    srcs = ["random_agent.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "random_agent_test",
+    srcs = ["random_agent_test.py"],
+    deps = [
+        ":random_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "policy_utils",
+    srcs = ["policy_utils.py"],
+    deps = [":get_all_states"],
+)
+
+pytype_strict_library(
+    name = "double_oracle",
+    srcs = ["double_oracle.py"],
+    deps = [
+        ":lp_solver",
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "jpsro",
+    srcs = ["jpsro.py"],
+    deps = [
+        ":projected_replicator_dynamics",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/egt:alpharank",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//cvxpy",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytype_strict_library(
+    name = "__init__",
+    srcs = ["__init__.py"],
+)
+
+pytype_strict_library(
+    name = "boltzmann_tabular_qlearner",
+    srcs = ["boltzmann_tabular_qlearner.py"],
+    deps = [
+        ":tabular_qlearner",
+        "//open_spiel/python:rl_tools",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "boltzmann_tabular_qlearner_test",
+    srcs = ["boltzmann_tabular_qlearner_test.py"],
+    deps = [
+        ":boltzmann_tabular_qlearner",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python:rl_tools",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "response_graph_ucb",
+    srcs = ["response_graph_ucb.py"],
+    strict_deps = True,
+    deps = [
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//networkx",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+py_library(
+    name = "response_graph_ucb_utils",
+    srcs = ["response_graph_ucb_utils.py"],
+    strict_deps = True,
+    deps = [
+        ":fictitious_play",
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:file_utils",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+py_test(
+    name = "response_graph_ucb_test",
+    srcs = ["response_graph_ucb_test.py"],
+    data = ["//open_spiel/data/paper_data:response_graph_ucb_data"],
+    deps = [
+        ":response_graph_ucb",
+        ":response_graph_ucb_utils",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "evaluate_bots",
+    srcs = ["evaluate_bots.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_test(
+    name = "evaluate_bots_test",
+    srcs = ["evaluate_bots_test.py"],
+    deps = [
+        ":evaluate_bots",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/bots:policy",
+        "//open_spiel/python/bots:uniform_random",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "lp_solver",
+    srcs = ["lp_solver.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//cvxpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "lp_solver_test",
+    srcs = ["lp_solver_test.py"],
+    deps = [
+        ":lp_solver",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//cvxpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "nfg_utils",
+    srcs = ["nfg_utils.py"],
+    strict_deps = True,
+    deps = ["@py_deps//numpy"],
+)
+
+py_test(
+    name = "nfg_utils_test",
+    srcs = ["nfg_utils_test.py"],
+    deps = [
+        ":nfg_utils",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "stackelberg_lp",
+    srcs = ["stackelberg_lp.py"],
+    strict_deps = True,
+    deps = [
+        ":projected_replicator_dynamics",
+        "//open_spiel/python/egt:utils",
+        "@py_deps//cvxpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "stackelberg_lp_test",
+    srcs = ["stackelberg_lp_test.py"],
+    deps = [
+        ":stackelberg_lp",
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//nashpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "mmd_dilated",
+    srcs = ["mmd_dilated.py"],
+    strict_deps = True,
+    deps = [
+        ":sequence_form_utils",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+py_test(
+    name = "mmd_dilated_test",
+    srcs = ["mmd_dilated_test.py"],
+    deps = [
+        ":mmd_dilated",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "sequence_form_lp",
+    srcs = ["sequence_form_lp.py"],
+    strict_deps = True,
+    deps = [
+        ":lp_solver",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_test(
+    name = "sequence_form_lp_test",
+    size = "medium",
+    srcs = ["sequence_form_lp_test.py"],
+    data = ["//open_spiel/games/efg_game:efg_files"],
+    tags = ["not_run:arm"],
+    deps = [
+        ":exploitability",
+        ":sequence_form_lp",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:file_utils",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "sequence_form_utils",
+    srcs = ["sequence_form_utils.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "sequence_form_utils_test",
+    size = "medium",
+    srcs = ["sequence_form_utils_test.py"],
+    deps = [
+        ":cfr",
+        ":expected_game_score",
+        ":sequence_form_utils",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "projected_replicator_dynamics",
+    srcs = ["projected_replicator_dynamics.py"],
+    strict_deps = True,
+    deps = [
+        ":nfg_utils",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "projected_replicator_dynamics_test",
+    srcs = ["projected_replicator_dynamics_test.py"],
+    deps = [
+        ":projected_replicator_dynamics",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "simplex_boundary_test",
+    size = "small",
+    srcs = ["simplex_boundary_test.py"],
+    deps = [
+        ":projected_replicator_dynamics",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "regret_matching",
+    srcs = ["regret_matching.py"],
+    strict_deps = True,
+    deps = [
+        ":nfg_utils",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "regret_matching_test",
+    srcs = ["regret_matching_test.py"],
+    deps = [
+        ":regret_matching",
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "discounted_cfr",
+    srcs = ["discounted_cfr.py"],
+    strict_deps = True,
+    deps = [
+        ":cfr",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "discounted_cfr_test",
+    srcs = ["discounted_cfr_test.py"],
+    deps = [
+        ":discounted_cfr",
+        ":expected_game_score",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "policy_aggregator",
+    srcs = ["policy_aggregator.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+    ],
+)
+
+py_test(
+    name = "policy_aggregator_test",
+    srcs = ["policy_aggregator_test.py"],
+    deps = [
+        ":policy_aggregator",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "policy_aggregator_joint_test",
+    srcs = ["policy_aggregator_joint_test.py"],
+    deps = [
+        ":policy_aggregator_joint",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "noisy_policy_test",
+    srcs = ["noisy_policy_test.py"],
+    deps = [
+        ":get_all_states",
+        ":noisy_policy",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "double_oracle_test",
+    srcs = ["double_oracle_test.py"],
+    deps = [
+        ":double_oracle",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "jpsro_test",
+    srcs = ["jpsro_test.py"],
+    shard_count = 50,
+    deps = [
+        ":jpsro",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "policy_aggregator_joint",
+    srcs = ["policy_aggregator_joint.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+    ],
+)
+
+py_library(
+    name = "noisy_policy",
+    srcs = ["noisy_policy.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "@py_deps//numpy",
+    ],
+)

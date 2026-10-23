@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "absl/algorithm/container.h"
+#include "absl/container/flat_hash_map.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"

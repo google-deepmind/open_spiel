@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

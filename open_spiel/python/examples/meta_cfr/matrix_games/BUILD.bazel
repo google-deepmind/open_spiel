@@ -1,0 +1,98 @@
+"""Build file for meta regret matching."""
+
+load("//bazel/python:pytype.bzl", "pytype_strict_binary", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+pytype_strict_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    deps = [
+        "@py_deps//absl/flags",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "matrix_dataset",
+    srcs = ["matrix_dataset.py"],
+    deps = [
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "evaluation",
+    srcs = ["evaluation.py"],
+    deps = [
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Failing pytype
+# pytype_strict_library(
+#     name = "rnn_meta_selfplay_agent",
+#     srcs = ["rnn_meta_selfplay_agent.py"],
+#     deps = [
+#         ":rnn_model",
+#         "@py_deps//absl/flags",
+#         "@py_deps//haiku",
+#         "@py_deps//jax",
+#         "@py_deps//numpy",
+#         "@py_deps//optax",
+#     ],
+# )
+
+pytype_strict_library(
+    name = "regret_matching_agent",
+    srcs = ["regret_matching_agent.py"],
+    deps = [
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_binary(
+    name = "main",
+    srcs = ["main.py"],
+    deps = [
+        ":evaluation",
+        ":matrix_dataset",
+        ":meta_selfplay_agent",
+        ":regret_matching_agent",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "meta_selfplay_agent",
+    srcs = ["meta_selfplay_agent.py"],
+    deps = [
+        ":utils",
+        "@py_deps//absl/flags",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_library(
+    name = "rnn_model",
+    srcs = ["rnn_model.py"],
+    deps = [
+        "@py_deps//haiku",
+        "@py_deps//jax",
+    ],
+)
