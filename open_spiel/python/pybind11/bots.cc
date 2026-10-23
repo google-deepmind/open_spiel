@@ -24,7 +24,6 @@
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
-#include "open_spiel/bots/uci/uci_bot.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
@@ -38,6 +37,11 @@
 // Optional headers.
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
 #include "open_spiel/bots/roshambo/roshambo_bot.h"
+#endif
+
+// The UCI bot uses POSIX process APIs.
+#ifndef _WIN32
+#include "open_spiel/bots/uci/uci_bot.h"
 #endif
 
 namespace open_spiel {
@@ -194,13 +198,13 @@ void init_pyspiel_bots(py::module& m) {
       },
       "A bot that samples from a policy.");
 
+#ifndef _WIN32
   py::enum_<open_spiel::uci::SearchLimitType>(m, "SearchLimitType")
       .value("MOVETIME", open_spiel::uci::SearchLimitType::kMoveTime)
       .value("NODES", open_spiel::uci::SearchLimitType::kNodes)
       .value("DEPTH", open_spiel::uci::SearchLimitType::kDepth)
       .export_values();
 
-#ifndef _WIN32
   m.def("make_uci_bot", open_spiel::uci::MakeUCIBot, py::arg("bot_binary_path"),
         py::arg("search_limit_value"), py::arg("ponder"), py::arg("options"),
         py::arg("search_limit_type") =
