@@ -19,9 +19,9 @@ pytype_strict_library(
 pytype_strict_library(
     name = "data_logger",
     srcs = ["data_logger.py"],
-    deps = select({
-        "//conditions:default": [":gfile"],
-    }),
+    deps = [
+        ":gfile",  # build_cleaner: keep
+    ],
 )
 
 # Plain-Python gfile replacement used by the open-source build.
@@ -112,7 +112,7 @@ py_test(
 pytype_strict_library(
     name = "metrics",
     srcs = ["metrics.py"],
-    deps = ["@py_deps//clu/metric_writers"],
+    deps = ["@py_deps//absl/logging"],
 )
 
 py_test(

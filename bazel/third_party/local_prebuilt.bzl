@@ -34,6 +34,9 @@ filegroup(
 
 def _local_prebuilt_repository_impl(rctx):
     path = rctx.workspace_root.get_child(rctx.attr.path)
+
+    # Refetch when the directory appears or disappears (install.sh run later).
+    rctx.watch(path)
     if path.exists:
         for child in path.readdir():
             rctx.symlink(child, child.basename)

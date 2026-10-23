@@ -43,6 +43,48 @@ PLATFORM_CONDITIONS = {
     "@platforms//os:windows": "WIN32",
 }
 
+# Prefixes of labels naming Python packages, in source and exported form. The
+# top-level package (e.g. `jax` in `//third_party/py/jax/example_libraries`)
+# decides which optional dependency group, if any, a dependency needs.
+PYTHON_PACKAGE_PREFIXES = ("//third_party/py/", "@py_deps//")
+
+# Top-level Python package -> optional dependency group. A copy of
+# OPTIONAL_DEP_GROUPS in the exported bazel/python/py_deps_table.bzl, kept here
+# so that generation needs only this directory; a test checks they agree.
+OPTIONAL_PYTHON_GROUPS = {
+    "chex": "jax",
+    "clu": "jax",
+    "distrax": "jax",
+    "flax": "jax",
+    "haiku": "jax",
+    "jax": "jax",
+    "optax": "jax",
+    "orbax": "jax",
+    "rlax": "jax",
+    "torch": "pytorch",
+    "cma": "python_misc",
+    "cvxpy": "python_misc",
+    "matplotlib": "python_misc",
+    "nashpy": "python_misc",
+    "networkx": "python_misc",
+    "pandas": "python_misc",
+    "pyarrow": "python_misc",
+    "pygraphviz": "python_misc",
+}
+
+# CMake switch that enables the tests needing each optional group.
+PYTHON_GROUP_OPTIONS = {
+    "jax": "OPEN_SPIEL_ENABLE_JAX",
+    "pytorch": "OPEN_SPIEL_ENABLE_PYTORCH",
+    "python_misc": "OPEN_SPIEL_ENABLE_PYTHON_MISC",
+}
+
+# Top-level Python packages whose dependents CMake never runs, and why. A copy
+# of MANUAL_PACKAGES in bazel/python/py_deps_table.bzl (tagged "manual" there).
+PYTHON_PACKAGES_NOT_RUN = {
+    "pygraphviz": "needs pygraphviz, which ships no wheels",
+}
+
 
 @dataclasses.dataclass(frozen=True)
 class ExternalLabel:
@@ -234,3 +276,20 @@ def open_spiel_package_and_name(label: str) -> tuple[str, str]:
       package, name = rest.split(":", 1)
       return package.lstrip("/"), name
   raise ValueError(f"Not an OpenSpiel label: {label}")
+
+
+def python_package(label: str) -> Optional[str]:
+  """The top-level Python package a label names, or None if it names none.
+
+  Args:
+    label: e.g. `//third_party/py/jax/example_libraries:optimizers` or
+      `@py_deps//jax/example_libraries:optimizers`.
+
+  Returns:
+    The top-level package (`jax`), or None for labels outside the Python
+    package trees.
+  """
+  for prefix in PYTHON_PACKAGE_PREFIXES:
+    if label.startswith(prefix):
+      return label[len(prefix):].split(":", 1)[0].split("/", 1)[0]
+  return None

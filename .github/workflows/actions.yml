@@ -160,3 +160,15 @@ jobs:
 
       - name: Build and test (optional C++ dependencies)
         run: bazel test --keep_going --config=optional //open_spiel/...
+
+  # The JAX code under Bazel (opt-in group, off in the default config).
+  bazel_jax:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Build and test (JAX)
+        run: bazel test --keep_going --config=jax //open_spiel/python/...

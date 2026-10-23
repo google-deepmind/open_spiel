@@ -23,7 +23,10 @@ set -euo pipefail
 readonly PYTHON_VERSION="3.12"
 cd "$(dirname "$0")"
 
+# Resolve against public PyPI (what users and CI install from), not a local
+# mirror configured in pip.conf that may lag behind new releases.
 uv pip compile \
+  --default-index https://pypi.org/simple \
   --universal \
   --python-version "${PYTHON_VERSION}" \
   --generate-hashes \

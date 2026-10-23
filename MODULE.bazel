@@ -44,6 +44,8 @@ bazel_dep(name = "rules_cc", version = "0.2.27")
 bazel_dep(name = "rules_license", version = "1.0.0")
 
 # The pybind11 headers repo created by pybind11_bazel (used by pybind11_json).
+# pybind11_bazel has no public extension that exposes it, so this uses the
+# extension its own MODULE.bazel uses; recheck it when bumping pybind11_bazel.
 pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
 use_repo(pybind11_configure, "pybind11")
 

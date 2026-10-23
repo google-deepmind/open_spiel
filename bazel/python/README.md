@@ -12,6 +12,8 @@ Bazel; CMake and `pip install .` do not use it.
 | `py_deps_table.bzl` | `@py_deps//<package>[:<target>]` labels used by BUILD files, mapped to pip packages; optional dependency groups. |
 | `py_deps.bzl` | Repository rule creating `@py_deps` from the table. |
 | `py_library.bzl`, `py_binary.bzl`, `py_test.bzl`, `pytype.bzl` | Python rules used by BUILD files: rules_python's, minus attributes that only Google's own build knows. |
+| `py_test_main.py`, `test_main.bzl` | Generated main of every `py_test`: runs the test file and fails the test if it defines tests but runs none (e.g. pytest-style tests without `absltest.main()`). |
+| `pytest.bzl`, `pytest_main.py` | `pytest_test`: runs test files under pytest; collecting no tests fails the test. |
 | `pybind.bzl` | pybind11_bazel's rules, with a `pybind_extension` that Python targets can depend on (`import pyspiel`). |
 
 ## Optional dependencies
@@ -25,7 +27,7 @@ bazel test //open_spiel/python/...                                  # core
 bazel test //open_spiel/python/... --//bazel/python:enable_jax      # + JAX
 ```
 
-The groups are `jax`, `pytorch`, `python_misc` and `tensorflow`. Pip packages
+The groups are `jax`, `pytorch` and `python_misc`. Pip packages
 are only downloaded for targets that are built.
 
 ## Adding a Python dependency

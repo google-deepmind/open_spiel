@@ -17,6 +17,9 @@
 BUILD files are Starlark, which for the constructs OpenSpiel uses is a subset of
 Python. We execute them with stub functions for every known rule and builtin,
 so no Bazel installation is needed. Anything unknown is a hard error.
+
+BUILD files are executed as Python code, so only evaluate trusted BUILD files
+(this repository's own). Restricting the available builtins is not a sandbox.
 """
 
 import dataclasses
@@ -43,6 +46,20 @@ SUPPORT_RULES = frozenset({
     "filegroup",
 })
 
+# Python tests, which the generator turns into CTest tests.
+PY_TEST_RULES = frozenset({
+    "py_test",
+    "pytest_test",
+    "pytype_strict_contrib_test",
+})
+
+# Python libraries, recorded so that the optional dependencies of the tests
+# using them can be found.
+PY_LIBRARY_RULES = frozenset({
+    "py_library",
+    "pytype_strict_library",
+})
+
 # Rules with no CMake counterpart: Python ships through setup.py, and the rest
 # is Bazel bookkeeping.
 IGNORED_RULES = frozenset({
@@ -53,15 +70,12 @@ IGNORED_RULES = frozenset({
     "package",
     "proto_library",
     "py_binary",
-    "py_library",
     "py_proto_library",
-    "py_test",
     "pytype_strict_binary",
-    "pytype_strict_contrib_test",
-    "pytype_strict_library",
 })
 
-KNOWN_RULES = CC_RULES | SUPPORT_RULES | IGNORED_RULES
+KNOWN_RULES = (CC_RULES | SUPPORT_RULES | PY_TEST_RULES | PY_LIBRARY_RULES |
+               IGNORED_RULES)
 
 # Non-rule symbols that BUILD files load from .bzl files. Their values only
 # matter to Bazel; attributes holding them are dropped by the generator.

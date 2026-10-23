@@ -9,6 +9,8 @@ package(
 
 licenses(["notice"])
 
+exports_files(["python_tests.cmake"])
+
 py_library(
     name = "rl_environment",
     srcs = ["rl_environment.py"],

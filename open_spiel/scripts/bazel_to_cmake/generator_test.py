@@ -604,6 +604,204 @@ class GeneratorTest(absltest.TestCase):
     self.assertNotIn("add_", text)
 
 
+class PythonTestsTest(absltest.TestCase):
+  """Generation of python/python_tests.cmake."""
+
+  def setUp(self):
+    super().setUp()
+    self.root = self.create_tempdir().full_path
+    _write_tree(self.root, "BUILD", internal=False, export=False)
+
+  def write(self, rel: str, text: str) -> None:
+    path = os.path.join(self.root, rel)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+      f.write(textwrap.dedent(text))
+
+  def python_tests(self, build: str, **files: str) -> str:
+    """Generates python_tests.cmake for `build` as python/algorithms/BUILD."""
+    self.write("python/algorithms/BUILD", build)
+    for name, text in files.items():
+      self.write(f"python/algorithms/{name}.py", text)
+    return _generate(self.root)[generator.PYTHON_TESTS_PATH]
+
+  def test_no_python_tests_no_file(self):
+    self.assertNotIn(generator.PYTHON_TESTS_PATH, _generate(self.root))
+
+  def test_unconditional_test(self):
+    text = self.python_tests(
+        """
+        py_test(
+            name = "cfr_test",
+            srcs = ["cfr_test.py"],
+            args = ["--iterations=2 --game=kuhn_poker", "--name='a b'"],
+            deps = [
+                "//third_party/open_spiel/python/pybind11:pyspiel",
+                "//third_party/py/absl/testing:absltest",
+                "//third_party/py/numpy",
+            ],
+        )
+        """, cfr_test="")
+    self.assertEqual(
+        text,
+        generator.HEADER + generator.PYTHON_TESTS_COMMENT + "\n"
+        "open_spiel_py_test(algorithms/cfr_test.py --iterations=2 "
+        '--game=kuhn_poker "--name=a b")\n')
+
+  def test_main_and_paths_outside_python(self):
+    self.write("games/foo/foo_py_test.py", "")
+    self.write("games/foo/BUILD", textwrap.dedent(_SOURCE_TREE[
+        "games/foo/BUILD"]) + textwrap.dedent("""
+        pytype_strict_contrib_test(
+            name = "foo_example_test",
+            srcs = ["foo_py_test.py"],
+            args = ["--data=third_party/open_spiel/games/foo/data.txt"],
+            main = "foo_py_test.py",
+        )
+        """))
+    text = _generate(self.root)[generator.PYTHON_TESTS_PATH]
+    self.assertIn(
+        "open_spiel_py_test(../games/foo/foo_py_test.py "
+        "--data=${open_spiel_SOURCE_DIR}/games/foo/data.txt)\n", text)
+
+  def test_python_group_guards(self):
+    text = self.python_tests(
+        """
+        py_library(
+            name = "dqn",
+            srcs = ["dqn.py"],
+            deps = ["//third_party/py/jax/example_libraries:optimizers"],
+        )
+        py_test(
+            name = "dqn_test",
+            srcs = ["dqn_test.py"],
+            deps = [":dqn", "//third_party/py/torch:pytorch"],
+        )
+        py_test(
+            name = "lp_test",
+            srcs = ["lp_test.py"],
+            deps = ["@py_deps//cvxpy"],
+        )
+        py_test(
+            name = "graph_test",
+            srcs = ["graph_test.py"],
+            deps = ["//third_party/py/pygraphviz"],
+        )
+        """, dqn="", dqn_test="", lp_test="", graph_test="")
+    self.assertIn(
+        "if(OPEN_SPIEL_ENABLE_JAX AND OPEN_SPIEL_ENABLE_PYTORCH)\n"
+        "  open_spiel_py_test(algorithms/dqn_test.py)\n"
+        "endif()\n", text)
+    self.assertIn(
+        "if(OPEN_SPIEL_ENABLE_PYTHON_MISC)\n"
+        "  open_spiel_py_test(algorithms/lp_test.py)\n"
+        "endif()\n", text)
+    self.assertIn("# py_test //python/algorithms:graph_test", text)
+    self.assertNotIn("open_spiel_py_test(algorithms/graph_test.py", text)
+
+  def test_cc_option_guards_propagate(self):
+    text = self.python_tests(
+        """
+        py_library(
+            name = "poker_utils",
+            srcs = ["poker_utils.py"],
+            deps = ["//third_party/open_spiel/games/poker"],
+        )
+        py_library(
+            name = "poker_agent",
+            srcs = ["poker_agent.py"],
+            deps = [":poker_utils"],
+        )
+        py_test(
+            name = "poker_agent_test",
+            srcs = ["poker_agent_test.py"],
+            deps = [
+                ":poker_agent",
+                "//third_party/open_spiel/python/pybind11:pyspiel",
+            ],
+        )
+        py_test(
+            name = "xinxin_test",
+            srcs = ["xinxin_test.py"],
+            target_compatible_with = select({
+                "//third_party/open_spiel:build_with_acpc_enabled": [],
+                "//conditions:default": [
+                    "//third_party/bazel_platforms:incompatible",
+                ],
+            }),
+        )
+        """, poker_utils="", poker_agent="", poker_agent_test="",
+        xinxin_test="")
+    # pyspiel needs OPEN_SPIEL_BUILD_WITH_PYTHON, which every Python test does.
+    self.assertIn(
+        "if(OPEN_SPIEL_BUILD_WITH_ACPC)\n"
+        "  open_spiel_py_test(algorithms/poker_agent_test.py)\n"
+        "  open_spiel_py_test(algorithms/xinxin_test.py)\n"
+        "endif()\n", text)
+    self.assertNotIn("BUILD_WITH_PYTHON", text)
+
+  def test_conditional_python_dep_adds_no_guard(self):
+    text = self.python_tests(
+        """
+        py_test(
+            name = "a_test",
+            srcs = ["a_test.py"],
+            deps = select({
+                "//third_party/open_spiel:build_with_acpc_enabled": [
+                    "//third_party/py/jax",
+                ],
+                "//conditions:default": [],
+            }),
+        )
+        """, a_test="")
+    self.assertIn("\nopen_spiel_py_test(algorithms/a_test.py)\n", text)
+
+  def test_main_must_be_unambiguous(self):
+    with self.assertRaisesRegex(generator.GenerationError, "set main"):
+      self.python_tests(
+          """
+          py_test(name = "a_test", srcs = ["b.py", "c.py"])
+          """, b="", c="")
+
+  def test_unknown_attribute_is_an_error(self):
+    with self.assertRaisesRegex(generator.GenerationError, "env"):
+      self.python_tests(
+          """
+          py_test(name = "a_test", srcs = ["a_test.py"], env = {"A": "1"})
+          """, a_test="")
+
+  def test_unknown_python_package_is_an_error(self):
+    with self.assertRaisesRegex(generator.GenerationError, "a_lib"):
+      self.python_tests(
+          """
+          py_test(name = "a_test", srcs = ["a_test.py"], deps = [":a_lib"])
+          """, a_test="")
+
+  def test_colliding_tests_are_an_error(self):
+    with self.assertRaisesRegex(generator.GenerationError, "collides"):
+      self.python_tests(
+          """
+          py_test(name = "a_test", srcs = ["a_test.py"])
+          pytest_test(name = "b_test", srcs = ["a_test.py"])
+          """, a_test="")
+
+  def test_wheel_exclusion_and_cmake_contract(self):
+    # python/CMakeLists.txt defines open_spiel_py_test, skips the tests in
+    # WHEEL_EXCLUDED_PYTHON_TESTS when building a wheel, and includes the
+    # generated file. Each excluded test must still be generated.
+    cmake_lists = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__)))), "python", "CMakeLists.txt")
+    if not os.path.exists(cmake_lists):
+      self.skipTest("python/CMakeLists.txt is not in the runfiles.")
+    with open(cmake_lists) as f:
+      text = f.read()
+    self.assertIn(f"function({generator.PYTHON_TEST_FUNCTION} py_test_file)",
+                  text)
+    self.assertIn("IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS", text)
+    self.assertIn(f"include({generator.PYTHON_TESTS_OUTPUT})", text)
+
+
 class CommandLineTest(absltest.TestCase):
   """Writing and checking generated files on disk."""
 

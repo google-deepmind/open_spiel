@@ -23,11 +23,10 @@ exports_files(["LICENSE"])
 
 exports_files([
     "CMakeLists.txt",
-    "copy.bara.sky",
-    "copy_python.bara.sky",
     "scripts/python_extra_deps.sh",
     "targets.cmake",
 ])
+
 
 # Optional dependencies. Each `build_with_<x>` flag mirrors the CMake option
 # OPEN_SPIEL_BUILD_WITH_<X>; targets use the `build_with_<x>_enabled` config

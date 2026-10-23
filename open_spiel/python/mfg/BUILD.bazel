@@ -27,9 +27,8 @@ pytype_strict_library(
     srcs = ["utils.py"],
     deps = [
         ":distribution",
-    ] + select({
-        "//conditions:default": ["//open_spiel/python/utils:gfile"],
-    }),
+        "//open_spiel/python/utils:gfile",  # build_cleaner: keep
+    ],
 )
 
 pytype_strict_library(

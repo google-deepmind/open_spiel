@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""`py_test` for OpenSpiel BUILD files: rules_python's, with adapted attributes."""
+"""`py_test` for OpenSpiel BUILD files: rules_python's, with adapted attributes.
+
+The test file runs through a generated main (from `py_test_main.py`) that fails
+the test if the file defines tests but never runs them, e.g. pytest-style
+`test_*` functions without `absltest.main()`; use `pytest.bzl` for those.
+"""
 
 load("@rules_python//python:py_test.bzl", _py_test = "py_test")
 load(":py_common.bzl", "adapt_py_executable_kwargs")
+load(":test_main.bzl", "test_main")
 
 # Optional C++ dependencies, each enabled by --//open_spiel:build_with_<dep>.
 # Tests learn which are built from OPEN_SPIEL_BUILD_WITH_<DEP>=ON, the
@@ -43,10 +49,11 @@ def _optional_cc_deps_env():
         })
     return env
 
-def py_test(**kwargs):
+def rules_python_test(**kwargs):
     """rules_python `py_test`; see `adapt_py_executable_kwargs`.
 
-    Also sets OPEN_SPIEL_BUILD_WITH_<DEP>=ON for enabled optional C++ deps.
+    Also sets OPEN_SPIEL_BUILD_WITH_<DEP>=ON for enabled optional C++ deps. For
+    the shims of this directory; BUILD files use `py_test` or `pytest_test`.
 
     Args:
       **kwargs: `py_test` attributes.
@@ -54,3 +61,34 @@ def py_test(**kwargs):
     adapted = adapt_py_executable_kwargs(kwargs)
     adapted["env"] = adapted.get("env", {}) | _optional_cc_deps_env()
     _py_test(**adapted)
+
+def _main_name(main):
+    """Returns the file name of a `main` label given relative to the package."""
+    return main.split(":")[-1]
+
+def py_test(name, srcs = [], main = None, **kwargs):
+    """`rules_python_test` that fails if the test file runs no tests.
+
+    Args:
+      name: name of the test.
+      srcs: Python sources; the test file is `main`, by default `<name>.py`.
+      main: the test file, if not `<name>.py`.
+      **kwargs: other `py_test` attributes.
+    """
+    checked_main = "_{}_checked_main.py".format(name)
+    test_main(
+        name = checked_main[:-len(".py")],
+        out = checked_main,
+        main = _main_name(main) if main else name + ".py",
+        srcs = srcs,
+        template = Label(":py_test_main.py"),
+        testonly = True,
+        tags = ["manual"],
+        visibility = ["//visibility:private"],
+    )
+    rules_python_test(
+        name = name,
+        srcs = srcs + [checked_main],
+        main = checked_main,
+        **kwargs
+    )

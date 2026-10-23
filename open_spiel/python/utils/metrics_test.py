@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for metrics."""
-
-import glob
+import json
 import os
 
 from absl.testing import absltest
@@ -26,28 +24,29 @@ class MetricsTest(parameterized.TestCase):
 
   @parameterized.parameters((True,), (False,))
   def test_create(self, just_logging: bool):
-    logdir = self.create_tempdir()
-    # Create the writer.
-    writer = metrics.create_default_writer(
-        logdir.full_path, just_logging=just_logging)
-    self.assertIsInstance(writer, metrics.metric_writers.MultiWriter)
+    logdir = self.create_tempdir().full_path
+    with metrics.ensure_flushes(
+        metrics.create_default_writer(logdir, just_logging=just_logging)
+    ) as writer:
+      writer.write_hparams({"param1": 1.0, "param2": 2.0})
+      for step in range(5):
+        writer.write_scalars(step, {"value": step * step})
+    writer.close()
 
-    # Write some metrics.
-    writer.write_hparams({"param1": 1.0, "param2": 2.0})
-    for step in range(5):
-      writer.write_scalars(step, {"value": step * step})
+    path = os.path.join(logdir, "metrics.jsonl")
+    if just_logging:
+      self.assertFalse(os.path.exists(path))
+      return
+    with open(path) as f:
+      records = [json.loads(line) for line in f]
+    self.assertEqual(records[0], {"hparams": {"param1": 1.0, "param2": 2.0}})
+    self.assertEqual(records[1:],
+                     [{"step": s, "value": s * s} for s in range(5)])
 
-    metrics.write_values(writer, 5, {
-        "scalar": 1.23,
-        "text": metrics.Text(value="foo")
-    })
-    # Flush the writer.
+  def test_no_logdir(self):
+    writer = metrics.create_default_writer()
+    writer.write_scalars(0, {"value": 1.0})
     writer.flush()
-
-    # Check that the summary file exists if not just logging.
-    self.assertLen(
-        glob.glob(os.path.join(logdir.full_path, "events.out.tfevents.*")),
-        0 if just_logging else 1)
 
 
 if __name__ == "__main__":

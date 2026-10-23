@@ -2,9 +2,11 @@
 # hand-written and included at the end of the root CMakeLists.txt, after all
 # generated targets are defined.
 
-## cc_binary targets that CMake also runs as smoke tests.
+## cc_binary targets that CMake also runs as smoke tests. The test names get a
+## `_binary` suffix so they differ from the generated cc_test names (several
+## examples have both a binary and a test with the same base name).
 macro(openspiel_binary_test TEST_NAME TARGET)
-  add_test(NAME ${TEST_NAME} COMMAND ${TARGET} ${ARGN})
+  add_test(NAME ${TEST_NAME}_binary COMMAND ${TARGET} ${ARGN})
 endmacro()
 
 openspiel_binary_test(benchmark_game_test open_spiel_examples_benchmark_game

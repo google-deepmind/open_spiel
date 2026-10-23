@@ -24,7 +24,6 @@ build:optional --//open_spiel:build_with_xinxin
 common:jax --//bazel/python:enable_jax
 common:pytorch --//bazel/python:enable_pytorch
 common:python_misc --//bazel/python:enable_python_misc
-common:tensorflow --//bazel/python:enable_tensorflow
 
 # Allow per-user overrides.
 try-import %workspace%/user.bazelrc

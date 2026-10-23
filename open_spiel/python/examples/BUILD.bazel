@@ -37,7 +37,6 @@ py_binary(
         "@py_deps//absl/flags",
         "@py_deps//absl/logging",
         "@py_deps//numpy",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -57,7 +56,6 @@ py_test(
         "@py_deps//absl/flags",
         "@py_deps//absl/logging",
         "@py_deps//numpy",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -221,7 +219,6 @@ py_binary(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//numpy",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -353,7 +350,6 @@ py_binary(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//absl/logging",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -372,7 +368,6 @@ py_test(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//absl/logging",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -614,7 +609,6 @@ py_binary(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//numpy",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -634,7 +628,6 @@ py_test(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//numpy",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -952,7 +945,6 @@ py_binary(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//numpy",
-        "@py_deps//tensorflow",
     ],
 )
 
@@ -980,7 +972,6 @@ py_test(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//numpy",
-        "@py_deps//tensorflow",
     ],
 )
 

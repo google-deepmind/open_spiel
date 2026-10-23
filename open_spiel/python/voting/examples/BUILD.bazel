@@ -49,6 +49,7 @@ pytype_strict_binary(
     srcs = ["chatbot_arena.py"],
     deps = [
         "//open_spiel/python/algorithms:nash_averaging",
+        "//open_spiel/python/utils:gfile",  # build_cleaner: keep
         "//open_spiel/python/voting",
         "//open_spiel/python/voting:approval",
         "//open_spiel/python/voting:base",
@@ -66,9 +67,7 @@ pytype_strict_binary(
         "@py_deps//pandas",
         "@py_deps//pyarrow",  # build_cleaner: keep
         "@py_deps//pygraphviz",
-    ] + select({
-        "//conditions:default": ["//open_spiel/python/utils:gfile"],
-    }),
+    ],
 )
 
 pytype_strict_binary(

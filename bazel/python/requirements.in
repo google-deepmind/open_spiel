@@ -8,16 +8,17 @@ ml-collections>=0.1.1
 numpy>=1.21.5
 scipy==1.16.3
 # OPEN_SPIEL_PYTHON_JAX_DEPS (scripts/python_extra_deps.sh, Python 3.12).
-jax==0.8.1
-jaxlib==0.8.1
-flax==0.12.1
-dm-haiku==0.0.16
-optax==0.2.6
-chex==0.1.91
-rlax==0.1.8
-distrax==0.1.7
+jax==0.12.0.1
+jaxlib==0.12.0.1
+flax==0.12.10
+dm-haiku==0.0.17
+optax==0.2.8
+chex==0.1.92
+rlax==0.1.9
+distrax==0.1.9
 # OPEN_SPIEL_PYTHON_PYTORCH_DEPS.
 torch==2.9.1
+dm-tree==0.1.10
 # OPEN_SPIEL_PYTHON_MISC_DEPS.
 IPython==8.23.0
 networkx==3.3
@@ -33,11 +34,9 @@ pokerkit==0.6.3
 fastmcp==3.3.1
 # Used by BUILD targets but not pinned by python_extra_deps.sh.
 cma
-clu
-dm-tree
 etils[epath]
-orbax-checkpoint
+orbax-checkpoint==0.12.8
 pandas
 pyarrow
 pygraphviz
-tensorflow
+pytest==9.1.1

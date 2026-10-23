@@ -101,5 +101,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
   options = vars(parser.parse_args(argv))
   return run(os.path.abspath(options.pop("root")), **options)
 
+
 if __name__ == "__main__":
   sys.exit(main())

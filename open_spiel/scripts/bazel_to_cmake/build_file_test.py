@@ -81,6 +81,15 @@ cc_library(name = "a", copts = TORCH_COPTS)
     with self.assertRaisesRegex(build_file.Error, "my_macro"):
       _evaluate('load("//x:defs.bzl", "my_macro")')
 
+  def test_pytest_test_is_recorded(self):
+    rules = _evaluate("""
+load("//third_party/py/pytest:pytest_defs.bzl", "pytest_test")
+pytest_test(name = "p_test", tests = ["p_test.py"])
+""")
+    self.assertEqual([(r.kind, r.name) for r in rules],
+                     [("pytest_test", "p_test")])
+    self.assertIn("pytest_test", build_file.PY_TEST_RULES)
+
   def test_glob(self):
     root = self.create_tempdir().full_path
     for rel in ("a.txt", "b.txt", "c.cc", "sub/d.txt", "pkg2/BUILD",
