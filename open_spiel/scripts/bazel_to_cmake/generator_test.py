@@ -782,8 +782,117 @@ class PythonTestsTest(absltest.TestCase):
       self.python_tests(
           """
           py_test(name = "a_test", srcs = ["a_test.py"])
-          pytest_test(name = "b_test", srcs = ["a_test.py"])
+          py_test(name = "b_test", srcs = ["a_test.py"])
           """, a_test="")
+
+  def test_pytest_single_file(self):
+    text = self.python_tests(
+        """
+        pytest_test(name = "a_test", tests = ["a_test.py"])
+        """, a_test="")
+    self.assertIn(
+        "\nopen_spiel_pytest(algorithms/a_test FILES "
+        "python/algorithms/a_test.py ARGS -s)\n", text)
+
+  def test_pytest_files_deselect_and_args(self):
+    text = self.python_tests(
+        """
+        pytest_test(
+            name = "ab_test",
+            srcs = ["helper.py"],
+            args = ["-q", "-k 'not slow'"],
+            deselect = ["a_test.py::test_x", "b_test.py::B::test_y"],
+            tests = ["a_test.py", "b_test.py"],
+        )
+        """, a_test="", b_test="", helper="")
+    self.assertIn(
+        "\nopen_spiel_pytest(algorithms/ab_test "
+        "FILES python/algorithms/a_test.py python/algorithms/b_test.py "
+        "DESELECT python/algorithms/a_test.py::test_x "
+        "python/algorithms/b_test.py::B::test_y "
+        'ARGS -q -k "not slow")\n', text)
+
+  def test_pytest_without_tests_runs_the_package(self):
+    text = self.python_tests(
+        """
+        pytest_test(name = "all_test", args = [])
+        """)
+    self.assertIn(
+        "\nopen_spiel_pytest(algorithms/all_test FILES python/algorithms)\n",
+        text)
+
+  def test_pytest_missing_test_file_is_an_error(self):
+    with self.assertRaisesRegex(generator.GenerationError, "does not exist"):
+      self.python_tests(
+          """
+          pytest_test(name = "a_test", tests = ["a_test.py"])
+          """)
+
+  def test_pytest_names_collide_with_py_test_names(self):
+    with self.assertRaisesRegex(generator.GenerationError,
+                                "python/algorithms/b_test.py collides"):
+      self.python_tests(
+          """
+          py_test(name = "b_test", srcs = ["b_test.py"])
+          pytest_test(name = "b_test.py", tests = ["b_test.py"])
+          """, b_test="")
+
+  def test_py_test_rejects_pytest_attributes(self):
+    for attr in ("tests", "deselect"):
+      with self.subTest(attr):
+        with self.assertRaisesRegex(generator.GenerationError,
+                                    f"unsupported attributes .*{attr}"):
+          self.python_tests(
+              f"""
+              py_test(name = "a_test", srcs = ["a_test.py"],
+                      {attr} = ["a_test.py"])
+              """, a_test="")
+
+  def test_manual_tests_are_guarded(self):
+    text = self.python_tests(
+        """
+        py_test(name = "a_test", srcs = ["a_test.py"], tags = ["manual"])
+        pytest_test(
+            name = "b_test",
+            tags = ["manual"],
+            tests = ["b_test.py"],
+            deps = ["//third_party/py/jax"],
+        )
+        py_test(
+            name = "c_test",
+            srcs = ["c_test.py"],
+            tags = ["notap"],
+            timeout = "long",
+        )
+        """, a_test="", b_test="", c_test="")
+    self.assertIn(
+        "if(OPEN_SPIEL_RUN_MANUAL_TESTS)\n"
+        "  open_spiel_py_test(algorithms/a_test.py)\n"
+        "endif()\n", text)
+    self.assertIn(
+        "if(OPEN_SPIEL_ENABLE_JAX AND OPEN_SPIEL_RUN_MANUAL_TESTS)\n"
+        "  open_spiel_pytest(algorithms/b_test FILES "
+        "python/algorithms/b_test.py ARGS -s)\n"
+        "endif()\n", text)
+    self.assertIn("\nopen_spiel_py_test(algorithms/c_test.py)\n", text)
+    self.assertNotIn("TIMEOUT", text)
+
+  def test_manual_cc_test_is_guarded(self):
+    self.write("games/foo/manual_test.cc", "")
+    self.write("games/foo/BUILD", textwrap.dedent(_SOURCE_TREE[
+        "games/foo/BUILD"]) + textwrap.dedent("""
+        cc_test(
+            name = "manual_test",
+            srcs = ["manual_test.cc"],
+            tags = ["manual"],
+            deps = [":foo"],
+        )
+        """))
+    text = _generate(self.root)["games/foo/CMakeLists.txt"]
+    self.assertIn(
+        "if(OPEN_SPIEL_RUN_MANUAL_TESTS)\n"
+        "  add_executable(open_spiel_games_foo_manual_test\n", text)
+    self.assertIn("\nadd_executable(open_spiel_games_foo_foo_test\n", text)
 
   def test_wheel_exclusion_and_cmake_contract(self):
     # python/CMakeLists.txt defines open_spiel_py_test, skips the tests in
@@ -798,6 +907,8 @@ class PythonTestsTest(absltest.TestCase):
       text = f.read()
     self.assertIn(f"function({generator.PYTHON_TEST_FUNCTION} py_test_file)",
                   text)
+    self.assertIn(f"function({generator.PYTEST_FUNCTION} name)", text)
+    self.assertIn("-m pytest", text)
     self.assertIn("IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS", text)
     self.assertIn(f"include({generator.PYTHON_TESTS_OUTPUT})", text)
 

@@ -40,6 +40,7 @@ pip install --upgrade setuptools
 
 python --version
 pip install --upgrade -r requirements.txt
+pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TEST_DEPS
 
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
 [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple

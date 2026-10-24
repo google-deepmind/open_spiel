@@ -54,7 +54,13 @@ fi
 if [[ "$MODE" = "full" ]]; then
   echo "Full mode. Installing Python extra deps libraries."
   source $PROJDIR/open_spiel/scripts/python_extra_deps.sh $PYBIN
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_TEST_DEPS
+  # No JAX release supports this Python version: skip JAX and its tests.
+  if [[ -z "$OPEN_SPIEL_PYTHON_JAX_DEPS" ]]; then
+    export OPEN_SPIEL_ENABLE_JAX="OFF"
+  else
+    $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+  fi
   $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
   $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 fi

@@ -32,6 +32,8 @@ osqp==1.0.4
 scs==3.2.11
 pokerkit==0.6.3
 fastmcp==3.3.1
+# OPEN_SPIEL_PYTHON_TEST_DEPS (all Python versions).
+pytest==9.1.1
 # Used by BUILD targets but not pinned by python_extra_deps.sh.
 cma
 etils[epath]
@@ -39,4 +41,3 @@ orbax-checkpoint==0.12.8
 pandas
 pyarrow
 pygraphviz
-pytest==9.1.1

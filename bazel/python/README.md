@@ -18,7 +18,7 @@ Bazel; CMake and `pip install .` do not use it.
 
 ## Optional dependencies
 
-Targets that need JAX, PyTorch, TensorFlow or the miscellaneous packages
+Targets that need JAX, PyTorch or the miscellaneous packages
 (cvxpy, nashpy, matplotlib, ...) are skipped unless their group is enabled,
 like the `OPEN_SPIEL_ENABLE_*` switches of the CMake build:
 
