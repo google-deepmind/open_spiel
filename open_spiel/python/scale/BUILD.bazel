@@ -1,0 +1,494 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "deps",
+    srcs = ["deps.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "metrics",
+    srcs = ["metrics.py"],
+    strict_deps = True,
+    deps = [
+        ":plugins",
+        "@py_deps//absl/logging",
+        "@py_deps//etils/epath",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "plugins",
+    srcs = ["plugins.py"],
+    strict_deps = True,
+    deps = ["@py_deps//absl/logging"],
+)
+
+# Every module the registries (envs, encoders, policies, belief, slot
+# factories, configs, JAX games) import by name, so a binary that
+# depends on this target can run any config or game by name.
+py_library(
+    name = "runtime",
+    strict_deps = True,
+    deps = [
+        ":deps",
+        ":metrics",
+        ":plugins",
+        ":registry",
+        ":scale",
+        ":train_lib",
+        "//open_spiel/python/jax/games",
+        "//open_spiel/python/scale/belief",
+        "//open_spiel/python/scale/belief:enumeration",
+        "//open_spiel/python/scale/belief:perfect_information",
+        "//open_spiel/python/scale/belief:registry",
+        "//open_spiel/python/scale/ckpt",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/ckpt:codecs",
+        "//open_spiel/python/scale/ckpt:formats",
+        "//open_spiel/python/scale/ckpt:layout",
+        "//open_spiel/python/scale/ckpt:provenance",
+        "//open_spiel/python/scale/ckpt:records",
+        "//open_spiel/python/scale/ckpt:run_state",
+        "//open_spiel/python/scale/ckpt:snapshot",
+        "//open_spiel/python/scale/configs",
+        "//open_spiel/python/scale/configs:az_connect_four",
+        "//open_spiel/python/scale/configs:bc_connect_four",
+        "//open_spiel/python/scale/configs:mmd_gin_rummy",
+        "//open_spiel/python/scale/configs:mmd_kuhn_poker",
+        "//open_spiel/python/scale/configs:mmd_kuhn_poker_jax",
+        "//open_spiel/python/scale/configs:mmd_leduc_poker",
+        "//open_spiel/python/scale/configs:ppo_tic_tac_toe",
+        "//open_spiel/python/scale/configs:psro_connect_four",
+        "//open_spiel/python/scale/configs:recipes",
+        "//open_spiel/python/scale/core",
+        "//open_spiel/python/scale/core:advantages",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:auxiliary",
+        "//open_spiel/python/scale/core:chance",
+        "//open_spiel/python/scale/core:deadline",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:frameworks",
+        "//open_spiel/python/scale/core:game_tree",
+        "//open_spiel/python/scale/core:host_arena",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:slots",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/encoders",
+        "//open_spiel/python/scale/encoders:bargaining",
+        "//open_spiel/python/scale/encoders:board_games",
+        "//open_spiel/python/scale/encoders:bridge",
+        "//open_spiel/python/scale/encoders:connect_four",
+        "//open_spiel/python/scale/encoders:dark_hex",
+        "//open_spiel/python/scale/encoders:gin",
+        "//open_spiel/python/scale/encoders:go",
+        "//open_spiel/python/scale/encoders:kuhn",
+        "//open_spiel/python/scale/encoders:leduc",
+        "//open_spiel/python/scale/encoders:liars_dice",
+        "//open_spiel/python/scale/encoders:lines_of_action",
+        "//open_spiel/python/scale/encoders:phantom_ttt",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/encoders:tic_tac_toe",
+        "//open_spiel/python/scale/encoders:universal_poker",
+        "//open_spiel/python/scale/envs",
+        "//open_spiel/python/scale/envs:bargaining",
+        "//open_spiel/python/scale/envs:breakthrough",
+        "//open_spiel/python/scale/envs:bridge",
+        "//open_spiel/python/scale/envs:dark_hex",
+        "//open_spiel/python/scale/envs:go",
+        "//open_spiel/python/scale/envs:gomoku",
+        "//open_spiel/python/scale/envs:hex",
+        "//open_spiel/python/scale/envs:hidden_cells",
+        "//open_spiel/python/scale/envs:jax_game_env",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs:kuhn_jax",
+        "//open_spiel/python/scale/envs:liars_dice",
+        "//open_spiel/python/scale/envs:lines_of_action",
+        "//open_spiel/python/scale/envs:othello",
+        "//open_spiel/python/scale/envs:phantom_ttt",
+        "//open_spiel/python/scale/envs:phantom_ttt_ir",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs:stub",
+        "//open_spiel/python/scale/envs:tic_tac_toe",
+        "//open_spiel/python/scale/envs:universal_poker",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/connect_four:teacher",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:belief",
+        "//open_spiel/python/scale/envs/gin:endgame",
+        "//open_spiel/python/scale/envs/gin:reference_eval",
+        "//open_spiel/python/scale/envs/gin:rule_bot",
+        "//open_spiel/python/scale/envs/gin:search",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/envs/leduc:belief",
+        "//open_spiel/python/scale/eval",
+        "//open_spiel/python/scale/eval:exploitability",
+        "//open_spiel/python/scale/eval:heldout",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/eval:mcts_baseline",
+        "//open_spiel/python/scale/eval:payoff",
+        "//open_spiel/python/scale/eval:registry",
+        "//open_spiel/python/scale/eval:stats",
+        "//open_spiel/python/scale/interop",
+        "//open_spiel/python/scale/interop:host",
+        "//open_spiel/python/scale/launch",
+        "//open_spiel/python/scale/launch:backend",
+        "//open_spiel/python/scale/launch:cloud_lib",
+        "//open_spiel/python/scale/launch:compile_cache",
+        "//open_spiel/python/scale/launch:hardware",
+        "//open_spiel/python/scale/launch:preflight",
+        "//open_spiel/python/scale/launch:run_lib",
+        "//open_spiel/python/scale/launch:storage",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "//open_spiel/python/scale/launch:supervisor",
+        "//open_spiel/python/scale/league",
+        "//open_spiel/python/scale/league:artifact_store",
+        "//open_spiel/python/scale/league:commit",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:controller",
+        "//open_spiel/python/scale/league:kinds_az",
+        "//open_spiel/python/scale/league:kinds_base",
+        "//open_spiel/python/scale/league:kinds_host",
+        "//open_spiel/python/scale/league:kinds_pg",
+        "//open_spiel/python/scale/league:meta_solvers",
+        "//open_spiel/python/scale/league:mixture",
+        "//open_spiel/python/scale/league:pool_params",
+        "//open_spiel/python/scale/league:population",
+        "//open_spiel/python/scale/league:refs",
+        "//open_spiel/python/scale/league:resume",
+        "//open_spiel/python/scale/league:sampler",
+        "//open_spiel/python/scale/league:siblings",
+        "//open_spiel/python/scale/league:slot_factories",
+        "//open_spiel/python/scale/learners",
+        "//open_spiel/python/scale/learners:az",
+        "//open_spiel/python/scale/learners:bc",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/learners:telemetry",
+        "//open_spiel/python/scale/networks",
+        "//open_spiel/python/scale/networks:actor_critic",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/networks:heads",
+        "//open_spiel/python/scale/networks:hl_gauss",
+        "//open_spiel/python/scale/networks:layers",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/networks:torsos",
+        "//open_spiel/python/scale/parallel",
+        "//open_spiel/python/scale/parallel:collectives_check",
+        "//open_spiel/python/scale/parallel:compiles",
+        "//open_spiel/python/scale/parallel:data_parallel",
+        "//open_spiel/python/scale/policies",
+        "//open_spiel/python/scale/policies:fixed_action",
+        "//open_spiel/python/scale/policies:members",
+        "//open_spiel/python/scale/policies:opening",
+        "//open_spiel/python/scale/policies:operator_vocab",
+        "//open_spiel/python/scale/policies:operators",
+        "//open_spiel/python/scale/policies:particle_belief",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:rollout",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:search",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/serve",
+        "//open_spiel/python/scale/serve:games",
+        "//open_spiel/python/scale/serve:host_agent",
+        "//open_spiel/python/scale/serve:replay",
+        "//open_spiel/python/scale/serve:server",
+        "//open_spiel/python/scale/serve:wire",
+        "//open_spiel/python/scale/sources",
+        "//open_spiel/python/scale/sources:dagger",
+        "//open_spiel/python/scale/sources:deals",
+        "//open_spiel/python/scale/sources:decisions",
+        "//open_spiel/python/scale/sources:replay",
+        "//open_spiel/python/scale/sources:shards",
+        "//open_spiel/python/scale/sources:targets",
+    ],
+)
+
+# runtime plus the examples, for the tests.
+py_library(
+    name = "registered",
+    testonly = True,
+    strict_deps = True,
+    deps = [
+        ":runtime",
+        "//open_spiel/python/scale/examples",
+        "//open_spiel/python/scale/examples:alphazero_tic_tac_toe_lib",
+        "//open_spiel/python/scale/examples:jax_games_vs_openspiel_lib",
+        "//open_spiel/python/scale/examples:mmd_kuhn_poker_lib",
+        "//open_spiel/python/scale/examples:play_checkpoints_lib",
+        "//open_spiel/python/scale/examples:ppo_tic_tac_toe_lib",
+        "//open_spiel/python/scale/examples:quickstart_lib",
+    ],
+)
+
+py_library(
+    name = "registry",
+    srcs = ["registry.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "scale",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel:__init__",
+        "//open_spiel/python",
+        "//open_spiel/python/scale/core:frameworks",
+    ],
+)
+
+py_library(
+    name = "tests_conftest",
+    testonly = True,
+    srcs = ["conftest.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/core:frameworks",
+        "//open_spiel/python/scale/testing:fixtures",
+        "//open_spiel/python/scale/testing:host_operator_fixtures",
+        "@py_deps//pytest",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "train_lib",
+    srcs = ["train.py"],
+    strict_deps = True,
+    deps = [
+        ":metrics",
+        ":plugins",
+        "//open_spiel/python/scale/ckpt:provenance",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/launch:backend",
+        "//open_spiel/python/scale/launch:compile_cache",
+        "//open_spiel/python/scale/launch:hardware",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/parallel:collectives_check",
+        "//open_spiel/python/scale/parallel:data_parallel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytest_test(
+    name = "extension_points_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/extension_points_test.py"],
+    deps = [
+        ":plugins",
+        ":registered",
+        ":registry",
+        ":tests_conftest",
+        "//open_spiel/python/scale/ckpt:codecs",
+        "//open_spiel/python/scale/ckpt:formats",
+        "//open_spiel/python/scale/ckpt:provenance",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:kinds_base",
+    ],
+)
+
+pytest_test(
+    name = "import_dag_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/import_dag_test.py"],
+    deps = [
+        ":deps",
+        ":registered",
+        ":registry",
+        ":tests_conftest",
+        "//open_spiel/python/scale/ckpt:layout",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/testing:import_graph",
+    ],
+)
+
+pytest_test(
+    name = "metrics_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/metrics_test.py"],
+    deps = [
+        ":metrics",
+        ":registered",
+        ":tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "plug_and_play_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/plug_and_play_test.py"],
+    deps = [
+        ":registered",
+        ":tests_conftest",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/networks:heads",
+        "//open_spiel/python/scale/networks:hl_gauss",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/testing:check_policy",
+        "//open_spiel/python/scale/testing:steps",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "recorded_names_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/recorded_names_test.py"],
+    deps = [
+        ":plugins",
+        ":registered",
+        ":tests_conftest",
+        "//open_spiel/python/scale/ckpt:provenance",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/launch:hardware",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "//open_spiel/python/scale/sources:deals",
+        "//open_spiel/python/scale/sources:shards",
+        "//open_spiel/python/scale/testing:infoset_invariance",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "standalone_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/standalone_test.py"],
+    deps = [
+        ":registered",
+        ":tests_conftest",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+pytest_test(
+    name = "train_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/train_test.py"],
+    deps = [
+        ":metrics",
+        ":registered",
+        ":tests_conftest",
+        ":train_lib",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/ckpt:run_state",
+        "//open_spiel/python/scale/examples:play_checkpoints_lib",
+        "//open_spiel/python/scale/league:commit",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:pg_fixtures",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/testing:flagsaver",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ) + [
+        "//open_spiel/python/scale/belief:all_files",
+        "//open_spiel/python/scale/ckpt:all_files",
+        "//open_spiel/python/scale/configs:all_files",
+        "//open_spiel/python/scale/core:all_files",
+        "//open_spiel/python/scale/encoders:all_files",
+        "//open_spiel/python/scale/envs:all_files",
+        "//open_spiel/python/scale/eval:all_files",
+        "//open_spiel/python/scale/examples:all_files",
+        "//open_spiel/python/scale/interop:all_files",
+        "//open_spiel/python/scale/launch:all_files",
+        "//open_spiel/python/scale/league:all_files",
+        "//open_spiel/python/scale/learners:all_files",
+        "//open_spiel/python/scale/networks:all_files",
+        "//open_spiel/python/scale/parallel:all_files",
+        "//open_spiel/python/scale/policies:all_files",
+        "//open_spiel/python/scale/serve:all_files",
+        "//open_spiel/python/scale/sources:all_files",
+        "//open_spiel/python/scale/testing:all_files",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "train",
+    srcs = ["train.py"],
+    strict_deps = True,
+    deps = [
+        ":runtime",
+        ":train_lib",
+    ],
+)
+
+pytest_test(
+    name = "runtime_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/runtime_test.py"],
+    deps = [
+        ":runtime",
+        ":tests_conftest",
+        "//open_spiel/python/jax/games:registry",
+        "//open_spiel/python/scale/belief:registry",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:slot_factories",
+        "//open_spiel/python/scale/policies:registry",
+    ],
+)

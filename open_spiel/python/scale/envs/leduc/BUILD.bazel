@@ -1,0 +1,60 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "belief",
+    srcs = ["belief.py"],
+    strict_deps = True,
+    deps = [
+        ":leduc",
+        "//open_spiel/python/scale/belief:registry",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "leduc",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/jax/games:game",
+        "//open_spiel/python/jax/games:leduc_poker",
+        "//open_spiel/python/scale/envs:jax_game_env",
+        "@py_deps//jax",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

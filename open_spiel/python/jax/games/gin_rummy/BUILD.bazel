@@ -1,0 +1,269 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "cards_and_melds",
+    srcs = ["cards_and_melds.py"],
+    strict_deps = True,
+    deps = [
+        "@py_deps//chex",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "deadwood",
+    srcs = ["deadwood.py"],
+    strict_deps = True,
+    deps = [
+        ":cards_and_melds",
+        ":lookup_tables",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "dense_cache",
+    srcs = ["dense_cache.py"],
+    strict_deps = True,
+    deps = [
+        ":cards_and_melds",
+        ":deadwood",
+        ":lookup_tables",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "dense_cache_game",
+    srcs = [
+        "dense_cache_game.py",
+        "game.py",
+    ],
+    strict_deps = True,
+    deps = [
+        ":cards_and_melds",
+        ":deadwood",
+        ":dense_cache",
+        ":layoffs",
+        "//open_spiel/python/jax/games:game",
+        "//open_spiel/python/jax/games:interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "gin_rummy",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+    deps = [
+        ":cards_and_melds",
+        ":dense_cache_game",
+        ":layoffs",
+    ],
+)
+
+py_library(
+    name = "layoffs",
+    srcs = ["layoffs.py"],
+    strict_deps = True,
+    deps = [
+        ":cards_and_melds",
+        ":lookup_tables",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "lookup_tables",
+    srcs = ["lookup_tables.py"],
+    strict_deps = True,
+    deps = ["@py_deps//numpy"],
+)
+
+py_library(
+    name = "simple_bot",
+    srcs = ["simple_bot.py"],
+    strict_deps = True,
+    deps = [
+        ":cards_and_melds",
+        ":deadwood",
+        ":dense_cache_game",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "cached_constants_test",
+    srcs = ["cached_constants_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":cards_and_melds",
+        ":dense_cache_game",
+        ":layoffs",
+        ":lookup_tables",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "deadwood_test",
+    srcs = ["deadwood_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":deadwood",
+        ":gin_rummy",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "dense_cache_test",
+    timeout = "long",
+    srcs = ["dense_cache_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":deadwood",
+        ":dense_cache",
+        ":dense_cache_game",
+        ":lookup_tables",
+        "//open_spiel/python/jax/games:registry",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "game_test",
+    timeout = "long",
+    srcs = ["game_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":dense_cache_game",
+        ":gin_rummy",
+        ":layoffs",
+        "//open_spiel/python/jax/games:game",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "layoffs_test",
+    srcs = ["layoffs_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":cards_and_melds",
+        ":layoffs",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "oklahoma_test",
+    timeout = "long",
+    srcs = ["oklahoma_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":cards_and_melds",
+        ":dense_cache_game",
+        ":gin_rummy",
+        ":simple_bot",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "rules_params_test",
+    timeout = "long",
+    srcs = ["rules_params_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":cards_and_melds",
+        ":dense_cache_game",
+        ":gin_rummy",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "simple_bot_rules_test",
+    timeout = "long",
+    srcs = ["simple_bot_rules_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":cards_and_melds",
+        ":dense_cache_game",
+        ":gin_rummy",
+        ":simple_bot",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/jax/games:__subpackages__"],
+)

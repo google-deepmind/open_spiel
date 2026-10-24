@@ -287,6 +287,15 @@ python3 -m pip install --upgrade torch==x.xx.x jax==x.x.x
 where `x.xx.x` should be the desired version numbers (which can be found at the
 link above).
 
+The JAX dependencies, including those of `open_spiel.python.scale` (see
+[scale](scale.md)), are pinned per Python version in
+`open_spiel/scripts/python_extra_deps.sh`:
+
+```bash
+source open_spiel/scripts/python_extra_deps.sh python3
+echo "$OPEN_SPIEL_PYTHON_JAX_DEPS" | xargs python3 -m pip install
+```
+
 The JAX-based algorithms need Python 3.12 or newer; the rest of OpenSpiel also
 supports Python 3.11.
 

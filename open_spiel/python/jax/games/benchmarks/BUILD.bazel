@@ -1,0 +1,132 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "benchmarks",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "gin_rummy_throughput_lib",
+    srcs = ["gin_rummy_throughput.py"],
+    strict_deps = True,
+    deps = [
+        ":throughput_common",
+        "//open_spiel/python/jax/games/gin_rummy",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_library(
+    name = "no_limit_holdem_showdown_benchmark_lib",
+    srcs = ["no_limit_holdem_showdown_benchmark.py"],
+    strict_deps = True,
+    deps = [
+        ":throughput_common",
+        "//open_spiel/python/jax/games:no_limit_holdem",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "no_limit_holdem_throughput_lib",
+    srcs = ["no_limit_holdem_throughput.py"],
+    strict_deps = True,
+    deps = [
+        ":throughput_common",
+        "//open_spiel/python/jax/games:no_limit_holdem",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_library(
+    name = "throughput_common",
+    srcs = ["throughput_common.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/jax/games:game",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "throughput_common_test",
+    srcs = ["throughput_common_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":no_limit_holdem_throughput_lib",
+        ":throughput_common",
+        "//open_spiel/python/jax/games:no_limit_holdem",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/jax/games:__subpackages__"],
+)
+
+py_binary(
+    name = "gin_rummy_throughput",
+    srcs = ["gin_rummy_throughput.py"],
+    strict_deps = True,
+    deps = [
+        ":gin_rummy_throughput_lib",
+    ],
+)
+
+py_binary(
+    name = "no_limit_holdem_showdown_benchmark",
+    srcs = ["no_limit_holdem_showdown_benchmark.py"],
+    strict_deps = True,
+    deps = [
+        ":no_limit_holdem_showdown_benchmark_lib",
+    ],
+)
+
+py_binary(
+    name = "no_limit_holdem_throughput",
+    srcs = ["no_limit_holdem_throughput.py"],
+    strict_deps = True,
+    deps = [
+        ":no_limit_holdem_throughput_lib",
+    ],
+)

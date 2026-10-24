@@ -1,0 +1,485 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "az",
+    srcs = ["az.py"],
+    strict_deps = True,
+    deps = [
+        ":bc",
+        ":losses",
+        "//open_spiel/python/scale/belief:registry",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:search",
+        "//open_spiel/python/scale/sources:replay",
+        "//open_spiel/python/scale/sources:targets",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "bc",
+    srcs = ["bc.py"],
+    strict_deps = True,
+    deps = [
+        ":losses",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/parallel:data_parallel",
+        "//open_spiel/python/scale/policies:operator_vocab",
+        "//open_spiel/python/scale/sources:targets",
+        "@py_deps//jax",
+        "@py_deps//optax",
+    ],
+)
+
+py_library(
+    name = "bc_fixtures",
+    testonly = True,
+    srcs = ["tests/bc_fixtures.py"],
+    strict_deps = True,
+    deps = [
+        ":bc",
+        ":losses",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/testing:steps",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "learners",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "losses",
+    srcs = ["losses.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/networks:hl_gauss",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "pg",
+    srcs = ["pg.py"],
+    strict_deps = True,
+    deps = [
+        ":losses",
+        ":telemetry",
+        "//open_spiel/python/scale/core:advantages",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/networks:actor_critic",
+        "//open_spiel/python/scale/parallel:data_parallel",
+        "//open_spiel/python/scale/policies:registry",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+py_library(
+    name = "pg_fixtures",
+    testonly = True,
+    srcs = ["tests/pg_fixtures.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "row_spy",
+    testonly = True,
+    srcs = ["tests/row_spy.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/networks:actor_critic",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "telemetry",
+    srcs = ["telemetry.py"],
+    strict_deps = True,
+    deps = [
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "toy_loss",
+    testonly = True,
+    srcs = ["tests/toy_loss.py"],
+    strict_deps = True,
+    deps = [
+        ":losses",
+        ":pg",
+        "//open_spiel/python/scale/core:advantages",
+        "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "advantages_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/advantages_test.py"],
+    deps = [
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:advantages",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/parallel:compiles",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "az_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/az_test.py"],
+    deps = [
+        ":az",
+        ":bc",
+        ":losses",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/configs:az_connect_four",
+        "//open_spiel/python/scale/configs:recipes",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs/leduc:belief",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/sources:replay",
+        "//open_spiel/python/scale/sources:targets",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "bc_policy_mask_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/bc_policy_mask_test.py"],
+    deps = [
+        ":bc",
+        ":bc_fixtures",
+        ":losses",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:operator_vocab",
+        "//open_spiel/python/scale/sources:helpers",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "bc_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/bc_test.py"],
+    deps = [
+        ":bc",
+        ":bc_fixtures",
+        ":losses",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/networks:helpers",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/sources:dagger",
+        "//open_spiel/python/scale/sources:helpers",
+        "//open_spiel/python/scale/sources:shards",
+        "//open_spiel/python/scale/sources:targets",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "losses_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/losses_test.py"],
+    deps = [
+        ":losses",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_contract_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_contract_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":pg_fixtures",
+        ":toy_loss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:advantages",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_forward_chunk_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_forward_chunk_test.py"],
+    deps = [
+        ":pg",
+        ":pg_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_kuhn_smoke_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_kuhn_smoke_test.py"],
+    deps = [
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/eval:exploitability",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+pytest_test(
+    name = "pg_loss_dispatch_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_loss_dispatch_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":pg_fixtures",
+        ":toy_loss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "pg_rnn_carry_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_rnn_carry_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":pg_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_train_rows_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_train_rows_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":pg_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_update_perf_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_update_perf_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":pg_fixtures",
+        ":toy_loss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/league:config_common",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "schedules_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/schedules_test.py"],
+    deps = [
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "telemetry_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/telemetry_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":pg_fixtures",
+        ":telemetry",
+        ":toy_loss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytest_test(
+    name = "value_support_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/value_support_test.py"],
+    deps = [
+        ":bc",
+        ":losses",
+        ":pg",
+        ":pg_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

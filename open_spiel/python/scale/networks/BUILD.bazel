@@ -1,0 +1,203 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "actor_critic",
+    srcs = ["actor_critic.py"],
+    strict_deps = True,
+    deps = [
+        ":heads",
+        ":torsos",
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "catalog",
+    srcs = ["catalog.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "heads",
+    srcs = ["heads.py"],
+    strict_deps = True,
+    deps = [
+        ":hl_gauss",
+        ":layers",
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "helpers",
+    testonly = True,
+    srcs = ["tests/helpers.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "hl_gauss",
+    srcs = ["hl_gauss.py"],
+    strict_deps = True,
+    deps = [
+        ":layers",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "layers",
+    srcs = ["layers.py"],
+    strict_deps = True,
+    deps = [
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "networks",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "policy",
+    srcs = ["policy.py"],
+    strict_deps = True,
+    deps = [
+        ":actor_critic",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/policies:registry",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "torsos",
+    srcs = ["torsos.py"],
+    strict_deps = True,
+    deps = [
+        ":layers",
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "chunk_plan_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/chunk_plan_test.py"],
+    deps = [
+        ":actor_critic",
+        ":helpers",
+        ":policy",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "heads_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/heads_test.py"],
+    deps = [
+        ":heads",
+        ":hl_gauss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "policy_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/policy_test.py"],
+    deps = [
+        ":actor_critic",
+        ":helpers",
+        ":policy",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/testing:check_f64",
+        "//open_spiel/python/scale/testing:check_forward_dtypes",
+        "//open_spiel/python/scale/testing:check_policy",
+        "//open_spiel/python/scale/testing:steps",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "torsos_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/torsos_test.py"],
+    deps = [
+        ":torsos",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)
