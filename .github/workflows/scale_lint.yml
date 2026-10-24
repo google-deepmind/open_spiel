@@ -1,0 +1,53 @@
+name: scale lint
+
+# Lint of open_spiel.python.scale and open_spiel.python.jax.games with each
+# package's ruff.toml and .pylintrc. Only pip-installed linters run here;
+# each .pylintrc loads the in-repository plugin open_spiel_lint from
+# open_spiel/python/scale/lint.
+
+on:
+  pull_request:
+    paths:
+      - 'open_spiel/python/scale/**'
+      - 'open_spiel/python/jax/games/**'
+      - '.github/workflows/scale_lint.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install the linters
+        run: >-
+          python -m pip install ruff==0.17.1
+          pylint==4.1.3
+      - name: ruff (open_spiel/python/scale)
+        run: ruff check --config open_spiel/python/scale/ruff.toml open_spiel/python/scale
+      - name: pylint (open_spiel/python/scale)
+        env:
+          PYTHONPATH: open_spiel/python/scale/lint
+        run: >-
+          pylint --rcfile=open_spiel/python/scale/.pylintrc --disable=unknown-option-value
+          --recursive=y open_spiel/python/scale
+      - name: ruff (open_spiel/python/jax/games)
+        run: ruff check --config open_spiel/python/jax/games/ruff.toml open_spiel/python/jax/games
+      - name: pylint (open_spiel/python/jax/games)
+        env:
+          PYTHONPATH: open_spiel/python/scale/lint
+        run: >-
+          pylint --rcfile=open_spiel/python/jax/games/.pylintrc --disable=unknown-option-value
+          --recursive=y open_spiel/python/jax/games
+      - name: import checks (cycles, from-imports, test imports)
+        run: python -m open_spiel.python.scale.testing.import_graph open_spiel.python.scale open_spiel.python.jax.games

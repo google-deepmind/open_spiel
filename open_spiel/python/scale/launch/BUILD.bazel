@@ -1,0 +1,343 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "backend",
+    srcs = [
+        "backend.py",
+        "config.py",
+        "gcp.py",
+        "local.py",
+        "preemption.py",
+    ],
+    data = [
+        "examples/gcp_cpu.yaml",
+        "examples/gcp_gpu.yaml",
+    ],
+    strict_deps = True,
+    deps = [
+        ":hardware",
+        ":storage",
+        ":subprocess_env",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:plugins",
+        "@py_deps//absl/logging",
+        "@py_deps//yaml",
+    ],
+)
+
+py_library(
+    name = "cloud_lib",
+    srcs = ["cloud.py"],
+    data = ["cloud_example.yaml"],
+    strict_deps = True,
+    deps = [
+        ":preflight",
+        ":subprocess_env",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:plugins",
+        "@py_deps//yaml",
+    ],
+)
+
+py_library(
+    name = "compile_cache",
+    srcs = ["compile_cache.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/ckpt:artifact",
+        "@py_deps//absl/logging",
+        "@py_deps//etils/epath",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "hardware",
+    srcs = ["hardware.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale:metrics",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "@py_deps//absl/logging",
+        "@py_deps//etils/epath",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "launch",
+    srcs = ["__init__.py"],
+    data = ["cloud_example.yaml"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "preflight",
+    srcs = ["preflight.py"],
+    strict_deps = True,
+    deps = [
+        ":subprocess_env",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_library(
+    name = "run_lib",
+    srcs = ["run.py"],
+    strict_deps = True,
+    deps = [
+        ":backend",
+        ":preflight",
+        ":supervisor",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale/core:frameworks",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_library(
+    name = "storage",
+    srcs = ["storage.py"],
+    strict_deps = True,
+    deps = ["@py_deps//absl/logging"],
+)
+
+py_library(
+    name = "subprocess_env",
+    srcs = ["subprocess_env.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "supervisor",
+    srcs = ["supervisor.py"],
+    strict_deps = True,
+    deps = [
+        ":backend",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+pytest_test(
+    name = "cloud_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/cloud_test.py"],
+    deps = [
+        ":cloud_lib",
+        ":subprocess_env",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "compile_cache_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/compile_cache_test.py"],
+    deps = [
+        ":backend",
+        ":compile_cache",
+        ":subprocess_env",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "config_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/config_test.py"],
+    deps = [
+        ":backend",
+        ":storage",
+        ":subprocess_env",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//yaml",
+    ],
+)
+
+pytest_test(
+    name = "gcp_backend_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/gcp_backend_test.py"],
+    deps = [
+        ":backend",
+        ":hardware",
+        ":run_lib",
+        ":storage",
+        ":supervisor",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//yaml",
+    ],
+)
+
+pytest_test(
+    name = "gcp_examples_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/gcp_examples_test.py"],
+    deps = [
+        ":backend",
+        ":hardware",
+        ":run_lib",
+        ":subprocess_env",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "hardware_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/hardware_test.py"],
+    deps = [
+        ":backend",
+        ":hardware",
+        "//open_spiel/python/scale:metrics",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "local_e2e_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/local_e2e_test.py"],
+    deps = [
+        ":backend",
+        ":subprocess_env",
+        ":supervisor",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:metrics",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:run_state",
+    ],
+)
+
+pytest_test(
+    name = "preemption_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/preemption_test.py"],
+    deps = [
+        ":backend",
+        ":subprocess_env",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:run_state",
+        "//open_spiel/python/scale/league:resume",
+    ],
+)
+
+pytest_test(
+    name = "preflight_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/preflight_test.py"],
+    deps = [
+        ":backend",
+        ":cloud_lib",
+        ":preflight",
+        ":run_lib",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//yaml",
+    ],
+)
+
+pytest_test(
+    name = "subprocess_env_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/subprocess_env_test.py"],
+    deps = [
+        ":backend",
+        ":subprocess_env",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "supervisor_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/supervisor_test.py"],
+    deps = [
+        ":backend",
+        ":supervisor",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)
+
+py_binary(
+    name = "cloud",
+    srcs = ["cloud.py"],
+    strict_deps = True,
+    deps = [
+        ":cloud_lib",
+        "//open_spiel/python/scale:runtime",
+    ],
+)
+
+py_binary(
+    name = "run",
+    srcs = ["run.py"],
+    strict_deps = True,
+    deps = [
+        ":run_lib",
+        "//open_spiel/python/scale:runtime",
+    ],
+)

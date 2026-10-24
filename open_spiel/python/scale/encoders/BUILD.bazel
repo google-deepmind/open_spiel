@@ -1,0 +1,383 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "bargaining",
+    srcs = ["bargaining.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:bargaining",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "board_games",
+    srcs = ["board_games.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "bridge",
+    srcs = ["bridge.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/jax/games:bridge",
+        "//open_spiel/python/scale/envs:bridge",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "connect_four",
+    srcs = ["connect_four.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs/connect_four",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "dark_hex",
+    srcs = ["dark_hex.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:dark_hex",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "encoders",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "gin",
+    srcs = ["gin.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "go",
+    srcs = ["go.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:go",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "kuhn",
+    srcs = ["kuhn.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:kuhn_jax",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "leduc",
+    srcs = ["leduc.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs/leduc",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "liars_dice",
+    srcs = ["liars_dice.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:liars_dice",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "lines_of_action",
+    srcs = ["lines_of_action.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:lines_of_action",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "phantom_ttt",
+    srcs = ["phantom_ttt.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:phantom_ttt",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "registry",
+    srcs = ["registry.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "tic_tac_toe",
+    srcs = ["tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:tic_tac_toe",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "universal_poker",
+    srcs = ["universal_poker.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:universal_poker",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "board_encoders_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/board_encoders_test.py"],
+    deps = [
+        ":board_games",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:breakthrough",
+        "//open_spiel/python/scale/envs:gomoku",
+        "//open_spiel/python/scale/envs:hex",
+        "//open_spiel/python/scale/envs:othello",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "bridge_encoder_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/bridge_encoder_test.py"],
+    deps = [
+        ":bridge",
+        ":registry",
+        "//open_spiel/python/jax/games:bridge",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:bridge",
+        "//open_spiel/python/scale/testing:infoset_invariance",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "gin_encoders_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/gin_encoders_test.py"],
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:gin_cards",
+        "//open_spiel/python/scale/envs/gin",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "go_loa_dark_hex_encoders_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/go_loa_dark_hex_encoders_test.py"],
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:dark_hex",
+        "//open_spiel/python/scale/envs:differential_vs_openspiel",
+        "//open_spiel/python/scale/envs:go",
+        "//open_spiel/python/scale/envs:lines_of_action",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "imperfect_breadth_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/imperfect_breadth_test.py"],
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:bargaining",
+        "//open_spiel/python/scale/envs:liars_dice",
+        "//open_spiel/python/scale/envs:phantom_ttt_ir",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "known_answer_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/known_answer_test.py"],
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:phantom_ttt",
+        "//open_spiel/python/scale/envs:tic_tac_toe",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "kuhn_encoder_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/kuhn_encoder_test.py"],
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "registry_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/registry_test.py"],
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:phantom_ttt",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs:tic_tac_toe",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "universal_poker_encoder_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/universal_poker_encoder_test.py"],
+    deps = [
+        ":registry",
+        ":universal_poker",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:universal_poker",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

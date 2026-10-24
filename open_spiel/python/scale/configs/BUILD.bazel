@@ -1,0 +1,181 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "az_connect_four",
+    srcs = ["az_connect_four.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:az",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "bc_connect_four",
+    srcs = ["bc_connect_four.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:refs",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "configs",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "mmd_gin_rummy",
+    srcs = ["mmd_gin_rummy.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+py_library(
+    name = "mmd_kuhn_poker",
+    srcs = ["mmd_kuhn_poker.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+py_library(
+    name = "mmd_kuhn_poker_jax",
+    srcs = ["mmd_kuhn_poker_jax.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+py_library(
+    name = "mmd_leduc_poker",
+    srcs = ["mmd_leduc_poker.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+py_library(
+    name = "ppo_tic_tac_toe",
+    srcs = ["ppo_tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+py_library(
+    name = "psro_connect_four",
+    srcs = ["psro_connect_four.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "recipes",
+    srcs = ["recipes.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:refs",
+        "//open_spiel/python/scale/learners:az",
+        "//open_spiel/python/scale/learners:bc",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+pytest_test(
+    name = "configs_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/configs_test.py"],
+    deps = [
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/policies:registry",
+    ],
+)
+
+pytest_test(
+    name = "mmd_gin_rummy_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/mmd_gin_rummy_test.py"],
+    deps = [
+        "//open_spiel/python/scale:metrics",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/core:frameworks",
+        "//open_spiel/python/scale/league:config_common",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

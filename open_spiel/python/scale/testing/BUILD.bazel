@@ -1,0 +1,435 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "check_decide",
+    testonly = True,
+    srcs = ["check_decide.py"],
+    strict_deps = True,
+    deps = [
+        ":errors",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "check_env",
+    testonly = True,
+    srcs = ["check_env.py"],
+    strict_deps = True,
+    deps = [
+        ":errors",
+        "//open_spiel/python/scale/core:chance",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "check_f64",
+    testonly = True,
+    srcs = ["check_f64.py"],
+    strict_deps = True,
+    deps = [
+        ":errors",
+        "//open_spiel/python/scale/core:decide",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "check_forward_dtypes",
+    testonly = True,
+    srcs = ["check_forward_dtypes.py"],
+    strict_deps = True,
+    deps = [
+        ":check_f64",
+        ":errors",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "check_operator",
+    testonly = True,
+    srcs = ["check_operator.py"],
+    strict_deps = True,
+    deps = [
+        ":errors",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/interop:host",
+        "//open_spiel/python/scale/policies:operators",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "check_policy",
+    testonly = True,
+    srcs = ["check_policy.py"],
+    strict_deps = True,
+    deps = [
+        ":errors",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/interop:host",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "errors",
+    testonly = True,
+    srcs = ["errors.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "fixtures",
+    testonly = True,
+    srcs = ["fixtures.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/policies:registry",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "host_operator_fixtures",
+    testonly = True,
+    srcs = ["host_operator_fixtures.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/interop:host",
+        "//open_spiel/python/scale/league:slot_factories",
+        "//open_spiel/python/scale/policies:operator_vocab",
+        "//open_spiel/python/scale/policies:registry",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "import_graph",
+    testonly = True,
+    srcs = ["import_graph.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "infoset_invariance",
+    testonly = True,
+    srcs = ["infoset_invariance.py"],
+    strict_deps = True,
+    deps = [
+        ":errors",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/interop:host",
+        "//open_spiel/python/scale/policies:operators",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/sources:dagger",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "infoset_invariance_fixtures",
+    testonly = True,
+    srcs = ["tests/infoset_invariance_fixtures.py"],
+    strict_deps = True,
+    deps = [
+        ":check_operator",
+        ":host_operator_fixtures",
+        ":infoset_invariance",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:gin",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:search",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/envs/leduc:belief",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/policies:operators",
+        "//open_spiel/python/scale/policies:search",
+        "//open_spiel/python/scale/sources:dagger",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "multidevice",
+    testonly = True,
+    srcs = ["multidevice.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "optional_pyspiel_games",
+    testonly = True,
+    srcs = ["optional_pyspiel_games.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//pytest",
+    ],
+)
+
+py_library(
+    name = "populations",
+    testonly = True,
+    srcs = ["populations.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/policies:tabular",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "steps",
+    testonly = True,
+    srcs = ["steps.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "testing",
+    testonly = True,
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+pytest_test(
+    name = "checkers_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/checkers_test.py"],
+    deps = [
+        ":check_decide",
+        ":check_env",
+        ":check_policy",
+        ":errors",
+        ":fixtures",
+        ":steps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "dtypes_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/dtypes_test.py"],
+    deps = [
+        ":check_forward_dtypes",
+        ":errors",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "infoset_invariance_shard1_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/infoset_invariance_shard1_test.py"],
+    deps = [
+        ":infoset_invariance_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "infoset_invariance_shard2_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/infoset_invariance_shard2_test.py"],
+    deps = [
+        ":infoset_invariance_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "infoset_invariance_shard3_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/infoset_invariance_shard3_test.py"],
+    deps = [
+        ":infoset_invariance_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/policies:operator_vocab",
+    ],
+)
+
+pytest_test(
+    name = "infoset_invariance_shard4_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/infoset_invariance_shard4_test.py"],
+    deps = [
+        ":infoset_invariance_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "infoset_invariance_shard5_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/infoset_invariance_shard5_test.py"],
+    deps = [
+        ":infoset_invariance_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
+    name = "infoset_invariance_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/infoset_invariance_test.py"],
+    deps = [
+        ":check_operator",
+        ":errors",
+        ":fixtures",
+        ":host_operator_fixtures",
+        ":infoset_invariance",
+        ":infoset_invariance_fixtures",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs/connect_four:teacher",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:endgame",
+        "//open_spiel/python/scale/envs/gin:rule_bot",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/policies:opening",
+        "//open_spiel/python/scale/policies:operator_vocab",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:rollout",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:search",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "x64_fixtures_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/x64_fixtures_test.py"],
+    deps = [
+        ":fixtures",
+        ":steps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

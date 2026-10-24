@@ -67,6 +67,8 @@ exclude = ["open_spiel.gui", "open_spiel.gui.*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.so", "*.pyd", "*.dll"]
+"open_spiel.python.jax.games" = ["**/*.json", "**/*.yaml", "**/*.txt", "**/*.md", "pytest.ini"]
+"open_spiel.python.scale" = ["**/*.json", "**/*.yaml", "**/*.txt", "**/*.md", "pytest.ini"]
 "open_spiel.python.gui" = ["*.json"]
 
 # ---------------------------------------------------------------------------
