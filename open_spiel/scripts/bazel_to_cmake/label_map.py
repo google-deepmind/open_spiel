@@ -64,6 +64,7 @@ OPTIONAL_PYTHON_GROUPS = {
     "torch": "pytorch",
     "cma": "python_misc",
     "cvxpy": "python_misc",
+    "fastmcp": "python_misc",
     "matplotlib": "python_misc",
     "nashpy": "python_misc",
     "networkx": "python_misc",

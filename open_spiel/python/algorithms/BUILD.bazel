@@ -886,6 +886,29 @@ py_test(
 )
 
 py_library(
+    name = "mip_nash",
+    srcs = ["mip_nash.py"],
+    strict_deps = True,
+    deps = [
+        ":projected_replicator_dynamics",
+        "//open_spiel/python/egt:utils",
+        "@py_deps//cvxpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "mip_nash_test",
+    srcs = ["mip_nash_test.py"],
+    deps = [
+        ":mip_nash",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
     name = "nfg_utils",
     srcs = ["nfg_utils.py"],
     strict_deps = True,

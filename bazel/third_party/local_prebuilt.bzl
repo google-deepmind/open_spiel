@@ -33,7 +33,11 @@ filegroup(
 """
 
 def _local_prebuilt_repository_impl(rctx):
-    path = rctx.workspace_root.get_child(rctx.attr.path)
+    # Relative to the OpenSpiel checkout, not to rctx.workspace_root: that is
+    # the root module's directory when another project depends on OpenSpiel.
+    # The checkout root is not a package, so go up from this file's package.
+    open_spiel_root = rctx.path(Label("//bazel/third_party:local_prebuilt.bzl")).dirname.dirname.dirname
+    path = open_spiel_root.get_child(rctx.attr.path)
 
     # Refetch when the directory appears or disappears (install.sh run later).
     rctx.watch(path)
@@ -54,7 +58,7 @@ local_prebuilt_repository = repository_rule(
         "build_file": attr.label(mandatory = True, allow_single_file = True),
         "path": attr.string(
             mandatory = True,
-            doc = "Directory relative to the workspace root.",
+            doc = "Directory relative to the OpenSpiel checkout.",
         ),
         "targets": attr.string_list(
             mandatory = True,

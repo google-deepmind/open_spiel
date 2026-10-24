@@ -15,3 +15,6 @@ open_spiel/libtorch/libtorch
 open_spiel/ortools
 open_spiel/pybind11_abseil
 open_spiel/pybind11_json
+
+# Example Bazel project using OpenSpiel as a dependency (built by CI).
+bazel/tests/consumer

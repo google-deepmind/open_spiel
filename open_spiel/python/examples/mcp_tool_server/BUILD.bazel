@@ -1,0 +1,31 @@
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "open_spiel_tools",
+    srcs = ["open_spiel_tools.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/algorithms:ismcts",
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//fastmcp",
+    ],
+)
+
+py_test(
+    name = "tools_test",
+    srcs = ["tools_test.py"],
+    deps = [
+        ":open_spiel_tools",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)

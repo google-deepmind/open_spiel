@@ -15,7 +15,8 @@
 """Bazel module for OpenSpiel.
 
 Usage: `bazel test //open_spiel/...`. CMake (`install.sh` + `cmake`) and
-`pip install .` remain supported and do not need Bazel.
+`pip install .` remain supported and do not need Bazel. Other Bazel projects
+can depend on this module, see bazel/README.md.
 
 Optional dependencies are off by default (like the CMake build) and are enabled
 with flags, e.g. `--//open_spiel:build_with_acpc`. Their sources are only
@@ -30,15 +31,6 @@ bazel_dep(name = "bazel_skylib", version = "1.9.2")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
 bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.2")
 bazel_dep(name = "platforms", version = "1.1.0")
-bazel_dep(name = "pybind11_abseil", version = "202402.0")
-
-# The BCR release of pybind11_abseil uses native cc rules, which Bazel 9 removed.
-archive_override(
-    module_name = "pybind11_abseil",
-    integrity = "sha256-yAbBVxP0SfGOb815Amix7ggM1a+eeNK/wbPLQBo9XJE=",
-    strip_prefix = "pybind11_abseil-c19861bb14c5b09d4edffa55af207e3abf6ff97b",
-    urls = ["https://github.com/pybind/pybind11_abseil/archive/c19861bb14c5b09d4edffa55af207e3abf6ff97b.tar.gz"],
-)
 bazel_dep(name = "pybind11_bazel", version = "3.0.3")
 bazel_dep(name = "rules_cc", version = "0.2.27")
 bazel_dep(name = "rules_license", version = "1.0.0")
@@ -61,7 +53,21 @@ include("//bazel/python:python.MODULE.bazel")
 # install.sh / CMake, so the same #include lines work with both build systems.
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+label_rewriting_archive = use_repo_rule("//bazel/third_party:label_rewriting_archive.bzl", "label_rewriting_archive")
+
 local_prebuilt_repository = use_repo_rule("//bazel/third_party:local_prebuilt.bzl", "local_prebuilt_repository")
+
+# pybind11_abseil at a commit newer than its only Bazel Central Registry release
+# (202402.0), which uses native cc rules that Bazel 9 removed. A bazel_dep with
+# archive_override would only work when OpenSpiel is the root module (Bazel
+# ignores overrides in dependencies), so it is fetched as a repository instead.
+label_rewriting_archive(
+    name = "pybind11_abseil",
+    integrity = "sha256-yAbBVxP0SfGOb815Amix7ggM1a+eeNK/wbPLQBo9XJE=",
+    rewrites = {"@com_google_absl//": "@abseil-cpp//"},
+    strip_prefix = "pybind11_abseil-c19861bb14c5b09d4edffa55af207e3abf6ff97b",
+    urls = ["https://github.com/pybind/pybind11_abseil/archive/c19861bb14c5b09d4edffa55af207e3abf6ff97b.tar.gz"],
+)
 
 http_archive(
     name = "dds",

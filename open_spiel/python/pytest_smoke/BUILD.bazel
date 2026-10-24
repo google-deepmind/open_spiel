@@ -1,0 +1,49 @@
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+# Checks that pytest_test targets work under both CMake (CTest) and Bazel.
+# The package is laid out like a downstream one: an __init__.py, a conftest.py
+# fixture and tests importing OpenSpiel modules by their full name.
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "conftest",
+    testonly = True,
+    srcs = [
+        "__init__.py",
+        "conftest.py",
+    ],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//pytest",
+    ],
+)
+
+pytest_test(
+    name = "smoke_test",
+    deselect = ["smoke_test.py::test_deselected"],
+    tests = ["smoke_test.py"],
+    deps = [
+        ":conftest",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:lru_cache",
+    ],
+)
+
+# No other test is tagged "manual": GitHub CI checks with this one that CMake
+# adds such tests only with OPEN_SPIEL_RUN_MANUAL_TESTS=ON.
+pytest_test(
+    name = "manual_test",
+    tags = ["manual"],
+    tests = ["manual_test.py"],
+    deps = [
+        ":conftest",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)

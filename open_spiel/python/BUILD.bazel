@@ -54,6 +54,23 @@ py_library(
     strict_deps = True,
 )
 
+py_library(
+    name = "vector_env",
+    srcs = ["vector_env.py"],
+    strict_deps = True,
+)
+
+py_test(
+    name = "bot_test",
+    srcs = ["tests/bot_test.py"],
+    deps = [
+        "//open_spiel/python/bots:uniform_random",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
 
 py_test(
     name = "sampled_stochastic_games_test",
@@ -132,6 +149,19 @@ py_test(
     deps = [
         "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "pyspiel_test",
+    srcs = ["tests/pyspiel_test.py"],
+    deps = [
+        ":policy",
+        "//open_spiel/python/games",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
     ],
 )
 

@@ -1,4 +1,4 @@
-# Copyright 2019 DeepMind Technologies Limited
+# Copyright 2026 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""OpenSpiel: A Framework for Reinforcement Learning in Games.
+"""Example Bazel project depending on OpenSpiel; see bazel/README.md.
 
-OpenSpiel is a collection of environments and algorithms for research in general
-reinforcement learning and search/planning in games.
+Built by the bazel_consumer CI job, against the OpenSpiel checkout it is in.
 """
 
-import pyspiel
+module(name = "open_spiel_consumer")
 
-__all__ = ["pyspiel"]
+bazel_dep(name = "open_spiel")
+local_path_override(
+    module_name = "open_spiel",
+    path = "../../..",
+)
+
+bazel_dep(name = "rules_cc", version = "0.2.27")
+bazel_dep(name = "rules_python", version = "2.4.4")

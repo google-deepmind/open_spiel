@@ -107,6 +107,26 @@ jobs:
         run: |
           python3 --version
           ./open_spiel/scripts/ci_script.sh
+      # Tests tagged "manual" in the BUILD files (python/pytest_smoke:manual_test)
+      # must reach CTest only with OPEN_SPIEL_RUN_MANUAL_TESTS=ON. Reconfiguring
+      # the build directory of the previous step takes seconds: `ctest -N` only
+      # lists the tests, nothing is built or run.
+      - name: Check the OPEN_SPIEL_RUN_MANUAL_TESTS switch
+        run: |
+          source ./venv/bin/activate
+          cd build
+          ctest -N > ctest_off.txt
+          grep -q ': python/pytest_smoke/smoke_test$' ctest_off.txt
+          if grep -q ': python/pytest_smoke/manual_test$' ctest_off.txt; then
+            echo "CTest has a manual test without OPEN_SPIEL_RUN_MANUAL_TESTS=ON."
+            exit 1
+          fi
+          cmake -DOPEN_SPIEL_RUN_MANUAL_TESTS=ON ../open_spiel > /dev/null
+          ctest -N > ctest_on.txt
+          if ! grep -q ': python/pytest_smoke/manual_test$' ctest_on.txt; then
+            echo "OPEN_SPIEL_RUN_MANUAL_TESTS=ON did not add the manual tests."
+            exit 1
+          fi
 
   # The per-package CMakeLists.txt files are generated from the BUILD.bazel
   # files. Fail if a change to a BUILD.bazel file was not followed by
@@ -172,3 +192,21 @@ jobs:
 
       - name: Build and test (JAX)
         run: bazel test --keep_going --config=jax //open_spiel/python/...
+
+  # An example project that depends on OpenSpiel as a Bazel module
+  # (bazel/tests/consumer), as other projects do; see bazel/README.md.
+  bazel_consumer:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Build and test the consumer project
+        working-directory: bazel/tests/consumer
+        run: |
+          # bazelisk only reads .bazelversion from the consumer's own root.
+          export USE_BAZEL_VERSION="$(cat ../../../.bazelversion)"
+          bazel run //:play_game
+          bazel test //...
