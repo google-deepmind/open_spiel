@@ -48,6 +48,7 @@ _REQUIREMENT_RE = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)(\[[^\]]*\])?(.*)$")
 _MODULE_VERSION_RE = re.compile(r'^_PYTHON_VERSION = "([0-9.]+)"$', re.M)
 _UPDATE_SCRIPT_VERSION_RE = re.compile(
     r'^readonly PYTHON_VERSION="([0-9.]+)"$', re.M)
+_EXTRA_DEPS_PREFIX = "OPEN_SPIEL_PYTHON_"
 _DEPS_VARIABLE_RE = re.compile(r"^OPEN_SPIEL_PYTHON_\w+_DEPS$")
 
 # Prints every exported OPEN_SPIEL_PYTHON_* variable after sourcing
@@ -161,9 +162,17 @@ def extra_deps(extra_deps_script: str, python_version: str) -> dict[str, str]:
     with open(fake_python, "w") as f:
       f.write(f"#!/bin/sh\necho 'Python {python_version}.0'\n")
     os.chmod(fake_python, os.stat(fake_python).st_mode | stat.S_IXUSR)
+    # Only the script may define OPEN_SPIEL_PYTHON_*: CI has often sourced
+    # python_extra_deps.sh already, and a variable the script leaves unset
+    # would otherwise keep its inherited value.
+    env = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.startswith(_EXTRA_DEPS_PREFIX)
+    }
     output = subprocess.run(
         ["bash", "-c", _DUMP_EXTRA_DEPS, extra_deps_script, fake_python],
-        check=True, capture_output=True, text=True).stdout
+        check=True, capture_output=True, text=True, env=env).stdout
   values = {}
   for line in output.splitlines():
     name, _, value = line.partition("=")

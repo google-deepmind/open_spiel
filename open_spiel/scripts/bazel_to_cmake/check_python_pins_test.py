@@ -18,6 +18,7 @@ import contextlib
 import io
 import os
 import textwrap
+from unittest import mock
 
 from absl.testing import absltest
 
@@ -142,6 +143,17 @@ class CheckPythonPinsTest(absltest.TestCase):
     values = check_python_pins.extra_deps(self.files.extra_deps, "3.11")
     self.assertEqual(values["OPEN_SPIEL_PYTHON_JAX_DEPS"], "")
     self.assertEqual(values["OPEN_SPIEL_PYTHON_MISC_DEPS"], "scipy==1.0.0")
+
+  def test_extra_deps_ignores_inherited_variables(self):
+    # As in CI, where python_extra_deps.sh has already been sourced.
+    with mock.patch.dict(os.environ, {
+        "OPEN_SPIEL_PYTHON_PYTORCH_DEPS": "torch==2.9.1 dm-tree==0.1.10",
+        "OPEN_SPIEL_PYTHON_MISC_DEPS": "scipy==0.0.1",
+    }):
+      values = check_python_pins.extra_deps(self.files.extra_deps, "3.12")
+      self.assertNotIn("OPEN_SPIEL_PYTHON_PYTORCH_DEPS", values)
+      self.assertEqual(values["OPEN_SPIEL_PYTHON_MISC_DEPS"], "scipy==1.16.3")
+      self.assertEqual(check_python_pins.problems(self.files), [])
 
   def test_extra_deps_pins(self):
     self.assertEqual(
