@@ -170,6 +170,7 @@ py_test(
         "@py_deps//absl/logging",
         "@py_deps//absl/testing:absltest",
         "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
         "@py_deps//torch:pytorch",
     ],
 )
