@@ -299,6 +299,26 @@ void ObservationTensorTests() {
   SPIEL_CHECK_EQ(v[offset++], 1.0 / 4);  // player_min h
 }
 
+// The rank a player draws when fishing is private: the other players must not
+// be able to tell which card was drawn.
+void FishedCardIsPrivateTest() {
+  std::shared_ptr<const Game> game = LoadGame("go_fish");
+  const GoFishGame* gfg = static_cast<const GoFishGame*>(game.get());
+  std::unique_ptr<State> state = gfg->NewSpecificState(
+      "Ask\n0\na1b1c1d1e1f1g1:0\na3h1i1j1k1:0\nb3c3d3e3f3g3h3i3j3k3l4m4");
+  state->ApplyAction(gfg->AskStringToAction("1,b"));
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+
+  // Player 0 misses, drawing either a 'c' or a 'd'.
+  std::unique_ptr<State> drew_c = state->Child(2);
+  std::unique_ptr<State> drew_d = state->Child(3);
+  SPIEL_CHECK_EQ(drew_c->CurrentPlayer(), 1);
+  SPIEL_CHECK_EQ(drew_d->CurrentPlayer(), 1);
+  SPIEL_CHECK_EQ(drew_c->ObservationString(1), drew_d->ObservationString(1));
+  SPIEL_CHECK_EQ(drew_c->InformationStateString(1),
+                 drew_d->InformationStateString(1));
+}
+
 }  // namespace
 }  // namespace go_fish
 }  // namespace open_spiel
@@ -309,4 +329,5 @@ int main(int argc, char** argv) {
   open_spiel::go_fish::ObservationTensorTests();
   open_spiel::go_fish::SerializationTests();
   open_spiel::go_fish::GoFishCoreRuleTests();
+  open_spiel::go_fish::FishedCardIsPrivateTest();
 }
