@@ -1,4 +1,4 @@
-# Copyright 2019 DeepMind Technologies Limited
+# Copyright 2026 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,13 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""OpenSpiel: A Framework for Reinforcement Learning in Games.
-
-OpenSpiel is a collection of environments and algorithms for research in general
-reinforcement learning and search/planning in games.
-"""
-
-import pyspiel
-
-__all__ = ["pyspiel"]

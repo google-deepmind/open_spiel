@@ -192,6 +192,7 @@ open_spiel_py_test(voting/ranked_pairs_test.py)
 open_spiel_py_test(voting/schulze_test.py)
 open_spiel_py_test(voting/soft_condorcet_optimization_test.py)
 open_spiel_py_test(voting/stv_test.py)
+open_spiel_pytest(pytest_smoke/smoke_test FILES python/pytest_smoke/smoke_test.py DESELECT python/pytest_smoke/smoke_test.py::test_deselected ARGS -s)
 
 if(OPEN_SPIEL_BUILD_WITH_ACPC)
   open_spiel_py_test(tests/games_repeated_poker_test.py)
@@ -264,6 +265,10 @@ endif()
 if(OPEN_SPIEL_ENABLE_PYTORCH)
   open_spiel_py_test(pytorch/boltzmann_dqn_pytorch_test.py)
   open_spiel_py_test(pytorch/policy_gradient_pytorch_test.py)
+endif()
+
+if(OPEN_SPIEL_RUN_MANUAL_TESTS)
+  open_spiel_pytest(pytest_smoke/manual_test FILES python/pytest_smoke/manual_test.py ARGS -s)
 endif()
 
 # py_test //python/examples:treeviz_example_test (examples/treeviz_example.py): not run by CMake (needs pygraphviz, which ships no wheels).

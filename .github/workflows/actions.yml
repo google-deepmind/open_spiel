@@ -107,6 +107,26 @@ jobs:
         run: |
           python3 --version
           ./open_spiel/scripts/ci_script.sh
+      # Tests tagged "manual" in the BUILD files (python/pytest_smoke:manual_test)
+      # must reach CTest only with OPEN_SPIEL_RUN_MANUAL_TESTS=ON. Reconfiguring
+      # the build directory of the previous step takes seconds: `ctest -N` only
+      # lists the tests, nothing is built or run.
+      - name: Check the OPEN_SPIEL_RUN_MANUAL_TESTS switch
+        run: |
+          source ./venv/bin/activate
+          cd build
+          ctest -N > ctest_off.txt
+          grep -q ': python/pytest_smoke/smoke_test$' ctest_off.txt
+          if grep -q ': python/pytest_smoke/manual_test$' ctest_off.txt; then
+            echo "CTest has a manual test without OPEN_SPIEL_RUN_MANUAL_TESTS=ON."
+            exit 1
+          fi
+          cmake -DOPEN_SPIEL_RUN_MANUAL_TESTS=ON ../open_spiel > /dev/null
+          ctest -N > ctest_on.txt
+          if ! grep -q ': python/pytest_smoke/manual_test$' ctest_on.txt; then
+            echo "OPEN_SPIEL_RUN_MANUAL_TESTS=ON did not add the manual tests."
+            exit 1
+          fi
 
   # The per-package CMakeLists.txt files are generated from the BUILD.bazel
   # files. Fail if a change to a BUILD.bazel file was not followed by
