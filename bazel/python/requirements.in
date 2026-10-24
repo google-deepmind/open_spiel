@@ -16,6 +16,7 @@ optax==0.2.8
 chex==0.1.92
 rlax==0.1.9
 distrax==0.1.9
+mctx==0.0.71
 # OPEN_SPIEL_PYTHON_PYTORCH_DEPS.
 torch==2.9.1
 dm-tree==0.1.10
@@ -41,3 +42,6 @@ orbax-checkpoint==0.12.8
 pandas
 pyarrow
 pygraphviz
+# No optional group: ml-collections (a core requirement) depends on it, so
+# every OpenSpiel install has it.
+pyyaml

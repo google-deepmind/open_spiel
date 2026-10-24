@@ -16,54 +16,49 @@
 
 BUILD files name Python dependencies with labels of the form
 `@py_deps//<package>[:<target>]` (for example `@py_deps//absl/testing:absltest`).
-`py_deps.bzl` creates the `@py_deps` repository from `PY_DEPS`: every entry
-becomes a `py_library` forwarding to pip packages of the `@open_spiel_pip` hub,
-whose pinned versions live in `requirements_lock.txt`.
+`py_deps.bzl` creates the `@py_deps` repository: every such label found in
+OpenSpiel's BUILD files becomes a `py_library` forwarding to pip packages of
+the `@open_spiel_pip` hub, whose pinned versions live in `requirements_lock.txt`.
+
+A label is resolved, in order, by:
+  1. its exact entry in `PY_DEPS`;
+  2. its top-level package (`jax` in `@py_deps//jax/experimental`) in
+     `LOCAL_PY_DEPS` or `PY_PACKAGES`;
+  3. the pip package named like its top-level package, if that package is in
+     `requirements_lock.txt`.
+So most labels need no entry here, only a pin in `requirements.in`. A label
+that resolves to nothing fails the build of its dependents with a message
+saying what to add.
 
 `OPTIONAL_DEP_GROUPS` mirrors the OPEN_SPIEL_ENABLE_{JAX,PYTORCH,PYTHON_MISC}
 switches of the CMake build: targets needing a disabled group are skipped.
 """
 
-# `<package>[:<target>]` under @py_deps -> list of normalized pip package names.
+# Labels `<package>[:<target>]` under @py_deps -> normalized pip package names,
+# where the top-level package rule below does not fit. Labels listed here are
+# always generated, also when no BUILD file uses them (e.g. ones added by the
+# rule macros of this directory).
 PY_DEPS = {
-    "absl:app": ["absl_py"],
-    "absl/flags": ["absl_py"],
-    "absl/logging": ["absl_py"],
-    "absl/testing:absltest": ["absl_py"],
-    "absl/testing:parameterized": ["absl_py"],
-    "attr": ["attrs"],
-    "chex": ["chex"],
-    "cma": ["cma"],
-    "cvxpy": ["cvxpy"],
-    "distrax": ["distrax"],
     "etils/epath": ["etils", "typing_extensions", "zipp"],
-    "fastmcp": ["fastmcp"],
-    "flax": ["flax"],
-    "flax/training:train_state": ["flax"],
-    "flax/nnx:v1": ["flax"],
+    "pytest": ["pytest"],
+}
+
+# Top-level @py_deps package -> normalized pip package names, for packages
+# whose import name differs from their pip name (or that need several).
+PY_PACKAGES = {
+    "absl": ["absl_py"],
+    "attr": ["attrs"],
     "haiku": ["dm_haiku"],
     "jax": ["jax", "jaxlib"],
-    "jax/example_libraries:optimizers": ["jax", "jaxlib"],
-    "matplotlib": ["matplotlib"],
-    "matplotlib:matplotlib_interactive": ["matplotlib"],
-    "ml_collections": ["ml_collections"],
-    "ml_collections/config_dict": ["ml_collections"],
-    "mock": ["mock"],
-    "nashpy": ["nashpy"],
-    "networkx": ["networkx"],
-    "numpy": ["numpy"],
-    "optax": ["optax"],
-    "orbax/checkpoint": ["orbax_checkpoint"],
-    "pandas": ["pandas"],
-    "pokerkit": ["pokerkit"],
-    "pyarrow": ["pyarrow"],
-    "pygraphviz": ["pygraphviz"],
-    "pytest": ["pytest"],
-    "rlax": ["rlax"],
-    "scipy": ["scipy"],
-    "torch": ["torch"],
-    "torch:pytorch": ["torch"],
+    "orbax": ["orbax_checkpoint"],
     "tree": ["dm_tree"],
+    "yaml": ["pyyaml"],
+}
+
+# Top-level @py_deps package -> OpenSpiel target providing it (relative to the
+# OpenSpiel repository), for modules OpenSpiel builds itself.
+LOCAL_PY_DEPS = {
+    "pyspiel": "//open_spiel/python/pybind11:pyspiel",
 }
 
 # Top-level @py_deps package -> optional dependency group. Each group has a
@@ -76,6 +71,7 @@ OPTIONAL_DEP_GROUPS = {
     "flax": "jax",
     "haiku": "jax",
     "jax": "jax",
+    "mctx": "jax",
     "optax": "jax",
     "orbax": "jax",
     "rlax": "jax",
