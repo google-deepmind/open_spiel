@@ -65,6 +65,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "crazyhouse",
     "cribbage",
     "crossword",
+    "crossword_duel",
     "cursor_go",
     "dark_chess",
     "dark_hex",

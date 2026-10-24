@@ -71,6 +71,11 @@ set(GAME_SOURCES
   crossword/crossword_default_puzzle.h
   crossword/crossword_board.cc
   crossword/crossword_board.h
+  crossword/duel.cc
+  crossword/duel.h
+  crossword/duel_board.cc
+  crossword/duel_board.h
+  crossword/duel_default_board.h
   cursor_go/cursor_go.cc
   cursor_go/cursor_go.h
   dark_chess/dark_chess.cc
@@ -457,6 +462,10 @@ add_test(cribbage_test cribbage_test)
 add_executable(crossword_test crossword/crossword_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(crossword_test crossword_test)
+
+add_executable(crossword_duel_test crossword/duel_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crossword_duel_test crossword_duel_test)
 
 add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

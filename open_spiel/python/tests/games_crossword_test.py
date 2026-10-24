@@ -21,6 +21,7 @@ import numpy as np
 import pyspiel
 
 crossword = pyspiel.crossword
+crossword_duel = pyspiel.crossword_duel
 
 flags.DEFINE_string(
     "puzzles_root", "", "The root directory of the crossword puzzles.",
@@ -159,6 +160,37 @@ class GamesCrosswordTest(absltest.TestCase):
     print(state)
     self.assertEqual(state.returns()[0], 3)
 
+  def test_create_game_from_crossword_string(self):
+    puzzle_contents = """
+Title: Default crossword puzzle.
+Author: OpenSpiel authors
+Copyright: © 2026 OpenSpiel authors
+Date: 2025-06-05
+
+
+GO#A
+ARID
+M#TA
+EDAM
+
+A1. Ancient board game with black and white stones ~ GO
+A4. Dry, like a desert ~ ARID
+A7. Teaching assistant ~ TA
+A8. Dutch cheese ~ EDAM
+
+D1. Chess is an example of a board ____ ~ GAME
+D2. Disjunction (logical operator) ~ OR
+D3. Popular optimizer ~ ADAM
+D6. Invitation to Apply, abbreviated ~ ITA
+"""
+    game = crossword.create_game_from_crossword_string(puzzle_contents)
+    state = game.new_initial_state()
+    self.assertFalse(state.is_chance_node())
+    action_struct = game.ActionStruct("A1", "GO")
+    status = state.apply_action_struct(action_struct)
+    self.assertTrue(status.ok())
+    self.assertEqual(state.returns()[0], 1)
+
   def test_bad_json_action(self):
     game = pyspiel.load_game("crossword")
     state = game.new_initial_state()
@@ -172,6 +204,235 @@ class GamesCrosswordTest(absltest.TestCase):
       # Prints "Error creating action struct:
       # json.exception.out_of_range.403] key 'clue_id' not found"
       print(f"Error creating action struct: {e}")
+
+
+class GamesCrosswordDuelTest(absltest.TestCase):
+
+  def apply_forced_chance_letter(self, state, letter):
+    """Applies the chance action drawing `letter`, which must be available."""
+    outcomes = state.chance_outcomes()
+    action = ord(letter) - ord("A")
+    self.assertTrue(any(outcome_action == action
+                        for outcome_action, _ in outcomes))
+    state.apply_action(action)
+
+  def apply_any_chance_letter(self, state):
+    """Applies an arbitrary (don't-care) chance outcome."""
+    outcomes = state.chance_outcomes()
+    state.apply_action(outcomes[0][0])
+
+  def test_default_word_list(self):
+    game = pyspiel.load_game("crossword_duel")
+    self.assertEqual(game.num_words(), 10)
+    self.assertEqual(game.num_players(), 2)
+
+  def test_create_crossword_duel_game(self):
+    game = crossword_duel.create_crossword_duel_game(
+        crossword_duel.DUEL_DEFAULT_BOARD, ""
+    )
+    self.assertEqual(game.num_words(), 10)
+    self.assertEqual(game.num_players(), 2)
+    state = game.new_initial_state()
+    self.assertTrue(state.is_chance_node())
+
+  def test_deal_and_first_move(self):
+    game = pyspiel.load_game("crossword_duel")
+    state = game.new_initial_state()
+    while state.is_chance_node():
+      self.apply_any_chance_letter(state)
+    self.assertLen(state.rack(0), 7)
+    self.assertLen(state.rack(1), 7)
+    self.assertEqual(state.current_player(), 0)
+
+    # A word not covering the start cell should be rejected as first move.
+    status = state.validate_action_struct(
+        crossword_duel.CrosswordDuelActionStruct(
+            0, 0, crossword_duel.Direction.ACROSS, "AB"
+        )
+    )
+    self.assertFalse(status.ok())
+
+    # A pass is always legal (direction/word are irrelevant when pass=true).
+    pass_action = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, "X"
+    )
+    pass_action.pass_ = True
+    status = state.validate_action_struct(pass_action)
+    self.assertTrue(status.ok())
+
+  def test_legal_and_illegal_placements(self):
+    # Forces both racks so that player 0 is guaranteed to hold C/A/T and
+    # player 1 is guaranteed to hold B/E/A/R, then checks: (1) a known-legal
+    # placement of CAT at the start cell validates as legal; (2) extending
+    # the board with a letter the mover's rack doesn't have is rejected for
+    # insufficient tiles; and (3) an otherwise-legal word placed away from
+    # the board's only tile is rejected for not connecting to an existing
+    # tile.
+    game = pyspiel.load_game("crossword_duel")
+    state = game.new_initial_state()
+
+    forced_p0 = list("CAT")
+    forced_p1 = list("BEAR")
+    i0, i1 = 0, 0
+    while state.is_chance_node():
+      dealing_to_p0 = len(state.rack(0)) < 7
+      if dealing_to_p0:
+        if i0 < len(forced_p0):
+          self.apply_forced_chance_letter(state, forced_p0[i0])
+          i0 += 1
+        else:
+          self.apply_any_chance_letter(state)
+      else:
+        if i1 < len(forced_p1):
+          self.apply_forced_chance_letter(state, forced_p1[i1])
+          i1 += 1
+        else:
+          self.apply_any_chance_letter(state)
+    self.assertLen(state.rack(0), 7)
+    self.assertLen(state.rack(1), 7)
+    self.assertEqual(state.current_player(), 0)
+
+    # (1) CAT across the start cell (7, 7) is a legal opening move.
+    legal_action = crossword_duel.CrosswordDuelActionStruct(
+        7, 7, crossword_duel.Direction.ACROSS, "CAT"
+    )
+    status = state.validate_action_struct(legal_action)
+    self.assertTrue(status.ok())
+    status = state.apply_action_struct(legal_action)
+    self.assertTrue(status.ok())
+    self.assertEqual(state.char_at(7, 7), "C")
+    self.assertEqual(state.char_at(7, 8), "A")
+    self.assertEqual(state.char_at(7, 9), "T")
+
+    # Drain the refill chance node(s) triggered by player 0's move.
+    while state.is_chance_node():
+      self.apply_any_chance_letter(state)
+    self.assertEqual(state.current_player(), 1)
+
+    # (2) Extending "CAT" into "CATX" needs an 'X' tile that player 1's rack
+    # (B/E/A/R + filler) does not have.
+    not_enough_tiles = crossword_duel.CrosswordDuelActionStruct(
+        7, 7, crossword_duel.Direction.ACROSS, "CATX"
+    )
+    status = state.validate_action_struct(not_enough_tiles)
+    self.assertFalse(status.ok())
+    self.assertIn("Not enough", status.message())
+
+    # (3) "BEAR" is spellable from player 1's rack, but placed far from the
+    # only tiles on the board.
+    not_connected = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, "BEAR"
+    )
+    status = state.validate_action_struct(not_connected)
+    self.assertFalse(status.ok())
+    self.assertIn("connect", status.message())
+
+  def test_action_struct_from_json(self):
+    action = crossword_duel.CrosswordDuelActionStruct(
+        '{"row": 7, "col": 7, "direction": "across", "word": "CAT", '
+        '"pass": false, "discard": false, "discard_tiles": ""}'
+    )
+    self.assertEqual(action.row, 7)
+    self.assertEqual(action.col, 7)
+    self.assertEqual(action.direction, crossword_duel.Direction.ACROSS)
+    self.assertEqual(action.word, "CAT")
+    self.assertFalse(action.pass_)
+    self.assertFalse(action.discard)
+    self.assertEqual(action.discard_tiles, "")
+
+  def test_action_struct_from_dict(self):
+    action = crossword_duel.CrosswordDuelActionStruct({
+        "row": 3,
+        "col": 5,
+        "direction": "down",
+        "word": "DOG",
+        "pass": False,
+        "discard": False,
+        "discard_tiles": "",
+    })
+    self.assertEqual(action.row, 3)
+    self.assertEqual(action.col, 5)
+    self.assertEqual(action.direction, crossword_duel.Direction.DOWN)
+    self.assertEqual(action.word, "DOG")
+    self.assertFalse(action.pass_)
+    self.assertFalse(action.discard)
+    self.assertEqual(action.discard_tiles, "")
+
+  def test_discard_tiles(self):
+    # Forces player 0's rack to hold known letters, then discards some of
+    # them and checks: (1) the discarded tiles leave the rack and go back
+    # into the bag; (2) a chance node is triggered to redraw the same
+    # number of tiles; (3) after redrawing, the rack is back to 7 tiles;
+    # and (4) discarding a letter not in the rack is rejected.
+    game = pyspiel.load_game("crossword_duel")
+    state = game.new_initial_state()
+
+    forced_p0 = list("CAT")
+    i0 = 0
+    while state.is_chance_node():
+      dealing_to_p0 = len(state.rack(0)) < 7
+      if dealing_to_p0 and i0 < len(forced_p0):
+        self.apply_forced_chance_letter(state, forced_p0[i0])
+        i0 += 1
+      else:
+        self.apply_any_chance_letter(state)
+    self.assertLen(state.rack(0), 7)
+    self.assertEqual(state.current_player(), 0)
+
+    bag_size_before = state.bag_size()
+
+    # Discarding a letter not in the rack should be rejected.
+    illegal_discard = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, ""
+    )
+    illegal_discard.discard = True
+    illegal_discard.discard_tiles = "Z" * 8
+    status = state.validate_action_struct(illegal_discard)
+    self.assertFalse(status.ok())
+
+    discard_action = crossword_duel.CrosswordDuelActionStruct(
+        0, 0, crossword_duel.Direction.ACROSS, ""
+    )
+    discard_action.discard = True
+    discard_action.discard_tiles = "CAT"
+    status = state.validate_action_struct(discard_action)
+    self.assertTrue(status.ok())
+    status = state.apply_action_struct(discard_action)
+    self.assertTrue(status.ok())
+
+    self.assertLen(state.rack(0), 4)
+    # The 3 discarded tiles go back into the bag immediately; they come back
+    # out again as the redraw chance nodes are resolved below.
+    self.assertEqual(state.bag_size(), bag_size_before + 3)
+    self.assertTrue(state.is_chance_node())
+
+    while state.is_chance_node():
+      self.apply_any_chance_letter(state)
+    self.assertLen(state.rack(0), 7)
+    self.assertEqual(state.bag_size(), bag_size_before)
+    self.assertEqual(state.current_player(), 1)
+
+  def test_default_random_sim(self):
+    # Only 10 words in the default word list, so most random games end
+    # quickly via consecutive passes.
+    game = pyspiel.load_game("crossword_duel")
+    state = game.new_initial_state()
+    rng = np.random.RandomState(SEED)
+    while not state.is_terminal():
+      if state.is_chance_node():
+        outcomes = state.chance_outcomes()
+        action_list, prob_list = zip(*outcomes)
+        action = rng.choice(action_list, p=prob_list)
+        state.apply_action(action)
+      else:
+        sampler = state.get_action_struct_sampler(
+            int(rng.randint(0, 2**30))
+        )
+        action = sampler.sample_action_struct()
+        status = state.apply_action_struct(action)
+        self.assertTrue(status.ok())
+    print(f"Final state: \n{state}")
+    self.assertEqual(sum(state.returns()), 0.0)
 
 
 if __name__ == "__main__":

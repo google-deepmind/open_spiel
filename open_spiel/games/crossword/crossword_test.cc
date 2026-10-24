@@ -25,6 +25,7 @@
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/games/crossword/crossword_board.h"
+#include "open_spiel/games/crossword/crossword_default_puzzle.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -133,6 +134,22 @@ void TestCrosswordGameDefaultPuzzleNoWordList() {
   std::cout << "state: \n" << state->ToString() << "\n";
 }
 
+void TestCreateGameFromCrosswordString() {
+  std::shared_ptr<const Game> game =
+      CreateGameFromCrosswordString(kDefaultPuzzleContents);
+  SPIEL_CHECK_TRUE(game != nullptr);
+  const CrosswordGame* crossword_game =
+      dynamic_cast<const CrosswordGame*>(game.get());
+  SPIEL_CHECK_TRUE(crossword_game != nullptr);
+  SPIEL_CHECK_EQ(crossword_game->num_puzzles(), 0);
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::cout << "state: \n" << state->ToString() << "\n";
+
+  Status status =
+      state->ApplyActionStruct(CrosswordActionStruct{"A1", "GO"});
+  SPIEL_CHECK_TRUE(status.ok());
+}
+
 void TestCrosswordGameDefaultRandomSim() {
   std::string word_list_file = absl::GetFlag(FLAGS_word_list_file);
   if (word_list_file.empty()) {
@@ -197,6 +214,7 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   open_spiel::Init(argv[0], &argc, &argv, false);
   open_spiel::crossword::TestCrosswordGameDefaultPuzzleNoWordList();
+  open_spiel::crossword::TestCreateGameFromCrosswordString();
   open_spiel::crossword::TestCrosswordGameDefaultRandomSim();
   open_spiel::crossword::TestCrosswordGameDefaultWinningSim();
   open_spiel::crossword::TestCrosswordGameWinningSimWithChance(10);

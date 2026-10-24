@@ -42,7 +42,7 @@ _MISSING_GAMES = set(["nfg_game", "efg_game", "restricted_nash_response"])
 
 # These games only support action structs and are not supported by the
 # playthroughs yet, so we exclude them from the test for now.
-_ACTION_STRUCT_ONLY_GAMES = set(["crossword"])
+_ACTION_STRUCT_ONLY_GAMES = set(["crossword", "crossword_duel"])
 
 
 # Regex to find the game name in a playthrough. This will return the name of the
