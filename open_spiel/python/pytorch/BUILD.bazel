@@ -123,14 +123,135 @@ py_test(
     ],
 )
 
-# Currently tests are disabled, as our version of PyTorch
-# is too old. So we currently only test these via the
-# CMake tests.
-# TODO(author5): re-enable test when PyTorch is upgraded.
-# py_strict_test(
+py_library(
+    name = "neurd",
+    srcs = ["neurd.py"],
+    strict_deps = True,
+    deps = [
+        ":rcfr",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_library(
+    name = "nfsp",
+    srcs = ["nfsp.py"],
+    strict_deps = True,
+    deps = [
+        ":dqn",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "ppo",
+    srcs = ["ppo.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "deep_cfr_pytorch_test",
+    srcs = ["deep_cfr_pytorch_test.py"],
+    deps = [
+        ":deep_cfr",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "dqn_pytorch_test",
+    srcs = ["dqn_pytorch_test.py"],
+    deps = [
+        ":dqn",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "escher_test",
+    srcs = ["escher_test.py"],
+    deps = [
+        ":escher",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "rl_losses_pytorch_test",
+    srcs = ["losses/rl_losses_pytorch_test.py"],
+    deps = [
+        ":rl_losses",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "neurd_pytorch_test",
+    srcs = ["neurd_pytorch_test.py"],
+    deps = [
+        ":neurd",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "nfsp_pytorch_test",
+    srcs = ["nfsp_pytorch_test.py"],
+    deps = [
+        ":nfsp",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "ppo_pytorch_test",
+    srcs = ["ppo_pytorch_test.py"],
+    deps = [
+        ":ppo",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python:vector_env",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+# RCFR PyTorch test causing problems. Disabled for now.
+# py_test(
 #    name = "rcfr_pytorch_test",
 #    srcs = ["rcfr_pytorch_test.py"],
-#    python_version = "PY3",
 #    deps = [
 #        ":rcfr",
 #        "//open_spiel/python/pybind11:pyspiel",

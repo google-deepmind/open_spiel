@@ -1,4 +1,6 @@
 load("//bazel/python:pytype.bzl", "pytype_strict_binary", "pytype_strict_library")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
 
 package(
     default_applicable_licenses = ["//open_spiel:license"],
@@ -30,5 +32,80 @@ pytype_strict_library(
         "//open_spiel/python/utils:lru_cache",
         "@py_deps//jax",
         "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "evaluator_test",
+    srcs = ["evaluator_test.py"],
+    deps = [
+        ":evaluator",
+        ":model_linen",  # build_cleaner: keep
+        ":model_nnx",  # build_cleaner: keep
+        ":utils",
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "model_linen",
+    srcs = ["model_linen.py"],
+    strict_deps = True,
+    deps = [
+        ":utils",
+        "@py_deps//chex",
+        "@py_deps//flax",
+        "@py_deps//flax/training:train_state",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//orbax/checkpoint",
+    ],
+)
+
+py_library(
+    name = "model_nnx",
+    srcs = ["model_nnx.py"],
+    strict_deps = True,
+    deps = [
+        ":utils",
+        "@py_deps//chex",
+        "@py_deps//flax",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//orbax/checkpoint",
+    ],
+)
+
+py_test(
+    name = "model_test",
+    srcs = ["model_test.py"],
+    deps = [
+        ":model_linen",  # build_cleaner: keep
+        ":model_nnx",  # build_cleaner: keep
+        ":utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//flax",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    strict_deps = True,
+    deps = [
+        "@py_deps//chex",
+        "@py_deps//flax",
+        "@py_deps//jax",
     ],
 )
