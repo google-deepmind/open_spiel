@@ -144,6 +144,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Check that the Python pins of CMake/pip and Bazel agree
+        run: python3 ./open_spiel/scripts/bazel_to_cmake/check_python_pins.py
+
       - name: Regenerate CMakeLists.txt files
         run: bash ./open_spiel/scripts/generate_cmake.sh
 

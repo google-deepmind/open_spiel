@@ -18,6 +18,21 @@ pytype_strict_library(
     deps = [":export_rules"],
 )
 
+# Command line entry point, run by GitHub CI with plain python3.
+pytype_strict_library(
+    name = "check_python_pins",
+    srcs = ["check_python_pins.py"],
+)
+
+py_test(
+    name = "check_python_pins_test",
+    srcs = ["check_python_pins_test.py"],
+    deps = [
+        ":check_python_pins",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
 pytype_strict_library(
     name = "export_rules",
     srcs = ["export_rules.py"],

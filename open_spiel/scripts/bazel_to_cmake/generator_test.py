@@ -699,6 +699,35 @@ class PythonTestsTest(absltest.TestCase):
     self.assertIn("# py_test //python/algorithms:graph_test", text)
     self.assertNotIn("open_spiel_py_test(algorithms/graph_test.py", text)
 
+  def test_python_group_of_subtargets_and_unlisted_packages(self):
+    # Any label under a top-level package gets its group, in either form;
+    # packages without a group (e.g. yaml) add no guard.
+    text = self.python_tests(
+        """
+        py_test(
+            name = "a_test",
+            srcs = ["a_test.py"],
+            deps = [
+                "@py_deps//jax/experimental",
+                "//third_party/py/flax:core",
+                "//third_party/py/mctx",
+            ],
+        )
+        py_test(
+            name = "b_test",
+            srcs = ["b_test.py"],
+            deps = [
+                "//third_party/py/yaml",
+                "//third_party/py/absl/testing:flagsaver",
+            ],
+        )
+        """, a_test="", b_test="")
+    self.assertIn(
+        "if(OPEN_SPIEL_ENABLE_JAX)\n"
+        "  open_spiel_py_test(algorithms/a_test.py)\n"
+        "endif()\n", text)
+    self.assertIn("\nopen_spiel_py_test(algorithms/b_test.py)\n", text)
+
   def test_cc_option_guards_propagate(self):
     text = self.python_tests(
         """

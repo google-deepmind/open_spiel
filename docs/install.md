@@ -287,6 +287,9 @@ python3 -m pip install --upgrade torch==x.xx.x jax==x.x.x
 where `x.xx.x` should be the desired version numbers (which can be found at the
 link above).
 
+The JAX-based algorithms need Python 3.12 or newer; the rest of OpenSpiel also
+supports Python 3.11.
+
 ### Building and running tests
 
 Make sure that the virtual environment is still activated.

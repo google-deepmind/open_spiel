@@ -5,6 +5,7 @@
 open_spiel_py_test(../integration_tests/api_test.py)
 open_spiel_py_test(../integration_tests/playthrough_test.py)
 open_spiel_py_test(../scripts/bazel_to_cmake/build_file_test.py)
+open_spiel_py_test(../scripts/bazel_to_cmake/check_python_pins_test.py)
 open_spiel_py_test(../scripts/bazel_to_cmake/generator_test.py)
 open_spiel_py_test(../scripts/bazel_to_cmake/label_map_test.py)
 open_spiel_py_test(algorithms/action_value_test.py)

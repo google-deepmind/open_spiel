@@ -50,14 +50,16 @@ PYTHON_PACKAGE_PREFIXES = ("//third_party/py/", "@py_deps//")
 
 # Top-level Python package -> optional dependency group. A copy of
 # OPTIONAL_DEP_GROUPS in the exported bazel/python/py_deps_table.bzl, kept here
-# so that generation needs only this directory; a test checks they agree.
+# so that generation needs only this directory; a test checks they agree. Like
+# the Bazel rules, this keys on the top-level package only, so every label
+# under it (`jax`, `jax/experimental`, `flax:core`) gets the same group.
 OPTIONAL_PYTHON_GROUPS = {
     "chex": "jax",
-    "clu": "jax",
     "distrax": "jax",
     "flax": "jax",
     "haiku": "jax",
     "jax": "jax",
+    "mctx": "jax",
     "optax": "jax",
     "orbax": "jax",
     "rlax": "jax",
