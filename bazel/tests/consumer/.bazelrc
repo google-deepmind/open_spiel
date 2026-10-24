@@ -1,0 +1,2 @@
+# OpenSpiel needs C++20; Bazel's default C++ toolchain compiles C++17.
+build --cxxopt=-std=c++20 --host_cxxopt=-std=c++20

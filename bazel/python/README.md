@@ -6,7 +6,7 @@ Bazel; CMake and `pip install .` do not use it.
 
 | File | Purpose |
 |---|---|
-| `python.MODULE.bazel` | Included by `MODULE.bazel`: rules_python, the Python 3.12 toolchain, the `@open_spiel_pip` pip hub (`pypi` is taken by pybind11_abseil) and the `@py_deps` repository. |
+| `python.MODULE.bazel` | Included by `MODULE.bazel`: rules_python, the Python toolchains (3.12 is the default; 3.13 and 3.14 serve projects that depend on OpenSpiel), the `@open_spiel_pip` pip hub and the `@py_deps` repository. |
 | `requirements.in` | Every Python package used by a target, pinned like `requirements.txt` and `scripts/python_extra_deps.sh`. |
 | `requirements_lock.txt` | Hash-pinned lock (Linux + macOS). Regenerate with `update_requirements_lock.sh` after editing `requirements.in`. |
 | `py_deps_table.bzl` | How `@py_deps//<package>[:<target>]` labels map to pip packages where the names differ; optional dependency groups. |

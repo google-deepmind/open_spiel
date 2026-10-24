@@ -1,9 +1,20 @@
 # Python part of OpenSpiel's MODULE.bazel, pulled in with
-# include("//bazel/python:python.MODULE.bazel").
+# include("//bazel/python:python.MODULE.bazel"). Bazel allows include() in the
+# root module and in modules fetched with a non-registry override
+# (local_path_override, git_override, archive_override), which is how other
+# projects depend on OpenSpiel (see bazel/README.md).
 
 bazel_dep(name = "rules_python", version = "2.4.4")
 
 _PYTHON_VERSION = "3.12"
+
+# Only the root module (or rules_python) picks the default Python version, so
+# a Bazel project depending on OpenSpiel may build it with another one. The pip
+# hub serves these versions from the same lock too; CI tests _PYTHON_VERSION.
+_OTHER_PYTHON_VERSIONS = [
+    "3.13",
+    "3.14",
+]
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
@@ -11,12 +22,21 @@ python.toolchain(
     python_version = _PYTHON_VERSION,
 )
 
+[
+    python.toolchain(python_version = version)
+    for version in _OTHER_PYTHON_VERSIONS
+]
+
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-pip.parse(
-    hub_name = "open_spiel_pip",
-    python_version = _PYTHON_VERSION,
-    requirements_lock = "//bazel/python:requirements_lock.txt",
-)
+
+[
+    pip.parse(
+        hub_name = "open_spiel_pip",
+        python_version = version,
+        requirements_lock = "//bazel/python:requirements_lock.txt",
+    )
+    for version in [_PYTHON_VERSION] + _OTHER_PYTHON_VERSIONS
+]
 use_repo(pip, "open_spiel_pip")
 
 # @py_deps//<package>[:<target>]: the Python dependency labels used in BUILD
