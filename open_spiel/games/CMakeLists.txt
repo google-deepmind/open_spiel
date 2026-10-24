@@ -30,6 +30,9 @@ set(GAME_SOURCES
   capture_the_flag/capture_the_flag.h
   catch/catch.cc
   catch/catch.h
+  catch_the_hidden_evader/catch_the_hidden_evader.cc
+  catch_the_hidden_evader/catch_the_hidden_evader.h
+  catch_the_hidden_evader/catch_the_hidden_evader_maps.h
   checkers/checkers.cc
   checkers/checkers.h
   chinese_checkers/chinese_checkers.cc
@@ -393,6 +396,11 @@ add_test(capture_the_flag_test capture_the_flag_test)
 add_executable(catch_test catch/catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(catch_test catch_test)
+
+add_executable(catch_the_hidden_evader_test
+               catch_the_hidden_evader/catch_the_hidden_evader_test.cc
+               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
+add_test(catch_the_hidden_evader_test catch_the_hidden_evader_test)
 
 add_executable(checkers_test checkers/checkers_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

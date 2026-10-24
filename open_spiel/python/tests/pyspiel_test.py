@@ -49,6 +49,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "cached_tree",
     "capture_the_flag",
     "catch",
+    "catch_the_hidden_evader",
     "chat_game",  # python game locating in python/games/chat_games/
     "checkers",
     "chess",
