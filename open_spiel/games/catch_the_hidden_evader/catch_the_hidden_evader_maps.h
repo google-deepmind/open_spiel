@@ -1,0 +1,416 @@
+// Copyright 2026 DeepMind Technologies Limited
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef OPEN_SPIEL_GAMES_CATCH_THE_HIDDEN_EVADER_MAPS_H_
+#define OPEN_SPIEL_GAMES_CATCH_THE_HIDDEN_EVADER_MAPS_H_
+
+// Built-in maps of Catch the Hidden Evader, in the map file format described
+// in catch_the_hidden_evader.h.
+
+namespace open_spiel {
+namespace catch_the_hidden_evader {
+
+// An original, procedurally generated city of 150 stations: a Gabriel graph
+// over random points, pruned, with bus and underground lines placed by
+// farthest-point sampling and a short river.
+inline constexpr const char* kCity150Map = R"(
+# Original, procedurally generated map.
+stations 150
+starts 1 3 4 17 28 32 33 38 66 73 75 93 104 108 145 147 148 149
+1 2 taxi
+1 15 taxi
+2 9 taxi
+2 15 taxi
+3 5 taxi
+3 6 taxi
+4 21 taxi
+4 22 taxi
+5 10 taxi
+5 14 taxi
+6 8 taxi
+6 18 taxi
+7 8 taxi
+7 16 taxi
+7 17 taxi
+8 16 taxi
+8 18 taxi
+9 13 taxi
+9 19 taxi
+10 11 taxi
+10 14 taxi
+11 13 taxi
+12 21 taxi
+12 25 taxi
+13 19 taxi
+14 23 taxi
+14 24 taxi
+15 27 taxi
+16 17 taxi
+16 26 taxi
+17 20 taxi
+18 26 taxi
+18 28 taxi
+20 25 taxi
+20 29 taxi
+21 22 taxi
+21 25 taxi
+21 34 taxi
+22 30 taxi
+23 24 taxi
+24 31 taxi
+25 34 taxi
+26 28 taxi
+27 32 taxi
+27 35 taxi
+27 45 taxi
+28 39 taxi
+29 36 taxi
+29 38 taxi
+29 41 taxi
+30 34 taxi
+30 46 taxi
+31 33 taxi
+31 40 taxi
+32 45 taxi
+33 44 taxi
+34 38 taxi
+34 46 taxi
+35 37 taxi
+35 45 taxi
+35 53 taxi
+36 41 taxi
+36 52 taxi
+37 44 taxi
+37 48 taxi
+38 50 taxi
+38 51 taxi
+39 43 taxi
+40 44 taxi
+40 49 taxi
+40 55 taxi
+41 50 taxi
+41 52 taxi
+42 43 taxi
+42 49 taxi
+42 54 taxi
+43 54 taxi
+43 56 taxi
+44 48 taxi
+44 55 taxi
+45 53 taxi
+45 60 taxi
+46 47 taxi
+46 59 taxi
+46 64 taxi
+47 64 taxi
+48 53 taxi
+48 67 taxi
+49 54 taxi
+49 62 taxi
+50 51 taxi
+50 58 taxi
+50 61 taxi
+51 58 taxi
+51 59 taxi
+51 65 taxi
+52 57 taxi
+52 61 taxi
+53 60 taxi
+54 56 taxi
+54 68 taxi
+54 70 taxi
+55 62 taxi
+56 66 taxi
+56 68 taxi
+57 63 taxi
+57 72 taxi
+58 61 taxi
+58 65 taxi
+58 71 taxi
+59 64 taxi
+59 65 taxi
+59 75 taxi
+60 73 taxi
+61 71 taxi
+61 72 taxi
+62 69 taxi
+62 74 taxi
+63 66 taxi
+63 79 taxi
+64 75 taxi
+65 71 taxi
+65 75 taxi
+66 68 taxi
+67 69 taxi
+67 82 taxi
+68 70 taxi
+69 82 taxi
+70 74 taxi
+71 78 taxi
+71 81 taxi
+72 76 taxi
+72 79 taxi
+73 77 taxi
+73 84 taxi
+75 80 taxi
+76 78 taxi
+76 83 taxi
+77 82 taxi
+77 88 taxi
+78 81 taxi
+78 87 taxi
+79 83 taxi
+79 85 taxi
+80 92 taxi
+81 87 taxi
+82 88 taxi
+83 89 taxi
+83 93 taxi
+84 91 taxi
+85 86 taxi
+85 89 taxi
+85 99 taxi
+86 94 taxi
+86 99 taxi
+87 93 taxi
+87 98 taxi
+87 102 taxi
+88 95 taxi
+89 99 taxi
+89 110 taxi
+90 94 taxi
+90 103 taxi
+91 97 taxi
+92 101 taxi
+93 102 taxi
+94 103 taxi
+94 105 taxi
+95 100 taxi
+95 104 taxi
+96 107 taxi
+96 109 taxi
+97 100 taxi
+98 102 taxi
+98 114 taxi
+99 105 taxi
+99 113 taxi
+100 104 taxi
+101 112 taxi
+102 114 taxi
+103 106 taxi
+103 111 taxi
+103 116 taxi
+104 109 taxi
+104 117 taxi
+105 111 taxi
+105 113 taxi
+105 119 taxi
+106 108 taxi
+106 115 taxi
+106 116 taxi
+107 108 taxi
+107 118 taxi
+108 115 taxi
+109 117 taxi
+109 121 taxi
+110 113 taxi
+110 125 taxi
+111 116 taxi
+111 119 taxi
+112 120 taxi
+113 119 taxi
+113 127 taxi
+114 122 taxi
+114 123 taxi
+115 116 taxi
+115 118 taxi
+115 136 taxi
+116 135 taxi
+117 121 taxi
+117 133 taxi
+118 128 taxi
+119 127 taxi
+119 135 taxi
+120 122 taxi
+120 126 taxi
+120 129 taxi
+121 132 taxi
+122 123 taxi
+122 129 taxi
+122 130 taxi
+123 130 taxi
+123 139 taxi
+124 134 taxi
+124 138 taxi
+125 127 taxi
+125 131 taxi
+125 141 taxi
+126 129 taxi
+126 146 taxi
+127 141 taxi
+127 148 taxi
+128 136 taxi
+128 137 taxi
+129 130 taxi
+129 144 taxi
+129 146 taxi
+129 147 taxi
+130 144 taxi
+131 139 taxi
+131 145 taxi
+132 133 taxi
+132 137 taxi
+132 143 taxi
+133 138 taxi
+133 143 taxi
+133 149 taxi
+134 140 taxi
+135 136 taxi
+135 142 taxi
+137 143 taxi
+138 140 taxi
+138 149 taxi
+139 145 taxi
+139 150 taxi
+141 148 taxi
+142 148 taxi
+143 149 taxi
+144 147 taxi
+145 150 taxi
+146 147 taxi
+1 27 bus
+4 12 bus
+4 30 bus
+5 23 bus
+8 17 bus
+8 28 bus
+12 17 bus
+12 29 bus
+12 30 bus
+13 27 bus
+13 35 bus
+17 29 bus
+23 28 bus
+23 31 bus
+23 42 bus
+27 35 bus
+28 42 bus
+29 38 bus
+30 38 bus
+30 47 bus
+31 42 bus
+31 44 bus
+35 44 bus
+35 60 bus
+38 58 bus
+42 68 bus
+42 74 bus
+47 75 bus
+57 58 bus
+57 68 bus
+57 83 bus
+57 86 bus
+58 75 bus
+58 81 bus
+68 74 bus
+68 86 bus
+68 90 bus
+74 82 bus
+74 90 bus
+74 96 bus
+75 81 bus
+75 101 bus
+81 83 bus
+82 88 bus
+82 96 bus
+83 86 bus
+83 110 bus
+86 90 bus
+86 105 bus
+86 110 bus
+88 91 bus
+88 117 bus
+90 96 bus
+90 105 bus
+90 118 bus
+96 117 bus
+96 118 bus
+101 114 bus
+101 126 bus
+105 110 bus
+105 127 bus
+105 135 bus
+110 127 bus
+114 130 bus
+114 145 bus
+117 118 bus
+117 134 bus
+117 143 bus
+118 135 bus
+126 130 bus
+126 146 bus
+127 135 bus
+127 148 bus
+130 146 bus
+135 148 bus
+1 5 underground
+1 60 underground
+4 29 underground
+4 75 underground
+5 29 underground
+5 68 underground
+29 68 underground
+29 75 underground
+60 68 underground
+60 118 underground
+60 134 underground
+68 118 underground
+68 148 underground
+75 146 underground
+118 134 underground
+118 148 underground
+53 74 ferry
+57 59 ferry
+57 74 ferry
+)";
+
+// A ten-station map for tests and small-scale solvers.
+inline constexpr const char* kTinyMap = R"(
+# Two five-station rings joined by taxi, bus and ferry links; stations 1 and 2
+# share a taxi and a bus link.
+stations 10
+starts 1 4 7 9
+1 2 taxi
+2 3 taxi
+3 4 taxi
+4 5 taxi
+1 5 taxi
+6 7 taxi
+7 8 taxi
+8 9 taxi
+9 10 taxi
+6 10 taxi
+1 6 taxi
+3 8 taxi
+1 2 bus
+2 7 bus
+4 9 bus
+5 10 bus
+3 9 ferry
+)";
+
+}  // namespace catch_the_hidden_evader
+}  // namespace open_spiel
+
+#endif  // OPEN_SPIEL_GAMES_CATCH_THE_HIDDEN_EVADER_MAPS_H_
