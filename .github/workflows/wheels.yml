@@ -4,7 +4,7 @@
 # standard MacOS X, and Windows using MSVC. Each binary wheel is built for
 # x86_64 (and arm64 where supported). Basic API tests are run within the build
 # environment. Full tests (tests that use extra dependencies such as PyTorch,
-# JAX, Tensorflow) are tested in the Github Actions CI environment.
+# JAX) are tested in the Github Actions CI environment.
 name: wheels
 
 on:
@@ -116,7 +116,9 @@ jobs:
           python -m pip install --upgrade setuptools
           python -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh python
-          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TEST_DEPS
+          # Empty when no JAX release supports this Python version.
+          [[ -n "$OPEN_SPIEL_PYTHON_JAX_DEPS" ]] && python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine

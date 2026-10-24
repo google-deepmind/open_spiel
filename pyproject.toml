@@ -50,7 +50,6 @@ full = [
     "pygame",
     "pygraphviz",
     "scipy",
-    "tensorflow",
     "torch",
 ]
 

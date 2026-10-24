@@ -156,6 +156,9 @@ openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTHON_MISC       OFF
 openspiel_optional_dependency(OPEN_SPIEL_BUILDING_WHEEL           OFF
   "Building a Python wheel?")
 
+# Tests tagged "manual" in the BUILD files are only added to CTest with this.
+option(OPEN_SPIEL_RUN_MANUAL_TESTS "Add the tests tagged manual." OFF)
+
 if (OPEN_SPIEL_BUILD_WITH_LIBTORCH AND NOT OPEN_SPIEL_BUILD_WITH_LIBNOP)
   message(FATAL_ERROR
     "OPEN_SPIEL_BUILD_WITH_LIBTORCH requires OPEN_SPIEL_BUILD_WITH_LIBNOP")

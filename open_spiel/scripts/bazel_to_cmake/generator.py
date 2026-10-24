@@ -47,8 +47,19 @@ Contract with the hand-written root CMakeLists.txt:
   relative to python/. A Python test is guarded like a C++ target, from its
   `target_compatible_with` and its deps through Python libraries; a
   dependency on an optional Python package group (label_map.
-  OPTIONAL_PYTHON_GROUPS) adds that group's OPEN_SPIEL_ENABLE_<GROUP> switch,
-  and groups without a switch (TensorFlow) are not run by CMake.
+  OPTIONAL_PYTHON_GROUPS) adds that group's OPEN_SPIEL_ENABLE_<GROUP> switch.
+* A `pytest_test` becomes `open_spiel_pytest(<name> FILES <files...>
+  [DESELECT <ids...>] [ARGS <args...>])`, which runs pytest like the Bazel
+  macro (bazel/python/pytest.bzl) does. `<name>` is the target's
+  `<package>/<name>` relative to python/ (the CTest name is python/<name>);
+  files and deselected test ids are relative to the OpenSpiel root. An empty
+  `tests` runs pytest on the whole package directory, as in Bazel; pytest
+  fails if it collects no test.
+* Tests (C++ and Python) tagged "manual" are guarded by
+  `if(OPEN_SPIEL_RUN_MANUAL_TESTS)` (default OFF), so the default test run
+  leaves them out, like `bazel test //...`. Bazel `timeout`s are not mapped:
+  tests can run slower under CTest than under Bazel (a `short` one took over
+  60s in CI), so the Bazel limits would make CTest flaky.
 """
 
 import collections
@@ -70,9 +81,16 @@ PYTHON_PACKAGE = "python"
 PYTHON_TESTS_OUTPUT = "python_tests.cmake"
 PYTHON_TESTS_PATH = os.path.join(PYTHON_PACKAGE, PYTHON_TESTS_OUTPUT)
 PYTHON_TEST_FUNCTION = "open_spiel_py_test"
+PYTEST_FUNCTION = "open_spiel_pytest"
 PYTHON_TESTS_COMMENT = (
     f"# Python tests, as {PYTHON_TEST_FUNCTION}(<main file relative to "
-    "python/> [args...]).\n")
+    "python/> [args...])\n"
+    f"# or {PYTEST_FUNCTION}(<package/name> FILES ... [DESELECT ...] "
+    "[ARGS ...]).\n")
+# Default `args` of the pytest_test macro.
+PYTEST_DEFAULT_ARGS = ("-s",)
+# Guards the tests tagged "manual".
+MANUAL_TESTS_OPTION = "OPEN_SPIEL_RUN_MANUAL_TESTS"
 BUILD_FILE_NAMES = ("BUILD", "BUILD.bazel")
 
 PYTHON_OPTION = "OPEN_SPIEL_BUILD_WITH_PYTHON"
@@ -114,6 +132,7 @@ for _kind in build_file.PY_TEST_RULES:
       "srcs_version", "tags", "target_compatible_with", "testonly", "timeout",
       "visibility",
   })
+_ALLOWED_ATTRS["pytest_test"] |= {"deselect", "tests"}
 
 # copts the generator may drop: CMake sets flags per compiler, and the root
 # defines OPEN_SPIEL_BUILD_WITH_* globally for enabled options.
@@ -580,13 +599,15 @@ class Workspace:
         raise GenerationError(
             f"{self._where(rule)}: copt {item!r} has no CMake translation")
 
-  def _args(self, rule: build_file.Rule, tokenize: bool = False) -> list[str]:
+  def _args(self, rule: build_file.Rule, tokenize: bool = False,
+            default: Sequence[str] = ()) -> list[str]:
     """Translates test args, mapping repository paths to CMake paths.
 
     Args:
       rule: The test.
       tokenize: Whether to split each arg like Bazel does (Bourne shell
         tokenization, which also removes quotes).
+      default: The args if the rule sets none.
 
     Returns:
       The args, quoted for CMake.
@@ -595,7 +616,7 @@ class Workspace:
       GenerationError: If the args use select().
     """
     context = f"{self._where(rule)}: args"
-    value = rule.attrs.get("args", [])
+    value = rule.attrs.get("args", list(default))
     if not isinstance(value, list):
       raise GenerationError(f"{context}: select() is not supported")
     if tokenize:
@@ -693,10 +714,20 @@ class Workspace:
         lines += _command(
             "add_test",
             ["NAME", self.test_name(rule), "COMMAND", name] + self._args(rule))
-    guard = tuple(sorted(analysis.guard))
+    guard = set(analysis.guard)
+    if rule.kind in _TEST_RULES and self._is_manual(rule):
+      guard.add((MANUAL_TESTS_OPTION, True))
     if guard:
-      lines = _wrap(guard, ["  " + l if l else l for l in lines], "")
+      lines = _wrap(tuple(sorted(guard)),
+                    ["  " + l if l else l for l in lines], "")
     return lines
+
+  def _is_manual(self, rule: build_file.Rule) -> bool:
+    """Whether a test is tagged "manual"."""
+    tags = rule.attrs.get("tags", [])
+    if not isinstance(tags, list):
+      raise GenerationError(f"{self._where(rule)}: tags must be a plain list")
+    return "manual" in tags
 
   def _python_main(self, rule: build_file.Rule) -> str:
     """Path of a Python test's main file relative to the OpenSpiel root."""
@@ -713,15 +744,54 @@ class Workspace:
       if len(candidates) != 1:
         raise GenerationError(f"{context}: cannot tell the main file; set main")
       main = candidates[0]
-    if not isinstance(main, str):
-      raise GenerationError(f"{context}: unsupported main {main!r}")
-    package, name = self._split_file_label(rule, main, f"{context}: main")
+    return self._python_file(rule, main, "main")
+
+  def _python_file(self, rule: build_file.Rule, item: Any, attr: str) -> str:
+    """Path of a Python test file relative to the OpenSpiel root."""
+    context = f"{self._where(rule)}: {attr}"
+    if not isinstance(item, str):
+      raise GenerationError(f"{context}: unsupported value {item!r}")
+    package, name = self._split_file_label(rule, item, context)
     rel = os.path.join(package, name)
     if export_rules.is_excluded(rel):
-      raise GenerationError(f"{context}: {main} is not exported")
+      raise GenerationError(f"{context}: {item} is not exported")
     if self.check_sources and not os.path.isfile(os.path.join(self.root, rel)):
-      raise GenerationError(f"{context}: {main} does not exist")
+      raise GenerationError(f"{context}: {item} does not exist")
     return rel
+
+  def _string_list(self, rule: build_file.Rule, attr: str) -> list[str]:
+    value = rule.attrs.get(attr, [])
+    if not isinstance(value, list) or not all(
+        isinstance(v, str) for v in value):
+      raise GenerationError(
+          f"{self._where(rule)}: {attr} must be a list of strings")
+    return value
+
+  def _pytest_head(self, rule: build_file.Rule) -> tuple[str, list[str]]:
+    """The CTest name (without python/) and arguments of a pytest_test.
+
+    Args:
+      rule: A pytest_test.
+
+    Returns:
+      (name, head): name is `<package>/<name>` relative to python/; head is
+      the quoted arguments of open_spiel_pytest().
+    """
+    name = os.path.relpath(os.path.join(rule.package, rule.name),
+                           PYTHON_PACKAGE)
+    tests = self._string_list(rule, "tests")
+    files = [self._python_file(rule, t, "tests") for t in tests]
+    if not files:
+      files = [rule.package or "."]  # The whole package, as in Bazel.
+    deselect = [os.path.join(rule.package, prefix)
+                for prefix in self._string_list(rule, "deselect")]
+    args = self._args(rule, tokenize=True, default=PYTEST_DEFAULT_ARGS)
+    head = [_quote(name), "FILES"] + [_quote(f) for f in files]
+    if deselect:
+      head += ["DESELECT"] + [_quote(d) for d in deselect]
+    if args:
+      head += ["ARGS"] + args
+    return name, head
 
   def _emit_python_test(
       self, rule: build_file.Rule
@@ -732,9 +802,10 @@ class Workspace:
       rule: A Python test.
 
     Returns:
-      (guard, main, line): guard is None if CMake does not run the test, in
-      which case the line is a comment saying why; main is relative to
-      python/.
+      (guard, name, line): guard is None if CMake does not run the test, in
+      which case the line is a comment saying why; name is the CTest name
+      without its python/ prefix (for py_test, the main file relative to
+      python/).
 
     Raises:
       GenerationError: If the test cannot be translated.
@@ -743,15 +814,23 @@ class Workspace:
     if unknown:
       raise GenerationError(
           f"{self._where(rule)}: unsupported attributes {unknown}")
-    main = os.path.relpath(self._python_main(rule), PYTHON_PACKAGE)
+    if rule.kind == "pytest_test":
+      name, head = self._pytest_head(rule)
+      function = PYTEST_FUNCTION
+    else:
+      name = os.path.relpath(self._python_main(rule), PYTHON_PACKAGE)
+      head = [_quote(name)] + self._args(rule, tokenize=True)
+      function = PYTHON_TEST_FUNCTION
     analysis = self.analyze((rule.package, rule.name))
     if analysis.skip:
       self.skipped.append(f"{self._where(rule)} ({analysis.skip})")
-      return None, main, (f"# {rule.kind} //{rule.package}:{rule.name} "
-                          f"({main}): not run by CMake ({analysis.skip}).")
-    head = [_quote(main)] + self._args(rule, tokenize=True)
-    line = f"{PYTHON_TEST_FUNCTION}({' '.join(head)})"
-    return tuple(sorted(analysis.guard)), main, line
+      return None, name, (f"# {rule.kind} //{rule.package}:{rule.name} "
+                          f"({name}): not run by CMake ({analysis.skip}).")
+    guard = set(analysis.guard)
+    if self._is_manual(rule):
+      guard.add((MANUAL_TESTS_OPTION, True))
+    line = f"{function}({' '.join(head)})"
+    return tuple(sorted(guard)), name, line
 
   def python_tests(self) -> str:
     """Contents of python/python_tests.cmake: every exported Python test.
@@ -774,7 +853,7 @@ class Workspace:
     for package in self.packages.values():
       for rule in package.python_tests:
         try:
-          guard, main, line = self._emit_python_test(rule)
+          guard, name, line = self._emit_python_test(rule)
         except GenerationError as e:
           errors.append(str(e))
           continue
@@ -782,10 +861,10 @@ class Workspace:
         if guard is None:
           skipped.append((key, line))
           continue
-        if main in seen:
-          errors.append(f"{self._where(rule)}: CTest test python/{main} "
-                        f"collides with {seen[main]}")
-        seen[main] = self._where(rule)
+        if name in seen:
+          errors.append(f"{self._where(rule)}: CTest test python/{name} "
+                        f"collides with {seen[name]}")
+        seen[name] = self._where(rule)
         blocks[guard].append((line, key))
     if errors:
       raise GenerationError("\n".join(errors))
