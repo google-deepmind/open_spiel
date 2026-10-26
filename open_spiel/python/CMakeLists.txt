@@ -65,6 +65,7 @@ set(WHEEL_EXCLUDED_PYTHON_TESTS
   algorithms/response_graph_ucb_test.py
   examples/bridge_supervised_learning.py
   examples/hearts_supervised_learning.py
+  examples/matrix_game_example.py
   games/tic_tac_toe_test.py
   ../integration_tests/playthrough_test.py)
 

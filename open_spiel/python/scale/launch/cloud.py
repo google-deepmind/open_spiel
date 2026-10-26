@@ -958,7 +958,11 @@ restore || finish 26
 sync_loop &
 SYNC_PID=$!
 PUBLISH=1
-mapfile -t ARGS < <(attr train-args | base64 -d |
+# A read loop rather than mapfile, which bash 3 (e.g. macOS /bin/bash) lacks.
+ARGS=()
+while IFS= read -r arg; do
+  ARGS+=("$arg")
+done < <(attr train-args | base64 -d |
   venv/bin/python -c 'import json,sys; print("\n".join(json.load(sys.stdin)))')
 echo "run $RUN_URI: training: python -m $MODULE ${ARGS[*]}"
 venv/bin/python -u -m "$MODULE" "${ARGS[@]}" --checkpoint_dir="$W/ckpt" \
