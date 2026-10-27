@@ -79,8 +79,46 @@ export const SCRIPTED: Controller = {
   },
   unavailable_reason: null,
 };
+/**
+ * A bot that plays a trained checkpoint, as a plugin declares it: a
+ * required text setting with no default, and two settings with defaults.
+ */
+export const CHECKPOINT: Controller = {
+  name: 'checkpoint',
+  label: 'Checkpoint',
+  config_schema: {
+    type: 'object',
+    properties: {
+      checkpoint: {
+        type: 'string',
+        description: 'The checkpoint to play.',
+        minLength: 1,
+      },
+      deterministic: {
+        type: 'boolean',
+        default: true,
+        description: 'Whether it plays its most likely move.',
+      },
+      temperature: {
+        type: 'number',
+        default: 1,
+        description: 'The temperature it samples its moves at.',
+        minimum: 0,
+      },
+    },
+    additionalProperties: false,
+    required: ['checkpoint'],
+  },
+  unavailable_reason: null,
+};
 /** Every controller above, in the order a frame offers them. */
-export const CONTROLLERS = [HUMAN_CONTROLLER, RANDOM, MCTS, SCRIPTED];
+export const CONTROLLERS = [
+  HUMAN_CONTROLLER,
+  RANDOM,
+  MCTS,
+  SCRIPTED,
+  CHECKPOINT,
+];
 
 /**
  * A seat played by `controller`. Like the server, it holds the settings it
@@ -97,6 +135,8 @@ export function seatView(
     config: {},
     autoplay: false,
     failure: null,
+    status: 'ready',
+    message: null,
     ...overrides,
   };
 }
@@ -107,7 +147,7 @@ export function frameWith(
   overrides: Partial<Frame> = {},
 ): Frame {
   return {
-    contract_version: 2,
+    contract_version: 7,
     session: {
       id: 'session-1',
       game: 'kuhn_poker',
@@ -135,6 +175,8 @@ export function frameWith(
     observation_text: null,
     information_state_text: null,
     struct: null,
+    observation_struct: null,
+    presentation: null,
     ...overrides,
   };
 }

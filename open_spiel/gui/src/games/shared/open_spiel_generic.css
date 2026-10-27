@@ -1,0 +1,70 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* The rules the connect four and tic-tac-toe gameplay panels share. */
+
+.ogs-panel {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  color: var(--color-text);
+  overflow-y: auto;
+}
+
+/* The client's Gameplay panel draws the panel's padding and frame, so the
+   shell inside it adds none (and another board's .ogs-panel padding does not
+   apply here). */
+.ogs-panel.gameplay-shell {
+  padding: 0;
+  background: none;
+}
+
+/* The notices sit 10 px below the panel's top edge, as in a padded panel:
+   here the 14 px padding is outside the shell. */
+.ogs-panel.gameplay-shell > .gameplay-notice-layer--top {
+  top: -4px;
+}
+
+/* A session error is shown ONCE, as a banner in the Gameplay panel; the other
+   panels stay quiet (see OpenSpielGenericGameplayPanel / StatePanel). */
+.ogs-error {
+  overflow-wrap: anywhere;
+}
+
+.ogs-error {
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--ogs-error-fill);
+  color: var(--color-error-text);
+  border: 1px solid var(--color-border);
+}
+
+/* Status row above a board: whole items wrap onto a new line, a single item
+   never breaks mid-phrase into a ragged multi-line grid. */
+.ogs-state-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 14px;
+  color: var(--ogs-meta-text);
+}
+
+.ogs-state-meta > * {
+  white-space: nowrap;
+}

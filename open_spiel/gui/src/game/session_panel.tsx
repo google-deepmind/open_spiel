@@ -19,7 +19,7 @@ import type {Frame} from '../contract/contract.ts';
 import {CopyableText} from '../controls/copy_button.tsx';
 import type {PanelGroupDefinition} from '../dock/panel_groups.ts';
 import {useGame} from './game_context.ts';
-import {viewerLabel} from './game_defaults.ts';
+import {modeLabel} from './game_defaults.ts';
 
 import './game.css';
 
@@ -43,14 +43,11 @@ function SessionDetails(): JSX.Element {
   const rows: Array<readonly [term: string, value: string]> = [
     ['Game', `${entry.long_name} (${info.game})`],
     ['Session', info.id],
-    ['Viewer', viewerLabel(frame.viewer)],
+    ['Mode', modeLabel(frame.viewer)],
     ['Status', STATUS[frame.status]],
     ['Seats', String(info.num_seats)],
     ['Chance', CHANCE[info.chance_policy]],
-    [
-      'Seed',
-      info.seed === null ? 'Shown to the oracle only' : String(info.seed),
-    ],
+    ['Seed', info.seed === null ? 'Shown in analysis only' : String(info.seed)],
     ['Parameters', JSON.stringify(info.parameters)],
   ];
   return (
@@ -79,7 +76,9 @@ function SessionSeats(): JSX.Element | null {
         return (
           <li key={seat.seat}>
             <strong>{`Player ${String(seat.seat)}:`}</strong> {seat.controller}
-            {seat.autoplay ? ', autoplay' : ''} <em>{`(config: ${config})`}</em>
+            {seat.autoplay ? ', autoplay' : ''}
+            {seat.status === 'preparing' ? ', preparing' : ''}{' '}
+            <em>{`(config: ${config})`}</em>
             {seat.failure !== null && (
               <span className="session-panel__failure">
                 {` Failed: ${seat.failure.error}${
@@ -88,6 +87,9 @@ function SessionSeats(): JSX.Element | null {
                     : `: ${seat.failure.message}`
                 }`}
               </span>
+            )}
+            {seat.status === 'unavailable' && seat.message !== null && (
+              <span className="session-panel__failure">{` ${seat.message}`}</span>
             )}
           </li>
         );

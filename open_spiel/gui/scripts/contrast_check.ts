@@ -101,6 +101,25 @@ export const PAIRS: readonly Pair[] = [
       minimum: TEXT_MINIMUM,
     }),
   ),
+  // A card's rank and suit on its face.
+  ...[
+    '--color-suit-black',
+    '--color-suit-red',
+    '--color-suit-blue',
+    '--color-suit-green',
+  ].map(foreground => ({
+    foreground,
+    background: '--color-card-face',
+    minimum: TEXT_MINIMUM,
+  })),
+  // Either piece, and the selection ring, on either square.
+  ...['--color-piece-light', '--color-piece-dark'].flatMap(foreground =>
+    ['--color-board-light', '--color-board-dark'].map(background => ({
+      foreground,
+      background,
+      minimum: MARK_MINIMUM,
+    })),
+  ),
   ...TABS.map(tab => ({
     foreground: `${tab}-color`,
     background: `${tab}-background-color`,

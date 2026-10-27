@@ -16,11 +16,7 @@ import {describe, expect, it} from 'vitest';
 
 import type {Frame} from '../contract/contract.ts';
 import {entries, frame} from '../testing/frames.ts';
-import {
-  controllerToMove,
-  seatToHandOver,
-  statusLine,
-} from './gameplay_state.ts';
+import {controllerToMove, statusLine} from './gameplay_state.ts';
 
 // A frame whose seat 1 is played by `controller`, with seat 1 to move.
 function seatOneToMove(controller: string, fields: Partial<Frame> = {}): Frame {
@@ -30,15 +26,6 @@ function seatOneToMove(controller: string, fields: Partial<Frame> = {}): Frame {
     seats: shown.seats.map(seat =>
       seat.seat === 1 ? {...seat, controller} : seat,
     ),
-  };
-}
-
-function hidden(shown: Frame, seat: number): Frame {
-  return {
-    ...shown,
-    session: {...shown.session, hides_information: true},
-    viewer: {kind: 'seat', seat},
-    omniscient: false,
   };
 }
 
@@ -62,35 +49,6 @@ describe('controllerToMove', () => {
   it('refuses a mover that is not seated', () => {
     const shown = frame({to_move: {kind: 'seat', seat: 5}});
     expect(() => controllerToMove(shown)).toThrow('not seated');
-  });
-});
-
-describe('seatToHandOver', () => {
-  it('names another person’s seat to move in a game that hides information', () => {
-    expect(seatToHandOver(hidden(seatOneToMove('human'), 0))).toBe(1);
-  });
-
-  it('is null when the viewer’s own seat is to move', () => {
-    expect(seatToHandOver(hidden(seatOneToMove('human'), 1))).toBeNull();
-  });
-
-  it('is null when a controller is to move', () => {
-    expect(seatToHandOver(hidden(seatOneToMove('random'), 0))).toBeNull();
-  });
-
-  it('is null when the game hides nothing', () => {
-    const shown: Frame = {
-      ...seatOneToMove('human'),
-      viewer: {kind: 'seat', seat: 0},
-    };
-    expect(seatToHandOver(shown)).toBeNull();
-  });
-
-  it('is null for the oracle', () => {
-    const shown = hidden(seatOneToMove('human'), 0);
-    expect(
-      seatToHandOver({...shown, viewer: {kind: 'oracle', seat: null}}),
-    ).toBeNull();
   });
 });
 

@@ -18,9 +18,9 @@
 // - the dock: a tab per panel, titled as in src/game/game_panels.ts;
 // - a panel's sections, where a panel has them: a tablist "<Panel> sections"
 //   of tabs, each with its tabpanel, and a "Pop out <section>" button;
-// - the viewer: View's "Perspective" list (or a list or group named "Viewer"
-//   or "View as"), offering "Seat <n>" (or "Player <n>"), "Oracle" and
-//   "Spectator"; with none, the address's `viewer`;
+// - the viewer: the address's `viewer`, `oracle` (analysis, the default),
+//   a seat or `spectator` (a game); View › Perspective chooses the seat
+//   analysis is drawn from, "Seat <n>", and is locked in a game;
 // - Gameplay: the status line, which gives the returns at the end, and the
 //   board, the game's text, a region named "State" or "<seat>'s
 //   observation";
@@ -70,8 +70,6 @@ export const RANDOM: ControllerChoice = {name: 'random', label: 'Random'};
 /** A bot that plays by Monte Carlo tree search. */
 export const MCTS: ControllerChoice = {name: 'mcts', label: 'MCTS'};
 
-const VIEWER_CONTROL = /^(viewer|view as|perspective)$/i;
-
 /** `text`, its regular expression syntax escaped. */
 function escape(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -80,12 +78,6 @@ function escape(text: string): string {
 /** A regular expression matching `text` exactly. */
 export function exactly(text: string): RegExp {
   return new RegExp(`^${escape(text)}$`);
-}
-
-function viewerOption(choice: ViewerChoice): RegExp {
-  if (choice === 'oracle') return /^oracle\b/i;
-  if (choice === 'spectator') return /^spectator\b/i;
-  return new RegExp(`^(seat|player) ${String(choice)}\\b`, 'i');
 }
 
 /** The client, driven through the page. */
@@ -179,46 +171,19 @@ export class App {
 
   /**
    * Views the game as `choice`, and waits for the first frame built for
-   * that viewer.
+   * that viewer. The address names the viewer, as a reload keeps the
+   * session and shows it to the viewer named: the oracle is analysis, a
+   * seat or a spectator a game.
    */
   async setViewer(choice: ViewerChoice): Promise<Frame> {
     // From the frame on screen, which is the answer when `choice` is the
     // viewer already.
     const before = Math.max(0, this.frames.count - 1);
-    let control = await this.viewerControl();
-    if (control === null && (await this.dockTab('View').count()) > 0) {
-      await this.showPanel('View');
-      control = await this.viewerControl();
-    }
-    if (control === null) {
-      // No panel on screen chooses the viewer: the address does, as a
-      // reload keeps the session and shows it to the viewer named.
-      const url = new URL(this.page.url());
-      url.searchParams.set('viewer', String(choice));
-      await this.page.goto(url.toString());
-      return this.frames.waitFor(
-        frame => isViewer(frame.viewer, choice),
-        before,
-        `a frame for viewer ${String(choice)}`,
-      );
-    }
-    const option = viewerOption(choice);
-    const kind = await control.evaluate(element => element.tagName);
-    if (kind === 'SELECT') {
-      const labels = await control.getByRole('option').allTextContents();
-      const label = labels.find(text => option.test(text.trim()));
-      if (label === undefined) {
-        throw new Error(
-          `The viewer list offers no ${String(option)}: ${labels.join(', ')}.`,
-        );
-      }
-      await control.selectOption({label});
-    } else {
-      await control
-        .getByRole('button', {name: option})
-        .or(control.getByRole('radio', {name: option}))
-        .click();
-    }
+    const url = new URL(this.page.url());
+    url.searchParams.set('viewer', String(choice));
+    url.searchParams.delete('viewSeat');
+    await this.page.goto(url.toString());
+    await expect(this.dockTab('Gameplay')).toBeVisible();
     return this.frames.waitFor(
       frame => isViewer(frame.viewer, choice),
       before,
@@ -226,14 +191,15 @@ export class App {
     );
   }
 
-  private async viewerControl(): Promise<Locator | null> {
-    const control = this.page
-      .getByRole('combobox', {name: VIEWER_CONTROL})
-      .or(this.page.getByRole('group', {name: VIEWER_CONTROL}))
-      .or(this.page.getByRole('radiogroup', {name: VIEWER_CONTROL}))
-      .filter({visible: true})
-      .first();
-    return (await control.count()) === 0 ? null : control;
+  /**
+   * Sits at `seat` in analysis: View › Perspective's choice, which draws
+   * the board from that seat and fetches nothing.
+   */
+  async sitAt(seat: number): Promise<void> {
+    const view = await this.showSection('View', 'Perspective');
+    await view
+      .getByRole('combobox', {name: 'Perspective'})
+      .selectOption({label: `Seat ${String(seat)}`});
   }
 
   /** Actions › Legal, in front: the chance outcomes and the legal list. */

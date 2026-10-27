@@ -1,0 +1,280 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* The bidding overlay, the hand-over panel and the status line: the
+   panels drawn over the euchre table (euchre.css). */
+
+/* ============================================
+   Bidding Overlay - floating panel, no blur
+   ============================================ */
+.euchre-bidding-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.euchre-bidding-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--euchre-night-92);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px var(--euchre-black-60);
+  pointer-events: auto;
+}
+
+.euchre-bidding-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--euchre-white);
+}
+
+.euchre-bidding-status {
+  margin: 0;
+  font-size: 12px;
+  color: var(--euchre-white-70);
+}
+
+.euchre-bidding-upcard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.euchre-bidding-upcard-label {
+  font-size: 12px;
+  color: var(--euchre-white);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.euchre-bidding-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.euchre-bidding-suits {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.euchre-bidding-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+}
+
+.euchre-bidding-btn:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.euchre-bidding-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.euchre-bidding-btn--primary {
+  background: linear-gradient(
+    135deg,
+    var(--euchre-blue) 0%,
+    var(--euchre-blue-dark) 100%
+  );
+  color: var(--euchre-white);
+  box-shadow: 0 4px 12px var(--euchre-blue-40);
+}
+
+.euchre-bidding-btn--primary:hover:enabled:not([aria-disabled='true']) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--euchre-blue-50);
+}
+
+.euchre-bidding-btn--secondary {
+  background: var(--euchre-white-10);
+  color: var(--euchre-white);
+  border: 1px solid var(--euchre-white-20);
+}
+
+.euchre-bidding-btn--secondary:hover:enabled:not([aria-disabled='true']) {
+  background: var(--euchre-white-20);
+}
+
+.euchre-bidding-btn--suit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--euchre-white-10);
+  border: 2px solid var(--euchre-transparent);
+}
+
+.euchre-bidding-btn--suit:hover:enabled:not([aria-disabled='true']) {
+  background: var(--euchre-white-20);
+  border-color: var(--euchre-white-30);
+}
+
+.euchre-bidding-btn--red {
+  color: var(--trump-red);
+}
+
+.euchre-bidding-btn--red:hover:enabled:not([aria-disabled='true']) {
+  border-color: var(--trump-red);
+}
+
+.euchre-bidding-btn--black {
+  color: var(--euchre-white);
+}
+
+.euchre-bidding-btn--black:hover:enabled:not([aria-disabled='true']) {
+  border-color: var(--euchre-white-50);
+}
+
+.euchre-bidding-btn__symbol {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.euchre-bidding-btn__name {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.euchre-bidding-trump {
+  font-size: 13px;
+  color: var(--euchre-white-70);
+}
+
+.euchre-red {
+  color: var(--trump-red);
+}
+
+.euchre-bidding-waiting {
+  font-size: 13px;
+  color: var(--euchre-white-50);
+  font-style: italic;
+}
+
+/* ============================================
+   Game Over Display
+   ============================================ */
+.euchre-game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background: var(--euchre-black-85);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  min-width: 220px;
+}
+
+.euchre-game-over__title {
+  color: var(--euchre-white);
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px var(--euchre-black-50);
+}
+
+.euchre-game-over__scores {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.euchre-game-over__team {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: var(--euchre-white-10);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.euchre-game-over__team--winner {
+  background: var(--euchre-gold-20);
+  border: 1px solid var(--euchre-gold-50);
+}
+
+.euchre-game-over__team-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--euchre-white);
+}
+
+.euchre-game-over__cause {
+  max-width: 280px;
+  font-size: 14px;
+  color: var(--euchre-white);
+  text-align: center;
+}
+
+.euchre-game-over__team-points {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--euchre-white);
+}
+
+.euchre-game-over__team-tricks {
+  font-size: 14px;
+  color: var(--euchre-white);
+}
+
+.euchre-game-over__badge {
+  color: var(--euchre-gold);
+  font-weight: 600;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ============================================
+   Message / Status Display
+   ============================================ */
+.euchre-message {
+  position: absolute;
+  /* Above the human seat's label, which sits above its hand. */
+  bottom: 176px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background: var(--euchre-black-75);
+  color: var(--euchre-white);
+  border-radius: 6px;
+  font-size: 13px;
+  backdrop-filter: blur(4px);
+  z-index: 15;
+  white-space: nowrap;
+}

@@ -17,7 +17,9 @@
 
 import argparse
 from collections.abc import Sequence
+import faulthandler
 import ipaddress
+import math
 import pathlib
 import signal
 import threading
@@ -26,8 +28,14 @@ import types
 from absl import logging
 
 from open_spiel.python.gui import api
+from open_spiel.python.gui import builds
+from open_spiel.python.gui import contract
+from open_spiel.python.gui import controllers
 from open_spiel.python.gui import health_report
 from open_spiel.python.gui import loader
+from open_spiel.python.gui import mcts_controller
+from open_spiel.python.gui import mcts_search
+from open_spiel.python.gui import plugins
 from open_spiel.python.gui import server as server_lib
 from open_spiel.python.gui import static
 from open_spiel.python.gui import store
@@ -42,6 +50,17 @@ DISCLAIMER = (
     "machine. It is not designed or reviewed as a production or secured "
     "system: do not expose it to untrusted networks or users."
 )
+
+
+def _seconds(value: str) -> float:
+  """Parses a positive, finite number of seconds, for argparse."""
+  try:
+    seconds = float(value)
+  except ValueError as e:
+    raise argparse.ArgumentTypeError(f"{value!r} is not a number") from e
+  if not (math.isfinite(seconds) and seconds > 0):
+    raise argparse.ArgumentTypeError(f"{value!r} is not a positive number")
+  return seconds
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
@@ -89,7 +108,61 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
       default=static.DEFAULT_ROOT,
       help="The directory of the built browser client.",
   )
+  parser.add_argument(
+      "--controllers",
+      action="append",
+      default=[],
+      metavar="MODULE[,MODULE...]",
+      help=(
+          "Controller plugins to load before serving: modules, each with a "
+          "function register_into(controllers) that registers its bots with "
+          f"controllers.register. {plugins.AUTO!r} loads every plugin that "
+          "an installed distribution declares in the entry-point group "
+          f"{plugins.ENTRY_POINT_GROUP!r}. Repeatable. Without this flag no "
+          "plugin is loaded. A plugin that cannot be imported, has no "
+          "register_into, or fails to register stops the server starting."
+      ),
+  )
+  parser.add_argument(
+      "--move-budget-seconds",
+      type=_seconds,
+      default=controllers.DEFAULT_MOVE_BUDGET_SECONDS,
+      metavar="SECONDS",
+      help=(
+          "How long a controller may take to choose a move. One that takes "
+          "longer fails, and its seat pauses. Default: %(default)g."
+      ),
+  )
+  parser.add_argument(
+      "--build-budget-seconds",
+      type=_seconds,
+      default=builds.DEFAULT_BUDGET_SECONDS,
+      metavar="SECONDS",
+      help=(
+          "How long a controller may take to be built, as a bot loads and "
+          "warms up a trained model. Its seat shows it preparing meanwhile; "
+          "one that takes longer leaves its seat unavailable, and the "
+          "session paused. Default: %(default)g."
+      ),
+  )
   return parser.parse_args(argv)
+
+
+def load_plugins(values: Sequence[str]) -> tuple[str, ...]:
+  """Loads the controller plugins that `--controllers` names.
+
+  Args:
+    values: The `--controllers` values, each comma separated.
+
+  Returns:
+    The names of the controllers the plugins registered.
+
+  Raises:
+    plugins.PluginError: If a plugin fails to load or register.
+  """
+  return plugins.load(
+      [name for value in values for name in plugins.parse(value)]
+  )
 
 
 def allowed_hosts(host: str, extra: Sequence[str]) -> frozenset[str]:
@@ -142,11 +215,56 @@ def log_disclaimer(host: str) -> None:
   )
 
 
+def configure_mcts() -> None:
+  """Sets MCTS's limits by how the served pyspiel's C++ MCTS bounds a search.
+
+  Probes once (`mcts_search.limits`) and logs what it found.
+  """
+  probe = mcts_search.limits()
+  controllers.configure_mcts(probe.limits)
+  maximum = mcts_controller.SIMULATIONS[probe.limits].maximum
+  logging.info(
+      "C++ MCTS limits: %s (the probe's search, given %d simulations and "
+      "%g s, ran %d simulations in %.1f ms); max_simulations is at most %d%s.",
+      probe.limits.value,
+      mcts_search.PROBE_SIMULATIONS,
+      mcts_search.PROBE_SECONDS,
+      probe.simulations,
+      probe.seconds * 1000,
+      maximum,
+      (
+          ", with a wall-clock backstop inside the move budget"
+          if probe.limits == contract.MctsLimits.SIMULATIONS_OR_CLOCK
+          else ", with no wall-clock time"
+      ),
+  )
+
+
+def enable_crash_stacks() -> None:
+  """Makes a crash of the server print every thread's Python stack.
+
+  A fault in native code (a segmentation fault, an abort) kills the process
+  before Python can log anything; with this, stderr shows where each thread
+  was. Already enabled by `python -X faulthandler` or PYTHONFAULTHANDLER, it
+  is left as it is.
+  """
+  if not faulthandler.is_enabled():
+    faulthandler.enable(all_threads=True)
+
+
 def main(argv: Sequence[str] | None = None) -> None:
   """Serves until interrupted or terminated, then shuts down cleanly."""
   args = parse_args(argv)
   logging.set_verbosity(logging.INFO)
+  enable_crash_stacks()
   log_disclaimer(args.host)
+  controllers.set_move_budget(args.move_budget_seconds)
+  builds.set_budget_seconds(args.build_budget_seconds)
+  # Before the server: the catalogue and the health report read the
+  # registry once. A plugin that fails stops the start here.
+  configure_mcts()
+  if args.controllers:
+    load_plugins(args.controllers)
   server = server_lib.Server(
       (args.host, args.port),
       api.Api(

@@ -1,0 +1,410 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+/* The gin board (gin_rummy_board_surface.tsx): felt, then ONE shared <Table>
+   fitted to the panel. Cards, their states (GIN_CARD_STYLE.tags) and the
+   board's scale are the card library's; this file styles only gin's own DOM:
+   the panel, the felt, the grid panels and the action and stats regions.
+   Colours are tokens (the --gin-* block of src/styles/tokens.css). */
+
+/* The Gameplay panel's content. */
+.ogs-panel {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.ogs-status {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--color-surface-sunken);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+/* The positioned box the notices are drawn over. */
+.gin-gameplay {
+  position: relative;
+}
+
+/* The notices are absolutely placed over the top of the board, as the
+   Gameplay panel's own are, so showing or hiding one never moves the cards
+   under the pointer. The layer passes clicks through to the board. */
+.gin-notices {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(560px, calc(100% - 24px));
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.gin-notices:empty {
+  display: none;
+}
+
+/* An error over the board: the session's, the hand result's, a laydown's. */
+.gin-notice {
+  box-shadow: 0 4px 14px var(--color-shadow);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--gin-fault-fill);
+  color: var(--gin-fault-text);
+  font-size: 13px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.gin-render-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  /* The shared felt token; the shared table surface sets it, and the
+     texture, inline. */
+  background-color: var(--color-felt);
+}
+
+.gin-render-surface {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  background: var(--table-texture, none), var(--color-felt);
+  color: var(--color-felt-text);
+}
+
+/* The felt under the grid, for a symbol-only card in an overlapped cell (the
+   library's symbol-corner slots fill their box with it, so a dead or known
+   symbol never lies over a neighbour's face). It follows the shared surface
+   colour; a normal grid's panel darkens it as the panel does. */
+.gin-board {
+  --pcard-symbol-backing: var(--color-felt);
+}
+.gin-board--grid-normal {
+  --pcard-symbol-backing: var(--gin-grid-backing);
+}
+
+/* The last turn's mark: a short, thin line in a pale tint of the felt, just
+   outside the card on its side toward the table's middle. It marks the pile
+   the turn drew from, the upcard it took and the card it discarded, and
+   stays until the next turn: legible after looking away, with no glow,
+   badge or banner. It arrives as a short highlight: drawn the card's full
+   width and thicker, it settles into the short line over 500 ms at Normal
+   (1.25 s at Slow). At Instant and under reduced motion it is simply
+   there. */
+.gin-move-cue {
+  position: absolute;
+  left: 28%;
+  right: 28%;
+  height: max(2px, calc(var(--card-w, 72px) * 0.035));
+  border-radius: 999px;
+  background: var(--gin-cue);
+  pointer-events: none;
+  animation: gin-move-cue-in calc(500ms * var(--anim-scale, 1)) ease-out;
+}
+.gin-move-cue[data-side='below'] {
+  top: calc(100% + max(3px, calc(var(--card-w, 72px) * 0.06)));
+}
+.gin-move-cue[data-side='above'] {
+  bottom: calc(100% + max(3px, calc(var(--card-w, 72px) * 0.06)));
+}
+@keyframes gin-move-cue-in {
+  from {
+    opacity: 0;
+    transform: scale(2.2, 1.8);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(2.2, 1.8);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gin-move-cue {
+    animation: none;
+  }
+}
+
+/* The table's box: the library fits the board inside it ('contain'). Its own
+   stacking context, so the grid panels (z-index -1) sit on the felt, under
+   the cards. */
+.gin-board {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px;
+  box-sizing: border-box;
+  isolation: isolate;
+  display: flex;
+}
+
+/* Pass, Knock and Sort at the foot of a scrolling board (<Table foot>): in a
+   row, centred, held in view on a band of the felt. While the table is
+   scrolled up the bar lies over its cards; only the buttons take the
+   pointer. */
+.gin-board__pinned-actions {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+  background: var(--gin-pinned-band);
+  pointer-events: none;
+}
+
+.gin-board__pinned-actions .gin-action {
+  pointer-events: auto;
+}
+
+.gin-actions.gin-actions--pinned {
+  height: auto;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.gin-actions--pinned .gin-action {
+  min-width: 5.5em;
+}
+
+.gin-actions--pinned .gin-action--sort {
+  margin-top: 0;
+  margin-left: 8px;
+}
+
+.gin-grid-panel {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: calc(var(--card-w) * 0.14);
+  background: var(--gin-grid-panel);
+  pointer-events: none;
+}
+
+/* Empty grid cells (hidden per grid style and variant by the layout's
+   'hide-empty' slot tag) and centring (fit="contain") are the library's. */
+
+/* ---- Regions: stats (left of the stock) and actions (right of the upcard). ---- */
+
+.gin-actions {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: calc(var(--card-w) * 0.07);
+  font-size: max(12px, calc(var(--card-w) * 0.2));
+  line-height: 1.25;
+}
+
+/* The stats box is a size container: the stats tell the wide layout's column
+   beside the stock (about as tall as it is wide) from the narrow layout's
+   full-width row below the supply by its shape. In the column the figures
+   and the turn line stack, right-aligned against the stock; in the row they
+   sit side by side. The turn line wraps inside its own box either way. */
+.gin-stats-box {
+  height: 100%;
+  container-type: size;
+}
+
+.gin-stats {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.35em;
+  /* 0.2 card widths: gin_rummy_layout.ts GIN_STATS_FONT, which the layout
+     sizes the stats region for. --fit-scale is the safety net
+     (useFitFontScale) and never takes the text under 12 px. */
+  font-size: max(12px, calc(var(--card-w) * 0.2 * var(--fit-scale, 1)));
+  line-height: 1.25;
+  text-align: right;
+  color: var(--gin-stats-text);
+}
+
+.gin-stats__figures {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35em;
+}
+
+.gin-stat {
+  white-space: nowrap;
+}
+
+/* The returns wrap between players, never inside one. */
+.gin-stat--returns {
+  white-space: normal;
+}
+
+.gin-stat__part {
+  white-space: nowrap;
+}
+
+/* The wide layout's stats are as tall as their longest text, which lifts
+   the piles to their foot: shorter text sits there too, against the stock. */
+.gin-stats-region--wide .gin-stats {
+  justify-content: flex-end;
+}
+
+.gin-stat strong {
+  font-size: 1.12em;
+  color: var(--gin-stats-strong);
+}
+
+.gin-stats__turn {
+  font-weight: 600;
+  font-size: 1.05em;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  column-gap: 0.4em;
+}
+
+@container (min-aspect-ratio: 3/1) {
+  .gin-stats {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    column-gap: 1.2em;
+  }
+
+  .gin-stats__figures {
+    flex: none;
+  }
+
+  .gin-stats__turn {
+    flex: 0 1 auto;
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+.gin-stats__note {
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.gin-action {
+  min-width: calc(var(--card-w) * 1.3);
+  white-space: nowrap;
+  font: inherit;
+  padding: 0.35em 0.9em;
+  border-radius: 0.6em;
+  border: 1px solid var(--gin-action-border);
+  background: var(--gin-action-fill);
+  color: var(--gin-action-text);
+  transition:
+    background calc(0.2s * var(--anim-scale, 1)) ease,
+    color calc(0.2s * var(--anim-scale, 1)) ease;
+}
+
+.gin-action:not(:disabled):not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.gin-action:disabled {
+  cursor: not-allowed;
+  background: var(--gin-action-disabled-fill);
+  color: var(--gin-action-disabled-text);
+  border-color: var(--gin-action-disabled-border);
+}
+
+.gin-action--primary {
+  background: var(--gin-action-primary-fill);
+  border-color: var(--gin-action-primary-border);
+  color: var(--gin-action-primary-text);
+}
+
+.gin-action:not(:disabled):not([aria-disabled='true']):hover {
+  filter: brightness(1.15);
+}
+
+.gin-action:focus-visible {
+  outline: 2px solid var(--gin-focus-ring);
+  outline-offset: 2px;
+}
+
+.gin-action--sort {
+  margin-top: calc(var(--card-w) * 0.08);
+}
+
+/* .gin-laydown-bar is the action region while the knock's laydown compose is
+   open (Done replaces Pass and Knock). It adds no box of its own, so the
+   table never rescales when a laydown starts. */
+
+/* The hand's accounting (components/hand_result.tsx), in the shared drawer,
+   which is portalled to the body: plain text, a definition list per player.
+   Colours are the drawer's own. */
+.gin-hand-result__headline {
+  font-weight: 600;
+}
+
+.gin-hand-result__seat h3 {
+  margin: 1em 0 0.35em;
+  font-size: 1em;
+}
+
+.gin-hand-result__seat dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25em 1em;
+  margin: 0;
+}
+
+.gin-hand-result__seat dt {
+  font-weight: 600;
+}
+
+.gin-hand-result__seat dd {
+  margin: 0;
+}
+
+/* A display fault the board recovered from (oneCardOnePlace): out of flow
+   at the board's top-left (absolute with no offsets keeps its static place),
+   so it never moves a card, and loud enough to report. */
+.gin-board__fault {
+  position: absolute;
+  z-index: 5;
+  max-width: 90%;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--gin-fault-fill);
+  color: var(--gin-fault-text);
+  font-size: 13px;
+  line-height: 1.3;
+}

@@ -1,0 +1,341 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* The felt and its info box (felt_table.tsx): the felt fills the Gameplay
+   panel; the box sits in its top-left corner and takes only its own height;
+   the cards lay out over the whole felt and keep clear of the box's corner
+   (felt_keep_out.ts). Text is never under 12 px and nothing is
+   dimmed. */
+
+/* A Gameplay panel that holds a felt: no frame, no gutter, the felt to the
+   panel's edges (the game adds `felt-shell` to its GameplayShell). */
+.ogs-panel.felt-shell {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+.felt-shell > .felt-wrapper {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.felt-table {
+  container: felt-table / inline-size;
+  box-sizing: border-box;
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--table-texture, none), var(--color-felt);
+  color: var(--color-felt-text);
+  font-size: 14px;
+  line-height: 1.35;
+  font-family: system-ui, sans-serif;
+}
+.felt-table__grid {
+  --felt-info-width: 232px;
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+/* No narrower on a small felt: the box floats over its corner and only the
+   rows it reaches yield, so a narrower box would only make it taller (and
+   reach more rows). */
+@container felt-table (min-width: 1200px) {
+  .felt-table__grid {
+    --felt-info-width: 264px;
+  }
+}
+
+/* The box: its own height in the corner, over the felt. Taller than the
+   felt, it scrolls inside (its prompt and buttons come first). */
+.felt-table__info {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  width: var(--felt-info-width);
+  max-height: calc(100% - 20px);
+  box-sizing: border-box;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 10px;
+}
+/* The cards: the whole felt. */
+.felt-table__cards {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+  position: relative;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* A phone: the box over the cards, still on the felt, at most a third of
+   the height (it scrolls inside). */
+@container felt-table (max-width: 559px) {
+  .felt-table__grid {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .felt-table__info {
+    position: static;
+    grid-column: 1;
+    grid-row: 1;
+    width: auto;
+    max-height: 34vh;
+    margin: 6px 6px 0;
+  }
+  .felt-table__cards {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 4px;
+  }
+}
+
+/* ---- The info box. Translucent over the felt (its texture shows through),
+   felt text; the theme's own tokens re-pointed inside it so a game's score
+   table and buttons read on the felt without restyling each one. */
+.table-info {
+  --color-text-primary: var(--color-felt-text);
+  --color-text-secondary: var(--color-felt-muted);
+  --color-text-muted: var(--color-felt-muted);
+  --color-border: var(--felt-info-border);
+  --color-border-strong: var(--felt-info-border-strong);
+  --color-panel-bg: var(--color-none);
+  --color-panel-border: var(--color-none);
+  --color-surface-raised: var(--color-none);
+  --color-ghost-button-bg: var(--felt-info-ghost);
+  --color-link: var(--color-felt-text);
+  --color-success-text: var(--color-felt-text);
+  --color-warning-text: var(--color-felt-text);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-radius: 10px;
+  background: var(--felt-info-fill);
+  border: 1px solid var(--felt-info-edge);
+  box-shadow: 0 2px 10px var(--felt-info-shadow);
+  color: var(--color-felt-text);
+  font-size: 14px;
+  line-height: 1.35;
+  font-family: system-ui, sans-serif;
+}
+.table-info p {
+  margin: 0;
+}
+/* Where the game stands: small capitals, one line. */
+.table-info__progress {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.3;
+  font-family: system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Whose turn: the line the eye comes to first; two lines reserved so a
+   longer prompt never moves the buttons under it. */
+.table-info__prompt {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.3;
+  font-family: system-ui, sans-serif;
+  min-height: 2.6em;
+  overflow-wrap: anywhere;
+}
+.table-info__prompt[data-done='true'] {
+  font-size: 17px;
+}
+.table-info__hint {
+  font-size: 13px;
+  line-height: 1.4;
+  font-family: system-ui, sans-serif;
+  color: var(--color-felt-text);
+}
+/* No hint: no line and no gap for it. */
+.table-info__hint[data-empty='true'] {
+  display: none;
+}
+.table-info__hint[data-refusal='true'] {
+  font-weight: 600;
+  border-left: 3px solid var(--color-focus);
+  padding-left: 6px;
+}
+.table-info__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+.table-info__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+  min-width: 0;
+}
+.table-info__title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.3;
+  font-family: system-ui, sans-serif;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.table-info__title small {
+  font-weight: 400;
+  font-size: 12px;
+}
+
+/* The info box's buttons (a game may use its own classes; these are the
+   shared ones): light on the felt, the primary gold. */
+.table-info__btn {
+  box-sizing: border-box;
+  min-height: 34px;
+  max-width: 100%;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.25;
+  font-family: system-ui, sans-serif;
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-ghost-button-bg);
+  color: var(--color-felt-text);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+.table-info__btn small {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.3;
+  font-family: system-ui, sans-serif;
+}
+.table-info__btn:not(:disabled):not([aria-disabled='true']) {
+  cursor: pointer;
+}
+.table-info__btn:hover:not(:disabled):not([aria-disabled='true']),
+.table-info__btn:focus-visible {
+  border-color: var(--color-felt-text);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+.table-info__btn--primary {
+  background: var(--color-felt-text);
+  color: var(--color-felt-dark);
+  border-color: var(--color-felt-text);
+}
+.table-info__btn--primary small {
+  color: inherit;
+}
+.table-info__btn--danger {
+  background: var(--felt-danger-fill);
+  color: var(--felt-danger-ink);
+  border-color: var(--felt-danger-edge);
+}
+.table-info__btn:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+}
+.table-info__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.table-info__row > .table-info__btn {
+  flex: 1 1 auto;
+}
+
+/* A score table in the box: tabular figures, seats as columns. */
+.table-info__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.3;
+  font-family: system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.table-info__table th,
+.table-info__table td {
+  text-align: right;
+  padding: 2px 3px;
+  vertical-align: baseline;
+}
+.table-info__table th:first-child,
+.table-info__table td:first-child {
+  text-align: left;
+}
+.table-info__table tbody th {
+  font-weight: 400;
+}
+.table-info__table thead th {
+  font-weight: 700;
+}
+.table-info__table small {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.2;
+  font-family: system-ui, sans-serif;
+}
+.table-info__table tr.table-info__total th,
+.table-info__table tr.table-info__total td {
+  font-weight: 700;
+  border-top: 1px solid var(--color-border-strong);
+}
+.table-info details summary {
+  font-weight: 600;
+}
+.table-info details summary:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+.table-info details[open] summary {
+  margin-bottom: 4px;
+}

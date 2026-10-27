@@ -16,13 +16,19 @@
 """Tests for the command line."""
 
 import contextlib
+import http
+import http.client
 import io
 import pathlib
 import queue
+import re
+import signal
 import subprocess
 import sys
 import threading
+import time
 import unittest
+import urllib.parse
 
 from absl.testing import absltest
 
@@ -105,6 +111,80 @@ class DisclaimerTest(absltest.TestCase):
     self.assertIn("no authentication", message)
 
 
+# How long the crash test waits for the server to answer, then to settle.
+_HEALTH_PATIENCE_SECONDS = 120.0
+
+
+def _served_url(serving: str) -> str:
+  """Returns the URL in the server's "Serving ... at <url>" line."""
+  match = re.fullmatch(r"Serving OpenSpiel games at (\S+)\n?", serving)
+  if match is None:
+    raise AssertionError(f"Expected the Serving line, read {serving!r}.")
+  return match.group(1)
+
+
+def _wait_for_health(url: str, process: subprocess.Popen[str]) -> None:
+  """Waits until `url`'s /api/health answers 200, failing loud on timeout."""
+  parts = urllib.parse.urlsplit(url)
+  assert parts.hostname is not None and parts.port is not None, url
+  deadline = time.monotonic() + _HEALTH_PATIENCE_SECONDS
+  last: object = None
+  while True:
+    if process.poll() is not None:
+      raise AssertionError(
+          f"The server exited ({process.returncode}) before /api/health"
+          " answered."
+      )
+    # A plain connection: no HTTP proxy from the environment applies.
+    connection = http.client.HTTPConnection(
+        parts.hostname, parts.port, timeout=10
+    )
+    try:
+      connection.request("GET", "/api/health")
+      response = connection.getresponse()
+      response.read()
+      if response.status == http.HTTPStatus.OK:
+        return
+      last = response.status
+    except OSError as error:  # Refused, reset or timed out: not up yet.
+      last = error
+    finally:
+      connection.close()
+    if time.monotonic() > deadline:
+      raise AssertionError(
+          f"{url}api/health did not answer 200 within"
+          f" {_HEALTH_PATIENCE_SECONDS:g} s; last: {last!r}."
+      )
+    time.sleep(0.05)
+
+
+def _thread_count(process: subprocess.Popen[str]) -> int:
+  """Returns how many threads `process` runs, from /proc."""
+  return len(list(pathlib.Path(f"/proc/{process.pid}/task").iterdir()))
+
+
+def _wait_for_thread_count(process: subprocess.Popen[str], count: int) -> None:
+  """Waits until `process` runs at most `count` threads, failing loud."""
+  if process.poll() is not None:
+    raise AssertionError(
+        f"The server exited ({process.returncode}) before its threads were"
+        " counted."
+    )
+  deadline = time.monotonic() + _HEALTH_PATIENCE_SECONDS
+  while (now := _thread_count(process)) > count:
+    if process.poll() is not None:
+      raise AssertionError(
+          f"The server exited ({process.returncode}) while the test waited"
+          " for its threads to settle."
+      )
+    if time.monotonic() > deadline:
+      raise AssertionError(
+          f"The server still runs {now} threads, not {count}, after"
+          f" {_HEALTH_PATIENCE_SECONDS:g} s."
+      )
+    time.sleep(0.01)
+
+
 class MainTest(absltest.TestCase):
 
   @unittest.skipIf(not sys.executable, "No Python interpreter to start.")
@@ -137,6 +217,52 @@ class MainTest(absltest.TestCase):
     self.assertRegex(
         line, r"^Serving OpenSpiel games at http://127\.0\.0\.1:\d+/\n$"
     )
+
+  @unittest.skipUnless(
+      pathlib.Path("/proc/self/task").is_dir(),
+      "Needs /proc/<pid>/task to see the server's threads exit.",
+  )
+  def test_a_crash_prints_every_threads_stack(self) -> None:
+    # A fault in native code kills the process before Python logs anything;
+    # the server must still leave the stacks of its threads on stderr. A
+    # SIGSEGV sent to it takes the path a segmentation fault takes.
+    client_dir = self.create_tempdir().full_path
+    lines: queue.Queue[str] = queue.Queue()
+    with subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "open_spiel.python.gui",
+            "--port=0",
+            f"--client-dir={client_dir}",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    ) as process:
+      assert process.stdout is not None
+      stdout = process.stdout
+      threading.Thread(
+          target=lambda: lines.put(stdout.readline()), daemon=True
+      ).start()
+      try:
+        serving = lines.get(timeout=120)
+        idle = _thread_count(process)
+        # "Serving" is printed before `serve_forever` starts; under load the
+        # signal could land while the main thread is still printing. An
+        # answered request proves `serve_forever` is running.
+        _wait_for_health(_served_url(serving), process)
+        # The request's handler thread outlives the response by a moment;
+        # a fault while it exits cuts the stack dump short (faulthandler
+        # writes "File ???" and stops), so wait for it to be gone.
+        _wait_for_thread_count(process, idle)
+        process.send_signal(signal.SIGSEGV)
+        _, stderr = process.communicate(timeout=120)
+      finally:
+        process.kill()
+    self.assertEqual(process.returncode, -signal.SIGSEGV, stderr)
+    self.assertIn("Fatal Python error: Segmentation fault", stderr)
+    self.assertRegex(stderr, r"in serve_forever")
 
 
 if __name__ == "__main__":

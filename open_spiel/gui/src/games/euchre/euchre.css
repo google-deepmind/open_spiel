@@ -1,0 +1,482 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* Euchre Game Styles */
+
+/* ============================================
+   CSS Variables
+   ============================================ */
+.euchre-table {
+  --card-width-sm: 60px;
+  --card-width-md: 80px;
+  --card-width-lg: 100px;
+  --card-aspect-ratio: 1.4;
+
+  --card-overlap: 25px;
+  --selection-lift: 20px;
+
+  --felt-color: var(--euchre-felt);
+  --felt-dark: var(--euchre-felt-dark);
+  --felt-border: var(--euchre-felt-border);
+
+  --selection-glow: var(--euchre-gold-60);
+  --playable-glow: var(--euchre-sky-40);
+
+  --transition-fast: calc(0.15s * var(--anim-scale, 1)) ease;
+  --transition-normal: calc(0.25s * var(--anim-scale, 1)) ease;
+
+  --trump-red: var(--euchre-red);
+  --trump-black: var(--euchre-ink);
+}
+
+/* ============================================
+   Card Component
+   ============================================ */
+.euchre-card {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--euchre-white);
+  box-shadow:
+    0 2px 4px var(--euchre-black-20),
+    0 1px 2px var(--euchre-black-10);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    filter var(--transition-fast);
+  transform-origin: center bottom;
+}
+
+.euchre-card--sm {
+  width: var(--card-width-sm);
+  height: calc(var(--card-width-sm) * var(--card-aspect-ratio));
+  border-radius: 5px;
+}
+
+.euchre-card--md {
+  width: var(--card-width-md);
+  height: calc(var(--card-width-md) * var(--card-aspect-ratio));
+  border-radius: 6px;
+}
+
+.euchre-card--lg {
+  width: var(--card-width-lg);
+  height: calc(var(--card-width-lg) * var(--card-aspect-ratio));
+  border-radius: 8px;
+}
+
+.euchre-card--back {
+  /* The library back covers the card; any gap shows its paper, never a
+     flat colour of its own. */
+  background: var(--card-back-paper);
+}
+
+.euchre-card--selected {
+  transform: translateY(calc(-1 * var(--selection-lift)));
+  box-shadow: 0 4px 8px var(--euchre-black-30);
+}
+
+.euchre-card--playable:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.euchre-card--playable:hover:not([aria-disabled='true']) {
+  transform: translateY(-8px);
+  box-shadow:
+    0 6px 12px var(--euchre-black-25),
+    0 0 15px var(--playable-glow);
+}
+
+.euchre-card--playable:active {
+  transform: translateY(-4px);
+}
+
+.euchre-card--selected.euchre-card--playable:hover:not([aria-disabled='true']) {
+  transform: translateY(calc(-1 * var(--selection-lift) - 4px));
+}
+
+.euchre-card--disabled {
+  filter: grayscale(40%) brightness(0.8);
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Card Fan Layout
+   ============================================ */
+.euchre-card-fan {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  /* DEBUG: border: 2px solid yellow; */
+}
+
+.euchre-card-fan--horizontal {
+  flex-direction: row;
+}
+
+.euchre-card-fan--vertical {
+  flex-direction: column;
+  align-items: center;
+}
+
+.euchre-card-fan__card {
+  position: absolute;
+  transform-origin: center bottom;
+}
+
+/* ============================================
+   Trick Pile (Center)
+   ============================================ */
+.euchre-trick-pile {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.euchre-trick-pile__card {
+  position: absolute;
+  /* transforms applied via inline style in JS */
+}
+
+/* ============================================
+   Table Layout
+   ============================================ */
+.euchre-table {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  background: linear-gradient(
+    145deg,
+    var(--felt-color) 0%,
+    var(--felt-dark) 100%
+  );
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 100px var(--euchre-black-30),
+    0 4px 20px var(--euchre-black-40);
+  box-sizing: border-box;
+}
+
+.euchre-table::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ============================================
+   Team Scores Display
+   ============================================ */
+.euchre-team-scores {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 12px;
+  z-index: 20;
+}
+
+.euchre-team-score {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--euchre-black-60);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--euchre-white);
+}
+
+.euchre-team-score__label {
+  font-weight: 600;
+}
+
+.euchre-team-score__value {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* ============================================
+   Trump Indicator
+   ============================================ */
+/* Top-right, in the chips' row: at bottom-right it covered the last card of
+ * the human hand. Compact, so it fits beside the chips on a narrow table. */
+.euchre-trump-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 3px 10px;
+  background: var(--euchre-black-70);
+  border-radius: 8px;
+  z-index: 20;
+}
+
+.euchre-trump-indicator__label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--euchre-white-60);
+}
+
+.euchre-trump-indicator__suit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--euchre-white);
+}
+
+.euchre-trump-indicator__suit--red {
+  color: var(--trump-red);
+}
+
+.euchre-trump-indicator__suit--black {
+  color: var(--euchre-white);
+}
+
+.euchre-trump-indicator__symbol {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.euchre-trump-indicator__name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.euchre-trump-indicator__alone {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--euchre-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* ============================================
+   Player Sections
+   ============================================ */
+.euchre-player-section {
+  position: absolute;
+  display: inline-flex;
+  width: fit-content;
+  height: fit-content;
+  /* DEBUG: border: 2px solid magenta; */
+}
+
+/* Below the score chips' and trump badge's row, so neither sits on the top
+ * seat's cards. */
+.euchre-player-section--top {
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 208px;
+}
+
+.euchre-player-section--bottom {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 208px;
+}
+
+.euchre-player-section--left {
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.euchre-player-section--right {
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.euchre-player-info {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+  /* DEBUG: border: 2px solid cyan; */
+}
+
+/* The top and bottom labels sit below / above their hand, inside the felt,
+ * as the side seats' labels do. Beside the hand (translateX(+-100%)) they ran
+ * off the table and were clipped. */
+.euchre-player-section--top .euchre-player-info {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-top: 6px;
+  white-space: nowrap;
+}
+
+.euchre-player-section--bottom .euchre-player-info {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-bottom: 6px;
+  white-space: nowrap;
+}
+
+/* The side labels sit below their hands and stay inside the hand's column
+ * (width: 100%, wrapping). Above the hands they shared a band with the top
+ * seat's label (under its hand) and ran into it in the docked 1280/1024
+ * panel; unconstrained below, they reach the turn message on a phone. */
+.euchre-player-section--left .euchre-player-info,
+.euchre-player-section--right .euchre-player-info {
+  width: 100%;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.euchre-player-section--left .euchre-player-info .euchre-player-name,
+.euchre-player-section--right .euchre-player-info .euchre-player-name {
+  white-space: normal;
+}
+
+.euchre-player-section--left .euchre-player-info {
+  bottom: 0;
+  left: 0;
+  transform: translateY(100%);
+  padding-top: 8px;
+}
+
+.euchre-player-section--right .euchre-player-info {
+  bottom: 0;
+  right: 0;
+  transform: translateY(100%);
+  padding-top: 8px;
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.euchre-player-name {
+  color: var(--euchre-white);
+  font-weight: 500;
+  font-size: 13px;
+  text-shadow: 0 1px 3px var(--euchre-black-70);
+  white-space: nowrap;
+  /* DEBUG: border: 1px solid lime; */
+}
+
+.euchre-player-name--active {
+  color: var(--euchre-gold);
+}
+
+.euchre-player-badges {
+  display: flex;
+  gap: 4px;
+}
+
+.euchre-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.euchre-badge--dealer {
+  background: var(--euchre-white-20);
+  color: var(--euchre-white);
+}
+
+.euchre-badge--declarer {
+  background: var(--euchre-gold-30);
+  color: var(--euchre-gold);
+}
+
+.euchre-sits-out {
+  padding: 2px 6px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--euchre-white);
+}
+
+.euchre-tricks-won {
+  padding: 2px 6px;
+  background: var(--euchre-white-15);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--euchre-white-80);
+}
+
+/* ============================================
+   Center Section
+   ============================================ */
+.euchre-center-section {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.euchre-center-placeholder {
+  width: 200px;
+  height: 200px;
+}
+
+/* ============================================
+   Gameplay Panel Wrapper
+   ============================================ */
+.euchre-gameplay-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 500px;
+}
+
+/* ============================================
+   Gameplay Panel
+   ============================================ */
+.ogs-panel.euchre-gameplay {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ============================================
+   Player Name - Base Styles
+   ============================================ */
+.euchre-player-name {
+  text-transform: capitalize;
+}

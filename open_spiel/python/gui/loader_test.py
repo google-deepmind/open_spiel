@@ -18,11 +18,14 @@
 import re
 from unittest import mock
 
+from absl import logging
 from absl.testing import absltest
 
 from open_spiel.python.gui import catalogue
 from open_spiel.python.gui import contract
 from open_spiel.python.gui import loader
+from open_spiel.python.gui import loader_support
+from open_spiel.python.gui import presenters
 
 
 class LoadTest(absltest.TestCase):
@@ -53,6 +56,20 @@ class LoadTest(absltest.TestCase):
     loaded = loader.load("kuhn_poker", {})
     self.assertTrue(loaded.hides_information)
     self.assertTrue(loaded.has_seat_views)
+
+  def test_a_game_that_silences_the_log_on_loading_does_not(self) -> None:
+    # chat_game sets the process's verbosity to ERROR when it loads; the
+    # catalogue loads it, and without the guard every request line and
+    # warning after that would go unlogged.
+    before = logging.get_verbosity()
+    self.addCleanup(logging.set_verbosity, before)
+    logging.set_verbosity(logging.INFO)
+    with self.assertLogs(level="WARNING") as logs:
+      loader.load("chat_game", {})
+    self.assertEqual(logging.get_verbosity(), logging.INFO)
+    self.assertRegex(
+        "\n".join(logs.output), r"Loading chat_game set the log verbosity"
+    )
 
   def test_refuses_an_unknown_game(self) -> None:
     with self.assertRaises(loader.UnknownGameError):
@@ -100,6 +117,39 @@ class LoadTest(absltest.TestCase):
   def test_refuses_games_that_cannot_be_rebuilt_from_history(self) -> None:
     with self.assertRaisesRegex(loader.UnavailableError, "rebuilt"):
       loader.load("negotiation", {})
+
+
+class SessionParametersTest(absltest.TestCase):
+
+  def _game_type(self, specification: dict[str, object]) -> mock.Mock:
+    """A game type declaring `specification`."""
+    game_type = mock.Mock()
+    game_type.parameter_specification = specification
+    return game_type
+
+  def test_a_declared_parameter_the_game_does_not_echo_takes_its_default(
+      self,
+  ) -> None:
+    game_type = self._game_type({"hand_size": 10, "dealer_rotation": "alt"})
+    self.assertEqual(
+        loader.session_parameters(game_type, {}, {"hand_size": 10}),
+        {"hand_size": 10, "dealer_rotation": "alt"},
+    )
+
+  def test_a_requested_value_beats_the_default_and_an_echo_beats_both(
+      self,
+  ) -> None:
+    game_type = self._game_type({"a": 1, "b": "x", "c": 3})
+    self.assertEqual(
+        loader.session_parameters(game_type, {"b": "y", "c": 4}, {"c": 5}),
+        {"a": 1, "b": "y", "c": 5},
+    )
+
+  def test_leaves_out_a_nested_game_default(self) -> None:
+    game_type = self._game_type({"game": {}, "rounds": 2})
+    self.assertEqual(
+        loader.session_parameters(game_type, {}, {}), {"rounds": 2}
+    )
 
 
 class ServerPathParametersTest(absltest.TestCase):
@@ -174,12 +224,12 @@ class StructSupportTest(absltest.TestCase):
 
   def setUp(self) -> None:
     super().setUp()
-    loader._STRUCT_SUPPORT.clear()  # pylint: disable=protected-access
+    loader_support._STRUCT_SUPPORT.clear()  # pylint: disable=protected-access
     self.probe = self.enter_context(
         mock.patch.object(
-            loader,
+            loader_support,
             "_probe_struct",
-            wraps=loader._probe_struct,  # pylint: disable=protected-access
+            wraps=loader_support._probe_struct,  # pylint: disable=protected-access
         )
     )
 
@@ -204,6 +254,35 @@ class StructSupportTest(absltest.TestCase):
     self.assertFalse(loader.load("kuhn_poker", {}).provides_struct)
     self.assertFalse(loader.load("kuhn_poker", {"players": 3}).provides_struct)
     self.assertEqual(self.probe.call_count, 2)
+
+
+class ObservationStructSupportTest(absltest.TestCase):
+  """Observation struct support is probed like the state struct's."""
+
+  def setUp(self) -> None:
+    super().setUp()
+    loader_support._STRUCT_SUPPORT.clear()  # pylint: disable=protected-access
+    self.probe = self.enter_context(
+        mock.patch.object(
+            loader_support,
+            "_probe_observation_struct",
+            wraps=loader_support._probe_observation_struct,  # pylint: disable=protected-access
+        )
+    )
+
+  def test_reports_whether_the_game_provides_an_observation_struct(
+      self,
+  ) -> None:
+    self.assertTrue(loader.load("gin_rummy", {}).provides_observation_struct)
+    self.assertFalse(loader.load("kuhn_poker", {}).provides_observation_struct)
+
+  def test_probes_once_per_game_apart_from_the_state_struct(self) -> None:
+    loaded = loader.load("tic_tac_toe", {})
+    self.assertTrue(loaded.provides_struct)
+    self.probe.assert_not_called()
+    for _ in range(3):
+      self.assertTrue(loaded.provides_observation_struct)
+    self.probe.assert_called_once()
 
 
 class CatalogueTest(absltest.TestCase):
@@ -247,6 +326,33 @@ class CatalogueTest(absltest.TestCase):
     self.assertTrue(routing.loadable)
     self.assertEqual(routing.num_players, 5)
     self.assertEqual(routing.min_seats, 1)
+
+  def test_names_the_renderer_of_each_registered_adapter(self) -> None:
+    for name, adapter in presenters.adapters().items():
+      if name in self.entries and self.entries[name].loadable:
+        self.assertEqual(self.entries[name].renderer, adapter.renderer, name)
+    self.assertEqual(self.entries["chess"].renderer, "chess")
+    self.assertEqual(self.entries["leduc_poker"].renderer, "poker")
+
+  def test_reads_renderers_afresh_when_the_adapter_registry_changes(
+      self,
+  ) -> None:
+    self.assertIsNone(self.entries["go"].renderer)
+    chess = presenters.adapter_for("chess")
+    assert chess is not None
+    presenters.register("go", chess)
+    try:
+      go = {entry.name: entry for entry in loader.build_catalogue().games}
+      self.assertEqual(go["go"].renderer, "chess")
+    finally:
+      presenters.unregister("go")
+    after = {entry.name: entry for entry in loader.build_catalogue().games}
+    self.assertIsNone(after["go"].renderer)
+
+  def test_a_game_with_no_adapter_names_no_renderer(self) -> None:
+    self.assertNotIn("go", presenters.adapters())
+    self.assertIsNone(self.entries["go"].renderer)
+    self.assertIsNone(self.entries["mfg_crowd_modelling"].renderer)
 
   def test_an_unservable_game_has_no_default_seat_count(self) -> None:
     self.assertIsNone(self.entries["mfg_crowd_modelling"].num_players)

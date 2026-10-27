@@ -21,6 +21,7 @@ import type {
   SeatConfig,
   SeatView,
 } from '../contract/contract.ts';
+import {preparingText} from './preparing.ts';
 import {HUMAN, controllerNamed, savedConfig} from './seat_draft.ts';
 import {SeatEditor} from './seat_editor.tsx';
 import {SeatSummary} from './seat_summary.tsx';
@@ -43,9 +44,11 @@ export interface SeatRowProps {
  * One seat as a card: its name, who plays it and, on the right, what can be
  * done with it. A controller that waits to be advanced can be stepped on its
  * turn, as can an autoplaying one left to move (after an undo, or past the
- * plies one request plays), and a failed one retried. The settings stay collapsed until asked
- * for; opening an editable seat's settings starts its draft afresh from what
- * the server holds.
+ * plies one request plays), and a failed one retried. While the server
+ * builds a seat's controller the card says it is preparing, in the place of
+ * the controller's name, and its Step waits, so that nothing moves when it is
+ * ready. The settings stay collapsed until asked for; opening an editable
+ * seat's settings starts its draft afresh from what the server holds.
  */
 export function SeatRow({
   seat,
@@ -64,17 +67,24 @@ export function SeatRow({
   const state = useSeatDraft(seat, controllers, moment, onSave);
   const name = `Player ${String(seat.seat)}`;
   const {label} = controllerNamed(controllers, seat.controller);
+  const preparing = seat.status === 'preparing';
   return (
     <li className="seat" aria-labelledby={`${id}-name`}>
       {seat.failure !== null && (
-        <SeatFailure name={name} failure={seat.failure} />
+        <SeatFailure name={name} seat={seat} failure={seat.failure} />
       )}
       <div className="seat__row">
         <div className="seat__details">
           <span id={`${id}-name`} className="seat__name">
             {name}
           </span>
-          <span className="seat__controller">{label}</span>
+          <span
+            className="seat__controller"
+            aria-live="polite"
+            title={preparing ? (seat.message ?? undefined) : undefined}
+          >
+            {preparing ? preparingText(controllers, seat) : label}
+          </span>
         </div>
         <div className="seat__actions">
           {editable && (
@@ -84,7 +94,7 @@ export function SeatRow({
               busy={busy}
               onRetry={() => {
                 onSave(savedConfig(seat, controllers));
-                if (!seat.autoplay) onStep();
+                if (!seat.autoplay && seat.status === 'ready') onStep();
               }}
               onStep={onStep}
             />
@@ -169,9 +179,11 @@ interface SeatCommandsProps {
   readonly onStep: () => void;
 }
 
-// Retry for a failed seat on its turn; Step for a controller that waits to
-// be advanced, which it may be only on its turn at the live position, and
-// for an autoplaying one on its turn there, which autoplay left to move.
+// Retry for a failed seat on its turn, and for one whose controller could
+// not be built at any time, which builds it again; Step for a controller
+// that waits to be advanced, which it may be only on its turn at the live
+// position once built, and for an autoplaying one on its turn there, which
+// autoplay left to move.
 function SeatCommands({
   seat,
   frame,
@@ -185,9 +197,11 @@ function SeatCommands({
     frame.to_move.kind === 'seat' &&
     frame.to_move.seat === seat.seat;
   const failed = seat.failure !== null;
+  const preparing = seat.status === 'preparing';
+  const canStep = onTurn && frame.status === 'playing' && !preparing;
   return (
     <>
-      {failed && onTurn && (
+      {failed && (onTurn || seat.status === 'unavailable') && (
         <button
           type="button"
           className="button"
@@ -201,11 +215,13 @@ function SeatCommands({
         <button
           type="button"
           className="button"
-          disabled={busy || !(onTurn && frame.status === 'playing')}
+          disabled={busy || !canStep}
           title={
-            onTurn && frame.status === 'playing'
-              ? 'Step this player'
-              : 'Not this player’s turn'
+            preparing
+              ? preparingText(frame.session.controllers, seat)
+              : canStep
+                ? 'Step this player'
+                : 'Not this player’s turn'
           }
           onClick={onStep}
         >
@@ -219,18 +235,24 @@ function SeatCommands({
 interface SeatFailureProps {
   /** The seat's name, such as "Player 0". */
   readonly name: string;
+  readonly seat: SeatView;
   readonly failure: ControllerFailure;
 }
 
-// Why a seat stopped, above its row.
-function SeatFailure({name, failure}: SeatFailureProps): JSX.Element {
+// Why a seat stopped, above its row: a controller that failed in play, or
+// one that could not be built, whose reason every viewer may read.
+function SeatFailure({name, seat, failure}: SeatFailureProps): JSX.Element {
+  const unavailable = seat.status === 'unavailable';
+  const message = unavailable ? seat.message : failure.message;
   return (
     <div className="seat__failure" role="alert">
       <p>
-        {name}’s controller stopped with {failure.error}. Play is paused.
+        {unavailable
+          ? `${name}’s controller could not be prepared (${failure.error}). Play is paused.`
+          : `${name}’s controller stopped with ${failure.error}. Play is paused.`}
       </p>
-      {failure.message !== null && (
-        <pre className="seat__failure-message">{failure.message}</pre>
+      {message !== null && (
+        <pre className="seat__failure-message">{message}</pre>
       )}
     </div>
   );

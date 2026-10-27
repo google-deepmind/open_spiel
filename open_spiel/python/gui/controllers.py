@@ -21,9 +21,25 @@ which controllers can play a game and why the others cannot (`available`
 lists only those that can), `create` builds one for a seat, and `choose` asks
 it for a move.
 
-No controller stands in for another. When one raises, or returns anything
-but a legal action, `choose` raises `ControllerError` naming the seat, and the
-caller pauses that seat.
+Controllers are registered by name with `register` (`controller_registry`);
+`human`, `random` and `mcts` are registered here, and a program that serves
+the GUI may register its own before it starts serving, since the catalogue
+and the health report read the registry once.
+
+No controller stands in for another. When one raises, returns anything but
+a legal action, or takes longer than the move budget (`set_move_budget`,
+10 seconds unless the server's `--move-budget-seconds` says otherwise),
+`choose` raises `ControllerError` naming the seat, and the caller pauses that
+seat. A controller chooses on a thread of its own, so a slow one holds up
+only the request that asked it, and only for the budget; a move it returns
+after that is discarded. A controller that may take long checks
+`move_budget.check` as it works, as MCTS does between simulations, so that
+one over its budget stops, and its thread exits, soon after. A call that
+cannot check, as OpenSpiel's C++ MCTS cannot, must bound its own work to fit
+the budget.
+
+Programs that serve the GUI and third-party packages alike register their
+controllers with `register`; `plugins` loads the packages' on request.
 
 Every random choice a controller makes is seeded from its seed and the ply it
 moves at, so a seat moves the same way at the same position however often it
@@ -33,38 +49,47 @@ is asked: after an undo, and when a game's history is replayed.
 from collections.abc import Callable, Mapping
 import dataclasses
 import random
-from typing import Protocol
 
 from open_spiel.python.gui import contract
+from open_spiel.python.gui import controller_registry
 from open_spiel.python.gui import controller_settings
 from open_spiel.python.gui import errors
-from open_spiel.python.gui import gil_safety
-from open_spiel.python.gui import information
+from open_spiel.python.gui import mcts_controller
+from open_spiel.python.gui import move_budget as move_budget_lib
 import pyspiel
 
 HUMAN = contract.HUMAN
 RANDOM = "random"
-MCTS = "mcts"
+MCTS = mcts_controller.NAME
 
 # A controller's settings, as a client sends them.
 Config = controller_settings.Config
 
-# The cap on the MCTS search tree's memory, in megabytes.
-_MCTS_MAX_MEMORY_MB = 1000
+# The failure name of a controller that did not choose within the budget.
+TIMEOUT = "Timeout"
 
-# The most simulations an MCTS move may run. A move runs while its session is
-# locked, so this bounds how long the session's other requests wait.
-_MCTS_MAX_SIMULATIONS = 10_000
+# The registry's names, which callers reach through this module.
+UnavailableError = controller_registry.UnavailableError
+Controller = controller_registry.Controller
+Builder = controller_registry.Builder
+Kind = controller_registry.Kind
+plays_every_game = controller_registry.plays_every_game
+register = controller_registry.register
+unregister = controller_registry.unregister
+kinds = controller_registry.kinds
 
-_SEED_BOUND = 2**31
+# The settings' names, which a plugin declares its controller's settings with.
+Setting = controller_settings.Setting
+REQUIRED = controller_settings.REQUIRED
 
+# MCTS's limits (`mcts_controller`), which a server sets once at startup.
+configure_mcts = mcts_controller.configure
+mcts_limits = mcts_controller.configured_limits
 
-class UnavailableError(errors.ControllerUnavailableError):
-  """A controller cannot be built for a seat.
-
-  The controller is unknown, cannot play the game, or was given invalid
-  settings. The message says which, and is safe to show to anyone.
-  """
+# The move budget's names, which callers reach through this module.
+DEFAULT_MOVE_BUDGET_SECONDS = move_budget_lib.DEFAULT_SECONDS
+set_move_budget = move_budget_lib.set_seconds
+move_budget = move_budget_lib.seconds
 
 
 class ControllerError(errors.ControllerFailedError):
@@ -101,7 +126,8 @@ class Spec:
   """A request for a controller.
 
   Attributes:
-    kind: The controller's name: `HUMAN`, `RANDOM` or `MCTS`.
+    kind: The name the controller is registered under, such as `HUMAN`,
+      `RANDOM` or `MCTS`.
     config: The controller's settings, satisfying its `config_schema`. A
       setting left out takes its default.
   """
@@ -133,76 +159,6 @@ class Descriptor:
 HUMAN_SPEC = Spec(kind=HUMAN)
 
 
-class Controller(Protocol):
-  """Plays a seat."""
-
-  def choose_action(self, state: pyspiel.State, seat: int) -> int:
-    """Returns the action `seat` plays at `state`, where it is to move."""
-
-
-# Builds a controller for a game from its parsed settings and a seed.
-_Builder = Callable[
-    [pyspiel.Game, Mapping[str, contract.ParameterValue], int], Controller
-]
-
-
-@dataclasses.dataclass(frozen=True)
-class _Kind:
-  """A registered controller.
-
-  Attributes:
-    label: The human-readable name.
-    settings: The settings the controller takes.
-    reads_full_state: Whether the controller reads more of the state than the
-      seat may see. Such a controller cannot play a game that hides
-      information from its players.
-    refusal: Returns why the controller cannot play a game, or None, beyond
-      what `reads_full_state` already refuses.
-    build: Builds the controller.
-  """
-
-  label: str
-  settings: tuple[controller_settings.Setting, ...]
-  reads_full_state: bool
-  refusal: Callable[[pyspiel.Game], str | None]
-  build: _Builder
-
-  def unavailable_reason(self, game: pyspiel.Game) -> str | None:
-    """Returns why the controller cannot play `game`, or None if it can."""
-    game_type = game.get_type()
-    if self.reads_full_state and information.hides_information(game_type):
-      return (
-          f"{self.label} reads the full state, which "
-          f"{game_type.short_name} hides from its players."
-      )
-    return self.refusal(game)
-
-  def config_schema(self) -> dict[str, contract.Json]:
-    """Returns the JSON Schema of the controller's settings."""
-    return controller_settings.schema(self.settings)
-
-  def parse(self, config: Config) -> dict[str, contract.ParameterValue]:
-    """Returns `config` with its defaults filled in.
-
-    Args:
-      config: The settings given for the controller, by name.
-
-    Raises:
-      UnavailableError: If `config` names an unknown setting or holds an
-        invalid value.
-    """
-    try:
-      return controller_settings.parse(self.settings, config, self.label)
-    except controller_settings.InvalidSettingError as e:
-      raise UnavailableError(str(e)) from e
-
-
-def _choice_seed(seed: int, state: pyspiel.State) -> int:
-  """Returns the seed of the choice made at `state`: one per ply."""
-  key = f"{seed}/{len(state.history())}"
-  return random.Random(key).randrange(_SEED_BOUND)
-
-
 class Human:
   """Leaves a seat's moves to the client; `choose` refuses to ask it."""
 
@@ -220,90 +176,8 @@ class Random:
 
   def choose_action(self, state: pyspiel.State, seat: int) -> int:
     """Returns one of `seat`'s legal actions, drawn uniformly."""
-    rng = random.Random(_choice_seed(self._seed, state))
+    rng = random.Random(controller_registry.choice_seed(self._seed, state))
     return int(rng.choice(state.legal_actions(seat)))
-
-
-class Mcts:
-  """Plays the move preferred by OpenSpiel's Monte Carlo tree search.
-
-  Each search runs a fixed number of simulations, each ending in a uniformly
-  random rollout, and is seeded afresh for the ply it moves at, so the moves
-  are reproducible from the seed. The search has no time limit: OpenSpiel's
-  wall-clock budget replaces the simulation count, which would make the move
-  depend on the machine's speed.
-  """
-
-  def __init__(
-      self,
-      game: pyspiel.Game,
-      seed: int,
-      *,
-      max_simulations: int,
-      uct_c: float,
-      solve: bool,
-  ) -> None:
-    self._game = game
-    self._seed = seed
-    self._max_simulations = max_simulations
-    self._uct_c = uct_c
-    self._solve = solve
-
-  def choose_action(self, state: pyspiel.State, seat: int) -> int:
-    """Returns the action the search prefers for `seat`."""
-    del seat  # The search plays for the player to move, which is `seat`.
-    seed = _choice_seed(self._seed, state)
-    bot = pyspiel.MCTSBot(
-        game=self._game,
-        evaluator=pyspiel.RandomRolloutEvaluator(n_rollouts=1, seed=seed),
-        uct_c=self._uct_c,
-        max_simulations=self._max_simulations,
-        max_memory_mb=_MCTS_MAX_MEMORY_MB,
-        solve=self._solve,
-        seed=seed,
-        verbose=False,
-    )
-    return int(bot.step(state))
-
-
-# The explicit None reads as "no refusal", which is what a refusal returns.
-# pylint: disable-next=useless-return
-def _plays_every_game(game: pyspiel.Game) -> str | None:
-  """Refuses no game: returns None, the refusal callback's "can play"."""
-  del game
-  return None
-
-
-def _mcts_refusal(game: pyspiel.Game) -> str | None:
-  """Returns why MCTS cannot play `game`, or None if it can.
-
-  The search plays forward from a clone of the full state, so it reads the
-  full state (see `_Kind.reads_full_state`), and in a game whose state samples
-  its own chance outcomes it would foresee them.
-
-  Args:
-    game: The game MCTS would play.
-  """
-  game_type = game.get_type()
-  name = game_type.short_name
-  if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
-    return f"MCTS needs a sequential game, and {name} is not one."
-  if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
-    return (
-        f"MCTS would foresee the chance outcomes of {name}, whose state "
-        "samples them itself."
-    )
-  if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
-    return (
-        f"MCTS needs rewards at the end of the game only, and {name} does not "
-        "give them so."
-    )
-  if gil_safety.uses_python(game) and not gil_safety.python_games_are_safe():
-    return (
-        f"{name} is, or wraps, a game implemented in Python, and the "
-        "installed pyspiel cannot run MCTS on games implemented in Python."
-    )
-  return None
 
 
 def _build_human(
@@ -322,72 +196,21 @@ def _build_random(
   return Random(seed)
 
 
-def _build_mcts(
-    game: pyspiel.Game, config: Mapping[str, contract.ParameterValue], seed: int
-) -> Controller:
-  """Builds the MCTS controller from its parsed settings."""
-  return Mcts(
-      game,
-      seed,
-      max_simulations=int(config["max_simulations"]),
-      uct_c=float(config["uct_c"]),
-      solve=bool(config["solve"]),
-  )
-
-
-_MCTS_SETTINGS = (
-    controller_settings.Setting(
-        "max_simulations",
-        int,
-        1000,
-        "Simulations per move, each ending in a random rollout.",
-        minimum=1,
-        maximum=_MCTS_MAX_SIMULATIONS,
-    ),
-    controller_settings.Setting(
-        "uct_c",
-        float,
-        2.0,
-        "The exploration constant of the UCT selection rule.",
-        minimum=0.0,
-        maximum=100.0,
-    ),
-    controller_settings.Setting(
-        "solve",
-        bool,
-        True,
-        "Whether proven wins and losses are backed up the search tree.",
-    ),
+register(
+    HUMAN,
+    Kind("Human", (), reads_full_state=False, build=_build_human),
 )
-
-# Every controller, in the order clients list them.
-_KINDS: Mapping[str, _Kind] = {
-    HUMAN: _Kind(
-        "Human",
-        (),
-        reads_full_state=False,
-        refusal=_plays_every_game,
-        build=_build_human,
-    ),
-    # Reads only the seat's legal actions.
-    RANDOM: _Kind(
-        "Random",
-        (),
-        reads_full_state=False,
-        refusal=_plays_every_game,
-        build=_build_random,
-    ),
-    MCTS: _Kind(
-        "MCTS",
-        _MCTS_SETTINGS,
-        reads_full_state=True,
-        refusal=_mcts_refusal,
-        build=_build_mcts,
-    ),
-}
+# Reads only the seat's legal actions.
+register(
+    RANDOM,
+    Kind("Random", (), reads_full_state=False, build=_build_random),
+)
+# With the limits that fit the move budget with either behaviour of the C++
+# search, until `configure_mcts` says which the served pyspiel has.
+register(MCTS, mcts_controller.kind(contract.MctsLimits.SIMULATIONS_ONLY))
 
 
-def _describe(name: str, kind: _Kind) -> contract.Controller:
+def _describe(name: str, kind: Kind) -> contract.Controller:
   """Returns the contract's description of the controller `name`."""
   return contract.Controller(
       name=name, label=kind.label, config_schema=kind.config_schema()
@@ -396,7 +219,7 @@ def _describe(name: str, kind: _Kind) -> contract.Controller:
 
 def registered() -> tuple[contract.Controller, ...]:
   """Returns every controller, `human` first."""
-  return tuple(_describe(name, kind) for name, kind in _KINDS.items())
+  return tuple(_describe(name, kind) for name, kind in kinds().items())
 
 
 def descriptors(game: pyspiel.Game) -> tuple[Descriptor, ...]:
@@ -410,7 +233,7 @@ def descriptors(game: pyspiel.Game) -> tuple[Descriptor, ...]:
   """
   return tuple(
       Descriptor(_describe(name, kind), kind.unavailable_reason(game))
-      for name, kind in _KINDS.items()
+      for name, kind in kinds().items()
   )
 
 
@@ -421,6 +244,49 @@ def available(game: pyspiel.Game) -> tuple[contract.Controller, ...]:
       for descriptor in descriptors(game)
       if descriptor.available
   )
+
+
+def builder(spec: Spec, game: pyspiel.Game) -> Callable[[int], Controller]:
+  """Checks `spec` against `game`, and returns what builds its controller.
+
+  Everything a client can get wrong is checked here, at once; the build
+  itself, which may take a while (a trained model loading and warming up),
+  is left to the returned call, which a session makes on a thread of its own
+  (`builds`).
+
+  Args:
+    spec: The controller and its settings.
+    game: The game as it is served, after any turn-based wrapping.
+
+  Returns:
+    A call that builds the controller from the seed of its random choices.
+    It raises `UnavailableError` if the controller finds it cannot play after
+    all (a checkpoint that does not load), and whatever else its builder
+    raises.
+
+  Raises:
+    UnavailableError: If the controller is unknown, cannot play `game`, or is
+      given invalid settings.
+  """
+  registry = kinds()
+  kind = registry.get(spec.kind)
+  if kind is None:
+    raise UnavailableError(
+        f"There is no controller {controller_settings.shown(spec.kind)}; the "
+        "controllers are "
+        f"{', '.join(registry)}."
+    )
+  reason = kind.unavailable_reason(game)
+  if reason is not None:
+    raise UnavailableError(reason)
+  config = kind.parse(spec.config)
+  return lambda seed: kind.build(game, config, seed)
+
+
+def label(name: str) -> str:
+  """Returns the label of the controller registered as `name`, or `name`."""
+  kind = kinds().get(name)
+  return name if kind is None else kind.label
 
 
 def create(spec: Spec, game: pyspiel.Game, *, seed: int) -> Controller:
@@ -438,26 +304,16 @@ def create(spec: Spec, game: pyspiel.Game, *, seed: int) -> Controller:
     UnavailableError: If the controller is unknown, cannot play
       `game`, or is given invalid settings.
   """
-  kind = _KINDS.get(spec.kind)
-  if kind is None:
-    raise UnavailableError(
-        f"There is no controller {controller_settings.shown(spec.kind)}; the "
-        "controllers are "
-        f"{', '.join(_KINDS)}."
-    )
-  reason = kind.unavailable_reason(game)
-  if reason is not None:
-    raise UnavailableError(reason)
-  return kind.build(game, kind.parse(spec.config), seed)
+  return builder(spec, game)(seed)
 
 
 def choose(controller: Controller, state: pyspiel.State, seat: int) -> int:
-  """Asks `controller` for `seat`'s action at `state`.
+  """Asks `controller` for `seat`'s action at `state`, within the budget.
 
   Args:
     controller: The controller playing `seat`.
     state: The position, where `seat` is to move. The controller is given a
-      copy, so `state` does not change.
+      copy, on a thread of its own, so `state` does not change.
     seat: The seat to move.
 
   Returns:
@@ -466,8 +322,8 @@ def choose(controller: Controller, state: pyspiel.State, seat: int) -> int:
   Raises:
     ValueError: If `seat` is not to move at `state`, or `controller` is a
       human's, whose moves come from the client and never from here.
-    ControllerError: If the controller raises, or returns anything but one of
-      `seat`'s legal actions.
+    ControllerError: If the controller raises, returns anything but one of
+      `seat`'s legal actions, or does not return within the move budget.
   """
   if isinstance(controller, Human):
     raise ValueError(
@@ -478,9 +334,20 @@ def choose(controller: Controller, state: pyspiel.State, seat: int) -> int:
         f"Seat {seat} is not to move; player {state.current_player()} is."
     )
   legal = state.legal_actions(seat)
+  # A copy: the controller may play on it, and the position stays as it is.
+  copy = state.clone()
   try:
-    # A copy: the controller may play on it, and the position stays as it is.
-    action: object = controller.choose_action(state.clone(), seat)
+    action: object = move_budget_lib.run(
+        lambda: controller.choose_action(copy, seat),
+        name=f"controller-seat-{seat}",
+    )
+  except move_budget_lib.OverBudgetError as e:
+    raise ControllerError(
+        seat,
+        TIMEOUT,
+        f"Seat {seat}'s controller did not choose a move within the "
+        f"{e.seconds:g} second move budget.",
+    ) from e
   except Exception as e:
     # Whatever the failure, the seat pauses; nothing retries or covers for it.
     raise ControllerError(seat, type(e).__name__, str(e)) from e

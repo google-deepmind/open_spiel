@@ -15,8 +15,6 @@
 
 """Tests for the controllers that play seats."""
 
-from unittest import mock
-
 from absl.testing import absltest
 
 from open_spiel.python.games import hangman  # pylint: disable=unused-import
@@ -24,8 +22,11 @@ from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
 from open_spiel.python.gui import contract
 from open_spiel.python.gui import controllers
 from open_spiel.python.gui import errors
-from open_spiel.python.gui import gil_safety
+from open_spiel.python.gui import mcts_controller
 import pyspiel
+
+# The simulations MCTS is capped at when the C++ search gives it no clock.
+_CAP = mcts_controller.SIMULATIONS[contract.MctsLimits.SIMULATIONS_ONLY].maximum
 
 
 def _availability(game: pyspiel.Game) -> dict[str, bool]:
@@ -124,26 +125,14 @@ class DescriptorsTest(absltest.TestCase):
   def test_mcts_searches_a_game_with_explicit_chance(self) -> None:
     self.assertIsNone(_mcts_reason(pyspiel.load_game("pig")))
 
-  def test_mcts_refuses_a_python_game_when_pyspiel_is_unsafe(self) -> None:
-    game = pyspiel.load_game("python_tic_tac_toe")
-    with mock.patch.object(
-        gil_safety, "python_games_are_safe", return_value=False
-    ):
-      self.assertIn("Python", _mcts_reason(game) or "")
-
-  def test_mcts_plays_a_python_game_when_pyspiel_is_safe(self) -> None:
-    game = pyspiel.load_game("python_tic_tac_toe")
-    with mock.patch.object(
-        gil_safety, "python_games_are_safe", return_value=True
-    ):
-      self.assertIsNone(_mcts_reason(game))
+  def test_mcts_plays_a_game_implemented_in_python(self) -> None:
+    self.assertIsNone(_mcts_reason(pyspiel.load_game("python_tic_tac_toe")))
 
   def test_a_controller_that_reads_the_full_state_refuses_hidden_info(
       self,
   ) -> None:
     game = pyspiel.load_game("kuhn_poker")
-    # pylint: disable-next=protected-access
-    for name, kind in controllers._KINDS.items():
+    for name, kind in controllers.kinds().items():
       with self.subTest(name):
         self.assertEqual(
             kind.unavailable_reason(game) is None, not kind.reads_full_state
@@ -153,17 +142,13 @@ class DescriptorsTest(absltest.TestCase):
       self,
   ) -> None:
     game = pyspiel.load_game("python_hangman")
-    with mock.patch.object(
-        gil_safety, "python_games_are_safe", return_value=True
-    ):
-      self.assertIn("python_hangman hides", _mcts_reason(game) or "")
+    self.assertIn("python_hangman hides", _mcts_reason(game) or "")
 
   def test_only_mcts_reads_the_full_state(self) -> None:
     self.assertEqual(
         {
             name
-            # pylint: disable-next=protected-access
-            for name, kind in controllers._KINDS.items()
+            for name, kind in controllers.kinds().items()
             if kind.reads_full_state
         },
         {controllers.MCTS},
@@ -213,12 +198,12 @@ class DescriptorsTest(absltest.TestCase):
         {
             "max_simulations": {
                 "type": "integer",
-                "default": 1000,
+                "default": 250,
                 "description": (
                     "Simulations per move, each ending in a random rollout."
                 ),
                 "minimum": 1,
-                "maximum": 10_000,
+                "maximum": 250,
             },
             "uct_c": {
                 "type": "number",
@@ -406,9 +391,24 @@ class MctsTest(absltest.TestCase):
     moves = {controllers.choose(bot, state, 1) for _ in range(5)}
     self.assertLen(moves, 1)
 
+  def test_max_simulations_is_bounded(self) -> None:
+    game = pyspiel.load_game("tic_tac_toe")
+    bound = _CAP
+    controllers.create(
+        controllers.Spec(controllers.MCTS, {"max_simulations": bound}),
+        game,
+        seed=0,
+    )
+    with self.assertRaisesRegex(
+        controllers.UnavailableError, f"lies in \\[1, {bound}\\]"
+    ):
+      controllers.create(
+          controllers.Spec(controllers.MCTS, {"max_simulations": bound + 1}),
+          game,
+          seed=0,
+      )
+
   def test_it_takes_a_winning_move_in_a_python_game(self) -> None:
-    if not gil_safety.python_games_are_safe():
-      self.skipTest("The installed pyspiel cannot search Python games.")
     game = pyspiel.load_game("python_tic_tac_toe")
     bot = controllers.create(controllers.Spec(controllers.MCTS), game, seed=0)
     self.assertEqual(

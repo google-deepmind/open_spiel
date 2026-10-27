@@ -1,0 +1,450 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* Checkers - Game-specific styles only */
+/* The board's panel and its status row; the colours are tokens (the
+   --checkers-* block of src/styles/tokens.css). */
+
+.ogs-panel.checkers-gameplay {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* The Gameplay panel already pads the board by 14px 16px, so the
+     board's own panel adds none. */
+  padding: 0;
+  box-sizing: border-box;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+/* Every box of the board is sized by its border box: the wrapper's width
+   includes its padding. */
+.checkers-gameplay *,
+.checkers-gameplay *::before,
+.checkers-gameplay *::after {
+  box-sizing: border-box;
+}
+
+/* Status row above a board: whole items wrap onto a new line, a single item
+   never breaks mid-phrase into a ragged multi-line grid. */
+.checkers-gameplay .ogs-state-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.checkers-gameplay .ogs-state-meta > * {
+  white-space: nowrap;
+}
+
+/* An error over the board, taking no room from it. */
+.checkers-notice {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-strong);
+  border-left: 4px solid var(--color-danger);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: 0 4px 14px var(--color-shadow);
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* Board Layout */
+.checkers-board-wrapper {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  overflow: hidden;
+  container-type: size;
+}
+
+/* Board with coordinates container - size to fill available space as a square */
+.checkers-board-with-coords {
+  display: flex;
+  flex-direction: column;
+  /* Use container units to pick the smaller dimension, stay square */
+  --board-size: min(100cqw, 100cqh);
+  width: var(--board-size);
+  height: var(--board-size);
+}
+
+/* Row containing left coords + board + right coords */
+.checkers-board-row {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Coordinates base styles */
+.checkers-coords {
+  display: flex;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+.checkers-coords span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Corner spacers for top/bottom rows */
+.checkers-coords-corner {
+  width: 20px;
+  flex-shrink: 0;
+}
+
+/* Top and bottom coordinates (column letters) */
+.checkers-coords--top,
+.checkers-coords--bottom {
+  flex-direction: row;
+}
+
+.checkers-coords--top {
+  margin-bottom: 4px;
+}
+
+.checkers-coords--bottom {
+  margin-top: 4px;
+}
+
+.checkers-coords--top span:not(.checkers-coords-corner),
+.checkers-coords--bottom span:not(.checkers-coords-corner) {
+  flex: 1;
+}
+
+/* Left and right coordinates (row numbers) */
+.checkers-coords--left,
+.checkers-coords--right {
+  flex-direction: column;
+  justify-content: space-around;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.checkers-coords--left {
+  padding-right: 4px;
+}
+
+.checkers-coords--right {
+  padding-left: 4px;
+}
+
+.checkers-coords--left span,
+.checkers-coords--right span {
+  flex: 1;
+}
+
+/* Checkers Board */
+.checkers-board {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px var(--checkers-shadow-strong);
+  border: 3px solid var(--checkers-board-border);
+}
+
+/* Board Squares */
+.checkers-square:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.checkers-square {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background calc(0.15s * var(--anim-scale, 1)) ease;
+  /* Its own stacking context, so a sliding piece's square can ride above
+       its neighbours as one layer. */
+  isolation: isolate;
+}
+
+/* The square a piece is sliding into rides above its neighbours, so the
+   piece passes over the squares between. */
+.checkers-square--slide-target {
+  z-index: 1;
+}
+
+.checkers-square--light {
+  background: var(--checkers-square-light);
+}
+
+.checkers-square--dark {
+  background: var(--checkers-square-dark);
+}
+
+.checkers-square--selected {
+  background: var(--checkers-selected) !important;
+}
+
+.checkers-square--destination {
+  background: var(--checkers-destination) !important;
+}
+
+.checkers-square--destination::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  background: var(--checkers-destination-dot);
+  border-radius: 50%;
+}
+
+/* The last turn, at rest until the next one: every square the piece
+   stood on (start, each landing of a multi-jump, end) ... */
+.checkers-board .checkers-square--dark.checkers-square--last-move {
+  background: var(--checkers-last-move);
+}
+
+/* ... and a dashed ring where each man it took stood. */
+.checkers-square--captured::before {
+  content: '';
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  border: 2px dashed var(--checkers-captured-ring);
+  box-sizing: border-box;
+}
+
+/* A move made while the board is open slides from its start square
+   (--slide-dx/--slide-dy, in squares; a piece is 75% of its square). */
+@keyframes checkers-slide {
+  from {
+    translate: calc(var(--slide-dx, 0) * 133.333%)
+      calc(var(--slide-dy, 0) * 133.333%);
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+.checkers-piece--sliding {
+  animation: checkers-slide calc(0.2s * var(--anim-scale, 1)) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkers-piece--sliding {
+    animation: none;
+  }
+}
+
+/* Pieces */
+.checkers-piece {
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform calc(0.15s * var(--anim-scale, 1)) ease,
+    box-shadow calc(0.15s * var(--anim-scale, 1)) ease;
+  position: relative;
+}
+
+.checkers-piece--black {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--checkers-black-highlight),
+    var(--checkers-black-body)
+  );
+  border: 3px solid var(--checkers-black-edge);
+  box-shadow:
+    inset 0 2px 4px var(--checkers-black-gloss),
+    0 4px 8px var(--checkers-shadow-strong);
+}
+
+.checkers-piece--white {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--checkers-white-highlight),
+    var(--checkers-white-body)
+  );
+  border: 3px solid var(--checkers-white-edge);
+  box-shadow:
+    inset 0 2px 4px var(--checkers-white-gloss),
+    0 4px 8px var(--checkers-shadow-soft);
+}
+
+.checkers-piece--movable:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.checkers-piece--movable:not([aria-disabled='true']):hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 0 3px var(--checkers-movable-ring),
+    0 6px 12px var(--checkers-shadow-strong);
+}
+
+/* A forced capture: the men that must capture are ringed at rest, as
+   draughts clients mark them, not only under the pointer. */
+.checkers-piece--must-capture:not([aria-disabled='true']) {
+  box-shadow:
+    0 0 0 3px var(--checkers-movable-ring),
+    0 4px 8px var(--checkers-shadow-strong);
+}
+
+/* Why a press picked nothing up; one line kept, so the board never moves. */
+.checkers-move-notice {
+  min-height: 1.4em;
+  padding: 0 12px;
+  color: var(--color-text);
+  font-size: 0.85rem;
+}
+
+/* King crown */
+.checkers-crown {
+  font-size: 1.2em;
+  color: var(--checkers-crown);
+  text-shadow: 0 1px 2px var(--checkers-crown-shadow);
+}
+
+.checkers-piece--black .checkers-crown {
+  color: var(--checkers-crown-black);
+}
+
+.checkers-piece--white .checkers-crown {
+  color: var(--checkers-crown-white);
+}
+
+/* A king is two men, one crowned on the other, as on a real board: the
+   upper man sits a little high and the lower one (.checkers-king-base, a
+   plain man of the same colour drawn before it) shows beneath it. */
+.checkers-piece--king {
+  border-width: 4px;
+  top: -5%;
+}
+
+.checkers-king-base {
+  position: absolute;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  left: 12.5%;
+  top: 17%;
+}
+
+.checkers-piece--black.checkers-piece--king {
+  border-color: var(--checkers-crown-black);
+}
+
+.checkers-piece--white.checkers-piece--king {
+  border-color: var(--checkers-crown-white);
+}
+
+/* Status notices */
+.checkers-spectator-notice {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.checkers-turn-notice {
+  color: var(--color-warning);
+}
+
+.checkers-turn-notice--active {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+/* Modern Theme */
+.checkers-board--modern {
+  border-color: var(--checkers-modern-board-border);
+  box-shadow: 0 8px 32px var(--checkers-modern-shadow);
+}
+
+.checkers-board--modern .checkers-square--light {
+  background: var(--checkers-modern-square-light);
+}
+
+.checkers-board--modern .checkers-square--dark {
+  background: var(--checkers-modern-square-dark);
+}
+
+.checkers-board--modern .checkers-piece--black {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--checkers-modern-black-highlight),
+    var(--checkers-modern-black-body)
+  );
+  border-color: var(--checkers-modern-square-dark);
+}
+
+.checkers-board--modern .checkers-piece--white {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--checkers-modern-white-highlight),
+    var(--checkers-modern-white-body)
+  );
+  border-color: var(--checkers-modern-white-edge);
+}
+
+.checkers-board--modern .checkers-piece--black.checkers-piece--king {
+  border-color: var(--checkers-modern-crown-black);
+}
+
+.checkers-board--modern .checkers-piece--white.checkers-piece--king {
+  border-color: var(--checkers-modern-crown-white);
+}
+
+.checkers-board--modern .checkers-piece--black .checkers-crown {
+  color: var(--checkers-modern-crown-black);
+}
+
+.checkers-board--modern .checkers-piece--white .checkers-crown {
+  color: var(--checkers-modern-crown-white);
+}
+
+.checkers-board--modern .checkers-square--dark.checkers-square--last-move {
+  background: var(--checkers-modern-last-move);
+}
+
+.checkers-board--modern .checkers-square--captured::before {
+  border-color: var(--checkers-modern-black-body);
+}

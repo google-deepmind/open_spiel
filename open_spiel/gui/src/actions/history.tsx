@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {type JSX, useMemo} from 'react';
+import {createElement, type JSX, useLayoutEffect, useMemo} from 'react';
 
+import type {Frame} from '../contract/contract.ts';
+import {RENDERERS} from '../renderers/registry.ts';
+import type {Renderers} from '../renderers/renderer.ts';
 import type {Session} from '../session/use_session.ts';
+import {
+  type HistoryRenderer,
+  historyRendererProps,
+} from './history_renderer.ts';
 import {type HistoryRow, historyRows, rowText} from './history_rows.ts';
 import {NoFrame, Note} from './note.tsx';
 import {useStickToBottom} from './use_stick_to_bottom.ts';
@@ -37,14 +44,49 @@ function standing({first, last}: HistoryRow, ply: number): Standing {
  * any other viewer the rows are read-only, a run of actions withheld from
  * them is a single row, and an empty history says so.
  */
-export function History({session}: {session: Session}): JSX.Element {
+export function History({
+  session,
+  renderers = RENDERERS,
+}: {
+  session: Session;
+  renderers?: Renderers;
+}): JSX.Element {
   const {frame, busy, commands} = session;
   const history = frame?.history;
   const rows = useMemo(() => historyRows(history ?? []), [history]);
   const {ref, onScroll} = useStickToBottom<HTMLOListElement>(
     history?.length ?? 0,
   );
+  // A board's own list follows the game as the rows do: pinned to the
+  // bottom while the game grows, and the current move kept in view while
+  // stepping through a replay.
+  const {ref: boardElement, onScroll: onBoardScroll} =
+    useStickToBottom<HTMLDivElement>(history?.length ?? 0);
+  const shownPly = frame?.ply ?? 0;
+  const replaying = frame !== null && frame.ply < frame.num_plies;
+  useLayoutEffect(() => {
+    const list = boardElement.current;
+    if (!replaying || list === null) return;
+    keepInView(list, list.querySelector('[aria-current]'));
+  }, [boardElement, shownPly, replaying]);
   if (frame === null) return <NoFrame />;
+  const board = boardHistory(frame, renderers);
+  if (board !== null) {
+    return (
+      <div
+        ref={boardElement}
+        className="history history--board"
+        aria-label="History"
+        onScroll={onBoardScroll}
+      >
+        {
+          // The registry's lists are module-level components, so each keeps
+          // its identity across renders.
+          createElement(board, historyRendererProps(frame, busy, commands.goTo))
+        }
+      </div>
+    );
+  }
   if (!frame.omniscient && frame.history.length === 0) {
     return <Note>No actions yet.</Note>;
   }
@@ -86,4 +128,30 @@ export function History({session}: {session: Session}): JSX.Element {
       })}
     </ol>
   );
+}
+
+/**
+ * Scrolls `list` the least that brings `item` into view. Not
+ * scrollIntoView, which scrolls every scrollable ancestor too (the dock).
+ */
+function keepInView(list: HTMLElement, item: Element | null): void {
+  if (item === null) return;
+  const frame = list.getBoundingClientRect();
+  const box = item.getBoundingClientRect();
+  if (box.top < frame.top) {
+    list.scrollTop -= frame.top - box.top;
+  } else if (box.bottom > frame.bottom) {
+    list.scrollTop += box.bottom - frame.bottom;
+  }
+}
+
+/** The board's own History list for `frame`, or null when it has none. */
+function boardHistory(
+  frame: Frame,
+  renderers: Renderers,
+): HistoryRenderer | null {
+  const {presentation} = frame;
+  if (presentation === null) return null;
+  if (renderers.get(presentation.renderer) === null) return null;
+  return renderers.options(presentation.renderer).History ?? null;
 }

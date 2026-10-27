@@ -26,13 +26,13 @@ class Capabilities:
   Attributes:
     controllers: Every registered controller, starting with the human one.
     chance_policies: The chance policies the server accepts.
-    python_game_search: Whether search controllers can play games written in
-      Python; that needs a pyspiel whose Python states clone safely.
+    cpp_mcts_limits: How the served pyspiel's C++ MCTS bounds a search, and
+      so which limits MCTS plays with.
   """
 
   controllers: tuple[contract.Controller, ...]
   chance_policies: tuple[contract.ChancePolicy, ...]
-  python_game_search: bool
+  cpp_mcts_limits: contract.MctsLimits
 
   def __post_init__(self) -> None:
     contract.require(

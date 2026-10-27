@@ -20,6 +20,7 @@ import type {Page} from '@playwright/test';
 /** What went wrong on a page, one sentence each. */
 export class PageHealth {
   private readonly problems: string[] = [];
+  private readonly allowed: RegExp[] = [];
 
   constructor(page: Page) {
     page.on('console', message => {
@@ -49,8 +50,16 @@ export class PageHealth {
     });
   }
 
-  /** Every problem seen so far. */
+  /** Takes problems matching `pattern` as expected: a test that asks for a
+   *  refusal sees the response, and the browser's console line about it. */
+  allow(pattern: RegExp): void {
+    this.allowed.push(pattern);
+  }
+
+  /** Every problem seen so far, but the expected ones. */
   list(): readonly string[] {
-    return this.problems;
+    return this.problems.filter(
+      problem => !this.allowed.some(pattern => pattern.test(problem)),
+    );
   }
 }

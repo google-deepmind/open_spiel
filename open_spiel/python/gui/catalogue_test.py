@@ -53,6 +53,7 @@ _GO = catalogue.CatalogueEntry(
     loadable=True,
     unavailable_reason=None,
     controllers=("human", "random", "mcts"),
+    renderer=None,
 )
 
 
@@ -116,6 +117,20 @@ class CatalogueEntryTest(absltest.TestCase):
           loadable=False,
           unavailable_reason="No replay.",
           controllers=("random",),
+      )
+
+  def test_a_renderer_is_named_only_for_a_loadable_game(self) -> None:
+    dataclasses.replace(_GO, renderer="go")
+    with self.assertRaisesRegex(ValueError, "renderer"):
+      dataclasses.replace(_GO, renderer="")
+    with self.assertRaisesRegex(ValueError, "renderer"):
+      dataclasses.replace(
+          _GO,
+          num_players=None,
+          loadable=False,
+          unavailable_reason="No replay.",
+          controllers=(),
+          renderer="go",
       )
 
   def test_the_default_seat_count_is_given_exactly_when_loadable(self) -> None:

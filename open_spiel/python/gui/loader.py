@@ -24,7 +24,6 @@ turn-based wrapper.
 from collections.abc import Mapping
 import dataclasses
 import functools
-import threading
 import types
 
 from absl import logging
@@ -36,9 +35,14 @@ from open_spiel.python.gui import contract
 from open_spiel.python.gui import controllers
 from open_spiel.python.gui import errors
 from open_spiel.python.gui import information
+from open_spiel.python.gui import loader_support
+from open_spiel.python.gui import presenters
 import pyspiel
 
 _GameType = pyspiel.GameType
+
+# Re-exported: the session's parameters are part of what `load` reports.
+session_parameters = loader_support.session_parameters
 
 # Parameters that name a file or directory on the server, by game: the server
 # loads these games only with the parameter's default, so that no request can
@@ -102,9 +106,29 @@ class LoadedGame:
   def provides_struct(self) -> bool:
     """Whether the game's states serialise to structured JSON.
 
-    Decided once per game and parameters, on first use, by `_struct_support`.
+    Decided once per game and parameters, on first use, by
+    `loader_support.struct_support`.
     """
-    return _struct_support(self)
+    return self._struct_support(loader_support.StructKind.STATE)
+
+  @property
+  def provides_observation_struct(self) -> bool:
+    """Whether the game gives each player a structured JSON observation.
+
+    Decided once per game and parameters, on first use, by
+    `loader_support.struct_support`.
+    """
+    return self._struct_support(loader_support.StructKind.OBSERVATION)
+
+  def _struct_support(self, kind: loader_support.StructKind) -> bool:
+    """Whether the game provides the struct `kind`."""
+    return loader_support.struct_support(
+        kind,
+        name=self.name,
+        turn_based=self.turn_based,
+        parameters=self.parameters,
+        game=self.game,
+    )
 
   @property
   def has_seat_views(self) -> bool:
@@ -179,7 +203,9 @@ def load(
   served_type = game.get_type()
   return LoadedGame(
       name=name,
-      parameters=types.MappingProxyType(dict(base.get_parameters())),
+      parameters=types.MappingProxyType(
+          session_parameters(game_type, parameters, base.get_parameters())
+      ),
       game=game,
       turn_based=turn_based,
       # Hidden if either the declared type or the type served (after
@@ -228,7 +254,7 @@ def _widen(
 ) -> dict[str, contract.ParameterValue]:
   """Widens integers given for real-valued parameters, as JSON blurs them."""
   defaults = game_type.parameter_specification
-  widened = {}
+  widened: dict[str, contract.ParameterValue] = {}
   for name, value in parameters.items():
     if (
         isinstance(defaults.get(name), float)
@@ -261,6 +287,7 @@ def _load_or_refuse(
   Returns:
     The loaded game.
   """
+  verbosity = logging.get_verbosity()
   try:
     if turn_based:
       return pyspiel.load_game_as_turn_based(name, dict(parameters))
@@ -273,6 +300,31 @@ def _load_or_refuse(
     raise InvalidParametersError(
         f"{name} refuses these parameters; the server's log has the details."
     ) from error
+  finally:
+    _keep_verbosity(verbosity, name)
+
+
+def _keep_verbosity(verbosity: int, name: str) -> None:
+  """Undoes a change a game made to the process's log verbosity on loading.
+
+  The log is the server's: chat_game, for one, sets it to ERROR when it
+  loads, which would silence every later request line and warning, the
+  catalogue's own loading included.
+
+  Args:
+    verbosity: The verbosity before the game loaded.
+    name: The game, named in the warning.
+  """
+  changed = logging.get_verbosity()
+  if changed == verbosity:
+    return
+  logging.set_verbosity(verbosity)
+  logging.warning(
+      "Loading %s set the log verbosity to %d; the server keeps its own, %d.",
+      name,
+      changed,
+      verbosity,
+  )
 
 
 def _new_initial_state(game: pyspiel.Game, name: str) -> pyspiel.State:
@@ -298,54 +350,37 @@ def _new_initial_state(game: pyspiel.Game, name: str) -> pyspiel.State:
     ) from error
 
 
-# Whether each game, under given parameters, serialises its states to
-# structured JSON; keyed by `_struct_key`. pyspiel offers no non-throwing check
-# (a game without the struct API throws from `State::ToStruct`, and pyspiel
-# prints every C++ SpielError it raises: "OpenSpiel exception: ToStruct is not
-# implemented."), so each game is probed once, on its first omniscient frame,
-# and the answer is kept here. The catalogue, which loads every game, never
-# asks, so building it probes nothing.
-_STRUCT_SUPPORT: dict[tuple[object, ...], bool] = {}
-_STRUCT_SUPPORT_LOCK = threading.Lock()
+def build_catalogue() -> catalogue.Catalogue:
+  """Returns the catalogue of every registered game, loading each once.
 
-
-def _struct_key(loaded: LoadedGame) -> tuple[object, ...]:
-  """The cache key: the game as served, with every parameter's value."""
-  return (
-      loaded.name,
-      loaded.turn_based,
-      tuple(sorted(loaded.parameters.items())),
+  Loading every game is slow, so what loading finds is cached for the life
+  of the process. Each entry's `renderer` is not: it is read from the
+  adapter registry on every call, so that an adapter registered or
+  unregistered after the first call (`presenters.register`) is in the next
+  catalogue.
+  """
+  return catalogue.Catalogue(
+      games=tuple(
+          dataclasses.replace(entry, renderer=_renderer_of(entry))
+          for entry in _loaded_entries()
+      )
   )
 
 
-def _struct_support(loaded: LoadedGame) -> bool:
-  """Whether the loaded game's states serialise to structured JSON."""
-  key = _struct_key(loaded)
-  with _STRUCT_SUPPORT_LOCK:
-    known = _STRUCT_SUPPORT.get(key)
-    if known is None:
-      known = _probe_struct(loaded.game.new_initial_state())
-      _STRUCT_SUPPORT[key] = known
-  return known
-
-
-def _probe_struct(state: pyspiel.State) -> bool:
-  """Asks a state for its structured JSON; the one probe per game."""
-  try:
-    state.to_json()
-  except pyspiel.SpielError:
-    return False
-  return True
+def _renderer_of(entry: catalogue.CatalogueEntry) -> str | None:
+  """The renderer of `entry`'s adapter now; None when it has none."""
+  if not entry.loadable:
+    return None
+  adapter = presenters.adapter_for(entry.name)
+  return None if adapter is None else adapter.renderer
 
 
 @functools.cache
-def build_catalogue() -> catalogue.Catalogue:
-  """Returns the catalogue of every registered game, loading each once."""
-  return catalogue.Catalogue(
-      games=tuple(
-          _catalogue_entry(game_type)
-          for _, game_type in sorted(registered_types().items())
-      )
+def _loaded_entries() -> tuple[catalogue.CatalogueEntry, ...]:
+  """Every registered game's entry, loaded once; renderers are read later."""
+  return tuple(
+      _catalogue_entry(game_type)
+      for _, game_type in sorted(registered_types().items())
   )
 
 
@@ -364,6 +399,7 @@ def _catalogue_entry(game_type: pyspiel.GameType) -> catalogue.CatalogueEntry:
     served_information = catalogue.Information.IMPERFECT_INFORMATION
   else:
     served_information = declared
+  controller_names: tuple[str, ...]
   if loaded is None:
     controller_names = ()
   else:
@@ -385,6 +421,8 @@ def _catalogue_entry(game_type: pyspiel.GameType) -> catalogue.CatalogueEntry:
       loadable=reason is None,
       unavailable_reason=reason,
       controllers=controller_names,
+      # Read from the adapter registry by `build_catalogue`, on every call.
+      renderer=None,
   )
 
 

@@ -16,7 +16,7 @@
 
 /*
   The game page: its panels' frames, the Gameplay panel's status line and
-  notices, the handover screen, and the Session panel.
+  notices, and the Session panel.
 */
 
 .game-page {
@@ -163,49 +163,12 @@
   line-height: 1;
 }
 
-.gameplay__notice-dismiss:not([aria-disabled='true']),
-.gameplay__notice-action:not([aria-disabled='true']) {
+.gameplay__notice-dismiss:not([aria-disabled='true']) {
   cursor: pointer;
 }
 
 .gameplay__notice-dismiss:hover:not([aria-disabled='true']) {
   background: var(--color-surface-sunken);
-}
-
-.gameplay__notice-action {
-  flex: none;
-  padding: 3px 10px;
-  border: 1px solid currentcolor;
-  border-radius: var(--radius);
-  background: var(--color-surface-raised);
-  color: inherit;
-  font: inherit;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.gameplay__notice-action:hover:not([aria-disabled='true']) {
-  background: var(--color-surface-sunken);
-}
-
-.hand-over {
-  position: fixed;
-  inset: 0;
-  /* Above every other layer, the settings dialog's 1000 included. */
-  z-index: 1100;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: var(--color-surface);
-  text-align: center;
-}
-
-.hand-over h2,
-.hand-over p {
-  margin: 0;
 }
 
 .session-panel__details {

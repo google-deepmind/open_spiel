@@ -64,7 +64,7 @@ describe('lintClient', () => {
   it('reads the page, the stylesheets and the scripts, and nothing else', async () => {
     const problems = await lintClient(
       await client({
-        'index.html': '<p>\n</p><p style="opacity: 0.5"></p>',
+        'index.html': '<p>\n</p><p style="font-size: 10px"></p>',
         'src/styles/tokens.css': ':root { --text-small: 10px; }',
         'src/styles/dock.css': '',
         'src/panel/small.css': 'a { font-size: var(--text-small); }',
@@ -98,10 +98,6 @@ describe('lintClient', () => {
 
 /** Declarations the gate refuses, each with part of its message. */
 const REFUSED: Array<[string, string]> = [
-  ['opacity: .5', 'opacity .5 fades content'],
-  ['opacity: 0', 'opacity 0 fades content'],
-  ['filter: grayscale(1)', 'filter tints or blurs'],
-  ['backdrop-filter: blur(2px)', 'backdrop-filter tints or blurs'],
   ['color: #888', 'the colour in "#888" belongs in src/styles/tokens.css'],
   ['border: 1px solid #ABCDEF', 'belongs in src/styles/tokens.css'],
   ['color: grey', 'belongs in src/styles/tokens.css'],
@@ -132,15 +128,7 @@ const REFUSED: Array<[string, string]> = [
   ['font-size: 10px !important', 'text at 10px !important cannot be checked'],
   ['font-size: 0.6vw', 'text at 0.6vw cannot be checked'],
   ['font-size: 1ex', 'text at 1ex cannot be checked'],
-  ['font-size: calc(0.5rem + 2px)', 'cannot be checked'],
-  ['font-size: clamp(10px, 1vw, 16px)', 'cannot be checked'],
   ['font-size: 1constructor', 'cannot be checked'],
-  ['opacity: var(--faded)', 'opacity var(--faded) fades content'],
-  ['opacity: calc(1 - 0.5)', 'fades content'],
-  ['fill-opacity: 0.5', 'fill-opacity 0.5 fades content'],
-  ['stroke-opacity: 0', 'stroke-opacity 0 fades content'],
-  ['stop-opacity: 0.4', 'stop-opacity 0.4 fades content'],
-  ['flood-opacity: 0.4', 'flood-opacity 0.4 fades content'],
   ['color: var(--color-text, #888)', 'belongs in src/styles/tokens.css'],
   [
     'background: var(--shade, rgb(0 0 0 / 0.5))',
@@ -172,6 +160,19 @@ describe('lintCss', () => {
     'font-family: system-ui, sans-serif',
     "content: '#888 red'",
     '--dv-tab-font-size: 13px',
+    // A game board's own styling: faded and filtered content, and text
+    // sized by the cards.
+    'opacity: 0.5',
+    'opacity: var(--faded)',
+    'fill-opacity: 0.35',
+    'stroke-opacity: 0',
+    'filter: grayscale(0.7)',
+    'filter: brightness(1.15)',
+    'backdrop-filter: blur(2px)',
+    'font-size: max(12px, calc(var(--card-w) * 0.2))',
+    'font-size: calc(var(--pcard-symbol-font, 1em) * 0.62)',
+    'font-size: min(0.8em, var(--pcard-empty-font, 0.8em))',
+    'font-size: clamp(10px, 1vw, 16px)',
   ])('passes %s', declaration => {
     expect(cssMessages(`a { ${declaration}; }`)).toEqual([]);
   });
@@ -190,14 +191,14 @@ describe('lintCss', () => {
       cssMessages(':root { --c: #888; }', 'src/styles/tokens.css'),
     ).toEqual([]);
     expect(
-      cssMessages(':root { opacity: 0.5; }', 'src/styles/tokens.css'),
+      cssMessages(':root { font-size: 10px; }', 'src/styles/tokens.css'),
     ).toHaveLength(1);
   });
 
   it('gives the line of each problem', () => {
     const problems = lintCss(
       'src/a.css',
-      'a {\n  color: red;\n}\n\nb {\n  opacity: 0;\n}',
+      'a {\n  color: red;\n}\n\nb {\n  font-size: 10px;\n}',
       TOKENS,
     );
     expect(problems.map(({file, line}) => `${file}:${String(line)}`)).toEqual([
@@ -211,20 +212,11 @@ describe('lintCss on a disabled control', () => {
   it.each([
     'cursor: not-allowed',
     'border-style: dashed',
-    'outline-style: dashed',
+    'color: var(--gin-action-disabled-text)',
+    'background: var(--gin-action-disabled-fill)',
+    'opacity: 0.5',
   ])('lets a disabled control set %s', declaration => {
     expect(cssMessages(`button:disabled { ${declaration}; }`)).toEqual([]);
-  });
-
-  it.each([
-    'button:disabled { color: var(--color-text-muted); }',
-    '.button[disabled] { background: var(--color-surface-sunken); }',
-    "[aria-disabled='true'] { cursor: default; }",
-    '@media (hover) { .row { a:disabled { color: var(--color-text); } } }',
-  ])('refuses a greyed-out disabled control: %s', css => {
-    const messages = cssMessages(css);
-    expect(messages).toHaveLength(1);
-    expect(messages[0]).toContain('a disabled control sets');
   });
 });
 
@@ -254,35 +246,23 @@ describe('lintCss on a live control', () => {
 
 describe('lintScript', () => {
   it.each([
-    ['<p style={{opacity: 0.5}} />', 'opacity 0.5 fades content'],
-    ['<p style={{filter: "blur(1px)"}} />', 'filter tints or blurs'],
     ['<p style={{color: "#888"}} />', 'belongs in src/styles/tokens.css'],
     [
       "<p style={{'backgroundColor': 'white'}} />",
       'belongs in src/styles/tokens.css',
     ],
     ['<p style={{fontSize: 10}} />', 'text at 10px is under 12 px'],
-    ['element.style.opacity = "0.5";', 'opacity 0.5 fades content'],
     ['element.style.borderColor = `red`;', 'belongs in src/styles/tokens.css'],
     ['<circle fill="#888" />', 'belongs in src/styles/tokens.css'],
     ["<path stroke={'black'} />", 'belongs in src/styles/tokens.css'],
     ['context.fillStyle = "#123456";', 'belongs in src/styles/tokens.css'],
     ["context.strokeStyle = 'white';", 'belongs in src/styles/tokens.css'],
     [
-      '<button style={{opacity: disabled ? 0.5 : 1}} />',
-      'opacity 0.5 fades content',
-    ],
-    [
       "<rect fill={on ? '#888' : 'var(--color-accent)'} />",
       'belongs in src/styles/tokens.css',
     ],
     ["<rect fill={colour ?? ('grey')} />", 'belongs in src/styles/tokens.css'],
     ["<rect stroke={colour || 'black'} />", 'belongs in src/styles/tokens.css'],
-    ['<p style={{opacity: faded && 0}} />', 'opacity 0 fades content'],
-    ['<circle fillOpacity={0.5} />', 'fill-opacity 0.5 fades content'],
-    ['<circle stroke-opacity="0.5" />', 'stroke-opacity 0.5 fades content'],
-    ['<stop stopOpacity={0} />', 'stop-opacity 0 fades content'],
-    ['<g opacity={0.3} />', 'opacity 0.3 fades content'],
     ['<p style={{fontSize: "var(--text-small)"}} />', 'text at 10px'],
   ])('refuses %s', (source, message) => {
     const problems = lintScript('src/a.tsx', `\n${source}`, TOKENS);
@@ -303,6 +283,11 @@ describe('lintScript', () => {
     '<p style={{fontSize: large ? 16 : 14, opacity: 1}} />',
     "<rect fill={on ? 'var(--color-accent)' : 'var(--color-surface)'} />",
     '<g opacity={1} />',
+    '<p style={{opacity: 0.7}} />',
+    '<p style={{filter: "blur(1px)"}} />',
+    'element.style.opacity = "0.5";',
+    '<circle strokeOpacity={0.35} />',
+    '<g opacity={0.3} />',
   ])('passes %s', source => {
     expect(scriptMessages(source)).toEqual([]);
   });
@@ -311,7 +296,7 @@ describe('lintScript', () => {
 describe('lintHtml', () => {
   it('reads style elements and attributes, on their own lines', () => {
     const html =
-      '<html>\n<style>\n  a { color: red; }\n</style>\n<p style="opacity: 0.5"></p>';
+      '<html>\n<style>\n  a { color: red; }\n</style>\n<p style="font-size: 10px"></p>';
     expect(lintHtml('index.html', html, TOKENS).map(({line}) => line)).toEqual([
       3, 5,
     ]);

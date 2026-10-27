@@ -23,11 +23,13 @@ import {
   editJson,
   isChanged,
   readSeatDraft,
+  refusalOf,
   sameConfig,
   savedConfig,
   savedDraft,
 } from './seat_draft.ts';
 import {
+  CHECKPOINT,
   CONTROLLERS,
   HUMAN_CONTROLLER,
   MCTS,
@@ -75,6 +77,54 @@ describe('savedConfig', () => {
   it('keeps settings no form can show as they are', () => {
     const seat = seatView(0, SCRIPTED, {config: {moves: '1 2'}});
     expect(savedConfig(seat, CONTROLLERS).config).toEqual({moves: '1 2'});
+  });
+});
+
+describe('required settings', () => {
+  const draft = choose(savedDraft(seatView(1), CONTROLLERS), 'checkpoint');
+
+  it('fills in no default for a required setting', () => {
+    const seat = seatView(1, CHECKPOINT, {config: {checkpoint: 'c'}});
+    expect(savedConfig(seat, CONTROLLERS).config).toEqual({
+      deterministic: true,
+      temperature: 1,
+      checkpoint: 'c',
+    });
+  });
+
+  it('refuses a draft missing a required setting, naming it', () => {
+    const reading = readSeatDraft(draft);
+    expect(reading).toEqual({
+      ok: false,
+      errors: {
+        kind: 'form',
+        errors: {checkpoint: 'This setting is required.'},
+      },
+    });
+    if (reading.ok) throw new Error('The draft was read.');
+    expect(refusalOf(draft, reading.errors)).toBe(
+      'Not saved: Checkpoint is required.',
+    );
+  });
+
+  it('says which settings are missing and which are not valid', () => {
+    const bad = editField(draft, 'temperature', '-1');
+    const reading = readSeatDraft(bad);
+    if (reading.ok) throw new Error('The draft was read.');
+    expect(refusalOf(bad, reading.errors)).toBe(
+      'Not saved: Checkpoint is required; Temperature is not valid.',
+    );
+  });
+
+  it('reads a draft with the required setting filled in', () => {
+    expect(readSeatDraft(editField(draft, 'checkpoint', 'c'))).toEqual({
+      ok: true,
+      config: {
+        controller: 'checkpoint',
+        config: {checkpoint: 'c', deterministic: true, temperature: 1},
+        autoplay: true,
+      },
+    });
   });
 });
 

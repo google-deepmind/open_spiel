@@ -18,11 +18,16 @@ import type {HistoryEntry} from '../contract/contract.ts';
 import {historyRows, rowText} from './history_rows.ts';
 
 function hidden(seat: number | null): HistoryEntry {
-  return {seat, action: null, label: null, rewards: null};
+  return {seat, action: null, label: null, rewards: null, public_label: null};
 }
 
 function shown(seat: number | null, label: string): HistoryEntry {
-  return {seat, action: 0, label, rewards: null};
+  return {seat, action: 0, label, rewards: null, public_label: null};
+}
+
+// Withheld from the viewer, with the label the game makes public.
+function published(seat: number | null, label: string): HistoryEntry {
+  return {seat, action: null, label: null, rewards: null, public_label: label};
 }
 
 // Each row's two columns, joined by a space.
@@ -63,6 +68,29 @@ describe('historyRows', () => {
       '#1 Hidden action of seat 0',
       '#2 Hidden action of seat 1',
       '#3 Hidden chance outcome',
+    ]);
+  });
+
+  it("shows another seat's public action under its public label", () => {
+    expect(
+      texts([
+        hidden(null),
+        hidden(null),
+        published(null, 'Chance outcome: Jd'),
+        published(1, 'Player: 1 Action: Draw upcard'),
+        published(1, 'Player: 1 Action: Qs'),
+        published(0, 'Player: 0 Action: Draw stock'),
+        hidden(null),
+        hidden(null),
+      ]),
+    ).toEqual([
+      '#0 Initial',
+      '#1–2 Hidden chance outcome ×2',
+      '#3 Chance outcome: Jd',
+      '#4 Player: 1 Action: Draw upcard',
+      '#5 Player: 1 Action: Qs',
+      '#6 Player: 0 Action: Draw stock',
+      '#7–8 Hidden chance outcome ×2',
     ]);
   });
 

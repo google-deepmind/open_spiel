@@ -285,7 +285,7 @@ describe('GameOptions refusals', () => {
     commit(control(container, 'Board Size'));
     const refusal = new ContractError(
       {
-        contract_version: 2,
+        contract_version: 7,
         code: 'bad_request',
         message: 'The game refuses a board of 13.',
         seat: null,

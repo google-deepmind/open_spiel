@@ -26,6 +26,7 @@ import random
 
 from open_spiel.python.gui import contract
 from open_spiel.python.gui import errors
+from open_spiel.python.gui import presenters
 import pyspiel
 
 
@@ -65,12 +66,16 @@ class Ply:
     action: The OpenSpiel action id.
     label: The game's text for the action, at the position it was applied.
     rewards: Each seat's reward for the action, in seat order.
+    public_label: What a viewer who may not see the action may read of it,
+      from the game's adapter; None when the action is hidden from such a
+      viewer.
   """
 
   seat: int | None
   action: int
   label: str
   rewards: tuple[float, ...]
+  public_label: str | None = None
 
 
 def to_move(state: pyspiel.State) -> contract.ToMove:
@@ -112,6 +117,9 @@ def label(state: pyspiel.State, action: int) -> str:
 def apply(state: pyspiel.State, action: int, *, ply: int) -> Ply:
   """Applies a legal action or chance outcome to `state`, recording it.
 
+  The record holds the action's public label, from the game's adapter
+  (`presenters.public_action_label`).
+
   Args:
     state: The state to change.
     action: An action or chance outcome legal at `state`.
@@ -129,12 +137,14 @@ def apply(state: pyspiel.State, action: int, *, ply: int) -> Ply:
         f"Action {action} is not legal at ply {ply}.", ply=ply, seat=seat
     )
   text = label(state, action)
+  public = presenters.public_action_label(state, action)
   state.apply_action(action)
   return Ply(
       seat=seat,
       action=action,
       label=text,
       rewards=tuple(float(reward) for reward in state.rewards()),
+      public_label=public,
   )
 
 

@@ -48,6 +48,40 @@ python3 -m open_spiel.python.gui --client-dir "$PWD/open_spiel/gui/dist"
 Without a built client the server still answers its JSON API, and its page
 at `/` says how to build the client.
 
+## Boards and bots
+
+Tic-tac-toe, connect four, chess, checkers, Kuhn poker, Leduc poker, gin
+rummy, hearts and euchre have their own boards, drawn by a per-game adapter
+in `open_spiel/python/gui/adapters/` and a renderer in
+`open_spiel/gui/src/games/`. Every other game is drawn from its text. The
+catalogue badges each game Board UI, Text only or Unavailable, and can be
+filtered by badge.
+
+A game page opens in analysis, which shows the full state: View ›
+Perspective chooses the seat the board is drawn from, a board's Show all
+cards turns the other hands face up, and moves are made for every seat a
+person plays. An address that names a seat (`viewer=1`) or a spectator shows
+only what that viewer may see.
+
+`open_spiel/gui/src/INTERFACES.md` says how to add a board, a card deck or a
+card back, and how to swap in a different chess board or chess pieces.
+
+A seat is played by a person or a bot: `random`, `mcts`, or one a plugin
+registers. For a game implemented in C++, `mcts` is pyspiel's `MCTSBot`; for
+a game implemented in Python, it is OpenSpiel's Python MCTS, which stops at
+the move budget and at a cap on tree nodes. At startup the server checks
+whether pyspiel's `MCTSBot` stops at its simulation count when it is also
+given a wall-clock limit, and reports the answer in `/api/health`. If it
+does, `mcts` runs up to its simulation count with a wall-clock limit inside
+the move budget; if not, it sets no wall-clock limit and caps the
+simulations at 250.
+
+Bots are built in the background, so a seat whose bot loads a model shows
+it preparing while the rest of the page stays usable. A plugin is a module
+with a function `register_into(controllers)`; the server loads plugins only
+when `--controllers` names them, and stops with an error naming the plugin
+if one fails to load (see `open_spiel/python/gui/plugins.py`).
+
 ## Options
 
 ```
@@ -60,6 +94,9 @@ python3 -m open_spiel.python.gui --help
 | `--port`            | The port to listen on; `8080` by default, `0` for any.     |
 | `--allow-host NAME` | A further host name requests may use. Repeatable.          |
 | `--client-dir DIR`  | The directory of the built client; `open_spiel/gui/dist`.  |
+| `--controllers MODULE[,MODULE...]` | Controller plugins to load before serving; `auto` loads every installed `open_spiel.gui.controllers` entry point. Repeatable; none by default. |
+| `--move-budget-seconds SECONDS` | How long a bot may take to choose a move; `10` by default. |
+| `--build-budget-seconds SECONDS` | How long a bot may take to load and warm up; `120` by default. |
 
 The server has no authentication, and the oracle viewer is shown every
 player's private information. Keep the default loopback address unless the

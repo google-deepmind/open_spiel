@@ -57,6 +57,7 @@ def _catalogue() -> catalogue_lib.Catalogue:
               loadable=True,
               unavailable_reason=None,
               controllers=(contract.HUMAN,),
+              renderer="tic_tac_toe",
           ),
       )
   )
@@ -70,7 +71,7 @@ def _health() -> health_lib.Health:
       capabilities=health_lib.Capabilities(
           controllers=controllers.registered(),
           chance_policies=tuple(contract.ChancePolicy),
-          python_game_search=False,
+          cpp_mcts_limits=controllers.mcts_limits(),
       ),
   )
 

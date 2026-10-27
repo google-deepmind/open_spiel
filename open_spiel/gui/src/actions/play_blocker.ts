@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Frame} from '../contract/contract.ts';
+import {preparingMover, preparingText} from '../players/preparing.ts';
 
 // The controller playing the seat to move, or null when no seat is.
 function moverController({to_move: mover, seats}: Frame): string | null {
@@ -51,6 +52,10 @@ export function playBlocker(frame: Frame): string | null {
     return `Paused: the controller of seat ${String(failed.seat)} failed.`;
   }
   if (controller === null) return 'Chance to move.';
+  const preparing = preparingMover(frame);
+  if (preparing !== null) {
+    return preparingText(session.controllers, preparing);
+  }
   if (viewer.kind === 'spectator') return 'Spectating. Claim a seat to act.';
   // The server lists the human controller first.
   if (controller !== session.controllers[0]?.name) {

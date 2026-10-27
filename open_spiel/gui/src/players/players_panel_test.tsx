@@ -21,7 +21,14 @@ import {stubResizeObserver} from '../testing/dom.ts';
 import {enter, labelled} from '../testing/input.ts';
 import {only} from '../testing/render.tsx';
 import {PlayersPanel} from './players_panel.tsx';
-import {MCTS, RANDOM, SCRIPTED, frameWith, seatView} from './testing/seats.ts';
+import {
+  CHECKPOINT,
+  MCTS,
+  RANDOM,
+  SCRIPTED,
+  frameWith,
+  seatView,
+} from './testing/seats.ts';
 
 let container: HTMLElement;
 let root: Root;
@@ -140,6 +147,7 @@ describe('PlayersPanel seats', () => {
       'Random',
       'MCTS — not available here',
       'Scripted',
+      'Checkpoint',
     ]);
     expect(select.value).toBe('human');
     expect(row.querySelector('[role="note"]')).toBeNull();
@@ -277,6 +285,71 @@ describe('PlayersPanel save bars', () => {
     expect(button(seat(0), 'Save settings for Player 0').disabled).toBe(true);
     expect(button(seat(0), 'Save settings').disabled).toBe(true);
     expect(button(seat(0), 'Reset changes for Player 0').disabled).toBe(true);
+  });
+});
+
+describe('PlayersPanel required settings', () => {
+  it('marks a required setting and starts it empty, in a text box', () => {
+    show(TWO_HUMANS);
+    const row = open(1);
+    enter(labelled(row, 'Controller'), 'checkpoint');
+    const box = labelled(row, 'Checkpoint') as HTMLInputElement;
+    expect(box.type).toBe('text');
+    expect(box.value).toBe('');
+    expect(box.getAttribute('aria-required')).toBe('true');
+    expect(only(row, '.field-form__required').textContent).toBe('*');
+  });
+
+  it('refuses a save missing a required setting, and says so', () => {
+    show(TWO_HUMANS);
+    const row = open(1);
+    enter(labelled(row, 'Controller'), 'checkpoint');
+    click(button(row, 'Save settings for Player 1'));
+    expect(setSeat).not.toHaveBeenCalled();
+    expect(saveState(row)).toBe('Not saved: Checkpoint is required.');
+    expect(only(row, '.seat-editor__refusal').textContent).toBe(
+      'Not saved: Checkpoint is required.',
+    );
+    const box = labelled(row, 'Checkpoint');
+    expect(box.getAttribute('aria-invalid')).toBe('true');
+    expect(row.textContent).toContain('This setting is required.');
+  });
+
+  it('saves a checkpoint typed in, with the other settings’ defaults', () => {
+    show(TWO_HUMANS);
+    const row = open(1);
+    enter(labelled(row, 'Controller'), 'checkpoint');
+    click(button(row, 'Save settings'));
+    enter(labelled(row, 'Checkpoint'), 'runs/run_1/checkpoint_100');
+    expect(row.textContent).not.toContain('This setting is required.');
+    expect(saveState(row)).toBe('Unsaved changes');
+    click(button(row, 'Save settings'));
+    expect(setSeat.mock.calls).toEqual([
+      [
+        1,
+        {
+          controller: 'checkpoint',
+          config: {
+            checkpoint: 'runs/run_1/checkpoint_100',
+            deterministic: true,
+            temperature: 1,
+          },
+          autoplay: true,
+        },
+      ],
+    ]);
+  });
+
+  it('holds no changes for a seat saved with its checkpoint', () => {
+    show(
+      frameWith([
+        seatView(0),
+        seatView(1, CHECKPOINT, {config: {checkpoint: 'c'}, autoplay: true}),
+      ]),
+    );
+    const row = open(1);
+    expect(labelled(row, 'Checkpoint').value).toBe('c');
+    expect(saveState(row)).toBe('No changes');
   });
 });
 

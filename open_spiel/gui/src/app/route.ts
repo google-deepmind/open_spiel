@@ -25,6 +25,8 @@ export type Route =
       readonly session: string | null;
       /** The viewer the URL names, or null for the game's default. */
       readonly viewer: Viewer | null;
+      /** The seat analysis is drawn from (`viewSeat`), or null for none. */
+      readonly viewSeat: number | null;
     }
   | {readonly page: 'missing'; readonly path: string};
 
@@ -32,7 +34,8 @@ const GAME_PATH = /^\/game\/([^/]+)\/?$/;
 
 /**
  * The page `url` shows: the catalogue at `/`, a game at `/game/<name>`, with
- * the session and viewer it names in its `session` and `viewer` parameters.
+ * the session and viewer it names in its `session` and `viewer` parameters,
+ * and the seat analysis is drawn from in `viewSeat`.
  */
 export function routeOf(url: URL): Route {
   const {pathname, searchParams} = url;
@@ -45,7 +48,8 @@ export function routeOf(url: URL): Route {
     page: 'game',
     game,
     session: searchParams.get('session'),
-    viewer: viewerOf(searchParams.get('viewer')),
+    viewer: addressedViewer(searchParams.get('viewer')),
+    viewSeat: seatOf(searchParams.get('viewSeat')),
   };
 }
 
@@ -60,13 +64,30 @@ function decodedName(segment: string): string | null {
   }
 }
 
+/**
+ * The viewer a page's `viewer` parameter names: null when it is absent (the
+ * game's default, analysis), and the spectator when it names no viewer, such
+ * as `viewer=-1` or `viewer=seat`. An address that asks for a viewer is never
+ * shown the oracle's every hand by mistake.
+ */
+function addressedViewer(parameter: string | null): Viewer | null {
+  if (parameter === null) return null;
+  return viewerOf(parameter) ?? {kind: 'spectator', seat: null};
+}
+
 /** The viewer a `viewer` parameter names; null when absent or unknown. */
 export function viewerOf(parameter: string | null): Viewer | null {
   if (parameter === 'oracle' || parameter === 'spectator') {
     return {kind: parameter, seat: null};
   }
+  const seat = seatOf(parameter);
+  return seat === null ? null : {kind: 'seat', seat};
+}
+
+/** The seat a parameter names; null when absent or not a seat index. */
+export function seatOf(parameter: string | null): number | null {
   if (parameter !== null && /^(0|[1-9][0-9]{0,3})$/.test(parameter)) {
-    return {kind: 'seat', seat: Number(parameter)};
+    return Number(parameter);
   }
   return null;
 }
@@ -76,12 +97,17 @@ export function gamePath(game: string): string {
   return `/game/${encodeURIComponent(game)}`;
 }
 
-/** The URL of the page that shows `session` of `game` to `viewer`. */
+/**
+ * The URL of the page that shows `session` of `game` to `viewer`, drawn from
+ * seat `viewSeat` in analysis when it is not null.
+ */
 export function sessionPath(
   game: string,
   session: string,
   viewer: Viewer,
+  viewSeat: number | null = null,
 ): string {
   const query = new URLSearchParams({session, viewer: viewerParameter(viewer)});
+  if (viewSeat !== null) query.set('viewSeat', String(viewSeat));
   return `${gamePath(game)}?${query.toString()}`;
 }

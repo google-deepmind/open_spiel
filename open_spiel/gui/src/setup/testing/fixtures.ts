@@ -98,6 +98,7 @@ export const ENTRY: CatalogueEntry = {
   loadable: true,
   unavailable_reason: null,
   controllers: ['human', 'random'],
+  renderer: null,
 };
 
 /** The values ENTRY's parameters take by default. */
@@ -129,7 +130,7 @@ export function boardFrame({
 }: FrameOptions = {}): Frame {
   const omniscient = viewer.kind === 'oracle' || !hidesInformation;
   return {
-    contract_version: 2,
+    contract_version: 7,
     session: {
       id,
       game: 'board',
@@ -164,6 +165,8 @@ export function boardFrame({
         config: {},
         autoplay: false,
         failure: null,
+        status: 'ready',
+        message: null,
       },
       {
         seat: 1,
@@ -171,6 +174,8 @@ export function boardFrame({
         config: {depth: 2},
         autoplay: true,
         failure: null,
+        status: 'ready',
+        message: null,
       },
     ],
     ply: history.length,
@@ -178,16 +183,20 @@ export function boardFrame({
     to_move: {kind: 'seat', seat: history.length % 2},
     legal_actions: omniscient ? [{id: 0, label: 'pass'}] : null,
     chance_outcomes: omniscient ? [] : null,
-    history: history.map((action, ply) =>
-      omniscient
-        ? {seat: ply % 2, action, label: String(action), rewards: [0, 0]}
-        : {seat: ply % 2, action: null, label: null, rewards: null},
-    ),
+    history: history.map((action, ply) => ({
+      seat: ply % 2,
+      public_label: null,
+      ...(omniscient
+        ? {action, label: String(action), rewards: [0, 0]}
+        : {action: null, label: null, rewards: null}),
+    })),
     rewards: history.length === 0 ? null : omniscient ? [0, 0] : null,
     returns: null,
     state_text: omniscient ? 'board' : null,
     observation_text: viewer.kind === 'seat' ? 'board' : null,
     information_state_text: null,
     struct: null,
+    observation_struct: null,
+    presentation: null,
   };
 }

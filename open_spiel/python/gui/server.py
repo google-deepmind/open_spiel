@@ -62,6 +62,10 @@ class Server(http.server.ThreadingHTTPServer):
   """An HTTP server for the API and the client, one thread per request."""
 
   daemon_threads = True
+  # The listen backlog: connections the system holds while the server has
+  # not yet accepted them. The standard library's 5 resets a burst of
+  # requests, such as a page loading while a move is played.
+  request_queue_size = 128
 
   def __init__(
       self,

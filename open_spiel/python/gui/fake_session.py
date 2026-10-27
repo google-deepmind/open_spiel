@@ -195,6 +195,8 @@ class FakeSession:
         observation_text=self._observation(viewer, state),
         information_state_text=self._information_state(viewer, state),
         struct=None,
+        observation_struct=None,
+        presentation=None,
     )
 
   def _info(self, viewer: contract.Viewer) -> contract.SessionInfo:

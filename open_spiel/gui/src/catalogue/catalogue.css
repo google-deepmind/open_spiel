@@ -14,7 +14,8 @@
   limitations under the License.
 */
 
-/* The catalogue: the search field above the list of games. */
+/* The catalogue: the search field and the view filter above the list of
+   games, each with its Board UI, Text only or Unavailable badge. */
 
 .catalogue {
   box-sizing: border-box;
@@ -43,19 +44,32 @@
 
 .catalogue__games {
   display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
   gap: 2px;
   margin: 16px 0 0;
   padding: 0;
   list-style: none;
 }
 
+/* The badge leads each row in a column of its own, as wide as the widest
+   badge (the rows share the list's columns), so the badges line up and
+   every title starts at one edge. */
 .catalogue__game {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.catalogue__about {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 12px;
   align-items: baseline;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--color-border);
+  min-width: 0;
 }
 
 .catalogue__title {
@@ -75,4 +89,37 @@ a.catalogue__title {
   flex-basis: 100%;
   margin: 0;
   color: var(--color-text-muted);
+}
+
+/* A game's view badge: a small pill. */
+.catalogue__badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  justify-self: stretch;
+  padding: 3px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.catalogue__badge--board {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.catalogue__badge--text {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
+}
+
+.catalogue__badge--unavailable {
+  border-style: dashed;
+  color: var(--color-text-secondary);
 }

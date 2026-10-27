@@ -28,6 +28,7 @@ import random
 import secrets
 import threading
 
+from open_spiel.python.gui import builds
 from open_spiel.python.gui import contract
 from open_spiel.python.gui import controllers as controllers_lib
 from open_spiel.python.gui import errors
@@ -93,7 +94,9 @@ class Session:
             for descriptor in controllers_lib.descriptors(loaded.game)
         ),
     )
-    self._seats = seats.Seats(loaded.num_seats)
+    self._seats = seats.Seats(
+        loaded.num_seats, loaded.game, seed=seed, on_built=self._built
+    )
     self._state = loaded.game.new_initial_state()
     self._plies: list[plies.Ply] = []
     # How many chance outcomes the session has sampled; never rewound.
@@ -141,11 +144,11 @@ class Session:
         seed=seats.random_seed() if seed is None else seed,
         chance_policy=chance_policy,
     )
-    for index, (spec, plays) in enumerate(
-        zip(controllers, autoplay or [False] * num_seats)
-    ):
-      session._seats[index] = session._make_seat(index, spec, plays)
-    session._settle(request.MAX_ADVANCE_PLIES, autoplay_only=True)
+    with session._lock:  # A build may finish on its own thread meanwhile.
+      session._seats.assign(
+          dict(enumerate(zip(controllers, autoplay or [False] * num_seats)))
+      )
+      session._settle(request.MAX_ADVANCE_PLIES, autoplay_only=True)
     return session
 
   @property
@@ -356,7 +359,8 @@ class Session:
     """Changes who plays `seat`, resuming it if its controller had failed.
 
     As with a reset, any viewer but a spectator changes it. Autoplaying seats
-    then move as usual; if a controller fails, the frame shows it paused.
+    then move as usual; if a controller fails, the frame shows it paused. A
+    controller still being built leaves the seat preparing (see `builds`).
 
     Args:
       viewer: The viewer changing the seat.
@@ -378,23 +382,20 @@ class Session:
       self._check_participant(viewer, "changes who plays a seat")
       if not 0 <= seat < len(self._seats):
         raise errors.NotFoundError(f"There is no seat {seat}.", seat=seat)
-      self._seats[seat] = self._make_seat(seat, spec, autoplay)
+      self._seats.assign({seat: (spec, autoplay)})
       self._settle(request.MAX_ADVANCE_PLIES, autoplay_only=True)
       return self._build(self._state, len(self._plies), viewer)
 
-  def _make_seat(
-      self, index: int, spec: controllers_lib.Spec, autoplay: bool
-  ) -> seats.Seat:
-    """Builds a seat played as `spec` says."""
-    try:
-      return seats.Seat.make(
-          spec,
-          self._loaded.game,
-          autoplay=autoplay,
-          seed=seats.derive_seed(self._seed, "seat", index),
-      )
-    except controllers_lib.UnavailableError as error:
-      raise errors.ControllerUnavailableError(str(error), seat=index) from error
+  def _built(
+      self, index: int, build: builds.Build[controllers_lib.Controller]
+  ) -> None:
+    """Finishes the seat `build` prepares, if it still does, and plays on."""
+    with self._lock:
+      seat = self._seats[index]
+      if seat.build is not build:
+        return  # Finished in its request, or superseded.
+      seat.finish(index, refuse=False)
+      self._settle(request.MAX_ADVANCE_PLIES, autoplay_only=True)
 
   def _position_to_play(
       self, viewer: contract.Viewer, ply: int | None
@@ -494,8 +495,8 @@ class Session:
     """Lets the controller of the seat to move play; returns whether it did.
 
     Nothing plays at a chance node, at the end of the game, while a seat is
-    paused, or when the seat to move is a human's (or, if `autoplay_only`,
-    does not autoplay).
+    paused, or when the seat to move is a human's, is preparing, or (if
+    `autoplay_only`) does not autoplay.
 
     Args:
       autoplay_only: Whether only an autoplaying seat may move.
@@ -513,7 +514,7 @@ class Session:
     index = plies.to_move(state).seat
     assert index is not None
     seat = self._seats[index]
-    if seat.is_human or (autoplay_only and not seat.autoplay):
+    if not seat.moves(autoplay_only=autoplay_only):
       return False
     action = seat.choose_action(state, index)
     if action is None:

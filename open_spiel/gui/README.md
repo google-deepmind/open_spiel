@@ -30,12 +30,16 @@ is a section of Setup. Every panel but Gameplay is a group of sections, and
 each game remembers the section each shows. Moves are made in Actions ›
 Legal, and the positions are stepped through from Actions › History, where
 the oracle, or any viewer of a game that hides nothing, may also play on from
-an earlier position, a new line that takes back the moves after it. A game
-of perfect information opens for the oracle, any other as the first seat; any
-viewer but a spectator changes who plays a seat, and in a game that hides
-information, when another person's seat is to move, the page offers to hand
-the device over behind a screen. Panel options reopens a closed panel and
-keeps named layouts in the browser.
+an earlier position, a new line that takes back the moves after it. Every
+game opens in analysis, as the oracle, who sees the full state and acts for
+every human seat; View › Perspective sits at any seat, and a board's Show
+all cards turns the other hands face up. An address that names a seat
+(`viewer=1`) or a spectator opens a game instead, shown only what that viewer
+may see, its perspective locked; one naming a seat the game does not have
+opens the spectator's view. Any viewer but a spectator changes who plays a
+seat. Panel options reopens a closed panel and keeps named layouts in the
+browser. The catalogue marks each game Board UI, Text only or Unavailable,
+and filters by it.
 
 ## Development
 
@@ -53,6 +57,12 @@ npm run lint:style         # the style gate alone
 npm run contrast           # the contrast check alone
 ```
 
+The Prettier options are under `prettier` in `package.json`, and the files
+Prettier and ESLint skip are named in the `format` scripts and in
+`eslint.config.mjs`, so the checks need no dotfiles. The commands above
+write `node_modules/`, `dist/`, `e2e-server.log`, `playwright-report/` and
+`test-results/` here; none of them is source, so keep them out of commits.
+
 `npm run smoke:session -- http://127.0.0.1:8080 tic_tac_toe` plays one game
 through a running server: it creates a session, plays to the end, goes back to
 ply 2, undoes, resets to a three-ply history, and shows the position to seat 0,
@@ -65,6 +75,10 @@ typed value (here three seats, as setting Players does), and replays a typed
 history.
 
 The server serves the client from `dist/`, so a build is all it needs.
+`npm run dev` serves the client with hot reload at `http://localhost:5173/`
+and sends its `/api` requests to a running server,
+`http://127.0.0.1:8080` (`python -m open_spiel.python.gui`, from the
+repository root) unless `OPENSPIEL_GUI_SERVER` names another.
 Third-party notices are in `licenses/`.
 
 ## End-to-end tests
@@ -156,9 +170,13 @@ read-only.
 
 ## View
 
-`src/view/` is the View panel, a panel group of how the game is shown. Its
-Perspective section chooses whose view the page shows: a seat, the oracle or
-a spectator. The page's theme is an app setting, in the header's Settings.
+`src/view/` is the View panel, a panel group of how the game is shown: a
+board's own sections, then Perspective, then the board's Animation. In
+analysis, Perspective chooses the seat the board is drawn from ("Seat N"),
+which only turns the board and fetches nothing; the address keeps it as
+`viewSeat`. In a game it shows the viewer's own seat, locked, with the
+reason. `src/game/bottom_seat.ts` holds the mode and the seat every board
+reads. The page's theme is an app setting, in the header's Settings.
 
 ## State and replay
 
@@ -187,9 +205,10 @@ the first paint.
 
 Two gates, both part of `npm run check`, keep the styling readable:
 
-- `npm run lint:style` refuses opacity, filters, a colour outside the tokens,
-  text under 12 px, and a disabled control styled by more than its cursor and
-  edge.
+- `npm run lint:style` refuses a colour outside the tokens, text under
+  12 px, and a live control's style on a selector that does not exclude
+  `[aria-disabled='true']`. A text size computed by `calc()`, `min()`,
+  `max()` or `clamp()` scales with a board's cards and is left to review.
 - `npm run contrast` measures every text colour against every surface (at
   least 4.5:1) and the focus ring and control edges (at least 3:1), in both
   themes.
@@ -234,7 +253,11 @@ save is the session's error, shown where the dock shows session errors; the
 panel keeps the draft so that it can be corrected. While Players is open,
 Setup's dock group stays tall enough to show every seat. `src/form/` builds
 the settings form from a controller's `config_schema`: a row per setting, its
-description behind an "i" toggle and its `x-presets` as chips, and falls back
+description behind an "i" toggle and its `x-presets` as chips, a text box for
+a string (a list for one with an `enum`), and an asterisk on a setting the
+schema lists in `required`, which starts empty. A save with a required
+setting empty, or a value its constraints refuse, is refused: the setting's
+row says why, and both bars say which settings to fix. The form falls back
 to a JSON box, where empty means no settings, for a schema a flat form cannot
 show.
 
@@ -252,3 +275,24 @@ the `Session` that `useSession` returns and draws the game with text alone:
 - Nothing else: the moves are made in Actions › Legal, and the Gameplay
   panel's status line gives the turn, who is to move, the viewer and, once
   the game is over, the returns.
+
+## Piece sets, boards and decks: swap recipes
+
+Chess pieces are drawn with the set picked in View › Board › Pieces: the
+Staunton set drawn for this client by default. A module in `addons/` (a
+directory git ignores) can draw a game with another board, or add piece sets
+and card decks. Each swap is a short recipe in `src/INTERFACES.md`: the
+commands, the one file to create with its whole content, and how to check
+it, run from this directory after the steps in
+[Before a recipe](src/INTERFACES.md#before-a-recipe) (Node.js, `npm ci`,
+`addons/`, and a running server).
+
+- [Replacing the chess board](src/INTERFACES.md#replacing-the-chess-board):
+  chessground, installed yourself into `addons/`
+  (`npm install --prefix addons chessground`), through one add-on file
+  that draws with the client's piece sets and View settings.
+- [Using the cburnett pieces](src/INTERFACES.md#using-the-cburnett-pieces):
+  `npm run fetch-pieces -- cburnett` downloads the cburnett pieces from
+  Wikimedia Commons.
+- [Adding a card deck or back](src/INTERFACES.md#adding-a-card-deck-or-back):
+  one add-on file registers a deck or a new back.

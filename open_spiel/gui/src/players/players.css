@@ -302,6 +302,16 @@
   font-weight: 600;
 }
 
+.seat-editor__state[data-refused='true'],
+.seat-editor__refusal {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.seat-editor__refusal {
+  font-size: 12px;
+}
+
 .seat-editor__unsaved-dot {
   display: inline-block;
   width: 7px;

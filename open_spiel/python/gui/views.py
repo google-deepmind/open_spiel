@@ -28,6 +28,7 @@ from open_spiel.python.gui import contract
 from open_spiel.python.gui import frame
 from open_spiel.python.gui import loader
 from open_spiel.python.gui import plies
+from open_spiel.python.gui import presenters
 import pyspiel
 
 
@@ -104,6 +105,7 @@ def build(position: Position, viewer: contract.Viewer) -> frame.Frame:
   history = tuple(
       _history_entry(ply, viewer, omniscient) for ply in position.history
   )
+  legal_actions = _legal_actions(position, viewer, omniscient, mover)
   return frame.Frame(
       session=(
           position.info
@@ -117,7 +119,7 @@ def build(position: Position, viewer: contract.Viewer) -> frame.Frame:
       ply=position.ply,
       num_plies=len(position.history),
       to_move=mover,
-      legal_actions=_legal_actions(position, viewer, omniscient, mover),
+      legal_actions=legal_actions,
       chance_outcomes=_chance_outcomes(position, omniscient, mover),
       history=history,
       rewards=history[position.ply - 1].rewards if position.ply else None,
@@ -134,19 +136,37 @@ def build(position: Position, viewer: contract.Viewer) -> frame.Frame:
           if omniscient and position.loaded.provides_struct
           else None
       ),
+      observation_struct=_observation_struct(position, viewer),
+      presentation=presenters.present(
+          position.loaded.name,
+          state,
+          presenters.Viewpoint(seat=viewer.seat, omniscient=omniscient),
+          (
+              None
+              if legal_actions is None
+              else [action.id for action in legal_actions]
+          ),
+      ),
   )
 
 
 def _history_entry(
     ply: plies.Ply, viewer: contract.Viewer, omniscient: bool
 ) -> contract.HistoryEntry:
-  """Shows one ply: in full to its own seat and to an omniscient viewer."""
+  """Shows one ply: in full to its own seat and to an omniscient viewer.
+
+  Any other viewer reads only the ply's public label, if its game gives one.
+  """
   if omniscient or (ply.seat is not None and ply.seat == viewer.seat):
     return contract.HistoryEntry(
         seat=ply.seat, action=ply.action, label=ply.label, rewards=ply.rewards
     )
   return contract.HistoryEntry(
-      seat=ply.seat, action=None, label=None, rewards=None
+      seat=ply.seat,
+      action=None,
+      label=None,
+      rewards=None,
+      public_label=ply.public_label,
   )
 
 
@@ -217,3 +237,25 @@ def _seat_text(
   if observation:
     return str(position.state.observation_string(viewer.seat))
   return str(position.state.information_state_string(viewer.seat))
+
+
+def _observation_struct(
+    position: Position, viewer: contract.Viewer
+) -> contract.Json:
+  """Returns a seat viewer's observation as the game's structured JSON.
+
+  The game builds the struct for the seat, so it holds only what the seat may
+  observe. The oracle reads `struct` instead, and a spectator, who holds no
+  seat, is given none: OpenSpiel defines observations per player only. A
+  hearts seat is given none while the hand is passing (the glue below).
+  """
+  if viewer.seat is None or not position.loaded.provides_observation_struct:
+    return None
+  struct = position.state.to_observation_struct(viewer.seat)
+  observed = json.loads(struct.to_json())
+  # STRUCT-GLUE(hearts ObservationStruct): withheld during passing until the
+  # engine hides received cards before the seat's own pass. Until then a seat
+  # gets only the hearts adapter's presentation in that phase.
+  if position.loaded.name == "hearts" and observed["phase"] == "Pass":
+    return None
+  return observed

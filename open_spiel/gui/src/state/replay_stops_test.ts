@@ -22,10 +22,17 @@ const CHANCE: HistoryEntry = {
   action: 0,
   label: 'deal',
   rewards: [0, 0],
+  public_label: null,
 };
 
 function seat(index: number): HistoryEntry {
-  return {seat: index, action: null, label: null, rewards: null};
+  return {
+    seat: index,
+    action: null,
+    label: null,
+    rewards: null,
+    public_label: null,
+  };
 }
 
 // Two chance outcomes, two seat actions, a chance outcome, a seat action.

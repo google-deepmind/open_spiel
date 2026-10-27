@@ -21,17 +21,20 @@ import {viewerParameter} from '../session/client.ts';
 import {HUMAN_SEAT} from '../setup/parameters.ts';
 
 // The parameters a game page opens a game with, where they are not the
-// game's own defaults: Go opens on the 9×9 board.
+// game's own defaults: Go opens on the 9×9 board, and gin rummy on Oklahoma
+// rules, where the first upcard sets the knock card.
 const OPENING_PARAMETERS: Readonly<
   Record<string, CreateSession['parameters']>
 > = {
+  gin_rummy: {oklahoma: true},
   go: {board_size: 9},
 };
 
 /**
  * The request that opens a game of `entry` with its defaults: every seat
  * played by a person, and chance sampled by the server. A few games open
- * with parameters of their own, such as Go on its smallest board.
+ * with parameters of their own, such as Go on its smallest board and gin
+ * rummy on Oklahoma rules.
  *
  * @throws Error when the server cannot serve the game.
  */
@@ -49,68 +52,44 @@ export function defaultSession(entry: CatalogueEntry): CreateSession {
 }
 
 /**
- * Who a game page shows the game to until told otherwise. A game of perfect
- * information hides nothing, so the oracle, who may act for every human
- * seat, sees what any seat sees; any other game opens as the first seat.
+ * Who a game page shows the game to when its address names no one: the
+ * oracle, so that the page opens in analysis. The oracle may act for every
+ * human seat, and the seat the board is drawn from is chosen in View ›
+ * Perspective.
  */
-export function defaultViewer(entry: CatalogueEntry): Viewer {
-  return entry.information === 'perfect_information'
-    ? {kind: 'oracle', seat: null}
-    : {kind: 'seat', seat: 0};
+export function defaultViewer(): Viewer {
+  return {kind: 'oracle', seat: null};
 }
 
 /**
- * Who a game page opens for: `asked`, the viewer its address names, when the
- * game has that viewer, and otherwise `defaultViewer`.
+ * Who a game page opens for: `defaultViewer` when its address names no one,
+ * else `asked`. A seat the game does not have opens the spectator's view,
+ * never the oracle's: an address meant to show one seat's hand must not
+ * show every hand.
  */
 export function initialViewer(
   entry: CatalogueEntry,
   asked: Viewer | null,
 ): Viewer {
-  if (asked === null) return defaultViewer(entry);
+  if (asked === null) return defaultViewer();
   if (asked.seat !== null && asked.seat >= (entry.num_players ?? 0)) {
-    return defaultViewer(entry);
+    return {kind: 'spectator', seat: null};
   }
   return asked;
 }
 
-/** A viewer a game page offers, with its name for people. */
-export interface ViewerOption {
-  /** The viewer's `viewer` query parameter. */
-  readonly value: string;
-  readonly label: string;
-  readonly viewer: Viewer;
-}
-
 /**
- * The perspectives of a game of `numSeats` seats: each seat, then the oracle,
- * who sees everything, and a spectator, who sees only what is public.
+ * The mode of a page shown to `viewer`, for people: analysis for the oracle,
+ * a game at a seat or spectating for any other.
  */
-export function viewerOptions(numSeats: number): ViewerOption[] {
-  const viewers: Viewer[] = [
-    ...Array.from({length: numSeats}, (_, seat): Viewer => ({
-      kind: 'seat',
-      seat,
-    })),
-    {kind: 'oracle', seat: null},
-    {kind: 'spectator', seat: null},
-  ];
-  return viewers.map(viewer => ({
-    value: viewerParameter(viewer),
-    label: viewerLabel(viewer),
-    viewer,
-  }));
-}
-
-/** `viewer`'s name for people. */
-export function viewerLabel(viewer: Viewer): string {
+export function modeLabel(viewer: Viewer): string {
   switch (viewer.kind) {
     case 'oracle':
-      return 'Oracle (sees everything)';
+      return 'Analysis';
     case 'spectator':
-      return 'Spectator';
+      return 'Game, spectating';
     case 'seat':
-      return `Seat ${viewerParameter(viewer)}`;
+      return `Game, seat ${viewerParameter(viewer)}`;
     default: {
       const unreachable: never = viewer.kind;
       throw new Error(`Unhandled viewer kind: ${String(unreachable)}`);

@@ -63,6 +63,11 @@ class Frame:
       unless the viewer holds a seat and the game provides information states.
     struct: The full state as the game's structured JSON; null unless
       `omniscient` and the game provides it.
+    observation_struct: The viewer's observation as the game's structured
+      JSON; null unless the viewer holds a seat and the game provides
+      observation structs.
+    presentation: The position as the game's adapter presents it to the
+      viewer; null when no adapter is registered for the game.
   """
 
   contract_version: contract.ContractVersion = dataclasses.field(
@@ -85,6 +90,8 @@ class Frame:
   observation_text: str | None
   information_state_text: str | None
   struct: contract.Json
+  observation_struct: contract.Json
+  presentation: contract.Presentation | None
 
   @property
   def live(self) -> bool:
@@ -101,6 +108,7 @@ class Frame:
     self._check_history()
     self._check_position()
     self._check_audience()
+    self._check_presentation()
 
   def _check_seats(self) -> None:
     """Checks the seats against the session and its status."""
@@ -120,10 +128,16 @@ class Frame:
           f"Seat {seat.seat} is played by {seat.controller!r}, which the "
           "session does not offer.",
       )
+    # A seat's controller fails only in play, which stops before the end; a
+    # build fails whenever it fails, so an over game may show one.
     contract.require(
         (self.status == contract.SessionStatus.PAUSED)
-        == any(seat.failure is not None for seat in self.seats),
-        "A session is paused exactly when a seat's controller has failed.",
+        == (
+            self.status != contract.SessionStatus.TERMINAL
+            and any(seat.failure is not None for seat in self.seats)
+        ),
+        "A session in play is paused exactly when a seat's controller has "
+        "failed.",
     )
 
   def _check_history(self) -> None:
@@ -234,6 +248,10 @@ class Frame:
         ),
         "Per-seat texts are served only to a seat.",
     )
+    contract.require(
+        is_seat or self.observation_struct is None,
+        "The observation struct is served only to a seat.",
+    )
     if self.omniscient:
       contract.require(
           self.legal_actions is not None
@@ -257,4 +275,22 @@ class Frame:
             for entry in self.history
         ),
         "A seat sees its own actions.",
+    )
+
+  def _check_presentation(self) -> None:
+    """Checks the adapter's hints against the legal actions offered."""
+    if self.presentation is None:
+      return
+    hints = self.presentation.actions
+    contract.require(
+        (hints is None) == (self.legal_actions is None),
+        "Action hints are served exactly when legal actions are.",
+    )
+    if hints is None or self.legal_actions is None:
+      return
+    offered = {action.id for action in self.legal_actions}
+    hinted = [hint.id for hint in hints]
+    contract.require(
+        len(set(hinted)) == len(hinted) and set(hinted) <= offered,
+        "Each action hint names a legal action of the frame, once.",
     )
