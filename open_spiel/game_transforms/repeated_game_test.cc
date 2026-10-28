@@ -14,7 +14,10 @@
 
 #include "open_spiel/game_transforms/repeated_game.h"
 
+#include <algorithm>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "absl/algorithm/container.h"
 #include "open_spiel/spiel.h"
@@ -219,17 +222,23 @@ void RelativeTest() {
 
   // One-hots for actions going forward in time.
   SPIEL_CHECK_TRUE(
-      absl::c_equal(state->InformationStateTensor(0), std::vector<float>{1, 0, 0, 1, 0, 1, 1, 0}));
+      absl::c_equal(state->InformationStateTensor(0),
+      std::vector<float>{1, 0, 0, 1, 0, 1, 1, 0}));
   SPIEL_CHECK_TRUE(
-      absl::c_equal(state->InformationStateTensor(1), std::vector<float>{0, 1, 1, 0, 1, 0, 0, 1}));
+      absl::c_equal(state->InformationStateTensor(1),
+      std::vector<float>{0, 1, 1, 0, 1, 0, 0, 1}));
   // These go backward in time, and only back to recall depth.
   SPIEL_CHECK_TRUE(
-      absl::c_equal(state->ObservationTensor(0), std::vector<float>{0, 1, 1, 0}));
+      absl::c_equal(state->ObservationTensor(0),
+      std::vector<float>{0, 1, 1, 0}));
   SPIEL_CHECK_TRUE(
-      absl::c_equal(state->ObservationTensor(1), std::vector<float>{1, 0, 0, 1}));
+      absl::c_equal(state->ObservationTensor(1),
+      std::vector<float>{1, 0, 0, 1}));
   // These use action names. Forward in time.
-  SPIEL_CHECK_EQ(state->InformationStateString(0), "Cooperate Defect ;Defect Cooperate ;");
-  SPIEL_CHECK_EQ(state->InformationStateString(1), "Defect Cooperate ;Cooperate Defect ;");
+  SPIEL_CHECK_EQ(state->InformationStateString(0),
+    "Cooperate Defect ;Defect Cooperate ;");
+  SPIEL_CHECK_EQ(state->InformationStateString(1),
+    "Defect Cooperate ;Cooperate Defect ;");
 
   SPIEL_CHECK_EQ(state->ObservationString(0), "Defect Cooperate ");
   SPIEL_CHECK_EQ(state->ObservationString(1), "Cooperate Defect ");

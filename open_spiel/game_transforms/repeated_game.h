@@ -34,8 +34,9 @@
 //   "recall"             int      Number of previous steps that defines the
 //                                 observations when enable_infostate is false
 //                                 (default: 1).
-//   "relative"            bool    Whether observation and information-state values
-//                                 are presented relative to player_id (default false)
+//   "relative"            bool    Whether observation and information-state
+//                                 values are presented relative to player_id
+//                                 (default false)
 
 namespace open_spiel {
 

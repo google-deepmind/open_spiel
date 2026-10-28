@@ -31,6 +31,7 @@ namespace open_spiel {
 namespace {
 
 constexpr bool kDefaultEnableInformationState = false;
+constexpr bool kDefaultRelative = false;
 constexpr int kDefaultRecall = 1;
 
 // These parameters represent the most general case. Game specific params are
@@ -55,10 +56,12 @@ const GameType kGameType{
      {"num_repetitions",
       GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/true)},
      {"recall", GameParameter(kDefaultRecall)},
-     {"relative", GameParameter(false)}},
+     {"enable_infostate", GameParameter(kDefaultEnableInformationState)},
+     {"relative", GameParameter(kDefaultRelative)}},
     /*default_loadable=*/false,
     /*provides_factored_observation_string=*/false,
-    /*is_concrete=*/false};
+    /*is_concrete=*/false
+};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return CreateRepeatedGame(*LoadGame(params.at("stage_game").game_value()),
@@ -136,7 +139,7 @@ std::vector<double> RepeatedState::Returns() const {
 }
 
 std::string RepeatedState::InformationStateString(Player player) const {
-	if (relative_) {
+  if (relative_) {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
   }
@@ -155,12 +158,14 @@ std::string RepeatedState::InformationStateString(Player player) const {
 }
 
 std::string RepeatedState::ObservationString(Player player) const {
-	if (relative_) {
+  if (relative_) {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
-	}
+  }
   std::string rv;
-  if (actions_history_.empty()) { return rv; }
+  if (actions_history_.empty()) { 
+    return rv;
+  }
 
   // Starting from the back of the history, show each player's moves:
   for (int j = 0;
