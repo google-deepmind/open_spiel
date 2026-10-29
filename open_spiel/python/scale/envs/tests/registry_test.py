@@ -19,9 +19,10 @@ options; EnvSpecs are complete and canonical (defaults filled, ints for float
 options normalised, unknown / non-JSON / out-of-range options refused) and
 round-trip through JSON and through spec_of(make(spec)); a replaced spec is
 used and logged, a conflicting one refused; extras load on first build;
-rules_sha is sha256(tag, module source sha, EnvSpec key) and separates
-variants; gin's covers() table; the serving, league and eval tables are
-views of the registry.
+rules_sha is sha256(tag, sha of the module's canonical source, EnvSpec key)
+and separates variants, and the canonical source survives a package rename
+and a reformat but not a code change; gin's covers() table; the serving,
+league and eval tables are views of the registry.
 """
 
 import dataclasses
@@ -32,6 +33,7 @@ import sys
 
 import pytest
 
+from open_spiel.python.scale import deps
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.envs import registry
 from open_spiel.python.scale.envs.gin import search as gin_search
@@ -138,19 +140,23 @@ def test_make_and_spec_of_round_trip_non_default_options():
   assert registry.spec_of(g) == registry.spec("gin_rummy", oklahoma_frac=0.25)
 
 
-def _manual_rules_sha(env, spec_key, tag="rules/1"):
+def _manual_rules_sha(env, spec_key, tag="rules/2", raw=False):
   """The rules digest computed by hand from the game's source.
 
   Args:
     env: The env.
     spec_key: The env spec's key.
     tag: The digest tag.
+    raw: Hash the module's raw bytes (RAW_SOURCE), not its canonical form.
 
   Returns:
     The hex digest.
   """
   with open(inspect.getsourcefile(type(env.game)), "rb") as f:
-    src = hashlib.sha256(f.read()).hexdigest()
+    text = f.read()
+  if not raw:
+    text = registry.rules_source(text.decode()).encode()
+  src = hashlib.sha256(text).hexdigest()
   return hashlib.sha256(
       tag.encode() + b"\0" + src.encode() + b"\0" + spec_key.encode() + b"\0"
   ).hexdigest()
@@ -184,12 +190,65 @@ def test_rules_sha_tag_is_settable(monkeypatch):
   # Reaches private _RULES_SHA_TAG of the code under test.
   tag = registry._RULES_SHA_TAG  # pylint: disable=protected-access
   monkeypatch.setitem(tag, "tag", tag["tag"])
+  monkeypatch.setitem(tag, "source", tag["source"])
   registry.set_rules_sha_tag("acme.rules/7")
   assert registry.rules_sha(env) == _manual_rules_sha(
       env, registry.spec_of(env).key(), "acme.rules/7"
   )
+  registry.set_rules_sha_tag("acme.rules/1", source=registry.RAW_SOURCE)
+  assert registry.rules_sha(env) == _manual_rules_sha(
+      env, registry.spec_of(env).key(), "acme.rules/1", raw=True
+  )
   with pytest.raises(ValueError):
     registry.set_rules_sha_tag("")
+  with pytest.raises(ValueError):
+    registry.set_rules_sha_tag("acme.rules/8", source="bytes")
+
+
+def test_rules_source_survives_a_rename_and_a_reformat(monkeypatch):
+  """The open-source export's rewrite keeps the canonical source.
+
+  The gin module with its games package renamed (in imports and strings),
+  an import wrapped and the imports reordered, its docstrings, comments and
+  quotes changed, has the same canonical source; one changed constant does
+  not.
+
+  Args:
+    monkeypatch: pytest monkeypatch fixture.
+  """
+  env = registry.make("gin_rummy")
+  with open(inspect.getsourcefile(type(env.game)), encoding="utf-8") as f:
+    text = f.read()
+  want = registry.rules_source(text)
+  pkg = deps.GAMES_PACKAGE
+  assert f"from {pkg}." in text, "the gin module imports its package"
+  lines = text.split("\n")
+  imports = [
+      i
+      for i, l in enumerate(lines)
+      if l.startswith(f"from {pkg}") and not l.endswith("(")
+  ]
+  assert len(imports) >= 2, imports
+  i, j = imports[0], imports[-1]
+  lines[i], lines[j] = lines[j], lines[i]  # import order
+  lines.insert(i, "# a comment the export never had")
+  moved = (
+      "\n".join(lines)
+      .replace(f"{pkg}.", "acme.games.")
+      .replace(f"from {pkg} import", "from acme.games import")
+  )
+  moved = moved.replace('"""Gin rummy', '"""Reworded: gin rummy', 1)
+  monkeypatch.setattr(deps, "GAMES_PACKAGE", "acme.games")
+  assert registry.rules_source(moved) == want
+  wrapped = moved.replace(
+      "from acme.games import interop",
+      "from acme.games import (\n    interop,\n)",
+  )
+  assert wrapped != moved
+  assert registry.rules_source(wrapped) == want
+  changed = moved.replace("GIN_BONUS", "GIN_BONUS_X")
+  assert changed != moved
+  assert registry.rules_source(changed) != want
 
 
 @pytest.mark.parametrize(

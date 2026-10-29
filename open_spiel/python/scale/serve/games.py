@@ -102,3 +102,52 @@ def env_for(game: str, params: Mapping[str, Any]) -> types.Env:
   env = env_registry.make(env_spec_for(game, params))
   assert env.name == game, (env.name, game)
   return env
+
+
+def _same(a: Any, b: Any) -> bool:
+  """Whether two parameter values are equal, a bool equal only to a bool.
+
+  Args:
+    a: A value.
+    b: A value.
+
+  Returns:
+    True when equal.
+  """
+  if isinstance(a, bool) or isinstance(b, bool):
+    return isinstance(a, bool) and isinstance(b, bool) and a == b
+  return a == b
+
+
+def game_string_params(
+    game: str,
+    params: Mapping[str, Any],
+    parameter_specification: Mapping[str, Any],
+) -> dict[str, Any]:
+  """`params` as a pyspiel whose `game` has `parameter_specification` takes.
+
+  A parameter at pyspiel's default is dropped (the same game); the others
+  are kept.
+
+  Args:
+    game: the game name.
+    params: the game parameters.
+    parameter_specification: {parameter: default} of the target pyspiel game.
+
+  Returns:
+    The parameters to write.
+
+  Raises:
+    ValueError: a parameter the pyspiel game does not have.
+  """
+  out = {}
+  for k in sorted(params):
+    v = params[k]
+    if k not in parameter_specification:
+      raise ValueError(
+          f"{game}: the artifact plays {k}={v!r}, but the installed pyspiel's "
+          f"{game} has no {k!r} parameter"
+      )
+    if not _same(v, parameter_specification[k]):
+      out[k] = v
+  return out

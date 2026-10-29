@@ -53,6 +53,23 @@ py_library(
 )
 
 py_library(
+    name = "gin_mmd_from_scratch",
+    srcs = ["gin_mmd_from_scratch.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/jax/games/gin_rummy:dense_cache_game",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
     name = "mmd_gin_rummy",
     srcs = ["mmd_gin_rummy.py"],
     strict_deps = True,

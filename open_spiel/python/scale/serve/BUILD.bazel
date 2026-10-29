@@ -39,6 +39,49 @@ py_library(
 )
 
 py_library(
+    name = "checkpoint_bot",
+    srcs = ["checkpoint_bot.py"],
+    strict_deps = True,
+    deps = [
+        ":games",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "checkpoint_bot_helpers",
+    testonly = True,
+    srcs = ["tests/checkpoint_bot_helpers.py"],
+    strict_deps = True,
+    deps = [
+        ":checkpoint_bot",
+        ":helpers",
+        ":server",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "controller",
+    srcs = ["controller.py"],
+    strict_deps = True,
+    deps = [
+        ":checkpoint_bot",
+        ":games",
+        ":server",
+    ],
+)
+
+py_library(
     name = "games",
     srcs = ["games.py"],
     strict_deps = True,
@@ -142,12 +185,14 @@ py_library(
     deps = [
         ":games",
         ":host_agent",
+        ":replay",
         ":wire",
         "//open_spiel/python/scale/ckpt:artifact",
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/core:x64",
         "@py_deps//absl/logging",
         "@py_deps//jax",
+        "@py_deps//numpy",
     ],
 )
 
@@ -198,6 +243,80 @@ pytest_test(
 )
 
 pytest_test(
+    name = "checkpoint_bot_long_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/checkpoint_bot_long_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":checkpoint_bot_helpers",
+        ":games",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "checkpoint_bot_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/checkpoint_bot_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":checkpoint_bot_helpers",
+        ":games",
+        ":helpers",
+        ":host_agent",
+        ":server",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/ckpt:public",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/testing:public_bucket",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "controller_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/controller_test.py"],
+    deps = [
+        ":controller",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+    ],
+)
+
+pytest_test(
     name = "env_spec_test",
     data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/env_spec_test.py"],
@@ -211,6 +330,25 @@ pytest_test(
         "//open_spiel/python/scale/envs:registry",
         "//open_spiel/python/scale/policies:uniform",
         "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "game_string_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/game_string_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
     ],
 )
 
@@ -302,6 +440,34 @@ pytest_test(
         "//open_spiel/python/scale/policies:uniform",
         "//open_spiel/python/scale/sources:shards",
         "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "replay_bucket_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/replay_bucket_test.py"],
+    deps = [
+        ":checkpoint_bot_helpers",
+        ":games",
+        ":helpers",
+        ":host_agent",
+        ":replay",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/networks:policy",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],
@@ -421,6 +587,10 @@ pytest_test(
         "//open_spiel/python/pybind11:pyspiel",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:chance",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs/gin",
+        "@py_deps//jax",
         "@py_deps//numpy",
     ],
 )

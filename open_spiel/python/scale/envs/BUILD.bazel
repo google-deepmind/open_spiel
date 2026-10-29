@@ -979,6 +979,7 @@ pytest_test(
     tests = ["tests/registry_test.py"],
     deps = [
         ":registry",
+        "//open_spiel/python/scale:deps",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/core:sequence",

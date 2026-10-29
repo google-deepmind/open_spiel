@@ -32,6 +32,18 @@ Per request:
      policy observes only the last ply), evaluate on the last ply, and the
      one `decide` in f64.
 
+Compiles. Every jitted call is compiled once per input shape. A stateless
+policy is served on the last ply alone: the replay builds that ply's SeatStep
+only (serve.replay.replay_last_seat_step), and the policy path has one shape
+whatever the history's length. A stateful policy's replay pads the history to
+a power-of-two bucket (serve.replay, "Length buckets"). warmup(max_plies)
+compiles every shape a match of up to max_plies plies uses, after which no
+decision compiles; a second warmup up to the same length does nothing. A
+stateful JAX policy observes the exact history, [1, T], and compiles once
+per history length (warmup does not compile those). Agents of the seats of
+one artifact can share their jitted calls (`share`), so the second seat
+compiles nothing.
+
 Keys reproduce the Arena: given the Arena's seat key and the row ply of the
 match's first ply (`first_ply`), the init_carry key is plies.init_key(seat_key)
 and the evaluate and decide keys are plies.ply_keys(seat_key, first_ply + T -
@@ -184,10 +196,14 @@ class Decision:
     action: the chosen action.
     probs: f64[A], decide's distribution (0 on illegal actions).
     legal: bool[A].
-    decider: "network", "search", "scripted" or "forced".
-    logits: f32[A]; None on a forced move.
-    value: f32[P]; None on a forced move.
+    decider: "network", "search", "scripted" or "forced"; "fallback" when a
+      serving shell played on through an env/pyspiel divergence without the
+      policy (server.PolicyServer.decide, repair).
+    logits: f32[A]; None on a forced or fallback move.
+    value: f32[P]; None on a forced or fallback move.
     identity: the artifact identity (identity_of).
+    notice: None, or what a serving shell that repaired the decision says
+      about it (server.PolicyServer.decide, repair).
   """
 
   action: int
@@ -197,6 +213,7 @@ class Decision:
   logits: Optional[np.ndarray]  # f32[A]; None on a forced move
   value: Optional[np.ndarray]  # f32[P]; None on a forced move
   identity: Mapping[str, Any]
+  notice: Optional[str] = None
 
   @property
   def searched(self) -> bool:
@@ -226,6 +243,9 @@ class HostAgent:
     identity: the artifact identity echoed with every decision (identity_of).
     host_driven: whether the policy is HOST_DRIVEN (no JAX path).
     pad_rows: rows the JAX path evaluates the request in.
+    stateful: whether the policy carries state across plies (its spec's
+      stateful).
+    warmed_plies: the longest match warmup has compiled for (0: none).
   """
 
   def __init__(
@@ -236,6 +256,7 @@ class HostAgent:
       rule: Optional[types.DecisionRule] = None,
       pad_rows: int = PAD_ROWS,
       allow_cross_variant: bool = False,
+      share: Optional["HostAgent"] = None,
   ):
     """Builds the agent; jits the policy path once.
 
@@ -250,6 +271,10 @@ class HostAgent:
       allow_cross_variant: serve an env the artifact's env_spec does not
         cover (envs.registry.check_serves), for intentional cross-variant
         evaluation.
+      share: an agent of another seat of the same artifact policy, env, rule
+        and pad_rows whose jitted calls this one reuses (the seat is an
+        argument of every one), so a second seat compiles nothing; None jits
+        its own.
 
     Raises:
       ValueError: the artifact's game, actions or players do not match the
@@ -305,8 +330,27 @@ class HostAgent:
     if int(pad_rows) < 1:
       raise ValueError(f"pad_rows must be >= 1, got {pad_rows}")
     self.pad_rows = int(pad_rows)
-    if not self.host_driven:
+    self.stateful = bool(spec.stateful)
+    # The longest match warmup has compiled for (0: none).
+    self.warmed_plies = 0
+    if share is not None:
+      if (
+          share.policy is not self.policy
+          or share.env is not self.env
+          or share.rule != self.rule
+          or share.pad_rows != self.pad_rows
+      ):
+        raise ValueError(
+            "a shared agent must serve the same policy, env, rule and pad_rows"
+        )
+      # Its jitted calls read only the policy, the rule and pad_rows.
+      self._decide, self._keys = share._decide, share._keys  # pylint: disable=protected-access
+      if not self.host_driven:
+        self._serve = share._serve  # pylint: disable=protected-access
+        self._serve_last = share._serve_last  # pylint: disable=protected-access
+    elif not self.host_driven:
       self._serve = jax.jit(self._serve_rows)
+      self._serve_last = jax.jit(self._serve_last_rows)
 
   def act(
       self,
@@ -336,43 +380,49 @@ class HostAgent:
     """
     if int(first_ply) < 0:
       raise ValueError(f"first_ply must be >= 0, got {first_ply}")
-    rep = replay.replay_seat_steps(self.env, hands, self.seat)
+    # A stateless policy reads the last ply only (module doc, "Compiles").
+    rep = (
+        replay.replay_seat_steps_padded(self.env, hands, self.seat)
+        if self.stateful
+        else replay.replay_last_seat_step(self.env, hands, self.seat)
+    )
     if node_check is not None:
       node_check(rep.state)
-    last = tree_map(lambda x: x[:, -1], rep.steps)
-    to_move = int(last.to_move[0])
+    last_np = rep.last  # numpy [1]
+    to_move = int(last_np.to_move[0])
     if to_move < 0:
       raise ValueError(
           "the history ends at a terminal state; there is no decision"
       )
     if to_move != self.seat:
       raise ValueError(f"seat {to_move} is to move, not seat {self.seat}")
-    legal = np.asarray(last.legal_mask[0])
+    legal = np.asarray(last_np.legal_mask[0])
+    last = tree_map(jnp.asarray, last_np)
     row_ply = jnp.int64(np.int64(first_ply) + np.int64(rep.num_plies - 1))
     init_key, eval_key, decide_key = self._keys(seat_key, row_ply)
     if int(legal.sum()) == 1:
       zeros = jnp.zeros((1, self.env.num_actions), jnp.float32)
       action, probs = self._decide(zeros, last.legal_mask, decide_key)
       return Decision(
-          action=int(action[0]),
-          probs=np.asarray(probs[0]),
+          action=int(np.asarray(action)[0]),
+          probs=np.asarray(probs)[0],
           legal=legal,
           decider="forced",
           logits=None,
           value=None,
           identity=self.identity,
       )
-    out = self._run_policy(rep.steps, last, init_key, eval_key)
-    logits = out.logits.astype(np.float32)
+    out = self._run_policy(rep, last, init_key, eval_key)
+    logits = np.asarray(out.logits, np.float32)
     assert logits.shape == (1, self.env.num_actions), logits.shape
     action, probs = self._decide(
         jnp.asarray(logits), last.legal_mask, decide_key
     )
-    probs = np.asarray(probs[0])
+    probs = np.asarray(probs)[0]
     assert probs.dtype == np.float64, probs.dtype
     decider = decider_for(self.policy, last.info)
     return Decision(
-        action=int(action[0]),
+        action=int(np.asarray(action)[0]),
         probs=probs,
         legal=legal,
         decider=decider,
@@ -429,13 +479,52 @@ class HostAgent:
     out = jax.vmap(_one)(rows)
     return tree_map(lambda x: x[:1], out)
 
-  def _run_policy(self, steps, last, init_key, eval_key) -> types.PolicyOutput:
+  def _serve_last_rows(
+      self, params, last, seat, init_key, eval_key
+  ) -> types.PolicyOutput:
+    """_serve_rows of a stateless policy, given the last ply alone ([1, ...]).
+
+    The same calls on the same values (init_carry, observe + evaluate on the
+    last ply), with no history axis, so one compile serves every length.
+
+    Args:
+      params: the policy's params.
+      last: the last ply's SeatStep [1].
+      seat: the seat served.
+      init_key: the init_carry key.
+      eval_key: the evaluate key.
+
+    Returns:
+      The PolicyOutput [1, ...].
+    """
+    pol, n = self.policy, self.pad_rows
+    rows = tree_map(lambda x: jnp.broadcast_to(x[0], (n,) + x.shape[1:]), last)
+
+    def one(st):
+      """The policy's output on one row's last ply.
+
+      Args:
+        st: the row's SeatStep (unbatched).
+
+      Returns:
+        The PolicyOutput of the row.
+      """
+      s1 = tree_map(lambda x: x[None], st)  # [1]
+      carry = pol.init_carry(params, 1, seat, init_key)
+      carry = pol.observe(params, carry, s1)
+      return tree_map(lambda x: x[0], pol.evaluate(params, carry, s1, eval_key))
+
+    out = jax.vmap(one)(rows)
+    return tree_map(lambda x: x[:1], out)
+
+  def _run_policy(self, rep, last, init_key, eval_key) -> types.PolicyOutput:
     """init_carry, observe_seq, evaluate on the last ply.
 
     A stateless policy: one observe of the last ply.
 
     Args:
-      steps: the request's SeatSteps [1, T].
+      rep: the request's replay: a PaddedSeatReplay [1, T] (stateful policy)
+        or a LastSeatStep (stateless).
       last: the last ply's SeatStep [1].
       init_key: the init_carry key.
       eval_key: the evaluate key.
@@ -445,18 +534,72 @@ class HostAgent:
     """
     if self.host_driven:
       pol, p = self.policy, self.params
-      steps_np, last_np = host.to_numpy(steps), host.to_numpy(last)
+      last_np = host.to_numpy(last)
       carry = pol.init_carry(
           p, 1, np.asarray([self.seat], np.int32), host.raw_keys(init_key)[None]
       )
       if pol.spec.stateful:
-        carry = pol.observe_seq(p, carry, steps_np)
+        carry = pol.observe_seq(p, carry, host.to_numpy(rep.exact().steps))
       else:
         carry = pol.observe(p, carry, last_np)
       out = pol.evaluate(p, carry, last_np, host.raw_keys(eval_key)[None])
       assert isinstance(out, types.PolicyOutput), type(out)
       return host.to_numpy(out)
     seat = jnp.asarray([self.seat], jnp.int32)
+    if self.stateful:
+      return host.to_numpy(
+          self._serve(self.params, rep.exact().steps, seat, init_key, eval_key)
+      )
     return host.to_numpy(
-        self._serve(self.params, steps, seat, init_key, eval_key)
+        self._serve_last(self.params, last, seat, init_key, eval_key)
     )
+
+  def warmup(self, max_plies: int) -> None:
+    """Compiles every call a decision on a match of at most max_plies makes.
+
+    Module doc, "Compiles": the replay's buckets, the keys, the decision rule
+    and, for a stateless JAX policy, the policy. A stateful JAX policy still
+    compiles once per history length on first use.
+
+    Args:
+      max_plies: the longest match in plies.
+
+    Raises:
+      ValueError: max_plies < 1.
+    """
+    if int(max_plies) < 1:
+      raise ValueError(f"max_plies must be >= 1, got {max_plies}")
+    if int(max_plies) <= self.warmed_plies:
+      return  # compiled already (jit caches persist in the process)
+    replay.warmup(
+        self.env, self.seat, int(max_plies), last_only=not self.stateful
+    )
+    seat_key = jax.random.key(0)
+    init_key, eval_key, decide_key = self._keys(seat_key, jnp.int64(0))
+    # A last ply of this seat's shapes, every action legal (only shapes and
+    # dtypes matter to a compile).
+    last = tree_map(
+        jnp.asarray, replay.first_decision_step(self.env, self.seat)
+    )
+    mask = jnp.asarray(np.ones((1, self.env.num_actions), np.bool_))
+    jax.block_until_ready(
+        self._decide(
+            jnp.zeros((1, self.env.num_actions), jnp.float32), mask, decide_key
+        )
+    )
+    # act lifts the policy's numpy logits with jnp.asarray, which since JAX
+    # 0.12 compiles a staging op per shape and dtype on first use: lift one.
+    jax.block_until_ready(
+        jnp.asarray(np.zeros((1, self.env.num_actions), np.float32))
+    )
+    if not self.host_driven and not self.stateful:
+      last = last._replace(legal_mask=mask)
+      out = self._serve_last(
+          self.params,
+          last,
+          jnp.asarray([self.seat], jnp.int32),
+          init_key,
+          eval_key,
+      )
+      jax.block_until_ready(out)
+    self.warmed_plies = int(max_plies)

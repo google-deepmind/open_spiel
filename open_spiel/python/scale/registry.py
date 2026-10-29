@@ -29,6 +29,11 @@ it. Every registry that turns a recorded string into an object goes through
 Resolvers run in registration order and the first non-None answer wins. When
 none answers, a path into a module this package moved (MOVED_MODULES) resolves
 to the module's new home; any other path resolves to itself.
+
+A path that starts with "." names a module of this package by its place in
+it (".envs.gin.endgame:in_domain"), whatever name the package is imported
+under: an artifact that records such paths loads in any install of the
+package. It is made absolute before the resolvers see it.
 """
 
 from __future__ import annotations
@@ -73,6 +78,29 @@ def moved_module_path(dotted: str) -> Optional[str]:
     if mod == old_mod or mod.startswith(old_mod + "."):
       return f"{_PACKAGE}.{new}{mod[len(old_mod):]}{sep}{attr}"
   return None
+
+
+def absolute_path(dotted: str) -> str:
+  """`dotted` with a leading "." replaced by this package's name.
+
+  Args:
+    dotted: A recorded path; relative when it starts with ".".
+
+  Returns:
+    The absolute path ("<package>.module[:attr]"); an absolute path as given.
+
+  Raises:
+    ValueError: a relative path whose module part is empty or starts with
+      another "." (only one level, this package, is meant).
+  """
+  if not dotted.startswith("."):
+    return dotted
+  module = dotted[1:].partition(":")[0]
+  if not module or module.startswith("."):
+    raise ValueError(
+        f"a relative path is '.module' or '.module:attr', got {dotted!r}"
+    )
+  return _PACKAGE + dotted
 
 
 def register_path_resolver(fn: PathResolver) -> None:
@@ -130,17 +158,20 @@ def resolve_path(dotted: str) -> str:
   """The current form of a recorded dotted path.
 
   Args:
-    dotted: The recorded path ("pkg.module" or "pkg.module:attr").
+    dotted: The recorded path ("pkg.module" or "pkg.module:attr"), or one
+      relative to this package (".module" or ".module:attr", module doc).
 
   Returns:
     The first non-None resolver answer; else the moved module's new path
-    (`moved_module_path`); else `dotted` itself.
+    (`moved_module_path`); else `dotted` itself (made absolute).
 
   Raises:
     TypeError: `dotted` is not a string, or a resolver returned a non-string.
+    ValueError: a relative path that names no module (".", ".:attr", "..x").
   """
   if not isinstance(dotted, str):
     raise TypeError(f"a dotted path is a string, got {dotted!r}")
+  dotted = absolute_path(dotted)
   for fn in _RESOLVERS:
     got = fn(dotted)
     if got is not None:

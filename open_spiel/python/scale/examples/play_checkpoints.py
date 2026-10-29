@@ -40,7 +40,15 @@ What it does:
     installed, replays every saved game in pyspiel and checks each move is
     legal and the returns are the same. Without pyspiel (the pure-JAX
     install) everything else runs and the script says the replay was
-    skipped.
+    skipped. A game whose env histories are not pyspiel's (gin rummy: the
+    env draws the first mover at a chance node pyspiel does not have) is
+    saved in pyspiel's ids through the game's map back to pyspiel
+    (GameSpec.raw_history_to_pyspiel) and replayed the same way; a game with
+    no such map is saved in the env's ids and not replayed. A game whose
+    returns pyspiel scores differently by a known difference
+    (known_return_difference: gin's equal-deadwood undercut, which
+    OpenSpiel up to 2.0.2 scores 0-0) is replayed move for move and
+    reported by index, not refused.
 
 Decision rules: each artifact plays its manifest's default rule (what its
 trainer recorded, usually greedy "argmax"), `uniform` samples and a scripted
@@ -49,7 +57,9 @@ policy plays greedily; --rule=argmax or --rule=sample overrides both sides.
 The output format ("game_trajectories", version 1). --out holds two files:
 
   summary.json        {"format": "game_trajectories", "format_version": 1,
-                       "game", "env_spec", "rules_sha", "pyspiel_params",
+                       "game", "env_spec", "rules_sha", "pyspiel_params"
+                       (of every record's game, null when they differ or
+                       there is none),
                        "entrants": {"a": {...}, "b": {...}} (spec, name,
                        rule, and for an artifact its path, step, run_id,
                        params_sha256), "games", "seed", "result": {mean,
@@ -61,17 +71,21 @@ The output format ("game_trajectories", version 1). --out holds two files:
     "game_string": a pyspiel game string, pyspiel.load_game(game_string)
                    loads the game this record was played in; null when the
                    game has no pyspiel counterpart here or its env's
-                   histories are not pyspiel's, and then "history" is in
-                   the env's ids
-    "seats":       ["a" or "b" for seat 0, the same for seat 1]
+                   histories have no map to pyspiel's, and then "history"
+                   is in the env's ids and its seats
+    "seats":       ["a" or "b" for player 0, the same for player 1]: the
+                   players of "history" (pyspiel's when "game_string" is
+                   set; for gin, pyspiel's player 0 is the seat that moved
+                   first)
     "history":     the game's pyspiel action history: chance outcomes and
                    player actions interleaved, OpenSpiel action ids, so
                    state.apply_action(a) for each a from
                    game.new_initial_state() replays it exactly
-    "actors":      per history entry, the seat that acted (-1 for chance)
-    "returns":     [seat 0's return, seat 1's return]
-    "env_history": the env's own raw history of the game (equal to
-                   "history" whenever "game_string" is not null)
+    "actors":      per history entry, the player that acted (-1 for chance)
+    "returns":     [player 0's return, player 1's return]
+    "env_history": the env's own raw history of the game, in the env's ids
+                   and seats (equal to "history" when the env's histories
+                   are pyspiel's)
     "policy":      with --probs only: per history entry, null for chance,
                    else the acting policy's distribution over the legal
                    actions, [[action, probability], ...] (the softmax at the
@@ -94,7 +108,6 @@ from typing import Any, Iterator, Optional, Sequence
 from absl import app
 from absl import flags
 from absl import logging
-from etils import epath
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -228,13 +241,49 @@ def read_trajectories(
   return summary, records()
 
 
-def replay_in_pyspiel(record: dict[str, Any], atol: float = 1e-4):
+def known_return_difference(
+    game: Any, pyspiel_returns: Sequence[float], record_returns: Sequence[float]
+) -> Optional[str]:
+  """Why pyspiel's returns of a replayed game may differ from the record's.
+
+  One difference is known: gin rummy scores a hand whose knocker and defender
+  tie on deadwood after layoffs as an undercut (the defender gets the
+  undercut bonus), which released OpenSpiel (2.0.2 and earlier) scores 0-0.
+  A pyspiel with the fix agrees with the record, and this never applies.
+
+  Args:
+    game: The pyspiel game.
+    pyspiel_returns: pyspiel's returns.
+    record_returns: The record's.
+
+  Returns:
+    The reason, or None when the difference is not a known one.
+  """
+  if game.get_type().short_name != "gin_rummy":
+    return None
+  bonus = float(game.get_parameters().get("undercut_bonus", 25))
+  if all(r == 0 for r in pyspiel_returns) and sorted(
+      float(r) for r in record_returns
+  ) == [-bonus, bonus]:
+    return (
+        "equal deadwood after layoffs: an undercut here, 0-0 in "
+        "OpenSpiel releases up to 2.0.2"
+    )
+  return None
+
+
+def replay_in_pyspiel(
+    record: dict[str, Any], atol: float = 1e-4, allow_known: bool = False
+):
   """Replays a record in pyspiel.
 
   Args:
     record: One trajectories.jsonl record.
     atol: The largest allowed difference between pyspiel's returns and the
       record's.
+    allow_known: accept returns that differ by a known scoring difference
+      (known_return_difference); the caller compares the returns to count
+      them.
 
   Returns:
     The terminal pyspiel state.
@@ -242,7 +291,8 @@ def replay_in_pyspiel(record: dict[str, Any], atol: float = 1e-4):
   Raises:
     ValueError: the record has no pyspiel game, a move is not legal where it
       was played, an actor differs, the game does not end where the record
-      does, or the returns differ by more than `atol`.
+      does, or the returns differ by more than `atol` (and not by a known
+      difference, with allow_known).
   """
   # Lazy: pyspiel is an optional dependency, needed only to replay.
   import pyspiel  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
@@ -270,6 +320,14 @@ def replay_in_pyspiel(record: dict[str, Any], atol: float = 1e-4):
   if not state.is_terminal():
     raise ValueError(f"game {record['index']}: pyspiel's game has not ended")
   if not np.allclose(state.returns(), record["returns"], atol=atol, rtol=0):
+    if (
+        allow_known
+        and known_return_difference(
+            state.get_game(), state.returns(), record["returns"]
+        )
+        is not None
+    ):
+      return state
     raise ValueError(
         f"game {record['index']}: pyspiel returns {state.returns()}, the "
         f"record has {record['returns']}"
@@ -328,6 +386,19 @@ def parse_params(text: str) -> dict[str, Any]:
     except ValueError:
       out[k.strip()] = v.strip()
   return out
+
+
+def _to_pyspiel(env):
+  """The game's map from raw env histories to pyspiel's, if it has one.
+
+  Args:
+    env: The env.
+
+  Returns:
+    GameSpec.raw_history_to_pyspiel's function, or None.
+  """
+  path = env_registry.game(env.name).raw_history_to_pyspiel
+  return None if path is None else env_registry.resolve(path)
 
 
 def pyspiel_params_for(
@@ -411,11 +482,7 @@ def latest_step(path: str) -> int:
   Raises:
     FileNotFoundError: no step under `path` holds an artifact.
   """
-  root = epath.Path(artifact.norm_path(path))
-  names = [c.name for c in root.iterdir()] if root.exists() else []
-  steps = sorted(
-      int(n) for n in names if n.isdigit() and artifact.exists(path, int(n))
-  )
+  steps = artifact.steps(path)
   if not steps:
     raise FileNotFoundError(
         f"no artifact step under {path}; name one as {path}@<step>"
@@ -1045,40 +1112,80 @@ def run(
     raise RuntimeError(
         "the replayed games' returns differ from the Arena's payoffs"
     )
-  base_params = pyspiel_params_for(env, env_spec, parse_params(pyspiel_params))
-  if base_params is None:
+  to_pyspiel = _to_pyspiel(env)
+  if to_pyspiel is None:
+    base_params = pyspiel_params_for(
+        env, env_spec, parse_params(pyspiel_params)
+    )
+  elif pyspiel_params:
+    raise app.UsageError(
+        f"--pyspiel_params: {env.name}'s pyspiel game is read from each "
+        "game's history (GameSpec.raw_history_to_pyspiel); leave it empty"
+    )
+  else:
+    base_params = None
+
+  os.makedirs(out_dir, exist_ok=True)
+  path = os.path.join(out_dir, TRAJECTORIES)
+  seen_params, replayable = set(), True
+  with open(path, "w", encoding="utf-8") as f:
+    for r in range(2 * n_deals):
+      raw = [int(x) for x in hists[r]]
+      order = list(range(len(raw)))
+      seat_of = (0, 1)  # the env seat of each player of the record
+      params = base_params
+      if to_pyspiel is not None:
+        conv = to_pyspiel(raw, env_spec.kwargs)
+        if conv is not None:
+          params, order, seat_of = conv
+      if params is None:
+        replayable = False
+      else:
+        seen_params.add(json.dumps(params, sort_keys=True))
+      seats = ["a", "b"] if a_seat[r] == 0 else ["b", "a"]
+      rec = dict(
+          index=r,
+          deal=r // 2,
+          game_string=(
+              None if params is None else game_string(env.name, params)
+          ),
+          seats=[seats[q] for q in seat_of],
+          history=[raw[i] for i in order],
+          actors=[
+              -1 if actors[r][i] < 0 else seat_of.index(int(actors[r][i]))
+              for i in order
+          ],
+          returns=[float(returns[r][q]) for q in seat_of],
+          env_history=raw,
+      )
+      if played.probs is not None:
+        pol = []
+        for i in order:
+          t = plies[r][i]
+          if t < 0:
+            pol.append(None)
+            continue
+          p = played.probs[r, t]
+          pol.append([[int(j), float(p[j])] for j in np.flatnonzero(p > 0)])
+        rec["policy"] = pol
+      f.write(json.dumps(rec) + "\n")
+  if not replayable:
     print(
         f"note: {env.name}'s env histories are not pyspiel's here; histories "
         "are in the env's ids",
         flush=True,
     )
-
-  os.makedirs(out_dir, exist_ok=True)
-  path = os.path.join(out_dir, TRAJECTORIES)
-  with open(path, "w", encoding="utf-8") as f:
-    for r in range(2 * n_deals):
-      raw = [int(x) for x in hists[r]]
-      gs = None if base_params is None else game_string(env.name, base_params)
-      rec = dict(
-          index=r,
-          deal=r // 2,
-          game_string=gs,
-          seats=["a", "b"] if a_seat[r] == 0 else ["b", "a"],
-          history=raw,
-          actors=[int(x) for x in actors[r]],
-          returns=[float(x) for x in returns[r]],
-          env_history=raw,
-      )
-      if played.probs is not None:
-        pol = []
-        for t in plies[r]:
-          if t < 0:
-            pol.append(None)
-            continue
-          p = played.probs[r, t]
-          pol.append([[int(i), float(p[i])] for i in np.flatnonzero(p > 0)])
-        rec["policy"] = pol
-      f.write(json.dumps(rec) + "\n")
+  elif to_pyspiel is not None:
+    print(
+        f"note: {env.name}'s env histories are not pyspiel's; each saved "
+        "history is mapped to pyspiel's (the env's own is env_history)",
+        flush=True,
+    )
+  base_params = (
+      json.loads(next(iter(seen_params)))
+      if replayable and len(seen_params) == 1
+      else None
+  )
   summary = dict(
       format=FORMAT,
       format_version=FORMAT_VERSION,
@@ -1105,7 +1212,7 @@ def run(
       flush=True,
   )
 
-  if verify and base_params is not None:
+  if verify and replayable:
     try:
       # Lazy: pyspiel is an optional dependency; only its availability
       # matters here.
@@ -1124,10 +1231,24 @@ def run(
       )
     else:
       _, records = read_trajectories(out_dir)
-      n = sum(1 for rec in records if replay_in_pyspiel(rec) is not None)
+      n, known = 0, {}
+      for rec in records:
+        st = replay_in_pyspiel(rec, allow_known=True)
+        n += 1
+        if not np.allclose(st.returns(), rec["returns"], atol=1e-4, rtol=0):
+          why = known_return_difference(
+              st.get_game(), st.returns(), rec["returns"]
+          )
+          known.setdefault(why, []).append(rec["index"])
+      same = n - sum(len(v) for v in known.values())
       print(
-          f"replayed {n} saved games in pyspiel: every move legal, same "
-          "returns",
+          f"replayed {n} saved games in pyspiel: every move legal; "
+          f"{same} with the same returns"
+          + "".join(
+              f"; {len(v)} ({', '.join(map(str, v))}) scored differently by "
+              f"this pyspiel, a known difference: {why}"
+              for why, v in known.items()
+          ),
           flush=True,
       )
   return summary

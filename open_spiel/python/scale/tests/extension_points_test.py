@@ -117,6 +117,27 @@ def test_path_resolvers_rewrite_recorded_paths_in_order(monkeypatch):
     registry.register_path_resolver("not callable")
 
 
+def test_relative_paths_name_this_package(monkeypatch):
+  """A path starting with "." names a module of this package, by any name."""
+  monkeypatch.setattr(registry, "_RESOLVERS", [])
+  pkg = registry.__name__.rpartition(".")[0]
+  assert registry.absolute_path(".envs.kuhn:KuhnEnv") == (
+      f"{pkg}.envs.kuhn:KuhnEnv"
+  )
+  assert registry.absolute_path("acme.mod:f") == "acme.mod:f"
+  assert registry.resolve_path(".envs.kuhn") == f"{pkg}.envs.kuhn"
+  assert registry.load_object(".envs.kuhn:KuhnEnv") is registry.load_object(
+      f"{pkg}.envs.kuhn:KuhnEnv"
+  )
+  seen = []
+  registry.register_path_resolver(seen.append)  # returns None: no answer
+  registry.resolve_path(".envs.kuhn:KuhnEnv")
+  assert seen == [f"{pkg}.envs.kuhn:KuhnEnv"]  # resolvers see it absolute
+  for bad in (".", ".:f", "..envs.kuhn:KuhnEnv"):
+    with pytest.raises(ValueError, match="relative path"):
+      registry.resolve_path(bad)
+
+
 def test_config_packages_resolvers_and_hash_transforms(tmp_path, monkeypatch):
   """Config packages, config resolvers and hash transforms take effect."""
   pkg = tmp_path / "acmecfg"
@@ -352,7 +373,7 @@ def _doc_blocks() -> dict[str, str]:
   blocks: dict[str, str] = {}
   current = None
   for line in text.splitlines():
-    m = re.match(r"^  (\S+)\s+(.*)$", line)
+    m = re.search(r"^  (\S+)\s+(.*)$", line)
     if m:
       current = m.group(1)
       blocks[current] = m.group(2)
@@ -382,7 +403,7 @@ def test_plugins_doc_lists_every_registration_function():
       for node in tree.body:
         if not (
             isinstance(node, ast.FunctionDef)
-            and re.match(r"(register|set)_", node.name)
+            and re.search(r"^(register|set)_", node.name)
             and node.name not in _NOT_EXTENSION_POINTS
         ):
           continue

@@ -366,7 +366,7 @@ def _orbax():
 TREE_SHA_TAG = b"params_tree_sha256\0"
 
 
-def tree_sha256(tree: Any) -> str:
+def tree_sha256(tree: Any, tag: Optional[bytes] = None) -> str:
   """sha256 of a pytree of arrays, computed in memory.
 
   The digest covers a tag (TREE_SHA_TAG), then per leaf in flatten order its
@@ -376,6 +376,8 @@ def tree_sha256(tree: Any) -> str:
 
   Args:
     tree: a pytree of arrays.
+    tag: the domain-separation tag; None is TREE_SHA_TAG (read at call time).
+      A reader of digests another deployment recorded passes its tag.
 
   Returns:
     The hex digest.
@@ -388,7 +390,7 @@ def tree_sha256(tree: Any) -> str:
     raise ArtifactError(
         "tree_sha256 hashes little-endian bytes; this host is big-endian"
     )
-  h = hashlib.sha256(TREE_SHA_TAG)
+  h = hashlib.sha256(TREE_SHA_TAG if tag is None else tag)
   jax = _jax()
   for path, leaf in jax.tree_util.tree_leaves_with_path(tree):
     if isinstance(leaf, jax.Array) and not leaf.is_fully_addressable:

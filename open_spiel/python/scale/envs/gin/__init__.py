@@ -1190,6 +1190,62 @@ def pyspiel_history_to_raw(history, params) -> list[int]:
   return [int(sp)] + [int(a) for a in history]
 
 
+def raw_history_to_pyspiel(
+    raw: list[int], kwargs: Mapping[str, Any]
+) -> Optional[tuple[dict[str, Any], list[int], tuple[int, int]]]:
+  """The pyspiel gin_rummy game, history and seats of a raw env history.
+
+  The inverse of `pyspiel_history_to_raw`, for OpenSpiel's gin_rummy, whose
+  player 0 always acts first: the seat that the first-player node chose
+  plays pyspiel's player 0. The variant node (0 < oklahoma_frac
+  < 1) picks the game's `oklahoma` parameter and the first-player node
+  picks the seats; neither is a pyspiel chance node. pyspiel deals its
+  player 0's ten cards first, so when seat 1 acts first the deal's two
+  hands change places; every other entry (the upcard, stock draws, player
+  actions) is kept as it is: gin's action ids name cards and melds, not
+  seats.
+
+  Args:
+    raw: The env's raw history of one game, from the root.
+    kwargs: The env's options (EnvSpec kwargs).
+
+  Returns:
+    (pyspiel parameters, the raw indices of pyspiel's history in its order,
+    the env seat of each pyspiel player), or None when the env's rules have
+    no pyspiel game (a rule option off its default: the served pyspiel plays
+    only the defaults, registry.GIN_PYSPIEL_PARAMS).
+
+  Raises:
+    ValueError: The history is too short for its deal, or a variant or
+      first-player outcome is not 0 or 1.
+  """
+  if any(kwargs.get(k, v) != v for k, v in DEFAULT_RULES.items()):
+    return None
+  f = kwargs.get("oklahoma_frac")
+  variant = f is not None and 0.0 < f < 1.0
+  n = (1 if variant else 0) + 1 + _DEAL_CARDS
+  if len(raw) < n:
+    raise ValueError(
+        f"gin_rummy: a raw history of {len(raw)} entries has no complete deal"
+        f" ({n} chance entries)"
+    )
+  if variant:
+    oklahoma = raw[0]
+    if oklahoma not in (0, 1):
+      raise ValueError(f"gin_rummy: variant outcome {oklahoma!r} is not 0 or 1")
+  else:
+    oklahoma = int(f == 1.0)
+  fp = raw[n - 1 - _DEAL_CARDS]
+  if fp not in (0, 1):
+    raise ValueError(f"gin_rummy: first-player outcome {fp!r} is not 0 or 1")
+  deal = n - _DEAL_CARDS  # the first deal card's index
+  h = cm.HAND_SIZE
+  hands = [list(range(deal, deal + h)), list(range(deal + h, deal + 2 * h))]
+  order = hands[fp] + hands[1 - fp] + list(range(deal + 2 * h, len(raw)))
+  params = {"oklahoma": True} if oklahoma else {}
+  return params, order, (fp, 1 - fp)
+
+
 def deal_canon(info, labels):
   """uint8[N, 52 + 52 + 3]: the whole initial deal of each row.
 

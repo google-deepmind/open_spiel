@@ -118,6 +118,26 @@ def test_spec_and_registry_round_trip():
   assert routed.RoutedPolicy(cb, h, ROUTE).spec.stateful
 
 
+def test_a_relative_route_round_trips_and_routes_the_same():
+  """A route relative to the package ('.module:attr') is recorded as given.
+
+  It resolves to the same function as the absolute route, so the policy
+  routes the same rows, and its spec rebuilds through the registry.
+  """
+  pkg = routed.__name__.rsplit(".", 2)[
+      0
+  ]  # the package: open_spiel.python.scale.policies.routed
+  assert ROUTE.startswith(pkg + ".")
+  rel = ROUTE[len(pkg) :]
+  tab = _tab()
+  pol = routed.RoutedPolicy(tab, tab, rel)
+  assert pol.spec.arch_kwargs["route"] == rel
+  assert pol.route is routed.RoutedPolicy(tab, tab, ROUTE).route
+  assert registry.build(pol.spec.arch_name, pol.spec.arch_kwargs).spec == (
+      pol.spec
+  )
+
+
 def test_passes_check_policy_with_a_stateful_part():
   """Passes check policy with a stateful part."""
   env = kuhn.KuhnEnv()

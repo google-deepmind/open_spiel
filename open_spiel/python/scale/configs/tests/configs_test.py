@@ -32,11 +32,15 @@ SHIPPED = {
     "mmd_kuhn_poker": ("pg", "kuhn_poker"),
     "mmd_leduc_poker": ("pg", "leduc_poker"),
     "mmd_gin_rummy": ("pg", "gin_rummy"),
+    "gin_mmd_from_scratch": ("pg", "gin_rummy"),
     "ppo_tic_tac_toe": ("pg", "tic_tac_toe"),
     "az_connect_four": ("az", "connect_four"),
     "bc_connect_four": ("bc", "connect_four"),
     "psro_connect_four": ("pg", "connect_four"),
 }
+
+#: Shipped configs whose metadata records the rules get_config checked.
+RECORDS_RULES = ("gin_mmd_from_scratch",)
 
 
 def test_the_shipped_configs_are_exactly_these():
@@ -89,7 +93,10 @@ def test_shipped_config_loads_hashes_and_builds(name):
   kind, env = SHIPPED[name]
   assert isinstance(cfg, runner.LeagueRunConfig) and cfg.name == name
   assert common.learner_kind(cfg) == kind and cfg.env == env
-  assert not cfg.metadata
+  if name in RECORDS_RULES:  # it records the rules it checked
+    assert set(cfg.metadata) >= {"rules_sha", "env_spec", "rules"}, cfg.metadata
+  else:
+    assert not cfg.metadata
   assert (
       len(common.config_hash(cfg)) == 64 and len(common.resume_hash(cfg)) == 64
   )

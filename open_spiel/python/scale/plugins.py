@@ -73,6 +73,8 @@ is complete):
                    hardware.register_accelerator_namer,
                    compile_cache.register_shared_dir
   parallel         collectives_check.register_preflight
+  serve            controller.register_checkpoint_resolver,
+                   controller.register_into
 """
 
 from __future__ import annotations

@@ -2,9 +2,10 @@
 
 ## Getting started
 
-On a CPU laptop, after the install below (the pure-JAX path is enough for steps 1 to 3), from outside the OpenSpiel
-checkout (for example `cd /tmp`). Each step prints the line shown under
-it (numbers vary with the platform; wall times on 12 cores):
+On a CPU laptop, after the install below (the pure-JAX path is enough for steps
+1 to 3), from outside the OpenSpiel checkout (for example `cd /tmp`). Each step
+prints the line shown under it (numbers vary with the platform; wall times on 12
+cores):
 
 1. Train two tiny tic-tac-toe agents (about 30 s and 15 s):
 
@@ -18,18 +19,20 @@ it (numbers vary with the platform; wall times on 12 cores):
 
        python -m open_spiel.python.scale.examples.play_checkpoints --a=/tmp/ttt_a@150 --b=/tmp/ttt_b@20 --rule=sample --games=1024 --out=/tmp/a_vs_b
 
-   expect `a's mean payoff per game: +0.6250 +/- 0.0212 (95% CI +0.5834 .. +0.6666); b's: -0.6250`
-   and `wrote 1024 games to /tmp/a_vs_b/trajectories.jsonl (game_trajectories format 1) ...`.
+   expect `a's mean payoff per game: +0.6250 +/- 0.0212 (95% CI +0.5834 ..
+   +0.6666); b's: -0.6250` and `wrote 1024 games to
+   /tmp/a_vs_b/trajectories.jsonl (game_trajectories format 1) ...`.
 
 3. Evaluate a checkpoint against a uniform-random player (about 7 s):
 
        python -m open_spiel.python.scale.examples.play_checkpoints --a=/tmp/ttt_a@150 --b=uniform --games=1024 --out=/tmp/a_vs_uniform
 
-   expect `a's mean payoff per game: +0.6221 +/- 0.0174 (95% CI +0.5879 .. +0.6563); b's: -0.6221`.
+   expect `a's mean payoff per game: +0.6221 +/- 0.0174 (95% CI +0.5879 ..
+   +0.6563); b's: -0.6221`.
 
 4. Optionally replay a saved game in OpenSpiel (each step above already
    replays all of them and prints `replayed 1024 saved games in pyspiel:
-   every move legal, same returns`):
+   every move legal; 1024 with the same returns`):
 
        python -c "import json, pyspiel; r = json.loads(open('/tmp/a_vs_b/trajectories.jsonl').readline()); s = pyspiel.load_game(r['game_string']).new_initial_state(); [s.apply_action(a) for a in r['history']]; print(r['seats'], r['history'], s.returns())"
 
@@ -90,10 +93,11 @@ from the root of the OpenSpiel checkout (Python 3.11 to 3.13):
     source open_spiel/scripts/python_extra_deps.sh python3
     echo "$OPEN_SPIEL_PYTHON_JAX_DEPS" | xargs pip install
 
-Run the examples from outside the checkout (`cd /tmp`), so Python imports
-the installed package (or the checkout on `PYTHONPATH`). The framework needs 64-bit JAX (`jax_enable_x64`):
-each example calls `open_spiel.python.scale.enable_x64()` first thing in `main`, and so must
-your own code. Do not set `JAX_ENABLE_X64=0`.
+Run the examples from outside the checkout (`cd /tmp`), so Python imports the
+installed package (or the checkout on `PYTHONPATH`). The framework needs 64-bit
+JAX (`jax_enable_x64`): each example calls
+`open_spiel.python.scale.enable_x64()` first thing in `main`, and so must your
+own code. Do not set `JAX_ENABLE_X64=0`.
 
 ## Run
 
@@ -113,9 +117,10 @@ and the test, which runs each example with tiny flags in its own process:
 
     python -m open_spiel.python.scale.examples.examples_test
 
-(it is an `absltest`). It takes several minutes (each example compiles and trains for real), so in
-OpenSpiel's Bazel and ctest runs it is a long test, tagged `manual`: run
-only when named, or under ctest with `OPEN_SPIEL_RUN_MANUAL_TESTS=ON`.
+(it is an `absltest`). It takes several minutes (each example compiles and
+trains for real), so in OpenSpiel's Bazel and ctest runs it is a long test,
+tagged `manual`: run only when named, or under ctest with
+`OPEN_SPIEL_RUN_MANUAL_TESTS=ON`.
 
 The outputs below came from a fresh environment with the pinned
 dependencies. Wall times are whole-process times (imports and compilation
@@ -243,8 +248,9 @@ Defaults: 20 iterations of 128 self-play games at 32 simulations per move,
 
 The command-line trainer runs MMD on Kuhn poker from a named config (the
 recipe's own settings: entropy 0.05 on normalised advantages, longer runs):
-`python -m open_spiel.python.scale.train --config=mmd_kuhn_poker --checkpoint_dir=/tmp/kuhn`
-(see the package's README.md for configs, checkpoints and resuming).
+`python -m open_spiel.python.scale.train --config=mmd_kuhn_poker
+--checkpoint_dir=/tmp/kuhn` (see the package's README.md for configs,
+checkpoints and resuming).
 
 ## Run on Google Cloud (optional)
 
@@ -257,11 +263,12 @@ Compute Engine API on, an existing bucket, and `gcloud`:
     python3 -m open_spiel.python.scale.launch.cloud --project=my-project --bucket=my-bucket \
         --dry_run -- --config=ppo_tic_tac_toe
 
-Drop `--dry_run` to launch: the launcher checks its prerequisites and prints
-the fix for anything missing, creates one SPOT VM labelled with the run's
-id, trains, syncs checkpoints to the bucket and deletes the VM when the run
-ends (or at `--max_run_hours`); if the final checkpoint upload fails, it keeps
-the VM, whose disk still holds the checkpoint, and prints how to recover. `--down=<run_id>` deletes a run's VM; it
-never deletes anything it did not label and never creates or deletes a
-bucket. Settings can live in a file (`launch/cloud_example.yaml`); the
-docstring of `launch/cloud.py` lists every default and the roles it needs.
+Drop `--dry_run` to launch: the launcher checks its prerequisites and prints the
+fix for anything missing, creates one SPOT VM labelled with the run's id,
+trains, syncs checkpoints to the bucket and deletes the VM when the run ends (or
+at `--max_run_hours`); if the final checkpoint upload fails, it keeps the VM,
+whose disk still holds the checkpoint, and prints how to recover.
+`--down=<run_id>` deletes a run's VM; it never deletes anything it did not label
+and never creates or deletes a bucket. Settings can live in a file
+(`launch/cloud_example.yaml`); the docstring of `launch/cloud.py` lists every
+default and the roles it needs.

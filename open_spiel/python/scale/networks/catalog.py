@@ -28,6 +28,7 @@ Builders:
             value head (optional hidden layer, optional tanh) and optional
             aux heads.
   cnn(...)  CNNTorso + dense policy head + scalar value head.
+  gin_tfv2.card_tokens(...)  the gin card-token transformer (networks.gin_tfv2).
 A key equal to the module default ("lecun" init, value hidden 0, no tanh) is
 left out.
 """
@@ -36,6 +37,8 @@ from __future__ import annotations
 
 import copy
 from typing import Any, Mapping, Sequence
+
+from open_spiel.python.scale.networks import gin_tfv2
 
 LECUN = "lecun"
 
@@ -174,6 +177,22 @@ NAMED: dict[str, dict[str, Any]] = {
     # behaviour-cloning example network.
     "mlp_256x2": mlp(
         [256, 256], "relu", "shared", value_hidden=256, value_tanh=True
+    ),
+    # The gin card-token transformer: d192, 3 layers, 6 heads, bf16 compute,
+    # an HL-Gauss value head of 101 bins on [-110, 110]; on the encoder
+    # gin_card_tokens (configs/gin_mmd_from_scratch).
+    "gin_tfv2_d192l3": gin_tfv2.card_tokens(
+        d_model=192,
+        num_layers=3,
+        num_heads=6,
+        ffn_ratio=2,
+        compute_dtype="bfloat16",
+        value_head="hl_gauss",
+        card_fields=4,
+        global_fields=24,
+        hl_gauss=dict(
+            num_bins=101, v_min=-110.0, v_max=110.0, sigma_ratio=0.75
+        ),
     ),
 }
 

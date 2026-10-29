@@ -534,6 +534,7 @@ def main(argv):
     }
     with open(GOLDEN, "w", encoding="utf-8") as f:
       json.dump(out, f, indent=1, sort_keys=True)
+      f.write("\n")
     print(f"wrote {GOLDEN}")
     return
   want = json.load(open(GOLDEN, encoding="utf-8"))

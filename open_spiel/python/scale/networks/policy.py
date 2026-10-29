@@ -67,6 +67,9 @@ import jax.numpy as jnp
 
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.networks import actor_critic
+
+# Registers the "card_tokens" torso and "pointer" head kinds (gin).
+from open_spiel.python.scale.networks import gin_tfv2  # noqa: F401  pylint: disable=unused-import
 from open_spiel.python.scale.policies import registry
 
 ARCH = "network"
