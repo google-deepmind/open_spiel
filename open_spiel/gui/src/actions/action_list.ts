@@ -37,22 +37,6 @@ export function sortById<Row extends Action>(actions: readonly Row[]): Row[] {
   return [...actions].sort((a, b) => a.id - b.id);
 }
 
-/** The ids of the actions whose label another action also has. */
-export function duplicateLabelIds(
-  actions: readonly Action[],
-): ReadonlySet<number> {
-  const idsByLabel = new Map<string, number[]>();
-  for (const {id, label} of actions) {
-    const ids = idsByLabel.get(label);
-    if (ids === undefined) {
-      idsByLabel.set(label, [id]);
-    } else {
-      ids.push(id);
-    }
-  }
-  return new Set([...idsByLabel.values()].filter(ids => ids.length > 1).flat());
-}
-
 /** The rows of a windowed list to render: from `start` up to `end`. */
 export interface WindowRange {
   readonly start: number;

@@ -37,21 +37,22 @@ describe('EuchreGameplayConfigExtras card style', () => {
     const select = only(container, 'select:has(option[value="basic"])');
     if (!(select instanceof HTMLSelectElement)) throw new Error('no select');
     expect([...select.options].map(o => [o.value, o.textContent])).toEqual([
+      ['basic', 'Corner index + large pip'],
       ['simple-corner', 'Large corner index'],
       ['simple', 'Centred rank and suit'],
-      ['basic', 'Corner index + large pip'],
     ]);
+    expect(select.value).toBe('basic');
     const hint = (): string | null =>
       only(container, '[data-testid="deck-description"]').textContent;
-    expect(hint()).toMatch(/^Best for fanned hands/);
+    expect(hint()).toMatch(/^Best for table piles and tricks/);
 
     act(() => {
-      select.value = 'basic';
+      select.value = 'simple-corner';
       select.dispatchEvent(new Event('change', {bubbles: true}));
     });
-    expect(hint()).toMatch(/^Best for table piles and tricks/);
+    expect(hint()).toMatch(/^Best for fanned hands/);
     act(() => {
-      select.value = 'simple-corner';
+      select.value = 'basic';
       select.dispatchEvent(new Event('change', {bubbles: true}));
     });
   });

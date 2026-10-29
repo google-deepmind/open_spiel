@@ -176,13 +176,11 @@ function TicTacToeBoard({
   readonly onCellClick: (index: number) => void;
 }): JSX.Element {
   const {waitingOnBot, turnLocked} = turn;
-  const lastActionIndex = state.history.at(-1) ?? null;
   return (
     <div className="tto-board-wrapper">
       <div className="tto-board" data-testid="ttt-board">
         {board.map((cell, index) => {
           const isLegal = legalActions.has(index);
-          const isLast = lastActionIndex === index;
           const disabled =
             Boolean(cell) ||
             !isLegal ||
@@ -200,9 +198,7 @@ function TicTacToeBoard({
           return (
             <button
               key={index}
-              className={`tto-cell${
-                isLast ? ' tto-cell--last' : ''
-              }${canPlay ? ' tto-cell--legal' : ''}`}
+              className={`tto-cell${canPlay ? ' tto-cell--legal' : ''}`}
               disabled={disabled}
               onClick={() => {
                 onCellClick(index);

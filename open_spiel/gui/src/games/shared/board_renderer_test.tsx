@@ -146,9 +146,8 @@ describe('tic_tac_toe renderer', () => {
     expect(meta.textContent).toBe('X to moveTurn: 2You play XYour turn!');
     expect(only(container, '[data-cell="4"]').textContent).toBe('X');
     expect(only(container, '[data-cell="0"]').textContent).toBe('O');
-    expect(only(container, '[data-cell="0"]').className).toMatch(
-      /tto-cell--last/,
-    );
+    // No ring or highlight marks the last move: the marks say it.
+    expect(only(container, '[data-cell="0"]').className).toBe('tto-cell');
     click(only(container, '[data-cell="8"]'));
     expect(play).toHaveBeenCalledWith(8);
   });

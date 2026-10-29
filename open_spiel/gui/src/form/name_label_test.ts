@@ -24,6 +24,8 @@ describe('nameLabel', () => {
     ['uct_c', 'Uct C'],
     ['players', 'Players'],
     ['num2Players', 'Num2 Players'],
+    ['url', 'URL'],
+    ['bot_url', 'Bot URL'],
   ])('names %j %j', (name, label) => {
     expect(nameLabel(name)).toBe(label);
   });

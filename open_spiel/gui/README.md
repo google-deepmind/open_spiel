@@ -239,8 +239,10 @@ Two gates, both part of `npm run check`, keep the styling readable:
 `src/players/` is the Players section of Setup: who plays each seat, chosen
 from the session's controllers, with each controller's settings and whether
 it autoplays. A controller that cannot play the game is listed as not
-available here, with the server's reason. A seat whose controller waits to be
-advanced has a Step button for its turn, as does an autoplaying seat that
+available here, with the server's reason. A controller's notice about its
+latest move (a remote bot's, say) follows its name on the same line, cut to
+that line, so that it never moves the layout. A seat whose controller waits to
+be advanced has a Step button for its turn, as does an autoplaying seat that
 autoplay left to move (after an undo, or past the plies one request plays),
 and a failed seat a Retry. Opening a
 seat's settings starts a draft from the settings it plays with; the draft is

@@ -1,8 +1,9 @@
 # GUI wire contract
 
 The game server speaks JSON over HTTP. Each response body is a **frame**, the
-**catalogue**, the **health** report or an **error**. This document is the
-specification of those bodies, of the request bodies, and of the routes.
+**catalogue**, the **health** report, a **closed session** or an **error**.
+This document is the specification of those bodies, of the request bodies,
+and of the routes.
 
 The definitions are Python dataclasses: [`contract.py`](contract.py),
 [`frame.py`](frame.py), [`catalogue.py`](catalogue.py),
@@ -17,7 +18,7 @@ present and null, never absent. Objects admit no extra fields.
 
 ## Versioning
 
-Every response carries `contract_version`, currently `7`. It increases on any
+Every response carries `contract_version`, currently `8`. It increases on any
 change a client could break on: a field added, removed, renamed or retyped,
 an enum value added or removed, or a route changed. The server and the
 client change version together: the client refuses a response of any other
@@ -25,6 +26,7 @@ version.
 
 | Version | Change                                                                                                                                       |
 | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `8`     | `SeatView.notice`, a controller's note about its latest move, sent only to that seat's viewer and to omniscient viewers; `DELETE /api/sessions/{id}`, answered with `SessionClosed` |
 | `7`     | `CatalogueEntry.renderer`: the renderer the game's adapter names, so a client can show which games it draws as a board before opening one |
 | `6`     | `Health.capabilities.cpp_mcts_limits` (`simulations_or_clock` \| `simulations_only`): how the served pyspiel's C++ MCTS bounds a search, which sets MCTS's limits |
 | `5`     | `Health.capabilities.python_game_search` removed: MCTS picks its search by how the game is implemented and plays games implemented in Python as in C++ |
@@ -53,6 +55,7 @@ path that does not exist, with `not_found`.
 | `POST` | `/api/sessions/{id}/undo`         |                      | `Frame`, live     | `bad_request`, `not_found`, `viewer_unavailable`, `nothing_to_undo`                                      |
 | `POST` | `/api/sessions/{id}/reset`        | `Reset`              | `Frame`, live     | `bad_request`, `not_found`, `viewer_unavailable`, `not_your_turn`, `illegal_action`                      |
 | `PUT`  | `/api/sessions/{id}/seats/{seat}` | `SeatConfig`         | `Frame`, live     | `bad_request`, `not_found`, `viewer_unavailable`, `not_your_turn`, `controller_unavailable`              |
+| `DELETE` | `/api/sessions/{id}`            |                      | `SessionClosed`   | `bad_request`, `not_found`, `viewer_unavailable`, `not_your_turn`                                        |
 
 - **Create** builds the game and returns its initial position, after any
   autoplay seats and `auto` chance nodes have acted.
@@ -96,6 +99,11 @@ path that does not exist, with `not_found`.
 - **Seats** hands a seat to another controller. On a paused seat this clears
   the failure and resumes play. As with reset, any viewer but a spectator
   changes a seat; a spectator is refused with `not_your_turn`.
+- **Close** forgets the session; its id is `not_found` from then on. As
+  with reset, any viewer but a spectator closes it; a spectator is refused
+  with `not_your_turn`. The answer is `SessionClosed`: `contract_version`
+  and the `id` closed. Like a change, a close from another origin is
+  refused.
 - **Health** identifies the running code, so a client or sweep can refuse a
   server it does not expect.
 
@@ -134,6 +142,7 @@ state; every other game is treated as hiding information.
 | `history[i]`                                 | in full when `s` acted, otherwise `action`, `label` and `rewards` are `null` | `action`, `label` and `rewards` `null` |
 | `rewards`                                    | as the history entry that reached the position                               | as for a seat                          |
 | `seats[i].failure.message`                   | `null`                                                                       | `null`                                 |
+| `seats[i].notice`                            | seat `s`'s own (`i == s`), otherwise `null`                                  | `null`                                 |
 
 An `omniscient` viewer receives everything, except that `session.seed` goes to
 the oracle alone: the seed determines every chance outcome to come. A history
@@ -151,7 +160,7 @@ and a **replay** of an earlier position otherwise.
 
 | Field                    | Type                                | Meaning                                                      |
 | ------------------------ | ----------------------------------- | ------------------------------------------------------------ |
-| `contract_version`       | `7`                                 |                                                              |
+| `contract_version`       | `8`                                 |                                                              |
 | `session`                | `SessionInfo`                       | the session's fixed properties                               |
 | `viewer`                 | `Viewer`                            | who the frame is for                                         |
 | `omniscient`             | boolean                             | whether the viewer sees the full state                       |
@@ -199,7 +208,7 @@ shows it to every viewer.
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SessionInfo`       | `id`, `game` (short name), `parameters`, `num_seats`, `chance_policy`, `turn_based`, `hides_information`, `seed`, `controllers`                                                                                                                                                                          |
 | `Viewer`            | `kind`, `seat`                                                                                                                                                                                                                                                                                           |
-| `SeatView`          | `seat`, `controller` (a `Controller.name`), `config`, `autoplay`, `failure`, `status` (`ready` \| `preparing` \| `unavailable`), `message` (why the seat is not ready, or null)                                                                                                                         |
+| `SeatView`          | `seat`, `controller` (a `Controller.name`), `config`, `autoplay`, `failure`, `status` (`ready` \| `preparing` \| `unavailable`), `message` (why the seat is not ready, or null), `notice` (the controller's note about its latest move, at most 200 characters, or null)                             |
 | `Controller`        | `name` (stable identifier), `label`, `config_schema` (a JSON Schema object whose `properties` give each setting's `type`, `default` and constraints, and whose `required` lists the settings a seat must be given, which have no `default`), `unavailable_reason` (why it cannot play the game, or null) |
 | `ControllerFailure` | `error` (exception name), `message`                                                                                                                                                                                                                                                                      |
 | `ToMove`            | `kind` (`seat` \| `chance` \| `terminal`), `seat`                                                                                                                                                                                                                                                        |
@@ -224,7 +233,8 @@ shows it to every viewer.
   and every history entry in full.
 - A viewer that is not `omniscient` gets no chance outcomes and no failure
   messages, gets legal actions only as the seat to move, and, holding a seat,
-  sees its own actions in full.
+  sees its own actions in full. It gets no seat's `notice` but its own.
+- A human seat has no `notice`.
 - A history entry withholds its `action`, `label` and `rewards` together;
   only a withheld entry has a non-null `public_label`.
 - `0 <= ply <= num_plies == len(history)`.
@@ -291,11 +301,30 @@ set, `status` becomes `paused`, the request that met the failure answers
 applied stand. Play resumes after an undo, a reset, or a change of that
 seat's controller.
 
-The server registers three controllers: `human`, `random` (a uniformly
-random legal action) and `mcts`. MCTS = pyspiel C++ MCTSBot for C++ games;
-OpenSpiel Python MCTS for Python-implemented games. Its limits follow a
-capability check the server makes once at startup, reported as
-`Health.capabilities.cpp_mcts_limits`.
+A controller may give a **notice** with a move: a line of plain text, at most
+200 characters, such as a remote bot reporting a fallback it took. The seat
+shows it in `notice` until the seat moves again, or an undo, a reset or a
+change of controller clears it. It reaches only that seat's viewer and
+omniscient viewers, and it has no effect on play. A notice that is not
+non-blank text of at most 200 characters fails the seat (`InvalidNotice`).
+A notice is text the controller writes, so a controller that reads the full
+state (a `remote` seat sent `full_state`, say) can put hidden information in
+it, which then reaches that seat's viewer. Every notice is passed on, as
+that seat's `config` says what it reads; the server's state policy
+(`controller_registry.full_state_notice`) is the place to drop or limit such
+a seat's notices.
+
+The server registers four controllers: `human`, `random` (a uniformly random
+legal action), `mcts`, and `remote`, a bot server the seat's `url` names, sent
+what the seat's `state` setting says: `seat_view`, what the seat may see (its
+information state string, legal actions and a seed, with more on request), or
+`full_state`, the whole state ([REMOTE_BOTS.md](REMOTE_BOTS.md) gives the
+protocol). A `remote` seat may be sent the full state in a game that hides
+information; its `config`, which every viewer receives, says which it is sent.
+The server posts to bot servers on its own machine only, unless started with
+`--remote-bot-host`. MCTS = pyspiel C++ MCTSBot for C++ games; OpenSpiel Python
+MCTS for Python-implemented games. Its limits follow a capability check the
+server makes once at startup, reported as `Health.capabilities.cpp_mcts_limits`.
 
 A game implemented in C++ is searched by OpenSpiel's C++ search
 (`pyspiel.MCTSBot`), its tree capped at 1000 MB. That search cannot be
@@ -373,7 +402,9 @@ controller.
 
 ## Catalogue
 
-`Catalogue.games` lists every registered game once, ordered by `name`.
+`Catalogue.games` lists every registered game once, ordered by `name`,
+except the games the server is started with `--exclude-games` to leave out,
+whose sessions it refuses as `not_found`.
 The server loads each game once per process and keeps what it finds, so a
 game registered after the first catalogue is not listed until a restart.
 `renderer` is not kept: it is read from the adapter registry on every

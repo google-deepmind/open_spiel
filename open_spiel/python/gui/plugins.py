@@ -38,7 +38,8 @@ with a `PluginError` that names the plugin.
 
 This module is the one place the GUI imports a module by name: the names
 come from the command line or the installed entry points, never from the
-GUI's own source.
+GUI's own source. The reference remote bot server imports its bot's module
+through `import_named` too.
 """
 
 from collections.abc import Callable, Sequence
@@ -106,16 +107,32 @@ def load(names: Sequence[str]) -> tuple[str, ...]:
   return added
 
 
-def _module_hook(name: str) -> RegisterInto:
-  """Imports the plugin module `name` and returns its `register_into`."""
+def import_named(
+    name: str, what: str = "Controller plugin module"
+) -> types.ModuleType:
+  """Imports the module `name`, given on a command line.
+
+  Besides controller plugins, the reference remote bot server
+  (`remote_bot_server --bot MODULE:FACTORY`) imports its bot's module here.
+
+  Args:
+    name: The module's dotted name.
+    what: What the module is, for the error.
+
+  Raises:
+    PluginError: If the module cannot be imported, naming it.
+  """
   try:
-    module = importlib.import_module(name)
+    return importlib.import_module(name)
   except Exception as e:
     raise PluginError(
-        f"Controller plugin module {name!r} cannot be imported: "
-        f"{type(e).__name__}: {e}"
+        f"{what} {name!r} cannot be imported: {type(e).__name__}: {e}"
     ) from e
-  return _hook_of(module, f"module {name!r}")
+
+
+def _module_hook(name: str) -> RegisterInto:
+  """Imports the plugin module `name` and returns its `register_into`."""
+  return _hook_of(import_named(name), f"module {name!r}")
 
 
 def _hook_of(loaded: object, plugin: str) -> RegisterInto:

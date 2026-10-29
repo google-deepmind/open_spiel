@@ -47,6 +47,7 @@ RESPONSE_TYPES: tuple[type[object], ...] = (
     frame.Frame,
     catalogue.Catalogue,
     health.Health,
+    contract.SessionClosed,
     errors.Error,
 )
 

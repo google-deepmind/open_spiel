@@ -306,6 +306,8 @@ test('euchre: North plays a whole hand on the board against Random', async ({
   // The board's own View section: Card style, Trick hold, Show all cards.
   const section = await app.showSection('View', 'Euchre');
   await expect(section.getByText('Card style')).toBeVisible();
+  await expect(section.getByTestId('card-style-select')).toHaveValue('basic');
   await expect(section.getByText('Trick hold')).toBeVisible();
+  await expect(section.getByText('Show all cards')).toBeVisible();
   await capture(page, '07-view');
 });

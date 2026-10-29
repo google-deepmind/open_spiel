@@ -242,9 +242,10 @@ export class FakeServer {
       failure: null,
       status: 'ready',
       message: null,
+      notice: null,
     }));
     const body: Frame = {
-      contract_version: 7,
+      contract_version: 8,
       session: {
         id,
         game: 'count',
@@ -313,7 +314,7 @@ function json(body: unknown, status = 200): Response {
 
 function refuse(code: ErrorCode, message: string): Response {
   const body: ErrorBody = {
-    contract_version: 7,
+    contract_version: 8,
     code,
     message,
     seat: null,
@@ -323,7 +324,7 @@ function refuse(code: ErrorCode, message: string): Response {
 }
 
 const HEALTH: Health = {
-  contract_version: 7,
+  contract_version: 8,
   version: '0.0.0',
   revision: null,
   capabilities: {
@@ -341,7 +342,7 @@ const HEALTH: Health = {
 };
 
 const CATALOGUE: Catalogue = {
-  contract_version: 7,
+  contract_version: 8,
   games: [
     {
       name: 'count',

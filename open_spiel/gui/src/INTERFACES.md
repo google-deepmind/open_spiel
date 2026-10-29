@@ -699,7 +699,10 @@ A deck's `id` is the stored and wire name and stays fixed; its `label` names
 the face style in the Card deck picker by what it draws, and its optional
 `description` is the one "best for" line the picker shows under it (Large
 corner index: fanned hands; Corner index + large pip: table piles and tricks;
-Centred rank and suit: cards seen one at a time). The built-in decks share
+Centred rank and suit: cards seen one at a time). Every card game starts on
+Corner index + large pip (`basic`): it is `DEFAULT_CARD_STYLE.deck` and the
+table-card settings' default, and euchre's and hearts' Card style default.
+The built-in decks share
 the card backs of `cards/library/decks/backs.tsx`, drawn in code (lattice,
 diamonds, stripes; blue lattice by default), named in the Card back picker by
 `Deck.backLabels`; the generic `cards` renderer's face-down cards
@@ -803,6 +806,16 @@ plays a checkpoint declares:
 ```
 
 `build` receives every setting, the defaults filled in.
+
+A controller may set a `last_notice` attribute in `choose_action`: a line of
+plain text about the move, at most 200 characters, or None. The seat shows it
+to its own viewer and to omniscient viewers, after the controller's name in
+Setup › Players; it has no effect on play.
+
+A bot that runs in its own process, or on another machine, needs no plugin:
+the built-in `remote` controller plays any bot server, and
+`open_spiel/python/gui/REMOTE_BOTS.md` gives the protocol
+and a reference server that wraps any bot.
 
 A controller has 10 seconds to choose each move (`--move-budget-seconds`
 changes it). The server asks it on a thread of its own, so a slow controller

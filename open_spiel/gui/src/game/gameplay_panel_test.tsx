@@ -79,8 +79,10 @@ describe('GameplayPanel', () => {
     expect(container.querySelector('[aria-label="Replay"]')).toBeNull();
     expect(container.querySelector('.legal__row')).toBeNull();
     expect(container.querySelector('input')).toBeNull();
-    // The text is copied from State, so the board has no copy button.
-    expect(container.querySelectorAll('button')).toHaveLength(0);
+    // The board's text has its own copy button, and that is the one button.
+    expect(
+      Array.from(container.querySelectorAll('button'), b => b.className),
+    ).toEqual(['button button--icon copy-button']);
   });
 
   it('shows the session error over the board, until dismissed', () => {
@@ -117,7 +119,12 @@ describe('GameplayPanel', () => {
       ),
     );
     expect(container.textContent).not.toContain('Hand over');
-    expect(container.querySelectorAll('button')).toHaveLength(0);
+    // The observation's copy button is the one button.
+    expect(
+      Array.from(container.querySelectorAll('button'), b =>
+        b.getAttribute('aria-label'),
+      ),
+    ).toEqual(['Copy to clipboard']);
   });
 });
 

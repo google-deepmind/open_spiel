@@ -25,7 +25,16 @@
 // - a live control's style, its :enabled and :hover rules and its pointer
 //   cursor, on a selector that does not exclude [aria-disabled='true']: a
 //   control refusing presses while a request is in flight is enabled, and
-//   such a selector outranks base.css's disabled rule.
+//   such a selector outranks base.css's disabled rule;
+// - an accent edge: a one-sided border on the left or right (the physical
+//   or logical side, shorthand or longhand) wider than 1 px or in any colour
+//   but the neutral border tokens, and an inset box-shadow drawn as a side
+//   stripe. A coloured stripe down a notice, card or callout is the look the
+//   UI refuses: say a tone with the text, or draw a plain full border. A
+//   pseudo-element's edges draw icon glyphs (the copy icon's sheet, the
+//   check mark) and are left alone. So is a stripe a pseudo-element draws
+//   with its own width and background: this lint does not catch that one,
+//   so a clean lint is not proof there is none.
 //
 // Opacity, filters and how a disabled control looks are not refused: a
 // game board keeps its own faded controls, washed-out ghost cards and
@@ -148,6 +157,30 @@ const TOKEN_REFERENCE = /^var\(\s*(--[\w-]+)\s*(?:,\s*(.*))?\)$/s;
 // The unitless opacity properties, to which React appends no px.
 const OPACITY = /^(?:fill-|stroke-|stop-|flood-)?opacity$/;
 const MATH_FUNCTION = /^(?:calc|min|max|clamp)\(.*\)$/s;
+// A side edge: border-left, border-inline-start, border-right-color...
+const SIDE_EDGE =
+  /^border-(?:left|right|inline-start|inline-end)(?:-(width|color|style))?$/;
+// The colours a side edge may take: the neutral dividers'.
+const NEUTRAL_EDGE_COLOURS = new Set([
+  'var(--color-border)',
+  'var(--color-border-strong)',
+]);
+const EDGE_OFF = new Set(['0', '0px', 'none', 'hidden', 'initial', 'unset']);
+const BORDER_STYLES = new Set([
+  'solid',
+  'dashed',
+  'dotted',
+  'double',
+  'groove',
+  'ridge',
+  'inset',
+  'outset',
+]);
+const GLASS_MESSAGE =
+  'a glass blur (backdrop-filter) is refused; draw an opaque surface.';
+const ACCENT_EDGE_MESSAGE =
+  'an accent edge (a coloured or heavy stripe down one side) is refused;' +
+  ' say the tone with the text, or draw a plain 1px full border.';
 
 /**
  * `value` with strings and url() arguments blanked, and each var() reduced to
@@ -276,6 +309,76 @@ function liveProblem({property, value, selectors}: Style): string | null {
   );
 }
 
+/** The shadows of a box-shadow list, split on commas outside parentheses. */
+function shadowList(value: string): string[] {
+  return value.split(/,(?![^(]*\))/).map(shadow => shadow.trim());
+}
+
+/**
+ * Whether one shadow is an inset stripe down one side: inset, written first
+ * or last, with a horizontal offset and no vertical one
+ * (`inset 3px 0 0 var(--color-accent)`, `-3px 0 0 var(...) inset`).
+ */
+function sideStripe(shadow: string): boolean {
+  const words = shadow.split(/\s+(?![^(]*\))/);
+  if (!words.includes('inset')) return false;
+  const lengths = words.filter(word => /^-?\d*\.?\d+[a-z]*$/.test(word));
+  const [x = '0', y = '0'] = lengths;
+  const magnitude = (length: string): number =>
+    Number(/^-?\d*\.?\d+/.exec(length)?.[0] ?? '0');
+  return magnitude(x) !== 0 && magnitude(y) === 0;
+}
+
+/** Whether `width` is a length over 1 px, or one this cannot read. */
+function heavyEdge(width: string): boolean {
+  const length = /^(\d*\.?\d+)px$/.exec(width);
+  if (length !== null) return Number(length[1]) > 1;
+  return !['thin'].includes(width);
+}
+
+// A side edge wider than 1 px or in a colour other than the neutral
+// dividers', or an inset shadow drawn as a stripe down one side.
+function accentEdgeProblem({property, value, selectors}: Style): string | null {
+  if (selectors.some(selector => /::?(?:before|after)\b/.test(selector))) {
+    return null;
+  }
+  const bare = value.trim().toLowerCase();
+  if (property === 'box-shadow') {
+    return shadowList(bare).some(sideStripe) ? ACCENT_EDGE_MESSAGE : null;
+  }
+  const side = SIDE_EDGE.exec(property);
+  if (side === null || EDGE_OFF.has(bare)) {
+    return null;
+  }
+  const part = side[1];
+  if (part === 'style') return null;
+  if (part === 'width') return heavyEdge(bare) ? ACCENT_EDGE_MESSAGE : null;
+  if (part === 'color') {
+    return NEUTRAL_EDGE_COLOURS.has(bare) ? null : ACCENT_EDGE_MESSAGE;
+  }
+  // The shorthand: a width, a style and a colour, in any order.
+  const words = bare.split(/\s+(?![^(]*\))/);
+  const colours = words.filter(
+    word => !BORDER_STYLES.has(word) && !/^\d*\.?\d+[a-z]*$/.test(word),
+  );
+  const widths = words.filter(word => /^\d*\.?\d+[a-z]*$/.test(word));
+  if (widths.some(heavyEdge) || widths.length === 0) {
+    // CSS's default width is medium, 3 px.
+    return ACCENT_EDGE_MESSAGE;
+  }
+  return colours.length === 1 && NEUTRAL_EDGE_COLOURS.has(colours[0] ?? '')
+    ? null
+    : ACCENT_EDGE_MESSAGE;
+}
+
+// A frosted-glass panel: backdrop-filter, set to anything but none.
+function glassProblem({property, value}: Style): string | null {
+  return /^(?:-webkit-)?backdrop-filter$/.test(property) &&
+    !EDGE_OFF.has(value.trim().toLowerCase())
+    ? GLASS_MESSAGE
+    : null;
+}
+
 /** What is wrong with one declaration, if anything. */
 export function styleProblems(
   style: Style,
@@ -283,7 +386,11 @@ export function styleProblems(
   tokens: Tokens,
 ): string[] {
   const {property, value} = style;
-  const problems: Array<string | null> = [liveProblem(style)];
+  const problems: Array<string | null> = [
+    liveProblem(style),
+    accentEdgeProblem(style),
+    glassProblem(style),
+  ];
   if (property === 'font' && value !== 'inherit') {
     problems.push(
       'set font-size and font-family apart, so the size is checked.',

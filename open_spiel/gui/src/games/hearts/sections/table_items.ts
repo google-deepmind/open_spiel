@@ -24,7 +24,6 @@ import {
   type TrickSeat,
 } from '../../../cards/library/index.ts';
 import {SEAT_SLOT} from '../hearts_layout.ts';
-import {DEFAULT_HEARTS_TRICK_LAYOUT} from '../hearts_view_settings.ts';
 import {
   getPointValue,
   toSharedCard,
@@ -88,6 +87,9 @@ export function points(code: CardCode): string {
   const n = getPointValue(code);
   return n === 0 ? '' : n === 1 ? ' (1 point)' : ` (${String(n)} points)`;
 }
+
+/** The trick layout the table draws: each card toward its player. */
+export const DEFAULT_HEARTS_TRICK_LAYOUT: TrickLayout = 'toward';
 
 /** The trick layout drawn: the one asked for, or the table's default. */
 export function trickLayoutOf(

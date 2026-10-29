@@ -50,6 +50,9 @@
   display: none;
 }
 
+/* A notice is a plain, squared plaque: one quiet full border, the raised
+   surface, a shadow just deep enough to lift it off the board. Its tone is
+   told by the text (weight and colour), never by a coloured edge or stripe. */
 .gameplay-notice {
   box-sizing: border-box;
   max-width: 100%;
@@ -57,18 +60,16 @@
   align-items: center;
   gap: 10px;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius);
   border: 1px solid var(--color-border-strong);
-  border-left-width: 4px;
   /* Opaque, not a tint: the notice sits on felt, wood and board art, and a
        translucent wash is unreadable over a busy board. */
   background: var(--color-surface-raised);
   color: var(--color-text);
-  box-shadow: 0 4px 14px var(--color-shadow);
+  box-shadow: 0 1px 3px var(--color-shadow);
   font-size: 13px;
   line-height: 1.35;
   overflow-wrap: anywhere;
-  animation: gameplay-notice-in 160ms ease-out;
 }
 
 .gameplay-notice__text {
@@ -80,23 +81,20 @@
   overflow: hidden;
 }
 
-.gameplay-notice--info,
 .gameplay-notice--turn {
-  border-left-color: var(--color-accent);
+  font-weight: 600;
 }
 
 .gameplay-notice--waiting {
-  border-left-color: var(--color-text-muted);
   color: var(--color-text-secondary);
 }
 
 .gameplay-notice--warning {
-  border-left-color: var(--color-warning);
+  color: var(--color-warning);
+  font-weight: 500;
 }
 
 .gameplay-notice--error {
-  border-radius: 10px;
-  border-left-color: var(--color-error-text);
   color: var(--color-error-text);
   font-weight: 500;
 }
@@ -123,49 +121,13 @@
   line-height: 1;
 }
 
-.gameplay-notice__action {
-  pointer-events: auto;
-  flex: none;
-  padding: 3px 10px;
-  border: 1px solid currentColor;
-  border-radius: 6px;
-  background: var(--color-surface-raised);
-  color: inherit;
-  font: inherit;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.gameplay-notice__action:not([aria-disabled='true']),
 .gameplay-notice__dismiss:not([aria-disabled='true']) {
   cursor: pointer;
-}
-
-.gameplay-notice__action:not([aria-disabled='true']):hover,
-.gameplay-notice__action:focus-visible {
-  background: var(--color-surface-sunken);
 }
 
 .gameplay-notice__dismiss:not([aria-disabled='true']):hover,
 .gameplay-notice__dismiss:focus-visible {
   background: var(--color-surface-sunken);
-}
-
-@keyframes gameplay-notice-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gameplay-notice {
-    animation: none;
-  }
 }
 
 /* Phone: smaller type and two lines at most, so a

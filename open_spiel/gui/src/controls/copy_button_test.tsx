@@ -97,7 +97,9 @@ describe('CopyableText', () => {
 });
 
 describe('CompactText', () => {
-  it('shows the text as a named, focusable group with no copy button', () => {
+  it('shows the text as a named, focusable group with its copy button', async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    stubProperty(navigator, 'clipboard', {writeText});
     rendered = render(<CompactText text={'P0: 1\nP1: -1'} label="Returns" />);
     const text = only(rendered.container, 'pre');
     expect(text.textContent).toBe('P0: 1\nP1: -1');
@@ -105,6 +107,28 @@ describe('CompactText', () => {
     expect(text.getAttribute('aria-label')).toBe('Returns');
     expect(text.tabIndex).toBe(0);
     expect(text.classList).toContain('copyable__text--compact');
-    expect(rendered.container.querySelector('button')).toBeNull();
+    const card = only(rendered.container, '.copyable');
+    expect(card.classList).toContain('copyable--compact');
+    const button = only(card, 'button');
+    expect(names(button)).toEqual(['Copy to clipboard', 'Copy to clipboard']);
+    await act(async () => {
+      button.click();
+      await Promise.resolve();
+    });
+    expect(writeText).toHaveBeenCalledExactlyOnceWith('P0: 1\nP1: -1');
+    expect(names(button)).toEqual(['Copied', 'Copied!']);
+  });
+});
+
+describe('CopyableText as a region', () => {
+  it('names the text as a region when asked, and keeps its copy button', () => {
+    rendered = render(
+      <CopyableText text="x.o" label="State" role="region" className="mine" />,
+    );
+    const text = only(rendered.container, 'pre');
+    expect(text.getAttribute('role')).toBe('region');
+    expect(text.classList).toContain('mine');
+    expect(text.classList).not.toContain('copyable__text--compact');
+    expect(only(rendered.container, '.copyable .copy-button')).toBeTruthy();
   });
 });

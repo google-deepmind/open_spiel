@@ -35,10 +35,12 @@
   background: none;
 }
 
-/* The notices sit 10 px below the panel's top edge, as in a padded panel:
-   here the 14 px padding is outside the shell. */
+/* The notices sit just inside the shell's top edge: the 14 px padding is
+   outside the shell here. Never above it: the shell scrolls (overflow-y:
+   auto), so anything above its top edge is clipped, and a negative offset
+   sliced the notice's top border off. 4 px keeps its border and shadow. */
 .ogs-panel.gameplay-shell > .gameplay-notice-layer--top {
-  top: -4px;
+  top: 4px;
 }
 
 /* A session error is shown ONCE, as a banner in the Gameplay panel; the other

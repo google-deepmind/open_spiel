@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {act, type ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import {afterEach, describe, expect, it} from 'vitest';
 
 import type {Frame, Presentation} from '../../contract/contract.ts';
@@ -78,6 +78,7 @@ function seatFrame(presentation: Presentation): Frame {
     failure: null,
     status: 'ready' as const,
     message: null,
+    notice: null,
   }));
   return frame({
     viewer: {kind: 'seat', seat: 0},
@@ -147,6 +148,24 @@ describe('heartsUIState', () => {
     const left = state.players.find(player => player.position === 'left');
     expect(left?.hidden).toBe(true);
     expect([...state.playableCards].sort()).toEqual(['2c', 'Td']);
+  });
+
+  it('names the seat on move as the table labels it, not by compass', () => {
+    const struct = passView()['struct'] as Record<string, unknown>;
+    const statusAt = (currentPlayer: number): string | undefined => {
+      const p = shown({
+        struct: {
+          ...struct,
+          phase: 'playing',
+          passDirection: 'none',
+          currentPlayer,
+        },
+      });
+      return heartsUIState(heartsSession(seatFrame(p), p), 0)?.statusMessage;
+    };
+    expect(statusAt(0)).toBe('Your turn to play');
+    // The table names the seat "Player 1"; it shows no compass letter.
+    expect(statusAt(1)).toBe('Waiting for Player 1');
   });
 });
 
@@ -244,18 +263,40 @@ describe('HeartsRenderer in analysis (View › Perspective)', () => {
     }
   });
 
-  it('offers to take the seat to move when its hand is hidden', () => {
+  it('says nothing over the table when the seat to move is hidden', () => {
     rendered = render(analysisBoard(2, false));
     const {container} = rendered;
-    const take = only(container, '[data-testid="hearts-turn-to-mover"]');
-    expect(take.textContent).toBe('Take their seat');
-    act(() => {
-      take.click();
-    });
+    // The layer is drawn, and holds no notice.
+    const layer = only(container, '[data-testid="gameplay-notice-layer"]');
+    expect(layer.children).toHaveLength(0);
+    expect(container.querySelectorAll('.gameplay-notice')).toHaveLength(0);
+    expect(container.textContent).not.toContain('Take their seat');
     expect(
       (labelled(container, 'Perspective') as HTMLSelectElement).value,
-    ).toBe('0');
-    expect(faceUp(container, 'south').sort()).toEqual([...HANDS.N].sort());
+    ).toBe('2');
+  });
+
+  it('draws the cards corner index + large pip by default, or the Card style chosen', () => {
+    const decks = (root: HTMLElement): string[] => [
+      ...new Set(
+        [...root.querySelectorAll('[data-deck]')].map(
+          card => card.getAttribute('data-deck') ?? '',
+        ),
+      ),
+    ];
+    rendered = render(analysisBoard(null, false));
+    expect(decks(rendered.container)).toEqual(['basic']);
+    rendered.unmount();
+    rendered = render(
+      <>
+        <SetViewSetting name="hearts.cardStyle" value="simple-corner" />
+        {analysisBoard(null, false)}
+      </>,
+    );
+    expect(decks(rendered.container)).toEqual(['simple-corner']);
+    rendered.unmount();
+    // The setting outlives the board: put the default back.
+    rendered = render(<SetViewSetting name="hearts.cardStyle" value="basic" />);
   });
 
   it('turns every hand face up with Show all cards, at any seat', () => {

@@ -149,6 +149,10 @@ class _Handler(http.server.BaseHTTPRequestHandler):
     """Answers a PUT request."""
     self._handle()
 
+  def do_DELETE(self) -> None:  # pylint: disable=invalid-name
+    """Answers a DELETE request."""
+    self._handle()
+
   def log_message(self, format: str, *args: object) -> None:
     """Logs a request through absl rather than to stderr."""
     logging.info("%s %s", self.address_string(), format % args)
@@ -180,6 +184,11 @@ class _Handler(http.server.BaseHTTPRequestHandler):
   def _handle_api(self) -> None:
     """Answers an API request."""
     body = b""
+    if self.command == "DELETE":
+      refusal = self._check_origin()
+      if refusal is not None:
+        self._refuse(refusal)
+        return
     if self.command in _BODY_METHODS:
       refusal = self._check_origin() or self._check_body()
       if refusal is not None:

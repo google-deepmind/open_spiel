@@ -47,7 +47,7 @@ export function entries(labels: readonly string[]): HistoryEntry[] {
 export function frame(fields: Partial<Frame> = {}): Frame {
   const history = fields.history ?? [];
   return {
-    contract_version: 7,
+    contract_version: 8,
     session: {
       id: 'session-1',
       game: 'game',
@@ -83,6 +83,7 @@ export function frame(fields: Partial<Frame> = {}): Frame {
       failure: null,
       status: 'ready',
       message: null,
+      notice: null,
     })),
     ply: history.length,
     num_plies: history.length,

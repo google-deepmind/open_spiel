@@ -18,7 +18,7 @@
 /**
  * Every response body the server sends.
  */
-export type ResponseBody = Frame | Catalogue | Health | Error;
+export type ResponseBody = Frame | Catalogue | Health | SessionClosed | Error;
 
 /**
  * A legal action at a position.
@@ -115,7 +115,7 @@ export interface Catalogue {
   /**
    * The contract version the catalogue was built against.
    */
-  contract_version: 7;
+  contract_version: 8;
   /**
    * One entry per game, ordered by name.
    */
@@ -294,7 +294,7 @@ export interface Error {
   /**
    * The contract version the error was built against.
    */
-  contract_version: 7;
+  contract_version: 8;
   /**
    * Why the request was refused.
    */
@@ -348,7 +348,7 @@ export interface Frame {
   /**
    * The contract version the frame was built against.
    */
-  contract_version: 7;
+  contract_version: 8;
   /**
    * The session's fixed properties.
    */
@@ -434,7 +434,7 @@ export interface Health {
   /**
    * The contract version the server speaks.
    */
-  contract_version: 7;
+  contract_version: 8;
   /**
    * The installed OpenSpiel package's version.
    */
@@ -648,6 +648,24 @@ export interface SeatView {
    * Why the seat is not ready, for every viewer: what the server is doing while it is `preparing`, or why it is `unavailable`; null when it is `ready`, and optional while it is `preparing`.
    */
   message: string | null;
+  /**
+   * The controller's short note about its latest choice, such as a remote bot reporting something it recovered from; null when it gave none. Only the seat's own viewer and omniscient viewers receive it. It has no effect on play.
+   */
+  notice: string | null;
+}
+
+/**
+ * The answer to closing a session: the server has forgotten it.
+ */
+export interface SessionClosed {
+  /**
+   * The contract version the answer was built against.
+   */
+  contract_version: 8;
+  /**
+   * The id of the session closed.
+   */
+  id: string;
 }
 
 /**

@@ -168,7 +168,7 @@ export const DEFAULT_TAG_STYLES: Readonly<Record<string, TagStyle>> =
 
 /** The style every card has unless a provider overrides it. */
 export const DEFAULT_CARD_STYLE: CardStyle = {
-  deck: 'simple',
+  deck: 'basic',
   scheme: 'two',
   suitGlyphs: DEFAULT_SUIT_GLYPHS,
   fan: {faceUp: 1.3, faceDown: 0.1, horizontal: 1.3},

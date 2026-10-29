@@ -99,34 +99,16 @@
   gap: 10px;
   max-width: 100%;
   padding: 6px 12px;
+  /* A plain, squared plaque, lifted just off the board it covers. Its tone
+     is told by its text, never by a coloured edge. */
   border: 1px solid var(--color-border-strong);
-  border-left: 4px solid var(--color-accent);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--color-surface-raised);
-  /* Lifted off the board it covers, and eased down into place, so it reads
-     as a notice over the board rather than a part of it. */
-  box-shadow: 0 4px 14px var(--color-shadow);
+  box-shadow: 0 1px 3px var(--color-shadow);
   color: var(--color-text);
   font-size: 13px;
   line-height: 1.35;
   overflow-wrap: anywhere;
-  animation: gameplay-notice-in 160ms ease-out;
-}
-
-@keyframes gameplay-notice-in {
-  from {
-    transform: translateY(-4px);
-  }
-
-  to {
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gameplay__notice {
-    animation: none;
-  }
 }
 
 /*
@@ -134,8 +116,6 @@
   third of the panel instead of covering it.
 */
 .gameplay__notice[data-tone='error'] {
-  border-left-color: var(--color-danger);
-  border-radius: 10px;
   color: var(--color-danger);
   font-weight: 500;
 }

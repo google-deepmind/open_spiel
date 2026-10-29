@@ -71,7 +71,7 @@ function rows(container: HTMLElement): Array<[string, string | null]> {
 describe('CataloguePage', () => {
   it('badges every game Board UI, Text only or Unavailable', () => {
     rendered = render(
-      <CataloguePage catalogue={{contract_version: 7, games: GAMES}} />,
+      <CataloguePage catalogue={{contract_version: 8, games: GAMES}} />,
     );
     expect(rows(rendered.container)).toEqual([
       ['chess', 'Board UI'],
@@ -83,7 +83,7 @@ describe('CataloguePage', () => {
 
   it('filters to the board games or the text games, keeping the count', () => {
     rendered = render(
-      <CataloguePage catalogue={{contract_version: 7, games: GAMES}} />,
+      <CataloguePage catalogue={{contract_version: 8, games: GAMES}} />,
     );
     const {container} = rendered;
     const status = (): string | null =>

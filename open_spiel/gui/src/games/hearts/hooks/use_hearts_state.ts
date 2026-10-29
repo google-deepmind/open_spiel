@@ -222,7 +222,10 @@ export function heartsUIState(
       ? mapPlayerToPosition(currentPlayerIndex, viewerSeat)
       : 'bottom';
 
-  // Status message
+  const players = playersOf(session, struct, viewerSeat);
+
+  // Status message. The seat on move is named as the table labels it
+  // ("Player 1"), never by a compass letter the table does not show.
   let statusMessage = '';
   if (state.isTerminal) {
     statusMessage = 'Game Over';
@@ -230,14 +233,20 @@ export function heartsUIState(
     statusMessage = `Select 3 cards to pass ${passDirection}`;
   } else if (currentPlayerIndex >= 0) {
     const isViewerTurn = currentPlayerIndex === viewerSeat;
+    const onMove = players[currentPlayerIndex]?.name;
+    if (onMove === undefined) {
+      throw new Error(`hearts: no seat ${String(currentPlayerIndex)} on move`);
+    }
     statusMessage = isViewerTurn
       ? 'Your turn to play'
-      : `Waiting for ${indexToCompass(currentPlayerIndex)}`;
+      : // The table capitalises its names (CSS); the status row says the
+        // same name the same way.
+        `Waiting for ${onMove.charAt(0).toUpperCase()}${onMove.slice(1)}`;
   }
 
   return {
     lastTrick: lastTrickOf(struct, viewerSeat),
-    players: playersOf(session, struct, viewerSeat),
+    players,
     trickPile: trickPileOf(struct, viewerSeat),
     phase,
     passDirection,

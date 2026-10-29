@@ -18,7 +18,6 @@
 
 import {type JSX, type ReactNode, useMemo, useState} from 'react';
 
-import {TableCardStyle} from '../../cards/table_cards/index.ts';
 import {
   GameplayNotice,
   GameplayNoticeLayer,
@@ -30,34 +29,18 @@ import {cardList} from './hearts_turn.ts';
 import {TableLayout} from './sections/index.ts';
 import './hearts.css';
 
-/** The board's notices, drawn over the table. */
+/**
+ * The board's errors, drawn over the table. A seat whose hand is hidden
+ * while another player is on move is told only by the status row, as at
+ * euchre's table: View › Perspective and Show all cards change the view.
+ */
 function HeartsNotices({b}: {readonly b: ReadyBoard}): JSX.Element {
-  const {error, pass, turn, heartsState} = b;
+  const {error, pass} = b;
   return (
     <>
       {error && <GameplayNotice tone="error">{error}</GameplayNotice>}
       {pass.passError && (
         <GameplayNotice tone="error">{pass.passError}</GameplayNotice>
-      )}
-      {turn.outOfReach && (
-        <GameplayNotice
-          tone="turn"
-          dismissible={false}
-          testId="hearts-out-of-reach"
-        >
-          {`${turn.onMoveName} to ${heartsState.phase === 'pass' ? 'pass' : 'play'}: their hand is hidden. `}
-          <button
-            type="button"
-            className="gameplay-notice__action"
-            data-testid="hearts-turn-to-mover"
-            onClick={() => {
-              b.setAnalysisViewSeat(turn.currentPlayerSlot);
-            }}
-          >
-            Take their seat
-          </button>
-          {' or turn on Show all cards (View panel).'}
-        </GameplayNotice>
       )}
     </>
   );
@@ -166,14 +149,12 @@ export function HeartsGameplay(): JSX.Element {
         style={b.wrapperStyle}
         data-trick-phase={b.trickCollect.phase ?? 'none'}
       >
-        <TableCardStyle {...b.cardScope}>
-          <TableLayout
-            // A new bottom seat redraws the table where it is, rather than
-            // flying every card to its new seat.
-            key={b.viewerSeat}
-            {...b.tableProps}
-          />
-        </TableCardStyle>
+        <TableLayout
+          // A new bottom seat redraws the table where it is, rather than
+          // flying every card to its new seat.
+          key={b.viewerSeat}
+          {...b.tableProps}
+        />
       </div>
     </HeartsShell>
   );

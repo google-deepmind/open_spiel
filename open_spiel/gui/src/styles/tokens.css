@@ -235,15 +235,13 @@
   --gin-hover-glow: rgb(255 255 255 / 0.55);
   --gin-fault-fill: #b3261e;
   --gin-fault-text: #ffffff;
-  /* Hearts (games/hearts/hearts.css): the felt's shadows, the name plates,
+  /* Hearts (games/hearts/hearts.css): the felt's shadows, the seat names,
      the pass button, the message and the game over plaque, the same in
      every theme. */
   --hearts-table-vignette: rgb(0 0 0 / 0.3);
   --hearts-table-drop: rgb(0 0 0 / 0.4);
-  --hearts-name-fill: rgb(0 0 0 / 0.32);
   --hearts-name-text: #ffffff;
-  --hearts-name-active-fill: #ffd700;
-  --hearts-name-active-text: #1b1b1b;
+  --hearts-name-active-text: #ffd700;
   --hearts-button-fill: #357abd;
   --hearts-button-hover: #2d6aa6;
   --hearts-button-disabled: #666666;
@@ -254,7 +252,6 @@
   --hearts-message-text: #ffffff;
   --hearts-over-fill: rgb(0 0 0 / 0.85);
   --hearts-over-text: #ffffff;
-  --hearts-over-shadow: rgb(0 0 0 / 0.5);
   --hearts-over-row-fill: rgb(255 255 255 / 0.1);
   --hearts-over-row-text: rgb(255 255 255 / 0.9);
   --hearts-over-winner-fill: rgb(255 215 0 / 0.2);
@@ -474,7 +471,6 @@
   --ttt-cell-fill: #eef1f6;
   --ttt-cell-ink: #0f172a;
   --ttt-legal-fill: rgb(112 162 255 / 0.18);
-  --ttt-last-ring: rgb(255 215 0 / 0.4);
   --ttt-hover-fill: rgb(120 137 255 / 0.32);
   /*
     A board panel's status row (games/shared): its text, and the fill
@@ -550,15 +546,13 @@
   --gin-hover-glow: rgb(255 255 255 / 0.55);
   --gin-fault-fill: #b3261e;
   --gin-fault-text: #ffffff;
-  /* Hearts (games/hearts/hearts.css): the felt's shadows, the name plates,
+  /* Hearts (games/hearts/hearts.css): the felt's shadows, the seat names,
      the pass button, the message and the game over plaque, the same in
      every theme. */
   --hearts-table-vignette: rgb(0 0 0 / 0.3);
   --hearts-table-drop: rgb(0 0 0 / 0.4);
-  --hearts-name-fill: rgb(0 0 0 / 0.32);
   --hearts-name-text: #ffffff;
-  --hearts-name-active-fill: #ffd700;
-  --hearts-name-active-text: #1b1b1b;
+  --hearts-name-active-text: #ffd700;
   --hearts-button-fill: #357abd;
   --hearts-button-hover: #2d6aa6;
   --hearts-button-disabled: #666666;
@@ -569,7 +563,6 @@
   --hearts-message-text: #ffffff;
   --hearts-over-fill: rgb(0 0 0 / 0.85);
   --hearts-over-text: #ffffff;
-  --hearts-over-shadow: rgb(0 0 0 / 0.5);
   --hearts-over-row-fill: rgb(255 255 255 / 0.1);
   --hearts-over-row-text: rgb(255 255 255 / 0.9);
   --hearts-over-winner-fill: rgb(255 215 0 / 0.2);
@@ -747,7 +740,6 @@
   --ttt-cell-fill: rgb(0 0 0 / 0.3);
   --ttt-cell-ink: #f5f7ff;
   --ttt-legal-fill: rgb(112 162 255 / 0.18);
-  --ttt-last-ring: rgb(255 215 0 / 0.4);
   --ttt-hover-fill: rgb(120 137 255 / 0.32);
   --ogs-meta-text: rgb(245 247 255 / 0.7);
   --ogs-error-fill: rgb(255 71 87 / 0.18);

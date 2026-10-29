@@ -134,29 +134,25 @@
   justify-content: flex-end;
 }
 
+/* A seat's name is plain text on the felt, as at euchre's table: no plate
+   or pill. */
 .hearts-player-name {
   max-width: 100%;
   box-sizing: border-box;
-  padding: 0 0.6em;
-  border-radius: 999px;
-  background: var(--hearts-name-fill);
   color: var(--hearts-name-text);
-  font-weight: 600;
+  font-weight: 500;
   font-size: clamp(12px, calc(var(--card-w) * 0.2), 16px);
   line-height: calc(var(--card-w) * 0.34);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: capitalize;
-  transition:
-    background var(--transition-normal),
-    color var(--transition-normal);
+  transition: color var(--transition-normal);
 }
 
-/* The seat on turn: a flat gold plate, no glow or halo ("flat,
-   straightforward, dignified, classic"). */
+/* The seat on turn: its name in gold, as at euchre's table, with no plate,
+   glow or halo. */
 .hearts-player-name--active {
-  background: var(--hearts-name-active-fill);
   color: var(--hearts-name-active-text);
 }
 
@@ -211,7 +207,6 @@
   padding: 24px 32px;
   background: var(--hearts-over-fill);
   border-radius: 12px;
-  backdrop-filter: blur(8px);
   min-width: 200px;
 }
 
@@ -219,7 +214,6 @@
   color: var(--hearts-over-text);
   font-size: 24px;
   font-weight: 700;
-  text-shadow: 0 2px 4px var(--hearts-over-shadow);
 }
 
 .hearts-game-over__scores {
@@ -272,7 +266,6 @@
   color: var(--hearts-message-text);
   border-radius: 6px;
   font-size: clamp(12px, calc(var(--card-w) * 0.19), 14px);
-  backdrop-filter: blur(4px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -241,6 +241,15 @@ class Frame:
         "Failure messages are served only to an omniscient viewer.",
     )
     contract.require(
+        self.omniscient
+        or all(
+            seat.notice is None or seat.seat == self.viewer.seat
+            for seat in self.seats
+        ),
+        "A seat's notice is served only to that seat and to an omniscient "
+        "viewer.",
+    )
+    contract.require(
         is_seat
         or (
             self.observation_text is None

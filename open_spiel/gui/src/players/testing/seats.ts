@@ -137,6 +137,7 @@ export function seatView(
     failure: null,
     status: 'ready',
     message: null,
+    notice: null,
     ...overrides,
   };
 }
@@ -147,7 +148,7 @@ export function frameWith(
   overrides: Partial<Frame> = {},
 ): Frame {
   return {
-    contract_version: 7,
+    contract_version: 8,
     session: {
       id: 'session-1',
       game: 'kuhn_poker',

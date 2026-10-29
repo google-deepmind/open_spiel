@@ -177,7 +177,7 @@ class ServedBuildTest(builds_testing.BuildsTestCase):
         },
     )
     self.assertEqual(status, http.HTTPStatus.OK, frame)
-    self.assertEqual(frame["contract_version"], 7)
+    self.assertEqual(frame["contract_version"], contract.CONTRACT_VERSION)
     self.assertEqual(frame["seats"][0]["status"], "preparing")
     self.assertEqual(
         frame["seats"][0]["message"], "Building Gated, for at most 30 seconds."

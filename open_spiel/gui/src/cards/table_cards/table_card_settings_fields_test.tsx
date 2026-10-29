@@ -55,10 +55,10 @@ describe('TableCardSettingsFields card picker', () => {
       ['simple-corner', 'Large corner index'],
       ['basic', 'Corner index + large pip'],
     ]);
-    expect(deck.value).toBe('simple');
+    expect(deck.value).toBe('basic');
     expect(
       only(rendered.container, '[data-testid="deck-description"]').textContent,
-    ).toMatch(/^Best for cards seen one at a time/);
+    ).toMatch(/^Best for table piles and tricks/);
 
     act(() => {
       deck.value = 'simple-corner';

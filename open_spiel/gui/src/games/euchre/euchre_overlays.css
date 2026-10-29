@@ -103,19 +103,14 @@
   cursor: not-allowed;
 }
 
+/* Flat: one solid fill, no gradient, glow or lift. */
 .euchre-bidding-btn--primary {
-  background: linear-gradient(
-    135deg,
-    var(--euchre-blue) 0%,
-    var(--euchre-blue-dark) 100%
-  );
+  background: var(--euchre-blue-dark);
   color: var(--euchre-white);
-  box-shadow: 0 4px 12px var(--euchre-blue-40);
 }
 
 .euchre-bidding-btn--primary:hover:enabled:not([aria-disabled='true']) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px var(--euchre-blue-50);
+  background: var(--euchre-blue);
 }
 
 .euchre-bidding-btn--secondary {
@@ -196,7 +191,6 @@
   padding: 24px 32px;
   background: var(--euchre-black-85);
   border-radius: 12px;
-  backdrop-filter: blur(8px);
   min-width: 220px;
 }
 
@@ -204,7 +198,6 @@
   color: var(--euchre-white);
   font-size: 24px;
   font-weight: 700;
-  text-shadow: 0 2px 4px var(--euchre-black-50);
 }
 
 .euchre-game-over__scores {
@@ -274,7 +267,6 @@
   color: var(--euchre-white);
   border-radius: 6px;
   font-size: 13px;
-  backdrop-filter: blur(4px);
   z-index: 15;
   white-space: nowrap;
 }

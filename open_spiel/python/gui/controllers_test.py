@@ -93,7 +93,13 @@ class DescriptorsTest(absltest.TestCase):
         )
     ]
     self.assertEqual(
-        kinds, [controllers.HUMAN, controllers.RANDOM, controllers.MCTS]
+        kinds,
+        [
+            controllers.HUMAN,
+            controllers.RANDOM,
+            controllers.MCTS,
+            controllers.REMOTE,
+        ],
     )
 
   def test_every_controller_plays_a_native_perfect_information_game(
@@ -101,7 +107,7 @@ class DescriptorsTest(absltest.TestCase):
   ) -> None:
     self.assertEqual(
         _availability(pyspiel.load_game("tic_tac_toe")),
-        {"human": True, "random": True, "mcts": True},
+        {"human": True, "random": True, "mcts": True, "remote": True},
     )
 
   def test_mcts_refuses_a_game_it_cannot_search_fairly(self) -> None:
@@ -114,7 +120,8 @@ class DescriptorsTest(absltest.TestCase):
       with self.subTest(name):
         game = pyspiel.load_game(name)
         self.assertEqual(
-            _availability(game), {"human": True, "random": True, "mcts": False}
+            _availability(game),
+            {"human": True, "random": True, "mcts": False, "remote": True},
         )
         self.assertIn(game.get_type().short_name, _mcts_reason(game) or "")
 
@@ -173,7 +180,7 @@ class DescriptorsTest(absltest.TestCase):
                 pyspiel.load_game("kuhn_poker")
             )
         ],
-        [controllers.HUMAN, controllers.RANDOM],
+        [controllers.HUMAN, controllers.RANDOM, controllers.REMOTE],
     )
     self.assertEqual(
         controllers.available(pyspiel.load_game("tic_tac_toe")),
@@ -181,7 +188,7 @@ class DescriptorsTest(absltest.TestCase):
     )
 
   def test_a_controller_without_settings_has_an_empty_schema(self) -> None:
-    human, uniform, _ = controllers.registered()
+    human, uniform, *_ = controllers.registered()
     self.assertEqual(human.config_schema, {})
     self.assertEqual(uniform.config_schema, {})
 

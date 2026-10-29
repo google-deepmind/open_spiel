@@ -42,7 +42,7 @@
   pointer-events: auto;
   background: var(--color-surface-raised);
   color: var(--color-text);
-  border-left: 2px solid var(--color-border-strong);
+  border-left: 1px solid var(--color-border);
   outline: none;
 }
 

@@ -15,6 +15,7 @@
 import type {JSX} from 'react';
 
 import type {Controller, SeatView} from '../contract/contract.ts';
+import {CopyableText} from '../controls/copy_button.tsx';
 import {fieldsOf} from '../form/json_schema.ts';
 import {HUMAN, controllerNamed, savedConfig} from './seat_draft.ts';
 
@@ -72,7 +73,14 @@ export function SeatSummary({
           </div>
         ))}
       </dl>
-      {json !== null && <pre className="seat__summary-json">{json}</pre>}
+      {json !== null && (
+        <CopyableText
+          text={json}
+          label="Controller settings"
+          className="seat__summary-json"
+          variant="compact"
+        />
+      )}
     </div>
   );
 }

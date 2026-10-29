@@ -235,21 +235,26 @@ describe('LegalActions with nothing to play', () => {
 });
 
 describe('LegalActions rows', () => {
-  it('flags labels that several actions share', () => {
+  it("shows each row as the id, the game's label and nothing else", () => {
+    // Rows are in id order, each label as OpenSpiel gives it, and a label
+    // several actions share is left as it is.
     const shared = [
-      {id: 4, label: 'Draw'},
       {id: 9, label: 'Draw'},
+      {id: 4, label: 'Draw'},
       {id: 5, label: 'Pass'},
     ];
     show(session(frame({legal_actions: shared})));
-    expect(container.querySelector('.legal > p')?.textContent).toBe(
-      '2 actions share their label with another; their ids tell them apart.',
-    );
-    expect(rows().map(row => row.getAttribute('data-duplicate'))).toEqual([
-      'true',
-      null,
-      'true',
+    expect(
+      rows().map(row => [
+        row.querySelector('.legal__id')?.textContent,
+        row.querySelector('.legal__label')?.textContent,
+      ]),
+    ).toEqual([
+      ['4', 'Draw'],
+      ['5', 'Pass'],
+      ['9', 'Draw'],
     ]);
+    expect(container.querySelector('.legal > p')).toBeNull();
   });
 
   it('does no work while hidden', () => {

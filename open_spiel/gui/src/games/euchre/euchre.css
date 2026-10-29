@@ -33,7 +33,6 @@
   --felt-border: var(--euchre-felt-border);
 
   --selection-glow: var(--euchre-gold-60);
-  --playable-glow: var(--euchre-sky-40);
 
   --transition-fast: calc(0.15s * var(--anim-scale, 1)) ease;
   --transition-normal: calc(0.25s * var(--anim-scale, 1)) ease;
@@ -96,9 +95,7 @@
 
 .euchre-card--playable:hover:not([aria-disabled='true']) {
   transform: translateY(-8px);
-  box-shadow:
-    0 6px 12px var(--euchre-black-25),
-    0 0 15px var(--playable-glow);
+  box-shadow: 0 6px 12px var(--euchre-black-25);
 }
 
 .euchre-card--playable:active {
@@ -381,7 +378,6 @@
   color: var(--euchre-white);
   font-weight: 500;
   font-size: 13px;
-  text-shadow: 0 1px 3px var(--euchre-black-70);
   white-space: nowrap;
   /* DEBUG: border: 1px solid lime; */
 }

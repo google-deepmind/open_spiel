@@ -17,6 +17,7 @@
 
 import type {
   CatalogueEntry,
+  Controller,
   Frame,
   ParameterSpec,
   Viewer,
@@ -120,6 +121,11 @@ export interface FrameOptions {
   readonly id?: string;
 }
 
+/** A controller with no settings that can play "board". */
+function controller(name: string, label: string): Controller {
+  return {name, label, config_schema: {}, unavailable_reason: null};
+}
+
 /** A live frame of "board" after `history`, with seat 1 played at random. */
 export function boardFrame({
   viewer = {kind: 'oracle', seat: null},
@@ -130,7 +136,7 @@ export function boardFrame({
 }: FrameOptions = {}): Frame {
   const omniscient = viewer.kind === 'oracle' || !hidesInformation;
   return {
-    contract_version: 7,
+    contract_version: 8,
     session: {
       id,
       game: 'board',
@@ -141,18 +147,8 @@ export function boardFrame({
       hides_information: hidesInformation,
       seed: viewer.kind === 'oracle' ? 3 : null,
       controllers: [
-        {
-          name: 'human',
-          label: 'Human',
-          config_schema: {},
-          unavailable_reason: null,
-        },
-        {
-          name: 'random',
-          label: 'Random',
-          config_schema: {},
-          unavailable_reason: null,
-        },
+        controller('human', 'Human'),
+        controller('random', 'Random'),
       ],
     },
     viewer,
@@ -167,6 +163,7 @@ export function boardFrame({
         failure: null,
         status: 'ready',
         message: null,
+        notice: null,
       },
       {
         seat: 1,
@@ -176,6 +173,7 @@ export function boardFrame({
         failure: null,
         status: 'ready',
         message: null,
+        notice: null,
       },
     ],
     ply: history.length,

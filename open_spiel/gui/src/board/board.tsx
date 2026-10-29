@@ -17,6 +17,7 @@ import {createElement, type JSX} from 'react';
 import {NoFrame} from '../actions/note.tsx';
 import {playBlocker} from '../actions/play_blocker.ts';
 import type {Frame, Presentation} from '../contract/contract.ts';
+import {CopyableText} from '../controls/copy_button.tsx';
 import {RENDERERS} from '../renderers/registry.ts';
 import type {Renderers} from '../renderers/renderer.ts';
 import {RendererBoundary} from '../renderers/renderer_boundary.tsx';
@@ -111,9 +112,9 @@ function playSequenceFor(
 }
 
 /**
- * The text, kept as the game wrote it. It takes the focus so that the
- * keyboard can scroll it, and is named by what it is: the state, or the
- * viewer's observation.
+ * The text, kept as the game wrote it, with its copy button. It takes the
+ * focus so that the keyboard can scroll it, and is named by what it is: the
+ * state, or the viewer's observation.
  */
 function BoardTextCard({frame}: {frame: Frame}): JSX.Element {
   const shown = boardText(frame);
@@ -121,13 +122,11 @@ function BoardTextCard({frame}: {frame: Frame}): JSX.Element {
     return <p className="board__missing">{missingTextReason(frame)}</p>;
   }
   return (
-    <pre
+    <CopyableText
+      text={shown.text}
+      label={shown.title}
       className="board__text"
       role="region"
-      tabIndex={0}
-      aria-label={shown.title}
-    >
-      {shown.text}
-    </pre>
+    />
   );
 }

@@ -62,8 +62,6 @@ export interface HeartsTurn {
   readonly canInteract: boolean;
   /** The hand on move is hidden from the analysis viewer. */
   readonly outOfReach: boolean;
-  /** The name of the seat on move, when out of reach. */
-  readonly onMoveName: string;
 }
 
 /** The turn at `session`'s position, for `viewer` (pure). */
@@ -103,8 +101,9 @@ export function heartsTurn(
 
   // Analysis with the opponents' hands hidden and another seat on move
   // (a bottom seat other than theirs): their hand is backs, so nothing at
-  // the table can pass or play for them. Say so, with the way out, rather
-  // than leave a table where nothing answers.
+  // the table can pass or play for them. The status row says whose turn it
+  // is; View › Perspective and Show all cards change the view, as at
+  // euchre's table.
   const outOfReach =
     !!heartsState &&
     isAnalysisMode &&
@@ -114,10 +113,6 @@ export function heartsTurn(
     currentPlayerSlot >= 0 &&
     heartsState.currentPlayer !== 'bottom' &&
     !(heartsState.phase === 'pass' && heartsState.passDirection === 'none');
-  const onMoveName = outOfReach
-    ? (heartsState.players.find(p => p.position === heartsState.currentPlayer)
-        ?.name ?? `Player ${String(currentPlayerSlot)}`)
-    : '';
   return {
     currentPlayerSlot,
     currentAutoPlay,
@@ -128,7 +123,6 @@ export function heartsTurn(
     notParticipant,
     canInteract,
     outOfReach,
-    onMoveName,
   };
 }
 

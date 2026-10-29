@@ -75,6 +75,7 @@ pytype_strict_library(
         ":mcts_controller",
         ":mcts_search",
         ":plugins",
+        ":remote_bot",
         ":server",
         ":static",
         ":store",
@@ -117,6 +118,7 @@ pytype_strict_library(
         ":errors",
         ":mcts_controller",
         ":move_budget",
+        ":remote_bot",
         "//open_spiel/python/pybind11:pyspiel",
     ],
 )
@@ -229,6 +231,30 @@ pytype_strict_library(
 )
 
 pytype_strict_library(
+    name = "mcp",
+    srcs = ["mcp.py"],
+    deps = [
+        ":mcp_client",
+        ":mcp_tools",
+        ":remote_bot",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "mcp_client",
+    srcs = ["mcp_client.py"],
+)
+
+pytype_strict_library(
+    name = "mcp_tools",
+    srcs = ["mcp_tools.py"],
+    deps = [
+        ":mcp_client",
+    ],
+)
+
+pytype_strict_library(
     name = "mcts_controller",
     srcs = ["mcts_controller.py"],
     deps = [
@@ -287,6 +313,49 @@ pytype_strict_library(
         "//open_spiel/python/gui/adapters",
         "//open_spiel/python/pybind11:pyspiel",
     ],
+)
+
+pytype_strict_library(
+    name = "remote_bot",
+    srcs = ["remote_bot.py"],
+    deps = [
+        ":contract",
+        ":controller_registry",
+        ":controller_settings",
+        ":information",
+        ":move_budget",
+        ":plies",
+        ":remote_bot_http",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_http",
+    srcs = ["remote_bot_http.py"],
+    deps = [
+        ":contract",
+        ":controller_settings",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_server",
+    srcs = ["remote_bot_server.py"],
+    deps = [
+        ":plugins",
+        ":remote_bot",
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_testing",
+    testonly = True,
+    srcs = ["remote_bot_testing.py"],
 )
 
 pytype_strict_library(
@@ -652,6 +721,18 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
+    name = "legal_labels_test",
+    srcs = ["legal_labels_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
     name = "loader_test",
     srcs = ["loader_test.py"],
     deps = [
@@ -661,6 +742,21 @@ pytype_strict_contrib_test(
         ":loader_support",
         ":presenters",
         "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "mcp_test",
+    srcs = ["mcp_test.py"],
+    data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
+    deps = [
+        ":cli",  # The GUI server it starts as a process runs cli.
+        ":mcp",
+        ":mcp_client",
+        ":mcp_tools",
+        ":remote_bot_server",
+        ":remote_bot_testing",
         "@py_deps//absl/testing:absltest",
     ],
 )
@@ -720,6 +816,20 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
+    name = "notice_test",
+    srcs = ["notice_test.py"],
+    deps = [
+        ":contract",
+        ":controller_registry",
+        ":controllers",
+        ":errors",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
     name = "plies_test",
     srcs = ["plies_test.py"],
     deps = [
@@ -755,6 +865,53 @@ pytype_strict_contrib_test(
         ":loader",
         ":presenters",
         ":views",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_server_test",
+    srcs = ["remote_bot_server_test.py"],
+    data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
+    deps = [
+        ":cli",  # The GUI server it starts as a process runs cli.
+        ":controllers",
+        ":remote_bot",
+        ":remote_bot_server",
+        ":remote_bot_testing",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_strict_test",
+    srcs = ["remote_bot_strict_test.py"],
+    deps = [
+        ":builds",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":remote_bot",
+        ":remote_bot_http",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_test",
+    srcs = ["remote_bot_test.py"],
+    deps = [
+        ":builds",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":remote_bot",
+        ":remote_bot_server",
+        ":session",
         "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//absl/testing:absltest",
     ],

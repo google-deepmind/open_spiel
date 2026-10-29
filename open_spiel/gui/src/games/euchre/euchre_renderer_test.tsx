@@ -286,6 +286,7 @@ function euchreFrame(shown: Presentation) {
       failure: null,
       status: 'ready',
       message: null,
+      notice: null,
     })),
     legal_actions: (shown.actions ?? []).map(({id}) => ({
       id,

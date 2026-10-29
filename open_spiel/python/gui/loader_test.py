@@ -119,6 +119,34 @@ class LoadTest(absltest.TestCase):
       loader.load("negotiation", {})
 
 
+class ExcludeTest(absltest.TestCase):
+
+  def setUp(self) -> None:
+    super().setUp()
+    self.addCleanup(loader.clear_exclusions)
+
+  def test_an_excluded_game_is_not_listed_or_served(self) -> None:
+    with self.assertLogs(level="WARNING") as logs:
+      self.assertEqual(
+          loader.exclude(["tic_tac_toe", "not_a_game_here"]), ("tic_tac_toe",)
+      )
+    self.assertIn("not_a_game_here", "\n".join(logs.output))
+    # The catalogue lists exactly the registered types.
+    self.assertNotIn("tic_tac_toe", loader.registered_types())
+    with self.assertRaises(loader.UnknownGameError):
+      loader.load("tic_tac_toe", {})
+    self.assertEqual(loader.excluded(), {"tic_tac_toe", "not_a_game_here"})
+
+  def test_clearing_offers_every_game_again(self) -> None:
+    loader.exclude(["tic_tac_toe"])
+    loader.clear_exclusions()
+    self.assertIn("tic_tac_toe", loader.registered_types())
+
+  def test_a_blank_name_is_refused(self) -> None:
+    with self.assertRaises(ValueError):
+      loader.exclude([" "])
+
+
 class SessionParametersTest(absltest.TestCase):
 
   def _game_type(self, specification: dict[str, object]) -> mock.Mock:

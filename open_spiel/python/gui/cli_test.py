@@ -19,6 +19,7 @@ import contextlib
 import http
 import http.client
 import io
+import os
 import pathlib
 import queue
 import re
@@ -28,6 +29,7 @@ import sys
 import threading
 import time
 import unittest
+from unittest import mock
 import urllib.parse
 
 from absl.testing import absltest
@@ -55,6 +57,37 @@ class ParseArgsTest(absltest.TestCase):
     self.assertEqual((args.host, args.port), ("::1", 0))
     self.assertEqual(args.client_dir, pathlib.Path("/tmp/dist"))
     self.assertEqual(args.allow_host, ["box", "box.local"])
+
+
+class RemoteBotAndExclusionFlagsTest(absltest.TestCase):
+
+  def test_remote_bot_hosts_are_repeatable(self) -> None:
+    args = cli.parse_args(
+        ["--remote-bot-host=bots.lan", "--remote-bot-host=gpu.lan"]
+    )
+    self.assertEqual(args.remote_bot_host, ["bots.lan", "gpu.lan"])
+    self.assertEqual(cli.parse_args([]).remote_bot_host, [])
+
+  def test_tokens_are_read_from_the_named_variables_by_host(self) -> None:
+    with mock.patch.dict(os.environ, {"A": " s3cret ", "B": "other"}):
+      self.assertEqual(
+          cli.remote_bot_tokens(["bots.lan:9001=A", "gpu.lan=B"]),
+          {"bots.lan:9001": "s3cret", "gpu.lan": "other"},
+      )
+    self.assertEqual(cli.remote_bot_tokens([]), {})
+
+  def test_a_token_flag_that_is_malformed_or_unset_stops_the_start(
+      self,
+  ) -> None:
+    with mock.patch.dict(os.environ, {}, clear=True):
+      with self.assertRaisesRegex(SystemExit, "NOPE"):
+        cli.remote_bot_tokens(["bots.lan=NOPE"])
+      with self.assertRaisesRegex(SystemExit, "HOST"):
+        cli.remote_bot_tokens(["NOPE"])
+
+  def test_excluded_games_are_comma_separated_and_repeatable(self) -> None:
+    args = cli.parse_args(["--exclude-games=a, b", "--exclude-games=c"])
+    self.assertEqual(cli.excluded_games(args.exclude_games), ("a", "b", "c"))
 
 
 class AllowedHostsTest(absltest.TestCase):

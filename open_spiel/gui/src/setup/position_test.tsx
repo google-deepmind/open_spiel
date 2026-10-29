@@ -137,7 +137,7 @@ describe('Position answers', () => {
     click(button('Apply', container));
     const refusal = new ContractError(
       {
-        contract_version: 7,
+        contract_version: 8,
         code: 'illegal_action',
         message: 'Ply 0 is illegal.',
         seat: null,

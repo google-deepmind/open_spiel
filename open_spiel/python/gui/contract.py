@@ -31,8 +31,11 @@ import enum
 from typing import Annotated, Literal
 
 # The contract's version, incremented on every change that breaks clients.
-ContractVersion = Literal[7]
-CONTRACT_VERSION: ContractVersion = 7
+ContractVersion = Literal[8]
+CONTRACT_VERSION: ContractVersion = 8
+
+# The most characters a seat's `SeatView.notice` holds.
+NOTICE_MAX_LENGTH = 200
 
 # The value of a game parameter or a controller setting.
 ParameterValue = bool | int | float | str
@@ -253,6 +256,10 @@ class SeatView:
     message: Why the seat is not ready, for every viewer: what the server is
       doing while it is `preparing`, or why it is `unavailable`; null when it
       is `ready`, and optional while it is `preparing`.
+    notice: The controller's short note about its latest choice, such as a
+      remote bot reporting something it recovered from; null when it gave
+      none. Only the seat's own viewer and omniscient viewers receive it. It
+      has no effect on play.
   """
 
   seat: int
@@ -262,6 +269,7 @@ class SeatView:
   failure: ControllerFailure | None
   status: SeatStatus = SeatStatus.READY
   message: str | None = None
+  notice: str | None = None
 
   def __post_init__(self) -> None:
     require(
@@ -284,6 +292,16 @@ class SeatView:
         self.status != SeatStatus.UNAVAILABLE
         or (self.failure is not None and self.message is not None),
         f"Seat {self.seat} is unavailable, so it has a failure and a message.",
+    )
+    require(
+        self.notice is None
+        or (
+            self.controller != HUMAN
+            and bool(self.notice.strip())
+            and len(self.notice) <= NOTICE_MAX_LENGTH
+        ),
+        f"Seat {self.seat}'s notice is not a controller's non-blank text of "
+        f"at most {NOTICE_MAX_LENGTH} characters.",
     )
 
 
@@ -430,6 +448,24 @@ class SessionInfo:
         ),
         "A session offers the human controller.",
     )
+
+
+@dataclasses.dataclass(frozen=True)
+class SessionClosed:
+  """The answer to closing a session: the server has forgotten it.
+
+  Attributes:
+    contract_version: The contract version the answer was built against.
+    id: The id of the session closed.
+  """
+
+  contract_version: ContractVersion = dataclasses.field(
+      default=CONTRACT_VERSION, kw_only=True
+  )
+  id: str
+
+  def __post_init__(self) -> None:
+    require(bool(self.id), "A closed session has an id.")
 
 
 def to_json(value: object) -> JsonValue:

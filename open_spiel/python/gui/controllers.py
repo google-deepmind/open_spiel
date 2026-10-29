@@ -22,7 +22,8 @@ lists only those that can), `create` builds one for a seat, and `choose` asks
 it for a move.
 
 Controllers are registered by name with `register` (`controller_registry`);
-`human`, `random` and `mcts` are registered here, and a program that serves
+`human`, `random`, `mcts` and `remote` (a bot server, `remote_bot`) are
+registered here, and a program that serves
 the GUI may register its own before it starts serving, since the catalogue
 and the health report read the registry once.
 
@@ -56,11 +57,13 @@ from open_spiel.python.gui import controller_settings
 from open_spiel.python.gui import errors
 from open_spiel.python.gui import mcts_controller
 from open_spiel.python.gui import move_budget as move_budget_lib
+from open_spiel.python.gui import remote_bot
 import pyspiel
 
 HUMAN = contract.HUMAN
 RANDOM = "random"
 MCTS = mcts_controller.NAME
+REMOTE = remote_bot.NAME
 
 # A controller's settings, as a client sends them.
 Config = controller_settings.Config
@@ -208,6 +211,9 @@ register(
 # With the limits that fit the move budget with either behaviour of the C++
 # search, until `configure_mcts` says which the served pyspiel has.
 register(MCTS, mcts_controller.kind(contract.MctsLimits.SIMULATIONS_ONLY))
+# Sent what its seat's `state` setting says: the seat's view, or the full
+# state (`remote_bot`).
+register(REMOTE, remote_bot.kind())
 
 
 def _describe(name: str, kind: Kind) -> contract.Controller:
@@ -280,7 +286,28 @@ def builder(spec: Spec, game: pyspiel.Game) -> Callable[[int], Controller]:
   if reason is not None:
     raise UnavailableError(reason)
   config = kind.parse(spec.config)
+  reason = kind.seat_refusal(game, config)
+  if reason is not None:
+    raise UnavailableError(reason)
   return lambda seed: kind.build(game, config, seed)
+
+
+def seat_notice(
+    spec: Spec, game: pyspiel.Game, notice: str | None
+) -> str | None:
+  """Returns the notice a seat played as `spec` shows, from its controller's.
+
+  Every notice passes through `controller_registry.full_state_notice`, the
+  state policy's say over what the viewer of a seat that reads the full
+  state is shown. A controller no longer registered counts as reading it.
+  """
+  if notice is None:
+    return None
+  kind = kinds().get(spec.kind)
+  reads_full_state = kind is None or kind.seat_reads_full_state(
+      kind.parse(spec.config)
+  )
+  return controller_registry.full_state_notice(game, reads_full_state, notice)
 
 
 def label(name: str) -> str:
@@ -310,6 +337,16 @@ def create(spec: Spec, game: pyspiel.Game, *, seed: int) -> Controller:
 def choose(controller: Controller, state: pyspiel.State, seat: int) -> int:
   """Asks `controller` for `seat`'s action at `state`, within the budget.
 
+  As `choose_with_notice`, without the notice.
+  """
+  return choose_with_notice(controller, state, seat)[0]
+
+
+def choose_with_notice(
+    controller: Controller, state: pyspiel.State, seat: int
+) -> tuple[int, str | None]:
+  """Asks `controller` for `seat`'s action at `state`, within the budget.
+
   Args:
     controller: The controller playing `seat`.
     state: The position, where `seat` is to move. The controller is given a
@@ -317,13 +354,17 @@ def choose(controller: Controller, state: pyspiel.State, seat: int) -> int:
     seat: The seat to move.
 
   Returns:
-    One of `seat`'s legal actions.
+    One of `seat`'s legal actions, and the controller's notice about the
+    choice: its `last_notice` attribute, read on the controller's thread right
+    after it chose, or None if it has none.
 
   Raises:
     ValueError: If `seat` is not to move at `state`, or `controller` is a
       human's, whose moves come from the client and never from here.
     ControllerError: If the controller raises, returns anything but one of
-      `seat`'s legal actions, or does not return within the move budget.
+      `seat`'s legal actions, gives a notice that is not text of at most
+      `contract.NOTICE_MAX_LENGTH` characters, or does not return within the
+      move budget.
   """
   if isinstance(controller, Human):
     raise ValueError(
@@ -336,11 +377,13 @@ def choose(controller: Controller, state: pyspiel.State, seat: int) -> int:
   legal = state.legal_actions(seat)
   # A copy: the controller may play on it, and the position stays as it is.
   copy = state.clone()
+
+  def ask() -> tuple[object, object]:
+    action = controller.choose_action(copy, seat)
+    return action, getattr(controller, "last_notice", None)
+
   try:
-    action: object = move_budget_lib.run(
-        lambda: controller.choose_action(copy, seat),
-        name=f"controller-seat-{seat}",
-    )
+    action, notice = move_budget_lib.run(ask, name=f"controller-seat-{seat}")
   except move_budget_lib.OverBudgetError as e:
     raise ControllerError(
         seat,
@@ -362,4 +405,16 @@ def choose(controller: Controller, state: pyspiel.State, seat: int) -> int:
         f"Seat {seat}'s controller chose {action!r}, which is not one of its "
         "legal actions.",
     )
-  return action
+  if notice is not None and (
+      not isinstance(notice, str)
+      or not notice.strip()
+      or len(notice) > contract.NOTICE_MAX_LENGTH
+  ):
+    raise ControllerError(
+        seat,
+        "InvalidNotice",
+        f"Seat {seat}'s controller gave the notice "
+        f"{controller_settings.shown(notice)}, which is not non-blank text "
+        f"of at most {contract.NOTICE_MAX_LENGTH} characters.",
+    )
+  return action, notice

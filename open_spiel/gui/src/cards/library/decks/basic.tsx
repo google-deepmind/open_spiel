@@ -45,7 +45,10 @@ const RANK_BASELINE = 68;
 const RANK_W_MAX = 58;
 const SUIT_SIZE = 44;
 const SUIT_X = INDEX_CX - SUIT_SIZE / 2;
-const SUIT_Y = 78;
+// The suit sits clear of the rank's descender: a Q's tail reaches about
+// 0.2 em below the baseline in the wider fallback faces, so the suit starts
+// at 82 to leave a gap under it.
+const SUIT_Y = 82;
 
 // The box that must stay visible: from the top of the tallest rank glyph
 // (cap height ~0.72em above the baseline, padded to 0.8em) to the bottom of

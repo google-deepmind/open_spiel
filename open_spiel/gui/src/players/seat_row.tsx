@@ -21,6 +21,7 @@ import type {
   SeatConfig,
   SeatView,
 } from '../contract/contract.ts';
+import {CopyableText} from '../controls/copy_button.tsx';
 import {preparingText} from './preparing.ts';
 import {HUMAN, controllerNamed, savedConfig} from './seat_draft.ts';
 import {SeatEditor} from './seat_editor.tsx';
@@ -48,7 +49,8 @@ export interface SeatRowProps {
  * builds a seat's controller the card says it is preparing, in the place of
  * the controller's name, and its Step waits, so that nothing moves when it is
  * ready. The settings stay collapsed until asked for; opening an editable
- * seat's settings starts its draft afresh from what the server holds.
+ * seat's settings starts its draft afresh from what the server holds. A
+ * controller's notice about its latest move follows its name, muted.
  */
 export function SeatRow({
   seat,
@@ -78,12 +80,15 @@ export function SeatRow({
           <span id={`${id}-name`} className="seat__name">
             {name}
           </span>
-          <span
-            className="seat__controller"
-            aria-live="polite"
-            title={preparing ? (seat.message ?? undefined) : undefined}
-          >
-            {preparing ? preparingText(controllers, seat) : label}
+          <span className="seat__controller-line">
+            <span
+              className="seat__controller"
+              aria-live="polite"
+              title={preparing ? (seat.message ?? undefined) : undefined}
+            >
+              {preparing ? preparingText(controllers, seat) : label}
+            </span>
+            {seat.notice !== null && <SeatNotice notice={seat.notice} />}
           </span>
         </div>
         <div className="seat__actions">
@@ -232,6 +237,20 @@ function SeatCommands({
   );
 }
 
+/**
+ * The controller's note about its latest move, on the controller's line,
+ * cut to that line so that it never moves the layout; the whole note is its
+ * title. The server sends it only to the seat's own viewer and to omniscient
+ * viewers, and it has no effect on play.
+ */
+function SeatNotice({notice}: {readonly notice: string}): JSX.Element {
+  return (
+    <span className="seat__notice" title={notice} data-testid="seat-notice">
+      {notice}
+    </span>
+  );
+}
+
 interface SeatFailureProps {
   /** The seat's name, such as "Player 0". */
   readonly name: string;
@@ -252,7 +271,12 @@ function SeatFailure({name, seat, failure}: SeatFailureProps): JSX.Element {
           : `${name}’s controller stopped with ${failure.error}. Play is paused.`}
       </p>
       {message !== null && (
-        <pre className="seat__failure-message">{message}</pre>
+        <CopyableText
+          text={message}
+          label={`${name}’s controller message`}
+          className="seat__failure-message"
+          variant="compact"
+        />
       )}
     </div>
   );

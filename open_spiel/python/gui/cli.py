@@ -20,6 +20,7 @@ from collections.abc import Sequence
 import faulthandler
 import ipaddress
 import math
+import os
 import pathlib
 import signal
 import threading
@@ -36,6 +37,7 @@ from open_spiel.python.gui import loader
 from open_spiel.python.gui import mcts_controller
 from open_spiel.python.gui import mcts_search
 from open_spiel.python.gui import plugins
+from open_spiel.python.gui import remote_bot
 from open_spiel.python.gui import server as server_lib
 from open_spiel.python.gui import static
 from open_spiel.python.gui import store
@@ -145,7 +147,75 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
           "session paused. Default: %(default)g."
       ),
   )
+  parser.add_argument(
+      "--remote-bot-host",
+      action="append",
+      default=[],
+      metavar="NAME",
+      help=(
+          "A host, beyond this machine, that a Remote bot seat's URL may "
+          "name; '*' admits any host. Repeatable. Without it the server "
+          "posts positions only to bot servers on this machine."
+      ),
+  )
+  parser.add_argument(
+      "--remote-bot-token-env",
+      action="append",
+      default=[],
+      metavar="HOST[:PORT]=VAR",
+      help=(
+          "Send the token held in the environment variable VAR as "
+          "'Authorization: Bearer <token>' to the remote bot server at HOST "
+          "(and PORT, if given), and to no other. Repeatable. A token is "
+          "never part of a seat's settings, which every viewer sees."
+      ),
+  )
+  parser.add_argument(
+      "--exclude-games",
+      action="append",
+      default=[],
+      metavar="GAME[,GAME...]",
+      help=(
+          "Registered games to leave out of the catalogue, and to refuse "
+          "sessions of. Repeatable. A name this build does not register is "
+          "ignored."
+      ),
+  )
   return parser.parse_args(argv)
+
+
+def remote_bot_tokens(values: Sequence[str]) -> dict[str, str]:
+  """Returns the tokens `--remote-bot-token-env` names, by host[:port].
+
+  Raises:
+    SystemExit: If a value is not HOST[:PORT]=VAR, or VAR is not set or is
+      blank.
+  """
+  tokens = {}
+  for value in values:
+    where, sep, variable = value.partition("=")
+    if not sep or not where.strip() or not variable.strip():
+      raise SystemExit(
+          f"--remote-bot-token-env {value!r} is not HOST[:PORT]=VAR."
+      )
+    token = os.environ.get(variable.strip(), "").strip()
+    if not token:
+      raise SystemExit(
+          f"--remote-bot-token-env names {variable.strip()}, which is not set "
+          "or blank."
+      )
+    tokens[where.strip()] = token
+  return tokens
+
+
+def excluded_games(values: Sequence[str]) -> tuple[str, ...]:
+  """Returns the game names `--exclude-games` gives, each comma separated."""
+  return tuple(
+      name.strip()
+      for value in values
+      for name in value.split(",")
+      if name.strip()
+  )
 
 
 def load_plugins(values: Sequence[str]) -> tuple[str, ...]:
@@ -263,6 +333,20 @@ def main(argv: Sequence[str] | None = None) -> None:
   # Before the server: the catalogue and the health report read the
   # registry once. A plugin that fails stops the start here.
   configure_mcts()
+  remote_bot.configure(
+      hosts=args.remote_bot_host,
+      tokens=remote_bot_tokens(args.remote_bot_token_env),
+  )
+  if args.remote_bot_host:
+    logging.info(
+        "Remote bot seats may post to this machine and to %s.",
+        ", ".join(args.remote_bot_host),
+    )
+  if args.exclude_games:
+    left_out = loader.exclude(excluded_games(args.exclude_games))
+    logging.info(
+        "Games left out of the catalogue: %s.", ", ".join(left_out) or "none"
+    )
   if args.controllers:
     load_plugins(args.controllers)
   server = server_lib.Server(

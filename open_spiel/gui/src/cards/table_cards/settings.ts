@@ -74,7 +74,7 @@ export interface TableCardPatch {
 export const DEFAULT_TABLE_CARDS: TableCardSettings = Object.freeze({
   surface: Object.freeze({texture: 'plain', shading: 'soft', color: null}),
   cards: Object.freeze({
-    deck: 'simple',
+    deck: 'basic',
     suitGlyphs: DEFAULT_SUIT_GLYPHS,
     back: DEFAULT_BACK,
   }),

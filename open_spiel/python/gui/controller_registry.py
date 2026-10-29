@@ -24,6 +24,7 @@ serving, since the catalogue and the health report read the registry once.
 
 from collections.abc import Callable, Mapping
 import dataclasses
+import enum
 import random
 import re
 import threading
@@ -54,7 +55,13 @@ class UnavailableError(errors.ControllerUnavailableError):
 
 
 class Controller(Protocol):
-  """Plays a seat."""
+  """Plays a seat.
+
+  A controller may also have a `last_notice` attribute: a short plain-text
+  note about its latest choice, or None. `controllers.choose` reads it right
+  after `choose_action` returns, and the seat shows it (`SeatView.notice`) to
+  its own viewer and to omniscient viewers only. It has no effect on play.
+  """
 
   def choose_action(self, state: pyspiel.State, seat: int) -> int:
     """Returns the action `seat` plays at `state`, where it is to move."""
@@ -74,6 +81,91 @@ def plays_every_game(game: pyspiel.Game) -> str | None:
   return None
 
 
+# Says why a controller cannot play a game with these parsed settings.
+ConfigRefusal = Callable[
+    [pyspiel.Game, Mapping[str, contract.ParameterValue]], str | None
+]
+
+# Says whether a controller with these parsed settings reads the full state.
+ConfigReadsFullState = Callable[[Mapping[str, contract.ParameterValue]], bool]
+
+
+# pylint: disable-next=useless-return
+def accepts_every_config(
+    game: pyspiel.Game, config: Mapping[str, contract.ParameterValue]
+) -> str | None:
+  """Refuses no settings: returns None, the config refusal's "can play"."""
+  del game, config
+  return None
+
+
+class StatePolicy(enum.Enum):
+  """What a seat whose settings make it read the full state may play.
+
+  ANALYSIS: such a seat plays any game, hidden information included, as the
+    seat's public settings say; the controller is trusted to use only what
+    its seat may see where that matters. It is the only policy. A stricter
+    policy (a match, say) would refuse such a seat in a game that hides
+    information, in `full_state_refusal`.
+  """
+
+  ANALYSIS = "analysis"
+
+
+def state_policy() -> StatePolicy:
+  """Returns the policy on seats that read the full state."""
+  return StatePolicy.ANALYSIS
+
+
+# The explicit None reads as "no refusal", as `plays_every_game` returns it.
+# pylint: disable-next=useless-return
+def full_state_refusal(
+    label: str, game: pyspiel.Game, reads_full_state: bool
+) -> str | None:
+  """Returns why a seat that reads the full state cannot play `game`, or None.
+
+  A seat reads the full state when its controller's settings say so
+  (`Kind.config_reads_full_state`). Under `StatePolicy.ANALYSIS` no such
+  seat is refused: this is where a stricter policy would refuse one.
+
+  Args:
+    label: The controller's label.
+    game: The game the seat plays.
+    reads_full_state: Whether the seat's settings make it read the full state.
+  """
+  del label, game, reads_full_state
+  policy = state_policy()
+  assert policy == StatePolicy.ANALYSIS, policy
+  return None
+
+
+def full_state_notice(
+    game: pyspiel.Game, reads_full_state: bool, notice: str | None
+) -> str | None:
+  """Returns the notice a seat's viewer is shown, from its controller's.
+
+  A notice (`SeatView.notice`) reaches the seat's own viewer. A controller
+  that reads the full state sees what its seat may not, and its notice is
+  free text it writes, so a notice can carry hidden information to the
+  seat's viewer: opponents' cards, say, from a full-state bot playing that
+  viewer's seat. Under `StatePolicy.ANALYSIS` every notice is passed on, as
+  the seat's public settings say it reads the full state and the controller
+  is trusted, as with its moves. This is where a stricter policy (a match)
+  would drop or limit the notices of seats that read the full state, in a
+  game that hides information.
+
+  Args:
+    game: The game the seat plays.
+    reads_full_state: Whether the seat's controller, with its settings,
+      reads the full state.
+    notice: The controller's notice about its latest choice, or None.
+  """
+  del game, reads_full_state
+  policy = state_policy()
+  assert policy == StatePolicy.ANALYSIS, policy
+  return notice
+
+
 @dataclasses.dataclass(frozen=True)
 class Kind:
   """A kind of controller, as it is registered.
@@ -88,6 +180,12 @@ class Kind:
       seed, which seeds every random choice it makes.
     refusal: Returns why the controller cannot play a game, or None, beyond
       what `reads_full_state` already refuses.
+    config_refusal: Returns why the controller cannot play a game with
+      particular parsed settings, or None; checked when a seat is given it.
+    config_reads_full_state: Whether the controller, with particular parsed
+      settings, reads the full state, for a controller that reads it or not
+      as its settings say (a remote bot). Such a seat is subject to
+      `full_state_refusal`; `reads_full_state` stays False for its kind.
   """
 
   label: str
@@ -95,6 +193,8 @@ class Kind:
   reads_full_state: bool
   build: Builder
   refusal: Callable[[pyspiel.Game], str | None] = plays_every_game
+  config_refusal: ConfigRefusal = accepts_every_config
+  config_reads_full_state: ConfigReadsFullState | None = None
 
   def __post_init__(self) -> None:
     if not self.label.strip():
@@ -109,6 +209,26 @@ class Kind:
           f"{game_type.short_name} hides from its players."
       )
     return self.refusal(game)
+
+  def seat_refusal(
+      self, game: pyspiel.Game, config: Mapping[str, contract.ParameterValue]
+  ) -> str | None:
+    """Returns why a seat with parsed settings `config` cannot play `game`."""
+    reason = self.config_refusal(game, config)
+    if reason is not None or self.config_reads_full_state is None:
+      return reason
+    return full_state_refusal(
+        self.label, game, self.config_reads_full_state(config)
+    )
+
+  def seat_reads_full_state(
+      self, config: Mapping[str, contract.ParameterValue]
+  ) -> bool:
+    """Whether a seat with parsed settings `config` reads the full state."""
+    return self.reads_full_state or (
+        self.config_reads_full_state is not None
+        and self.config_reads_full_state(config)
+    )
 
   def config_schema(self) -> dict[str, contract.Json]:
     """Returns the JSON Schema of the controller's settings."""

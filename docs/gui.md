@@ -66,21 +66,46 @@ only what that viewer may see.
 `open_spiel/gui/src/INTERFACES.md` says how to add a board, a card deck or a
 card back, and how to swap in a different chess board or chess pieces.
 
-A seat is played by a person or a bot: `random`, `mcts`, or one a plugin
-registers. For a game implemented in C++, `mcts` is pyspiel's `MCTSBot`; for
-a game implemented in Python, it is OpenSpiel's Python MCTS, which stops at
-the move budget and at a cap on tree nodes. At startup the server checks
-whether pyspiel's `MCTSBot` stops at its simulation count when it is also
-given a wall-clock limit, and reports the answer in `/api/health`. If it
-does, `mcts` runs up to its simulation count with a wall-clock limit inside
-the move budget; if not, it sets no wall-clock limit and caps the
-simulations at 250.
+A seat is played by a person or a bot: `random`, `mcts`, `remote` (a bot server,
+below), or one a plugin registers. For a game implemented in C++, `mcts` is
+pyspiel's `MCTSBot`; for a game implemented in Python, it is OpenSpiel's Python
+MCTS, which stops at the move budget and at a cap on tree nodes. At startup the
+server checks whether pyspiel's `MCTSBot` stops at its simulation count when it
+is also given a wall-clock limit, and reports the answer in `/api/health`. If it
+does, `mcts` runs up to its simulation count with a wall-clock limit inside the
+move budget; if not, it sets no wall-clock limit and caps the simulations at
+250.
 
 Bots are built in the background, so a seat whose bot loads a model shows
 it preparing while the rest of the page stays usable. A plugin is a module
 with a function `register_into(controllers)`; the server loads plugins only
 when `--controllers` names them, and stops with an error naming the plugin
 if one fails to load (see `open_spiel/python/gui/plugins.py`).
+
+## Remote bots and agents
+
+A **Remote bot** seat is played by a bot server, a separate process that the
+GUI server sends each position to over HTTP and that answers with a move, so
+any bot, a trained model included, can play from its own process. The seat's
+settings name the bot server's URL and what it is sent: `seat_view`, what
+the seat may see, or `full_state`. `open_spiel/python/gui/remote_bot_server.py`
+is a reference bot server that serves `random`, `mcts` or your own bot:
+
+```sh
+python3 -m open_spiel.python.gui.remote_bot_server --port 9001 --bot random
+```
+
+Then, in a game's Setup, give a seat the controller Remote bot with the URL
+`http://127.0.0.1:9001`. The GUI server posts positions only to bot servers
+on this machine unless `--remote-bot-host` names another host.
+`open_spiel/python/gui/REMOTE_BOTS.md` gives the steps, each with its check,
+and the protocol.
+
+`python3 -m open_spiel.python.gui.mcp --server http://127.0.0.1:8080` is a
+Model Context Protocol server that lets an agent list games, open sessions,
+read positions, play moves and set seats through the GUI server's API. It
+speaks MCP over stdin and stdout to the agent that starts it and opens no
+port; `open_spiel/python/gui/MCP.md` lists its tools.
 
 ## Options
 
@@ -97,6 +122,9 @@ python3 -m open_spiel.python.gui --help
 | `--controllers MODULE[,MODULE...]` | Controller plugins to load before serving; `auto` loads every installed `open_spiel.gui.controllers` entry point. Repeatable; none by default. |
 | `--move-budget-seconds SECONDS` | How long a bot may take to choose a move; `10` by default. |
 | `--build-budget-seconds SECONDS` | How long a bot may take to load and warm up; `120` by default. |
+| `--remote-bot-host NAME` | A further host a Remote bot seat's URL may name; `*` admits any. Repeatable; this machine only by default. |
+| `--remote-bot-token-env HOST[:PORT]=VAR` | Send the token in environment variable `VAR` as a bearer token to the bot server at that host, and to no other. Repeatable. |
+| `--exclude-games GAME[,GAME...]` | Registered games to leave out of the catalogue and to refuse sessions of. Repeatable. |
 
 The server has no authentication, and the oracle viewer is shown every
 player's private information. Keep the default loopback address unless the

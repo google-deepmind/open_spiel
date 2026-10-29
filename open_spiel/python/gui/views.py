@@ -115,7 +115,7 @@ def build(position: Position, viewer: contract.Viewer) -> frame.Frame:
       viewer=viewer,
       omniscient=omniscient,
       status=position.status,
-      seats=tuple(_seat(seat, omniscient) for seat in position.seats),
+      seats=tuple(_seat(seat, viewer, omniscient) for seat in position.seats),
       ply=position.ply,
       num_plies=len(position.history),
       to_move=mover,
@@ -170,12 +170,24 @@ def _history_entry(
   )
 
 
-def _seat(seat: contract.SeatView, omniscient: bool) -> contract.SeatView:
-  """Shows a seat, withholding its failure message from most viewers."""
-  if omniscient or seat.failure is None:
+def _seat(
+    seat: contract.SeatView, viewer: contract.Viewer, omniscient: bool
+) -> contract.SeatView:
+  """Shows a seat, withholding its failure message and notice from most.
+
+  A failure message reaches only an omniscient viewer; a notice, only an
+  omniscient viewer and the seat's own.
+  """
+  if omniscient:
     return seat
   return dataclasses.replace(
-      seat, failure=dataclasses.replace(seat.failure, message=None)
+      seat,
+      failure=(
+          None
+          if seat.failure is None
+          else dataclasses.replace(seat.failure, message=None)
+      ),
+      notice=seat.notice if viewer.seat == seat.seat else None,
   )
 
 

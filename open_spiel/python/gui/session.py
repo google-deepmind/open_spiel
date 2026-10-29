@@ -386,6 +386,21 @@ class Session:
       self._settle(request.MAX_ADVANCE_PLIES, autoplay_only=True)
       return self._build(self._state, len(self._plies), viewer)
 
+  def check_closer(self, viewer: contract.Viewer) -> None:
+    """Refuses a viewer that may not close the session.
+
+    As with a reset, any viewer but a spectator closes it.
+
+    Raises:
+      NotFoundError: If `viewer` is a seat the game does not have.
+      ViewerUnavailableError: If `viewer` is a seat of a game without seat
+        views.
+      NotYourTurnError: If `viewer` is a spectator.
+    """
+    with self._lock:
+      self._check_viewer(viewer)
+      self._check_participant(viewer, "closes the session")
+
   def _built(
       self, index: int, build: builds.Build[controllers_lib.Controller]
   ) -> None:

@@ -64,6 +64,9 @@ class Seat:
     status: Whether the controller is ready, being built, or not buildable.
     message: Why the seat is not ready, for every viewer; None when it is.
     build: The build of the controller while the seat is preparing.
+    notice: The controller's note about its latest choice, or None; cleared
+      when it chooses again without one, and on an undo, a reset or a change
+      of controller.
   """
 
   spec: controllers.Spec
@@ -73,6 +76,7 @@ class Seat:
   status: contract.SeatStatus = contract.SeatStatus.READY
   message: str | None = None
   build: builds.Build[controllers.Controller] | None = None
+  notice: str | None = None
 
   @classmethod
   def human(cls) -> "Seat":
@@ -243,6 +247,7 @@ class Seat:
         failure=self.failure,
         status=self.status,
         message=self.message,
+        notice=self.notice,
     )
 
   def choose_action(self, state: pyspiel.State, index: int) -> int | None:
@@ -254,17 +259,22 @@ class Seat:
 
     Returns:
       A legal action, or None if the controller failed; `failure` then says
-      why.
+      why. `notice` is the controller's note about this choice, or None.
 
     Raises:
       ValueError: If the seat is a human's (see `controllers.choose`).
     """
     assert self.controller is not None and self.ready
+    self.notice = None
     try:
-      return controllers.choose(self.controller, state, index)
+      action, notice = controllers.choose_with_notice(
+          self.controller, state, index
+      )
     except controllers.ControllerError as error:
       self.failure = error.failure(visible=True)
       return None
+    self.notice = controllers.seat_notice(self.spec, state.get_game(), notice)
+    return action
 
 
 # Called with a seat's build once it has finished.
@@ -342,8 +352,13 @@ class Seats:
     )
 
   def clear_failures(self) -> None:
-    """Resumes every failed seat that has a controller to resume."""
+    """Resumes every failed seat that has a controller to resume.
+
+    Every seat's notice, which was about a choice now taken back or
+    replaced, is cleared too.
+    """
     for seat in self._seats:
+      seat.notice = None
       if seat.status != contract.SeatStatus.UNAVAILABLE:
         seat.failure = None
 

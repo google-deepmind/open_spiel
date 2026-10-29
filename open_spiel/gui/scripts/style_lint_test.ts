@@ -168,7 +168,6 @@ describe('lintCss', () => {
     'stroke-opacity: 0',
     'filter: grayscale(0.7)',
     'filter: brightness(1.15)',
-    'backdrop-filter: blur(2px)',
     'font-size: max(12px, calc(var(--card-w) * 0.2))',
     'font-size: calc(var(--pcard-symbol-font, 1em) * 0.62)',
     'font-size: min(0.8em, var(--pcard-empty-font, 0.8em))',
@@ -242,6 +241,78 @@ describe('lintCss on a live control', () => {
     expect(messages).toHaveLength(1);
     expect(messages[0]).toContain("add :not([aria-disabled='true'])");
   });
+});
+
+describe('lintCss on an accent edge', () => {
+  const EDGE =
+    'an accent edge (a coloured or heavy stripe down one side) is refused;' +
+    ' say the tone with the text, or draw a plain 1px full border.';
+
+  it.each([
+    '.notice { border-left: 4px solid var(--color-accent); }',
+    '.notice { border-left: 1px solid var(--color-accent); }',
+    '.notice { border-left: 2px solid var(--color-border-strong); }',
+    '.notice { border-left: solid var(--color-border); }',
+    '.notice { border-inline-start: 3px solid var(--color-focus); }',
+    '.notice { border-right: 4px solid var(--color-danger); }',
+    '.notice { border-inline-end: 3px double var(--color-border); }',
+    '.notice { border-left-width: 4px; }',
+    '.notice { border-inline-start-width: thick; }',
+    '.notice { border-left-color: var(--color-accent); }',
+    '.notice { box-shadow: inset 3px 0 0 var(--color-accent); }',
+    '.notice { box-shadow: 0 1px 2px var(--color-shadow), inset -4px 0 0 var(--color-accent); }',
+    '.notice { box-shadow: 3px 0 0 var(--color-accent) inset; }',
+    '.notice { box-shadow: 0 1px 2px var(--color-shadow), -0.25rem 0 var(--color-accent) inset; }',
+  ])('refuses %s', css => {
+    expect(cssMessages(css)).toEqual([EDGE]);
+  });
+
+  it.each([
+    '.pane { border-left: 1px solid var(--color-border); }',
+    '.pane { border-right: 1px solid var(--color-border-strong); }',
+    '.pane { border-left: 0; }',
+    '.pane { border-left: none; }',
+    '.pane { border-left-style: dashed; }',
+    '.pane { border-left-width: 1px; }',
+    '.pane { border-left-color: var(--color-border); }',
+    '.pane { border: 2px solid var(--color-accent); }',
+    '.pane { border-top: 3px solid var(--color-accent); }',
+    '.ring { box-shadow: inset 0 0 0 3px var(--color-piece-dark); }',
+    '.hole { box-shadow: inset 0 4px 8px var(--color-shadow); }',
+    '.lift { box-shadow: 0 1px 3px var(--color-shadow); }',
+    '.side { box-shadow: 4px 0 8px var(--color-shadow); }',
+    '.edge { box-shadow: inset 0 0 0 calc(var(--edge, 1px) + 3px) var(--color-border); }',
+    '.icon::before { border-left: 2px solid currentcolor; }',
+  ])('allows %s', css => {
+    expect(cssMessages(css)).toEqual([]);
+  });
+
+  it('refuses an accent edge in an inline style', () => {
+    expect(
+      scriptMessages(
+        'const a = <p style={{borderLeft: "4px solid var(--color-accent)"}} />;',
+      ),
+    ).toEqual([EDGE]);
+  });
+});
+
+describe('lintCss on a glass blur', () => {
+  const GLASS =
+    'a glass blur (backdrop-filter) is refused; draw an opaque surface.';
+
+  it.each([
+    '.plaque { backdrop-filter: blur(8px); }',
+    '.plaque { -webkit-backdrop-filter: blur(4px) saturate(1.2); }',
+  ])('refuses %s', css => {
+    expect(cssMessages(css)).toEqual([GLASS]);
+  });
+
+  it.each(['.plaque { backdrop-filter: none; }', '.card { filter: none; }'])(
+    'allows %s',
+    css => {
+      expect(cssMessages(css)).toEqual([]);
+    },
+  );
 });
 
 describe('lintScript', () => {

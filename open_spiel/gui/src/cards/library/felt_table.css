@@ -198,8 +198,6 @@
 }
 .table-info__hint[data-refusal='true'] {
   font-weight: 600;
-  border-left: 3px solid var(--color-focus);
-  padding-left: 6px;
 }
 .table-info__actions {
   display: flex;

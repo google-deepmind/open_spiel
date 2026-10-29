@@ -17,14 +17,14 @@ presents each position to each viewer; `open_spiel/gui/src/INTERFACES.md`
 says how to add one, with its client renderer. A game without an adapter is
 drawn from its text.
 
-A seat is played by a person or a controller: `random`, `mcts`, or one a
-plugin registers (`controllers.py`). MCTS = pyspiel C++ MCTSBot (memory cap
-1000 MB) for C++ games; OpenSpiel Python MCTS for Python-implemented games,
-which stops at the move budget and at its node budget. At startup the server
-checks whether the served pyspiel's C++ search honours its simulation count
-when given a wall-clock time, logs the answer and reports it in `/api/health`
-(`capabilities.cpp_mcts_limits`). If it does, MCTS runs up to 10000
-simulations with a wall-clock backstop inside the move budget; if not, it
+A seat is played by a person or a controller: `random`, `mcts`, a remote bot
+(`remote`, below), or one a plugin registers (`controllers.py`). MCTS = pyspiel
+C++ MCTSBot (memory cap 1000 MB) for C++ games; OpenSpiel Python MCTS for
+Python-implemented games, which stops at the move budget and at its node budget.
+At startup the server checks whether pyspiel's C++ search honours its simulation
+count when given a wall-clock time, logs the answer and reports it in
+`/api/health` (`capabilities.cpp_mcts_limits`). If it does, MCTS runs up to
+10000 simulations with a wall-clock backstop inside the move budget; if not, it
 sets no clock and caps the simulations at 250 (`mcts_controller.py`;
 `CONTRACT.md`, Controllers, with the measurements behind the cap).
 
@@ -35,3 +35,13 @@ Run it after changing the server or adding a game.
 
 The format, lint and type-check configuration is in `pyproject.toml`, which
 also pins the tools that run it.
+
+## Remote bots and agents
+
+- [Running a remote bot](REMOTE_BOTS.md): a seat played by a bot server,
+  on this machine or another, sent the seat's view or the full state; the
+  steps, the reference bot server that wraps any bot (a trained checkpoint
+  included), and the protocol.
+- [Driving sessions from an agent (MCP)](MCP.md): an MCP server through
+  which an agent lists games, opens and closes sessions, reads frames and
+  plays.

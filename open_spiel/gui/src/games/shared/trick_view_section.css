@@ -13,37 +13,22 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-/* Hearts' section of the View panel (hearts_gameplay_config_extras.tsx): a
-   heading over its fields, in a rounded box. */
 
-.hearts-config-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 12px;
-  padding: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: var(--color-surface-sunken);
+/* A trick-taking game's section of the View panel (trick_view_section.tsx):
+   a .view-card (view/view.css), as the Perspective tab beside it is, set in
+   from the panel's edges as that tab's card is. */
+.trick-view-section {
+  margin: 14px 16px;
 }
 
-.hearts-config-section > h3 {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.ogs-config-field {
+.trick-view-section .ogs-config-field {
   display: flex;
   flex-direction: column;
   gap: 4px;
   font-size: 13px;
 }
 
-.ogs-config-field select {
+.trick-view-section .ogs-config-field select {
   max-width: 100%;
   min-width: 0;
   padding: 6px 8px;
@@ -53,7 +38,7 @@
   color: inherit;
 }
 
-.ogs-config-toggle {
+.trick-view-section .ogs-config-toggle {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -61,15 +46,15 @@
   user-select: none;
 }
 
-.ogs-config-toggle:not([aria-disabled='true']) {
+.trick-view-section .ogs-config-toggle:not([aria-disabled='true']) {
   cursor: pointer;
 }
 
-.ogs-config-toggle input {
+.trick-view-section .ogs-config-toggle input {
   accent-color: var(--color-accent);
 }
 
-.ogs-config-note {
+.trick-view-section .ogs-config-note {
   margin: 0;
   font-size: 12px;
   color: var(--color-text-muted);

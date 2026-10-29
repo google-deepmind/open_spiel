@@ -143,7 +143,7 @@ class ServerTest(absltest.TestCase):
         {"action": 4, "ply": None},
     )
     _, seat = self.request_json("GET", f"/api/sessions/{session}?viewer=1")
-    self.assertEqual(seat["contract_version"], 7)
+    self.assertEqual(seat["contract_version"], contract.CONTRACT_VERSION)
     self.assertEqual(seat["observation_struct"]["board"][4], "x")
     _, oracle = self.request_json(
         "GET", f"/api/sessions/{session}?viewer=oracle"
@@ -169,7 +169,7 @@ class ServerTest(absltest.TestCase):
     status, error = self.request_json("GET", "/api/sessions/none?viewer=0")
     self.assertEqual(status, http.HTTPStatus.NOT_FOUND)
     self.assertEqual(error["code"], "not_found")
-    self.assertEqual(error["contract_version"], 7)
+    self.assertEqual(error["contract_version"], contract.CONTRACT_VERSION)
 
   def test_refuses_a_host_it_does_not_answer_to(self) -> None:
     status, _, content = self.request(
@@ -205,6 +205,26 @@ class ServerTest(absltest.TestCase):
         _JSON | {"Origin": "http://attacker.example"},
     )
     self.assertEqual(status, http.HTTPStatus.BAD_REQUEST)
+    self.assertEmpty(self.store)
+
+  def test_closing_a_session_from_another_origin_is_refused(self) -> None:
+    _, frame = self.request_json("POST", "/api/sessions?viewer=0", _CREATE)
+    session = frame["session"]["id"]
+    status, _, _ = self.request(
+        "DELETE",
+        f"/api/sessions/{session}?viewer=oracle",
+        headers={"Origin": "http://attacker.example"},
+    )
+    self.assertEqual(status, http.HTTPStatus.BAD_REQUEST)
+    self.assertLen(self.store, 1)
+    status, _, content = self.request(
+        "DELETE", f"/api/sessions/{session}?viewer=oracle"
+    )
+    self.assertEqual(status, http.HTTPStatus.OK)
+    self.assertEqual(
+        json.loads(content),
+        {"contract_version": contract.CONTRACT_VERSION, "id": session},
+    )
     self.assertEmpty(self.store)
 
   def test_a_change_from_its_own_origin_is_accepted(self) -> None:

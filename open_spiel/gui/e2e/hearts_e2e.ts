@@ -149,6 +149,27 @@ function southCard(table: Locator, code: string): Locator {
 const PRESS_WAIT_MS = 4000;
 const PRESS_TRIES = 5;
 
+/**
+ * Where a card in your hand is clicked: the middle of the strip the fan
+ * leaves showing (up to the next card's left edge), near the top where its
+ * corner index is. Its centre is under the next card in a tight fan (the
+ * corner-index decks pack the hand closely). Measured from the cards drawn,
+ * so it follows the card size and the deck.
+ */
+async function indexPoint(card: Locator): Promise<{x: number; y: number}> {
+  return card.evaluate(element => {
+    const box = element.getBoundingClientRect();
+    const slot = element.getAttribute('data-slot') ?? '';
+    const next = [
+      ...document.querySelectorAll(`[data-slot="${slot}"][data-card-id]`),
+    ]
+      .map(other => other.getBoundingClientRect().left)
+      .filter(left => left > box.left + 0.5)
+      .reduce((nearest, left) => Math.min(nearest, left), box.right);
+    return {x: Math.max(1, (next - box.left) / 2), y: box.height * 0.15};
+  });
+}
+
 async function press(page: Page, target: Locator, what: string): Promise<void> {
   await expect(target, what).toBeVisible();
   for (let attempt = 0; attempt < PRESS_TRIES; attempt++) {
@@ -163,7 +184,7 @@ async function press(page: Page, target: Locator, what: string): Promise<void> {
         () => true,
         () => false,
       );
-    await target.click({force: true});
+    await target.click({force: true, position: await indexPoint(target)});
     if (await posted) return;
   }
   throw new Error(
@@ -183,7 +204,8 @@ async function pass(
     .evaluateAll(cards => cards.map(card => card.getAttribute('data-card-id')));
   const picks = ids.filter((id): id is string => id !== null).slice(-3);
   for (const code of picks) {
-    await southCard(table, code).click({force: true});
+    const card = southCard(table, code);
+    await card.click({force: true, position: await indexPoint(card)});
     await expect(southCard(table, code)).toHaveAttribute(
       'data-tags',
       /selected/,
@@ -323,9 +345,16 @@ test('hearts: seat 0 passes and plays a whole hand on the board against Random',
   await page.screenshot({path: testInfo.outputPath('hearts-dark.png')});
   await app.chooseTheme('Light');
   // The board's own View section.
+  // The board's own View section, the same as euchre's: Card style (corner
+  // index + large pip by default), Trick hold, Show all cards.
   const section = await app.showSection('View', 'Hearts');
+  await expect(section.getByText('Card style')).toBeVisible();
+  await expect(section.getByTestId('card-style-select')).toHaveValue('basic');
+  await expect(section.getByText('Trick hold')).toBeVisible();
   await expect(section.getByText('Show all cards')).toBeVisible();
-  await expect(section.getByText('Hand shape')).toBeVisible();
+  for (const gone of ['Hand shape', 'Trick layout', 'Card deck', 'Card back']) {
+    await expect(section.getByText(gone)).toHaveCount(0);
+  }
   await capture(page, '05-view');
   expect(expectPrivate(app.frames.all())).toBeGreaterThan(10);
 });

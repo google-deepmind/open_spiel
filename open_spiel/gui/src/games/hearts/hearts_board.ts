@@ -31,11 +31,8 @@ import {
   useCardStyle,
   type TrickCollectState,
 } from '../../cards/library/index.ts';
-import {
-  type TableCardScope,
-  useTableSurface,
-} from '../../cards/table_cards/index.ts';
-import {svgLayer} from '../../cards/table_cards/surface.ts';
+import {DEFAULT_TABLE_CARDS} from '../../cards/table_cards/index.ts';
+import {surfaceVars, svgLayer} from '../../cards/table_cards/surface.ts';
 import {
   animationScale,
   scaleMs,
@@ -45,8 +42,11 @@ import {useAnalysisViewSeat, useBottomSeat} from '../../game/bottom_seat.ts';
 import {useSessionTrickCollect} from '../shared/trick_hold.ts';
 import {PLAY_REST_MS, useStagedPlays} from '../shared/use_staged_plays.ts';
 import {useViewSetting} from '../shared/view_settings.ts';
-import {useHeartsTableCardScope} from './hearts_deck.ts';
-import {SHOW_ALL_CARDS_KEY} from './hearts_gameplay_config_extras.tsx';
+import type {CardStyle} from '../shared/trick_view_section.tsx';
+import {
+  SHOW_ALL_CARDS_KEY,
+  useHeartsCardStyle,
+} from './hearts_gameplay_config_extras.tsx';
 import {useHeartsPass, type HeartsPass} from './hearts_pass.ts';
 import type {SessionContextValue, SessionPayload} from './hearts_session.ts';
 import {
@@ -55,10 +55,6 @@ import {
   heartsTurn,
   type HeartsTurn,
 } from './hearts_turn.ts';
-import {
-  useHeartsHandShape,
-  useHeartsTrickLayout,
-} from './hearts_view_settings.ts';
 import {heartsHeldView, heartsStagedView} from './held_trick.ts';
 import {useHeartsState, type HeartsUIState} from './hooks/use_hearts_state.ts';
 import type {TableLayoutProps} from './sections/table_layout.tsx';
@@ -80,7 +76,8 @@ export interface HeartsBoard {
   readonly pass: HeartsPass;
   readonly viewerSeat: number;
   readonly setAnalysisViewSeat: (seat: number | null) => void;
-  readonly cardScope: TableCardScope;
+  /** The deck the cards are drawn with: View › Card style. */
+  readonly deck: CardStyle;
   readonly wrapperStyle: CSSProperties;
   readonly trickCollect: Collect;
   /** The table's props; null until the state is read. */
@@ -143,22 +140,21 @@ function useCardPlay(
   return {sending, handleCardClick};
 }
 
-/** The board's look: the table and card scope, surface, hand and trick. */
-function useHeartsLook(): {
-  cardScope: TableCardScope;
-  wrapperStyle: CSSProperties;
-  handShape: TableLayoutProps['handShape'];
-  trickLayout: TableLayoutProps['trickLayout'];
-} {
-  const cardScope = useHeartsTableCardScope();
-  const surface = useTableSurface(cardScope.game);
-  const wrapperStyle = useMemo((): CSSProperties => {
-    const vars: Record<string, string> = {'--hearts-grain': GRAIN};
-    return {...surface, ...vars};
-  }, [surface]);
-  const [handShape] = useHeartsHandShape();
-  const [trickLayout] = useHeartsTrickLayout();
-  return {cardScope, wrapperStyle, handShape, trickLayout};
+/** The table's surface: the theme's felt, as euchre's, with hearts' grain. */
+const GRAIN_VARS: Record<string, string> = {'--hearts-grain': GRAIN};
+const WRAPPER_STYLE: CSSProperties = {
+  ...surfaceVars(DEFAULT_TABLE_CARDS.surface),
+  ...GRAIN_VARS,
+};
+
+/**
+ * The board's look: the deck View › Card style chose, on the default felt,
+ * back and suit symbols. Your hand is flat and each trick card lies toward
+ * its player, as at euchre's table.
+ */
+function useHeartsLook(): {deck: CardStyle; wrapperStyle: CSSProperties} {
+  const [deck] = useHeartsCardStyle();
+  return {deck, wrapperStyle: WRAPPER_STYLE};
 }
 
 /**
@@ -267,7 +263,7 @@ export function useHeartsBoard(s: SessionContextValue): HeartsBoard {
     pass,
     viewerSeat,
     setAnalysisViewSeat,
-    cardScope: look.cardScope,
+    deck: look.deck,
     wrapperStyle: look.wrapperStyle,
     trickCollect,
     tableProps,
@@ -352,7 +348,6 @@ function tablePropsOf(i: TableInputs): TableLayoutProps {
     message: heartsStatusMessage(heartsState, turn, play.sending),
     collect,
     cardSize: 'md',
-    ...(look.handShape === undefined ? {} : {handShape: look.handShape}),
-    ...(look.trickLayout === undefined ? {} : {trickLayout: look.trickLayout}),
+    deck: look.deck,
   };
 }

@@ -67,19 +67,3 @@
   transform: translateX(-50%);
   overflow-wrap: anywhere;
 }
-
-/* The View panel's Euchre section: a heading over its fields. */
-.euchre-config-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px;
-}
-
-.euchre-config-section h3 {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}

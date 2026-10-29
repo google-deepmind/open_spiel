@@ -21,7 +21,7 @@ than rewind them. Simultaneous-move games are served through OpenSpiel's
 turn-based wrapper.
 """
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 import dataclasses
 import functools
 import types
@@ -140,12 +140,68 @@ class LoadedGame:
     )
 
 
+# The registered games the server leaves out (`exclude`).
+_EXCLUDED: set[str] = set()
+
+
+def exclude(names: Iterable[str]) -> tuple[str, ...]:
+  """Leaves registered games out of the catalogue, and refuses their sessions.
+
+  For a build of OpenSpiel that registers games a server should not offer.
+  Call it before serving: the catalogue reads the registered games once.
+
+  Args:
+    names: Short names of games to leave out. A name this build does not
+      register is ignored, with a warning, so that one list serves several
+      builds.
+
+  Returns:
+    The names given that this build registers, and so are now left out,
+    in order.
+
+  Raises:
+    ValueError: If a name is blank.
+  """
+  names = tuple(names)
+  for name in names:
+    if not name.strip():
+      raise ValueError("A game to exclude has a blank name.")
+  registered = set(pyspiel.registered_names())
+  for name in sorted(set(names) - registered):
+    # Ignored, so that one list serves several builds; said, so that a typo
+    # shows.
+    logging.warning(
+        "Not excluding %r: this build of OpenSpiel registers no such game.",
+        name,
+    )
+  _EXCLUDED.update(names)
+  registered_types.cache_clear()
+  _loaded_entries.cache_clear()
+  return tuple(sorted(set(names) & registered))
+
+
+def clear_exclusions() -> None:
+  """Offers every registered game again, undoing `exclude`."""
+  _EXCLUDED.clear()
+  registered_types.cache_clear()
+  _loaded_entries.cache_clear()
+
+
+def excluded() -> frozenset[str]:
+  """Returns the names of the games `exclude` left out."""
+  return frozenset(_EXCLUDED)
+
+
 @functools.cache
 def registered_types() -> Mapping[str, pyspiel.GameType]:
-  """Returns every registered game's type, keyed by short name."""
+  """Returns every registered game's type, keyed by short name.
+
+  A game left out by `exclude` is not listed.
+  """
   return {
       game_type.short_name: game_type
       for game_type in pyspiel.registered_games()
+      if game_type.short_name not in _EXCLUDED
   }
 
 

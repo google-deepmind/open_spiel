@@ -96,9 +96,30 @@
   font-weight: 600;
 }
 
+/* The controller's name and its notice share one line, so that a notice
+   arriving or clearing never moves the layout. */
+.seat__controller-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+}
+
 .seat__controller {
+  flex: 0 1 auto;
+  min-width: 0;
   color: var(--color-text-secondary);
   font-size: 13px;
+}
+
+.seat__notice {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .seat__actions {
@@ -133,8 +154,11 @@
   margin: 0;
 }
 
+.seat__failure .copyable {
+  margin-top: 4px;
+}
+
 .seat__failure-message {
-  margin: 4px 0 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -181,12 +205,6 @@
 }
 
 .seat__summary-json {
-  margin: 4px 0 0;
-  padding: 8px;
-  overflow-x: auto;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface-sunken);
   font-size: 12px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;

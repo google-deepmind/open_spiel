@@ -59,9 +59,7 @@
   color: var(--ttt-cell-ink);
   font-size: clamp(2rem, 5vw, 3.6rem);
   font-weight: 700;
-  transition:
-    transform calc(0.15s * var(--anim-scale, 1)) ease,
-    background calc(0.15s * var(--anim-scale, 1)) ease;
+  transition: background calc(0.15s * var(--anim-scale, 1)) ease;
 }
 
 .tto-cell:not([aria-disabled='true']) {
@@ -70,10 +68,6 @@
 
 .tto-cell--legal {
   background: var(--ttt-legal-fill);
-}
-
-.tto-cell--last {
-  box-shadow: 0 0 0 3px var(--ttt-last-ring);
 }
 
 .tto-cell:disabled {
@@ -85,6 +79,5 @@
 }
 
 .tto-cell:not(:disabled):not([aria-disabled='true']):hover {
-  transform: translateY(-2px);
   background: var(--ttt-hover-fill);
 }

@@ -12,50 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The View panel's Hearts section: the shared table and card settings,
-// Hearts' own view fields, and Show all cards (analysis only, which is the
-// oracle's view).
+// The View panel's Hearts section: the same section as euchre's (card
+// style, trick hold, and Show all cards, analysis only, which is the
+// oracle's view), under Hearts' own keys.
 import type {JSX} from 'react';
-import {useIsAnalysisMode} from '../../game/bottom_seat.ts';
-import {useViewSetting} from '../shared/view_settings.ts';
 import {
-  HeartsTableCardFields,
-  HeartsViewFields,
-} from './hearts_view_controls.tsx';
-import './hearts_settings.css';
+  TrickViewSection,
+  useGameCardStyle,
+  type CardStyle,
+} from '../shared/trick_view_section.tsx';
+
+/** The card style setting's key. */
+export const CARD_STYLE_KEY = 'hearts.cardStyle';
 
 /** The Show all cards setting's key. */
 export const SHOW_ALL_CARDS_KEY = 'hearts.showAllCards';
 
+/** Hook to get/set hearts' card style: corner index + large pip by default. */
+export function useHeartsCardStyle(): [
+  CardStyle,
+  (next: CardStyle | ((current: CardStyle) => CardStyle)) => void,
+] {
+  return useGameCardStyle(CARD_STYLE_KEY);
+}
+
 /** The View panel's Hearts section. */
 export function HeartsGameplayConfigExtras(): JSX.Element {
-  const isAnalysisMode = useIsAnalysisMode();
-  const [showAllCards, setShowAllCards] = useViewSetting<boolean>(
-    SHOW_ALL_CARDS_KEY,
-    false,
-  );
-
   return (
-    <section className="hearts-config-section">
-      <h3>Hearts</h3>
-      <HeartsTableCardFields />
-      <HeartsViewFields />
-      <label className="ogs-config-toggle">
-        <input
-          type="checkbox"
-          checked={showAllCards}
-          disabled={!isAnalysisMode}
-          onChange={event => {
-            setShowAllCards(event.target.checked);
-          }}
-        />
-        <span>Show all cards</span>
-      </label>
-      {!isAnalysisMode && (
-        <p className="ogs-config-note">
-          Cards can only be revealed in analysis mode.
-        </p>
-      )}
-    </section>
+    <TrickViewSection
+      title="Hearts"
+      cardStyleKey={CARD_STYLE_KEY}
+      showAllCardsKey={SHOW_ALL_CARDS_KEY}
+    />
   );
 }
