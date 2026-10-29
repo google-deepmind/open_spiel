@@ -1,0 +1,43 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "antichess",
+    srcs = ["antichess.cc"],
+    hdrs = ["antichess.h"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/chess:chess_board",
+        "//open_spiel/games/chess:chess_common",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "antichess_test",
+    srcs = ["antichess_test.cc"],
+    deps = [
+        ":antichess",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/chess:chess_board",
+    ],
+)

@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 

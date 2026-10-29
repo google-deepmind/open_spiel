@@ -1,0 +1,51 @@
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "catch",
+    srcs = ["catch.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "catch_test",
+    size = "small",
+    srcs = ["catch_test.py"],
+    deps = [
+        ":catch",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "cliff_walking",
+    srcs = ["cliff_walking.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "cliff_walking_test",
+    size = "small",
+    srcs = ["cliff_walking_test.py"],
+    deps = [
+        ":cliff_walking",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+    ],
+)

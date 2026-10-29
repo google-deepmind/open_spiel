@@ -1,0 +1,956 @@
+# Example C++ algorithm implementations, which may be useful in their own right
+# or a useful starting point for further work.
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "best_response",
+    srcs = ["best_response.cc"],
+    hdrs = ["best_response.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":expected_returns",
+        ":history_tree",
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "best_response_test",
+    srcs = ["best_response_test.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":best_response",
+        ":minimax",
+        "//open_spiel",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+        "//open_spiel/games/matching_pennies_3p",
+        "//open_spiel/games/matrix_games",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "cfr",
+    srcs = ["cfr.cc"],
+    hdrs = ["cfr.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/utils:serialization",
+    ],
+)
+
+cc_test(
+    name = "cfr_test",
+    srcs = ["cfr_test.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":cfr",
+        ":expected_returns",
+        ":history_tree",
+        ":tabular_exploitability",
+        "//open_spiel",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+        "//open_spiel/games/matching_pennies_3p",
+        "//open_spiel/games/matrix_games",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "cfr_br",
+    srcs = ["cfr_br.cc"],
+    hdrs = ["cfr_br.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":best_response",
+        ":cfr",
+        ":tabular_exploitability",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "cfr_br_test",
+    srcs = ["cfr_br_test.cc"],
+    deps = [
+        ":cfr_br",
+        ":expected_returns",
+        ":tabular_exploitability",
+        "//open_spiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+    ],
+)
+
+cc_library(
+    name = "corr_dist",
+    srcs = [
+        "corr_dist.cc",
+        "corr_dist/afcce.cc",
+        "corr_dist/afce.cc",
+        "corr_dist/cce.cc",
+        "corr_dist/ce.cc",
+        "corr_dist/efcce.cc",
+        "corr_dist/efce.cc",
+    ],
+    hdrs = [
+        "corr_dist.h",
+        "corr_dist/afcce.h",
+        "corr_dist/afce.h",
+        "corr_dist/cce.h",
+        "corr_dist/ce.h",
+        "corr_dist/efcce.h",
+        "corr_dist/efce.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":best_response",
+        ":expected_returns",
+        ":get_all_infostates",
+        ":tabular_exploitability",
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/game_transforms:game_wrapper",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+    ],
+)
+
+cc_test(
+    name = "corr_dist_test",
+    srcs = ["corr_dist_test.cc"],
+    deps = [
+        ":cfr",
+        ":corr_dev_builder",
+        ":corr_dist",
+        "//open_spiel",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/matrix_games",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_library(
+    name = "corr_dev_builder",
+    srcs = ["corr_dev_builder.cc"],
+    hdrs = ["corr_dev_builder.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":corr_dist",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "corr_dev_builder_test",
+    srcs = ["corr_dev_builder_test.cc"],
+    deps = [
+        ":cfr",
+        ":corr_dev_builder",
+        ":corr_dist",
+        ":deterministic_policy",
+        ":expected_returns",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/matrix_games",
+    ],
+)
+
+cc_library(
+    name = "get_all_states",
+    srcs = [
+        "get_all_states.cc",
+    ],
+    hdrs = [
+        "get_all_states.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+)
+
+cc_test(
+    name = "get_all_states_test",
+    size = "small",
+    srcs = [
+        "get_all_states_test.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":get_all_states",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "fsicfr",
+    srcs = ["fsicfr.cc"],
+    hdrs = ["fsicfr.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "get_all_histories",
+    srcs = [
+        "get_all_histories.cc",
+    ],
+    hdrs = [
+        "get_all_histories.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+)
+
+cc_test(
+    name = "get_all_histories_test",
+    size = "small",
+    srcs = [
+        "get_all_histories_test.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":get_all_histories",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "get_all_infostates",
+    srcs = [
+        "get_all_infostates.cc",
+    ],
+    hdrs = [
+        "get_all_infostates.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+)
+
+cc_library(
+    name = "get_legal_actions_map",
+    srcs = [
+        "get_legal_actions_map.cc",
+    ],
+    hdrs = [
+        "get_legal_actions_map.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+)
+
+cc_test(
+    name = "get_legal_actions_map_test",
+    size = "small",
+    srcs = [
+        "get_legal_actions_map_test.cc",
+    ],
+    deps = [
+        ":get_legal_actions_map",
+        "//open_spiel",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+    ],
+)
+
+cc_library(
+    name = "deterministic_policy",
+    srcs = [
+        "deterministic_policy.cc",
+    ],
+    hdrs = [
+        "deterministic_policy.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":get_legal_actions_map",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "expected_returns",
+    srcs = [
+        "expected_returns.cc",
+    ],
+    hdrs = [
+        "expected_returns.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "state_distribution",
+    srcs = [
+        "state_distribution.cc",
+    ],
+    hdrs = [
+        "state_distribution.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "state_distribution_test",
+    size = "small",
+    srcs = [
+        "state_distribution_test.cc",
+    ],
+    deps = [
+        ":state_distribution",
+        "//open_spiel",
+        "//open_spiel:all_games",
+    ],
+)
+
+cc_library(
+    name = "matrix_game_utils",
+    srcs = [
+        "matrix_game_utils.cc",
+    ],
+    hdrs = [
+        "matrix_game_utils.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":deterministic_policy",
+        ":expected_returns",
+        "//open_spiel",
+        "//open_spiel/games/blotto",
+        "//open_spiel/games/kuhn_poker",
+    ],
+)
+
+cc_test(
+    name = "matrix_game_utils_test",
+    srcs = [
+        "matrix_game_utils_test.cc",
+    ],
+    deps = [
+        ":matrix_game_utils",
+        "//open_spiel",
+        "//open_spiel/games/kuhn_poker",
+    ],
+)
+
+cc_library(
+    name = "tensor_game_utils",
+    srcs = ["tensor_game_utils.cc"],
+    hdrs = [
+        "tensor_game_utils.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":deterministic_policy",
+        ":expected_returns",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "tensor_game_utils_test",
+    srcs = [
+        "tensor_game_utils_test.cc",
+    ],
+    deps = [
+        ":tensor_game_utils",
+        "//open_spiel",
+        "//open_spiel/games/blotto",
+    ],
+)
+
+cc_library(
+    name = "nfg_writer",
+    srcs = ["nfg_writer.cc"],
+    hdrs = ["nfg_writer.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "nfg_writer_test",
+    srcs = [
+        "nfg_writer_test.cc",
+    ],
+    deps = [
+        ":nfg_writer",
+        "//open_spiel",
+        "//open_spiel/games/matching_pennies_3p",
+        "//open_spiel/games/matrix_games",
+    ],
+)
+
+cc_test(
+    name = "deterministic_policy_test",
+    size = "small",
+    srcs = [
+        "deterministic_policy_test.cc",
+    ],
+    deps = [
+        ":deterministic_policy",
+        "//open_spiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+    ],
+)
+
+cc_library(
+    name = "minimax",
+    srcs = [
+        "minimax.cc",
+    ],
+    hdrs = [
+        "minimax.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_test(
+    name = "minimax_test",
+    srcs = [
+        "minimax_test.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":minimax",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/pig",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "maxn",
+    srcs = [
+        "maxn.cc",
+    ],
+    hdrs = [
+        "maxn.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "tabular_exploitability",
+    srcs = ["tabular_exploitability.cc"],
+    hdrs = ["tabular_exploitability.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":best_response",
+        ":expected_returns",
+        ":history_tree",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "tabular_exploitability_test",
+    srcs = ["tabular_exploitability_test.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":best_response",
+        ":minimax",
+        ":tabular_exploitability",
+        "//open_spiel",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "tabular_best_response_mdp",
+    srcs = ["tabular_best_response_mdp.cc"],
+    hdrs = ["tabular_best_response_mdp.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":expected_returns",
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/memory",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "tabular_best_response_mdp_test",
+    srcs = ["tabular_best_response_mdp_test.cc"],
+    deps = [
+        ":cfr",
+        ":tabular_best_response_mdp",
+        ":tabular_exploitability",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+        "//open_spiel/games/matrix_games",
+        "//open_spiel/games/oshi_zumo",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "value_iteration",
+    srcs = [
+        "value_iteration.cc",
+    ],
+    hdrs = [
+        "value_iteration.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":get_all_states",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "mcts",
+    srcs = [
+        "mcts.cc",
+    ],
+    hdrs = [
+        "mcts.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "is_mcts",
+    srcs = ["is_mcts.cc"],
+    hdrs = ["is_mcts.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":mcts",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "is_mcts_test",
+    srcs = ["is_mcts_test.cc"],
+    deps = [
+        ":is_mcts",
+        ":mcts",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+    ],
+)
+
+cc_library(
+    name = "evaluate_bots",
+    srcs = [
+        "evaluate_bots.cc",
+    ],
+    hdrs = [
+        "evaluate_bots.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "history_tree",
+    srcs = ["history_tree.cc"],
+    hdrs = ["history_tree.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "evaluate_bots_test",
+    size = "small",
+    srcs = [
+        "evaluate_bots_test.cc",
+    ],
+    deps = [
+        ":evaluate_bots",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+    ],
+)
+
+cc_test(
+    name = "mcts_test",
+    srcs = ["mcts_test.cc"],
+    deps = [
+        ":evaluate_bots",
+        ":mcts",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+        "//open_spiel/games/catch",
+        "//open_spiel/games/pig",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_test(
+    name = "history_tree_test",
+    srcs = ["history_tree_test.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":history_tree",
+        ":minimax",
+        "@abseil-cpp//absl/container:node_hash_set",
+        "//open_spiel",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "external_sampling_mccfr",
+    srcs = ["external_sampling_mccfr.cc"],
+    hdrs = ["external_sampling_mccfr.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":cfr",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "external_sampling_mccfr_test",
+    srcs = ["external_sampling_mccfr_test.cc"],
+    deps = [
+        ":external_sampling_mccfr",
+        ":tabular_exploitability",
+        "//open_spiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+    ],
+)
+
+cc_library(
+    name = "outcome_sampling_mccfr",
+    srcs = ["outcome_sampling_mccfr.cc"],
+    hdrs = ["outcome_sampling_mccfr.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":cfr",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "outcome_sampling_mccfr_test",
+    srcs = ["outcome_sampling_mccfr_test.cc"],
+    deps = [
+        ":outcome_sampling_mccfr",
+        ":tabular_exploitability",
+        "//open_spiel",
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/liars_dice",
+    ],
+)
+
+cc_test(
+    name = "trajectories_test",
+    size = "large",
+    srcs = ["trajectories_test.cc"],
+    deps = [
+        ":trajectories",
+        "//open_spiel",
+        "//open_spiel:all_games",
+    ],
+)
+
+cc_library(
+    name = "trajectories",
+    srcs = ["trajectories.cc"],
+    hdrs = ["trajectories.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "observation_history",
+    srcs = ["observation_history.cc"],
+    hdrs = ["observation_history.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "observation_history_test",
+    srcs = ["observation_history_test.cc"],
+    deps = [
+        ":observation_history",
+        "//open_spiel",
+        "//open_spiel/games/coordinated_mp",
+        "//open_spiel/games/kuhn_poker",
+    ],
+)
+
+cc_library(
+    name = "oos",
+    srcs = ["oos.cc"],
+    hdrs = ["oos.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":cfr",
+        ":observation_history",
+        "//open_spiel",
+        "//open_spiel/utils:random",
+    ],
+)
+
+cc_test(
+    name = "oos_test",
+    srcs = ["oos_test.cc"],
+    deps = [
+        ":oos",
+        ":tabular_exploitability",
+        "//open_spiel",
+        "//open_spiel/games/coordinated_mp",
+        "//open_spiel/games/kuhn_poker",
+    ],
+)
+
+cc_library(
+    name = "policy_iteration",
+    srcs = ["policy_iteration.cc"],
+    hdrs = ["policy_iteration.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":get_all_states",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "tabular_sarsa",
+    srcs = ["tabular_sarsa.cc"],
+    hdrs = ["tabular_sarsa.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":get_all_states",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "tabular_sarsa_test",
+    srcs = ["tabular_sarsa_test.cc"],
+    deps = [
+        ":tabular_sarsa",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel/games/catch",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "tabular_q_learning",
+    srcs = ["tabular_q_learning.cc"],
+    hdrs = ["tabular_q_learning.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":get_all_states",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "tabular_q_learning_test",
+    srcs = ["tabular_q_learning_test.cc"],
+    deps = [
+        ":tabular_q_learning",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel/games/catch",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_library(
+    name = "infostate_tree",
+    srcs = ["infostate_tree.cc"],
+    hdrs = ["infostate_tree.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "infostate_tree_test",
+    srcs = ["infostate_tree_test.cc"],
+    deps = [
+        ":infostate_tree",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/games/coordinated_mp",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/kuhn_poker",
+    ],
+)

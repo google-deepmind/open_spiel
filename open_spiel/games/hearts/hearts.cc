@@ -16,17 +16,20 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <cstdlib>
+#include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/algorithm/container.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
@@ -186,9 +189,7 @@ std::string HeartsState::FormatPass() const {
       absl::StrAppend(&rv, CardString(card), " ");
     }
   }
-  // Cards are not received until all players have completed passing.
-  // West is the last player to pass.
-  if (passed_cards_[static_cast<int>(kWest)].size() == kNumCardsInPass) {
+  if (PassingComplete()) {
     absl::StrAppend(&rv, "\n\nReceived Cards:");
     for (int receiver = 0; receiver < kNumPlayers; ++receiver) {
       absl::StrAppend(&rv, "\n", DirString(receiver), ": ");
@@ -211,9 +212,7 @@ std::string HeartsState::FormatPass(Player player) const {
   // information leakage.
   absl::c_sort(passed_cards);
   for (int card : passed_cards) absl::StrAppend(&rv, CardString(card), " ");
-  // Cards are not received until all players have completed passing.
-  // West is the last player to pass.
-  if (passed_cards_[static_cast<int>(kWest)].size() == kNumCardsInPass) {
+  if (PassingComplete()) {
     absl::StrAppend(&rv, "\n\nReceived Cards: ");
     int passing_player =
         (player + kNumPlayers - static_cast<int>(pass_dir_)) % kNumPlayers;
@@ -266,9 +265,7 @@ void HeartsState::InformationStateTensor(Player player,
   for (int card : passed_cards_[player]) ptr[card] = 1;
   ptr += kNumCards;
   // Received cards
-  // Cards are not received until all players have completed passing.
-  // West is the last player to pass.
-  if (passed_cards_[static_cast<int>(kWest)].size() == kNumCardsInPass) {
+  if (PassingComplete()) {
     int passer =
         (player - static_cast<int>(pass_dir_) + kNumPlayers) % kNumPlayers;
     for (int card : passed_cards_[passer]) ptr[card] = 1;
@@ -675,14 +672,13 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
 
   // at this point we have all the information we need about which card
   // locations are known to player_id, so we can start applying deal actions
-  Player deal_to, pass_to, recv_from;
+  Player deal_to, recv_from;
   int card_num;
   std::vector<bool> dealt(kNumCards, false);
   std::vector<int> known_dealt_counter(kNumPlayers, 0);
   for (int num_dealt = 0; num_dealt < kNumCards; num_dealt++) {
     card_num = num_dealt / kNumPlayers;
     deal_to = num_dealt % kNumPlayers;
-    pass_to = (deal_to + pass_dir) % kNumPlayers;
     recv_from = (deal_to + kNumPlayers - pass_dir) % kNumPlayers;
     Action action = kInvalidAction;
     // deal out the pass moves first so those constraints are satisfied
@@ -726,17 +722,12 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
     for (Player to_move = 0; to_move < kNumPlayers; to_move++) {
       SPIEL_CHECK_EQ(pass_actions[to_move].size(),
                      passed_cards_[to_move].size());
-      pass_to = (to_move + pass_dir) % kNumPlayers;
       for (int passes = 0; passes < passed_cards_[to_move].size(); passes++) {
-        Action action = kInvalidAction;
-        if (to_move == player_id || pass_to == player_id) {
-          // player_id knows exactly which cards were passed by player_id and
-          // the player who passed cards to player_id
-          action = passed_cards_[to_move][passes];
-        } else {
-          action = pass_actions[to_move][passes];
-        }
-        clone->ApplyAction(action);
+        // pass_actions already holds the true pass wherever player_id knows
+        // it (their own pass and, once the play phase has started, the pass
+        // they received); it is the single place that decides what
+        // player_id knows about the passes.
+        clone->ApplyAction(pass_actions[to_move][passes]);
       }
     }
   }
@@ -782,7 +773,9 @@ std::unique_ptr<StateStruct> HeartsState::ToStruct() const {
     }
     absl::c_sort(rv->passed_cards[p]);
 
-    if (pass_dir_ != PassDir::kNoPass) {
+    // Cards are received only once every player has passed, as in ToString
+    // and the information state.
+    if (PassingComplete()) {
       int passer =
           (p + kNumPlayers - static_cast<int>(pass_dir_)) % kNumPlayers;
       for (int card : passed_cards_[passer]) {

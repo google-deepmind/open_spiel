@@ -19,7 +19,7 @@
 #include <vector>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/game_transforms/game_wrapper.h"

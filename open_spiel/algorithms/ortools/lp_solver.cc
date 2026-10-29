@@ -16,10 +16,10 @@
 
 #include <numeric>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/spiel.h"
-#include "ortools/linear_solver/linear_solver.h"
+#include "third_party/ortools/ortools/linear_solver/linear_solver.h"
 
 namespace open_spiel {
 namespace algorithms {

@@ -1,0 +1,250 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* The Actions sections: History, Legal and Text. */
+
+.actions-note {
+  margin: 0;
+  padding: 4px 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/*
+  The History rows: a muted turn column, then the label. The row of the
+  position shown is an accent pill; the rows ahead of it are muted.
+*/
+.history {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.history__item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--color-none);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+
+.history__row[data-standing='played'] .history__item {
+  color: var(--color-text);
+}
+
+button.history__item:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+button.history__item:hover:not([aria-disabled='true']) {
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+.history__row[aria-current='step'] .history__item,
+.history__row[aria-current='step']
+  button.history__item:hover:not([aria-disabled='true']) {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.history__turn {
+  min-width: 32px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.history__row[aria-current='step'] .history__turn {
+  color: var(--color-accent);
+}
+
+.history__label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* A run of withheld actions, collapsed into one row. */
+.history__row[data-collapsed='true'] .history__label {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.legal {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.legal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+/*
+  A long list draws only the rows in view: the window is the one scroller,
+  the track has the whole list's height, and each slot's inline style sets
+  its offset and height.
+*/
+.legal-window {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 240px;
+  padding: 4px;
+  overflow-y: auto;
+}
+
+.legal-window__track {
+  position: relative;
+}
+
+.legal-window__slot {
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+
+/* A legal move is an action: a boxed row with a hover and a pressed state. */
+.legal__row {
+  box-sizing: border-box;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+
+button.legal__row:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+button.legal__row:hover:not([aria-disabled='true']) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.legal__id {
+  min-width: 32px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.legal__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legal__probability {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.history-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.history-text__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Two small joined pills, the same track as the section tabs. */
+.history-text__options .segmented__options {
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius);
+  background: var(--color-surface-sunken);
+}
+
+.history-text__options .segmented__option {
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--color-none);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.history-text__options .segmented__option[aria-pressed='true'] {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/*
+  A row refuses a press while a request is in flight, which is every move:
+  it keeps its edge, so the list does not flicker.
+*/
+.history__item[aria-disabled='true'],
+.legal__row[aria-disabled='true'] {
+  border-style: solid;
+}
+
+/* The options are named for screen readers; on screen the pills say it. */
+.history-text__options .segmented__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

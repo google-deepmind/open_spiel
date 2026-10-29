@@ -26,16 +26,16 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/base/attributes.h"
-#include "open_spiel/abseil-cpp/absl/base/const_init.h"
-#include "open_spiel/abseil-cpp/absl/random/random.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/algorithm/container.h"
+#include "absl/base/attributes.h"
+#include "absl/base/const_init.h"
+#include "absl/random/random.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/str_split.h"
+#include "absl/synchronization/mutex.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/games/bridge/double_dummy_solver/src/Memory.h"
 #include "open_spiel/games/bridge/double_dummy_solver/src/SolverIF.h"
@@ -616,7 +616,7 @@ void BridgeState::WriteObservationTensor(Player player,
     int last_bid = 0;
     for (int i = kNumCards; i < history_.size(); ++i) {
       int this_call = history_[i].action - kBiddingActionBase;
-      int relative_bidder = (i + kNumPlayers - player) % kNumPlayers;
+      int relative_bidder = (i + dealer_ + kNumPlayers - player) % kNumPlayers;
       if (last_bid == 0 && this_call == kPass) ptr[relative_bidder] = 1;
       if (this_call == kDouble) {
         ptr[kNumPlayers + (last_bid - kFirstBid) * kNumPlayers * 3 +
@@ -651,7 +651,7 @@ std::vector<double> BridgeState::PublicObservationTensor() const {
   auto bidding = ptr + 2 * kNumPlayers;  // initial and recent passes
   int last_bid = 0;
   for (int i = kNumCards; i < history_.size(); ++i) {
-    const int player = i % kNumPlayers;
+    const int player = (i - kNumCards + dealer_) % kNumPlayers;
     const int this_call = history_[i].action - kBiddingActionBase;
     if (this_call == kPass) {
       if (last_bid == 0) ptr[player] = 1;  // Leading passes
@@ -1020,7 +1020,7 @@ void BridgeState::ApplyBiddingAction(int call) {
 
 void BridgeState::ApplyPlayAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
-  holder_[card] = absl::nullopt;
+  holder_[card] = std::nullopt;
   if (num_cards_played_ % kNumPlayers == 0) {
     CurrentTrick() = Trick(current_player_, contract_.trumps, card);
   } else {

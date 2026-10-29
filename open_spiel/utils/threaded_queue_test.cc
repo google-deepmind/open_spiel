@@ -14,9 +14,9 @@
 
 #include "open_spiel/utils/threaded_queue.h"
 
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
+#include "absl/types/optional.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

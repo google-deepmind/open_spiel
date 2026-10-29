@@ -18,8 +18,8 @@
 #include <memory>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/memory/memory.h"
+#include "absl/types/span.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/spiel_utils.h"
 

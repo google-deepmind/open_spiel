@@ -491,7 +491,7 @@ std::string LaserTagState::PartialObservationString(int player) const {
 
       if (grid_position[0] < 0) {
         // observed cell out-of-bounds of game grid
-        result += "*";
+        result += '*';
       } else {
         value = field(grid_position[0], grid_position[1]);
         result += value;

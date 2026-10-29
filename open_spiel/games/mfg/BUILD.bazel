@@ -1,0 +1,129 @@
+# Mean Field Games.
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "all_mfg_games",
+    deps = [
+        ":crowd_modelling",
+        ":crowd_modelling_2d",
+        ":dynamic_routing",
+        ":garnet",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "crowd_modelling",
+    srcs = ["crowd_modelling.cc"],
+    hdrs = ["crowd_modelling.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "crowd_modelling_test",
+    srcs = ["crowd_modelling_test.cc"],
+    deps = [
+        ":crowd_modelling",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "crowd_modelling_2d",
+    srcs = ["crowd_modelling_2d.cc"],
+    hdrs = ["crowd_modelling_2d.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "crowd_modelling_2d_test",
+    srcs = ["crowd_modelling_2d_test.cc"],
+    deps = [
+        ":crowd_modelling_2d",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "garnet",
+    srcs = ["garnet.cc"],
+    hdrs = ["garnet.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "garnet_test",
+    srcs = ["garnet_test.cc"],
+    deps = [
+        ":garnet",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "dynamic_routing",
+    srcs = ["dynamic_routing.cc"],
+    hdrs = ["dynamic_routing.h"],
+    deps = [
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "//open_spiel",
+        "//open_spiel/games/dynamic_routing:dynamic_routing_data",
+        "//open_spiel/games/dynamic_routing:dynamic_routing_utils",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "dynamic_routing_test",
+    size = "medium",
+    srcs = ["dynamic_routing_test.cc"],
+    deps = [
+        ":dynamic_routing",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

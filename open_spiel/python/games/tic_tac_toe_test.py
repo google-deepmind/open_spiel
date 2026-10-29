@@ -31,6 +31,18 @@ import pyspiel
 _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
 
+def _data_dir() -> str:
+  """Returns the playthroughs directory under $TEST_SRCDIR.
+
+  Bazel keeps the main repository's runfiles in a `_main` subdirectory.
+  """
+  test_srcdir = os.environ.get("TEST_SRCDIR", "")
+  path = os.path.join(test_srcdir, _DATA_DIR)
+  if not os.path.isdir(path):
+    path = os.path.join(test_srcdir, "_main", _DATA_DIR)
+  return path
+
+
 class TicTacToeTest(absltest.TestCase):
 
   def test_can_create_game_and_state(self):
@@ -64,8 +76,7 @@ class TicTacToeTest(absltest.TestCase):
 
   def test_playthoughs_consistent(self):
     """Checks the saved C++ and Python playthroughs are the same."""
-    test_srcdir = os.environ.get("TEST_SRCDIR", "")
-    path = os.path.join(test_srcdir, _DATA_DIR)
+    path = _data_dir()
     cc_playthrough = os.path.join(path, "tic_tac_toe.txt")
     py_playthrough = os.path.join(path, "python_tic_tac_toe.txt")
     with open(cc_playthrough, encoding="utf-8") as cc:

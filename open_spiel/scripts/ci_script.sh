@@ -24,6 +24,12 @@ PYBIN=`which $PYBIN`
 
 source ./open_spiel/scripts/python_extra_deps.sh $PYBIN
 
+# No JAX release supports this Python version (python_extra_deps.sh leaves the
+# list empty), so skip installing JAX and running the JAX tests.
+if [[ -z "$OPEN_SPIEL_PYTHON_JAX_DEPS" ]]; then
+  export OPEN_SPIEL_ENABLE_JAX="OFF"
+fi
+
 ${PYBIN} -m venv ./venv
 source ./venv/bin/activate
 
@@ -34,6 +40,7 @@ pip install --upgrade setuptools
 
 python --version
 pip install --upgrade -r requirements.txt
+pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TEST_DEPS
 
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
 [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple

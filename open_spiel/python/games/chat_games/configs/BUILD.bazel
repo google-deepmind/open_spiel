@@ -1,0 +1,24 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "configs",
+    srcs = glob(["**/*.py"]),
+    deps = [
+        "//open_spiel/python/games/chat_games/envs/base_envs",
+        "//open_spiel/python/games/chat_games/envs/observations",
+        "//open_spiel/python/games/chat_games/envs/payoffs",
+        "//open_spiel/python/games/chat_games/envs/scenarios/actions",
+        "//open_spiel/python/games/chat_games/envs/scenarios/domains",
+        "//open_spiel/python/games/chat_games/envs/scenarios/players",
+        "//open_spiel/python/games/chat_games/envs/termination",
+        "//open_spiel/python/games/chat_games/envs/utils",
+        "@py_deps//ml_collections/config_dict",
+    ],
+)

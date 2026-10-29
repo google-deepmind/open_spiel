@@ -1,0 +1,166 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  A form of settings: one row per field, its label (and an "i" toggle for
+  its description) on the left and its control on the right. The label
+  column gives way first: 140 px, at most 40% of the row, never under 90 px.
+*/
+
+.field-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-form__field {
+  display: grid;
+  grid-template-columns: minmax(90px, min(140px, 40%)) minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: center;
+}
+
+.field-form__label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+/* The asterisk after a required field's label; its control says required. */
+.field-form__required {
+  color: var(--color-danger);
+}
+
+/* A text box, number box, list or text area in any form. */
+.control {
+  min-height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.control[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.field-form__field .control {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.field-form__check {
+  justify-self: start;
+  margin: 0;
+}
+
+.field-form__error {
+  grid-column: 2;
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.field-form__with-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-form__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.field-form__preset {
+  padding: 2px 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.field-form__preset:enabled:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.field-form__preset[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* The "i" toggle, at least a 20 px target around its glyph. */
+.field-info {
+  display: inline-flex;
+  align-items: center;
+}
+
+.field-info__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 2px;
+  border: none;
+  border-radius: 4px;
+  background: var(--color-none);
+  color: var(--color-accent);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.field-info__button:enabled:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.field-info__button:hover:enabled:not([aria-disabled='true']) {
+  background: var(--color-surface-sunken);
+}
+
+/* Drawn over the page and placed by FieldInfo, so no panel clips it. */
+.field-info__popover {
+  position: fixed;
+  /* Above the dock's overlays and the settings dialog. */
+  z-index: 1050;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 16px));
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.field-info__popover[data-placed='false'] {
+  visibility: hidden;
+}

@@ -1,0 +1,31 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "matrix_games",
+    srcs = ["matrix_games.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "matrix_games_test",
+    srcs = ["matrix_games_test.cc"],
+    deps = [
+        ":matrix_games",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games/blotto",
+    ],
+)

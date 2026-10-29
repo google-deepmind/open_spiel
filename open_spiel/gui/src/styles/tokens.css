@@ -1,0 +1,746 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  The design tokens: every colour the client draws with, in both themes. The
+  rest of the stylesheets refer to these names and never to a colour (checked
+  by npm run lint:style). The light theme is the default; <html
+  data-theme="dark"> selects the dark one. npm run contrast checks that every
+  text colour reaches 4.5:1, and every other mark 3:1, on every surface; the
+  colours it checks are opaque hex values.
+*/
+
+:root {
+  /* Backgrounds: the page, a panel or control raised above it, a well. */
+  --color-surface: #ffffff;
+  --color-surface-raised: #f5f6f8;
+  --color-surface-sunken: #eceef2;
+
+  /* Borders: dividers, and the outline that marks a control's edge. */
+  --color-border: #d3d8e0;
+  --color-border-strong: #7b8494;
+
+  /* Text, from the most to the least prominent; all three are body text. */
+  --color-text: #16191f;
+  --color-text-secondary: #394150;
+  --color-text-muted: #535b6b;
+
+  /* The selected or primary control, and the text drawn on it. */
+  --color-accent: #2456d3;
+  --color-on-accent: #ffffff;
+
+  /* A tint of the accent behind accent or body text: the current row. */
+  --color-accent-soft: #e3eafb;
+
+  /* The keyboard focus ring. */
+  --color-focus: #b4410e;
+
+  /* Text that reports an outcome. */
+  --color-success: #17663a;
+  --color-warning: #8a4b00;
+  --color-danger: #b42318;
+
+  /* The overlay that marks where a dragged panel will land. */
+  --color-drop-target: rgb(36 86 211 / 0.2);
+
+  /* No colour: a divider that shows only while it is dragged. */
+  --color-none: transparent;
+
+  /* The shadow that lifts a notice off the board under it. */
+  --color-shadow: rgb(0 0 0 / 0.22);
+
+  /*
+    Cards: the face and the suits drawn on it (the back is the card
+    library's, below). A card is drawn the same in both themes.
+  */
+  --color-card-face: #ffffff;
+  --color-suit-black: #16191f;
+  --color-suit-red: #b42318;
+  --color-suit-blue: #1d4ed8;
+  --color-suit-green: #17663a;
+
+  /*
+    The card library (cards/library): the decks' suit inks, the card
+    backs' inks, paper and inset frame (decks/backs.tsx), a card's edge,
+    the rings its state tags draw and its shadows. Theme-independent like
+    the cards above.
+  */
+  --card-ink-black: #111111;
+  --card-ink-red: #c8102e;
+  --card-ink-blue: #0b5bd3;
+  --card-ink-green: #12803a;
+  --card-back-black: #1b1d21;
+  --card-back-blue: #1d3b72;
+  --card-back-diamond-red: #e8141c;
+  --card-back-inset: #ffffff;
+  --card-back-navy: #21406b;
+  --card-back-navy-light: #2a4f80;
+  --card-back-paper: #ffffff;
+  --card-back-red: #8e1b1b;
+  --card-edge: #2b2f36;
+  --card-ring-selected: #f5b400;
+  --card-ring-highlighted: #3b82f6;
+  --card-ring-drop-legal: #22c55e;
+  --card-ring-drop-over: #16a34a;
+  --card-shadow-near: rgb(0 0 0 / 0.25);
+  --card-shadow-far: rgb(0 0 0 / 0.12);
+  --card-shadow-hard: rgb(0 0 0 / 0.45);
+  --card-drag-shadow: rgb(0 0 0 / 0.35);
+  --card-count-fill: #333333;
+  --card-count-ink: #ffffff;
+  --card-overflow-fill: #b00020;
+  --card-overflow-ink: #ffffff;
+  --card-badge-neutral-fill: rgb(20 20 20 / 0.78);
+  --card-badge-neutral-ink: #ffffff;
+  --card-badge-accent-fill: #f2c14e;
+  --card-badge-accent-ink: #1b1b1b;
+  --card-badge-accent-edge: rgb(0 0 0 / 0.25);
+  --card-badge-muted-fill: rgb(255 255 255 / 0.82);
+  --card-badge-muted-ink: #333333;
+  --card-badge-muted-edge: rgb(0 0 0 / 0.2);
+  /* An empty place's dashed outline: 45% of the text colour around it. */
+  --card-empty-dash: color-mix(in srgb, currentColor 45%, var(--color-none));
+  /*
+    Card text sizes a card sets inline from its width (playing_card.tsx);
+    these are the sizes until it does, at the text floor.
+  */
+  --pcard-empty-font: 12px;
+  --pcard-symbol-font: 12px;
+  /*
+    A felt table's info box (felt_table.css): its fill, edges and shadow
+    from the felt, and its danger button; the custom felt swatch's rainbow.
+  */
+  --felt-info-border: color-mix(
+    in srgb,
+    var(--color-felt-text) 28%,
+    var(--color-none)
+  );
+  --felt-info-border-strong: color-mix(
+    in srgb,
+    var(--color-felt-text) 60%,
+    var(--color-none)
+  );
+  --felt-info-ghost: color-mix(
+    in srgb,
+    var(--color-felt-text) 10%,
+    var(--color-none)
+  );
+  --felt-info-fill: color-mix(
+    in srgb,
+    var(--color-felt-dark) 80%,
+    var(--color-none)
+  );
+  --felt-info-edge: color-mix(
+    in srgb,
+    var(--color-felt-text) 22%,
+    var(--color-none)
+  );
+  --felt-info-shadow: color-mix(
+    in srgb,
+    var(--color-felt-border) 60%,
+    var(--color-none)
+  );
+  --felt-danger-fill: #b71c1c;
+  --felt-danger-ink: #ffffff;
+  --felt-danger-edge: #ffcdd2;
+  --felt-swatch-rainbow: conic-gradient(#e33, #ec3, #3c5, #3ae, #93e, #e33);
+
+  /*
+    The card table's felt (cards/library, cards/table_cards): its colour,
+    the darker shade and edge it fades to, the text written on it, the ink
+    of a card that names a discarded card, and the felt's shadows. A table
+    whose player picks a colour overrides the first five (table_cards
+    surface.ts), mixing its shades with --felt-shade-ink.
+  */
+  --color-felt: #236b3f;
+  --color-felt-dark: #1c5e36;
+  --color-felt-border: #164d2c;
+  --color-felt-text: #ffffff;
+  --color-felt-muted: rgb(255 255 255 / 0.9);
+  --color-card-dead-ink: #dadada;
+  --color-error-text: #b4232f;
+  --felt-shade-ink: #000000;
+  --felt-picked-text: #ffffff;
+  --felt-picked-muted: rgb(255 255 255 / 0.85);
+  --felt-vignette: rgb(0 0 0 / 0.3);
+  --felt-drop-shadow: rgb(0 0 0 / 0.4);
+  /* The table textures' threads, seams and light (table_cards surface.ts). */
+  --felt-cloth-light: rgb(255 255 255 / 0.05);
+  --felt-cloth-dark: rgb(0 0 0 / 0.1);
+  --felt-wood-seam: rgb(0 0 0 / 0.22);
+  --felt-shade-light: rgb(255 255 255 / 0.06);
+  --felt-shade-dark: rgb(0 0 0 / 0.18);
+
+  /*
+    Boards: the two squares, and the light and dark pieces drawn on either.
+    A board is drawn the same in both themes.
+  */
+  --color-board-light: #b08c62;
+  --color-board-dark: #7d5c3c;
+  --color-piece-light: #ffffff;
+  --color-piece-dark: #000000;
+
+  --radius: 6px;
+  /* The corners of a card: inset content and the text a panel shows. */
+  --radius-card: 12px;
+  --font-family: system-ui, sans-serif;
+  --font-family-monospace: ui-monospace, monospace;
+  --font-size: 14px;
+  /*
+    Gin rummy's board (games/gin_rummy): the grid panels and the felt under
+    a symbol-only card on them, the last turn's mark, the pinned action
+    band, the stats text, the action buttons, the card states' rings, bands
+    and glows (GIN_CARD_STYLE), and a display fault.
+  */
+  --gin-grid-backing: color-mix(in srgb, var(--color-felt), #000000 18%);
+  --gin-grid-panel: rgb(0 0 0 / 0.18);
+  --gin-cue: color-mix(in srgb, var(--color-felt), #ffffff 72%);
+  --gin-pinned-band: color-mix(in srgb, var(--color-felt) 88%, transparent);
+  --gin-stats-text: rgb(255 255 255 / 0.85);
+  --gin-stats-strong: rgb(255 255 255 / 0.95);
+  --gin-action-border: rgb(255 255 255 / 0.35);
+  --gin-action-fill: rgb(0 0 0 / 0.25);
+  --gin-action-text: rgb(255 255 255 / 0.85);
+  --gin-action-disabled-fill: rgb(255 255 255 / 0.06);
+  --gin-action-disabled-text: rgb(255 255 255 / 0.45);
+  --gin-action-disabled-border: rgb(255 255 255 / 0.18);
+  --gin-action-primary-fill: rgb(36 112 80 / 0.95);
+  --gin-action-primary-border: rgb(160 230 190 / 0.7);
+  --gin-action-primary-text: #f6fff3;
+  --gin-focus-ring: #f5b400;
+  --gin-selected-ring: #f5b400;
+  --gin-meld-run: #2e89ff;
+  --gin-meld-set: #a855f7;
+  --gin-layoff: #2e89ff;
+  --gin-staged-layoff-glow: rgb(46 137 255 / 0.6);
+  --gin-alert-ring: #ffb347;
+  --gin-alert-glow: rgb(255 179 0 / 0.65);
+  --gin-ghost-tint: rgb(255 255 255 / 0.5);
+  --gin-card-dead-ink: #dadada;
+  --gin-card-known-ink: #ffd27f;
+  --gin-picked-ring: #64b4ff;
+  --gin-hover-glow: rgb(255 255 255 / 0.55);
+  --gin-fault-fill: #b3261e;
+  --gin-fault-text: #ffffff;
+  /* Hearts (games/hearts/hearts.css): the felt's shadows, the seat names,
+     the pass button, the message and the game over plaque, the same in
+     every theme. */
+  --hearts-table-vignette: rgb(0 0 0 / 0.3);
+  --hearts-table-drop: rgb(0 0 0 / 0.4);
+  --hearts-name-text: #ffffff;
+  --hearts-name-active-text: #ffd700;
+  --hearts-button-fill: #357abd;
+  --hearts-button-hover: #2d6aa6;
+  --hearts-button-disabled: #666666;
+  --hearts-button-text: #ffffff;
+  --hearts-plate-fill: rgb(0 0 0 / 0.6);
+  --hearts-plate-text: #ffffff;
+  --hearts-message-fill: rgb(0 0 0 / 0.75);
+  --hearts-message-text: #ffffff;
+  --hearts-over-fill: rgb(0 0 0 / 0.85);
+  --hearts-over-text: #ffffff;
+  --hearts-over-row-fill: rgb(255 255 255 / 0.1);
+  --hearts-over-row-text: rgb(255 255 255 / 0.9);
+  --hearts-over-winner-fill: rgb(255 215 0 / 0.2);
+  --hearts-over-winner-edge: rgb(255 215 0 / 0.5);
+  --hearts-over-score-text: rgb(255 255 255 / 0.7);
+  --hearts-over-badge-text: #ffd700;
+  /*
+    Euchre's board (games/euchre): the felt, the cards' backs and glows,
+    the trump colours, the panels and buttons over the felt.
+  */
+  --euchre-felt: #2d5a3a;
+  --euchre-felt-dark: #1a3d24;
+  --euchre-felt-border: #0f2816;
+  --euchre-gold-60: rgb(255 215 0 / 0.6);
+  --euchre-sky-40: rgb(100 200 255 / 0.4);
+  --euchre-red: #e53e3e;
+  --euchre-ink: #1a202c;
+  --euchre-white: #ffffff;
+  --euchre-black-20: rgb(0 0 0 / 0.2);
+  --euchre-black-10: rgb(0 0 0 / 0.1);
+  --euchre-black-30: rgb(0 0 0 / 0.3);
+  --euchre-black-25: rgb(0 0 0 / 0.25);
+  --euchre-black-40: rgb(0 0 0 / 0.4);
+  --euchre-black-60: rgb(0 0 0 / 0.6);
+  --euchre-black-70: rgb(0 0 0 / 0.7);
+  --euchre-white-60: rgb(255 255 255 / 0.6);
+  --euchre-gold: #ffd700;
+  --euchre-white-20: rgb(255 255 255 / 0.2);
+  --euchre-gold-30: rgb(255 215 0 / 0.3);
+  --euchre-white-15: rgb(255 255 255 / 0.15);
+  --euchre-white-80: rgb(255 255 255 / 0.8);
+  --euchre-night-92: rgb(20 20 30 / 0.92);
+  --euchre-white-70: rgb(255 255 255 / 0.7);
+  --euchre-blue: #4a90d9;
+  --euchre-blue-dark: #357abd;
+  --euchre-blue-40: rgb(74 144 217 / 0.4);
+  --euchre-blue-50: rgb(74 144 217 / 0.5);
+  --euchre-white-10: rgb(255 255 255 / 0.1);
+  --euchre-transparent: transparent;
+  --euchre-white-30: rgb(255 255 255 / 0.3);
+  --euchre-white-50: rgb(255 255 255 / 0.5);
+  --euchre-black-85: rgb(0 0 0 / 0.85);
+  --euchre-black-50: rgb(0 0 0 / 0.5);
+  --euchre-gold-20: rgb(255 215 0 / 0.2);
+  --euchre-gold-50: rgb(255 215 0 / 0.5);
+  --euchre-black-75: rgb(0 0 0 / 0.75);
+  /*
+    The poker board (games/poker): the felt, rail and ink of the poker
+    table, its hand bar, seat plates, cards, chips and action
+    buttons. The board is drawn the same in both themes.
+  */
+  --poker-felt: #176244;
+  --poker-felt-dark: #0d3d2e;
+  --poker-rail: #232833;
+  --poker-ink: #f7fbff;
+  --poker-muted: #a9b5c2;
+  --poker-accent: #e0b15b;
+  --poker-action-red: #b72422;
+  --poker-action-red-dark: #681110;
+  --poker-action-dark: #181d26;
+  --poker-handbar-border: rgba(255, 255, 255, 0.1);
+  --poker-handbar-bg: rgba(18, 25, 36, 0.92);
+  --poker-handbar-bg-2: rgba(10, 14, 22, 0.82);
+  --poker-span-border: rgba(255, 255, 255, 0.12);
+  --poker-span-bg: rgba(0, 0, 0, 0.18);
+  --poker-select-border: rgba(255, 255, 255, 0.16);
+  --poker-select-bg: #202938;
+  --poker-table-bg: rgba(255, 255, 255, 0.15);
+  --poker-table-bg-2: transparent;
+  --poker-table-bg-3: rgba(48, 218, 85, 0.25);
+  --poker-table-bg-4: #1b7754;
+  --poker-table-shadow: rgba(255, 255, 255, 0.07);
+  --poker-table-shadow-2: rgba(0, 0, 0, 0.4);
+  --poker-table-shadow-3: rgba(0, 0, 0, 0.22);
+  --poker-table-border: rgba(224, 177, 91, 0.18);
+  --poker-pot-border: rgba(224, 177, 91, 0.45);
+  --poker-pot-bg: rgba(0, 0, 0, 0.28);
+  --poker-card-text: #17202b;
+  --poker-card-border: rgba(13, 19, 28, 0.22);
+  --poker-card-bg: rgba(255, 255, 255, 0.96);
+  --poker-card-bg-2: rgba(235, 239, 245, 0.98);
+  --poker-card-bg-3: #f8fafc;
+  --poker-card-shadow: rgba(0, 0, 0, 0.32);
+  --poker-card-shadow-2: rgba(255, 255, 255, 0.75);
+  --poker-card-red-text: #bc2626;
+  --poker-card-h-text: #c92f54;
+  --poker-card-d-text: #2078c7;
+  --poker-card-c-text: #1f7a45;
+  --poker-card-empty-bg: rgba(255, 255, 255, 0.08);
+  --poker-seat-body-bg: rgba(16, 21, 29, 0.86);
+  --poker-seat-body-border: rgba(224, 177, 91, 0.95);
+  --poker-seat-body-shadow: rgba(224, 177, 91, 0.2);
+  --poker-seat-body-border-2: rgba(82, 227, 132, 0.95);
+  --poker-seat-body-shadow-2: rgba(82, 227, 132, 0.18);
+  --poker-seat-badge-text: #1f2430;
+  --poker-seat-best-text: #d7e7ff;
+  --poker-seat-return-text: #d6dee9;
+  --poker-seat-return-positive-text: #72e69a;
+  --poker-controls-bg: rgba(41, 47, 57, 0.96);
+  --poker-controls-bg-2: rgba(9, 12, 18, 0.96);
+  --poker-controls-bg-3: #10141c;
+  --poker-action-text: white;
+  --poker-action-text-shadow: rgba(0, 0, 0, 0.45);
+  --poker-action-bg: #d84b45;
+  --poker-action-shadow: rgba(255, 255, 255, 0.22);
+  --poker-action-shadow-2: rgba(0, 0, 0, 0.35);
+  --poker-action-fold-bg: #3c4652;
+  --poker-action-fold-bg-2: #202731;
+  --poker-action-fold-bg-3: #111620;
+  --poker-betbox-bg: rgba(10, 14, 21, 0.94);
+  --poker-betbox-bg-2: rgba(4, 7, 12, 0.88);
+  --poker-input-type-number-bg: rgba(5, 8, 13, 0.72);
+  --poker-button-bg: #303743;
+  --poker-betbox-hint-text: #ffc9c9;
+  /*
+    Chess's board (games/chess): each theme's light and dark squares, which
+    also colour the coordinates drawn on the other kind; the last move, the
+    king in check, the selected square and the moves it has; the pieces'
+    fill and lines; the promotion choice; the move list's current move.
+  */
+  --chess-brown-light: #f0d9b5;
+  --chess-brown-dark: #b58863;
+  --chess-blue-light: #dee3e6;
+  --chess-blue-dark: #4a7297;
+  --chess-green-light: #eeeed2;
+  --chess-green-dark: #769656;
+  --chess-last-move: rgb(250 204 21 / 0.4);
+  --chess-check-core: rgb(255 0 0 / 0.8);
+  --chess-check-edge: rgb(255 0 0 / 0.4);
+  --chess-check-clear: rgb(255 0 0 / 0);
+  --chess-move-dest: rgb(125 211 252 / 0.7);
+  --chess-capture-dest: rgb(125 211 252 / 0.5);
+  --chess-selected: rgb(125 211 252 / 0.5);
+  --chess-dest-hover: rgb(125 211 252 / 0.3);
+  --chess-clear: rgb(0 0 0 / 0);
+  --chess-piece-white: #ffffff;
+  --chess-piece-black: #000000;
+  --chess-piece-white-line: #000000;
+  --chess-piece-black-line: #ffffff;
+  --chess-promotion-overlay: rgb(0 0 0 / 0.5);
+  --chess-promotion-hover: rgb(209 135 66 / 0.9);
+  --chess-promotion-light: #d4d4d4;
+  --chess-promotion-dark: #a8a8a8;
+  --chess-promotion-shadow: rgb(0 0 0 / 0.3);
+  --chess-drag-shadow: rgb(0 0 0 / 0.3);
+  --chess-history-current-fill: rgb(96 165 250 / 0.2);
+  --chess-history-current-text: #60a5fa;
+  /*
+    Checkers' board (games/checkers), the same in both themes: its squares,
+    edge and shadow, the selected square and the legal landings, the last
+    turn and the rings where taken men stood, each side's men with their
+    highlight, body, edge and gloss, the crowns of kings, and the same parts
+    in the Modern theme.
+  */
+  --checkers-shadow-strong: rgb(0 0 0 / 0.4);
+  --checkers-shadow-soft: rgb(0 0 0 / 0.3);
+  --checkers-board-border: rgb(60 40 20 / 0.9);
+  --checkers-square-light: #f0d9b5;
+  --checkers-square-dark: #b58863;
+  --checkers-selected: rgb(255 215 0 / 0.5);
+  --checkers-destination: rgb(100 200 100 / 0.5);
+  --checkers-destination-dot: rgb(100 200 100 / 0.8);
+  --checkers-last-move: #cfa94e;
+  --checkers-captured-ring: #3c2814;
+  --checkers-black-highlight: #4a4a4a;
+  --checkers-black-body: #1a1a1a;
+  --checkers-black-edge: #333333;
+  --checkers-black-gloss: rgb(255 255 255 / 0.2);
+  --checkers-white-highlight: #f5f5f5;
+  --checkers-white-body: #c0c0c0;
+  --checkers-white-edge: #999999;
+  --checkers-white-gloss: rgb(255 255 255 / 0.5);
+  --checkers-movable-ring: rgb(255 215 0 / 0.6);
+  --checkers-crown: #ffd700;
+  --checkers-crown-shadow: rgb(0 0 0 / 0.5);
+  --checkers-crown-black: #ffd700;
+  --checkers-crown-white: #b8860b;
+  --checkers-modern-board-border: rgb(80 80 100 / 0.9);
+  --checkers-modern-shadow: rgb(0 0 0 / 0.5);
+  --checkers-modern-square-light: #e8e8e8;
+  --checkers-modern-square-dark: #4a5568;
+  --checkers-modern-black-highlight: #2d3748;
+  --checkers-modern-black-body: #1a202c;
+  --checkers-modern-white-highlight: #ffffff;
+  --checkers-modern-white-body: #e2e8f0;
+  --checkers-modern-white-edge: #cbd5e0;
+  --checkers-modern-crown-black: #ed8936;
+  --checkers-modern-crown-white: #4299e1;
+  --checkers-modern-last-move: #6f7f9f;
+  /*
+    Connect four's board (games/connect_four): the blue frame, its edge and
+    shadow, an empty hole, a hole's lift on hover, and the two discs.
+  */
+  --c4-board-top: rgb(12 73 164 / 0.96);
+  --c4-board-bottom: rgb(8 55 125 / 0.96);
+  --c4-board-edge: rgb(255 255 255 / 0.08);
+  --c4-board-shadow: rgb(0 0 0 / 0.35);
+  --c4-hole: #0a1f44;
+  --c4-hole-rim: rgb(0 0 0 / 0.35);
+  --c4-hole-shade: rgb(0 0 0 / 0.45);
+  --c4-lift-shadow: rgb(0 0 0 / 0.35);
+  --c4-red-light: #ff4444;
+  --c4-red: #c41212;
+  --c4-red-rim: rgb(120 19 19 / 0.85);
+  --c4-red-shade: rgb(0 0 0 / 0.45);
+  --c4-yellow-light: #ffe066;
+  --c4-yellow: #d9ad0e;
+  --c4-yellow-rim: rgb(160 118 11 / 0.8);
+  --c4-yellow-shade: rgb(0 0 0 / 0.4);
+  --c4-win-ring: #ffffff;
+  /*
+    Tic-tac-toe's board (games/tic_tac_toe): a cell's edge, fill and mark, a
+    cell the viewer may mark, the newest mark's ring, and a cell under the
+    pointer.
+  */
+  --ttt-cell-border: rgb(15 23 42 / 0.12);
+  --ttt-cell-fill: #eef1f6;
+  --ttt-cell-ink: #0f172a;
+  --ttt-legal-fill: rgb(112 162 255 / 0.18);
+  --ttt-hover-fill: rgb(120 137 255 / 0.32);
+  /*
+    A board panel's status row (games/shared): its text, and the fill
+    of an error drawn in place of the board.
+  */
+  --ogs-meta-text: #475569;
+  --ogs-error-fill: #fde8eb;
+}
+
+:root[data-theme='dark'] {
+  --color-surface: #16191e;
+  --color-surface-raised: #1e2229;
+  --color-surface-sunken: #101216;
+
+  --color-border: #323844;
+  --color-border-strong: #788396;
+
+  --color-text: #eef1f5;
+  --color-text-secondary: #c5cbd5;
+  --color-text-muted: #a1a9b7;
+
+  --color-accent: #8eaefc;
+  --color-on-accent: #0d1526;
+
+  --color-accent-soft: #1f2a44;
+
+  --color-focus: #f2b33d;
+
+  --color-success: #5fd38d;
+  --color-warning: #f0b545;
+  --color-danger: #ff8f85;
+
+  --color-drop-target: rgb(142 174 252 / 0.2);
+
+  --color-shadow: rgb(0 0 0 / 0.6);
+
+  /* The card table's felt, as in the light theme. */
+  --color-felt: #1a6b35;
+  --color-felt-dark: #0d4d23;
+  --color-felt-border: #0a3a1a;
+  --color-felt-text: #f4f7f2;
+  --color-felt-muted: rgb(244 247 242 / 0.82);
+  --color-error-text: #ff6b81;
+
+  /* Gin rummy's board, as in the light theme. */
+  --gin-grid-backing: color-mix(in srgb, var(--color-felt), #000000 18%);
+  --gin-grid-panel: rgb(0 0 0 / 0.18);
+  --gin-cue: color-mix(in srgb, var(--color-felt), #ffffff 72%);
+  --gin-pinned-band: color-mix(in srgb, var(--color-felt) 88%, transparent);
+  --gin-stats-text: rgb(255 255 255 / 0.85);
+  --gin-stats-strong: rgb(255 255 255 / 0.95);
+  --gin-action-border: rgb(255 255 255 / 0.35);
+  --gin-action-fill: rgb(0 0 0 / 0.25);
+  --gin-action-text: rgb(255 255 255 / 0.85);
+  --gin-action-disabled-fill: rgb(255 255 255 / 0.06);
+  --gin-action-disabled-text: rgb(255 255 255 / 0.45);
+  --gin-action-disabled-border: rgb(255 255 255 / 0.18);
+  --gin-action-primary-fill: rgb(36 112 80 / 0.95);
+  --gin-action-primary-border: rgb(160 230 190 / 0.7);
+  --gin-action-primary-text: #f6fff3;
+  --gin-focus-ring: #f5b400;
+  --gin-selected-ring: #f5b400;
+  --gin-meld-run: #2e89ff;
+  --gin-meld-set: #a855f7;
+  --gin-layoff: #2e89ff;
+  --gin-staged-layoff-glow: rgb(46 137 255 / 0.6);
+  --gin-alert-ring: #ffb347;
+  --gin-alert-glow: rgb(255 179 0 / 0.65);
+  --gin-ghost-tint: rgb(255 255 255 / 0.5);
+  --gin-card-dead-ink: #dadada;
+  --gin-card-known-ink: #ffd27f;
+  --gin-picked-ring: #64b4ff;
+  --gin-hover-glow: rgb(255 255 255 / 0.55);
+  --gin-fault-fill: #b3261e;
+  --gin-fault-text: #ffffff;
+  /* Hearts (games/hearts/hearts.css): the felt's shadows, the seat names,
+     the pass button, the message and the game over plaque, the same in
+     every theme. */
+  --hearts-table-vignette: rgb(0 0 0 / 0.3);
+  --hearts-table-drop: rgb(0 0 0 / 0.4);
+  --hearts-name-text: #ffffff;
+  --hearts-name-active-text: #ffd700;
+  --hearts-button-fill: #357abd;
+  --hearts-button-hover: #2d6aa6;
+  --hearts-button-disabled: #666666;
+  --hearts-button-text: #ffffff;
+  --hearts-plate-fill: rgb(0 0 0 / 0.6);
+  --hearts-plate-text: #ffffff;
+  --hearts-message-fill: rgb(0 0 0 / 0.75);
+  --hearts-message-text: #ffffff;
+  --hearts-over-fill: rgb(0 0 0 / 0.85);
+  --hearts-over-text: #ffffff;
+  --hearts-over-row-fill: rgb(255 255 255 / 0.1);
+  --hearts-over-row-text: rgb(255 255 255 / 0.9);
+  --hearts-over-winner-fill: rgb(255 215 0 / 0.2);
+  --hearts-over-winner-edge: rgb(255 215 0 / 0.5);
+  --hearts-over-score-text: rgb(255 255 255 / 0.7);
+  --hearts-over-badge-text: #ffd700;
+  /*
+    Euchre's board (games/euchre): the felt, the cards' backs and glows,
+    the trump colours, the panels and buttons over the felt.
+  */
+  --euchre-felt: #2d5a3a;
+  --euchre-felt-dark: #1a3d24;
+  --euchre-felt-border: #0f2816;
+  --euchre-gold-60: rgb(255 215 0 / 0.6);
+  --euchre-sky-40: rgb(100 200 255 / 0.4);
+  --euchre-red: #e53e3e;
+  --euchre-ink: #1a202c;
+  --euchre-white: #ffffff;
+  --euchre-black-20: rgb(0 0 0 / 0.2);
+  --euchre-black-10: rgb(0 0 0 / 0.1);
+  --euchre-black-30: rgb(0 0 0 / 0.3);
+  --euchre-black-25: rgb(0 0 0 / 0.25);
+  --euchre-black-40: rgb(0 0 0 / 0.4);
+  --euchre-black-60: rgb(0 0 0 / 0.6);
+  --euchre-black-70: rgb(0 0 0 / 0.7);
+  --euchre-white-60: rgb(255 255 255 / 0.6);
+  --euchre-gold: #ffd700;
+  --euchre-white-20: rgb(255 255 255 / 0.2);
+  --euchre-gold-30: rgb(255 215 0 / 0.3);
+  --euchre-white-15: rgb(255 255 255 / 0.15);
+  --euchre-white-80: rgb(255 255 255 / 0.8);
+  --euchre-night-92: rgb(20 20 30 / 0.92);
+  --euchre-white-70: rgb(255 255 255 / 0.7);
+  --euchre-blue: #4a90d9;
+  --euchre-blue-dark: #357abd;
+  --euchre-blue-40: rgb(74 144 217 / 0.4);
+  --euchre-blue-50: rgb(74 144 217 / 0.5);
+  --euchre-white-10: rgb(255 255 255 / 0.1);
+  --euchre-transparent: transparent;
+  --euchre-white-30: rgb(255 255 255 / 0.3);
+  --euchre-white-50: rgb(255 255 255 / 0.5);
+  --euchre-black-85: rgb(0 0 0 / 0.85);
+  --euchre-black-50: rgb(0 0 0 / 0.5);
+  --euchre-gold-20: rgb(255 215 0 / 0.2);
+  --euchre-gold-50: rgb(255 215 0 / 0.5);
+  --euchre-black-75: rgb(0 0 0 / 0.75);
+
+  /* The poker board, as in the light theme. */
+  --poker-felt: #176244;
+  --poker-felt-dark: #0d3d2e;
+  --poker-rail: #232833;
+  --poker-ink: #f7fbff;
+  --poker-muted: #a9b5c2;
+  --poker-accent: #e0b15b;
+  --poker-action-red: #b72422;
+  --poker-action-red-dark: #681110;
+  --poker-action-dark: #181d26;
+  --poker-handbar-border: rgba(255, 255, 255, 0.1);
+  --poker-handbar-bg: rgba(18, 25, 36, 0.92);
+  --poker-handbar-bg-2: rgba(10, 14, 22, 0.82);
+  --poker-span-border: rgba(255, 255, 255, 0.12);
+  --poker-span-bg: rgba(0, 0, 0, 0.18);
+  --poker-select-border: rgba(255, 255, 255, 0.16);
+  --poker-select-bg: #202938;
+  --poker-table-bg: rgba(255, 255, 255, 0.15);
+  --poker-table-bg-2: transparent;
+  --poker-table-bg-3: rgba(48, 218, 85, 0.25);
+  --poker-table-bg-4: #1b7754;
+  --poker-table-shadow: rgba(255, 255, 255, 0.07);
+  --poker-table-shadow-2: rgba(0, 0, 0, 0.4);
+  --poker-table-shadow-3: rgba(0, 0, 0, 0.22);
+  --poker-table-border: rgba(224, 177, 91, 0.18);
+  --poker-pot-border: rgba(224, 177, 91, 0.45);
+  --poker-pot-bg: rgba(0, 0, 0, 0.28);
+  --poker-card-text: #17202b;
+  --poker-card-border: rgba(13, 19, 28, 0.22);
+  --poker-card-bg: rgba(255, 255, 255, 0.96);
+  --poker-card-bg-2: rgba(235, 239, 245, 0.98);
+  --poker-card-bg-3: #f8fafc;
+  --poker-card-shadow: rgba(0, 0, 0, 0.32);
+  --poker-card-shadow-2: rgba(255, 255, 255, 0.75);
+  --poker-card-red-text: #bc2626;
+  --poker-card-h-text: #c92f54;
+  --poker-card-d-text: #2078c7;
+  --poker-card-c-text: #1f7a45;
+  --poker-card-empty-bg: rgba(255, 255, 255, 0.08);
+  --poker-seat-body-bg: rgba(16, 21, 29, 0.86);
+  --poker-seat-body-border: rgba(224, 177, 91, 0.95);
+  --poker-seat-body-shadow: rgba(224, 177, 91, 0.2);
+  --poker-seat-body-border-2: rgba(82, 227, 132, 0.95);
+  --poker-seat-body-shadow-2: rgba(82, 227, 132, 0.18);
+  --poker-seat-badge-text: #1f2430;
+  --poker-seat-best-text: #d7e7ff;
+  --poker-seat-return-text: #d6dee9;
+  --poker-seat-return-positive-text: #72e69a;
+  --poker-controls-bg: rgba(41, 47, 57, 0.96);
+  --poker-controls-bg-2: rgba(9, 12, 18, 0.96);
+  --poker-controls-bg-3: #10141c;
+  --poker-action-text: white;
+  --poker-action-text-shadow: rgba(0, 0, 0, 0.45);
+  --poker-action-bg: #d84b45;
+  --poker-action-shadow: rgba(255, 255, 255, 0.22);
+  --poker-action-shadow-2: rgba(0, 0, 0, 0.35);
+  --poker-action-fold-bg: #3c4652;
+  --poker-action-fold-bg-2: #202731;
+  --poker-action-fold-bg-3: #111620;
+  --poker-betbox-bg: rgba(10, 14, 21, 0.94);
+  --poker-betbox-bg-2: rgba(4, 7, 12, 0.88);
+  --poker-input-type-number-bg: rgba(5, 8, 13, 0.72);
+  --poker-button-bg: #303743;
+  --poker-betbox-hint-text: #ffc9c9;
+  /*
+    Checkers' board (games/checkers), the same in both themes: its squares,
+    edge and shadow, the selected square and the legal landings, the last
+    turn and the rings where taken men stood, each side's men with their
+    highlight, body, edge and gloss, the crowns of kings, and the same parts
+    in the Modern theme.
+  */
+  --checkers-shadow-strong: rgb(0 0 0 / 0.4);
+  --checkers-shadow-soft: rgb(0 0 0 / 0.3);
+  --checkers-board-border: rgb(60 40 20 / 0.9);
+  --checkers-square-light: #f0d9b5;
+  --checkers-square-dark: #b58863;
+  --checkers-selected: rgb(255 215 0 / 0.5);
+  --checkers-destination: rgb(100 200 100 / 0.5);
+  --checkers-destination-dot: rgb(100 200 100 / 0.8);
+  --checkers-last-move: #cfa94e;
+  --checkers-captured-ring: #3c2814;
+  --checkers-black-highlight: #4a4a4a;
+  --checkers-black-body: #1a1a1a;
+  --checkers-black-edge: #333333;
+  --checkers-black-gloss: rgb(255 255 255 / 0.2);
+  --checkers-white-highlight: #f5f5f5;
+  --checkers-white-body: #c0c0c0;
+  --checkers-white-edge: #999999;
+  --checkers-white-gloss: rgb(255 255 255 / 0.5);
+  --checkers-movable-ring: rgb(255 215 0 / 0.6);
+  --checkers-crown: #ffd700;
+  --checkers-crown-shadow: rgb(0 0 0 / 0.5);
+  --checkers-crown-black: #ffd700;
+  --checkers-crown-white: #b8860b;
+  --checkers-modern-board-border: rgb(80 80 100 / 0.9);
+  --checkers-modern-shadow: rgb(0 0 0 / 0.5);
+  --checkers-modern-square-light: #e8e8e8;
+  --checkers-modern-square-dark: #4a5568;
+  --checkers-modern-black-highlight: #2d3748;
+  --checkers-modern-black-body: #1a202c;
+  --checkers-modern-white-highlight: #ffffff;
+  --checkers-modern-white-body: #e2e8f0;
+  --checkers-modern-white-edge: #cbd5e0;
+  --checkers-modern-crown-black: #ed8936;
+  --checkers-modern-crown-white: #4299e1;
+  --checkers-modern-last-move: #6f7f9f;
+
+  /* Connect four's board, as in the light theme. */
+  --c4-board-top: rgb(12 73 164 / 0.96);
+  --c4-board-bottom: rgb(8 55 125 / 0.96);
+  --c4-board-edge: rgb(255 255 255 / 0.08);
+  --c4-board-shadow: rgb(0 0 0 / 0.35);
+  --c4-hole: #0a1f44;
+  --c4-hole-rim: rgb(0 0 0 / 0.35);
+  --c4-hole-shade: rgb(0 0 0 / 0.45);
+  --c4-lift-shadow: rgb(0 0 0 / 0.35);
+  --c4-red-light: #ff4444;
+  --c4-red: #c41212;
+  --c4-red-rim: rgb(120 19 19 / 0.85);
+  --c4-red-shade: rgb(0 0 0 / 0.45);
+  --c4-yellow-light: #ffe066;
+  --c4-yellow: #d9ad0e;
+  --c4-yellow-rim: rgb(160 118 11 / 0.8);
+  --c4-yellow-shade: rgb(0 0 0 / 0.4);
+  --c4-win-ring: #ffffff;
+  /* Tic-tac-toe's board and a board panel's status row, dark. */
+  --ttt-cell-border: rgb(245 247 255 / 0.12);
+  --ttt-cell-fill: rgb(0 0 0 / 0.3);
+  --ttt-cell-ink: #f5f7ff;
+  --ttt-legal-fill: rgb(112 162 255 / 0.18);
+  --ttt-hover-fill: rgb(120 137 255 / 0.32);
+  --ogs-meta-text: rgb(245 247 255 / 0.7);
+  --ogs-error-fill: rgb(255 71 87 / 0.18);
+}

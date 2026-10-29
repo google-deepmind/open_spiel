@@ -14,7 +14,7 @@
 
 #include <random>
 
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "absl/random/distributions.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/spiel.h"

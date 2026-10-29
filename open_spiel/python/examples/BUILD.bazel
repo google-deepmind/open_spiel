@@ -1,0 +1,1080 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_binary")
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+licenses(["notice"])
+
+# We test the binaries by checking that the returned status is 0,
+# i.e. they run without errors and exit.
+
+py_binary(
+    name = "benchmark_games",
+    srcs = ["benchmark_games.py"],
+    deps = [
+        "//open_spiel/python/games",  # fixdeps: keep
+        "//open_spiel/python/mfg/games",  # fixdeps: keep
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//pandas",
+    ],
+)
+
+py_binary(
+    name = "dqn_breakthrough_jax",
+    srcs = ["dqn_breakthrough_jax.py"],
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/jax:dqn",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "dqn_breakthrough_jax_test",
+    srcs = ["dqn_breakthrough_jax.py"],
+    args = [
+        "--num_train_episodes=2",
+        "--replay_buffer_capacity=100",
+    ],
+    main = "dqn_breakthrough_jax.py",
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/jax:dqn",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "bridge_uncontested_bidding_bluechip_example",
+    srcs = ["bridge_uncontested_bidding_bluechip.py"],
+    main = "bridge_uncontested_bidding_bluechip.py",
+    deps = [
+        "//open_spiel/python/bots:bluechip_bridge_uncontested_bidding",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "cfr_example",
+    srcs = ["cfr_example.py"],
+    deps = [
+        "//open_spiel/python/algorithms:cfr",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "mccfr_cpp_example",
+    srcs = ["mccfr_cpp_example.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "cfr_example_test",
+    srcs = ["cfr_example.py"],
+    main = "cfr_example.py",
+    deps = [
+        "//open_spiel/python/algorithms:cfr",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "cfr_cpp_example",
+    srcs = ["cfr_cpp_example.py"],
+    main = "cfr_cpp_example.py",
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "chat_game_psro_example",
+    srcs = ["chat_game_psro_example.py"],
+    main = "chat_game_psro_example.py",
+    deps = [
+        "//open_spiel/python/games:chat_game",
+        "//open_spiel/python/games/chat_games/configs",
+        "//open_spiel/python/games/chat_games/envs/utils",
+        "//open_spiel/python/games/chat_games/utils:test_utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//ml_collections",
+        "@py_deps//nashpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "game_tree_traversal_example",
+    srcs = ["game_tree_traversal_example.py"],
+    main = "game_tree_traversal_example.py",
+    deps = [
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "play_via_console_example",
+    srcs = ["play_via_console_example.py"],
+    main = "play_via_console_example.py",
+    deps = [
+        "//open_spiel/python/bots:human",
+        "//open_spiel/python/bots:uniform_random",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "example",
+    srcs = ["example.py"],
+    deps = [
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "roshambo_population_example",
+    srcs = ["roshambo_population_example.py"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_roshambo_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "nego_nbs_example",
+    srcs = ["nego_nbs_example.py"],
+    deps = [
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "rl_response",
+    srcs = ["rl_response.py"],
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python:rl_tools",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "//open_spiel/python/jax:dqn",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "poker_fcpa_example",
+    srcs = ["poker_fcpa_example.py"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_acpc_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel/python/bots:human",
+        "//open_spiel/python/bots:uniform_random",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "is_mcts_exploitability",
+    srcs = ["is_mcts_exploitability.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "query_example",
+    srcs = ["query_example.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "example_test",
+    srcs = ["example.py"],
+    main = "example.py",
+    deps = [
+        "//open_spiel/python/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "fictitious_play_example",
+    srcs = ["fictitious_play_example.py"],
+    deps = [
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/algorithms:fictitious_play",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "fictitious_play_example_test",
+    srcs = ["fictitious_play_example.py"],
+    args = ["--iterations=2"],
+    main = "fictitious_play_example.py",
+    deps = [
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/algorithms:fictitious_play",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "get_all_states",
+    srcs = ["get_all_states.py"],
+    main = "get_all_states.py",
+    deps = [
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/games",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "get_all_states_test",
+    srcs = ["get_all_states.py"],
+    main = "get_all_states.py",
+    deps = [
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/games",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "kuhn_poker_cfr",
+    srcs = ["kuhn_poker_cfr.py"],
+    deps = [
+        "//open_spiel/python/algorithms:cfr",
+        "//open_spiel/python/algorithms:expected_game_score",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+    ],
+)
+
+py_binary(
+    name = "nfsp_kuhn_jax",
+    srcs = ["nfsp_kuhn_jax.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/jax:nfsp",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_test(
+    name = "nfsp_kuhn_jax_test",
+    srcs = ["nfsp_kuhn_jax.py"],
+    args = [
+        "--num_train_episodes=2",
+    ],
+    main = "nfsp_kuhn_jax.py",
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/jax:nfsp",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_test(
+    name = "kuhn_poker_cfr_test",
+    srcs = ["kuhn_poker_cfr.py"],
+    main = "kuhn_poker_cfr.py",
+    deps = [
+        "//open_spiel/python/algorithms:cfr",
+        "//open_spiel/python/algorithms:expected_game_score",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+    ],
+)
+
+py_binary(
+    name = "lp_solve_example",
+    srcs = ["lp_solve_example.py"],
+    deps = [
+        "//open_spiel/python/algorithms:lp_solver",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+    ],
+)
+
+py_test(
+    name = "lp_solve_example_test",
+    srcs = ["lp_solve_example.py"],
+    main = "lp_solve_example.py",
+    deps = [
+        "//open_spiel/python/algorithms:lp_solver",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+    ],
+)
+
+py_binary(
+    name = "matrix_game_example",
+    srcs = ["matrix_game_example.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:file_utils",
+        "@py_deps//absl:app",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "matrix_game_example_test",
+    srcs = ["matrix_game_example.py"],
+    data = ["//open_spiel/data/paper_data:response_graph_ucb_data"],
+    main = "matrix_game_example.py",
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:file_utils",
+        "@py_deps//absl:app",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "matrix_nash_example",
+    srcs = ["matrix_nash_example.py"],
+    deps = [
+        "//open_spiel/python/algorithms:lp_solver",
+        "//open_spiel/python/algorithms:matrix_nash",
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//nashpy",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "marl_nashq_example",
+    srcs = ["marl_nashq_example.py"],
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:tabular_multiagent_qlearner",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "@py_deps//absl:app",
+    ],
+)
+
+py_binary(
+    name = "mcts",
+    srcs = ["mcts.py"],
+    deps = [
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/bots:gtp",
+        "//open_spiel/python/bots:human",
+        "//open_spiel/python/bots:uniform_random",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "mcts_test",
+    srcs = ["mcts.py"],
+    main = "mcts.py",
+    deps = [
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/bots:gtp",
+        "//open_spiel/python/bots:human",
+        "//open_spiel/python/bots:uniform_random",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "play_tarok_game",
+    srcs = ["play_tarok_game.py"],
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_binary(
+    name = "playthrough",
+    srcs = ["playthrough.py"],
+    deps = [
+        "//open_spiel/python/algorithms:generate_playthrough",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+exports_files(["playthrough.py"])
+
+py_test(
+    name = "playthrough_test",
+    srcs = ["playthrough.py"],
+    main = "playthrough.py",
+    deps = [
+        "//open_spiel/python/algorithms:generate_playthrough",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_binary(
+    name = "rl_example",
+    srcs = ["rl_example.py"],
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "rl_example_test",
+    srcs = ["rl_example.py"],
+    main = "rl_example.py",
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "nfg_writer_example",
+    srcs = ["nfg_writer_example.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "rl_main_loop",
+    srcs = ["rl_main_loop.py"],
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "rl_main_loop_test",
+    srcs = ["rl_main_loop.py"],
+    main = "rl_main_loop.py",
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "single_agent_cliff_walking",
+    srcs = ["single_agent_cliff_walking.py"],
+    deps = [
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "//open_spiel/python/environments:cliff_walking",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "single_agent_cliff_walking_test",
+    srcs = ["single_agent_cliff_walking.py"],
+    args = [
+        "--num_episodes=2",
+    ],
+    main = "single_agent_cliff_walking.py",
+    deps = [
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "//open_spiel/python/environments:cliff_walking",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "tic_tac_toe_dqn_vs_tabular",
+    srcs = ["tic_tac_toe_dqn_vs_tabular.py"],
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "//open_spiel/python/jax:dqn",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "tic_tac_toe_dqn_vs_tabular_test",
+    srcs = ["tic_tac_toe_dqn_vs_tabular.py"],
+    args = [
+        "--num_episodes=2",
+        "--nointeractive_play",
+    ],
+    main = "tic_tac_toe_dqn_vs_tabular.py",
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "//open_spiel/python/jax:dqn",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "tic_tac_toe_qlearner",
+    srcs = ["tic_tac_toe_qlearner.py"],
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "independent_tabular_qlearning",
+    srcs = ["independent_tabular_qlearning.py"],
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python:rl_tools",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "tic_tac_toe_qlearner_test",
+    srcs = ["tic_tac_toe_qlearner.py"],
+    args = [
+        "--num_episodes=2",
+        "--nointeractive_play",
+    ],
+    main = "tic_tac_toe_qlearner.py",
+    deps = [
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:random_agent",
+        "//open_spiel/python/algorithms:tabular_qlearner",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "value_iteration",
+    srcs = ["value_iteration.py"],
+    deps = [
+        "//open_spiel/python/algorithms:value_iteration",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "minimax_solver",
+    srcs = ["minimax_solver.py"],
+    deps = [
+        "//open_spiel/python/algorithms:minimax_solver",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "value_iteration_test",
+    srcs = ["value_iteration.py"],
+    args = ["tic_tac_toe"],
+    main = "value_iteration.py",
+    deps = [
+        "//open_spiel/python/algorithms:value_iteration",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "discounted_cfr",
+    srcs = ["discounted_cfr.py"],
+    main = "discounted_cfr.py",
+    deps = [
+        "//open_spiel/python/algorithms:discounted_cfr",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "discounted_cfr_test",
+    srcs = ["discounted_cfr.py"],
+    args = [
+        "--iterations=10",
+    ],
+    main = "discounted_cfr.py",
+    deps = [
+        "//open_spiel/python/algorithms:discounted_cfr",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "gambit_example",
+    srcs = ["gambit_example.py"],
+    deps = [
+        "//open_spiel/python/algorithms:gambit",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_test(
+    name = "gambit_example_test",
+    srcs = ["gambit_example.py"],
+    args = [
+        "--game=kuhn_poker",
+        "--out=/tmp/gambit_test.efg",
+    ],
+    main = "gambit_example.py",
+    deps = [
+        "//open_spiel/python/algorithms:gambit",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_binary(
+    name = "treeviz_example",
+    srcs = ["treeviz_example.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/visualizations:treeviz",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_test(
+    name = "treeviz_example_test",
+    srcs = ["treeviz_example.py"],
+    args = [
+        "--game=kuhn_poker",
+        "--out=/tmp/treeviz_test.png",
+        "--verbose",
+    ],
+    main = "treeviz_example.py",
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/visualizations:treeviz",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_test(
+    name = "policy_aggregator_example",
+    srcs = ["policy_aggregator_example.py"],
+    main = "policy_aggregator_example.py",
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/algorithms:policy_aggregator",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_binary(
+    name = "play_scenarios",
+    srcs = ["play_scenarios.py"],
+    deps = [
+        "//open_spiel/python/bots:scenarios",
+        "//open_spiel/python/bots:uniform_random",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+pytype_strict_binary(
+    name = "bridge_supervised_learning",
+    srcs = ["bridge_supervised_learning.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_binary(
+    name = "hearts_supervised_learning",
+    srcs = ["hearts_supervised_learning.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+py_test(
+    name = "hearts_supervised_learning_test",
+    srcs = ["hearts_supervised_learning.py"],
+    # We use a very small number of iterations and small prime batch sizes to
+    # check for issues assumptions without running for an excessive time.
+    args = [
+        "--iterations=3",
+        "--eval_every=3",
+        "--data_path=open_spiel/python/examples/data/hearts",
+        "--train_batch=13",
+        "--eval_batch=17",
+    ],
+    data = [
+        "data/hearts/test.txt",
+        "data/hearts/train.txt",
+    ],
+    main = "hearts_supervised_learning.py",
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_binary(
+    name = "deep_cfr_pytorch",
+    srcs = ["deep_cfr_pytorch.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:expected_game_score",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/pytorch:deep_cfr",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_binary(
+    name = "jpsro",
+    srcs = ["jpsro.py"],
+    deps = [
+        "//open_spiel/python/algorithms:jpsro",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+pytype_strict_binary(
+    name = "chat_game_cfr_example",
+    srcs = ["chat_game_cfr_example.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:expected_game_score",
+        "//open_spiel/python/games:chat_game",
+        "//open_spiel/python/games/chat_games:chat_game_base",
+        "//open_spiel/python/games/chat_games/configs",
+        "//open_spiel/python/games/chat_games/envs/base_envs",
+        "//open_spiel/python/games/chat_games/envs/comm_substrates",
+        "//open_spiel/python/games/chat_games/utils:test_utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//ml_collections",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "psro_v2_example",
+    srcs = ["psro_v2_example.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/algorithms:policy_aggregator",
+        "//open_spiel/python/algorithms/psro_v2",
+        "//open_spiel/python/algorithms/psro_v2:best_response_oracle",
+        "//open_spiel/python/algorithms/psro_v2:rl_oracle",
+        "//open_spiel/python/algorithms/psro_v2:rl_policy",
+        "//open_spiel/python/algorithms/psro_v2:strategy_selectors",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "psro_v2_example_test",
+    srcs = ["psro_v2_example.py"],
+    args = [
+        "--game_name=kuhn_poker --gpsro_iterations=2 --oracle_type=PG --number_training_episodes=5 --sims_per_entry=2 --hidden_layer_size=8",
+        "--game_name=kuhn_poker --gpsro_iterations=2 --oracle_type=DQN --number_training_episodes=5 --sims_per_entry=2 --hidden_layer_size=8",
+        "--game_name=kuhn_poker --gpsro_iterations=2 --oracle_type=BR --number_training_episodes=5 --sims_per_entry=2 --hidden_layer_size=8",
+    ],
+    main = "psro_v2_example.py",
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/algorithms:policy_aggregator",
+        "//open_spiel/python/algorithms/psro_v2",
+        "//open_spiel/python/algorithms/psro_v2:best_response_oracle",
+        "//open_spiel/python/algorithms/psro_v2:rl_oracle",
+        "//open_spiel/python/algorithms/psro_v2:rl_policy",
+        "//open_spiel/python/algorithms/psro_v2:strategy_selectors",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "response_graph_ucb_sample_complexity",
+    srcs = ["response_graph_ucb_sample_complexity.py"],
+    deps = [
+        "//open_spiel/python/algorithms:response_graph_ucb",
+        "//open_spiel/python/algorithms:response_graph_ucb_utils",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "response_graph_ucb_2x2_game",
+    srcs = ["response_graph_ucb_2x2_game.py"],
+    deps = [
+        "//open_spiel/python/algorithms:response_graph_ucb",
+        "//open_spiel/python/algorithms:response_graph_ucb_utils",
+        "@py_deps//absl:app",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "bridge_supervised_learning_test",
+    srcs = ["bridge_supervised_learning.py"],
+    # We use a very small number of iterations and small prime batch sizes to
+    # check for issues assumptions without running for an excessive time.
+    args = [
+        "--iterations=3",
+        "--eval_every=3",
+        "--data_path=open_spiel/python/examples/data/bridge",
+        "--train_batch=13",
+        "--eval_batch=17",
+    ],
+    data = [
+        "data/bridge/test.txt",
+        "data/bridge/train.txt",
+    ],
+    main = "bridge_supervised_learning.py",
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+py_binary(
+    name = "uniform_policy_exploitability",
+    srcs = ["uniform_policy_exploitability.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "uniform_policy_exploitability_test",
+    srcs = ["uniform_policy_exploitability.py"],
+    args = ["--game=kuhn_poker"],
+    main = "uniform_policy_exploitability.py",
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "catch_jax_policy_gradient",
+    srcs = ["catch_jax_policy_gradient.py"],
+    deps = [
+        "//open_spiel/python/environments:catch",
+        "//open_spiel/python/jax:policy_gradient",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "universal_poker_cfr_cpp_load_from_acpc_gamedef_example",
+    srcs = ["universal_poker_cfr_cpp_load_from_acpc_gamedef_example.py"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_acpc_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)

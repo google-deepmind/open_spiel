@@ -17,9 +17,9 @@
 #include <iostream>
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/types/optional.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/algorithms/deterministic_policy.h"

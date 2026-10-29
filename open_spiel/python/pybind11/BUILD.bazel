@@ -1,0 +1,692 @@
+load("//bazel/python:pybind.bzl", "pybind_extension", "pybind_library")
+
+# Python bindings for open spiel
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+pybind_library(
+    name = "pybind11",
+    hdrs = ["pybind11.h"],
+    deps = [
+        "@abseil-cpp//absl/types:optional",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+    ],
+)
+
+pybind_library(
+    name = "bots",
+    srcs = ["bots.cc"],
+    hdrs = ["bots.h"],
+    copts = select({
+        "//open_spiel:build_with_roshambo_enabled": [
+            "-DOPEN_SPIEL_BUILD_WITH_ROSHAMBO",
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:evaluate_bots",
+        "//open_spiel/algorithms:is_mcts",
+        "//open_spiel/algorithms:mcts",
+        "//open_spiel/bots/gin_rummy:simple_gin_rummy_bot",
+        "//open_spiel/game_transforms:normal_form_extensive_game",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+    ] + select({
+        "//open_spiel:build_with_acpc_enabled": [
+            "//open_spiel/games/universal_poker",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_roshambo_enabled": [
+            "//open_spiel/bots/roshambo:roshambo_bot",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_xinxin_enabled": [
+            "//open_spiel/bots/xinxin:xinxin_bot",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        # The UCI bot uses POSIX process APIs; make_uci_bot is not bound there.
+        "@platforms//os:windows": [],
+        "//conditions:default": ["//open_spiel/bots/uci:uci_bot"],
+    }),
+)
+
+pybind_library(
+    name = "policy",
+    srcs = ["policy.cc"],
+    hdrs = ["policy.h"],
+    deps = [
+        ":pybind11",
+        ":python_policy",
+        "//open_spiel",
+        "//open_spiel/algorithms:best_response",
+        "//open_spiel/algorithms:cfr",
+        "//open_spiel/algorithms:cfr_br",
+        "//open_spiel/algorithms:deterministic_policy",
+        "//open_spiel/algorithms:evaluate_bots",
+        "//open_spiel/algorithms:expected_returns",
+        "//open_spiel/algorithms:external_sampling_mccfr",
+        "//open_spiel/algorithms:is_mcts",
+        "//open_spiel/algorithms:matrix_game_utils",
+        "//open_spiel/algorithms:mcts",
+        "//open_spiel/algorithms:outcome_sampling_mccfr",
+        "//open_spiel/algorithms:tabular_best_response_mdp",
+        "//open_spiel/algorithms:tabular_exploitability",
+        "//open_spiel/algorithms:tensor_game_utils",
+        "//open_spiel/algorithms:trajectories",
+        "//open_spiel/game_transforms:normal_form_extensive_game",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+    ],
+)
+
+pybind_library(
+    name = "python_policy",
+    srcs = ["python_policy.cc"],
+    hdrs = ["python_policy.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+    ],
+)
+
+pybind_library(
+    name = "algorithms_infostate_tree",
+    srcs = [
+        "algorithms_infostate_tree.cc",
+    ],
+    hdrs = [
+        "algorithms_infostate_tree.h",
+        "algorithms_infostate_tree_templates.h",
+    ],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/algorithms:infostate_tree",
+        "//open_spiel/game_transforms:normal_form_extensive_game",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+        "@pybind11_abseil//pybind11_abseil:absl_casters",
+    ],
+)
+
+pybind_library(
+    name = "algorithms_trajectories",
+    srcs = ["algorithms_trajectories.cc"],
+    hdrs = ["algorithms_trajectories.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/algorithms:trajectories",
+        "//open_spiel/game_transforms:normal_form_extensive_game",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+    ],
+)
+
+pybind_library(
+    name = "algorithms_corr_dist",
+    srcs = ["algorithms_corr_dist.cc"],
+    hdrs = ["algorithms_corr_dist.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/algorithms:corr_dev_builder",
+        "//open_spiel/algorithms:corr_dist",
+    ],
+)
+
+pybind_library(
+    name = "game_transforms",
+    srcs = ["game_transforms.cc"],
+    hdrs = ["game_transforms.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/game_transforms:cached_tree",
+        "//open_spiel/game_transforms:normal_form_extensive_game",
+        "//open_spiel/game_transforms:repeated_game",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+    ],
+)
+
+pybind_library(
+    name = "games_backgammon",
+    srcs = ["games_backgammon.cc"],
+    hdrs = ["games_backgammon.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/backgammon",
+    ],
+)
+
+pybind_library(
+    name = "games_bargaining",
+    srcs = ["games_bargaining.cc"],
+    hdrs = ["games_bargaining.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/bargaining",
+    ],
+)
+
+pybind_library(
+    name = "games_blackjack",
+    srcs = ["games_blackjack.cc"],
+    hdrs = ["games_blackjack.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/blackjack",
+    ],
+)
+
+pybind_library(
+    name = "games_catch",
+    srcs = ["games_catch.cc"],
+    hdrs = ["games_catch.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/catch",
+    ],
+)
+
+pybind_library(
+    name = "games_chess",
+    srcs = ["games_chess.cc"],
+    hdrs = ["games_chess.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/chess:chess_board",
+        "//open_spiel/games/chess:chess_common",
+    ],
+)
+
+pybind_library(
+    name = "games_crazyhouse",
+    srcs = ["games_crazyhouse.cc"],
+    hdrs = ["games_crazyhouse.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/crazyhouse",
+        "//open_spiel/games/crazyhouse:crazyhouse_board",
+        "//open_spiel/games/crazyhouse:crazyhouse_common",
+    ],
+)
+
+pybind_library(
+    name = "games_crossword",
+    srcs = ["games_crossword.cc"],
+    hdrs = ["games_crossword.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/crossword",
+        "//open_spiel/games/crossword:crossword_board",
+    ],
+)
+
+pybind_library(
+    name = "games_colored_trails",
+    srcs = ["games_colored_trails.cc"],
+    hdrs = ["games_colored_trails.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/colored_trails",
+    ],
+)
+
+pybind_library(
+    name = "games_crazy_eights",
+    srcs = ["games_crazy_eights.cc"],
+    hdrs = ["games_crazy_eights.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/crazy_eights",
+    ],
+)
+
+pybind_library(
+    name = "games_dots_and_boxes",
+    srcs = ["games_dots_and_boxes.cc"],
+    hdrs = ["games_dots_and_boxes.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/dots_and_boxes",
+    ],
+)
+
+pybind_library(
+    name = "games_bridge",
+    srcs = ["games_bridge.cc"],
+    hdrs = ["games_bridge.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/bridge",
+    ],
+)
+
+pybind_library(
+    name = "games_connect_four",
+    srcs = ["games_connect_four.cc"],
+    hdrs = ["games_connect_four.h"],
+    deps = [
+        ":pybind11",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/games/connect_four",
+    ],
+)
+
+pybind_library(
+    name = "games_euchre",
+    srcs = ["games_euchre.cc"],
+    hdrs = ["games_euchre.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/euchre",
+        "@pybind11_abseil//pybind11_abseil:absl_casters",
+    ],
+)
+
+pybind_library(
+    name = "games_gin_rummy",
+    srcs = ["games_gin_rummy.cc"],
+    hdrs = ["games_gin_rummy.h"],
+    deps = [
+        ":pybind11",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/games/gin_rummy",
+        "@pybind11_abseil//pybind11_abseil:absl_casters",
+    ],
+)
+
+pybind_library(
+    name = "games_go",
+    srcs = ["games_go.cc"],
+    hdrs = ["games_go.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/go",
+    ],
+)
+
+pybind_library(
+    name = "games_go_fish",
+    srcs = ["games_go_fish.cc"],
+    hdrs = ["games_go_fish.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/go_fish",
+    ],
+)
+
+pybind_library(
+    name = "games_gomoku",
+    srcs = ["games_gomoku.cc"],
+    hdrs = ["games_gomoku.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/gomoku",
+    ],
+)
+
+pybind_library(
+    name = "games_hearts",
+    srcs = ["games_hearts.cc"],
+    hdrs = ["games_hearts.h"],
+    deps = [
+        ":pybind11",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/games/hearts",
+        "@pybind11_abseil//pybind11_abseil:absl_casters",
+    ],
+)
+
+pybind_library(
+    name = "games_kuhn_poker",
+    srcs = ["games_kuhn_poker.cc"],
+    hdrs = ["games_kuhn_poker.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/kuhn_poker",
+    ],
+)
+
+pybind_library(
+    name = "games_universal_poker",
+    srcs = ["games_universal_poker.cc"],
+    hdrs = ["games_universal_poker.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/universal_poker",
+    ],
+)
+
+pybind_library(
+    name = "games_trade_comm",
+    srcs = ["games_trade_comm.cc"],
+    hdrs = ["games_trade_comm.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/trade_comm",
+    ],
+)
+
+pybind_library(
+    name = "games_tic_tac_toe",
+    srcs = ["games_tic_tac_toe.cc"],
+    hdrs = ["games_tic_tac_toe.h"],
+    deps = [
+        ":pybind11",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/games/tic_tac_toe",
+        "@pybind11_json",
+    ],
+)
+
+pybind_library(
+    name = "games_tiny_bridge",
+    srcs = ["games_tiny_bridge.cc"],
+    hdrs = ["games_tiny_bridge.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/tiny_bridge",
+    ],
+)
+
+pybind_library(
+    name = "games_leduc_poker",
+    srcs = ["games_leduc_poker.cc"],
+    hdrs = ["games_leduc_poker.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/leduc_poker",
+    ],
+)
+
+pybind_library(
+    name = "games_negotiation",
+    srcs = ["games_negotiation.cc"],
+    hdrs = ["games_negotiation.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/negotiation",
+    ],
+)
+
+pybind_library(
+    name = "games_pokerkit_wrapper",
+    srcs = ["games_pokerkit_wrapper.cc"],
+    hdrs = ["games_pokerkit_wrapper.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        # NOTE: Unlike most others, not a full C++ game - JUST a struct!
+        "//open_spiel/games/pokerkit_wrapper:pokerkit_wrapper_struct",
+        "@pybind11_json",
+    ],
+)
+
+pybind_library(
+    name = "games_repeated_poker",
+    srcs = ["games_repeated_poker.cc"],
+    hdrs = ["games_repeated_poker.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/universal_poker:repeated_poker",
+        "@pybind11_json",
+    ],
+)
+
+pybind_library(
+    name = "games_repeated_pokerkit",
+    srcs = ["games_repeated_pokerkit.cc"],
+    hdrs = ["games_repeated_pokerkit.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        # NOTE: Unlike most others, not a full C++ game - JUST a struct!
+        "//open_spiel/games/repeated_pokerkit:repeated_pokerkit_struct",
+        "@pybind11_json",
+    ],
+)
+
+pybind_library(
+    name = "games_shogi",
+    srcs = ["games_shogi.cc"],
+    hdrs = ["games_shogi.h"],
+    deps = [
+        ":pybind11",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+        "//open_spiel/games/shogi",
+        "//open_spiel/games/shogi:shogi_board",
+    ],
+)
+
+pybind_library(
+    name = "games_spades",
+    srcs = ["games_spades.cc"],
+    hdrs = ["games_spades.h"],
+    deps = [
+        ":pybind11",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/games/spades",
+    ],
+)
+
+pybind_library(
+    name = "games_tarok",
+    srcs = ["games_tarok.cc"],
+    hdrs = ["games_tarok.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/games/tarok",
+    ],
+)
+
+pybind_library(
+    name = "utils",
+    srcs = ["utils.cc"],
+    hdrs = ["utils.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:sgf_reader",
+        "//open_spiel/utils:status",
+    ],
+)
+
+pybind_library(
+    name = "utils_trajectories",
+    srcs = ["utils_trajectories.cc"],
+    hdrs = ["utils_trajectories.h"],
+    deps = [
+        ":pybind11",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/utils:trajectories",
+        "@pybind11_json",
+    ],
+)
+
+pybind_library(
+    name = "evaluation_sco",
+    srcs = ["evaluation_sco.cc"],
+    hdrs = ["evaluation_sco.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel/evaluation:soft_condorcet_optimization",
+    ],
+)
+
+pybind_library(
+    name = "evaluation_elo",
+    srcs = ["evaluation_elo.cc"],
+    hdrs = ["evaluation_elo.h"],
+    deps = [
+        ":pybind11",
+        "//open_spiel/evaluation:elo",
+    ],
+)
+
+pybind_extension(
+    name = "pyspiel",
+    srcs = [
+        "observer.cc",
+        "observer.h",
+        "pyspiel.cc",
+        "python_games.cc",
+        "python_games.h",
+    ],
+    copts = select({
+        "//open_spiel:build_with_acpc_enabled": [
+            "-DOPEN_SPIEL_BUILD_WITH_ACPC",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_gamut_enabled": [
+            "-DOPEN_SPIEL_BUILD_WITH_GAMUT",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_roshambo_enabled": [
+            "-DOPEN_SPIEL_BUILD_WITH_ROSHAMBO",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_xinxin_enabled": [
+            "-DOPEN_SPIEL_BUILD_WITH_XINXIN",
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":algorithms_corr_dist",
+        ":algorithms_infostate_tree",
+        ":algorithms_trajectories",
+        ":bots",
+        ":evaluation_elo",
+        ":evaluation_sco",
+        ":game_transforms",
+        ":games_backgammon",
+        ":games_bargaining",
+        ":games_blackjack",
+        ":games_bridge",
+        ":games_catch",
+        ":games_chess",
+        ":games_colored_trails",
+        ":games_connect_four",
+        ":games_crazy_eights",
+        ":games_crazyhouse",
+        ":games_crossword",
+        ":games_dots_and_boxes",
+        ":games_euchre",
+        ":games_gin_rummy",
+        ":games_go",
+        ":games_go_fish",
+        ":games_gomoku",
+        ":games_hearts",
+        ":games_kuhn_poker",
+        ":games_leduc_poker",
+        ":games_negotiation",
+        ":games_pokerkit_wrapper",
+        ":games_repeated_pokerkit",
+        ":games_shogi",
+        ":games_spades",
+        ":games_tarok",
+        ":games_tic_tac_toe",
+        ":games_tiny_bridge",
+        ":games_trade_comm",
+        ":policy",
+        ":pybind11",
+        ":utils",
+        ":utils_trajectories",
+        "@abseil-cpp//absl/container:inlined_vector",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:matrix_game_utils",
+        "//open_spiel/algorithms:nfg_writer",
+        "//open_spiel/algorithms:tensor_game_utils",
+        "//open_spiel/game_transforms:normal_form_extensive_game",
+        "//open_spiel/game_transforms:turn_based_simultaneous_game",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+        "//open_spiel/games/nfg_game",
+        "//open_spiel/utils:status",
+        "@pybind11_abseil//pybind11_abseil:absl_casters",
+        "@pybind11_abseil//pybind11_abseil:status_casters",
+        "@pybind11_json",
+    ] + select({
+        "//open_spiel:build_with_acpc_enabled": [
+            ":games_repeated_poker",
+            ":games_universal_poker",
+            "//open_spiel/games/universal_poker",
+            "//open_spiel/games/universal_poker:repeated_poker",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_gamut_enabled": [
+            "//open_spiel/games/gamut:gamut_pybind11",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_xinxin_enabled": [
+            "//open_spiel/bots/xinxin:xinxin_pybind11",
+        ],
+        "//conditions:default": [],
+    }),
+)

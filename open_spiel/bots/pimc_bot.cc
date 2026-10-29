@@ -20,8 +20,8 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/random/distributions.h"
 #include "open_spiel/algorithms/maxn.h"
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/spiel.h"

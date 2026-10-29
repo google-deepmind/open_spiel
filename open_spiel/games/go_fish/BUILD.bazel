@@ -1,0 +1,38 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "go_fish",
+    srcs = ["go_fish.cc"],
+    hdrs = ["go_fish.h"],
+    copts = [
+        "-fexceptions",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "go_fish_test",
+    srcs = ["go_fish_test.cc"],
+    deps = [
+        ":go_fish",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:init",
+    ],
+)

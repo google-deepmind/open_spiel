@@ -1,0 +1,678 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "arena_ref",
+    testonly = True,
+    srcs = ["tests/arena_ref.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:chance",
+        "//open_spiel/python/scale/core:host_arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "checkpoint_bot",
+    srcs = ["checkpoint_bot.py"],
+    strict_deps = True,
+    deps = [
+        ":games",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "checkpoint_bot_helpers",
+    testonly = True,
+    srcs = ["tests/checkpoint_bot_helpers.py"],
+    strict_deps = True,
+    deps = [
+        ":checkpoint_bot",
+        ":helpers",
+        ":server",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "controller",
+    srcs = ["controller.py"],
+    strict_deps = True,
+    deps = [
+        ":checkpoint_bot",
+        ":games",
+        ":server",
+    ],
+)
+
+py_library(
+    name = "games",
+    srcs = ["games.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+    ],
+)
+
+py_library(
+    name = "helpers",
+    testonly = True,
+    srcs = ["tests/helpers.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/networks:helpers",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "host_agent",
+    srcs = ["host_agent.py"],
+    strict_deps = True,
+    deps = [
+        ":games",
+        ":replay",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/interop:host",
+        "//open_spiel/python/scale/policies:operators",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "remote_bot",
+    srcs = ["remote_bot.py"],
+    strict_deps = True,
+    deps = [
+        ":checkpoint_bot",
+        ":controller",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/ckpt:public",
+        "@py_deps//absl/logging",
+    ],
+)
+
+py_library(
+    name = "remote_bot_helpers",
+    testonly = True,
+    srcs = ["tests/remote_bot_helpers.py"],
+    strict_deps = True,
+    deps = [
+        ":games",
+        ":helpers",
+        ":remote_bot",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "replay",
+    srcs = ["replay.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "serve",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+    deps = [":server"],
+)
+
+py_library(
+    name = "serve_eval_checks",
+    testonly = True,
+    srcs = ["tests/serve_eval_checks.py"],
+    strict_deps = True,
+    deps = [
+        ":replay",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "serve_fixtures",
+    testonly = True,
+    srcs = ["tests/serve_fixtures.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "server",
+    srcs = ["server.py"],
+    strict_deps = True,
+    deps = [
+        ":games",
+        ":host_agent",
+        ":replay",
+        ":wire",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "wire",
+    srcs = ["wire.py"],
+    strict_deps = True,
+    deps = [
+        ":replay",
+        "//open_spiel/python/scale:registry",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "board_serve_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/board_serve_test.py"],
+    deps = [
+        ":games",
+        ":helpers",
+        ":host_agent",
+        ":replay",
+        ":wire",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:board_games",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "checkpoint_bot_long_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/checkpoint_bot_long_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":checkpoint_bot_helpers",
+        ":games",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "checkpoint_bot_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/checkpoint_bot_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":checkpoint_bot_helpers",
+        ":games",
+        ":helpers",
+        ":host_agent",
+        ":server",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/ckpt:public",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/testing:public_bucket",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "controller_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/controller_test.py"],
+    deps = [
+        ":controller",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+    ],
+)
+
+pytest_test(
+    name = "env_spec_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/env_spec_test.py"],
+    deps = [
+        ":helpers",
+        ":host_agent",
+        ":server",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "game_string_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/game_string_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+    ],
+)
+
+pytest_test(
+    name = "go_loa_dark_hex_serve_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/go_loa_dark_hex_serve_test.py"],
+    deps = [
+        ":games",
+        ":helpers",
+        ":host_agent",
+        ":replay",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "host_agent_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/host_agent_test.py"],
+    deps = [
+        ":helpers",
+        ":host_agent",
+        ":replay",
+        ":serve_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/belief:perfect_information",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/gin:reference_eval",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/policies:named_fns",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:search",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "imperfect_info_serve_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/imperfect_info_serve_test.py"],
+    deps = [
+        ":games",
+        ":helpers",
+        ":host_agent",
+        ":replay",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:host_arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:dark_hex",
+        "//open_spiel/python/scale/envs:phantom_ttt",
+        "//open_spiel/python/scale/envs:phantom_ttt_ir",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/sources:shards",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "remote_bot_http_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/remote_bot_http_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":remote_bot",
+        ":remote_bot_helpers",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "remote_bot_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/remote_bot_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":remote_bot",
+        ":remote_bot_helpers",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:public",
+        "//open_spiel/python/scale/testing:public_bucket",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "replay_bucket_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/replay_bucket_test.py"],
+    deps = [
+        ":checkpoint_bot_helpers",
+        ":games",
+        ":helpers",
+        ":host_agent",
+        ":replay",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "replay_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/replay_test.py"],
+    deps = [
+        ":replay",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs:phantom_ttt",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/leduc",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "serve_eval_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/serve_eval_test.py"],
+    deps = [
+        ":arena_ref",
+        ":helpers",
+        ":host_agent",
+        ":serve_eval_checks",
+        ":serve_fixtures",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "server_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/server_test.py"],
+    deps = [
+        ":helpers",
+        ":host_agent",
+        ":server",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs:tic_tac_toe",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "universal_poker_serve_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/universal_poker_serve_test.py"],
+    deps = [
+        ":games",
+        ":host_agent",
+        ":replay",
+        ":server",
+        ":wire",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs:universal_poker",
+        "//open_spiel/python/scale/networks:policy",
+        "//open_spiel/python/scale/testing:optional_pyspiel_games",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "wire_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/wire_test.py"],
+    deps = [
+        ":games",
+        ":replay",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:chance",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs/gin",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

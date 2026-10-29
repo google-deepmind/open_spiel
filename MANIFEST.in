@@ -8,6 +8,13 @@ include pybind11/CMakeLists.txt
 
 # open_spiel files, including source files for abseil and dds
 recursive-include open_spiel CMakeLists.txt *.cc *.cpp *.h *.hpp *.py evalHandTables
+# open_spiel CMake files that are not called CMakeLists.txt
+include open_spiel/targets.cmake
+include open_spiel/python/python_tests.cmake
+recursive-include open_spiel/cmake *.cmake
+
+# data files of the GUI server
+recursive-include open_spiel/python/gui *.json
 
 # abseil CMake files
 recursive-include open_spiel/abseil-cpp/CMake **
@@ -17,3 +24,7 @@ recursive-include open_spiel/abseil-cpp/ *.cmake *.inc
 recursive-include open_spiel/json
 recursive-include open_spiel/json/cmake **
 recursive-include open_spiel/json *.cmake *.inc *.in
+
+# The GUI's browser client is not part of the Python package, nor are the
+# npm packages a client build installs beside it.
+prune open_spiel/gui

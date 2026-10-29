@@ -1,0 +1,37 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "nine_mens_morris",
+    srcs = ["nine_mens_morris.cc"],
+    hdrs = ["nine_mens_morris.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/utils:tensor_view",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "nine_mens_morris_test",
+    srcs = ["nine_mens_morris_test.cc"],
+    deps = [
+        ":nine_mens_morris",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel:console_play_test",
+    ],
+)

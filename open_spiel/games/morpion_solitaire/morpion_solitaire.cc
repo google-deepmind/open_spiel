@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 
 namespace open_spiel {
 namespace morpion_solitaire {
@@ -336,6 +336,7 @@ void MorpionState::UndoAction(Player player, Action move) {
   board_[last_move.second.x * kNumRows + last_move.second.y] = 0;
   move_history_.pop_back();
   num_moves_ -= 1;
+  current_returns_ -= 1;
   history_.pop_back();
   --move_number_;
 }

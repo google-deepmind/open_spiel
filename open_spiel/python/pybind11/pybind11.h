@@ -23,19 +23,19 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/detail/common.h"
-#include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"  // IWYU pragma: keep
-#include "pybind11/include/pybind11/numpy.h"  // IWYU pragma: keep
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"  // IWYU pragma: keep
+#include "pybind11/cast.h"
+#include "pybind11/detail/common.h"
+#include "pybind11/detail/descr.h"
+#include "pybind11/functional.h"  // IWYU pragma: keep
+#include "pybind11/numpy.h"  // IWYU pragma: keep
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"  // IWYU pragma: keep
 
 namespace open_spiel {
 
@@ -203,20 +203,24 @@ class PyBot : public BotBase, public ::pybind11::trampoline_self_life_support {
 // This automatically adds:
 //   - Default constructor: def(py::init<>())
 //   - JSON string constructor: def(py::init<std::string>())
-//   - JSON object constructor: def(py::init<const nlohmann::json>())
 //   - Python dict constructor: def(py::init([](py::dict d) {...}))
+//   - JSON object constructor: def(py::init<const nlohmann::json>())
 template <typename StructType, typename BaseType>
 auto bind_spiel_struct(pybind11::module_& m, const char* name) {
   return pybind11::class_<StructType, BaseType>(m, name)
       .def(pybind11::init<>())
       .def(pybind11::init<std::string>())
-      .def(pybind11::init<const nlohmann::json>())
+      // The dict constructor is registered before the nlohmann::json one so
+      // that pybind11 picks it for Python dicts. Otherwise dicts go through
+      // the pybind11_json caster, which some builds (e.g. the macOS wheel)
+      // convert to a JSON number instead of an object.
       .def(pybind11::init([](pybind11::dict d) {
         // Convert Python dict to JSON string, then construct from that
         pybind11::module_ json_module = pybind11::module_::import("json");
         std::string json_str = json_module.attr("dumps")(d).cast<std::string>();
         return StructType(json_str);
-      }));
+      }))
+      .def(pybind11::init<const nlohmann::json>());
 }
 
 }  // namespace open_spiel

@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
+#include "absl/strings/ascii.h"
 #include "open_spiel/utils/status.h"
 
 // SGF spec here:

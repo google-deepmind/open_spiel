@@ -1,0 +1,237 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "alphazero_tic_tac_toe_lib",
+    srcs = ["alphazero_tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/configs:recipes",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:az",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "examples",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "jax_games_vs_openspiel_lib",
+    srcs = ["jax_games_vs_openspiel.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/jax/games:registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "mmd_kuhn_poker_lib",
+    srcs = ["mmd_kuhn_poker.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale:metrics",
+        "//open_spiel/python/scale/configs:recipes",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/eval:exploitability",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "play_checkpoints_lib",
+    srcs = ["play_checkpoints.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:chance",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:host_arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/eval:payoff",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/serve:games",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "ppo_tic_tac_toe_lib",
+    srcs = ["ppo_tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "quickstart_lib",
+    srcs = ["quickstart.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale:metrics",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/league:config_common",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "examples_test",
+    timeout = "long",
+    srcs = ["examples_test.py"],
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":play_checkpoints_lib",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)
+
+py_binary(
+    name = "alphazero_tic_tac_toe",
+    srcs = ["alphazero_tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        ":alphazero_tic_tac_toe_lib",
+        "//open_spiel/python/scale:runtime",
+    ],
+)
+
+py_binary(
+    name = "jax_games_vs_openspiel",
+    srcs = ["jax_games_vs_openspiel.py"],
+    strict_deps = True,
+    deps = [
+        ":jax_games_vs_openspiel_lib",
+    ],
+)
+
+py_binary(
+    name = "mmd_kuhn_poker",
+    srcs = ["mmd_kuhn_poker.py"],
+    strict_deps = True,
+    deps = [
+        ":mmd_kuhn_poker_lib",
+        "//open_spiel/python/scale:runtime",
+    ],
+)
+
+py_binary(
+    name = "play_checkpoints",
+    srcs = ["play_checkpoints.py"],
+    strict_deps = True,
+    deps = [
+        ":play_checkpoints_lib",
+        "//open_spiel/python/scale:runtime",
+    ],
+)
+
+py_binary(
+    name = "ppo_tic_tac_toe",
+    srcs = ["ppo_tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        ":ppo_tic_tac_toe_lib",
+        "//open_spiel/python/scale:runtime",
+    ],
+)
+
+py_binary(
+    name = "quickstart",
+    srcs = ["quickstart.py"],
+    strict_deps = True,
+    deps = [
+        ":quickstart_lib",
+        "//open_spiel/python/scale:runtime",
+    ],
+)

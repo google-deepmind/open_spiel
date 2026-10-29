@@ -1,0 +1,33 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "matching_pennies_3p",
+    srcs = ["matching_pennies_3p.cc"],
+    hdrs = ["matching_pennies_3p.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "matching_pennies_3p_test",
+    srcs = ["matching_pennies_3p_test.cc"],
+    deps = [
+        ":matching_pennies_3p",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

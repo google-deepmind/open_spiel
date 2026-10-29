@@ -100,6 +100,28 @@ class HeartsGameTest(absltest.TestCase):
             sort_keys=True)
     )
 
+  def test_received_cards_hidden_until_passing_ends(self):
+    game = pyspiel.load_game('hearts')
+    state = game.new_initial_state()
+    state.apply_action(3)  # Pass right
+    # Cards are dealt round-robin from North; card k ^ 2 has suit (k % 4) ^ 2,
+    # so North is dealt the hearts.
+    for k in range(52):
+      state.apply_action(k ^ 2)
+    for card in ['TH', '2H', '3H']:
+      state.apply_action(
+          next(a for a in state.legal_actions()
+               if state.action_to_string(a) == card))
+    # No player sees a received card until West completes the pass.
+    for _ in range(9):  # East, South and West pass.
+      for viewer in range(4):
+        self.assertEqual(state.to_observation_struct(viewer).received_cards,
+                         [[], [], [], []])
+      state.apply_action(state.legal_actions()[0])
+    west = state.to_observation_struct(3)
+    self.assertEqual(west.received_cards[3], ['2H', '3H', 'TH'])
+    self.assertEqual(west.received_cards[0], ['XX'] * 3)
+
   def test_struct_dict_constructor(self):
     """Test constructing structs from Python dicts."""
     game = pyspiel.load_game('hearts')

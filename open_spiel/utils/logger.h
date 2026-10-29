@@ -18,9 +18,9 @@
 #include <cstdio>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/strings/str_format.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 #include "open_spiel/utils/file.h"
 
 namespace open_spiel {

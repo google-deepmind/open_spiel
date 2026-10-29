@@ -350,3 +350,13 @@ else
        "Feel free to contribute the install for a new OS."
   exit 1
 fi
+
+# The CMake build needs CMake >= 3.21 (see open_spiel/CMakeLists.txt). Older
+# distributions ship an older version: `python3 -m pip install cmake` gets a
+# recent one.
+OPEN_SPIEL_MIN_CMAKE_VERSION="3.21"
+CMAKE_VERSION=$(cmake --version 2>/dev/null | head -n1 | sed -E 's/[^0-9]*([0-9.]+).*/\1/')
+if [[ -z "$CMAKE_VERSION" ]] || \
+   [[ "$(printf '%s\n' "$OPEN_SPIEL_MIN_CMAKE_VERSION" "$CMAKE_VERSION" | sort -V | head -n1)" != "$OPEN_SPIEL_MIN_CMAKE_VERSION" ]]; then
+  echo -e "\e[33m** Warning: CMake >= ${OPEN_SPIEL_MIN_CMAKE_VERSION} is required, found '${CMAKE_VERSION}'. Install a recent one, e.g. with 'python3 -m pip install cmake'.\e[0m"
+fi

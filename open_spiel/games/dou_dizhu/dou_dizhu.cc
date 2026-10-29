@@ -14,10 +14,11 @@
 
 #include "open_spiel/games/dou_dizhu/dou_dizhu.h"
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/algorithm/container.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
 #include "open_spiel/games/dou_dizhu/dou_dizhu_utils.h"
+#include "open_spiel/spiel_globals.h"
 
 namespace open_spiel {
 namespace dou_dizhu {
@@ -160,8 +161,13 @@ DouDizhuState::OriginalDeal() const {
     deal[((i - 1 + first_player_) % kNumPlayers)]
         [CardToRank(history_[i].action - kDealingActionBase)]++;
 
-  for (int i = 0; i < kNumCardsLeftOver; ++i)
-    deal[dizhu_][cards_left_over_[i]]++;
+  // If everybody passed during the auction there is no dizhu, so the
+  // left-over cards were never dealt to anybody. Indexing deal with
+  // kInvalidPlayer writes outside the array.
+  if (dizhu_ != kInvalidPlayer) {
+    for (int i = 0; i < kNumCardsLeftOver; ++i)
+      deal[dizhu_][cards_left_over_[i]]++;
+  }
   return deal;
 }
 

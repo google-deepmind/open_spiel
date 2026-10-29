@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_POLICY_ITERATION_H_
 #define OPEN_SPIEL_ALGORITHMS_POLICY_ITERATION_H_
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_map.h"
 #include "open_spiel/algorithms/get_all_states.h"
 #include "open_spiel/spiel.h"
 

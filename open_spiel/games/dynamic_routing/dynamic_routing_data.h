@@ -17,8 +17,8 @@
 
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/string_view.h"
 #include "open_spiel/games/dynamic_routing/dynamic_routing_utils.h"
 
 namespace open_spiel::dynamic_routing {

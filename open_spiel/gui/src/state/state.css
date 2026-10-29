@@ -1,0 +1,124 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* The State panel and the replay control. */
+
+/* A missing state text: a muted line, not an empty card. */
+.state-panel__missing {
+  margin: 0;
+  padding: 4px 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/*
+  The replay row: the buttons keep their size and glyphs on one line, the
+  slider takes what is left and gives it up first, and a very narrow panel
+  wraps the row.
+*/
+.replay {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  background: var(--color-surface-sunken);
+}
+
+.replay__button {
+  flex-shrink: 0;
+  min-width: 28px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 4px;
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-family: var(--font-family-monospace);
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.replay__button:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.replay__button:hover:not([aria-disabled='true']) {
+  background: var(--color-surface);
+}
+
+.replay__slider {
+  flex: 1 1 60px;
+  width: auto;
+  min-width: 0;
+  accent-color: var(--color-accent);
+}
+
+.replay__slider:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+/* Wide enough for "999 / 999", so the slider keeps its width as it moves. */
+.replay__count {
+  flex-shrink: 0;
+  min-width: 44px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.replay__skip-chance {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.replay__skip-chance:has(input:enabled):not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.replay__skip-chance:hover:has(input:enabled):not([aria-disabled='true']) {
+  color: var(--color-text);
+}
+
+.replay__skip-chance input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-accent);
+}
+
+.replay__skip-chance input:enabled:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+/* A State section: its text fills the pane, inside the group's inset. */
+.state-panel__section {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 14px 16px;
+}

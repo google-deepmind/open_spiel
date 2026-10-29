@@ -22,23 +22,23 @@
 
 // Interface code for using Python Games and States from C++.
 
-#include "open_spiel/abseil-cpp/absl/container/inlined_vector.h"
-#include "open_spiel/abseil-cpp/absl/strings/escaping.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/container/inlined_vector.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
+#include "pybind11_json/pybind11_json.hpp"
 
 namespace open_spiel {
 
@@ -351,10 +351,13 @@ std::vector<int> TensorShape(const TrackingVectorAllocator& allocator) {
 }  // namespace
 
 std::vector<int> PyGame::InformationStateTensorShape() const {
-  TrackingVectorAllocator allocator;
-  auto state = NewInitialState();
-  info_state_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
-  return TensorShape(allocator);
+  if (!information_state_tensor_shape_.has_value()) {
+    TrackingVectorAllocator allocator;
+    auto state = NewInitialState();
+    info_state_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
+    information_state_tensor_shape_ = TensorShape(allocator);
+  }
+  return *information_state_tensor_shape_;
 }
 
 void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
@@ -366,10 +369,13 @@ void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
 }
 
 std::vector<int> PyGame::ObservationTensorShape() const {
-  TrackingVectorAllocator allocator;
-  auto state = NewInitialState();
-  default_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
-  return TensorShape(allocator);
+  if (!observation_tensor_shape_.has_value()) {
+    TrackingVectorAllocator allocator;
+    auto state = NewInitialState();
+    default_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
+    observation_tensor_shape_ = TensorShape(allocator);
+  }
+  return *observation_tensor_shape_;
 }
 
 py::dict PyDict(const State& state) {

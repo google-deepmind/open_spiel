@@ -24,9 +24,9 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/memory/memory.h"
+#include "absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/crazyhouse/crazyhouse_board.h"
 #include "open_spiel/spiel.h"

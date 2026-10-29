@@ -17,8 +17,8 @@
 #include <functional>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 #include "open_spiel/game_transforms/repeated_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"

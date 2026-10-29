@@ -17,10 +17,10 @@
 #include <memory>
 #include <random>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/strings/str_cat.h"
+#include "absl/time/time.h"
 #include "open_spiel/examples/sbr_blotto/fictitious_play.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"

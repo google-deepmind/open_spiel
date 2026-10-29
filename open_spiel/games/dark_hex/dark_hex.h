@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/games/hex/hex.h"
 #include "open_spiel/spiel.h"
 

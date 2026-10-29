@@ -1,0 +1,44 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "rbc",
+    srcs = ["rbc.cc"],
+    hdrs = ["rbc.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/chess:chess_board",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "rbc_test",
+    srcs = ["rbc_test.cc"],
+    deps = [
+        ":rbc",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/chess:chess_board",
+    ],
+)

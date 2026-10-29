@@ -1,0 +1,62 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "bargaining",
+    srcs = [
+        "bargaining.cc",
+        "bargaining_instances1000.cc",
+    ],
+    hdrs = ["bargaining.h"],
+    copts = ["-fexceptions"],
+    data = ["bargaining_instances1000.txt"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+    ],
+    alwayslink = 1,
+)
+
+cc_binary(
+    name = "bargaining_instance_generator",
+    srcs = ["bargaining_instance_generator.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":bargaining",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_test(
+    name = "bargaining_test",
+    srcs = ["bargaining_test.cc"],
+    deps = [
+        ":bargaining",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:init",
+    ],
+)

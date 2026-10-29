@@ -173,6 +173,41 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
     for agent in agents:
       agent.step(time_step)
 
+  @parameterized.parameters("a2c", "qpg")
+  def test_copy_with_noise(self, loss_str):
+    agent = policy_gradient.PolicyGradient(
+        player_id=0,
+        info_state_size=8,
+        num_actions=3,
+        loss_str=loss_str,
+        hidden_layers_sizes=[8, 4],
+    )
+
+    with torch.no_grad():
+      for i, p in enumerate(agent._pi_network.parameters()):
+        p.fill_(i + 1)
+      for i, p in enumerate(agent._critic_network.parameters()):
+        p.fill_(i + 11)
+
+    clone = agent.copy_with_noise()
+    for key, value in agent.policy_logits_network.state_dict().items():
+      torch.testing.assert_close(
+          value, clone.policy_logits_network.state_dict()[key], rtol=0, atol=0
+      )
+    for key, value in agent._critic_network.state_dict().items():
+      torch.testing.assert_close(
+          value, clone._critic_network.state_dict()[key], rtol=0, atol=0
+      )
+
+    torch.manual_seed(SEED)
+    noisy = agent.copy_with_noise(sigma=0.1)
+    self.assertTrue(
+        any(
+            not torch.equal(src, dst)
+            for src, dst in zip(agent.get_weights(), noisy.get_weights())
+        )
+    )
+
   def test_loss_modes(self):
     loss_dict = {
         "qpg": rl_losses.BatchQPGLoss,

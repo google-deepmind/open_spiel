@@ -1,0 +1,145 @@
+# Description:
+#   Spiel games targets.
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+# Core games that we will use as a first step to major changes.
+cc_library(
+    name = "games",
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel/games/kuhn_poker",
+        "//open_spiel/games/matrix_games",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+# All the games officially supported by OpenSpiel.
+cc_library(
+    name = "all_games",
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    # When adding a new dependency to this list, please ensure that alwayslink = 1 is set in the new
+    # cc_library target. This is needed in order to get the REGISTER_SPIEL_GAME macro to work
+    # properly.
+    deps = [
+        # do not sort
+        ":games",
+        "//open_spiel/game_transforms",
+        "//open_spiel/games/amazons",
+        "//open_spiel/games/antichess",
+        "//open_spiel/games/banqi",
+        "//open_spiel/games/backgammon",
+        "//open_spiel/games/bargaining",
+        "//open_spiel/games/battleship",
+        "//open_spiel/games/blackjack",
+        "//open_spiel/games/blotto",
+        "//open_spiel/games/breakthrough",
+        "//open_spiel/games/bridge",
+        "//open_spiel/games/bridge:bridge_uncontested_bidding",
+        "//open_spiel/games/capture_the_flag",
+        "//open_spiel/games/catch",
+        "//open_spiel/games/checkers",
+        "//open_spiel/games/chess",
+        "//open_spiel/games/chinese_checkers",
+        "//open_spiel/games/cliff_walking",
+        "//open_spiel/games/clobber",
+        "//open_spiel/games/coin_game",
+        "//open_spiel/games/colored_trails",
+        "//open_spiel/games/connect_four",
+        "//open_spiel/games/coop_box_pushing",
+        "//open_spiel/games/coordinated_mp",
+        "//open_spiel/games/crazy_eights",
+        "//open_spiel/games/crazyhouse",
+        "//open_spiel/games/cribbage",
+        "//open_spiel/games/crossword",
+        "//open_spiel/games/cursor_go",
+        "//open_spiel/games/dark_chess",
+        "//open_spiel/games/dark_hex",
+        "//open_spiel/games/deep_sea",
+        "//open_spiel/games/dots_and_boxes",
+        "//open_spiel/games/dou_dizhu",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/einstein_wurfelt_nicht",
+        "//open_spiel/games/euchre",
+        "//open_spiel/games/first_sealed_auction",
+        "//open_spiel/games/gin_rummy",
+        "//open_spiel/games/go",
+        "//open_spiel/games/go_fish",
+        "//open_spiel/games/gomoku",
+        "//open_spiel/games/goofspiel",
+        "//open_spiel/games/havannah",
+        "//open_spiel/games/hearts",
+        "//open_spiel/games/hex",
+        "//open_spiel/games/hive",
+        "//open_spiel/games/kriegspiel",
+        "//open_spiel/games/laser_tag",
+        "//open_spiel/games/latent_ttt",
+        "//open_spiel/games/leduc_poker",
+        "//open_spiel/games/leduc_poker:repeated_leduc_poker",
+        "//open_spiel/games/lewis_signaling",
+        "//open_spiel/games/liars_dice",
+        "//open_spiel/games/lines_of_action",
+        "//open_spiel/games/maedn",
+        "//open_spiel/games/mancala",
+        "//open_spiel/games/markov_soccer",
+        "//open_spiel/games/matching_pennies_3p",
+        "//open_spiel/games/mfg:all_mfg_games",
+        "//open_spiel/games/mnk",
+        "//open_spiel/games/morpion_solitaire",
+        "//open_spiel/games/negotiation",
+        "//open_spiel/games/nfg_game",
+        "//open_spiel/games/nim",
+        "//open_spiel/games/nine_mens_morris",
+        "//open_spiel/games/oh_hell",
+        "//open_spiel/games/oshi_zumo",
+        "//open_spiel/games/othello",
+        "//open_spiel/games/oware",
+        "//open_spiel/games/pathfinding",
+        "//open_spiel/games/pentago",
+        "//open_spiel/games/phantom_go",
+        "//open_spiel/games/phantom_ttt",
+        "//open_spiel/games/pig",
+        "//open_spiel/games/quoridor",
+        "//open_spiel/games/rbc",
+        "//open_spiel/games/sheriff",
+        "//open_spiel/games/shogi",
+        "//open_spiel/games/skat",
+        "//open_spiel/games/snake",
+        "//open_spiel/games/social_deduction",
+        "//open_spiel/games/solitaire",
+        "//open_spiel/games/spades",
+        "//open_spiel/games/stones_and_gems",
+        "//open_spiel/games/tarok",
+        "//open_spiel/games/tiny_bridge",
+        "//open_spiel/games/tiny_hanabi",
+        "//open_spiel/games/trade_comm",
+        "//open_spiel/games/twenty_forty_eight:2048",
+        "//open_spiel/games/twixt",
+        "//open_spiel/games/ultimate_tic_tac_toe",
+        "//open_spiel/games/xiangqi",
+        "//open_spiel/games/y",
+        "//open_spiel/games/yacht",
+    ] + select({
+        "//open_spiel:build_with_acpc_enabled": [
+            "//open_spiel/games/universal_poker",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        "//open_spiel:build_with_hanabi_enabled": [
+            "//open_spiel/games/hanabi",
+        ],
+        "//conditions:default": [],
+    }),
+    alwayslink = 1,
+)

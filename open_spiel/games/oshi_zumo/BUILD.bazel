@@ -1,0 +1,32 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "oshi_zumo",
+    srcs = ["oshi_zumo.cc"],
+    hdrs = ["oshi_zumo.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "oshi_zumo_test",
+    srcs = ["oshi_zumo_test.cc"],
+    deps = [
+        ":oshi_zumo",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:get_all_states",
+    ],
+)

@@ -17,10 +17,10 @@
 
 #include <queue>
 
-#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/synchronization/mutex.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
+#include "absl/types/optional.h"
 
 namespace open_spiel {
 
