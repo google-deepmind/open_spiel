@@ -23,14 +23,11 @@ export interface Game {
   readonly entry: CatalogueEntry;
   /** The session the page shows, as `viewer` sees it. */
   readonly session: Session;
-  readonly viewer: Viewer;
-  /** Shows the session to `viewer`. */
-  readonly setViewer: (viewer: Viewer) => void;
   /**
-   * Shows the session to the seat `seat`, behind a screen that asks the
-   * person at the device to hand it over first.
+   * Who the page is shown to, for as long as it is open: the oracle in
+   * analysis, a seat or a spectator in a game (see bottom_seat.ts).
    */
-  readonly handOver: (seat: number) => void;
+  readonly viewer: Viewer;
 }
 
 /** The game of the page; provided by `GamePage`. */

@@ -73,6 +73,13 @@ export interface CopyableTextProps {
   readonly label: string;
   /** Further classes of the text's <pre>. */
   readonly className?: string;
+  /**
+   * 'compact': a card sized to a few lines (rewards, returns, a seat's
+   * message), with a smaller inset. Default: a card that fills its panel.
+   */
+  readonly variant?: 'fill' | 'compact';
+  /** The text's role: 'group' (default), or 'region' for a landmark. */
+  readonly role?: 'group' | 'region';
 }
 
 /**
@@ -84,13 +91,16 @@ export function CopyableText({
   text,
   label,
   className,
+  variant = 'fill',
+  role = 'group',
 }: CopyableTextProps): JSX.Element {
+  const compact = variant === 'compact';
   return (
-    <div className="copyable">
+    <div className={compact ? 'copyable copyable--compact' : 'copyable'}>
       <CopyButton text={text} />
       <pre
-        className={`copyable__text${className === undefined ? '' : ` ${className}`}`}
-        role="group"
+        className={`copyable__text${compact ? ' copyable__text--compact' : ''}${className === undefined ? '' : ` ${className}`}`}
+        role={role}
         tabIndex={0}
         aria-label={label}
       >
@@ -102,8 +112,8 @@ export function CopyableText({
 
 /**
  * Preformatted text in the same card as CopyableText, sized to its few
- * lines and with no copy button: rewards and returns, read rather than
- * copied.
+ * lines, with the same copy button in its top right corner: rewards and
+ * returns.
  */
 export function CompactText({
   text,
@@ -113,14 +123,5 @@ export function CompactText({
   /** The accessible name of the text. */
   readonly label: string;
 }): JSX.Element {
-  return (
-    <pre
-      className="copyable__text copyable__text--compact"
-      role="group"
-      tabIndex={0}
-      aria-label={label}
-    >
-      {text}
-    </pre>
-  );
+  return <CopyableText text={text} label={label} variant="compact" />;
 }

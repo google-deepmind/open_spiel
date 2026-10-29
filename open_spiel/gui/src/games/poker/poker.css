@@ -1,0 +1,959 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+.poker-gameplay {
+  display: grid;
+  /* The table's row is never shorter than the table: a minmax(300px, ...)
+       row shrank to its floor when the panel was short (a phone), and the
+       controls were drawn over the table's lower seat. The panel
+       scrolls instead. */
+  grid-template-rows: auto min-content auto minmax(96px, auto);
+  gap: 10px;
+  align-content: start;
+  height: 100%;
+  min-height: 0;
+  color: var(--poker-ink);
+  /* The table lays itself out by the panel's width, not the window's: a
+       docked panel on a laptop is as narrow as a phone. */
+  container: poker-gameplay / inline-size;
+}
+
+.poker-handbar {
+  display: flex;
+  flex-wrap: wrap;
+  /* Tight enough that the whole bar, showdown included, is one row in the
+       docked Gameplay panel at a 1440 px window. */
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  color: var(--poker-muted);
+  border: 1px solid var(--poker-handbar-border);
+  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    var(--poker-handbar-bg),
+    var(--poker-handbar-bg-2)
+  );
+}
+
+.poker-handbar__title {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  flex: 0 0 auto;
+}
+
+.poker-handbar__title strong {
+  color: var(--poker-ink);
+  font-size: 1rem;
+}
+
+.poker-handbar__title span,
+.poker-handbar__meta span {
+  padding: 4px 6px;
+  white-space: nowrap;
+  border: 1px solid var(--poker-span-border);
+  border-radius: 6px;
+  background: var(--poker-span-bg);
+}
+
+.poker-handbar__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  flex: 1 1 220px;
+  justify-content: center;
+}
+
+/* The street takes one width from Preflop to Showdown, so the bar keeps its
+   width when the hand reaches showdown and does not wrap there. */
+.poker-handbar__street {
+  display: inline-block;
+  min-width: 5.6em;
+  text-align: center;
+}
+
+.poker-new-hand {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding: 4px;
+  border: 1px solid var(--poker-span-border);
+  border-radius: 7px;
+  background: var(--poker-span-bg);
+}
+
+.poker-new-hand label {
+  color: var(--poker-muted);
+  font-size: 0.8rem;
+}
+
+.poker-new-hand select,
+.poker-new-hand button {
+  min-height: 28px;
+  color: var(--poker-ink);
+  border: 1px solid var(--poker-select-border);
+  border-radius: 6px;
+  background: var(--poker-select-bg);
+}
+
+.poker-new-hand select {
+  padding: 3px 7px;
+}
+
+.poker-new-hand button {
+  padding: 4px 9px;
+  font-weight: 700;
+}
+
+.poker-new-hand button:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.poker-new-hand button:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+.poker-table-stage {
+  position: relative;
+  justify-self: center;
+  width: min(100%, 660px);
+  min-height: 300px;
+  margin: 18px 0 48px;
+  aspect-ratio: 1.62;
+}
+
+/* Three or more seats put a seat at the top rail, whose hole cards stand
+   above the table: room for them below the hand bar. */
+.poker-table-stage--3,
+.poker-table-stage--4,
+.poker-table-stage--5,
+.poker-table-stage--6 {
+  margin-top: 52px;
+}
+
+.poker-table {
+  position: absolute;
+  inset: 7% 3%;
+  overflow: visible;
+  border: 12px solid var(--poker-rail);
+  border-radius: 50% / 42%;
+  background:
+    radial-gradient(
+      ellipse at 50% 43%,
+      var(--poker-table-bg),
+      var(--poker-table-bg-2) 26%
+    ),
+    radial-gradient(
+      ellipse at 50% 52%,
+      var(--poker-table-bg-3),
+      var(--poker-table-bg-2) 42%
+    ),
+    radial-gradient(
+      ellipse at center,
+      var(--poker-table-bg-4) 0%,
+      var(--poker-felt) 48%,
+      var(--poker-felt-dark) 100%
+    );
+  box-shadow:
+    inset 0 0 0 2px var(--poker-table-shadow),
+    inset 0 0 42px var(--poker-table-shadow-2),
+    0 18px 36px var(--poker-table-shadow-3);
+}
+
+.poker-table::before,
+.poker-table::after {
+  position: absolute;
+  content: '';
+  pointer-events: none;
+}
+
+.poker-table::before {
+  inset: 8px;
+  border: 2px solid var(--poker-span-border);
+  border-radius: inherit;
+}
+
+.poker-table::after {
+  inset: 18px 22px;
+  border: 1px solid var(--poker-table-border);
+  border-radius: inherit;
+}
+
+.poker-board {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  display: grid;
+  gap: 8px;
+  place-items: center;
+  width: min(340px, 50%);
+  transform: translate(-50%, -50%);
+}
+
+.poker-table--3 .poker-board,
+.poker-table--4 .poker-board,
+.poker-table--5 .poker-board,
+.poker-table--6 .poker-board {
+  width: min(300px, 44%);
+}
+
+.poker-board__cards,
+.poker-seat__cards {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.poker-pot {
+  display: inline-grid;
+  gap: 2px;
+  min-width: 84px;
+  padding: 5px 10px;
+  text-align: center;
+  border: 1px solid var(--poker-pot-border);
+  border-radius: 999px;
+  background: var(--poker-pot-bg);
+}
+
+.poker-pot span {
+  font-size: 0.75rem;
+  color: var(--poker-muted);
+  text-transform: uppercase;
+}
+
+.poker-pot strong {
+  font-size: 1rem;
+  color: var(--poker-accent);
+}
+
+.poker-table--terminal .poker-board {
+  gap: 6px;
+}
+
+.poker-card {
+  position: relative;
+  display: block;
+  width: clamp(34px, 4.5vw, 48px);
+  aspect-ratio: 0.72;
+  padding: 4px;
+  color: var(--poker-card-text);
+  font-family: ui-serif, Georgia, 'Times New Roman', serif;
+  font-weight: 900;
+  line-height: 1;
+  border: 1px solid var(--poker-card-border);
+  border-radius: 7px;
+  background:
+    linear-gradient(145deg, var(--poker-card-bg), var(--poker-card-bg-2)),
+    var(--poker-card-bg-3);
+  box-shadow:
+    0 4px 10px var(--poker-card-shadow),
+    inset 0 0 0 1px var(--poker-card-shadow-2);
+}
+
+.poker-card__corner {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: grid;
+  gap: 1px;
+  justify-items: center;
+  font-size: clamp(0.75rem, 1.1vw, 0.92rem);
+}
+
+.poker-card__corner--bottom {
+  right: 4px;
+  bottom: 4px;
+  top: auto;
+  left: auto;
+  transform: rotate(180deg);
+}
+
+.poker-card__pip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+  transform: translate(-50%, -50%);
+}
+
+.poker-card--red {
+  color: var(--poker-card-red-text);
+}
+
+/* The four-colour deck as the poker clients draw it (PokerStars, GGPoker):
+   spades black, hearts red, diamonds blue, clubs green. Spades were green
+   and clubs black, so a player who knows the deck read a spade as a club. */
+.poker-card--s {
+  color: var(--poker-card-text);
+}
+
+.poker-card--h {
+  color: var(--poker-card-h-text);
+}
+
+.poker-card--d {
+  color: var(--poker-card-d-text);
+}
+
+.poker-card--c {
+  color: var(--poker-card-c-text);
+}
+
+.poker-card--empty {
+  border-style: dashed;
+  background: var(--poker-card-empty-bg);
+  box-shadow: none;
+}
+
+/* One of the five cards that make the winning hand at showdown: raised and
+   outlined, the cue the poker clients give, so which cards play reads from
+   the still table. `translate`, not `transform`, so a deal or reveal that
+   ends at `transform: none` keeps the lift. The other cards are not dimmed. */
+.poker-card--plays {
+  translate: 0 -6px;
+  outline: 3px solid var(--poker-accent);
+  outline-offset: 1px;
+}
+
+/* Motion. Durations and delays come from usePokerMotion.ts as
+   --poker-flight-ms / --poker-delay-ms: the card library's motionDuration()
+   at the viewer's Animation speed. At Instant or under reduced motion no
+   motion class is set and the end state shows at once. Edge-on (rotateY 90)
+   hides a card before its turn; nothing fades. */
+.poker-card--deal {
+  animation: poker-card-deal var(--poker-flight-ms)
+    cubic-bezier(0.2, 0.8, 0.2, 1) var(--poker-delay-ms) both;
+}
+
+.poker-card--reveal {
+  animation: poker-card-reveal var(--poker-flight-ms)
+    cubic-bezier(0.2, 0.8, 0.2, 1) var(--poker-delay-ms) both;
+}
+
+@keyframes poker-card-deal {
+  from {
+    transform: translateY(-48px) rotateY(90deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes poker-card-reveal {
+  from {
+    transform: rotateY(90deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* A bet or call: a chip with the amount travels from the seat to the pot,
+   for the whole shared flight (--poker-flight-ms). Plain ease-out, not the
+   cards' cubic-bezier(.2, .8, .2, 1): that curve covers half a seat-to-pot
+   trip in the first two frames and nine tenths by the sixth, so a chip reads
+   at 60 fps as a 120 ms jump though it runs 240 ms. A card's short drop and
+   turn can take that curve; a chip crossing the table cannot. */
+.poker-chip-flight {
+  position: absolute;
+  z-index: 5;
+  min-width: 34px;
+  padding: 3px 8px;
+  color: var(--poker-action-dark);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  pointer-events: none;
+  border: 2px solid var(--poker-ink);
+  border-radius: 999px;
+  background: var(--poker-accent);
+  box-shadow: 0 2px 6px var(--poker-table-shadow-2);
+  transform: translate(-50%, -50%);
+  animation: poker-chip-travel var(--poker-flight-ms) ease-out
+    var(--poker-delay-ms, 0ms) both;
+}
+
+/* A chip waiting its turn (a later seat's, --poker-delay-ms) is not drawn
+   until it leaves: it shows the seat's action only when its turn comes. */
+@keyframes poker-chip-travel {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+  1% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(
+      calc(-50% + var(--chip-dx)),
+      calc(-50% + var(--chip-dy))
+    );
+  }
+}
+
+.poker-seat {
+  position: absolute;
+  top: var(--seat-y);
+  /* A plate never leaves the table: its centre is held half a plate in from
+       either side, so a seat drawn at the rail cannot run past the screen
+       edge and clip its BB chip. */
+  left: clamp(
+    calc(var(--seat-w) / 2),
+    var(--seat-x),
+    calc(100% - var(--seat-w) / 2)
+  );
+  display: grid;
+  gap: 5px;
+  justify-items: center;
+  --seat-w: clamp(126px, 14vw, 158px);
+  width: var(--seat-w);
+  transform: translate(-50%, -50%);
+}
+
+.poker-table--2 .poker-seat,
+.poker-table--3 .poker-seat,
+.poker-table--4 .poker-seat {
+  --seat-w: clamp(138px, 15vw, 166px);
+}
+
+.poker-table--5 .poker-seat,
+.poker-table--6 .poker-seat {
+  --seat-w: clamp(108px, 12vw, 132px);
+}
+
+.poker-table--5 .poker-card,
+.poker-table--6 .poker-card {
+  width: clamp(26px, 3vw, 34px);
+  padding: 3px;
+  border-radius: 5px;
+}
+
+.poker-table--5 .poker-board .poker-card,
+.poker-table--6 .poker-board .poker-card {
+  width: clamp(30px, 3.5vw, 40px);
+}
+
+.poker-card--compact .poker-card__corner {
+  font-size: 0.75rem;
+}
+
+.poker-card--compact .poker-card__pip {
+  font-size: 1.1rem;
+}
+
+.poker-table--5 .poker-seat__body,
+.poker-table--6 .poker-seat__body {
+  padding: 6px 7px;
+}
+
+.poker-table--5 .poker-seat__metrics,
+.poker-table--6 .poker-seat__metrics,
+.poker-table--5 .poker-seat__best,
+.poker-table--6 .poker-seat__best {
+  font-size: 0.75rem;
+}
+
+.poker-table--5 .poker-seat__best,
+.poker-table--6 .poker-seat__best {
+  display: none;
+}
+
+/* A folded seat is out of the hand: the word says so, and it has no rank. */
+.poker-seat__folded {
+  color: var(--poker-muted);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.poker-seat__body {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--poker-span-border);
+  border-radius: 8px;
+  background: var(--poker-seat-body-bg);
+  box-shadow: 0 8px 20px var(--poker-pot-bg);
+}
+
+.poker-seat--active .poker-seat__body {
+  border-color: var(--poker-seat-body-border);
+  box-shadow:
+    0 0 0 2px var(--poker-seat-body-shadow),
+    0 8px 20px var(--poker-pot-bg);
+}
+
+.poker-seat--winner .poker-seat__body {
+  border-color: var(--poker-seat-body-border-2);
+  box-shadow:
+    0 0 0 2px var(--poker-seat-body-shadow-2),
+    0 8px 20px var(--poker-pot-bg);
+}
+
+.poker-seat__name-row,
+.poker-seat__metrics {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.poker-seat__name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.poker-seat__badge {
+  flex: 0 0 auto;
+  min-width: 22px;
+  padding: 2px 5px;
+  color: var(--poker-seat-badge-text);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-align: center;
+  border-radius: 999px;
+  background: var(--poker-accent);
+}
+
+.poker-seat__metrics {
+  color: var(--poker-muted);
+  font-size: 0.78rem;
+}
+
+.poker-seat__best {
+  overflow: hidden;
+  color: var(--poker-seat-best-text);
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.poker-seat__return {
+  color: var(--poker-seat-return-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.poker-seat__return--positive {
+  color: var(--poker-seat-return-positive-text);
+}
+
+.poker-controls {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-self: center;
+  width: min(100%, 660px);
+  padding: 5px 7px;
+  border: 1px solid var(--poker-handbar-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      180deg,
+      var(--poker-controls-bg),
+      var(--poker-controls-bg-2)
+    ),
+    var(--poker-controls-bg-3);
+  box-shadow: 0 10px 22px var(--poker-table-shadow-3);
+}
+
+.poker-controls--terminal {
+  display: block;
+}
+
+.poker-terminal {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.poker-terminal strong {
+  color: var(--poker-accent);
+}
+
+.poker-controls__primary {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  align-self: stretch;
+}
+
+.poker-action,
+.poker-betbox__presets button {
+  min-height: 32px;
+  padding: 5px 12px;
+  color: var(--poker-action-text);
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-shadow: 0 1px 0 var(--poker-action-text-shadow);
+  border: 1px solid var(--poker-span-border);
+  border-radius: 4px;
+  background: linear-gradient(
+    180deg,
+    var(--poker-action-bg) 0%,
+    var(--poker-action-red) 47%,
+    var(--poker-action-red-dark) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 var(--poker-action-shadow),
+    0 1px 2px var(--poker-action-shadow-2);
+}
+
+.poker-action:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+/* Disabled is dashed and not-allowed on a neutral face, never faded
+   (PRINCIPLES 1): the red face is kept for a button that can be pressed. */
+.poker-action:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+  border-color: var(--poker-muted);
+  background: var(--poker-action-dark);
+}
+
+.poker-action--fold {
+  background: linear-gradient(
+    180deg,
+    var(--poker-action-fold-bg) 0%,
+    var(--poker-action-fold-bg-2) 48%,
+    var(--poker-action-fold-bg-3) 100%
+  );
+}
+
+.poker-action--call {
+  background: linear-gradient(
+    180deg,
+    var(--poker-action-bg) 0%,
+    var(--poker-action-red) 47%,
+    var(--poker-action-red-dark) 100%
+  );
+}
+
+.poker-action--bet {
+  min-width: 104px;
+  background: linear-gradient(
+    180deg,
+    var(--poker-action-bg) 0%,
+    var(--poker-action-red) 47%,
+    var(--poker-action-red-dark) 100%
+  );
+}
+
+.poker-betbox {
+  display: grid;
+  flex: 1 1 300px;
+  gap: 3px;
+  max-width: 360px;
+  padding: 4px 7px;
+  border: 1px solid var(--poker-handbar-border);
+  border-radius: 5px;
+  background: linear-gradient(
+    180deg,
+    var(--poker-betbox-bg),
+    var(--poker-betbox-bg-2)
+  );
+}
+
+.poker-betbox input[type='number'] {
+  width: 70px;
+  min-width: 0;
+  min-height: 24px;
+  padding: 3px 7px;
+  color: var(--poker-ink);
+  border: 1px solid var(--poker-select-border);
+  border-radius: 4px;
+  background: var(--poker-input-type-number-bg);
+}
+
+.poker-betbox__slider {
+  width: 100%;
+  height: 14px;
+}
+
+.poker-betbox__presets {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+  align-items: center;
+}
+
+.poker-betbox__presets button {
+  min-height: 24px;
+  padding: 3px 7px;
+  color: var(--poker-ink);
+  font-size: 0.75rem;
+  background: linear-gradient(
+    180deg,
+    var(--poker-button-bg) 0%,
+    var(--poker-action-dark) 100%
+  );
+}
+
+.poker-betbox__presets button:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+  border-color: var(--poker-muted);
+  background: var(--poker-action-dark);
+}
+
+.poker-betbox__hint {
+  color: var(--poker-betbox-hint-text);
+  font-size: 0.78rem;
+}
+
+/* Its own dark surface, like the hand bar: the text is the poker ink and
+   muted tokens (light), so a translucent tint would read 1.4:1 on the
+   light skin's page. */
+.poker-history {
+  min-height: 0;
+  overflow: auto;
+  padding: 9px 10px;
+  border: 1px solid var(--poker-handbar-border);
+  border-radius: 8px;
+  background: var(--poker-rail);
+}
+
+.poker-history h3 {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+}
+
+.poker-history p,
+.poker-history ol {
+  margin: 0;
+  color: var(--poker-muted);
+  font-size: 0.82rem;
+}
+
+/* One name column for every row: as wide as the longest plate name
+   ("player 1"), so a name never wraps and the actions line
+   up. A long display name ends in an ellipsis; the full name is its title. */
+.poker-history ol {
+  display: grid;
+  grid-template-columns: minmax(42px, max-content) minmax(0, 1fr);
+  gap: 3px 8px;
+  padding-left: 20px;
+}
+
+.poker-history li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+.poker-history li > span:first-child {
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.poker-error {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+}
+
+/* An error over the table, drawn over it so it never moves the board. */
+.poker-gameplay {
+  position: relative;
+}
+
+/* The board's sizes are border-box sizes, as on the page it was drawn for:
+   a control of width 100% keeps its padding and border inside the panel. */
+.poker-gameplay,
+.poker-gameplay *,
+.poker-gameplay *::before,
+.poker-gameplay *::after {
+  box-sizing: border-box;
+}
+
+.poker-notice {
+  position: absolute;
+  z-index: 5;
+  top: 8px;
+  right: 8px;
+  left: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--gin-fault-fill);
+  color: var(--gin-fault-text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .poker-gameplay {
+    /* The history scrolls inside itself, so an `auto` row let a short
+           panel squeeze it to a 16 px sliver; it keeps 96 px and the panel
+           scrolls to it. */
+    grid-template-rows: auto min-content auto minmax(96px, auto);
+  }
+}
+
+/* A phone, or a narrow docked panel. The table turns portrait and
+   each plate holds its hole cards beside it rather than above, so two plates
+   and the board stack top to bottom instead of overrunning the rail side by
+   side. */
+@container poker-gameplay (max-width: 560px) {
+  /* An explicit height, not an aspect ratio: the grid row sizes to the
+       stage's min-content, which ignores aspect-ratio, so the controls were
+       drawn over the bottom of a portrait table. */
+  .poker-table-stage {
+    width: 100%;
+    height: max(390px, 122cqi);
+    min-height: 0;
+    margin: 4px 0 8px;
+    aspect-ratio: auto;
+  }
+
+  .poker-table {
+    inset: 3% 2%;
+    border-width: 10px;
+    border-radius: 42% / 50%;
+  }
+
+  /* Heads-up only: two wide plates, cards beside them, top and bottom. */
+  .poker-table--2 .poker-seat {
+    --seat-w: min(236px, 72%);
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+  }
+
+  .poker-table--2 .poker-seat__cards {
+    gap: 3px;
+  }
+
+  /* 3-6 seats keep the oval's coordinates and cards-above plates, sized
+       so three fit across, and are held inside the table top to bottom as
+       well as side to side. */
+  .poker-table--3 .poker-seat,
+  .poker-table--4 .poker-seat {
+    --seat-w: min(128px, 36%);
+    --seat-h: 136px;
+  }
+
+  .poker-table--5 .poker-seat,
+  .poker-table--6 .poker-seat {
+    --seat-w: min(108px, 32%);
+    --seat-h: 112px;
+  }
+
+  .poker-table--3 .poker-seat,
+  .poker-table--4 .poker-seat,
+  .poker-table--5 .poker-seat,
+  .poker-table--6 .poker-seat {
+    top: clamp(
+      calc(var(--seat-h) / 2),
+      var(--seat-y),
+      calc(100% - var(--seat-h) / 2)
+    );
+  }
+
+  /* Four seats: the oval's left and right seats sat on the board of a
+       portrait table. They take the four corners instead, as the side seats
+       of six do, clockwise from top right. */
+  .poker-table--4 .poker-seat--0,
+  .poker-table--4 .poker-seat--3 {
+    top: 21%;
+  }
+
+  .poker-table--4 .poker-seat--1,
+  .poker-table--4 .poker-seat--2 {
+    top: 79%;
+  }
+
+  /* Five seats: the upper side seats sat on the board's ends; they move up
+       beside the top seat. */
+  .poker-table--5 .poker-seat--1,
+  .poker-table--5 .poker-seat--4 {
+    top: 24%;
+  }
+
+  /* The hand name made a corner plate tall enough to reach the board; the
+       showdown line under the table names the winner. */
+  .poker-table--4 .poker-seat__best {
+    display: none;
+  }
+
+  .poker-table--4 .poker-seat--0,
+  .poker-table--4 .poker-seat--1 {
+    left: calc(100% - var(--seat-w) / 2);
+  }
+
+  .poker-table--4 .poker-seat--2,
+  .poker-table--4 .poker-seat--3 {
+    left: calc(var(--seat-w) / 2);
+  }
+
+  /* Heads-up: the seat to act first sits across the table, the other at
+       the near rail (slot 0, the seated player's own seat in a game). */
+  .poker-table--2 .poker-seat--1 {
+    top: 16%;
+    left: 50%;
+  }
+
+  .poker-table--2 .poker-seat--0 {
+    top: 84%;
+    left: 50%;
+  }
+
+  .poker-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* In a column the betbox's 300 px flex basis was its HEIGHT: an empty
+       black box above the presets. */
+  .poker-betbox {
+    flex: 0 0 auto;
+    max-width: none;
+  }
+
+  .poker-betbox__presets input[type='number'] {
+    flex: 1 1 60px;
+  }
+}
+
+/* Actions › History on a poker table (PokerHistoryRenderer): the generic
+   History rows, in the table's words. */
+.poker-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.poker-history-list__empty,
+.poker-history-list__error {
+  margin: 0;
+  padding: 8px;
+  color: var(--color-text);
+}

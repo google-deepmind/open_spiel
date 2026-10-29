@@ -13,35 +13,61 @@
 // limitations under the License.
 import type {JSX} from 'react';
 
-import type {PanelGroupDefinition} from '../dock/panel_groups.ts';
+import type {
+  PanelGroupDefinition,
+  SectionDefinition,
+} from '../dock/panel_groups.ts';
 import {useGame} from '../game/game_context.ts';
+import {BOARD_VIEW_SECTIONS} from '../renderers/registry.ts';
 import {Perspective} from './perspective.tsx';
 
 import './view.css';
 
-// View › Perspective: whose view of the game the page shows.
+// View › Perspective: the seat the board is drawn from.
 function PerspectiveContent(): JSX.Element {
-  const {entry, session, viewer, setViewer} = useGame();
+  const {entry, session, viewer} = useGame();
   const numSeats = session.frame?.session.num_seats ?? entry.num_players;
   if (numSeats === null) {
     throw new Error(`${entry.name} is not loadable, so it has no seats.`);
   }
   return (
     <div className="view">
-      <Perspective viewer={viewer} numSeats={numSeats} onChange={setViewer} />
+      <Perspective viewer={viewer} numSeats={numSeats} />
     </div>
   );
 }
 
+// A board's own section, drawn only while that board draws the game: a
+// section that draws nothing has no tab.
+function boardSection(
+  renderer: string,
+  section: SectionDefinition,
+): SectionDefinition {
+  const {Content} = section;
+  function BoardContent(): JSX.Element | null {
+    const {session} = useGame();
+    const shown = session.frame?.presentation?.renderer ?? null;
+    return shown === renderer ? <Content /> : null;
+  }
+  return {...section, Content: BoardContent};
+}
+
+const BOARD_SECTIONS = BOARD_VIEW_SECTIONS.map(({renderer, section}) =>
+  boardSection(renderer, section),
+);
+
 /**
  * The View panel: how the game is shown, one section per inner tab. Board
- * display settings come first, should a board have any, then Perspective.
- * The page's theme is an app setting, in the header's Settings.
+ * display settings come first, should a board have any, then Perspective,
+ * then the board's Animation section, should it animate. The page's theme is
+ * an app setting, in the header's Settings.
  */
 export const VIEW_GROUP: PanelGroupDefinition = {
   id: 'view',
   title: 'View',
   sections: [
+    ...BOARD_SECTIONS.filter(section => !section.id.endsWith('_animation')),
     {id: 'perspective', title: 'Perspective', Content: PerspectiveContent},
+    ...BOARD_SECTIONS.filter(section => section.id.endsWith('_animation')),
   ],
 };

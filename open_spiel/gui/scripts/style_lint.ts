@@ -15,22 +15,35 @@
 // The style gate, `npm run lint:style`. It refuses the styling that makes
 // text hard to read or a colour impossible to theme:
 //
-// - opacity other than 1, the SVG paint opacities among it, and filters,
-//   which fade or tint content;
 // - a colour written anywhere but src/styles/tokens.css, the one place both
 //   themes define and the contrast check measures, `transparent` included;
 // - text under 12 px, and any text size it cannot evaluate, a token's
-//   included: a size given by a token is checked as each theme defines it;
-// - a disabled control styled by anything but its cursor and edge, which is
-//   how controls get greyed out;
+//   included: a size given by a token is checked as each theme defines it.
+//   A size computed by calc(), min(), max() or clamp() scales with the
+//   board (`max(12px, calc(var(--card-w) * 0.2))`) and is left to review,
+//   as written;
 // - a live control's style, its :enabled and :hover rules and its pointer
 //   cursor, on a selector that does not exclude [aria-disabled='true']: a
 //   control refusing presses while a request is in flight is enabled, and
-//   such a selector outranks base.css's disabled rule.
+//   such a selector outranks base.css's disabled rule;
+// - an accent edge: a one-sided border on the left or right (the physical
+//   or logical side, shorthand or longhand) wider than 1 px or in any colour
+//   but the neutral border tokens, and an inset box-shadow drawn as a side
+//   stripe. A coloured stripe down a notice, card or callout is the look the
+//   UI refuses: say a tone with the text, or draw a plain full border. A
+//   pseudo-element's edges draw icon glyphs (the copy icon's sheet, the
+//   check mark) and are left alone. So is a stripe a pseudo-element draws
+//   with its own width and background: this lint does not catch that one,
+//   so a clean lint is not proof there is none.
+//
+// Opacity, filters and how a disabled control looks are not refused: a
+// game board keeps its own faded controls, washed-out ghost cards and
+// hover filters. The lesson the gates keep is the one about text: the
+// contrast check (`npm run contrast`) measures every text colour.
 //
 // It reads every stylesheet under src/, the inline styles of index.html, and
 // in TypeScript the literal values of JSX `style` attributes, of the JSX
-// paint attributes (`fill`, `stroke`, `opacity` and the like), of assignments
+// paint attributes (`fill`, `stroke` and the like), of assignments
 // to `element.style` and of a canvas context's colour properties; a value
 // chosen by `?:`, `??`, `||` or `&&` is read branch by branch. It judges each
 // declaration alone, not how rules combine, so a hover rule that changes the
@@ -111,8 +124,6 @@ const NAMED_COLOURS = new Set(
 const HEX_COLOUR = /#[0-9a-f]{3,8}\b/i;
 const COLOUR_FUNCTION =
   /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i;
-const DISABLED_SELECTOR = /:disabled|\[disabled\]|\[aria-disabled\b/;
-const NEGATION = /:not\([^()]*\)/g;
 const LIVE_SELECTOR = /:enabled|:hover/;
 const NOT_ARIA_DISABLED = /:not\(\[aria-disabled=(['"])true\1\]\)/;
 const SMALL_FONT_KEYWORDS = new Set(['xx-small', 'x-small', 'smaller']);
@@ -143,7 +154,33 @@ const PX_PER_UNIT = new Map([
 ]);
 const FONT_SIZE = /^(\d*\.?\d+)([a-z]+|%)$/;
 const TOKEN_REFERENCE = /^var\(\s*(--[\w-]+)\s*(?:,\s*(.*))?\)$/s;
+// The unitless opacity properties, to which React appends no px.
 const OPACITY = /^(?:fill-|stroke-|stop-|flood-)?opacity$/;
+const MATH_FUNCTION = /^(?:calc|min|max|clamp)\(.*\)$/s;
+// A side edge: border-left, border-inline-start, border-right-color...
+const SIDE_EDGE =
+  /^border-(?:left|right|inline-start|inline-end)(?:-(width|color|style))?$/;
+// The colours a side edge may take: the neutral dividers'.
+const NEUTRAL_EDGE_COLOURS = new Set([
+  'var(--color-border)',
+  'var(--color-border-strong)',
+]);
+const EDGE_OFF = new Set(['0', '0px', 'none', 'hidden', 'initial', 'unset']);
+const BORDER_STYLES = new Set([
+  'solid',
+  'dashed',
+  'dotted',
+  'double',
+  'groove',
+  'ridge',
+  'inset',
+  'outset',
+]);
+const GLASS_MESSAGE =
+  'a glass blur (backdrop-filter) is refused; draw an opaque surface.';
+const ACCENT_EDGE_MESSAGE =
+  'an accent edge (a coloured or heavy stripe down one side) is refused;' +
+  ' say the tone with the text, or draw a plain 1px full border.';
 
 /**
  * `value` with strings and url() arguments blanked, and each var() reduced to
@@ -172,10 +209,11 @@ function colourProblem(value: string): string | null {
   return null;
 }
 
-// A size passes only once it is read and found large enough: a length in a
+// A size passes once it is read and found large enough: a length in a
 // known unit, a size keyword, or a token reference, read as each theme
-// defines the token and, if it has one, as its fallback. Anything else,
-// calc(), !important and an undefined token among them, is refused.
+// defines the token and, if it has one, as its fallback. A size computed by
+// calc(), min(), max() or clamp() passes unread. Anything else,
+// !important and an undefined token among them, is refused.
 function fontSizeProblem(
   value: string,
   tokens: Tokens,
@@ -202,6 +240,9 @@ function fontSizeProblem(
         .find(problem => problem !== null) ?? null
     );
   }
+  if (MATH_FUNCTION.test(size)) {
+    return null;
+  }
   const length = FONT_SIZE.exec(size);
   const pxPerUnit = PX_PER_UNIT.get(length?.[2] ?? '');
   const pixels =
@@ -221,28 +262,6 @@ function fontSizeProblem(
     );
   }
   return null;
-}
-
-// A disabled control says so with the not-allowed cursor and a dashed edge;
-// anything else it sets is how it gets greyed out.
-function disabledProblem({property, value, selectors}: Style): string | null {
-  const disabled = selectors.some(selector =>
-    DISABLED_SELECTOR.test(selector.replace(NEGATION, '')),
-  );
-  if (!disabled) {
-    return null;
-  }
-  const marks =
-    (property === 'cursor' && value === 'not-allowed') ||
-    property === 'border-style' ||
-    property === 'outline-style';
-  if (marks) {
-    return null;
-  }
-  return (
-    `a disabled control sets ${property}; it keeps full contrast and is` +
-    ' marked only by cursor: not-allowed and a dashed border or outline.'
-  );
 }
 
 /** The selectors of a comma-separated list, split outside parentheses. */
@@ -290,6 +309,76 @@ function liveProblem({property, value, selectors}: Style): string | null {
   );
 }
 
+/** The shadows of a box-shadow list, split on commas outside parentheses. */
+function shadowList(value: string): string[] {
+  return value.split(/,(?![^(]*\))/).map(shadow => shadow.trim());
+}
+
+/**
+ * Whether one shadow is an inset stripe down one side: inset, written first
+ * or last, with a horizontal offset and no vertical one
+ * (`inset 3px 0 0 var(--color-accent)`, `-3px 0 0 var(...) inset`).
+ */
+function sideStripe(shadow: string): boolean {
+  const words = shadow.split(/\s+(?![^(]*\))/);
+  if (!words.includes('inset')) return false;
+  const lengths = words.filter(word => /^-?\d*\.?\d+[a-z]*$/.test(word));
+  const [x = '0', y = '0'] = lengths;
+  const magnitude = (length: string): number =>
+    Number(/^-?\d*\.?\d+/.exec(length)?.[0] ?? '0');
+  return magnitude(x) !== 0 && magnitude(y) === 0;
+}
+
+/** Whether `width` is a length over 1 px, or one this cannot read. */
+function heavyEdge(width: string): boolean {
+  const length = /^(\d*\.?\d+)px$/.exec(width);
+  if (length !== null) return Number(length[1]) > 1;
+  return !['thin'].includes(width);
+}
+
+// A side edge wider than 1 px or in a colour other than the neutral
+// dividers', or an inset shadow drawn as a stripe down one side.
+function accentEdgeProblem({property, value, selectors}: Style): string | null {
+  if (selectors.some(selector => /::?(?:before|after)\b/.test(selector))) {
+    return null;
+  }
+  const bare = value.trim().toLowerCase();
+  if (property === 'box-shadow') {
+    return shadowList(bare).some(sideStripe) ? ACCENT_EDGE_MESSAGE : null;
+  }
+  const side = SIDE_EDGE.exec(property);
+  if (side === null || EDGE_OFF.has(bare)) {
+    return null;
+  }
+  const part = side[1];
+  if (part === 'style') return null;
+  if (part === 'width') return heavyEdge(bare) ? ACCENT_EDGE_MESSAGE : null;
+  if (part === 'color') {
+    return NEUTRAL_EDGE_COLOURS.has(bare) ? null : ACCENT_EDGE_MESSAGE;
+  }
+  // The shorthand: a width, a style and a colour, in any order.
+  const words = bare.split(/\s+(?![^(]*\))/);
+  const colours = words.filter(
+    word => !BORDER_STYLES.has(word) && !/^\d*\.?\d+[a-z]*$/.test(word),
+  );
+  const widths = words.filter(word => /^\d*\.?\d+[a-z]*$/.test(word));
+  if (widths.some(heavyEdge) || widths.length === 0) {
+    // CSS's default width is medium, 3 px.
+    return ACCENT_EDGE_MESSAGE;
+  }
+  return colours.length === 1 && NEUTRAL_EDGE_COLOURS.has(colours[0] ?? '')
+    ? null
+    : ACCENT_EDGE_MESSAGE;
+}
+
+// A frosted-glass panel: backdrop-filter, set to anything but none.
+function glassProblem({property, value}: Style): string | null {
+  return /^(?:-webkit-)?backdrop-filter$/.test(property) &&
+    !EDGE_OFF.has(value.trim().toLowerCase())
+    ? GLASS_MESSAGE
+    : null;
+}
+
 /** What is wrong with one declaration, if anything. */
 export function styleProblems(
   style: Style,
@@ -298,21 +387,10 @@ export function styleProblems(
 ): string[] {
   const {property, value} = style;
   const problems: Array<string | null> = [
-    disabledProblem(style),
     liveProblem(style),
+    accentEdgeProblem(style),
+    glassProblem(style),
   ];
-  if (OPACITY.test(property) && value !== '1') {
-    problems.push(
-      `${property} ${value} fades content; keep it at full contrast` +
-        ' and say what is different in words or with an outline.',
-    );
-  }
-  if (
-    (property === 'filter' || property === 'backdrop-filter') &&
-    value !== 'none'
-  ) {
-    problems.push(`${property} tints or blurs content; use a token colour.`);
-  }
   if (property === 'font' && value !== 'inherit') {
     problems.push(
       'set font-size and font-family apart, so the size is checked.',
@@ -370,11 +448,6 @@ const PAINT_ATTRIBUTES = new Set([
   'stop-color',
   'flood-color',
   'lighting-color',
-  'opacity',
-  'fill-opacity',
-  'stroke-opacity',
-  'stop-opacity',
-  'flood-opacity',
 ]);
 const CANVAS_COLOURS = new Set(['fillStyle', 'strokeStyle', 'shadowColor']);
 

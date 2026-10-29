@@ -137,6 +137,103 @@ void MeldTests() {
   SPIEL_CHECK_EQ(deadwood, 3);
 }
 
+// Cards laid off on a run extend it, so further cards may be laid off on the
+// same end, whatever the order of the previous layoffs.
+void ChainedLayoffTest() {
+  GinRummyUtils utils(kDefaultNumRanks, kDefaultNumSuits, kDefaultHandSize);
+  auto layoffs = [&utils](const std::vector<std::vector<std::string>>& melds,
+                          const std::vector<std::string>& previous) {
+    std::vector<int> meld_ids;
+    for (const auto& meld : melds) {
+      meld_ids.push_back(utils.MeldToInt(utils.CardStringsToCardInts(meld)));
+    }
+    return utils.CardIntsToCardStrings(
+        utils.AllLayoffs(meld_ids, utils.CardStringsToCardInts(previous)));
+  };
+  using Cards = std::vector<std::string>;
+  SPIEL_CHECK_EQ(layoffs({{"9c", "Tc", "Jc"}}, {}), (Cards{"8c", "Qc"}));
+  SPIEL_CHECK_EQ(layoffs({{"9c", "Tc", "Jc"}}, {"8c"}), (Cards{"7c", "Qc"}));
+  SPIEL_CHECK_EQ(layoffs({{"9c", "Tc", "Jc"}}, {"8c", "7c"}),
+                 (Cards{"6c", "Qc"}));
+  SPIEL_CHECK_EQ(layoffs({{"9c", "Tc", "Jc"}}, {"7c", "8c"}),
+                 (Cards{"6c", "Qc"}));
+  SPIEL_CHECK_EQ(layoffs({{"9c", "Tc", "Jc"}}, {"8c", "Qc", "7c", "Kc"}),
+                 (Cards{"6c"}));
+  SPIEL_CHECK_EQ(layoffs({{"As", "2s", "3s"}}, {"4s", "5s"}), (Cards{"6s"}));
+  SPIEL_CHECK_EQ(layoffs({{"Jh", "Qh", "Kh"}}, {"Th", "9h"}), (Cards{"8h"}));
+  // A card laid off on a set does not extend a run it does not touch.
+  SPIEL_CHECK_EQ(layoffs({{"2h", "3h", "4h"}, {"7s", "7c", "7d"}}, {"7h"}),
+                 (Cards{"Ah", "5h", "7h"}));
+}
+
+// The deadwood of a hand that must discard is minimized over the discard. The
+// best meld group of these eleven cards (2s-2d-2h, 4s-4c-4d and the run Ac-3c)
+// leaves Ad and Ah, one of which is discarded for 1 deadwood; discarding 3c
+// instead leaves gin.
+void MandatoryDiscardDeadwoodTest() {
+  GinRummyUtils utils(kDefaultNumRanks, kDefaultNumSuits, kDefaultHandSize);
+  VecInt hand = utils.CardStringsToCardInts(
+      {"2s", "4s", "Ac", "2c", "3c", "4c", "Ad", "2d", "4d", "Ah", "2h"});
+  SPIEL_CHECK_EQ(utils.MinDeadwood(hand), 0);
+  SPIEL_CHECK_EQ(utils.LegalDiscards(hand, 0),
+                 utils.CardStringsToCardInts({"3c"}));
+  absl::c_reverse(hand);
+  SPIEL_CHECK_EQ(utils.MinDeadwood(hand), 0);
+  // The discard is taken whenever the hand holds hand_size + 1 cards.
+  GinRummyUtils small(kDefaultNumRanks, kDefaultNumSuits, /*hand_size=*/3);
+  SPIEL_CHECK_EQ(small.MinDeadwood(utils.CardStringsToCardInts(
+                     {"As", "Ac", "Ad", "Ks"})),
+                 0);
+  SPIEL_CHECK_EQ(small.MinDeadwood(utils.CardStringsToCardInts(
+                     {"As", "5s", "9s"})),
+                 15);
+}
+
+void CheckLegalActionsAfter(const std::string& game_string,
+                            const std::vector<Action>& history,
+                            const std::vector<Action>& expected) {
+  std::shared_ptr<const Game> game = LoadGame(game_string);
+  std::unique_ptr<State> state = game->NewInitialState();
+  for (Action action : history) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), action));
+    state->ApplyAction(action);
+  }
+  SPIEL_CHECK_EQ(state->LegalActions(), expected);
+}
+
+// A knock is legal when the hand left after the best discard is within the
+// knock card, even if the best eleven-card meld group is not.
+void KnockAfterBestDiscardGameplayTest() {
+  // Knock card 3. Player 0 holds 2s, 2c-5c, 3d-5d, 2h, 3h and 5h. Discarding
+  // 5h leaves 2s-2c-2h, 3c-5c, 3d-5d and 3 deadwood, so Knock (55) is legal.
+  CheckLegalActionsAfter(
+      "gin_rummy(oklahoma=true)",
+      {28, 29, 17, 14, 24, 1,  25, 40, 43, 15, 44, 30, 48, 11, 16,
+       23, 39, 31, 34, 6,  41, 52, 25, 53, 32, 11, 53, 46, 24, 53,
+       9,  23, 53, 35, 35, 52, 16, 52, 46, 53, 18, 30, 52},
+      {1, 14, 15, 16, 17, 28, 29, 30, 40, 41, 43, 55});
+  // Knock card 0 (an ace upcard). Player 1 holds 2s-4s, Ac-3c, Ad, 2d and
+  // Ah-3h. Discarding 4s leaves three aces, four twos and three threes: gin.
+  CheckLegalActionsAfter(
+      "gin_rummy(oklahoma=true)",
+      {43, 23, 24, 28, 8,  44, 19, 14, 18, 50, 39, 15, 3,  5,  46, 26,
+       27, 45, 36, 51, 13, 54, 52, 51, 53, 41, 14, 52, 36, 53, 11, 23,
+       53, 1,  46, 53, 33, 33, 53, 2,  45, 52, 8,  53, 37, 37, 52, 41,
+       52, 5,  53, 47, 47, 53, 9,  9,  53, 42, 37, 53, 40},
+      {1, 2, 3, 13, 14, 15, 26, 27, 39, 40, 41, 55});
+}
+
+// The knocker lays the run 4s-6s; the defender lays off 7s, then 8s, and may
+// then lay off 9s (action 8).
+void ChainedLayoffGameplayTest() {
+  CheckLegalActionsAfter(
+      "gin_rummy(oklahoma=true)",
+      {34, 51, 17, 31, 6,  7,  42, 23, 36, 50, 15, 38, 4,   27,  48, 3,
+       19, 39, 5,  49, 37, 54, 54, 53, 12, 51, 53, 1,  38,  53,  8,  12,
+       53, 30, 30, 53, 47, 50, 52, 55, 19, 163, 124, 54, 6, 7},
+      {8, 47, 54});
+}
+
 // An extremely rare situation, but one that does arise in actual gameplay.
 // Tests both layoff and undercut functionality.
 void GameplayTest1() {
@@ -330,6 +427,114 @@ void GameplayTest3() {
   std::vector<double> returns = state->Returns();
   SPIEL_CHECK_EQ(returns[0], -27);
   SPIEL_CHECK_EQ(returns[1], 27);
+}
+
+// Deals the knocker's and defender's hands and the upcard, then has the
+// knocker draw the upcard, knock and discard. The knocker may sit in either
+// seat; if the knocker is player 1, player 0 passes on the first upcard.
+std::unique_ptr<State> DealAndKnock(const Game& game,
+                                    const GinRummyUtils& utils, Player knocker,
+                                    const std::vector<int>& knocker_cards,
+                                    const std::vector<int>& defender_cards,
+                                    const std::string& upcard,
+                                    const std::string& discard) {
+  std::unique_ptr<State> state = game.NewInitialState();
+  const std::vector<int>& seat0 = knocker == 0 ? knocker_cards : defender_cards;
+  const std::vector<int>& seat1 = knocker == 0 ? defender_cards : knocker_cards;
+  for (int card : seat0) state->ApplyAction(card);
+  for (int card : seat1) state->ApplyAction(card);
+  state->ApplyAction(utils.CardInt(upcard));
+  if (knocker == 1) state->ApplyAction(kPassAction);
+  state->ApplyAction(kDrawUpcardAction);
+  state->ApplyAction(kKnockAction);
+  state->ApplyAction(utils.CardInt(discard));
+  return state;
+}
+
+// When the knocker's deadwood equals the defender's, the defender wins an
+// undercut: the deadwood difference (zero) plus the undercut bonus.
+void EqualDeadwoodUndercutTest() {
+  GinRummyUtils utils = GinRummyUtils(kDefaultNumRanks, kDefaultNumSuits,
+                                      kDefaultHandSize);
+  auto meld_action = [&utils](const std::vector<std::string>& cards) {
+    return kMeldActionBase +
+           utils.MeldToInt(utils.CardStringsToCardInts(cards));
+  };
+  // After drawing the As and discarding the 2s, the knocker holds three rank
+  // melds and the As. The defender holds three runs and the Ah, and has
+  // nothing to lay off on the knocker's rank melds. Both end on 1 deadwood.
+  std::vector<int> knocker_cards = utils.CardStringsToCardInts(
+      {"2s", "5s", "6s", "7s", "5c", "6c", "7c", "5d", "6d", "7d"});
+  std::vector<int> defender_cards = utils.CardStringsToCardInts(
+      {"8s", "9s", "Ts", "8c", "9c", "Tc", "8d", "9d", "Td", "Ah"});
+  for (Player knocker : {0, 1}) {
+    Player defender = 1 - knocker;
+    for (int undercut_bonus : {kDefaultUndercutBonus, 0}) {
+      std::shared_ptr<const Game> game = LoadGame(
+          "gin_rummy", {{"undercut_bonus", GameParameter(undercut_bonus)}});
+      std::unique_ptr<State> state = DealAndKnock(
+          *game, utils, knocker, knocker_cards, defender_cards, "As", "2s");
+      state->ApplyAction(meld_action({"5s", "5c", "5d"}));
+      state->ApplyAction(meld_action({"6s", "6c", "6d"}));
+      state->ApplyAction(meld_action({"7s", "7c", "7d"}));
+      state->ApplyAction(kPassAction);
+      state->ApplyAction(kPassAction);  // No layoffs.
+      state->ApplyAction(meld_action({"8s", "9s", "Ts"}));
+      state->ApplyAction(meld_action({"8c", "9c", "Tc"}));
+      state->ApplyAction(meld_action({"8d", "9d", "Td"}));
+      state->ApplyAction(kPassAction);
+      SPIEL_CHECK_TRUE(state->IsTerminal());
+      const auto& gin_state = down_cast<const GinRummyState&>(*state);
+      SPIEL_CHECK_TRUE(gin_state.Knocked()[knocker]);
+      SPIEL_CHECK_EQ(gin_state.Deadwood()[knocker], 1);
+      SPIEL_CHECK_EQ(gin_state.Deadwood()[defender], 1);
+      std::vector<double> returns = state->Returns();
+      SPIEL_CHECK_EQ(returns[defender], undercut_bonus);
+      SPIEL_CHECK_EQ(returns[knocker], -undercut_bonus);
+    }
+  }
+}
+
+// A gin hand cannot be undercut, even when the defender also has no deadwood
+// and the gin bonus is 0.
+void GinCannotBeUndercutTest() {
+  GinRummyUtils utils = GinRummyUtils(kDefaultNumRanks, kDefaultNumSuits,
+                                      kDefaultHandSize);
+  auto meld_action = [&utils](const std::vector<std::string>& cards) {
+    return kMeldActionBase +
+           utils.MeldToInt(utils.CardStringsToCardInts(cards));
+  };
+  // After drawing the 8s and discarding the 2s, the knocker has gin. The
+  // defender's hand is also fully melded.
+  std::vector<int> knocker_cards = utils.CardStringsToCardInts(
+      {"2s", "5s", "6s", "7s", "5c", "6c", "7c", "5d", "6d", "7d"});
+  std::vector<int> defender_cards = utils.CardStringsToCardInts(
+      {"Ts", "Js", "Qs", "Ks", "Tc", "Jc", "Qc", "Td", "Jd", "Qd"});
+  for (Player knocker : {0, 1}) {
+    Player defender = 1 - knocker;
+    for (int gin_bonus : {kDefaultGinBonus, 0}) {
+      std::shared_ptr<const Game> game =
+          LoadGame("gin_rummy", {{"gin_bonus", GameParameter(gin_bonus)}});
+      std::unique_ptr<State> state = DealAndKnock(
+          *game, utils, knocker, knocker_cards, defender_cards, "8s", "2s");
+      state->ApplyAction(meld_action({"5s", "6s", "7s", "8s"}));
+      state->ApplyAction(meld_action({"5c", "6c", "7c"}));
+      state->ApplyAction(meld_action({"5d", "6d", "7d"}));
+      state->ApplyAction(kPassAction);
+      // No layoffs against gin; the defender lays melds directly.
+      state->ApplyAction(meld_action({"Ts", "Js", "Qs", "Ks"}));
+      state->ApplyAction(meld_action({"Tc", "Jc", "Qc"}));
+      state->ApplyAction(meld_action({"Td", "Jd", "Qd"}));
+      state->ApplyAction(kPassAction);
+      SPIEL_CHECK_TRUE(state->IsTerminal());
+      const auto& gin_state = down_cast<const GinRummyState&>(*state);
+      SPIEL_CHECK_EQ(gin_state.Deadwood()[knocker], 0);
+      SPIEL_CHECK_EQ(gin_state.Deadwood()[defender], 0);
+      std::vector<double> returns = state->Returns();
+      SPIEL_CHECK_EQ(returns[knocker], gin_bonus);
+      SPIEL_CHECK_EQ(returns[defender], -gin_bonus);
+    }
+  }
 }
 
 // Tests action on the 50th card, and tests that layoffs are not allowed when
@@ -737,9 +942,15 @@ void TestStructs() {
 int main(int argc, char** argv) {
   open_spiel::gin_rummy::BasicGameTests();
   open_spiel::gin_rummy::MeldTests();
+  open_spiel::gin_rummy::ChainedLayoffTest();
+  open_spiel::gin_rummy::MandatoryDiscardDeadwoodTest();
+  open_spiel::gin_rummy::KnockAfterBestDiscardGameplayTest();
+  open_spiel::gin_rummy::ChainedLayoffGameplayTest();
   open_spiel::gin_rummy::GameplayTest1();
   open_spiel::gin_rummy::GameplayTest2();
   open_spiel::gin_rummy::GameplayTest3();
+  open_spiel::gin_rummy::EqualDeadwoodUndercutTest();
+  open_spiel::gin_rummy::GinCannotBeUndercutTest();
   open_spiel::gin_rummy::MaxGameLengthTest();
   open_spiel::gin_rummy::WallTest();
   open_spiel::gin_rummy::OklahomaTest();

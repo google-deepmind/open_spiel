@@ -1,0 +1,573 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+.chess-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  /* The Gameplay panel pads the board; the board adds no padding. */
+  padding: 0;
+  color: var(--color-text);
+  background: var(--color-surface);
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.chess-panel__status {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.chess-panel__error {
+  color: var(--color-error-text);
+  font-size: 0.875rem;
+}
+
+.chess-board-wrapper {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.chess-board {
+  /* Component handles sizing internally */
+  width: 100%;
+  height: 100%;
+}
+
+.chess-board .cg-container {
+  container-type: inline-size;
+}
+
+/* Custom last move highlight color */
+.chess-board .cg-board .square.last-move {
+  background-color: var(--chess-last-move);
+}
+
+/* Custom check highlight */
+.chess-board .cg-board .square.check {
+  background: radial-gradient(
+    ellipse at center,
+    var(--chess-check-core) 0%,
+    var(--chess-check-edge) 40%,
+    var(--chess-check-clear) 70%
+  );
+}
+
+/* Move destination dots */
+.chess-board .cg-board .square.move-dest {
+  background: radial-gradient(
+    var(--chess-move-dest) 22%,
+    var(--chess-clear) 22%
+  );
+}
+
+/* Capture destination ring */
+.chess-board .cg-board .square.move-dest.oc {
+  background: radial-gradient(
+    var(--chess-clear) 0%,
+    var(--chess-clear) 80%,
+    var(--chess-capture-dest) 80%
+  );
+}
+
+/* Selected piece highlight */
+.chess-board .cg-board .square.selected {
+  background-color: var(--chess-selected);
+}
+
+/* Promotion dialog styles */
+.promotion-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--chess-promotion-overlay);
+  z-index: 100;
+}
+
+.promotion-overlay:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.promotion-choice {
+  position: absolute;
+  z-index: 101;
+  border: none;
+  padding: 0;
+  background: var(--chess-clear);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color calc(0.15s * var(--anim-scale, 1)) ease;
+}
+
+.promotion-choice:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.promotion-choice:not([aria-disabled='true']):hover {
+  background-color: var(--chess-promotion-hover);
+}
+
+.promotion-circle {
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: linear-gradient(
+    145deg,
+    var(--chess-promotion-light),
+    var(--chess-promotion-dark)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 6px var(--chess-promotion-shadow);
+  transition: transform calc(0.1s * var(--anim-scale, 1)) ease;
+}
+
+.promotion-choice:not([aria-disabled='true']):hover .promotion-circle {
+  transform: scale(1.05);
+}
+
+/* The promotion options draw the board's own pieces (chess_pieces.tsx). */
+.promotion-piece {
+  width: 80%;
+  height: 80%;
+}
+
+/* Board color themes: the squares drawn from the theme's two colours, a1
+   dark (the pattern is the same from either side). */
+.chess-board .cg-board {
+  background: repeating-conic-gradient(
+      var(--chess-square-dark) 0 25%,
+      var(--chess-square-light) 0 50%
+    )
+    0 0 / 25% 25%;
+}
+
+.chess-board.theme-brown {
+  --chess-square-light: var(--chess-brown-light);
+  --chess-square-dark: var(--chess-brown-dark);
+}
+
+/* Blue theme */
+.chess-board.theme-blue {
+  --chess-square-light: var(--chess-blue-light);
+  --chess-square-dark: var(--chess-blue-dark);
+}
+
+/* Green theme - Chess.com green */
+.chess-board.theme-green {
+  --chess-square-light: var(--chess-green-light);
+  --chess-square-dark: var(--chess-green-dark);
+}
+
+/* Board coordinates styling - position inside the board squares */
+.chess-board .coords {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 700;
+  font-size: clamp(12px, 1.8cqi, 14px);
+  text-shadow: none;
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* Files (a-h) - bottom row, bottom-left corner of each square */
+.chess-board .coords.files {
+  bottom: 2px;
+  left: 0;
+  height: 12.5%;
+  text-transform: lowercase;
+}
+
+.chess-board .coords.files .coord {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding-left: 2px;
+  line-height: 1;
+}
+
+/* Ranks (1-8) - right column, top-right corner of each square */
+.chess-board .coords.ranks {
+  right: 0;
+  left: auto;
+  top: 0;
+  width: 12.5%;
+}
+
+.chess-board .coords.ranks .coord {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-right: 2px;
+  padding-top: 2px;
+  transform: none;
+  line-height: 1;
+}
+
+/* Coordinate colors for each theme - alternating based on square color */
+/* White orientation: files odd=dark, even=light; ranks odd=light, even=dark */
+/* Black orientation: files odd=light, even=dark; ranks odd=dark, even=light */
+
+.chess-board.theme-brown .orientation-white .coords.files .coord:nth-child(odd),
+.chess-board.theme-brown
+  .orientation-white
+  .coords.ranks
+  .coord:nth-child(even),
+.chess-board.theme-brown
+  .orientation-black
+  .coords.files
+  .coord:nth-child(even),
+.chess-board.theme-brown
+  .orientation-black
+  .coords.ranks
+  .coord:nth-child(odd) {
+  color: var(--chess-brown-light);
+}
+.chess-board.theme-brown
+  .orientation-white
+  .coords.files
+  .coord:nth-child(even),
+.chess-board.theme-brown .orientation-white .coords.ranks .coord:nth-child(odd),
+.chess-board.theme-brown .orientation-black .coords.files .coord:nth-child(odd),
+.chess-board.theme-brown
+  .orientation-black
+  .coords.ranks
+  .coord:nth-child(even) {
+  color: var(--chess-brown-dark);
+}
+
+.chess-board.theme-blue .orientation-white .coords.files .coord:nth-child(odd),
+.chess-board.theme-blue .orientation-white .coords.ranks .coord:nth-child(even),
+.chess-board.theme-blue .orientation-black .coords.files .coord:nth-child(even),
+.chess-board.theme-blue .orientation-black .coords.ranks .coord:nth-child(odd) {
+  color: var(--chess-blue-light);
+}
+.chess-board.theme-blue .orientation-white .coords.files .coord:nth-child(even),
+.chess-board.theme-blue .orientation-white .coords.ranks .coord:nth-child(odd),
+.chess-board.theme-blue .orientation-black .coords.files .coord:nth-child(odd),
+.chess-board.theme-blue
+  .orientation-black
+  .coords.ranks
+  .coord:nth-child(even) {
+  color: var(--chess-blue-dark);
+}
+
+.chess-board.theme-green .orientation-white .coords.files .coord:nth-child(odd),
+.chess-board.theme-green
+  .orientation-white
+  .coords.ranks
+  .coord:nth-child(even),
+.chess-board.theme-green
+  .orientation-black
+  .coords.files
+  .coord:nth-child(even),
+.chess-board.theme-green
+  .orientation-black
+  .coords.ranks
+  .coord:nth-child(odd) {
+  color: var(--chess-green-light);
+}
+.chess-board.theme-green
+  .orientation-white
+  .coords.files
+  .coord:nth-child(even),
+.chess-board.theme-green .orientation-white .coords.ranks .coord:nth-child(odd),
+.chess-board.theme-green .orientation-black .coords.files .coord:nth-child(odd),
+.chess-board.theme-green
+  .orientation-black
+  .coords.ranks
+  .coord:nth-child(even) {
+  color: var(--chess-green-dark);
+}
+
+/* Chess history panel - two-column layout */
+.chess-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+  overflow-y: auto;
+}
+
+.chess-history-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+}
+
+.chess-history-row--header {
+  margin-bottom: 4px;
+}
+
+.chess-history-turn {
+  min-width: 28px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.chess-history-initial {
+  flex: 1;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: var(--chess-clear);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  text-align: left;
+  transition: background calc(0.15s * var(--anim-scale, 1)) ease;
+}
+
+.chess-history-initial:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.chess-history-initial:not([aria-disabled='true']):hover:not(:disabled) {
+  background: var(--color-accent-soft);
+}
+
+.chess-history-initial--current {
+  background: var(--chess-history-current-fill);
+  color: var(--chess-history-current-text);
+  font-weight: 600;
+}
+
+.chess-history-move {
+  flex: 1;
+  min-width: 48px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: var(--chess-clear);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-align: left;
+  transition:
+    background calc(0.15s * var(--anim-scale, 1)) ease,
+    color calc(0.15s * var(--anim-scale, 1)) ease;
+}
+
+.chess-history-move:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+button.chess-history-move:not([aria-disabled='true']):hover:not(:disabled) {
+  background: var(--color-accent-soft);
+}
+
+.chess-history-move--played {
+  color: var(--color-text-secondary);
+}
+
+.chess-history-move--current {
+  background: var(--chess-history-current-fill);
+  color: var(--chess-history-current-text);
+  font-weight: 600;
+}
+
+.chess-history-placeholder {
+  flex: 1;
+  min-width: 48px;
+}
+
+.chess-history-list--readonly .chess-history-move {
+  cursor: default;
+}
+
+/* Players' strips above and below the board (ChessPlayerStrip): who plays
+   each side, the pieces it has taken and its lead, and a quiet word on the
+   side to move. Full contrast, never dimmed; the strip keeps one height so
+   nothing moves when the turn passes. */
+.chess-board__strip {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.chess-strip {
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  gap: 0.75rem;
+  height: 2rem;
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.chess-strip__side {
+  flex: 0 0 auto;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* The name is the one thing that shortens when the strip is narrow:
+   the side, the pile, the lead and the turn word keep their width. */
+.chess-strip__name {
+  flex: 0 1 auto;
+  min-width: 0;
+  /* The side and its player read as one: closer than the strip's gap. */
+  margin-left: -0.35rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chess-strip__taken.cg-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--chess-pile-gap);
+  position: static;
+  /* The pile tightens to PILE_MAX_REM (pileStep, chessTable.ts) and keeps
+       that width; only a pile up five kinds of piece, which cannot fit even
+       at the tightest overlap, is clipped at the budget. */
+  flex: 0 0 auto;
+  max-width: var(--chess-pile-max);
+  overflow: hidden;
+}
+
+.chess-strip__group {
+  display: inline-flex;
+}
+
+.chess-board .chess-strip__taken.cg-wrap .piece {
+  position: static;
+  display: inline-block;
+  width: var(--chess-pile-piece);
+  height: var(--chess-pile-piece);
+  background-size: cover;
+  will-change: auto;
+  z-index: auto;
+}
+
+/* Taken pieces of one kind overlap, as a small pile does beside a board. */
+.chess-board .chess-strip__taken.cg-wrap .piece + .piece {
+  margin-left: calc(var(--chess-pile-step) - var(--chess-pile-piece));
+}
+
+.chess-strip__lead {
+  flex: 0 0 auto;
+  /* Beside the pile, as one group: the pile's own gap, not the strip's. */
+  margin-left: -0.45rem;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.chess-strip__turn {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--color-text);
+}
+
+.chess-panel__score {
+  color: var(--color-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.chess-history-figurine {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The piece glyph at the move text's own colour and weight, from a system
+   font that draws chess symbols solid; never a lighter fallback. */
+.chess-history-figurine__piece {
+  color: inherit;
+  font-family:
+    'Segoe UI Symbol', 'Noto Sans Symbols 2', 'DejaVu Sans', 'Apple Symbols',
+    sans-serif;
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+/* chess_board_kit.tsx: the status line and promotion choice a replacement
+   board draws (src/INTERFACES.md, "Replacing the chess board"). */
+.chess-kit-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.chess-kit-frame__space {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.chess-kit-frame__board {
+  position: relative;
+  flex: none;
+}
+
+.chess-kit-status {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.chess-kit-promotion {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chess-kit-promotion__choices {
+  position: relative;
+  z-index: 101;
+  display: flex;
+  gap: 4%;
+  width: 60%;
+}
+
+.chess-kit-promotion__choice {
+  flex: 1 1 0;
+  aspect-ratio: 1;
+  border: none;
+  padding: 0;
+  background: var(--chess-clear);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chess-kit-promotion__choice:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.chess-kit-promotion__choice:not([aria-disabled='true']):hover
+  .promotion-circle,
+.chess-kit-promotion__choice:not([aria-disabled='true']):focus-visible
+  .promotion-circle {
+  transform: scale(1.05);
+}

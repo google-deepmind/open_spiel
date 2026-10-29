@@ -65,6 +65,7 @@ _BUILTIN_MODULES = tuple(
         "bargaining",
         "universal_poker",
         "gin",
+        "gin_card_tokens",
         "board_games",
         "go",
         "lines_of_action",

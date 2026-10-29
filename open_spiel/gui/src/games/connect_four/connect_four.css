@@ -1,0 +1,148 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* Connect Four - Game-specific styles only */
+/* Generic styles (toolbar, buttons, panels, etc.) are in openSpielGeneric.css */
+
+/* Board Layout */
+.cf-board-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  min-height: 0;
+  padding: 16px 0 20px;
+  overflow: auto;
+}
+
+.cf-board-wrapper > * {
+  flex-shrink: 0;
+}
+
+.cf-board-container {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+/* Connect Four Board */
+.cf-board {
+  width: min(100%, 640px);
+  height: auto;
+  max-height: 100%;
+  /* Grid size comes from the game's rows/columns params (set inline by
+       ConnectFourGameplayPanel); the fallbacks are the engine defaults. */
+  aspect-ratio: var(--cf-columns, 7) / var(--cf-rows, 6);
+  display: grid;
+  grid-template-columns: repeat(var(--cf-columns, 7), 1fr);
+  grid-template-rows: repeat(var(--cf-rows, 6), 1fr);
+  gap: clamp(6px, 1.1vw, 12px);
+  padding: clamp(12px, 2vw, 20px);
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    var(--c4-board-top),
+    var(--c4-board-bottom)
+  );
+  margin: 0 auto;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--c4-board-edge),
+    0 18px 32px var(--c4-board-shadow);
+}
+
+.cf-board--interactive:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+/* Board Cells */
+.cf-cell {
+  position: relative;
+  border-radius: 999px;
+  border: 3px solid var(--c4-hole-rim);
+  background: var(--c4-hole);
+  transition:
+    transform calc(0.15s * var(--anim-scale, 1)) ease,
+    box-shadow calc(0.15s * var(--anim-scale, 1)) ease;
+  box-shadow: inset 0 4px 8px var(--c4-hole-shade);
+}
+
+.cf-cell--interactive:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.cf-cell--interactive:not([aria-disabled='true']):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px var(--c4-lift-shadow);
+}
+
+.cf-cell--player-one {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--c4-red-light),
+    var(--c4-red)
+  );
+  border-color: var(--c4-red-rim);
+  box-shadow: inset 0 6px 10px var(--c4-red-shade);
+}
+
+.cf-cell--player-two {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--c4-yellow-light),
+    var(--c4-yellow)
+  );
+  border-color: var(--c4-yellow-rim);
+  box-shadow: inset 0 6px 10px var(--c4-yellow-shade);
+}
+
+/* The disc the last move dropped falls from above the board into its hole
+   (--cf-drop-rows: the rows it falls, its own included), at the viewer's
+   Animation speed. */
+.cf-disc-drop {
+  position: absolute;
+  inset: -3px;
+  z-index: 1;
+  border-width: 3px;
+  border-style: solid;
+  border-radius: 999px;
+  animation: cf-disc-drop calc(0.35s * var(--anim-scale, 1)) ease-in both;
+}
+
+@keyframes cf-disc-drop {
+  from {
+    transform: translateY(calc(var(--cf-drop-rows, 1) * -115%));
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* The four (or more) that won, ringed once the game is over. */
+.cf-cell--winning {
+  box-shadow:
+    0 0 0 6px var(--c4-win-ring),
+    inset 0 6px 10px var(--c4-hole-shade);
+}

@@ -31,8 +31,11 @@ import enum
 from typing import Annotated, Literal
 
 # The contract's version, incremented on every change that breaks clients.
-ContractVersion = Literal[2]
-CONTRACT_VERSION: ContractVersion = 2
+ContractVersion = Literal[8]
+CONTRACT_VERSION: ContractVersion = 8
+
+# The most characters a seat's `SeatView.notice` holds.
+NOTICE_MAX_LENGTH = 200
 
 # The value of a game parameter or a controller setting.
 ParameterValue = bool | int | float | str
@@ -97,13 +100,34 @@ class SessionStatus(enum.StrEnum):
   Attributes:
     PLAYING: The game is in progress.
     PAUSED: A seat's controller failed; play resumes only after an undo, a
-      reset or a change of that seat's controller.
+      reset or a change of that seat's controller. A seat whose controller
+      could not be built (`SeatStatus.UNAVAILABLE`) resumes only after a
+      change of its controller.
     TERMINAL: The game is over.
   """
 
   PLAYING = "playing"
   PAUSED = "paused"
   TERMINAL = "terminal"
+
+
+class SeatStatus(enum.StrEnum):
+  """Whether a seat's controller is ready to play.
+
+  Attributes:
+    READY: The controller is built and plays the seat; a human seat is always
+      ready.
+    PREPARING: The server is building the controller, which can take a while
+      (a trained model loads and warms up). The seat does not move until it
+      is ready; then autoplay goes on.
+    UNAVAILABLE: The controller could not be built, or was not built within
+      the build budget. The seat has a `failure`, so the session is paused
+      until the seat is given a controller again.
+  """
+
+  READY = "ready"
+  PREPARING = "preparing"
+  UNAVAILABLE = "unavailable"
 
 
 class ChancePolicy(enum.StrEnum):
@@ -117,6 +141,26 @@ class ChancePolicy(enum.StrEnum):
 
   AUTO = "auto"
   EXPOSE = "expose"
+
+
+class MctsLimits(enum.StrEnum):
+  """How the served pyspiel's C++ MCTS (`pyspiel.MCTSBot`) bounds a search.
+
+  The server finds out once, at startup, and picks MCTS's limits by it.
+
+  Attributes:
+    SIMULATIONS_OR_CLOCK: A search stops at its simulation count or its
+      wall-clock time, whichever comes first. MCTS runs up to 10000
+      simulations, 1000 by default, with a wall-clock backstop a little
+      inside the move budget.
+    SIMULATIONS_ONLY: A wall-clock time replaces the simulation count rather
+      than bounding it. MCTS sets no wall-clock time, and its simulations are
+      capped at 250, which fits the move budget on the slowest catalogued
+      game.
+  """
+
+  SIMULATIONS_OR_CLOCK = "simulations_or_clock"
+  SIMULATIONS_ONLY = "simulations_only"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -165,7 +209,10 @@ class Controller:
     name: The stable identifier used in requests and in `SeatView.controller`.
     label: The human-readable name.
     config_schema: A JSON Schema object that a seat's `config` for this
-      controller must satisfy; `{}` when it takes no settings.
+      controller must satisfy; `{}` when it takes no settings. Each of its
+      `properties` gives a setting's `type`, `default` and constraints; a
+      setting listed in its `required` has no `default`, and a seat must be
+      given it.
     unavailable_reason: Why the controller cannot play the session's game;
       null when it can. A seat is never played by a controller with a
       reason.
@@ -204,6 +251,15 @@ class SeatView:
     autoplay: Whether the server plays the seat's moves as soon as it is to
       move, rather than on an advance request. Never true for a human seat.
     failure: Why the controller failed, or null while it plays.
+    status: Whether the controller is ready, being built, or could not be
+      built.
+    message: Why the seat is not ready, for every viewer: what the server is
+      doing while it is `preparing`, or why it is `unavailable`; null when it
+      is `ready`, and optional while it is `preparing`.
+    notice: The controller's short note about its latest choice, such as a
+      remote bot reporting something it recovered from; null when it gave
+      none. Only the seat's own viewer and omniscient viewers receive it. It
+      has no effect on play.
   """
 
   seat: int
@@ -211,11 +267,41 @@ class SeatView:
   config: dict[str, ParameterValue]
   autoplay: bool
   failure: ControllerFailure | None
+  status: SeatStatus = SeatStatus.READY
+  message: str | None = None
+  notice: str | None = None
 
   def __post_init__(self) -> None:
     require(
         not (self.autoplay and self.controller == HUMAN),
         f"Seat {self.seat} is human, so it cannot autoplay.",
+    )
+    require(
+        self.status == SeatStatus.READY or self.controller != HUMAN,
+        f"Seat {self.seat} is human, so it is always ready.",
+    )
+    require(
+        self.status != SeatStatus.READY or self.message is None,
+        f"Seat {self.seat} is ready, so it has no message.",
+    )
+    require(
+        self.status != SeatStatus.PREPARING or self.failure is None,
+        f"Seat {self.seat} is preparing, so it has not failed.",
+    )
+    require(
+        self.status != SeatStatus.UNAVAILABLE
+        or (self.failure is not None and self.message is not None),
+        f"Seat {self.seat} is unavailable, so it has a failure and a message.",
+    )
+    require(
+        self.notice is None
+        or (
+            self.controller != HUMAN
+            and bool(self.notice.strip())
+            and len(self.notice) <= NOTICE_MAX_LENGTH
+        ),
+        f"Seat {self.seat}'s notice is not a controller's non-blank text of "
+        f"at most {NOTICE_MAX_LENGTH} characters.",
     )
 
 
@@ -230,6 +316,38 @@ class Action:
 
   id: int
   label: str
+
+
+@dataclasses.dataclass(frozen=True)
+class ActionHint:
+  """What a game's adapter says about one legal action, for its renderer.
+
+  Attributes:
+    id: The legal action's OpenSpiel id.
+    hint: The adapter's description of the action, such as the card it plays
+      or the cells it joins.
+  """
+
+  id: int
+  hint: Json
+
+
+@dataclasses.dataclass(frozen=True)
+class Presentation:
+  """A position as the game's adapter presents it to one viewer.
+
+  Attributes:
+    renderer: The name of the client renderer that draws the view.
+    view: The adapter's view of the position, holding only what the viewer
+      may see.
+    actions: The adapter's hints for the legal actions, each naming an action
+      of the frame's `legal_actions` at most once; null exactly when the
+      frame's `legal_actions` is null.
+  """
+
+  renderer: str
+  view: Json
+  actions: tuple[ActionHint, ...] | None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -263,17 +381,25 @@ class HistoryEntry:
     label: The game's text for the action, or null when withheld.
     rewards: Each seat's reward for the action, in seat order, or null when
       withheld.
+    public_label: What every viewer may read of a withheld action, as the
+      game's adapter says, such as a card discarded face up; null when the
+      action is shown in full or wholly hidden.
   """
 
   seat: int | None
   action: int | None
   label: str | None
   rewards: tuple[float, ...] | None
+  public_label: str | None = None
 
   def __post_init__(self) -> None:
     require(
         (self.action is None) == (self.label is None) == (self.rewards is None),
         "A history entry withholds its action, label and rewards together.",
+    )
+    require(
+        self.public_label is None or self.action is None,
+        "Only a withheld history entry has a public label.",
     )
 
   @property
@@ -322,6 +448,24 @@ class SessionInfo:
         ),
         "A session offers the human controller.",
     )
+
+
+@dataclasses.dataclass(frozen=True)
+class SessionClosed:
+  """The answer to closing a session: the server has forgotten it.
+
+  Attributes:
+    contract_version: The contract version the answer was built against.
+    id: The id of the session closed.
+  """
+
+  contract_version: ContractVersion = dataclasses.field(
+      default=CONTRACT_VERSION, kw_only=True
+  )
+  id: str
+
+  def __post_init__(self) -> None:
+    require(bool(self.id), "A closed session has an id.")
 
 
 def to_json(value: object) -> JsonValue:

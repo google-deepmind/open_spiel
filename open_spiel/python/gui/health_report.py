@@ -22,7 +22,6 @@ import subprocess
 
 from open_spiel.python.gui import contract
 from open_spiel.python.gui import controllers
-from open_spiel.python.gui import gil_safety
 from open_spiel.python.gui import health
 
 # The version reported when OpenSpiel runs from a source tree, uninstalled.
@@ -35,18 +34,14 @@ _PACKAGE_PATH = pathlib.Path("open_spiel", "python", "gui")
 
 
 def build() -> health.Health:
-  """Returns the server's health report.
-
-  The first call probes whether search can play games written in Python,
-  which takes a few seconds; later calls reuse the answer.
-  """
+  """Returns the server's health report."""
   return health.Health(
       version=_version(),
       revision=_own_revision(),
       capabilities=health.Capabilities(
           controllers=controllers.registered(),
           chance_policies=tuple(contract.ChancePolicy),
-          python_game_search=gil_safety.python_games_are_safe(),
+          cpp_mcts_limits=controllers.mcts_limits(),
       ),
   )
 

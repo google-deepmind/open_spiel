@@ -42,14 +42,17 @@ Concepts:
   its own (a belief sampler "leduc", a slot factory "gin_mctx_pimc") is
   declared in `GameSpec.components`, which its registry consults
   (`component_module`).
-* `rules_sha(env)` is the rules identity of an env: a hash of the module that
-  implements the game's rules and of its EnvSpec.
+* `rules_sha(env)` is the rules identity of an env: a hash of the canonical
+  form of the module that implements the game's rules (its code, not its
+  docstrings, comments, formatting or the import name of its package) and
+  of its EnvSpec.
 * `register(spec, replace=True)` lets a plugin replace a game's spec (for
   example to change its default options); every replacement is logged.
 """
 
 from __future__ import annotations
 
+import ast
 import dataclasses
 import hashlib
 import importlib
@@ -66,7 +69,9 @@ from open_spiel.python.scale import registry as path_registry
 from open_spiel.python.scale.core import types
 
 ANY = object()  # serving: any value of this pyspiel parameter is accepted
-RULES_SHA_VERSION = 1  # the scheme version of rules_sha
+# The scheme version of rules_sha: 1 hashed the module's raw bytes, 2 its
+# canonical form (rules_source).
+RULES_SHA_VERSION = 2
 
 _JSON_SCALARS = (bool, int, float, str, type(None))
 
@@ -133,6 +138,14 @@ class GameSpec:
     pyspiel_history_to_raw: "module:attr" of
       fn(history: list[int], params: Mapping) -> list[int], the env's raw
       history for a pyspiel history; None means the two are equal.
+    raw_history_to_pyspiel: "module:attr" of
+      fn(raw: list[int], kwargs: Mapping) -> (params, order, seats) or
+      None, the inverse for a game with pyspiel_history_to_raw: the pyspiel
+      parameters of the game the raw history replays in, the raw indices
+      of pyspiel's history in its order (the entries pyspiel has no node
+      for left out), and the env seat of each pyspiel player; None when the
+      env's options have no pyspiel game. Unset (with pyspiel_history_to_raw
+      set), the env's histories are not replayed in pyspiel.
     covers: covers(trained_kwargs, other_kwargs) -> whether an artifact
       trained with the first options plays every deal of the second, for a
       game that is not served (a served game's ServingSpec.covers); None
@@ -154,6 +167,7 @@ class GameSpec:
   endgame: Optional[str] = None
   reference_evals: tuple[str, ...] = ()
   pyspiel_history_to_raw: Optional[str] = None
+  raw_history_to_pyspiel: Optional[str] = None
   covers: Optional[Callable[[Mapping[str, Any], Mapping[str, Any]], bool]] = (
       None
   )
@@ -163,7 +177,12 @@ class GameSpec:
   def __post_init__(self):
     if not isinstance(self.name, str) or not self.name:
       raise ValueError(f"a game name is a non-empty string, got {self.name!r}")
-    for field in ("ctor", "canon", "pyspiel_history_to_raw"):
+    for field in (
+        "ctor",
+        "canon",
+        "pyspiel_history_to_raw",
+        "raw_history_to_pyspiel",
+    ):
       v = getattr(self, field)
       if v is not None and (not isinstance(v, str) or ":" not in v):
         raise ValueError(
@@ -241,8 +260,8 @@ class EnvSpec:
     """
     return {"name": self.name, "kwargs": dict(self.kwargs)}
 
-  @staticmethod
-  def from_json(d: Mapping[str, Any]) -> "EnvSpec":
+  @classmethod
+  def from_json(cls, d: Mapping[str, Any]) -> "EnvSpec":
     """The EnvSpec of its JSON form.
 
     Args:
@@ -264,7 +283,7 @@ class EnvSpec:
       raise ValueError(
           f"{d!r} is not a canonical EnvSpec (canonical: {s.to_json()})"
       )
-    return s
+    return cls(s.name, s.kwargs)
 
 
 # -- option normalisers and serving maps of the shipped games
@@ -371,7 +390,6 @@ GIN_PYSPIEL_PARAMS = {
     "num_ranks": (13,),
     "num_suits": (4,),
     "oklahoma": (False, True),
-    "starting_player": (0, 1),
 }
 
 
@@ -814,6 +832,7 @@ BUILTIN = (
         endgame="gin_rummy.scripted_endgame",
         reference_evals=("gin_rummy.rule_bot",),
         pyspiel_history_to_raw=f"{_ENVS}.gin:pyspiel_history_to_raw",
+        raw_history_to_pyspiel=f"{_ENVS}.gin:raw_history_to_pyspiel",
         serving=_served(
             GIN_PYSPIEL_PARAMS,
             served_kwargs=gin_served_kwargs,
@@ -1425,45 +1444,176 @@ def check_serves(
     )
 
 
-_RULES_SHA_TAG = {"tag": f"rules/{RULES_SHA_VERSION}"}
+# How rules_sha reads the game's module: its canonical form (rules_source) or,
+# for a plugin whose recorded hashes predate it, its raw bytes.
+CANONICAL_SOURCE = "canonical"
+RAW_SOURCE = "raw"
+_RULES_SHA_TAG = {
+    "tag": f"rules/{RULES_SHA_VERSION}",
+    "source": CANONICAL_SOURCE,
+}
 
 
-def set_rules_sha_tag(tag: str) -> None:
+def set_rules_sha_tag(tag: str, *, source: str = CANONICAL_SOURCE) -> None:
   """Sets the domain-separation tag hashed first into every rules_sha.
 
   (default "rules/<RULES_SHA_VERSION>").
 
   The tag namespaces a deployment's rules hashes: two deployments with
   different tags never share a rules_sha. A plugin sets it once, at import,
-  before any rules_sha is computed.
+  before any rules_sha is computed. A plugin whose recorded hashes were
+  computed over the module's raw bytes (scheme 1) keeps them with
+  source=RAW_SOURCE.
 
   Args:
     tag: The tag (default "rules/<RULES_SHA_VERSION>").
+    source: CANONICAL_SOURCE (rules_source, the default) or RAW_SOURCE.
 
   Raises:
-    ValueError: The tag is not a non-empty string.
+    ValueError: The tag is not a non-empty string, or `source` is unknown.
   """
   if not isinstance(tag, str) or not tag:
     raise ValueError(f"a rules_sha tag is a non-empty string, got {tag!r}")
+  if source not in (CANONICAL_SOURCE, RAW_SOURCE):
+    raise ValueError(
+        f"rules_sha source is {CANONICAL_SOURCE!r} or {RAW_SOURCE!r}, got"
+        f" {source!r}"
+    )
   _RULES_SHA_TAG["tag"] = tag
+  _RULES_SHA_TAG["source"] = source
+
+
+def _package_roots() -> tuple[tuple[str, str], ...]:
+  """The import names a module's canonical form writes as placeholders.
+
+  Returns:
+    ((import name, placeholder), ...): the games package (deps.GAMES_PACKAGE)
+    and this framework's own package, each under whatever name it is
+    installed as.
+  """
+  framework = __name__.rsplit(".", 2)[0]  # <framework>.envs.registry
+  return ((deps.GAMES_PACKAGE, "<games>"), (framework, "<framework>"))
+
+
+def _canonical_name(name: str, roots: tuple[tuple[str, str], ...]) -> str:
+  """`name` with a leading package root replaced by its placeholder.
+
+  Args:
+    name: A dotted module name, or any string.
+    roots: _package_roots().
+
+  Returns:
+    The name.
+  """
+  for root, token in roots:
+    if name == root or name.startswith(root + "."):
+      return token + name[len(root) :]
+  return name
+
+
+def _canonical_dump(node: Any) -> str:
+  """A Python-version-stable dump of an AST.
+
+  Fields left empty (None or []) are skipped, so a field a newer Python
+  added and leaves empty (type_params, for example) changes nothing.
+
+  Args:
+    node: An AST node, a list of them, or a field value.
+
+  Returns:
+    The dump.
+  """
+  if isinstance(node, ast.AST):
+    fields = []
+    for name in node._fields:
+      v = getattr(node, name, None)
+      if v is None or (isinstance(v, list) and not v):
+        continue
+      fields.append(f"{name}={_canonical_dump(v)}")
+    return f"{type(node).__name__}({','.join(fields)})"
+  if isinstance(node, list):
+    return "[" + ",".join(_canonical_dump(x) for x in node) + "]"
+  return repr(node)
+
+
+def rules_source(text: str) -> str:
+  """The canonical form of a game module's source, which rules_sha hashes.
+
+  What the module does, not how it is written or where it is installed: the
+  module's AST without its docstrings (module, class and function), so
+  comments, formatting and quote style do not count; the import name of the
+  games package and of this framework written as placeholders, in imports
+  and in strings, so the module hashes the same under any import name (the
+  open-source export renames both); and the module-level imports as a
+  sorted list of single imports, so their order and grouping do not count.
+  Every other change to the code, a constant or a name included, changes
+  it.
+
+  Args:
+    text: The module's source.
+
+  Returns:
+    The canonical form.
+  """
+  roots = _package_roots()
+  tree = ast.parse(text)
+  for node in ast.walk(tree):
+    if isinstance(
+        node,
+        (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef),
+    ):
+      body = node.body
+      if (
+          body
+          and isinstance(body[0], ast.Expr)
+          and isinstance(body[0].value, ast.Constant)
+          and isinstance(body[0].value.value, str)
+      ):
+        node.body = body[1:] or [ast.Pass()]
+    elif isinstance(node, ast.Import):
+      for a in node.names:
+        a.name = _canonical_name(a.name, roots)
+    elif isinstance(node, ast.ImportFrom):
+      if node.module is not None and not node.level:
+        node.module = _canonical_name(node.module, roots)
+    elif isinstance(node, ast.Constant):
+      node.kind = None  # a u"" prefix
+      if isinstance(node.value, str):
+        for root, token in roots:
+          node.value = node.value.replace(root + ".", token + ".")
+  imports, rest = [], []
+  for stmt in tree.body:
+    if isinstance(stmt, ast.Import):
+      imports += [_canonical_dump(ast.Import(names=[a])) for a in stmt.names]
+    elif isinstance(stmt, ast.ImportFrom):
+      imports += [
+          _canonical_dump(
+              ast.ImportFrom(module=stmt.module, names=[a], level=stmt.level)
+          )
+          for a in stmt.names
+      ]
+    else:
+      rest.append(stmt)
+  return "\n".join(sorted(imports) + [_canonical_dump(rest)])
 
 
 def rules_sha(env: types.Env) -> str:
   """The rules identity of an env.
 
-  Sha256 over the scheme tag, the source of the module that defines its game
-  (env.game) and its canonical EnvSpec, so variants of one module (standard
-  and Oklahoma gin) differ. An env that declares its rules identity
-  (`declared_rules_sha`, a sha256 hex) gets that one, and a stub env
-  (envs.stub) the one it was given.
+  Sha256 over the scheme tag, the canonical form of the module that defines
+  its game (env.game; rules_source) and its canonical EnvSpec, so variants of
+  one module (standard and Oklahoma gin) differ. An env that declares its
+  rules identity (`declared_rules_sha`, a sha256 hex) gets that one, and a
+  stub env (envs.stub) the one it was given.
 
-  The hash is over the raw bytes of the module that defines the game class,
-  so it is both too sensitive and too narrow: any edit to that file (a
-  comment, a reformat, a licence header) changes every artifact's rules
-  identity, while a rules change in another module of the engine (a helper
-  the game calls) leaves it unchanged. An engine that wants a stable,
-  complete identity declares it with `declared_rules_sha` (a versioned
-  description of its rules, as envs.bridge does).
+  The canonical form ignores docstrings, comments, formatting, import order
+  and the packages' import names, so the open-source export (which renames
+  the packages and reformats) and an edit to the module's prose keep every
+  artifact's rules identity, while any change to the code changes it. It is
+  still narrow: a rules change in another module of the engine (a helper the
+  game calls) leaves it unchanged. An engine that wants a complete identity
+  declares it with `declared_rules_sha` (a versioned description of its
+  rules, as envs.bridge does).
 
   Args:
     env: The env.
@@ -1498,7 +1648,11 @@ def rules_sha(env: types.Env) -> str:
         f"{type(env).__name__} has no `game` attribute to read rules from"
     )
   with open(inspect.getsourcefile(type(g)), "rb") as f:
-    src = hashlib.sha256(f.read()).hexdigest()
+    raw = f.read()
+  if _RULES_SHA_TAG["source"] == RAW_SOURCE:
+    src = hashlib.sha256(raw).hexdigest()
+  else:
+    src = hashlib.sha256(rules_source(raw.decode("utf-8")).encode()).hexdigest()
   h = hashlib.sha256()
   for part in (_RULES_SHA_TAG["tag"], src, spec_of(env).key()):
     h.update(part.encode())

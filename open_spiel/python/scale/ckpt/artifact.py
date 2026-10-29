@@ -60,7 +60,10 @@ Invariants:
     validates the keys it has registered and keeps the others as they are.
   * A policy whose spec says `publishable=False` (a training-only behaviour
     wrapper) is refused.
-  * Paths are local or gs://; `norm_path` keeps the scheme.
+  * Paths are local, gs:// or a public Cloud Storage HTTPS URL (ckpt.public);
+    `norm_path` keeps the scheme. A public URL, and gs:// without Google
+    credentials, is read anonymously into a local cache (`ckpt.public`); a
+    public URL is read-only.
 """
 
 from __future__ import annotations
@@ -78,6 +81,7 @@ from open_spiel.python.scale import plugins
 from open_spiel.python.scale.ckpt import codecs
 from open_spiel.python.scale.ckpt import formats
 from open_spiel.python.scale.ckpt import provenance as provenance_lib
+from open_spiel.python.scale.ckpt import public
 from open_spiel.python.scale.ckpt import records
 from open_spiel.python.scale.core import frameworks
 from open_spiel.python.scale.core import types
@@ -131,22 +135,24 @@ def _assert_x64(where: str) -> None:
 def norm_path(path: str) -> str:
   """A checkpoint path, normalised.
 
-  gs://bucket/a/b (scheme kept, duplicate and trailing slashes dropped) or an
-  absolute local path.
+  gs://bucket/a/b or <public.ENDPOINT>/bucket/a/b (scheme kept,
+  duplicate and trailing slashes dropped) or an absolute local path.
 
   Args:
-    path: a local or gs:// path.
+    path: a local, gs:// or public Cloud Storage HTTPS path.
 
   Returns:
     The normalised path.
 
   Raises:
-    ValueError: for an empty path, a gs:// path without a bucket, or another
-      URL scheme.
+    ValueError: for an empty path, a gs:// or public URL without a bucket, or
+      another URL scheme.
   """
   path = str(path)
   if not path:
     raise ValueError("empty checkpoint path")
+  if public.is_https(path):
+    return public.norm_https(path)
   if path.startswith(GCS_PREFIX):
     rest = posixpath.normpath(path[len(GCS_PREFIX) :]).lstrip("/")
     if not rest or rest == ".":
@@ -154,7 +160,8 @@ def norm_path(path: str) -> str:
     return GCS_PREFIX + rest
   if "://" in path:
     raise ValueError(
-        f"unsupported checkpoint path scheme: {path!r} (local or gs://)"
+        f"unsupported checkpoint path scheme: {path!r} (local, gs:// or "
+        f"{public.ENDPOINT}/<bucket>/<path>)"
     )
   return os.path.abspath(path)
 
@@ -167,8 +174,18 @@ def ckpt_root(path: str) -> epath.Path:
 
   Returns:
     The etils path.
+
+  Raises:
+    ValueError: `path` is a public HTTPS URL (read through `_read_path`, never
+      opened directly, and read-only).
   """
-  return epath.Path(norm_path(path))
+  path = norm_path(path)
+  if public.is_https(path):
+    raise ValueError(
+        f"{path} is a public URL: it is read-only, and read through "
+        "load_artifact, load_manifest, steps or exists"
+    )
+  return epath.Path(path)
 
 
 def atomic_write(path: epath.Path, data: bytes) -> None:
@@ -465,6 +482,17 @@ class NativeFormat:
         c.name.isdigit() and (c / MANIFEST_FILENAME).exists()
         for c in root.iterdir()
     )
+
+  def steps(self, ckpt_dir: str) -> tuple[int, ...]:
+    """The steps `ckpt_dir` holds in the native format, ascending.
+
+    Args:
+      ckpt_dir: the checkpoint dir.
+
+    Returns:
+      The steps.
+    """
+    return _digit_steps(ckpt_dir, self.detect)
 
   def _read(self, ckpt_dir: str, step: int) -> dict[str, Any]:
     """The manifest.json of `step`.
@@ -852,6 +880,25 @@ def write_artifact(
   return formats.writer().write(ckpt_dir, int(step), policy, params, manifest)
 
 
+def _read_path(path: str, step: Optional[int] = None) -> str:
+  """The path the formats read for `path`@`step` (`ckpt.public.readable`).
+
+  A public HTTPS URL, or gs:// without Google credentials, is copied into the
+  local cache and its copy returned; any other path is returned as given.
+
+  Args:
+    path: the checkpoint dir.
+    step: the step being read, or None.
+
+  Returns:
+    The path to read.
+  """
+  p = str(path)
+  if public.is_https(p) or p.startswith(GCS_PREFIX):
+    return public.readable(norm_path(p), step)
+  return path
+
+
 def _format_of(path: str, step: int) -> formats.ArtifactFormat:
   """The format of the artifact at `path`@`step`.
 
@@ -893,6 +940,7 @@ def load_manifest(
     ArtifactError: the manifest or the params fail validation.
   """
   _assert_x64("load_manifest")
+  path = _read_path(path, step)
   return _format_of(path, step).load_manifest(path, step, verify=verify)
 
 
@@ -915,7 +963,76 @@ def load_artifact(
       with it, or (with `verify`) the params do not match their digest.
   """
   _assert_x64("load_artifact")
-  return _format_of(path, step).load_artifact(path, step, verify=verify)
+  read = _read_path(path, step)
+  art = _format_of(read, step).load_artifact(read, step, verify=verify)
+  if read is not path:
+    art = art._replace(path=norm_path(path))
+  return art
+
+
+def _digit_steps(
+    path: str, detect: Callable[[str, int], bool]
+) -> tuple[int, ...]:
+  """The digit-named entries of `path` that `detect(path, step)` accepts.
+
+  Args:
+    path: The checkpoint directory.
+    detect: fn(path, step) -> whether the step is there.
+
+  Returns:
+    The accepted steps, ascending.
+  """
+  root = ckpt_root(path)
+  if not root.exists():
+    return ()
+  return tuple(
+      sorted(
+          int(c.name)
+          for c in root.iterdir()
+          if c.name.isdigit() and detect(path, int(c.name))
+      )
+  )
+
+
+def steps(path: str) -> tuple[int, ...]:
+  """Every step `path` holds, in any format, ascending.
+
+  A format's own `steps`, else its digit-named entries that it detects.
+
+  Args:
+    path: the checkpoint dir.
+
+  Returns:
+    The steps.
+  """
+  _load_plugins()
+  path = _read_path(path)
+  found = set()
+  for f in formats.in_order():
+    fn = getattr(f, "steps", None)
+    found.update(
+        int(s)
+        for s in (fn(path) if fn is not None else _digit_steps(path, f.detect))
+    )
+  return tuple(sorted(found))
+
+
+def latest_step(path: str) -> int:
+  """The largest step `path` holds, in any format.
+
+  Args:
+    path: the checkpoint dir.
+
+  Returns:
+    The step.
+
+  Raises:
+    FileNotFoundError: `path` holds no step.
+  """
+  held = steps(path)
+  if not held:
+    raise FileNotFoundError(f"no artifact step under {path}")
+  return held[-1]
 
 
 def exists(path: str, step: Optional[int] = None) -> bool:
@@ -931,6 +1048,7 @@ def exists(path: str, step: Optional[int] = None) -> bool:
     True when it does.
   """
   _load_plugins()
+  path = _read_path(path)  # a step's top-level files tell whether it is there
   if step is None:
     return any(f.has_any(path) for f in formats.in_order())
   return formats.detect(path, int(step)) is not None

@@ -184,6 +184,10 @@ class CatalogueEntry:
       loadable.
     controllers: The `Controller.name`s that can play the game with its
       default parameters; empty when not loadable.
+    renderer: The renderer its frames name in `Presentation.renderer`, from
+      the game's registered adapter: the board a client draws it with, if
+      the client has that renderer. Null for a game with no adapter, and for
+      one that is not loadable; such a game is shown as its text.
   """
 
   name: str
@@ -198,6 +202,7 @@ class CatalogueEntry:
   loadable: bool
   unavailable_reason: str | None
   controllers: tuple[str, ...]
+  renderer: str | None
 
   def __post_init__(self) -> None:
     contract.require(
@@ -231,6 +236,10 @@ class CatalogueEntry:
     contract.require(
         self.loadable or not self.controllers,
         f"{self.name} is not loadable, so it offers no controllers.",
+    )
+    contract.require(
+        self.renderer is None or (self.loadable and bool(self.renderer)),
+        f"{self.name} names a renderer only when loadable, and never ''.",
     )
 
 

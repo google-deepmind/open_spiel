@@ -30,6 +30,7 @@ py_library(
         ":codecs",
         ":formats",
         ":provenance",
+        ":public",
         ":records",
         "//open_spiel/python/scale:plugins",
         "//open_spiel/python/scale/core:frameworks",
@@ -81,6 +82,16 @@ py_library(
         "//open_spiel/python/scale:plugins",
         "@py_deps//absl/logging",
         "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "public",
+    srcs = ["public.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale:plugins",
+        "@py_deps//absl/logging",
     ],
 )
 
@@ -183,6 +194,26 @@ pytest_test(
         "//open_spiel/python/scale/core:numpy_policies",
         "//open_spiel/python/scale/policies:tabular",
         "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "public_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/public_test.py"],
+    deps = [
+        ":artifact",
+        ":public",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/testing:public_bucket",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],

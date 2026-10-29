@@ -225,8 +225,14 @@ export class FakeServer {
     const entries: HistoryEntry[] = history.map((action, index) => {
       const seat = index % SEATS;
       return sees(seat)
-        ? {seat, action, label: LABELS[action] ?? null, rewards: [0, 0]}
-        : {seat, action: null, label: null, rewards: null};
+        ? {
+            seat,
+            action,
+            label: LABELS[action] ?? null,
+            rewards: [0, 0],
+            public_label: null,
+          }
+        : {seat, action: null, label: null, rewards: null, public_label: null};
     });
     const seats: SeatView[] = Array.from({length: SEATS}, (_, seat) => ({
       seat,
@@ -234,9 +240,12 @@ export class FakeServer {
       config: {},
       autoplay: false,
       failure: null,
+      status: 'ready',
+      message: null,
+      notice: null,
     }));
     const body: Frame = {
-      contract_version: 2,
+      contract_version: 8,
       session: {
         id,
         game: 'count',
@@ -273,6 +282,8 @@ export class FakeServer {
           : null,
       information_state_text: null,
       struct: null,
+      observation_struct: null,
+      presentation: null,
     };
     return json(body);
   }
@@ -303,7 +314,7 @@ function json(body: unknown, status = 200): Response {
 
 function refuse(code: ErrorCode, message: string): Response {
   const body: ErrorBody = {
-    contract_version: 2,
+    contract_version: 8,
     code,
     message,
     seat: null,
@@ -313,7 +324,7 @@ function refuse(code: ErrorCode, message: string): Response {
 }
 
 const HEALTH: Health = {
-  contract_version: 2,
+  contract_version: 8,
   version: '0.0.0',
   revision: null,
   capabilities: {
@@ -326,12 +337,12 @@ const HEALTH: Health = {
       },
     ],
     chance_policies: ['auto', 'expose'],
-    python_game_search: false,
+    cpp_mcts_limits: 'simulations_only',
   },
 };
 
 const CATALOGUE: Catalogue = {
-  contract_version: 2,
+  contract_version: 8,
   games: [
     {
       name: 'count',
@@ -346,6 +357,7 @@ const CATALOGUE: Catalogue = {
       loadable: true,
       unavailable_reason: null,
       controllers: ['human'],
+      renderer: null,
     },
   ],
 };

@@ -129,3 +129,6 @@ pyink-annotation-pragmas = [
     "pyright:",
     "pyre-",
 ]
+
+[project.entry-points."open_spiel.gui.controllers"]
+checkpoint = "open_spiel.python.scale.serve.controller"

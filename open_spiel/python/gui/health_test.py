@@ -21,19 +21,20 @@ from open_spiel.python.gui import health
 
 _HUMAN = contract.Controller(contract.HUMAN, "Human", {})
 _RANDOM = contract.Controller("random", "Random", {})
+_LIMITS = contract.MctsLimits.SIMULATIONS_ONLY
 
 
 class CapabilitiesTest(absltest.TestCase):
 
   def test_the_human_controller_is_listed_first(self) -> None:
     policies = (contract.ChancePolicy.AUTO,)
-    health.Capabilities((_HUMAN, _RANDOM), policies, False)
+    health.Capabilities((_HUMAN, _RANDOM), policies, _LIMITS)
     with self.assertRaisesRegex(ValueError, "human"):
-      health.Capabilities((_RANDOM, _HUMAN), policies, False)
+      health.Capabilities((_RANDOM, _HUMAN), policies, _LIMITS)
 
   def test_at_least_one_chance_policy_is_accepted(self) -> None:
     with self.assertRaisesRegex(ValueError, "chance policy"):
-      health.Capabilities((_HUMAN,), (), False)
+      health.Capabilities((_HUMAN,), (), _LIMITS)
 
 
 if __name__ == "__main__":

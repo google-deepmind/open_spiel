@@ -1,0 +1,77 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* The Board section of the View panel (chess_config_section.tsx), drawn as
+   a card with an upper-case heading and a line under it, each field's label over its control, and
+   the checkbox beside its label. */
+
+.chess-config-section.ogs-config-section {
+  margin: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 12px;
+  background: var(--color-surface-raised);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chess-config-section .ogs-config-header h3 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.chess-config-section .ogs-config-header p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.chess-config-section .ogs-config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.chess-config-section .ogs-config-field select {
+  max-width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: inherit;
+}
+
+.chess-config-section .ogs-config-field--checkbox {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chess-config-section .ogs-config-field--checkbox:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.chess-config-section .ogs-config-field--checkbox input[type='checkbox'] {
+  accent-color: var(--color-accent);
+  width: 16px;
+  height: 16px;
+}

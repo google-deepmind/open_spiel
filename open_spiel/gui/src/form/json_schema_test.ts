@@ -56,6 +56,7 @@ describe('fieldsOf', () => {
         label: 'Max Simulations',
         description: 'Simulations per move, each ending in a random rollout.',
         kind: 'integer',
+        required: false,
         default: 1000,
         minimum: 1,
         maximum: 10000,
@@ -65,6 +66,7 @@ describe('fieldsOf', () => {
         label: 'Uct C',
         description: 'The exploration constant of the UCT selection rule.',
         kind: 'number',
+        required: false,
         default: 2,
         minimum: 0,
         maximum: 100,
@@ -75,6 +77,7 @@ describe('fieldsOf', () => {
         description:
           'Whether proven wins and losses are backed up the search tree.',
         kind: 'boolean',
+        required: false,
         default: true,
       },
     ]);
@@ -136,6 +139,10 @@ describe('fieldsOf labels and presets', () => {
         label: 'Model',
         description: null,
         kind: 'string',
+        required: false,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
         default: 'small',
       },
       {
@@ -143,8 +150,88 @@ describe('fieldsOf labels and presets', () => {
         label: 'Size',
         description: null,
         kind: 'choice',
+        required: false,
         default: 9,
         choices: [9, 13, 19],
+      },
+    ]);
+  });
+});
+
+describe('fieldsOf required and text settings', () => {
+  it('reads a required setting with no default, and text constraints', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        checkpoint: {
+          type: 'string',
+          description: 'The checkpoint.',
+          minLength: 1,
+          maxLength: 200,
+          pattern: '^runs/',
+        },
+        temperature: {type: 'number', default: 1, minimum: 0},
+      },
+      additionalProperties: false,
+      required: ['checkpoint'],
+    };
+    expect(fieldsOf(schema)).toEqual([
+      {
+        name: 'checkpoint',
+        label: 'Checkpoint',
+        description: 'The checkpoint.',
+        required: true,
+        kind: 'string',
+        default: null,
+        minLength: 1,
+        maxLength: 200,
+        pattern: '^runs/',
+      },
+      {
+        name: 'temperature',
+        label: 'Temperature',
+        description: null,
+        required: false,
+        kind: 'number',
+        default: 1,
+        minimum: 0,
+        maximum: null,
+      },
+    ]);
+  });
+
+  it('reads a required setting that has a default, of any type', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        n: {type: 'integer', default: 3},
+        b: {type: 'boolean'},
+      },
+      required: ['n', 'b'],
+    };
+    expect(
+      fieldsOf(schema)?.map(field => [field.required, field.default]),
+    ).toEqual([
+      [true, 3],
+      [true, null],
+    ]);
+  });
+
+  it('reads a required closed set of text as a choice with none chosen', () => {
+    const schema = {
+      type: 'object',
+      properties: {model: {type: 'string', enum: ['small', 'large']}},
+      required: ['model'],
+    };
+    expect(fieldsOf(schema)).toEqual([
+      {
+        name: 'model',
+        label: 'Model',
+        description: null,
+        required: true,
+        kind: 'choice',
+        default: null,
+        choices: ['small', 'large'],
       },
     ]);
   });
@@ -161,7 +248,7 @@ describe('fieldsOf refusals', () => {
     ['a fractional integer default', {x: {type: 'integer', default: 1.5}}],
     [
       'a keyword the form cannot enforce',
-      {x: {type: 'string', default: '', pattern: 'a'}},
+      {x: {type: 'string', default: '', format: 'uri'}},
     ],
     [
       'a bound that is not a number',
@@ -213,11 +300,62 @@ describe('fieldsOf refusals', () => {
     ],
     [
       'a schema keyword the form cannot enforce',
-      {type: 'object', properties: {}, required: ['x']},
+      {type: 'object', properties: {}, minProperties: 1},
     ],
     [
       'extra properties a schema allows',
       {type: 'object', properties: {}, additionalProperties: {type: 'string'}},
+    ],
+  ])('refuses %s', (_, properties) => {
+    const schema =
+      'type' in properties ? properties : {type: 'object', properties};
+    expect(fieldsOf(schema)).toBeNull();
+  });
+});
+
+describe('fieldsOf refusals of required and text settings', () => {
+  it.each([
+    ['a missing default, not required', {x: {type: 'string'}}],
+    [
+      'a length bound on a number',
+      {x: {type: 'integer', default: 1, minLength: 1}},
+    ],
+    [
+      'a negative length bound',
+      {x: {type: 'string', default: '', minLength: -1}},
+    ],
+    [
+      'a fractional length bound',
+      {x: {type: 'string', default: '', maxLength: 1.5}},
+    ],
+    [
+      'length bounds that cross',
+      {x: {type: 'string', default: 'ab', minLength: 3, maxLength: 2}},
+    ],
+    [
+      'a pattern that is not a regular expression',
+      {x: {type: 'string', default: '', pattern: '('}},
+    ],
+    [
+      'a default the pattern refuses',
+      {x: {type: 'string', default: 'a', pattern: '^[0-9]+$'}},
+    ],
+    ['a default too short', {x: {type: 'string', default: '', minLength: 1}}],
+    [
+      'a choice too long',
+      {x: {type: 'string', default: 'a', enum: ['a', 'abc'], maxLength: 2}},
+    ],
+    [
+      'a required name that is not a property',
+      {type: 'object', properties: {}, required: ['x']},
+    ],
+    [
+      'a required list that is not a list of names',
+      {type: 'object', properties: {x: {type: 'string'}}, required: 'x'},
+    ],
+    [
+      'a required name listed twice',
+      {type: 'object', properties: {x: {type: 'string'}}, required: ['x', 'x']},
     ],
   ])('refuses %s', (_, properties) => {
     const schema =

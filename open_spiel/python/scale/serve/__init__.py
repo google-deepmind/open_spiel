@@ -26,6 +26,10 @@ rounding.
   reply.action, reply.probs, reply.decider
 
   server     PolicyServer and Reply: pyspiel state in, one move out.
+  checkpoint_bot  checkpoint_bot: an artifact as a bot,
+             choose_action(state, seat).
+  controller register_into: the "checkpoint" controller of OpenSpiel's game GUI
+             (imported only by the GUI's opt-in loader, never by this package).
   host_agent HostAgent: one seat's decision over a replayed history.
   replay     a recorded match to the SeatSteps one seat saw.
   wire       pyspiel histories to raw env histories, and the node check.

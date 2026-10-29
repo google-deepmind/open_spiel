@@ -14,14 +14,21 @@
 
 import {describe, expect, it} from 'vitest';
 
-import type {ChoiceField, Field, NumberField} from './field.ts';
-import {admittedNumbers, draftOf, readDraft} from './field.ts';
+import type {ChoiceField, Field, NumberField, StringField} from './field.ts';
+import {
+  REQUIRED_ERROR,
+  admittedNumbers,
+  admittedText,
+  draftOf,
+  readDraft,
+} from './field.ts';
 
 const SIMULATIONS: NumberField = {
   name: 'max_simulations',
   label: 'max_simulations',
   description: null,
   kind: 'integer',
+  required: false,
   default: 1000,
   minimum: 1,
   maximum: 10000,
@@ -30,6 +37,7 @@ const UCT_C: NumberField = {
   ...SIMULATIONS,
   name: 'uct_c',
   kind: 'number',
+  required: false,
   default: 2,
   minimum: 0,
   maximum: 100,
@@ -39,6 +47,7 @@ const SOLVE: Field = {
   label: 'solve',
   description: null,
   kind: 'boolean',
+  required: false,
   default: true,
 };
 const MODEL: Field = {
@@ -46,6 +55,10 @@ const MODEL: Field = {
   label: 'model',
   description: null,
   kind: 'string',
+  required: false,
+  minLength: null,
+  maxLength: null,
+  pattern: null,
   default: 'small',
 };
 const SIZE: ChoiceField = {
@@ -53,8 +66,22 @@ const SIZE: ChoiceField = {
   label: 'size',
   description: null,
   kind: 'choice',
+  required: false,
   default: 9,
   choices: [9, 13, 19],
+};
+
+// A required text setting with no default, as a checkpoint bot declares it.
+const CHECKPOINT: StringField = {
+  name: 'checkpoint',
+  label: 'Checkpoint',
+  description: null,
+  kind: 'string',
+  required: true,
+  default: null,
+  minLength: 1,
+  maxLength: null,
+  pattern: null,
 };
 
 describe('draftOf', () => {
@@ -127,6 +154,91 @@ describe('readDraft', () => {
     expect(() => readDraft(MODEL, true)).toThrow(
       "The field model has a box's draft.",
     );
+  });
+});
+
+describe('required fields', () => {
+  it('starts a required field with no default empty', () => {
+    expect(draftOf(CHECKPOINT)).toBe('');
+    expect(draftOf({...SIZE, required: true, default: null})).toBe('');
+    expect(draftOf({...SIMULATIONS, required: true, default: null})).toBe('');
+    expect(draftOf({...SOLVE, required: true, default: null})).toBe(false);
+    expect(draftOf(CHECKPOINT, 'runs/c')).toBe('runs/c');
+  });
+
+  it('refuses a required field left empty, of any kind but a box', () => {
+    for (const field of [
+      CHECKPOINT,
+      {...SIZE, required: true},
+      {...SIMULATIONS, required: true},
+    ]) {
+      expect(readDraft(field, '')).toEqual({ok: false, error: REQUIRED_ERROR});
+    }
+    expect(readDraft({...SIMULATIONS, required: true}, '  ')).toEqual({
+      ok: false,
+      error: REQUIRED_ERROR,
+    });
+    expect(readDraft({...SOLVE, required: true}, false)).toEqual({
+      ok: true,
+      value: false,
+    });
+  });
+
+  it('reads a required field filled in', () => {
+    expect(readDraft(CHECKPOINT, 'runs/c')).toEqual({
+      ok: true,
+      value: 'runs/c',
+    });
+  });
+});
+
+describe('text constraints', () => {
+  const text = (
+    minLength: number | null,
+    maxLength: number | null,
+    pattern: string | null = null,
+  ): StringField => ({
+    ...CHECKPOINT,
+    required: false,
+    minLength,
+    maxLength,
+    pattern,
+  });
+
+  it('counts characters, not UTF-16 units', () => {
+    expect(readDraft(text(null, 2), '\u{1F0A1}\u{1F0B1}').ok).toBe(true);
+    expect(readDraft(text(null, 2), 'abc')).toEqual({
+      ok: false,
+      error: 'Text of at most 2 characters.',
+    });
+    expect(readDraft(text(2, 2), 'a')).toEqual({
+      ok: false,
+      error: 'Text of exactly 2 characters.',
+    });
+  });
+
+  it('searches for the pattern, as JSON Schema does', () => {
+    expect(readDraft(text(null, null, '[0-9]'), 'a1b').ok).toBe(true);
+    expect(readDraft(text(null, null, '^[0-9]+$'), 'a1')).toEqual({
+      ok: false,
+      error: 'Text matching ^[0-9]+$.',
+    });
+  });
+
+  it('says which text a field admits', () => {
+    expect(admittedText(text(1, 8))).toBe('Text of 1 to 8 characters.');
+    expect(admittedText(text(1, null))).toBe('Text of at least 1 character.');
+    expect(admittedText(text(1, null, '^a'))).toBe(
+      'Text of at least 1 character, matching ^a.',
+    );
+    expect(admittedText(text(null, null))).toBeNull();
+  });
+
+  it('refuses text too short in a field that is not required', () => {
+    expect(readDraft(text(1, null), '')).toEqual({
+      ok: false,
+      error: 'Text of at least 1 character.',
+    });
   });
 });
 

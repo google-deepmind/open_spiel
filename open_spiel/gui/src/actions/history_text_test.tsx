@@ -27,6 +27,7 @@ const WITHHELD: HistoryEntry = {
   action: null,
   label: null,
   rewards: null,
+  public_label: null,
 };
 
 let rendered: Rendered | undefined;

@@ -227,6 +227,13 @@ py_library(
 )
 
 py_library(
+    name = "public_bucket",
+    testonly = True,
+    srcs = ["public_bucket.py"],
+    strict_deps = True,
+)
+
+py_library(
     name = "steps",
     testonly = True,
     srcs = ["steps.py"],

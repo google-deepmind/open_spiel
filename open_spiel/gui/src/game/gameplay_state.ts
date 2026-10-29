@@ -17,6 +17,7 @@
 
 import {returnsSentence} from '../board/board_text.ts';
 import type {Frame} from '../contract/contract.ts';
+import {preparingMover, preparingText} from '../players/preparing.ts';
 
 // The seat to move at the live position of a game in play, or null.
 function liveMover(frame: Frame): number | null {
@@ -36,29 +37,13 @@ function isHuman(frame: Frame, seat: number): boolean {
 
 /**
  * The seat a controller plays that is to move at the live position, which an
- * advance lets play, or null when there is none.
+ * advance lets play, or null when there is none. A seat whose controller is
+ * still being built is not one: it plays once it is ready.
  */
 export function controllerToMove(frame: Frame): number | null {
   const seat = liveMover(frame);
-  return seat !== null && !isHuman(frame, seat) ? seat : null;
-}
-
-/**
- * The seat to hand the device to: in a game that hides information, viewed
- * as one seat, another seat that a person plays is to move. Null otherwise.
- */
-export function seatToHandOver(frame: Frame): number | null {
-  const {viewer, session} = frame;
-  const seat = liveMover(frame);
-  if (
-    !session.hides_information ||
-    viewer.kind !== 'seat' ||
-    seat === null ||
-    seat === viewer.seat
-  ) {
-    return null;
-  }
-  return isHuman(frame, seat) ? seat : null;
+  if (seat === null || isHuman(frame, seat)) return null;
+  return preparingMover(frame) === null ? seat : null;
 }
 
 // Who acts at the position shown, as the status line names them.
@@ -70,8 +55,8 @@ function moverName({to_move: mover}: Frame): string {
 /**
  * The Gameplay panel's status line for `frame`: the turn, who is to move,
  * and then, as they apply, that a controller is to play (an autoplaying one
- * is to move only where autoplay stopped, so it too waits for a step), that
- * the session is paused, that the game is simultaneous, the returns at the
+ * is to move only where autoplay stopped, so it too waits for a step) or is
+ * still being built ("Preparing MCTS…"), that the session is paused, that the game is simultaneous, the returns at the
  * end, and who the viewer is. "Turn 3 · Player 1 · Waiting for bot step… ·
  * Seat: Player 0".
  */
@@ -79,6 +64,10 @@ export function statusLine(frame: Frame): string {
   const parts = [`Turn ${String(frame.ply)}`, moverName(frame)];
   const controller = controllerToMove(frame);
   if (controller !== null) parts.push('Waiting for bot step…');
+  const preparing = preparingMover(frame);
+  if (preparing !== null) {
+    parts.push(preparingText(frame.session.controllers, preparing));
+  }
   if (frame.status === 'paused' && frame.ply === frame.num_plies) {
     parts.push('Paused');
   }

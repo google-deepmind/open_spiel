@@ -58,6 +58,13 @@ py_library(
 )
 
 py_library(
+    name = "card_tokens_layout",
+    srcs = ["card_tokens_layout.py"],
+    strict_deps = True,
+    deps = ["@py_deps//jax"],
+)
+
+py_library(
     name = "connect_four",
     srcs = ["connect_four.py"],
     strict_deps = True,
@@ -92,6 +99,19 @@ py_library(
     deps = [
         ":registry",
         "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "gin_card_tokens",
+    srcs = ["gin_card_tokens.py"],
+    strict_deps = True,
+    deps = [
+        ":card_tokens_layout",
+        ":registry",
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "//open_spiel/python/jax/games/gin_rummy:deadwood",
         "@py_deps//jax",
     ],
 )
@@ -238,6 +258,26 @@ pytest_test(
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/envs:bridge",
         "//open_spiel/python/scale/testing:infoset_invariance",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "gin_card_tokens_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/gin_card_tokens_test.py"],
+    deps = [
+        ":card_tokens_layout",
+        ":gin_card_tokens",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs/gin",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],

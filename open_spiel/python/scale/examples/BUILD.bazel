@@ -106,7 +106,6 @@ py_library(
         "@py_deps//absl:app",
         "@py_deps//absl/flags",
         "@py_deps//absl/logging",
-        "@py_deps//etils/epath",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],

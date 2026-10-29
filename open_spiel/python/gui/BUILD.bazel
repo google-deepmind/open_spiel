@@ -13,6 +13,15 @@ pytype_strict_library(
 )
 
 pytype_strict_library(
+    name = "adapter",
+    srcs = ["adapter.py"],
+    deps = [
+        ":contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
     name = "api",
     srcs = ["api.py"],
     deps = [
@@ -24,6 +33,24 @@ pytype_strict_library(
         ":request",
         ":store",
         ":wire",
+    ],
+)
+
+pytype_strict_library(
+    name = "builds",
+    srcs = ["builds.py"],
+)
+
+pytype_strict_library(
+    name = "builds_testing",
+    testonly = True,
+    srcs = ["builds_testing.py"],
+    deps = [
+        ":builds",
+        ":contract",
+        ":controllers",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
     ],
 )
 
@@ -40,8 +67,15 @@ pytype_strict_library(
     srcs = ["cli.py"],
     deps = [
         ":api",
+        ":builds",
+        ":contract",
+        ":controllers",
         ":health_report",
         ":loader",
+        ":mcts_controller",
+        ":mcts_search",
+        ":plugins",
+        ":remote_bot",
         ":server",
         ":static",
         ":store",
@@ -50,8 +84,25 @@ pytype_strict_library(
 )
 
 pytype_strict_library(
+    name = "child_servers",
+    srcs = ["child_servers.py"],
+)
+
+pytype_strict_library(
     name = "contract",
     srcs = ["contract.py"],
+)
+
+pytype_strict_library(
+    name = "controller_registry",
+    srcs = ["controller_registry.py"],
+    deps = [
+        ":contract",
+        ":controller_settings",
+        ":errors",
+        ":information",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
 )
 
 pytype_strict_library(
@@ -67,10 +118,12 @@ pytype_strict_library(
     srcs = ["controllers.py"],
     deps = [
         ":contract",
+        ":controller_registry",
         ":controller_settings",
         ":errors",
-        ":gil_safety",
-        ":information",
+        ":mcts_controller",
+        ":move_budget",
+        ":remote_bot",
         "//open_spiel/python/pybind11:pyspiel",
     ],
 )
@@ -80,6 +133,24 @@ pytype_strict_library(
     srcs = ["errors.py"],
     deps = [
         ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "fake_checkpoint_plugin",
+    srcs = ["fake_checkpoint_plugin.py"],
+    deps = [
+        ":contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "fake_plugin",
+    srcs = ["fake_plugin.py"],
+    deps = [
+        ":contract",
+        "//open_spiel/python/pybind11:pyspiel",
     ],
 )
 
@@ -113,15 +184,6 @@ pytype_strict_library(
 )
 
 pytype_strict_library(
-    name = "gil_safety",
-    srcs = ["gil_safety.py"],
-    deps = [
-        "//open_spiel/python/games:tic_tac_toe",  # build_cleaner: keep; imported by a probe subprocess.
-        "//open_spiel/python/pybind11:pyspiel",
-    ],
-)
-
-pytype_strict_library(
     name = "health",
     srcs = ["health.py"],
     deps = [
@@ -135,7 +197,6 @@ pytype_strict_library(
     deps = [
         ":contract",
         ":controllers",
-        ":gil_safety",
         ":health",
     ],
 )
@@ -157,9 +218,86 @@ pytype_strict_library(
         ":controllers",
         ":errors",
         ":information",
+        ":loader_support",
+        ":presenters",
         "//open_spiel/python/games",
         "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "loader_support",
+    srcs = ["loader_support.py"],
+    deps = [
+        ":contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "mcp",
+    srcs = ["mcp.py"],
+    deps = [
+        ":mcp_client",
+        ":mcp_tools",
+        ":remote_bot",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "mcp_client",
+    srcs = ["mcp_client.py"],
+)
+
+pytype_strict_library(
+    name = "mcp_tools",
+    srcs = ["mcp_tools.py"],
+    deps = [
+        ":mcp_client",
+    ],
+)
+
+pytype_strict_library(
+    name = "mcts_controller",
+    srcs = ["mcts_controller.py"],
+    deps = [
+        ":contract",
+        ":controller_registry",
+        ":controller_settings",
+        ":mcts_search",
+        ":move_budget",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "mcts_search",
+    srcs = ["mcts_search.py"],
+    deps = [
+        ":contract",
+        ":move_budget",
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "move_budget",
+    srcs = ["move_budget.py"],
+)
+
+pytype_strict_library(
+    name = "play",
+    srcs = ["play.py"],
+    deps = [
+        ":child_servers",
+        ":remote_bot",
+        ":remote_bot_server",
+        ":static",
+        "//open_spiel/python/pybind11:pyspiel",
     ],
 )
 
@@ -169,8 +307,81 @@ pytype_strict_library(
     deps = [
         ":contract",
         ":errors",
+        ":presenters",
         "//open_spiel/python/pybind11:pyspiel",
     ],
+)
+
+pytype_strict_library(
+    name = "plugins",
+    srcs = ["plugins.py"],
+    deps = [
+        ":controllers",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "presenters",
+    srcs = ["presenters.py"],
+    deps = [
+        ":adapter",
+        ":contract",
+        "//open_spiel/python/gui/adapters",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot",
+    srcs = ["remote_bot.py"],
+    deps = [
+        ":contract",
+        ":controller_registry",
+        ":controller_settings",
+        ":information",
+        ":move_budget",
+        ":plies",
+        ":remote_bot_config",
+        ":remote_bot_http",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_config",
+    srcs = ["remote_bot_config.py"],
+    deps = [
+        ":contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_http",
+    srcs = ["remote_bot_http.py"],
+    deps = [
+        ":contract",
+        ":controller_settings",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_server",
+    srcs = ["remote_bot_server.py"],
+    deps = [
+        ":plugins",
+        ":remote_bot",
+        "//open_spiel/python/algorithms:mcts",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_testing",
+    testonly = True,
+    srcs = ["remote_bot_testing.py"],
 )
 
 pytype_strict_library(
@@ -202,8 +413,10 @@ pytype_strict_library(
     name = "seats",
     srcs = ["seats.py"],
     deps = [
+        ":builds",
         ":contract",
         ":controllers",
+        ":errors",
         "//open_spiel/python/pybind11:pyspiel",
     ],
 )
@@ -224,6 +437,7 @@ pytype_strict_library(
     name = "session",
     srcs = ["session.py"],
     deps = [
+        ":builds",
         ":contract",
         ":controllers",
         ":errors",
@@ -240,6 +454,14 @@ pytype_strict_library(
 pytype_strict_library(
     name = "static",
     srcs = ["static.py"],
+)
+
+pytype_strict_library(
+    name = "stand_in_checkpoint_bot",
+    srcs = ["stand_in_checkpoint_bot.py"],
+    deps = [
+        ":remote_bot_server",
+    ],
 )
 
 pytype_strict_library(
@@ -308,6 +530,7 @@ pytype_strict_library(
         ":frame",
         ":loader",
         ":plies",
+        ":presenters",
         "//open_spiel/python/pybind11:pyspiel",
     ],
 )
@@ -346,6 +569,24 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
+    name = "builds_test",
+    srcs = ["builds_test.py"],
+    deps = [
+        ":api",
+        ":builds",
+        ":builds_testing",
+        ":catalogue",
+        ":contract",
+        ":controllers",
+        ":health",
+        ":server",
+        ":static",
+        ":store",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
     name = "catalogue_test",
     srcs = ["catalogue_test.py"],
     deps = [
@@ -375,6 +616,18 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
+    name = "controller_registry_test",
+    srcs = ["controller_registry_test.py"],
+    deps = [
+        ":contract",
+        ":controller_settings",
+        ":controllers",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
     name = "controller_settings_test",
     srcs = ["controller_settings_test.py"],
     deps = [
@@ -390,7 +643,7 @@ pytype_strict_contrib_test(
         ":contract",
         ":controllers",
         ":errors",
-        ":gil_safety",
+        ":mcts_controller",
         "//open_spiel/python/games:hangman",
         "//open_spiel/python/games:tic_tac_toe",
         "//open_spiel/python/pybind11:pyspiel",
@@ -404,6 +657,21 @@ pytype_strict_contrib_test(
     deps = [
         ":contract",
         ":errors",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "fake_checkpoint_plugin_test",
+    srcs = ["fake_checkpoint_plugin_test.py"],
+    deps = [
+        ":api",
+        ":catalogue",
+        ":controllers",
+        ":fake_checkpoint_plugin",
+        ":health_report",
+        ":plugins",
+        ":store",
         "@py_deps//absl/testing:absltest",
     ],
 )
@@ -456,18 +724,6 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
-    name = "gil_safety_test",
-    srcs = ["gil_safety_test.py"],
-    deps = [
-        ":gil_safety",
-        "//open_spiel/python/games:iterated_prisoners_dilemma",
-        "//open_spiel/python/games:tic_tac_toe",
-        "//open_spiel/python/pybind11:pyspiel",
-        "@py_deps//absl/testing:absltest",
-    ],
-)
-
-pytype_strict_contrib_test(
     name = "health_report_test",
     srcs = ["health_report_test.py"],
     deps = [
@@ -499,12 +755,123 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
+    name = "legal_labels_test",
+    srcs = ["legal_labels_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
     name = "loader_test",
     srcs = ["loader_test.py"],
     deps = [
         ":catalogue",
         ":contract",
         ":loader",
+        ":loader_support",
+        ":presenters",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "mcp_test",
+    srcs = ["mcp_test.py"],
+    data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
+    deps = [
+        ":cli",  # The GUI server it starts as a process runs cli.
+        ":mcp",
+        ":mcp_client",
+        ":mcp_tools",
+        ":remote_bot_server",
+        ":remote_bot_testing",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "mcts_controller_test",
+    srcs = ["mcts_controller_test.py"],
+    deps = [
+        ":cli",
+        ":contract",
+        ":controllers",
+        ":health_report",
+        ":mcts_controller",
+        ":mcts_search",
+        "//open_spiel/python/games:tic_tac_toe",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "mcts_search_test",
+    srcs = ["mcts_search_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":mcts_controller",
+        ":mcts_search",
+        ":move_budget",
+        "//open_spiel/python/games:iterated_prisoners_dilemma",
+        "//open_spiel/python/games:tic_tac_toe",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "move_budget_test",
+    srcs = ["move_budget_test.py"],
+    deps = [
+        ":api",
+        ":catalogue",
+        ":contract",
+        ":controllers",
+        ":health",
+        ":mcts_controller",
+        ":mcts_search",
+        ":move_budget",
+        ":server",
+        ":static",
+        ":store",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "notice_test",
+    srcs = ["notice_test.py"],
+    deps = [
+        ":contract",
+        ":controller_registry",
+        ":controllers",
+        ":errors",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "play_test",
+    srcs = ["play_test.py"],
+    data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
+    deps = [
+        ":child_servers",
+        ":cli",  # The GUI server it starts as a process runs cli.
+        ":play",
+        ":stand_in_checkpoint_bot",
         "@py_deps//absl/testing:absltest",
     ],
 )
@@ -515,6 +882,95 @@ pytype_strict_contrib_test(
     deps = [
         ":contract",
         ":plies",
+        ":presenters",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "plugins_test",
+    srcs = ["plugins_test.py"],
+    deps = [
+        ":cli",
+        ":controllers",
+        ":errors",  # build_cleaner: keep; loaded by name in a test.
+        ":fake_plugin",
+        ":loader",
+        ":plugins",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "presenters_test",
+    srcs = ["presenters_test.py"],
+    deps = [
+        ":contract",
+        ":controllers",
+        ":loader",
+        ":presenters",
+        ":views",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_config_test",
+    srcs = ["remote_bot_config_test.py"],
+    deps = [
+        ":controllers",
+        ":remote_bot",
+        ":remote_bot_config",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_server_test",
+    srcs = ["remote_bot_server_test.py"],
+    data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
+    deps = [
+        ":cli",  # The GUI server it starts as a process runs cli.
+        ":controllers",
+        ":remote_bot",
+        ":remote_bot_server",
+        ":remote_bot_testing",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_strict_test",
+    srcs = ["remote_bot_strict_test.py"],
+    deps = [
+        ":builds",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":remote_bot",
+        ":remote_bot_http",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_test",
+    srcs = ["remote_bot_test.py"],
+    deps = [
+        ":builds",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":remote_bot",
+        ":remote_bot_server",
+        ":session",
         "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//absl/testing:absltest",
     ],
@@ -569,6 +1025,20 @@ pytype_strict_contrib_test(
         ":server",
         ":static",
         ":store",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "session_builds_test",
+    srcs = ["session_builds_test.py"],
+    deps = [
+        ":builds",
+        ":builds_testing",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":session",
         "@py_deps//absl/testing:absltest",
     ],
 )

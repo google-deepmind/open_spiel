@@ -38,6 +38,22 @@ py_library(
     name = "catalog",
     srcs = ["catalog.py"],
     strict_deps = True,
+    deps = [":gin_tfv2"],
+)
+
+py_library(
+    name = "gin_tfv2",
+    srcs = ["gin_tfv2.py"],
+    strict_deps = True,
+    deps = [
+        ":actor_critic",
+        ":layers",
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "//open_spiel/python/scale/encoders:card_tokens_layout",
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
 )
 
 py_library(
@@ -97,6 +113,7 @@ py_library(
     strict_deps = True,
     deps = [
         ":actor_critic",
+        ":gin_tfv2",
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/encoders:registry",
         "//open_spiel/python/scale/policies:registry",

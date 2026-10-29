@@ -16,7 +16,7 @@ import {type JSX, useMemo, useRef} from 'react';
 
 import type {Action, ChanceOutcome, Frame} from '../contract/contract.ts';
 import type {Session} from '../session/use_session.ts';
-import {WINDOW_ABOVE, duplicateLabelIds, sortById} from './action_list.ts';
+import {WINDOW_ABOVE, sortById} from './action_list.ts';
 import {LegalWindow} from './legal_window.tsx';
 import {NoFrame, Note} from './note.tsx';
 import {GAME_FINISHED, playBlocker} from './play_blocker.ts';
@@ -146,11 +146,9 @@ interface LegalRowsProps {
 /** The rows: all of them, or above WINDOW_ABOVE only those in view. */
 function LegalRows(props: LegalRowsProps): JSX.Element {
   const {actions, label} = props;
-  const duplicates = useMemo(() => duplicateLabelIds(actions), [actions]);
   const renderRow = (action: Choice, tabIndex?: 0 | -1): JSX.Element => (
     <LegalRow
       action={action}
-      duplicate={duplicates.has(action.id)}
       play={props.play}
       busy={props.busy}
       tabIndex={tabIndex}
@@ -158,12 +156,6 @@ function LegalRows(props: LegalRowsProps): JSX.Element {
   );
   return (
     <>
-      {duplicates.size > 0 && (
-        <p className="actions-note">
-          {String(duplicates.size)} actions share their label with another;
-          their ids tell them apart.
-        </p>
-      )}
       {actions.length > WINDOW_ABOVE ? (
         <LegalWindow
           actions={actions}
@@ -186,7 +178,6 @@ function LegalRows(props: LegalRowsProps): JSX.Element {
 
 interface LegalRowProps extends Pick<LegalRowsProps, 'play' | 'busy'> {
   readonly action: Choice;
-  readonly duplicate: boolean;
   /**
    * Whether the button is in the tab order: undefined for a button's
    * default, which is in it. Required, so a list cannot forget to pass it.
@@ -198,13 +189,7 @@ interface LegalRowProps extends Pick<LegalRowsProps, 'play' | 'busy'> {
  * One row: a button when the viewer can play it, text otherwise. While a
  * request is in flight the button refuses a press but keeps the focus.
  */
-function LegalRow({
-  action,
-  duplicate,
-  play,
-  busy,
-  tabIndex,
-}: LegalRowProps): JSX.Element {
+function LegalRow({action, play, busy, tabIndex}: LegalRowProps): JSX.Element {
   const content = (
     <>
       <span className="legal__id">{action.id}</span>
@@ -218,19 +203,13 @@ function LegalRow({
       </span>
     </>
   );
-  const duplicated = duplicate ? 'true' : undefined;
   if (play === null) {
-    return (
-      <span className="legal__row" data-duplicate={duplicated}>
-        {content}
-      </span>
-    );
+    return <span className="legal__row">{content}</span>;
   }
   return (
     <button
       type="button"
       className="legal__row"
-      data-duplicate={duplicated}
       aria-disabled={busy ? 'true' : undefined}
       title={action.label}
       tabIndex={tabIndex}

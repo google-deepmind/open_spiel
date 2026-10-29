@@ -13,12 +13,12 @@ rest.
 - TypeScript follows the
   [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html).
 
-|                    | Python                                 | TypeScript                                                            |
-| ------------------ | -------------------------------------- | --------------------------------------------------------------------- |
-| Format (_checked_) | pyink                                  | Prettier                                                              |
-| Lint (_checked_)   | pylint                                 | ESLint: the gts rules on typescript-eslint's strict, type-checked set |
-| Types (_checked_)  | mypy, strict                           | tsc, strict                                                           |
-| Configuration      | `open_spiel/python/gui/pyproject.toml` | `open_spiel/gui/`                                                     |
+|                    | Python                                 | TypeScript                                                                                            |
+| ------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Format (_checked_) | pyink                                  | Prettier                                                                                              |
+| Lint (_checked_)   | pylint                                 | ESLint: the gts rules on typescript-eslint's strict, type-checked set, and the TypeScript rules below |
+| Types (_checked_)  | mypy, strict                           | tsc, strict                                                                                           |
+| Configuration      | `open_spiel/python/gui/pyproject.toml` | `open_spiel/gui/`                                                                                     |
 
 Run the same checks locally before sending a change:
 
@@ -34,10 +34,55 @@ npm ci
 npm run check
 ```
 
+## TypeScript rules
+
+These rules from the Google TypeScript Style Guide are in
+`eslint.config.mjs` on top of the gts rule set (_checked_).
+
+- `T[]` and `readonly T[]` only when `T` is a primitive or a dotted name;
+  otherwise `Array<T>` and `ReadonlyArray<T>`: `Array<string | number>`,
+  `ReadonlyArray<{id: string}>`.
+- Every exported function, class, constant, type and interface has a
+  `/** ... */` comment that says what it is for.
+- A top-level function is a declaration, `function f() {}`, not
+  `const f = () => {}`. Arrow functions stay for callbacks and nested
+  functions.
+- Every `switch` has a `default`. On a union, the default is a compile-time
+  exhaustiveness check:
+
+  ```ts
+  default: {
+    const unreachable: never = field;
+    throw new Error(`Unhandled field kind: ${String(unreachable)}`);
+  }
+  ```
+
+- Numbers are parsed with `Number()`, which is NaN for malformed text. No
+  `parseFloat`; `parseInt` only with a radix other than 10. A CSS length is
+  read with `pixels()` (`src/styles/pixels.ts`).
+- No `Array()` or `new Array()`: an array literal, or
+  `Array.from({length: n}, () => value)`.
+- A body without braces sits on the line of its `if`, `else`, `for` or
+  `while`; a body on its own line has braces.
+- Exports are named, not default.
+- DOM code reads `textContent`, not `innerText`.
+- Production code types an object literal by its declaration,
+  `const x: T = {...}`, not `{...} as T`, except as an argument.
+
+The deliberate exceptions:
+
+| Pattern                                  | Where                                         | Why                                                                   |
+| ---------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------- |
+| Default exports                          | `playwright.config.ts`, `e2e/global_setup.ts` | Playwright requires them.                                             |
+| `locator.innerText()`                    | `e2e/`                                        | Playwright's rendered, visible text, which the privacy tests read.    |
+| Object literals cast with `as`           | tests (`*_test.ts*`) and `testing/`           | Fakes build partial objects, such as events jsdom does not implement. |
+| A type parameter used only in the return | `useStickToBottom<T extends HTMLElement>`     | The React ref pattern, as in `useRef<T>`; callers always name `T`.    |
+
 ## Size
 
 - A file is at most 500 lines (_checked_). TypeScript does not count blank
-  lines and comments.
+  lines and comments; a Python file, where docstrings and comments count, is
+  at most 600.
 - A TypeScript function is at most 80 lines, not counting blank lines and
   comments (_checked_). A Python function is at most 50 statements
   (_checked_).
@@ -86,9 +131,8 @@ npm run check
   button.
 - Inset content sits in a `.card` (`--radius-card`, `--color-surface-raised`
   on a `--color-border` edge); a status line is a `.status-bar`.
-- Icons are drawn in CSS (`.icon` in `src/controls/controls.css`), since the
-  client ships no images; a control that shows only an icon is named by its
-  `aria-label` and `title`.
+- Icons are drawn in CSS (`.icon` in `src/controls/controls.css`); a control
+  that shows only an icon is named by its `aria-label` and `title`.
 
 ## Dependencies and assets
 
@@ -100,7 +144,11 @@ npm run check
 - A relative import names the file with its extension: `./app.tsx`, not
   `./app` (_checked_).
 - Runtime dependencies are pinned to an exact version.
-- The client ships no images, fonts or card art. Every game is drawn with text
-  and CSS.
+- Art is SVG (drawn in code, shipped as `.svg` files, or an SVG `data:` URI)
+  or a small PNG `data:` URI. The client ships no fonts and no other images,
+  and loads nothing from another host, SVG included (_checked_).
+- Art is drawn in code for this client. Each `.svg` file starts with the
+  Apache-2.0 header and a comment that says what it draws and that it is
+  drawn in code.
 - Third-party notices are in `licenses/`.
 - Every source file starts with the OpenSpiel Apache-2.0 licence header.

@@ -1,0 +1,311 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* Hearts game styles: the felt, the names, the pass button, game over and
+   the message (sections/table_layout.tsx draws them). Colours are tokens
+   (the --hearts-* block of src/styles/tokens.css). */
+
+/* ============================================
+   CSS Variables
+   ============================================ */
+.hearts-table {
+  /* The shared felt tokens. */
+  --felt-color: var(--color-felt);
+  --felt-dark: var(--color-felt-dark);
+  --felt-border: var(--color-felt-border);
+
+  --transition-fast: calc(0.15s * var(--anim-scale, 1)) ease;
+  --transition-normal: calc(0.25s * var(--anim-scale, 1)) ease;
+}
+
+/* The Gameplay panel's content. */
+.hearts-gameplay {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.hearts-gameplay > .ogs-status {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--color-surface-sunken);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Status row above the board: whole items wrap onto a new line, a single
+   item never breaks mid-phrase into a ragged multi-line grid. */
+.hearts-gameplay .ogs-state-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.hearts-gameplay .ogs-state-meta > * {
+  white-space: nowrap;
+}
+
+/* ============================================
+   Table Layout: the felt. The cards, names and centre are drawn by the shared
+   <HandTable> (hearts_layout.ts), which fits this box.
+   ============================================ */
+.hearts-table {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  padding: 10px;
+  /* The shared table surface (cards/table_cards): its texture,
+     then its shading (Hearts' diagonal fall-off to the darker felt and the
+     inset vignette under 'soft'; nothing under 'flat'), then the colour. The
+     fallbacks are the 'soft' values, for a table drawn outside a surface. */
+  background:
+    var(--table-texture, none),
+    var(
+      --table-shading,
+      linear-gradient(145deg, var(--color-none) 0%, var(--felt-dark) 100%)
+    ),
+    var(--felt-color);
+  border-radius: 12px;
+  box-shadow: var(
+    --table-shadow,
+    inset 0 0 100px var(--hearts-table-vignette),
+    0 4px 20px var(--hearts-table-drop)
+  );
+  box-sizing: border-box;
+}
+
+/* Felt texture overlay */
+.hearts-table::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* The grain tile (hearts_grain.svg), set on the wrapper by the board. */
+  background-image: var(--hearts-grain, none);
+  /* Part of the shading: none under 'flat'. */
+  opacity: var(--table-grain, 0.03);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Region content fills its region box (sized in card widths, --card-w). */
+.hearts-region {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hearts-centre {
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* A name is centred in its box unless the layout (hearts_layout.ts) sets it
+   to one end: your name at your hand's left end, north's at its hand's right
+   end (its player's left) on the full table. */
+.hearts-name--left > .hearts-region {
+  justify-content: flex-start;
+}
+
+.hearts-name--right > .hearts-region {
+  justify-content: flex-end;
+}
+
+/* A seat's name is plain text on the felt, as at euchre's table: no plate
+   or pill. */
+.hearts-player-name {
+  max-width: 100%;
+  box-sizing: border-box;
+  color: var(--hearts-name-text);
+  font-weight: 500;
+  font-size: clamp(12px, calc(var(--card-w) * 0.2), 16px);
+  line-height: calc(var(--card-w) * 0.34);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  transition: color var(--transition-normal);
+}
+
+/* The seat on turn: its name in gold, as at euchre's table, with no plate,
+   glow or halo. */
+.hearts-player-name--active {
+  color: var(--hearts-name-active-text);
+}
+
+/* ============================================
+   Pass Phase UI
+   ============================================ */
+.hearts-pass-button {
+  padding: calc(var(--card-w) * 0.14) calc(var(--card-w) * 0.36);
+  font-size: clamp(12px, calc(var(--card-w) * 0.22), 16px);
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--hearts-button-text);
+  /* Flat: no gradient, no shadow, no lift. */
+  background: var(--hearts-button-fill);
+  border: none;
+  border-radius: 8px;
+  transition: background var(--transition-fast);
+}
+
+.hearts-pass-button:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.hearts-pass-button:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--hearts-button-hover);
+}
+
+.hearts-pass-button:disabled {
+  background: var(--hearts-button-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.hearts-no-pass-indicator {
+  padding: calc(var(--card-w) * 0.14) calc(var(--card-w) * 0.36);
+  font-size: clamp(12px, calc(var(--card-w) * 0.22), 16px);
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--hearts-plate-text);
+  background: var(--hearts-plate-fill);
+  border-radius: 8px;
+}
+
+/* ============================================
+   Game Over Display
+   ============================================ */
+.hearts-game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background: var(--hearts-over-fill);
+  border-radius: 12px;
+  min-width: 200px;
+}
+
+.hearts-game-over__title {
+  color: var(--hearts-over-text);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.hearts-game-over__scores {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.hearts-game-over__player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 12px;
+  background: var(--hearts-over-row-fill);
+  border-radius: 6px;
+  color: var(--hearts-over-row-text);
+  font-size: 14px;
+}
+
+.hearts-game-over__player--winner {
+  background: var(--hearts-over-winner-fill);
+  border: 1px solid var(--hearts-over-winner-edge);
+}
+
+.hearts-game-over__name {
+  font-weight: 500;
+}
+
+.hearts-game-over__score {
+  color: var(--hearts-over-score-text);
+}
+
+.hearts-game-over__badge {
+  color: var(--hearts-over-badge-text);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ============================================
+   Message / Status Display
+   ============================================ */
+.hearts-message {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 1em;
+  line-height: calc(var(--card-w) * 0.38);
+  background: var(--hearts-message-fill);
+  color: var(--hearts-message-text);
+  border-radius: 6px;
+  font-size: clamp(12px, calc(var(--card-w) * 0.19), 14px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================
+   Gameplay Panel Wrapper
+   ============================================ */
+.hearts-gameplay-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 0;
+}
+
+/* The table fills the panel: TableLayout fits its card width to this box
+   (width and height), so the felt takes no minimum of its own that would
+   push it past the panel. Below the smallest card the table scrolls inside
+   the felt. */
+.hearts-gameplay-wrapper > .hearts-table {
+  height: auto;
+  min-height: 0;
+  align-self: stretch;
+}
+
+/* Phone shell: below the app's 640px breakpoint the felt and its frame keep
+   thin gutters, so the table fits a 390px phone at the minimum card width
+   instead of scrolling. */
+@media (max-width: 640px) {
+  .hearts-gameplay {
+    padding: 8px 4px;
+  }
+
+  .hearts-gameplay-wrapper {
+    padding: 4px 0;
+  }
+
+  .hearts-table {
+    padding: 4px;
+  }
+}

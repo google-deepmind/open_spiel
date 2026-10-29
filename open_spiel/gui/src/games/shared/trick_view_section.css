@@ -1,0 +1,61 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* A trick-taking game's section of the View panel (trick_view_section.tsx):
+   a .view-card (view/view.css), as the Perspective tab beside it is, set in
+   from the panel's edges as that tab's card is. */
+.trick-view-section {
+  margin: 14px 16px;
+}
+
+.trick-view-section .ogs-config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.trick-view-section .ogs-config-field select {
+  max-width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: inherit;
+}
+
+.trick-view-section .ogs-config-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  user-select: none;
+}
+
+.trick-view-section .ogs-config-toggle:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.trick-view-section .ogs-config-toggle input {
+  accent-color: var(--color-accent);
+}
+
+.trick-view-section .ogs-config-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}

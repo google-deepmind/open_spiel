@@ -27,13 +27,15 @@ histories differ names a translator in its GameSpec
 
 `check_replayed_node` runs on every request: after the replay, the env's
 actor, legal set and terminal flag must equal pyspiel's, or the request is
-refused rather than answered at the wrong node (a different rulebook, a wrong
-seat, a wrong translation).
+refused (ReplayDivergenceError) rather than answered at the wrong node (a
+different rulebook, a wrong seat, a wrong translation). A shell that plays on
+through a legal-set difference (server.PolicyServer.decide, repair) asks for
+the two sets instead (allow_legal_mismatch).
 """
 
 from __future__ import annotations
 
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 import numpy as np
 
@@ -119,7 +121,28 @@ def _node_fn(env: types.Env):
   return replay.decision_node_fn(env)
 
 
-def check_replayed_node(env: types.Env, env_state: Any, state: Any) -> None:
+class ReplayDivergenceError(ValueError):
+  """The replayed env node is not pyspiel's node (check_replayed_node).
+
+  Attributes:
+    env_legal: the env's legal actions, for a legal-set difference; else
+      None.
+    pyspiel_legal: pyspiel's legal actions, likewise.
+  """
+
+  def __init__(self, message: str, env_legal=None, pyspiel_legal=None):
+    super().__init__(message)
+    self.env_legal = env_legal
+    self.pyspiel_legal = pyspiel_legal
+
+
+def check_replayed_node(
+    env: types.Env,
+    env_state: Any,
+    state: Any,
+    *,
+    allow_legal_mismatch: bool = False,
+) -> Optional[tuple[list[int], list[int]]]:
   """Checks that the replayed env node is pyspiel's node.
 
   Same terminal flag, same actor, same legal action set.
@@ -128,9 +151,17 @@ def check_replayed_node(env: types.Env, env_state: Any, state: Any) -> None:
     env: the env.
     env_state: the replayed env state.
     state: the pyspiel state.
+    allow_legal_mismatch: return a legal-set difference instead of raising
+      (the terminal flag and the actor must still agree).
+
+  Returns:
+    None when the nodes agree; with allow_legal_mismatch, (the env's legal
+    actions, pyspiel's) when only the legal sets differ.
 
   Raises:
-    ValueError: the nodes differ.
+    ValueError: the pyspiel state is a chance node, or has a legal action
+      the env has no id for.
+    ReplayDivergenceError: (a ValueError) the nodes differ.
   """
   if state.is_chance_node():
     raise ValueError(
@@ -138,15 +169,15 @@ def check_replayed_node(env: types.Env, env_state: Any, state: Any) -> None:
     )
   actor, legal, terminal = (np.asarray(x) for x in _node_fn(env)(env_state))
   if bool(terminal) != bool(state.is_terminal()):
-    raise ValueError(
+    raise ReplayDivergenceError(
         f"replay: env terminal {bool(terminal)} != pyspiel terminal "
         f"{state.is_terminal()} after {len(state.history())} actions"
     )
   if state.is_terminal():
-    return
+    return None
   want_actor = int(state.current_player())
   if int(actor) != want_actor:
-    raise ValueError(
+    raise ReplayDivergenceError(
         f"replay: env actor {int(actor)} != pyspiel current_player "
         f"{want_actor} "
         f"after {len(state.history())} actions"
@@ -160,7 +191,13 @@ def check_replayed_node(env: types.Env, env_state: Any, state: Any) -> None:
     )
   want[la] = True
   if not np.array_equal(legal.astype(np.bool_), want):
-    raise ValueError(
-        f"replay: env legal set {np.flatnonzero(legal).tolist()} != pyspiel "
-        f"legal set {la} after {len(state.history())} actions"
+    env_legal = np.flatnonzero(legal).tolist()
+    if allow_legal_mismatch:
+      return env_legal, sorted(la)
+    raise ReplayDivergenceError(
+        f"replay: env legal set {env_legal} != pyspiel "
+        f"legal set {la} after {len(state.history())} actions",
+        env_legal=env_legal,
+        pyspiel_legal=sorted(la),
     )
+  return None

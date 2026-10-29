@@ -22,7 +22,7 @@ import type {
 import {ContractError, TransportError} from './errors.ts';
 
 /** The contract version this client speaks. */
-export const CONTRACT_VERSION: Frame['contract_version'] = 2;
+export const CONTRACT_VERSION: Frame['contract_version'] = 8;
 
 /** The success bodies, by the name a route's caller expects. */
 export interface Bodies {

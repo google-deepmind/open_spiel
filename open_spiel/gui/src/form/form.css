@@ -42,6 +42,11 @@
   overflow-wrap: anywhere;
 }
 
+/* The asterisk after a required field's label; its control says required. */
+.field-form__required {
+  color: var(--color-danger);
+}
+
 /* A text box, number box, list or text area in any form. */
 .control {
   min-height: 28px;

@@ -68,6 +68,16 @@ class ArtifactFormat(Protocol):
       True when it does.
     """
 
+  def steps(self, ckpt_dir: str) -> Sequence[int]:
+    """The steps `ckpt_dir` holds in this format.
+
+    Optional: without it, `ckpt.artifact.steps` takes the digit-named entries of
+    `ckpt_dir` that `detect` accepts.
+
+    Args:
+      ckpt_dir: the checkpoint dir.
+    """
+
   def load_manifest(
       self, ckpt_dir: str, step: int, *, verify: bool = True
   ) -> types.Manifest:

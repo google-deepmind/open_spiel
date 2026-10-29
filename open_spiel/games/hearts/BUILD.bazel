@@ -35,6 +35,7 @@ cc_test(
         ":hearts",
         "@abseil-cpp//absl/strings",
         "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
         "@nlohmann_json//:json",
         "//open_spiel",
         "//open_spiel:basic_tests",

@@ -49,6 +49,32 @@ class SeatViewTest(absltest.TestCase):
     with self.assertRaisesRegex(ValueError, "human"):
       contract.SeatView(0, contract.HUMAN, {}, True, None)
 
+  def test_a_seat_is_ready_unless_its_controller_is_being_built(self) -> None:
+    self.assertEqual(
+        contract.SeatView(0, "mcts", {}, True, None).status,
+        contract.SeatStatus.READY,
+    )
+    preparing = contract.SeatStatus.PREPARING
+    contract.SeatView(0, "mcts", {}, True, None, preparing, None)
+    contract.SeatView(0, "mcts", {}, True, None, preparing, "Building MCTS.")
+    with self.assertRaisesRegex(ValueError, "always ready"):
+      contract.SeatView(0, contract.HUMAN, {}, False, None, preparing, None)
+    with self.assertRaisesRegex(ValueError, "no message"):
+      contract.SeatView(0, "mcts", {}, True, None, message="Ready.")
+
+  def test_a_seat_fails_only_once_built_or_when_it_cannot_be(self) -> None:
+    failure = contract.ControllerFailure("UnavailableError", None)
+    unavailable = contract.SeatStatus.UNAVAILABLE
+    contract.SeatView(0, "mcts", {}, True, failure, unavailable, "No model.")
+    with self.assertRaisesRegex(ValueError, "preparing"):
+      contract.SeatView(
+          0, "mcts", {}, True, failure, contract.SeatStatus.PREPARING, None
+      )
+    with self.assertRaisesRegex(ValueError, "a failure and a message"):
+      contract.SeatView(0, "mcts", {}, True, failure, unavailable, None)
+    with self.assertRaisesRegex(ValueError, "a failure and a message"):
+      contract.SeatView(0, "mcts", {}, True, None, unavailable, "No model.")
+
 
 class ChanceOutcomeTest(absltest.TestCase):
 
@@ -68,6 +94,14 @@ class HistoryEntryTest(absltest.TestCase):
       contract.HistoryEntry(0, 3, None, None)
     with self.assertRaisesRegex(ValueError, "together"):
       contract.HistoryEntry(0, 3, "Bet", None)
+
+  def test_only_a_withheld_entry_has_a_public_label(self) -> None:
+    entry = contract.HistoryEntry(0, None, None, None, "Discard Jd")
+    self.assertTrue(entry.withheld)
+    self.assertEqual(entry.public_label, "Discard Jd")
+    self.assertIsNone(contract.HistoryEntry(0, None, None, None).public_label)
+    with self.assertRaisesRegex(ValueError, "Only a withheld"):
+      contract.HistoryEntry(0, 3, "Bet", (0.0, 0.0), "Bet")
 
 
 class SessionInfoTest(absltest.TestCase):
@@ -100,7 +134,13 @@ class ToJsonTest(absltest.TestCase):
     entry = contract.HistoryEntry(1, 4, "Bet", (-1.0, 1.0))
     self.assertEqual(
         contract.to_json(entry),
-        {"seat": 1, "action": 4, "label": "Bet", "rewards": [-1.0, 1.0]},
+        {
+            "seat": 1,
+            "action": 4,
+            "label": "Bet",
+            "rewards": [-1.0, 1.0],
+            "public_label": None,
+        },
     )
 
   def test_values_outside_the_contract_are_refused(self) -> None:

@@ -27,6 +27,7 @@ const FIELDS: Field[] = [
     label: 'max_simulations',
     description: 'Simulations per move.',
     kind: 'integer',
+    required: false,
     default: 1000,
     minimum: 1,
     maximum: 10000,
@@ -36,6 +37,7 @@ const FIELDS: Field[] = [
     label: 'uct_c',
     description: null,
     kind: 'number',
+    required: false,
     default: 2,
     minimum: 0,
     maximum: null,
@@ -45,6 +47,7 @@ const FIELDS: Field[] = [
     label: 'solve',
     description: null,
     kind: 'boolean',
+    required: false,
     default: true,
   },
   {
@@ -52,6 +55,10 @@ const FIELDS: Field[] = [
     label: 'Model',
     description: null,
     kind: 'string',
+    required: false,
+    minLength: null,
+    maxLength: null,
+    pattern: null,
     default: '',
   },
   {
@@ -59,8 +66,32 @@ const FIELDS: Field[] = [
     label: 'size',
     description: null,
     kind: 'choice',
+    required: false,
     default: 9,
     choices: [9, 13],
+  },
+];
+// A required text setting and a required closed set, neither with a default.
+const REQUIRED: Field[] = [
+  {
+    name: 'checkpoint',
+    label: 'Checkpoint',
+    description: null,
+    kind: 'string',
+    required: true,
+    default: null,
+    minLength: 1,
+    maxLength: null,
+    pattern: null,
+  },
+  {
+    name: 'model',
+    label: 'Model',
+    description: null,
+    kind: 'choice',
+    required: true,
+    default: null,
+    choices: ['small', 'large'],
   },
 ];
 const DRAFTS = {
@@ -174,6 +205,10 @@ describe('FieldForm names', () => {
       label: 'max depth',
       description: null,
       kind: 'string',
+      required: false,
+      minLength: null,
+      maxLength: null,
+      pattern: null,
       default: '',
     };
     rendered = render(
@@ -211,6 +246,69 @@ describe('FieldForm presets', () => {
       chips[0]?.click();
     });
     expect(onChange).toHaveBeenCalledExactlyOnceWith('max_simulations', '100');
+  });
+});
+
+describe('FieldForm required fields', () => {
+  it('marks a required field beside its label, not in its name', () => {
+    rendered = render(
+      <FieldForm
+        fields={REQUIRED}
+        drafts={{checkpoint: '', model: ''}}
+        errors={{}}
+        onChange={vi.fn()}
+      />,
+    );
+    const box = control('Checkpoint') as HTMLInputElement;
+    expect(box.type).toBe('text');
+    expect(box.getAttribute('aria-required')).toBe('true');
+    expect(box.placeholder).toBe('Required');
+    const model = control('Model') as HTMLSelectElement;
+    expect(model.tagName).toBe('SELECT');
+    expect(model.getAttribute('aria-required')).toBe('true');
+    expect(model.options[0]?.text).toBe('Choose…');
+    const markers = rendered.container.querySelectorAll(
+      '.field-form__required',
+    );
+    expect(Array.from(markers, marker => marker.textContent)).toEqual([
+      '*',
+      '*',
+    ]);
+    for (const marker of Array.from(markers)) {
+      expect(marker.getAttribute('aria-hidden')).toBe('true');
+    }
+  });
+
+  it('shows a required field’s error under it', () => {
+    rendered = render(
+      <FieldForm
+        fields={REQUIRED}
+        drafts={{checkpoint: '', model: '0'}}
+        errors={{checkpoint: 'This setting is required.'}}
+        onChange={vi.fn()}
+      />,
+    );
+    const box = control('Checkpoint');
+    expect(box.getAttribute('aria-invalid')).toBe('true');
+    const describedBy = box.getAttribute('aria-describedby') ?? '';
+    expect(document.getElementById(describedBy)?.textContent).toBe(
+      'This setting is required.',
+    );
+  });
+
+  it('marks no field that is not required', () => {
+    rendered = render(
+      <FieldForm
+        fields={FIELDS}
+        drafts={DRAFTS}
+        errors={{}}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(
+      rendered.container.querySelector('.field-form__required'),
+    ).toBeNull();
+    expect(control('Model').getAttribute('aria-required')).toBe('false');
   });
 });
 

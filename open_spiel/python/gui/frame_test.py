@@ -74,6 +74,8 @@ _ORACLE_FRAME = frame.Frame(
     observation_text=None,
     information_state_text=None,
     struct={"cards": [2, 0]},
+    observation_struct=None,
+    presentation=None,
 )
 
 
@@ -91,6 +93,7 @@ def _seat_frame(seat: int) -> frame.Frame:
       state_text=None,
       observation_text=f"card {2 - 2 * seat}",
       struct=None,
+      observation_struct={"card": 2 - 2 * seat},
   )
 
 
@@ -98,6 +101,7 @@ _SPECTATOR_FRAME = dataclasses.replace(
     _seat_frame(1),
     viewer=contract.Viewer(contract.ViewerKind.SPECTATOR),
     observation_text=None,
+    observation_struct=None,
 )
 
 
@@ -148,6 +152,13 @@ class AudienceTest(absltest.TestCase):
     with self.assertRaisesRegex(ValueError, "struct"):
       dataclasses.replace(_seat_frame(0), struct={"cards": [2, 0]})
     dataclasses.replace(_ORACLE_FRAME, struct=None)
+
+  def test_the_observation_struct_reaches_only_a_seat(self) -> None:
+    with self.assertRaisesRegex(ValueError, "observation struct"):
+      dataclasses.replace(_ORACLE_FRAME, observation_struct={"card": 2})
+    with self.assertRaisesRegex(ValueError, "observation struct"):
+      dataclasses.replace(_SPECTATOR_FRAME, observation_struct={"card": 0})
+    dataclasses.replace(_seat_frame(1), observation_struct=None)
 
   def test_the_seed_reaches_only_the_oracle(self) -> None:
     with self.assertRaisesRegex(ValueError, "seed"):
@@ -301,6 +312,35 @@ class SeatsTest(absltest.TestCase):
     alphazero = contract.SeatView(1, "alphazero", {}, False, None)
     with self.assertRaisesRegex(ValueError, "does not offer"):
       dataclasses.replace(_ORACLE_FRAME, seats=(_SEATS[0], alphazero))
+
+
+def _presentation(
+    actions: tuple[contract.ActionHint, ...] | None,
+) -> contract.Presentation:
+  """A presentation with the action hints `actions`."""
+  return contract.Presentation(renderer="cards", view={}, actions=actions)
+
+
+class PresentationTest(absltest.TestCase):
+
+  def test_hints_name_offered_actions(self) -> None:
+    hint = contract.ActionHint(1, {"card": "K"})
+    dataclasses.replace(_ORACLE_FRAME, presentation=_presentation((hint,)))
+    dataclasses.replace(_seat_frame(1), presentation=_presentation(None))
+
+  def test_hints_come_exactly_with_legal_actions(self) -> None:
+    with self.assertRaisesRegex(ValueError, "exactly when legal actions"):
+      dataclasses.replace(_seat_frame(1), presentation=_presentation(()))
+    with self.assertRaisesRegex(ValueError, "exactly when legal actions"):
+      dataclasses.replace(_ORACLE_FRAME, presentation=_presentation(None))
+
+  def test_a_hint_names_a_legal_action_once(self) -> None:
+    unknown = contract.ActionHint(7, None)
+    with self.assertRaisesRegex(ValueError, "names a legal action"):
+      dataclasses.replace(_ORACLE_FRAME, presentation=_presentation((unknown,)))
+    twice = (contract.ActionHint(0, None), contract.ActionHint(0, None))
+    with self.assertRaisesRegex(ValueError, "names a legal action"):
+      dataclasses.replace(_ORACLE_FRAME, presentation=_presentation(twice))
 
 
 if __name__ == "__main__":

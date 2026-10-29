@@ -17,6 +17,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {Frame, SeatConfig} from '../contract/contract.ts';
 import {usePaneHidden} from '../dock/panel_groups.ts';
+import {requirePixels} from '../styles/pixels.ts';
 import {SeatRow} from './seat_row.tsx';
 
 import './players.css';
@@ -71,7 +72,7 @@ export function PlayersPanel({
       </header>
       {spectator && (
         <p className="players__status" role="note">
-          Spectating: choose a seat in View › Perspective to play.
+          Spectating: the seats are read only during a game.
         </p>
       )}
       <div
@@ -138,7 +139,6 @@ function useSeatList(onSeatsOverflow?: (pixels: number | null) => void): {
 function seatsOverflow(scroll: HTMLElement): number | null {
   const list = scroll.querySelector<HTMLElement>('.players__seats');
   if (list === null || scroll.clientHeight <= 0) return null;
-  const px = (value: string): number => Number(value.replace(/px$/, '')) || 0;
   let height = 0;
   for (const item of Array.from(list.children)) {
     const row = item.querySelector<HTMLElement>('.seat__row');
@@ -146,15 +146,15 @@ function seatsOverflow(scroll: HTMLElement): number | null {
     const style = window.getComputedStyle(item);
     height +=
       row.offsetHeight +
-      px(style.paddingTop) +
-      px(style.paddingBottom) +
-      px(style.borderTopWidth) +
-      px(style.borderBottomWidth);
+      requirePixels(style.paddingTop) +
+      requirePixels(style.paddingBottom) +
+      requirePixels(style.borderTopWidth) +
+      requirePixels(style.borderBottomWidth);
   }
   const listStyle = window.getComputedStyle(list);
   height +=
-    px(listStyle.rowGap) * Math.max(0, list.children.length - 1) +
-    px(listStyle.paddingTop) +
-    px(listStyle.paddingBottom);
+    requirePixels(listStyle.rowGap) * Math.max(0, list.children.length - 1) +
+    requirePixels(listStyle.paddingTop) +
+    requirePixels(listStyle.paddingBottom);
   return Math.ceil(height - scroll.clientHeight);
 }

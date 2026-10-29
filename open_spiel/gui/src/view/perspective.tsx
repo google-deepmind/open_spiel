@@ -15,61 +15,128 @@
 import {type JSX, useId} from 'react';
 
 import type {Viewer} from '../contract/contract.ts';
-import {viewerOptions} from '../game/game_defaults.ts';
-import {viewerParameter} from '../session/client.ts';
+import {
+  perspectiveLock,
+  sessionModeOf,
+  useAnalysisViewSeat,
+} from '../game/bottom_seat.ts';
 
 import './view.css';
 
 /** The properties of Perspective. */
 export interface PerspectiveProps {
-  /** Who the game is shown to. */
+  /** Who the page is shown to: the oracle in analysis, else a seat. */
   readonly viewer: Viewer;
-  /** The game's seats, which the perspectives are offered for. */
+  /** The game's seats, which the select offers. */
   readonly numSeats: number;
-  /** Shows the game to `viewer`. */
-  readonly onChange: (viewer: Viewer) => void;
 }
 
 /**
- * Whose view of the game the page shows: a seat, the oracle, who sees
- * everything, or a spectator, who sees only what is public. A perspective is
- * what the board shows, not who may change the game.
+ * View › Perspective. In analysis the viewer sits
+ * at any seat: the select chooses the seat the board draws at the bottom
+ * and fetches nothing, and the board's own "Show all cards" reveals the
+ * other hands. In a game the perspective is the viewer's own seat, shown as
+ * a fact with the reason it is locked.
  */
-export function Perspective({
-  viewer,
-  numSeats,
-  onChange,
-}: PerspectiveProps): JSX.Element {
+export function Perspective({viewer, numSeats}: PerspectiveProps): JSX.Element {
   const id = useId();
-  const options = viewerOptions(numSeats);
+  const [analysisViewSeat, setAnalysisViewSeat] = useAnalysisViewSeat();
+  const isParticipant = viewer.kind === 'seat' && viewer.seat !== null;
+  const lock = perspectiveLock(
+    {mode: sessionModeOf(viewer)},
+    {seat: viewer.seat, isParticipant},
+  );
+  const options = Array.from({length: numSeats}, (_, seat) => ({
+    value: seat,
+    label:
+      seat === viewer.seat
+        ? `Seat ${String(seat)} (you)`
+        : `Seat ${String(seat)}`,
+  }));
+  // Until a seat is chosen the select names one, the viewer's
+  // own seat when it has one (the address's viewSeat is already the chosen
+  // seat here), else the first. The oracle holds no seat, so analysis rests
+  // on Seat 0. Chess keeps its View from until a seat is
+  // chosen, so it may rest on Seat 0 drawn from White.
+  const preferred =
+    options.find(option => option.value === viewer.seat)?.value ??
+    options[0]?.value ??
+    null;
+  const value =
+    analysisViewSeat !== null
+      ? String(analysisViewSeat)
+      : preferred !== null
+        ? String(preferred)
+        : '';
   return (
     <section className="view-card" aria-label="Perspective">
-      <div className="view-field">
-        <label htmlFor={id}>Perspective</label>
-        <select
-          id={id}
-          className="view-field__select"
-          value={viewerParameter(viewer)}
-          onChange={event => {
-            const chosen = options.find(
-              option => option.value === event.currentTarget.value,
-            );
-            if (chosen === undefined) {
-              throw new Error(`No perspective "${event.currentTarget.value}".`);
-            }
-            onChange(chosen.viewer);
-          }}
-        >
-          <option value="" disabled>
-            Select a seat
-          </option>
-          {options.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      {lock.switchable ? (
+        <>
+          <div className="view-field">
+            <label htmlFor={id}>Perspective</label>
+            <select
+              id={id}
+              className="view-field__select"
+              data-testid="perspective-select"
+              value={value}
+              disabled={options.length === 0}
+              onChange={event => {
+                const seat = Number(event.currentTarget.value);
+                if (!Number.isInteger(seat)) {
+                  throw new Error(
+                    `No seat "${event.currentTarget.value}" to sit at.`,
+                  );
+                }
+                setAnalysisViewSeat(seat);
+              }}
+            >
+              <option value="" disabled>
+                Select a seat
+              </option>
+              {options.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          {options.length === 0 && (
+            <p className="view-note">
+              Seat options will appear once players or hands are detected in the
+              current session.
+            </p>
+          )}
+        </>
+      ) : (
+        <LockedPerspective
+          seat={isParticipant ? viewer.seat : null}
+          reason={lock.reason}
+        />
+      )}
     </section>
+  );
+}
+
+// A game's Perspective: the viewer's own seat, as a fact, with the reason it
+// cannot change.
+function LockedPerspective({
+  seat,
+  reason,
+}: {
+  readonly seat: number | null;
+  readonly reason: string | null;
+}): JSX.Element {
+  return (
+    <>
+      <div className="view-field">
+        <span>Perspective</span>
+        <span data-testid="perspective-locked">
+          {seat !== null ? `Seat ${String(seat)} (you)` : 'Spectating'}
+        </span>
+      </div>
+      <p className="view-note" data-testid="perspective-lock-reason">
+        {reason}
+      </p>
+    </>
   );
 }

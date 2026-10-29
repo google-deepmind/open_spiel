@@ -212,6 +212,78 @@ test('a copy icon copies', async ({app, page}) => {
   expect(copied).toBe(stateText(live));
 });
 
+test('rewards have a copy icon beside their text, and it copies', async ({
+  app,
+  page,
+}) => {
+  await app.openGame('tic_tac_toe');
+  await app.setViewer('oracle');
+  await playMoves(app, 1);
+  const rewards = await app.showSection('State', 'Rewards');
+  const text = rewards.getByRole('group', {name: 'Rewards', exact: true});
+  await expect(text).toBeVisible();
+  const shown = await text.textContent();
+  const copy = rewards.getByRole('button', {name: 'Copy to clipboard'});
+  const card = rewards.locator('.copyable--compact');
+  const [textBox, copyBox, cardBox] = [
+    await text.boundingBox(),
+    await copy.boundingBox(),
+    await card.boundingBox(),
+  ];
+  if (textBox === null || copyBox === null || cardBox === null) {
+    throw new Error('The rewards, their card or their copy icon is not drawn.');
+  }
+  // Beside the text, never over it, and inside the card.
+  expect(copyBox.x).toBeGreaterThanOrEqual(textBox.x + textBox.width);
+  expect(copyBox.y).toBeGreaterThanOrEqual(cardBox.y);
+  expect(copyBox.y + copyBox.height).toBeLessThanOrEqual(
+    cardBox.y + cardBox.height,
+  );
+  await copy.click();
+  await expect(rewards.getByRole('button', {name: 'Copied'})).toBeVisible();
+  // The card does not move or grow when the icon changes.
+  expect(await card.boundingBox()).toEqual(cardBox);
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toBe(shown);
+});
+
+test('the result notice is drawn whole, never clipped by its panel', async ({
+  app,
+  page,
+}) => {
+  await app.openGame('tic_tac_toe');
+  await app.setViewer('oracle');
+  // First legal action each time: X takes the 2-4-6 diagonal on move 7.
+  await playMoves(app, 7);
+  const notice = page.getByTestId('game-result');
+  await expect(notice).toContainText('X wins');
+  // Every edge of the notice lies inside every ancestor that clips, so no
+  // scrolling shell cuts off any part of its border.
+  const clipped = await notice.evaluate(element => {
+    const box = element.getBoundingClientRect();
+    const cuts: string[] = [];
+    for (let up = element.parentElement; up !== null; up = up.parentElement) {
+      const style = getComputedStyle(up);
+      if (style.overflowX === 'visible' && style.overflowY === 'visible') {
+        continue;
+      }
+      const clip = up.getBoundingClientRect();
+      if (
+        box.top < clip.top ||
+        box.left < clip.left ||
+        box.bottom > clip.bottom ||
+        box.right > clip.right
+      ) {
+        cuts.push(
+          `${up.className}: notice ${JSON.stringify(box)} clip ${JSON.stringify(clip)}`,
+        );
+      }
+    }
+    return cuts;
+  });
+  expect(clipped).toEqual([]);
+});
+
 test('the settings switch the theme, and it is kept', async ({app, page}) => {
   await app.openGame('tic_tac_toe');
   const html = page.locator('html');

@@ -235,5 +235,24 @@ class ExamplesTest(absltest.TestCase):
         self.assertEqual(state.history(), rec["history"])
 
 
+class KnownReturnDifferenceTest(absltest.TestCase):
+
+  def test_gin_equal_deadwood_undercut_only(self):
+    try:
+      # Lazy: pyspiel is an optional dependency.
+      import pyspiel  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+    except ModuleNotFoundError:
+      self.skipTest("needs pyspiel")
+    gin = pyspiel.load_game("gin_rummy(oklahoma=true)")
+    known = play_checkpoints.known_return_difference
+    self.assertIsNotNone(known(gin, [0.0, 0.0], [25.0, -25.0]))
+    self.assertIsNotNone(known(gin, [-0.0, 0.0], [-25.0, 25.0]))
+    self.assertIsNone(known(gin, [0.0, 0.0], [27.0, -27.0]))
+    self.assertIsNone(known(gin, [3.0, -3.0], [25.0, -25.0]))
+    self.assertIsNone(
+        known(pyspiel.load_game("kuhn_poker"), [0.0, 0.0], [25.0, -25.0])
+    )
+
+
 if __name__ == "__main__":
   absltest.main()

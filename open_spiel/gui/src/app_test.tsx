@@ -20,7 +20,7 @@ import {SessionClient} from './session/client.ts';
 import {FakeServer} from './session/testing/fake_server.ts';
 import {fakeColorScheme} from './testing/color_scheme.ts';
 import {enter, labelled} from './testing/input.ts';
-import {button, render, type Rendered} from './testing/render.tsx';
+import {render, type Rendered} from './testing/render.tsx';
 import {ThemeProvider} from './theme/theme_provider.tsx';
 
 /** A ResizeObserver that never reports: the dock keeps its first layout. */
@@ -51,14 +51,21 @@ function open(path: string): HTMLElement {
   return rendered.container;
 }
 
-/** Waits, letting the fake server answer, until `check` passes. */
+/**
+ * Waits, letting the fake server answer, until `check` passes. Five seconds,
+ * not vitest's one: a loaded CI runner timed this out at one second on a
+ * passing build.
+ */
 async function until(check: () => void): Promise<void> {
-  await vi.waitFor(async () => {
-    await act(async () => {
-      await Promise.resolve();
-    });
-    check();
-  });
+  await vi.waitFor(
+    async () => {
+      await act(async () => {
+        await Promise.resolve();
+      });
+      check();
+    },
+    {timeout: 5000},
+  );
 }
 
 function click(element: HTMLElement): void {
@@ -81,8 +88,8 @@ function legal(container: HTMLElement, label: string): HTMLElement {
   return row;
 }
 
-/** The Perspective list, in the View panel, which it brings forward. */
-function perspective(container: HTMLElement): HTMLSelectElement {
+/** Brings the View panel forward. */
+function perspectiveTab(): void {
   const tab = [...document.querySelectorAll('.dv-tab')].find(
     candidate => candidate.textContent === 'View',
   );
@@ -90,7 +97,30 @@ function perspective(container: HTMLElement): HTMLSelectElement {
   act(() => {
     tab.dispatchEvent(new MouseEvent('pointerdown', {bubbles: true}));
   });
+}
+
+/** The Perspective list, in the View panel, which it brings forward. */
+function perspective(container: HTMLElement): HTMLSelectElement {
+  perspectiveTab();
   return labelled(container, 'Perspective') as HTMLSelectElement;
+}
+
+/** Every viewer the page sent a session request as, once each. */
+function sessionViewers(): Array<string | null> {
+  return [
+    ...new Set(
+      server.received
+        .filter(({path}) => path.startsWith('/api/sessions'))
+        .map(({viewer}) => viewer),
+    ),
+  ];
+}
+
+/** A locked Perspective: the seat it shows, and why it is locked. */
+function lockedPerspective(container: HTMLElement): Array<string | null> {
+  return ['perspective-locked', 'perspective-lock-reason'].map(
+    id => container.querySelector(`[data-testid="${id}"]`)?.textContent ?? null,
+  );
 }
 
 beforeEach(() => {
@@ -200,55 +230,123 @@ describe('App, on a game page', () => {
   });
 });
 
-describe('App, choosing the viewer', () => {
-  it('opens for the default viewer when the address names a seat the game lacks', async () => {
-    const container = open('/game/count?viewer=7');
-    await until(() => {
-      expect(legal(container, 'zero')).toBeDefined();
-    });
-    expect(perspective(container).value).toBe('oracle');
-    expect(server.received.every(({viewer}) => viewer !== '7')).toBe(true);
-  });
-
-  it('shows the game to the viewer chosen', async () => {
-    const container = open('/game/count');
-    await until(() => {
-      expect(legal(container, 'zero')).toBeDefined();
-    });
-    enter(perspective(container), 'spectator');
-    await until(() => {
-      expect(server.received.at(-1)?.viewer).toBe('spectator');
-      expect(container.querySelector('.gameplay__status')?.textContent).toBe(
-        'Turn 0 · Player 0 · Spectating',
-      );
-    });
-    expect(new URL(window.location.href).searchParams.get('viewer')).toBe(
-      'spectator',
-    );
-  });
-
-  it('hands the device over behind a screen in a game that hides information', async () => {
+describe('App, analysis and a game', () => {
+  it('opens in analysis, offering every seat and nothing else', async () => {
     server = new FakeServer({hidesInformation: true});
     const container = open('/game/count');
     await until(() => {
       expect(legal(container, 'zero')).toBeDefined();
     });
-    expect(perspective(container).value).toBe('0');
-    click(legal(container, 'zero'));
-    await until(() => {
-      expect(button('Hand over to Player 1', container)).toBeDefined();
-    });
-    click(button('Hand over to Player 1', container));
-    const screen = document.querySelector('[role="dialog"][aria-modal]');
-    expect(screen?.textContent).toContain('Pass the device to Player 1');
-    expect(container.querySelector('.game-page')?.hasAttribute('inert')).toBe(
-      true,
+    const select = perspective(container);
+    expect([...select.options].map(option => option.textContent)).toEqual([
+      'Select a seat',
+      'Seat 0',
+      'Seat 1',
+    ]);
+    expect(select.value).toBe('0');
+    expect(sessionViewers()).toEqual(['oracle']);
+    expect(new URL(window.location.href).searchParams.get('viewer')).toBe(
+      'oracle',
     );
-    click(button('Show Player 1’s view', container));
-    expect(document.querySelector('[aria-modal]')).toBeNull();
+  });
+
+  it('sits at another seat without a request, and keeps it in the address', async () => {
+    server = new FakeServer({hidesInformation: true});
+    const container = open('/game/count');
     await until(() => {
-      expect(legal(container, 'one')).toBeDefined();
+      expect(legal(container, 'zero')).toBeDefined();
+    });
+    const requests = server.received.length;
+    enter(perspective(container), '1');
+    expect(perspective(container).value).toBe('1');
+    await until(() => {
+      expect(new URL(window.location.href).searchParams.get('viewSeat')).toBe(
+        '1',
+      );
+    });
+    expect(server.received).toHaveLength(requests);
+  });
+
+  it('opens analysis at the seat its address names', async () => {
+    const container = open('/game/count?viewSeat=1');
+    await until(() => {
+      expect(legal(container, 'zero')).toBeDefined();
     });
     expect(perspective(container).value).toBe('1');
   });
+
+  it('plays every seat in analysis, with no hand-over', async () => {
+    server = new FakeServer({hidesInformation: true});
+    const container = open('/game/count');
+    await until(() => {
+      expect(legal(container, 'zero')).toBeDefined();
+    });
+    click(legal(container, 'zero'));
+    await until(() => {
+      expect(legal(container, 'one')).toBeDefined();
+    });
+    click(legal(container, 'one'));
+    await until(() => {
+      expect(container.querySelector('.history')?.textContent).toContain(
+        '#2one',
+      );
+    });
+    expect(document.querySelector('[aria-modal]')).toBeNull();
+    expect(container.textContent).not.toContain('Hand over');
+  });
+});
+
+describe('App, a game at a seat or spectating', () => {
+  it('opens a game at the seat its address names, its perspective locked', async () => {
+    server = new FakeServer({hidesInformation: true});
+    const container = open('/game/count?viewer=1');
+    await until(() => {
+      expect(container.querySelector('.gameplay__status')).not.toBeNull();
+    });
+    perspectiveTab();
+    expect(lockedPerspective(container)).toEqual([
+      'Seat 1 (you)',
+      'Locked to your seat during a game',
+    ]);
+    expect(container.querySelector('[data-testid="perspective-select"]')).toBe(
+      null,
+    );
+    expect(sessionViewers()).toEqual(['1']);
+  });
+
+  it('opens a spectator, its perspective locked', async () => {
+    const container = open('/game/count?viewer=spectator');
+    await until(() => {
+      expect(container.querySelector('.gameplay__status')?.textContent).toBe(
+        'Turn 0 · Player 0 · Spectating',
+      );
+    });
+    perspectiveTab();
+    expect(lockedPerspective(container)).toEqual([
+      'Spectating',
+      'Spectating: the perspective is fixed during a game',
+    ]);
+  });
+
+  it.each(['7', '-1'])(
+    'opens the spectator, never the oracle, for viewer=%s the game lacks',
+    async parameter => {
+      server = new FakeServer({hidesInformation: true});
+      const container = open(`/game/count?viewer=${parameter}`);
+      await until(() => {
+        expect(container.querySelector('.gameplay__status')?.textContent).toBe(
+          'Turn 0 · Player 0 · Spectating',
+        );
+      });
+      perspectiveTab();
+      expect(lockedPerspective(container)).toEqual([
+        'Spectating',
+        'Spectating: the perspective is fixed during a game',
+      ]);
+      expect(sessionViewers()).toEqual(['spectator']);
+      expect(new URL(window.location.href).searchParams.get('viewer')).toBe(
+        'spectator',
+      );
+    },
+  );
 });
