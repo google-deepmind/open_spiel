@@ -228,6 +228,7 @@ py_library(
         "//open_spiel/python/scale/serve:controller",
         "//open_spiel/python/scale/serve:games",
         "//open_spiel/python/scale/serve:host_agent",
+        "//open_spiel/python/scale/serve:remote_bot",
         "//open_spiel/python/scale/serve:replay",
         "//open_spiel/python/scale/serve:server",
         "//open_spiel/python/scale/serve:wire",
