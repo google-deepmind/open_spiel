@@ -35,12 +35,16 @@ trained it, and name the folder it writes.
    prints `v22.` or later.
 
 1. **Install** OpenSpiel into a virtualenv, build the client, and install
-   whatever the bot that plays the checkpoint needs (its package documents
-   it; for a Cloud Storage checkpoint, `gcsfs`), from the repository root:
+   whatever the bot that plays the checkpoint needs (for `scale`'s pretrained
+   gin rummy checkpoint below, `$OPEN_SPIEL_PYTHON_JAX_DEPS`; a public
+   `https://` URL needs no `gcsfs` or Cloud credentials, whereas an
+   unauthenticated `gs://` URL uses `gcsfs`), from the repository root:
 
    ```sh
    python3.12 -m venv venv && . venv/bin/activate
    pip install -e .
+   source open_spiel/scripts/python_extra_deps.sh python3
+   echo "$OPEN_SPIEL_PYTHON_JAX_DEPS" | xargs pip install
    (cd open_spiel/gui && npm ci && npm run build)
    ```
 
@@ -51,8 +55,8 @@ trained it, and name the folder it writes.
    the package that trained the checkpoint names it:
 
    ```sh
-   BOT=<module>:<factory>
-   CHECKPOINT=<location>@<step>
+   BOT=open_spiel.python.scale.serve.remote_bot:make_bot
+   CHECKPOINT=https://storage.googleapis.com/openspiel-data/checkpoints/scale/gin_rummy/v1@30000
    python -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
      --bot "$BOT" --checkpoint "$CHECKPOINT"
    ```

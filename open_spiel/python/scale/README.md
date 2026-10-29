@@ -77,6 +77,7 @@ The named configs (`configs/`; train one with
 | `mmd_kuhn_poker` | MMD self-play on Kuhn poker |
 | `mmd_leduc_poker` | MMD self-play on Leduc poker |
 | `mmd_gin_rummy` | MMD self-play on gin rummy, scored every 100 updates against the scripted rule bot |
+| `gin_mmd_from_scratch` | MMD self-play from scratch on Oklahoma gin rummy (recipe of the pretrained checkpoint below) |
 | `ppo_tic_tac_toe` | PPO against a uniform-random seat on tic-tac-toe |
 | `az_connect_four` | AlphaZero on Connect Four |
 | `bc_connect_four` | behaviour cloning of a scripted Connect Four player |
@@ -118,12 +119,12 @@ on the cmake line (with every other manual test).
 
 A gin rummy agent trained with this package (the named config
 `gin_mmd_from_scratch`, step 30000) is distributed as an artifact folder anyone
-can read, with no account and no cloud tools; point `CKPT` at a copy. It plays
-Oklahoma gin, the game string `gin_rummy(oklahoma=true)`. Playing it needs the
-full install above (pyspiel).
+can read, with no account and no cloud tools; point `CKPT` at it (or at a local
+copy). It plays Oklahoma gin, the game string `gin_rummy(oklahoma=true)`.
+Playing it needs the full install above (pyspiel).
 
-    CKPT=/path/to/artifact   # a local directory, gs://<bucket>/<path>, or
-                             # https://storage.googleapis.com/<bucket>/<path>
+    CKPT=https://storage.googleapis.com/openspiel-data/checkpoints/scale/gin_rummy/v1
+    # A local copy or gs://openspiel-data/checkpoints/scale/gin_rummy/v1 also works.
 
 The folder is an artifact in this package's own format (`ckpt.artifact`), one
 step:
@@ -167,14 +168,22 @@ installed server does not find the client in the checkout, so
 `--client-dir` points at it:
 
     (cd open_spiel/gui && npm ci && npm run build)
+    python3 -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
+        --bot open_spiel.python.scale.serve.remote_bot:make_bot --checkpoint "$CKPT@30000"
+
+Once the bot has loaded and compiled (tens of seconds), open the printed
+`http://127.0.0.1:8080/game/gin_rummy?...` address to play (see
+`../gui/REMOTE_BOTS.md`). Alternatively, to run the in-process `"checkpoint"`
+controller plugin directly inside the GUI server (`--client-dir` points at the
+built client after a non-editable `pip install .`):
+
     python3 -m open_spiel.python.gui --controllers open_spiel.python.scale.serve.controller \
         --client-dir "$PWD/open_spiel/gui/dist"
 
 Then open http://127.0.0.1:8080, choose gin rummy with `oklahoma=true`, play
 one seat yourself and give the other seat the controller "Checkpoint", its
-`checkpoint` setting `$CKPT@30000` written out. The seat shows as preparing
-while the agent loads and compiles (tens of seconds); after that it moves at
-once. The agent sees only its own seat's view of the game.
+`checkpoint` setting `$CKPT@30000` written out. The agent sees only its own
+seat's view of the game.
 
 **Equal deadwood after layoffs is an undercut**, as the agent was trained.
 OpenSpiel releases up to 2.0.2 score that hand 0-0; with such a release,

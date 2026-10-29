@@ -320,7 +320,10 @@ def test_gin_checkpoint_twenty_games(bot_server):
     pytest.skip(f"{GIN_ARTIFACT_ENV} names no gin artifact")
   _, _, move_budget = _gui()
   move_budget.set_seconds(120.0)
-  manifest = ckpt.load_manifest(path, ckpt.latest_step(path))
+  ckpt_dir, step = checkpoint_bot_lib.split_checkpoint(path)
+  if step is None:
+    step = ckpt.latest_step(ckpt_dir)
+  manifest = ckpt.load_manifest(ckpt_dir, step)
   game = pyspiel.load_game(checkpoint_bot_lib.game_string_of(manifest))
   url = bot_server(_FACTORY, path)
   assert get_json(url + "/info")["games"] == ["gin_rummy"]

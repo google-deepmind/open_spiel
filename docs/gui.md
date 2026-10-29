@@ -103,11 +103,12 @@ and the protocol.
 
 `python3 -m open_spiel.python.gui.play` starts a bot server and the GUI
 server in one step and opens a game whose seat 1 is that bot, for example
-gin rummy against a trained checkpoint:
+gin rummy against the pretrained `scale` checkpoint:
 
 ```sh
 python3 -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
-  --bot <module>:<factory> --checkpoint <location>@<step>
+  --bot open_spiel.python.scale.serve.remote_bot:make_bot \
+  --checkpoint https://storage.googleapis.com/openspiel-data/checkpoints/scale/gin_rummy/v1@30000
 ```
 
 The checkpoint is a variable: the seat's settings carry it as
