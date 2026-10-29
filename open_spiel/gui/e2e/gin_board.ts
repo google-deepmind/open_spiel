@@ -297,3 +297,46 @@ export async function press(
     `${move.what}: no move was sent after ${String(PRESS_TRIES)} presses.`,
   );
 }
+
+/** The seat's frame from the server, as that seat sees it. */
+export async function seatFrame(
+  page: Page,
+  id: string,
+  seat: number,
+): Promise<Frame> {
+  const response = await page.request.get(
+    `/api/sessions/${id}?viewer=${String(seat)}`,
+  );
+  expect(response.ok(), await response.text()).toBe(true);
+  return (await response.json()) as Frame;
+}
+
+/** Plays `action` for a human seat through the server's API, off the page. */
+export async function seatAct(
+  page: Page,
+  id: string,
+  seat: number,
+  action: number,
+): Promise<Frame> {
+  const response = await page.request.post(
+    `/api/sessions/${id}/actions?viewer=${String(seat)}`,
+    {data: {action, ply: null}},
+  );
+  expect(response.ok(), await response.text()).toBe(true);
+  return (await response.json()) as Frame;
+}
+
+/** The seat's discard: its highest card outside its best melds. */
+export function seatDiscard(frame: Frame, view: GinView, seat: number): number {
+  const hand = view.hands[seat] ?? [];
+  const melded = bestMelded(view.view, seat);
+  const choices = hand
+    .filter(code => legal(frame, code) !== null)
+    .sort(
+      (a, b) =>
+        Number(melded.has(a)) - Number(melded.has(b)) || points(b) - points(a),
+    );
+  const action = choices[0] === undefined ? null : legal(frame, choices[0]);
+  if (action === null) throw new Error(`Seat ${String(seat)} cannot discard.`);
+  return action;
+}

@@ -19,6 +19,11 @@ interface ActionBarProps {
   knockDisabled?: boolean | undefined;
   onPass?: (() => void) | undefined;
   onKnock?: (() => void) | undefined;
+  /**
+   * The stock is down to its last two cards: Pass ends the hand in a draw,
+   * and a knock takes the upcard. The buttons' titles say so.
+   */
+  atWall?: boolean | undefined;
   /** The fanned hand's Sort (melds first, then by rank); absent in grid view. */
   onSort?: (() => void) | undefined;
   /**
@@ -65,9 +70,11 @@ function PassKnock({
   knockDisabled,
   onPass,
   onKnock,
+  atWall,
 }: Pick<ActionBarProps, 'onPass' | 'onKnock'> & {
   passDisabled: boolean;
   knockDisabled: boolean;
+  atWall: boolean;
 }): JSX.Element {
   return (
     <>
@@ -76,7 +83,11 @@ function PassKnock({
         className={`gin-action${passDisabled ? '' : ' gin-action--primary'}`}
         onClick={passDisabled ? undefined : onPass}
         disabled={passDisabled}
-        title="Pass on the upcard"
+        title={
+          atWall
+            ? 'Pass: end the hand as a draw, with no score'
+            : 'Pass on the upcard'
+        }
       >
         Pass
       </button>
@@ -85,7 +96,11 @@ function PassKnock({
         className={`gin-action${knockDisabled ? '' : ' gin-action--primary'}`}
         onClick={knockDisabled ? undefined : onKnock}
         disabled={knockDisabled}
-        title="Knock: end the hand and lay down your melds"
+        title={
+          atWall
+            ? 'Knock: take the upcard, end the hand and lay down your melds'
+            : 'Knock: end the hand and lay down your melds'
+        }
       >
         Knock
       </button>
@@ -103,6 +118,7 @@ export function ActionBar({
   knockDisabled = true,
   onPass,
   onKnock,
+  atWall = false,
   onSort,
   onResult,
   laydown,
@@ -139,6 +155,7 @@ export function ActionBar({
           knockDisabled={knockDisabled}
           onPass={onPass}
           onKnock={onKnock}
+          atWall={atWall}
         />
       )}
       {onSort !== undefined && (

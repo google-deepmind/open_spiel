@@ -38,7 +38,6 @@ import {
   bestMelded,
   plansOf,
   readView,
-  points,
   legal,
   button,
   handCard,
@@ -46,45 +45,10 @@ import {
   chooseMove,
   capture,
   press,
+  seatAct,
+  seatDiscard,
+  seatFrame,
 } from './gin_board.ts';
-
-/** Seat 1's frame from the server, as seat 1 sees it. */
-async function seatFrame(page: Page, id: string, seat: number): Promise<Frame> {
-  const response = await page.request.get(
-    `/api/sessions/${id}?viewer=${String(seat)}`,
-  );
-  expect(response.ok(), await response.text()).toBe(true);
-  return (await response.json()) as Frame;
-}
-
-async function seatAct(
-  page: Page,
-  id: string,
-  seat: number,
-  action: number,
-): Promise<Frame> {
-  const response = await page.request.post(
-    `/api/sessions/${id}/actions?viewer=${String(seat)}`,
-    {data: {action, ply: null}},
-  );
-  expect(response.ok(), await response.text()).toBe(true);
-  return (await response.json()) as Frame;
-}
-
-/** Seat 1's discard: its highest card outside its best melds. */
-function seatDiscard(frame: Frame, view: GinView, seat: number): number {
-  const hand = view.hands[seat] ?? [];
-  const melded = bestMelded(view.view, seat);
-  const choices = hand
-    .filter(code => legal(frame, code) !== null)
-    .sort(
-      (a, b) =>
-        Number(melded.has(a)) - Number(melded.has(b)) || points(b) - points(a),
-    );
-  const action = choices[0] === undefined ? null : legal(frame, choices[0]);
-  if (action === null) throw new Error(`Seat ${String(seat)} cannot discard.`);
-  return action;
-}
 
 /**
  * Plays seat 1's turn through the API, a human knocking as soon as it may

@@ -69,7 +69,8 @@ function GinNotice({children}: {readonly children: string}): JSX.Element {
   );
 }
 
-function passKnock(
+/** Pass and Knock: each one's handler, and whether it is disabled. */
+export function passKnock(
   d: GinRummyDerivedState,
   moves: GinMoves,
   turn: GinTurn,
@@ -132,6 +133,7 @@ function boardProps(b: BoardInputs): GinRummyBoardSurfaceProps {
     onDrawStock: moves.drawStockHandler ?? undefined,
     onDrawDiscard: moves.drawUpcardHandler ?? undefined,
     ...b.buttons,
+    atWall: d.normalizedPhase === 'wall',
     waitingOnBot: turn.waitingOnBot,
     currentAutoPlay: turn.currentAutoPlay,
     interactionBlockReason: turn.interactionBlockReason,

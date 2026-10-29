@@ -154,12 +154,10 @@ export function useGinMoves(
     handleActionDoubleClick,
     drawUpcardHandler: play(d.drawUpcardAction),
     drawStockHandler: play(d.drawStockAction),
-    // The Pass button serves only the first-upcard pass: every laydown
-    // commit goes through Done.
-    passHandler:
-      d.normalizedPhase === 'firstupcard'
-        ? play(d.initialUpcardPassAction)
-        : null,
+    // The Pass button serves the first-upcard pass and the wall's pass
+    // (use_gin_actions.ts, PASS_BUTTON_PHASES): every laydown commit goes
+    // through Done.
+    passHandler: play(d.passAction),
     handleKnock,
     canAttemptKnock: may,
   };

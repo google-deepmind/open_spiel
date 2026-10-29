@@ -86,6 +86,8 @@ export interface GinRummyBoardSurfaceProps {
   onKnock?: (() => void) | undefined;
   passDisabled?: boolean | undefined;
   knockDisabled?: boolean | undefined;
+  /** The wall: Pass ends the hand in a draw, a knock takes the upcard. */
+  atWall?: boolean | undefined;
   /** Laydown compose in progress: Done takes the action region. */
   laydown?:
     | {stage: string | null; onDone?: (() => void) | undefined}

@@ -20,9 +20,30 @@ import {findActionId, extractCardCodesFromLabel} from '../types.ts';
 export interface GinActionsState {
   drawUpcardAction: number | null;
   drawStockAction: number | null;
-  initialUpcardPassAction: number | null;
+  /** Pass on the first upcard, or at the wall (a pass there ends the hand). */
+  passAction: number | null;
   knockAction: number | null;
   discardActions: Map<string, number>;
+}
+
+/**
+ * The phases whose Pass the board's Pass button plays: the first upcard
+ * (decline it) and the wall (the stock is down to its last two cards; a pass
+ * ends the hand as a draw, the only other move a knock). Every other pass is
+ * a laydown commit, which goes through Done.
+ */
+export const PASS_BUTTON_PHASES: ReadonlySet<string> = new Set([
+  'firstupcard',
+  'wall',
+]);
+
+/** The Pass the board's Pass button plays at `normalizedPhase`, if any. */
+export function passActionOf(
+  legalActions: readonly LegalAction[],
+  normalizedPhase: string,
+): number | null {
+  if (!PASS_BUTTON_PHASES.has(normalizedPhase)) return null;
+  return findActionId(legalActions, label => label.includes('pass'));
 }
 
 /** Extracts action ids from the legal actions for gin's common moves. */
@@ -48,12 +69,10 @@ export function useGinActions(
     [legalActions],
   );
 
-  const initialUpcardPassAction = useMemo(() => {
-    if (normalizedPhase !== 'firstupcard') {
-      return null;
-    }
-    return findActionId(legalActions, label => label.includes('pass'));
-  }, [normalizedPhase, legalActions]);
+  const passAction = useMemo(
+    () => passActionOf(legalActions, normalizedPhase),
+    [normalizedPhase, legalActions],
+  );
 
   const knockAction = useMemo(
     () => findActionId(legalActions, label => label.includes('knock')),
@@ -82,7 +101,7 @@ export function useGinActions(
   return {
     drawUpcardAction,
     drawStockAction,
-    initialUpcardPassAction,
+    passAction,
     knockAction,
     discardActions,
   };

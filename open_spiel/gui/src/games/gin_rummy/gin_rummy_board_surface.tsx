@@ -262,6 +262,7 @@ function GinActionBar({
       knockDisabled={p.knockDisabled ?? true}
       onPass={p.onPass}
       onKnock={p.onKnock}
+      atWall={p.atWall ?? false}
       onSort={v.fanned && !v.handHidden ? p.onSort : undefined}
       onResult={onResult}
       laydown={p.laydown ?? null}
