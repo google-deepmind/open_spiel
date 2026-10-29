@@ -3,9 +3,118 @@
 A **Remote bot** seat is played by a bot server: a separate process, on this
 machine or another, that the GUI server sends each position to over HTTP and
 that answers with a move. Any bot can be served this way, a trained
-checkpoint included, without the GUI knowing anything of it. The steps,
-each with its check, run from the repository root with OpenSpiel installed
-(`pip install -e .`):
+checkpoint included, without the GUI knowing anything of it. Every step
+below, each with its check, runs from the repository root with OpenSpiel
+installed (`pip install -e .`).
+
+## Play gin rummy against a trained bot
+
+One command starts the reference bot server with a checkpoint, starts the
+GUI server, and opens a game of gin rummy whose seat 1 is that bot. The
+checkpoint is a variable: a local directory, a Cloud Storage path or a
+public `https://` URL, each followed by `@<step>`.
+
+**The checkpoint is an exported artifact folder**: `<location>/<step>/`
+holds `manifest.json` and `params/`, and `CHECKPOINT` names it as
+`<location>@<step>`. A training run's own directory (its periodic
+checkpoints, as the trainer writes them) is not one; convert the step you
+want into an artifact folder first, with the converter of the package that
+trained it, and name the folder it writes.
+
+0. **Prerequisites**: Python 3.12 with `venv`, and Node.js 22 or later to
+   build the browser client. On Debian or Ubuntu, with
+   [nvm](https://github.com/nvm-sh/nvm) for Node.js (a distribution's
+   `nodejs` package is often older than 22):
+
+   ```sh
+   sudo apt-get install -y python3.12-venv
+   nvm install 22
+   ```
+
+   Check: `python3.12 -m venv --help` prints its usage, and `node --version`
+   prints `v22.` or later.
+
+1. **Install** OpenSpiel into a virtualenv, build the client, and install
+   whatever the bot that plays the checkpoint needs (its package documents
+   it; for a Cloud Storage checkpoint, `gcsfs`), from the repository root:
+
+   ```sh
+   python3.12 -m venv venv && . venv/bin/activate
+   pip install -e .
+   (cd open_spiel/gui && npm ci && npm run build)
+   ```
+
+   Check: `open_spiel/gui/dist/index.html` exists.
+
+2. **Name the bot and the checkpoint, and play**, from the repository root.
+   `BOT` is the bot's factory, `MODULE:FACTORY` (step 4 of the next section), as
+   the package that trained the checkpoint names it:
+
+   ```sh
+   BOT=<module>:<factory>
+   CHECKPOINT=<location>@<step>
+   python -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
+     --bot "$BOT" --checkpoint "$CHECKPOINT"
+   ```
+
+   Check: once the bot has loaded its checkpoint (a minute or so), it
+   prints `Play http://127.0.0.1:8080/game/gin_rummy?session=<id>&viewer=0`.
+   Open that address: you are seat 0, and Setup › Players reads Player 1
+   "Remote bot". Every move you make is answered by the bot. Ctrl-C stops
+   both servers, as do SIGTERM and closing the terminal.
+
+   **On a remote machine** (a cloud VM, say) the address is that machine's
+   loopback, which your browser cannot reach directly. Forward the port over
+   SSH from your own machine, then open the printed address there:
+
+   ```sh
+   ssh -L 8080:127.0.0.1:8080 <user>@<vm>
+   ```
+
+   (With `gcloud compute ssh <vm> -- -L 8080:127.0.0.1:8080` on Compute
+   Engine.) Keep that session open while you play.
+
+3. **Play again** once a hand ends: Setup › Position › **Reset**, then
+   **Reset** in the "Reset Game?" confirmation. A new hand starts with the
+   same seats: you are still seat 0, and the bot seat 1 on the same
+   checkpoint. No restart of either server is needed.
+
+4. **Change the checkpoint** without restarting: Setup › Players ›
+   Player 1 › Settings, put another `<location>@<step>` in **Checkpoint**,
+   and Save. The bot server is sent it with every request, as
+   `config.checkpoint`, and loads it at its first move, which waits for it:
+   a trained checkpoint's load and warm-up takes about 16 s, over the GUI
+   server's own 10 s move budget, so `play` gives the GUI server a 60 s
+   budget (`--move-budget-seconds`) and the seat waits the whole of it
+   (`timeout_seconds` 0). A bot slower still needs a larger
+   `--move-budget-seconds`.
+
+To try the steps without a trained checkpoint, write a stand-in and serve
+the stand-in bot, which plays random legal moves and needs nothing beyond
+OpenSpiel:
+
+```sh
+CHECKPOINT=$(python -m open_spiel.python.gui.stand_in_checkpoint_bot write /tmp/stand_in --game gin_rummy --step 1)
+python -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
+  --bot open_spiel.python.gui.stand_in_checkpoint_bot:make_bot \
+  --checkpoint "$CHECKPOINT"
+```
+
+What `play` does, step by step, is the rest of this page: it runs
+`remote_bot_server --bot <MODULE:FACTORY>` on a free port of this machine with
+the checkpoint in the environment variables `OPEN_SPIEL_REMOTE_BOT_CHECKPOINT`
+and `OPEN_SPIEL_SCALE_REMOTE_BOT_CHECKPOINT`, the names a bot's factory may read
+(`--checkpoint-env VAR` sets `VAR` alone instead), waits for its `/health`,
+starts the GUI server, and opens a session whose seat `--bot-seat` (1) is a
+Remote bot at that URL, with state `--state` (`full_state`), the checkpoint in
+its **Checkpoint** setting and autoplay on, every other seat human. Any game and
+any bot work the same way (`--game`, `--bot random`). The bot runs in its own
+process, so the GUI imports nothing of it. Flags after `--` go to the GUI
+server; `--move-budget-seconds` (60, so that a checkpoint switched in the seat
+can load at its first move) bounds each of the bot's moves, and `--open` opens
+the address in a browser.
+
+## Running a bot server by hand
 
 1. **Start the GUI server** in one terminal:
 
@@ -148,8 +257,12 @@ limit the notices of full-state seats.
 Every request is sent to the seat's `url` plus a path, with the protocol
 version in the `Spiel-Protocol: 1` header, so that its JSON body is exactly
 the bot's input. The seat's settings are `url`, `state` (`seat_view` or
-`full_state`), `config` (a JSON object passed on as `config`), `extras`,
-`tensors` and `timeout_seconds`.
+`full_state`), `checkpoint` (sent as `config.checkpoint` when not empty),
+`config` (a JSON object passed on as `config`), `extras`, `tensors` and
+`timeout_seconds`. A seat whose `config` gives a `checkpoint` other than its
+`checkpoint` setting is refused. A bot that plays a checkpoint reads it from
+`config.checkpoint`, else from its server's environment
+(`remote_bot_server.CHECKPOINT_ENV`).
 
 | Request | Body |
 | ------- | ---- |

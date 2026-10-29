@@ -31,6 +31,10 @@ served without the GUI knowing of it. A bot is an object with:
     "full_state", and `request` is the request's JSON body. A ValueError
     is answered as a refusal (HTTP 422), with its message.
 
+A factory that plays a checkpoint reads it, by convention, from the
+environment variable CHECKPOINT_ENV, and a request's `config.checkpoint`
+(a Remote bot seat's `checkpoint` setting) may name another.
+
 The server listens on 127.0.0.1 unless told otherwise. With `--token-env
 VAR` it answers only requests carrying `Authorization: Bearer <token>`, the
 token held in the environment variable VAR, and 401 to any other; it refuses
@@ -60,6 +64,11 @@ FULL_STATE = "full_state"
 
 # Each request path, and the state mode it carries.
 _PATHS = {"/spiel/observe": SEAT_VIEW, "/spiel/step": FULL_STATE}
+
+# The environment variable a bot's factory reads the checkpoint it plays
+# from, by convention: `play --checkpoint` sets it and
+# `stand_in_checkpoint_bot` reads it.
+CHECKPOINT_ENV = "OPEN_SPIEL_REMOTE_BOT_CHECKPOINT"
 
 # The largest request body read.
 MAX_BODY_BYTES = 16 << 20

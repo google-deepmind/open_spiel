@@ -101,6 +101,21 @@ on this machine unless `--remote-bot-host` names another host.
 `open_spiel/python/gui/REMOTE_BOTS.md` gives the steps, each with its check,
 and the protocol.
 
+`python3 -m open_spiel.python.gui.play` starts a bot server and the GUI
+server in one step and opens a game whose seat 1 is that bot, for example
+gin rummy against a trained checkpoint:
+
+```sh
+python3 -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
+  --bot <module>:<factory> --checkpoint <location>@<step>
+```
+
+The checkpoint is a variable: the seat's settings carry it as
+`checkpoint`, so another one can be chosen in Setup without a restart.
+`open_spiel/python/gui/REMOTE_BOTS.md` gives the steps, and
+`open_spiel.python.gui.stand_in_checkpoint_bot:make_bot` is a stand-in bot
+to try them with.
+
 `python3 -m open_spiel.python.gui.mcp --server http://127.0.0.1:8080` is a
 Model Context Protocol server that lets an agent list games, open sessions,
 read positions, play moves and set seats through the GUI server's API. It

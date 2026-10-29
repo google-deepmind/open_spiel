@@ -50,6 +50,7 @@ from open_spiel.python.gui import controller_settings
 from open_spiel.python.gui import information
 from open_spiel.python.gui import move_budget
 from open_spiel.python.gui import plies
+from open_spiel.python.gui import remote_bot_config
 from open_spiel.python.gui import remote_bot_http
 import pyspiel
 
@@ -217,6 +218,15 @@ def _settings() -> tuple[controller_settings.Setting, ...]:
           choices=STATE_MODES,
       ),
       controller_settings.Setting(
+          "checkpoint",
+          str,
+          "",
+          "The checkpoint the bot plays, such as /path/to/run@30000, sent "
+          "with every request as `config.checkpoint`; empty, the bot server's "
+          "own. Only a bot that reads `config.checkpoint` uses it.",
+          max_length=2000,
+      ),
+      controller_settings.Setting(
           "config",
           str,
           "{}",
@@ -248,21 +258,6 @@ def _settings() -> tuple[controller_settings.Setting, ...]:
           minimum=0.0,
       ),
   )
-
-
-def _bot_config(text: str) -> dict[str, contract.JsonValue]:
-  """Parses the `config` setting: a JSON object.
-
-  Raises:
-    ValueError: If `text` is not a JSON object.
-  """
-  try:
-    value = json.loads(text)
-  except json.JSONDecodeError as e:
-    raise ValueError(f"The remote bot's config is not JSON: {e.msg}.") from e
-  if not isinstance(value, dict):
-    raise ValueError("The remote bot's config is not a JSON object.")
-  return value
 
 
 def _provides_seat_view(game: pyspiel.Game) -> bool:
@@ -309,7 +304,7 @@ def config_refusal(
   if reason is not None:
     return reason
   try:
-    _bot_config(str(config["config"]))
+    remote_bot_config.seat_bot_config(config)
   except ValueError as e:
     return str(e)
   if config["state"] == SEAT_VIEW and not _provides_seat_view(game):
@@ -558,7 +553,7 @@ def _build(
       game,
       url=url,
       state_mode=str(config["state"]),
-      bot_config=_bot_config(str(config["config"])),
+      bot_config=remote_bot_config.seat_bot_config(config),
       extras=bool(config["extras"]),
       tensors=bool(config["tensors"]),
       timeout_seconds=float(config["timeout_seconds"]),

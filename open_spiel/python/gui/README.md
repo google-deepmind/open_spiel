@@ -38,6 +38,9 @@ also pins the tools that run it.
 
 ## Remote bots and agents
 
+- [Play gin rummy against a trained bot](REMOTE_BOTS.md#play-gin-rummy-against-a-trained-bot):
+  one command starts a bot server with a checkpoint and the GUI, and opens a
+  game against it; the checkpoint is a variable.
 - [Running a remote bot](REMOTE_BOTS.md): a seat played by a bot server,
   on this machine or another, sent the seat's view or the full state; the
   steps, the reference bot server that wraps any bot (a trained checkpoint

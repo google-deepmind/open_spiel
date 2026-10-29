@@ -84,6 +84,11 @@ pytype_strict_library(
 )
 
 pytype_strict_library(
+    name = "child_servers",
+    srcs = ["child_servers.py"],
+)
+
+pytype_strict_library(
     name = "contract",
     srcs = ["contract.py"],
 )
@@ -285,6 +290,18 @@ pytype_strict_library(
 )
 
 pytype_strict_library(
+    name = "play",
+    srcs = ["play.py"],
+    deps = [
+        ":child_servers",
+        ":remote_bot",
+        ":remote_bot_server",
+        ":static",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
     name = "plies",
     srcs = ["plies.py"],
     deps = [
@@ -325,8 +342,17 @@ pytype_strict_library(
         ":information",
         ":move_budget",
         ":plies",
+        ":remote_bot_config",
         ":remote_bot_http",
         "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "remote_bot_config",
+    srcs = ["remote_bot_config.py"],
+    deps = [
+        ":contract",
     ],
 )
 
@@ -428,6 +454,14 @@ pytype_strict_library(
 pytype_strict_library(
     name = "static",
     srcs = ["static.py"],
+)
+
+pytype_strict_library(
+    name = "stand_in_checkpoint_bot",
+    srcs = ["stand_in_checkpoint_bot.py"],
+    deps = [
+        ":remote_bot_server",
+    ],
 )
 
 pytype_strict_library(
@@ -830,6 +864,19 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
+    name = "play_test",
+    srcs = ["play_test.py"],
+    data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
+    deps = [
+        ":child_servers",
+        ":cli",  # The GUI server it starts as a process runs cli.
+        ":play",
+        ":stand_in_checkpoint_bot",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
     name = "plies_test",
     srcs = ["plies_test.py"],
     deps = [
@@ -865,6 +912,18 @@ pytype_strict_contrib_test(
         ":loader",
         ":presenters",
         ":views",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "remote_bot_config_test",
+    srcs = ["remote_bot_config_test.py"],
+    deps = [
+        ":controllers",
+        ":remote_bot",
+        ":remote_bot_config",
         "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//absl/testing:absltest",
     ],
