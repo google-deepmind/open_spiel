@@ -19,13 +19,16 @@
 #include <ctime>
 #include <map>
 #include <memory>
+#include <optional>
 #include <random>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "absl/types/optional.h"
+#include "absl/types/span.h"
 #include "nlohmann/json_fwd.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
@@ -55,6 +58,134 @@ void BasicGameTests() {
                       ->MakeObserver(kInfoStateObsType,
                                      GameParametersFromString("single_tensor"));
   testing::RandomSimTestCustomObserver(*LoadGame("hearts"), observer);
+}
+
+// Builds a pass-phase state: pass direction, the deal of card c to seat
+// c % 4 (so North holds 0, 4, ..., 48 and East 1, 5, ..., 49), then `passes`.
+std::unique_ptr<State> PassPhaseState(const Game& game, PassDir pass_dir,
+                                      const std::vector<Action>& passes) {
+  std::unique_ptr<State> state = game.NewInitialState();
+  state->ApplyAction(static_cast<int>(pass_dir));
+  for (Action card = 0; card < kNumCards; ++card) {
+    state->ApplyAction(card);
+  }
+  for (Action card : passes) {
+    state->ApplyAction(card);
+  }
+  return state;
+}
+
+// The kNumCardsInPass pass actions starting at history index first_pass.
+std::vector<Action> ResampledPass(const State& state, int first_pass) {
+  const std::vector<Action> history = state.History();
+  return std::vector<Action>(history.begin() + first_pass,
+                             history.begin() + first_pass + kNumCardsInPass);
+}
+
+// Two pass-phase states that differ only in the pass made to `viewer`, which
+// `viewer` has not yet received. That pass starts at history index
+// `first_pass` and is `true_pass` in `with_true_pass`.
+struct PassTwins {
+  std::unique_ptr<State> with_true_pass;
+  std::unique_ptr<State> with_other_pass;
+  Player viewer;
+  int first_pass;
+  std::vector<Action> true_pass;
+};
+
+// Resamples for the viewer must be consistent with its information state and
+// must not depend on the hidden pass.
+void CheckPassHiddenFromViewer(const PassTwins& twins) {
+  const State& truth = *twins.with_true_pass;
+  const State& other = *twins.with_other_pass;
+  const Player viewer = twins.viewer;
+  SPIEL_CHECK_EQ(truth.InformationStateString(viewer),
+                 other.InformationStateString(viewer));
+  SPIEL_CHECK_EQ(truth.InformationStateTensor(viewer),
+                 other.InformationStateTensor(viewer));
+  SPIEL_CHECK_EQ(truth.ToObservationStruct(viewer)->ToJson(),
+                 other.ToObservationStruct(viewer)->ToJson());
+  constexpr int kNumSamples = 200;
+  int true_pass_reproduced = 0;
+  for (int seed = 0; seed < kNumSamples; ++seed) {
+    std::mt19937 rng_truth(seed);
+    std::mt19937 rng_other(seed);
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    std::unique_ptr<State> from_truth =
+        truth.ResampleFromInfostate(viewer, [&]() { return dist(rng_truth); });
+    std::unique_ptr<State> from_other =
+        other.ResampleFromInfostate(viewer, [&]() { return dist(rng_other); });
+    // Consistent with the viewer's information state.
+    SPIEL_CHECK_EQ(from_truth->InformationStateString(viewer),
+                   truth.InformationStateString(viewer));
+    SPIEL_CHECK_EQ(from_truth->InformationStateTensor(viewer),
+                   truth.InformationStateTensor(viewer));
+    SPIEL_CHECK_EQ(from_truth->ToObservationStruct(viewer)->ToJson(),
+                   truth.ToObservationStruct(viewer)->ToJson());
+    // Independent of what the viewer cannot see.
+    SPIEL_CHECK_EQ(from_truth->History(), from_other->History());
+    if (ResampledPass(*from_truth, twins.first_pass) == twins.true_pass) {
+      ++true_pass_reproduced;
+    }
+  }
+  // A resampler that copies the true pass reproduces it every time; a private
+  // one deals the passer 13 of the 39 cards the viewer cannot see.
+  SPIEL_CHECK_LE(true_pass_reproduced, 2);
+}
+
+// The cards passed to a player are hidden from them until every player has
+// passed (they arrive with the start of the play phase). During the pass
+// phase, ResampleFromInfostate must therefore not copy them from the true
+// state: two states that the viewer cannot tell apart must resample alike.
+void ResamplePassPhasePrivacyTest() {
+  std::shared_ptr<const Game> game = LoadGame("hearts");
+  // History layout: pass direction, 52 deal actions, then the passes in seat
+  // order, North first.
+  constexpr int kNorthPass = 1 + kNumCards;
+  constexpr int kEastPass = kNorthPass + kNumCardsInPass;
+
+  // Case 1: the viewer has not passed yet. Pass left, so North passes to
+  // East; East is to move.
+  const std::vector<Action> north_true = {4, 8, 12};
+  const std::vector<Action> north_other = {16, 20, 24};
+  PassTwins before_viewer_passes{
+      PassPhaseState(*game, PassDir::kLeft, north_true),
+      PassPhaseState(*game, PassDir::kLeft, north_other), kEast, kNorthPass,
+      north_true};
+  SPIEL_CHECK_EQ(before_viewer_passes.with_true_pass->CurrentPlayer(), kEast);
+  CheckPassHiddenFromViewer(before_viewer_passes);
+
+  // Case 2: the viewer has already passed and the cards it will receive are
+  // still hidden. Pass right, so North passes to West and East passes to
+  // North; North and East have passed and South is to move.
+  const std::vector<Action> north_east_true = {4, 8, 12, 1, 5, 9};
+  const std::vector<Action> north_east_other = {4, 8, 12, 13, 17, 21};
+  PassTwins after_viewer_passes{
+      PassPhaseState(*game, PassDir::kRight, north_east_true),
+      PassPhaseState(*game, PassDir::kRight, north_east_other), kNorth,
+      kEastPass,
+      std::vector<Action>(north_east_true.begin() + kNumCardsInPass,
+                          north_east_true.end())};
+  SPIEL_CHECK_EQ(after_viewer_passes.with_true_pass->CurrentPlayer(), kSouth);
+  CheckPassHiddenFromViewer(after_viewer_passes);
+
+  // Once all players have passed, East has received North's cards in case 1
+  // and knows them, so every resample must keep them.
+  std::unique_ptr<State> play = before_viewer_passes.with_true_pass->Clone();
+  for (Action card : {1, 5, 9, 2, 6, 10, 3, 7, 11}) {
+    play->ApplyAction(card);
+  }
+  SPIEL_CHECK_FALSE(play->IsChanceNode());
+  constexpr int kNumPlaySamples = 20;
+  for (int seed = 0; seed < kNumPlaySamples; ++seed) {
+    std::mt19937 rng(seed);
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    std::unique_ptr<State> resampled =
+        play->ResampleFromInfostate(kEast, [&]() { return dist(rng); });
+    SPIEL_CHECK_EQ(ResampledPass(*resampled, kNorthPass), north_true);
+    SPIEL_CHECK_EQ(resampled->InformationStateString(kEast),
+                   play->InformationStateString(kEast));
+  }
 }
 
 void ShootTheMoonTest() {
@@ -391,13 +522,244 @@ void TestStructs() {
                  HeartsObservationStruct(obs_json).ToJson());
 }
 
+// Returns the cards in the received-cards section of `player`'s information
+// state tensor.
+std::vector<std::string> ReceivedCardsInTensor(const State& state,
+                                               Player player) {
+  std::vector<float> tensor(kInformationStateTensorSize);
+  state.InformationStateTensor(player, absl::MakeSpan(tensor));
+  // Pass direction, dealt hand and passed cards come first.
+  const int offset = kNumPlayers + 2 * kNumCards;
+  std::vector<std::string> cards;
+  for (int card = 0; card < kNumCards; ++card) {
+    if (tensor[offset + card] == 1) cards.push_back(CardString(card));
+  }
+  std::sort(cards.begin(), cards.end());
+  return cards;
+}
+
+// Checks that each player's observation struct shows the cards passed to that
+// player exactly when the information state does: only once every player has
+// passed. Other players' received cards are masked or, before then, empty.
+void CheckReceivedCardsMatchInformationState(const State& state) {
+  // Passing is over once the pass direction, the deal and every pass are in
+  // the history.
+  const std::vector<Action> history = state.History();
+  const bool passing_over =
+      !history.empty() && history[0] != static_cast<Action>(PassDir::kNoPass) &&
+      static_cast<int>(history.size()) >=
+          1 + kNumCards + kNumPlayers * kNumCardsInPass;
+  for (Player viewer = 0; viewer < kNumPlayers; ++viewer) {
+    auto obs = state.ToObservationStruct(viewer);
+    const auto* hearts_obs =
+        static_cast<const HeartsObservationStruct*>(obs.get());
+    const bool shown = absl::StrContains(state.InformationStateString(viewer),
+                                         "Received Cards");
+    SPIEL_CHECK_EQ(shown, passing_over);
+    for (Player p = 0; p < kNumPlayers; ++p) {
+      const std::vector<std::string>& received = hearts_obs->received_cards[p];
+      if (!shown) {
+        SPIEL_CHECK_TRUE(received.empty());
+      } else if (p != viewer) {
+        SPIEL_CHECK_EQ(received,
+                       std::vector<std::string>(kNumCardsInPass, "XX"));
+      } else {
+        SPIEL_CHECK_EQ(received.size(), kNumCardsInPass);
+        if (!state.IsTerminal()) {
+          SPIEL_CHECK_EQ(received, ReceivedCardsInTensor(state, viewer));
+        }
+      }
+    }
+  }
+}
+
+// Deals hearts to North, spades to East, clubs to South and diamonds to West.
+std::unique_ptr<State> DealSuitsState(const Game& game, PassDir pass_dir) {
+  std::unique_ptr<State> state = game.NewInitialState();
+  state->ApplyAction(static_cast<Action>(pass_dir));
+  // Cards are dealt round-robin from North. Card k ^ 2 has suit (k % 4) ^ 2.
+  for (int k = 0; k < kNumCards; ++k) state->ApplyAction(k ^ 2);
+  return state;
+}
+
+void ReceivedCardsHiddenDuringPassTest() {
+  std::shared_ptr<const Game> game = LoadGame("hearts");
+
+  // North passes TH, 2H and 3H to the right, to West. West has not passed.
+  std::unique_ptr<State> state = DealSuitsState(*game, PassDir::kRight);
+  const std::vector<std::string> north_pass = {"TH", "2H", "3H"};
+  for (const std::string& card : north_pass) {
+    state->ApplyAction(card_int[card]);
+    CheckReceivedCardsMatchInformationState(*state);
+    for (Player viewer = 0; viewer < kNumPlayers; ++viewer) {
+      auto obs = state->ToObservationStruct(viewer);
+      for (const auto& received :
+           static_cast<HeartsObservationStruct*>(obs.get())->received_cards) {
+        SPIEL_CHECK_TRUE(received.empty());
+      }
+    }
+  }
+
+  // A twin in which North passes other hearts. No other player can tell the
+  // two apart until passing ends: their observation structs are identical
+  // while East, South and then West choose their passes.
+  std::unique_ptr<State> twin = DealSuitsState(*game, PassDir::kRight);
+  for (const std::string& card : {"AH", "KH", "QH"}) {
+    twin->ApplyAction(card_int[card]);
+  }
+  for (int i = 0; i < 3 * kNumCardsInPass; ++i) {
+    for (Player viewer = 1; viewer < kNumPlayers; ++viewer) {
+      SPIEL_CHECK_EQ(state->ToObservationStruct(viewer)->ToJson(),
+                     twin->ToObservationStruct(viewer)->ToJson());
+    }
+    if (i == 3 * kNumCardsInPass - 1) break;
+    const Action action = state->LegalActions()[0];
+    state->ApplyAction(action);
+    twin->ApplyAction(action);
+    CheckReceivedCardsMatchInformationState(*state);
+  }
+
+  // West completes the pass: every player now sees the cards it received.
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kWest);
+  state->ApplyAction(state->LegalActions()[0]);
+  SPIEL_CHECK_TRUE(absl::StrContains(state->InformationStateString(kWest),
+                                     "Received Cards"));
+  CheckReceivedCardsMatchInformationState(*state);
+  auto west_obs = state->ToObservationStruct(kWest);
+  SPIEL_CHECK_EQ(
+      static_cast<HeartsObservationStruct*>(west_obs.get())->received_cards[3],
+      (std::vector<std::string>{"2H", "3H", "TH"}));
+
+  // Random playouts over every pass direction.
+  std::mt19937 rng(1234);
+  for (int game_num = 0; game_num < 200; ++game_num) {
+    std::unique_ptr<State> playout = game->NewInitialState();
+    while (!playout->IsTerminal()) {
+      CheckReceivedCardsMatchInformationState(*playout);
+      std::vector<Action> actions = playout->LegalActions();
+      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      playout->ApplyAction(actions[dis(rng)]);
+    }
+    CheckReceivedCardsMatchInformationState(*playout);
+  }
+}
+
+// Replays `history` with cards `a` and `b` exchanged in every action after the
+// pass direction.
+std::unique_ptr<State> ReplayWithSwap(const Game& game,
+                                      const std::vector<Action>& history,
+                                      Action a, Action b) {
+  std::unique_ptr<State> state = game.NewInitialState();
+  for (int i = 0; i < history.size(); ++i) {
+    Action action = history[i];
+    if (i > 0 && action == a) {
+      action = b;
+    } else if (i > 0 && action == b) {
+      action = a;
+    }
+    state->ApplyAction(action);
+  }
+  return state;
+}
+
+// Checks that `viewer` sees the same thing in both states, and that its
+// observation struct masks every other player's hand, passed cards and
+// received cards.
+void CheckSameView(const State& state, const State& twin, Player viewer) {
+  SPIEL_CHECK_EQ(state.InformationStateString(viewer),
+                 twin.InformationStateString(viewer));
+  SPIEL_CHECK_EQ(state.InformationStateTensor(viewer),
+                 twin.InformationStateTensor(viewer));
+  SPIEL_CHECK_EQ(state.ToObservationStruct(viewer)->ToJson(),
+                 twin.ToObservationStruct(viewer)->ToJson());
+  auto obs = state.ToObservationStruct(viewer);
+  const auto* hearts_obs =
+      static_cast<const HeartsObservationStruct*>(obs.get());
+  for (Player p = 0; p < kNumPlayers; ++p) {
+    if (p == viewer) continue;
+    for (const auto* cards :
+         {&hearts_obs->hands[p], &hearts_obs->passed_cards[p],
+          &hearts_obs->received_cards[p]}) {
+      for (const std::string& card : *cards) SPIEL_CHECK_EQ(card, "XX");
+    }
+  }
+}
+
+// A player's views (information state string and tensor, observation struct)
+// never reveal another player's hidden cards: exchanging two unplayed cards of
+// one suit between two other players, neither card passed, changes nothing the
+// viewer sees, at every point of the hand. The two of clubs and the queen of
+// spades are left in place because the rules name them.
+void ObservationHidesOtherHandsTest() {
+  std::shared_ptr<const Game> game = LoadGame("hearts");
+  constexpr int kMaxSwapsPerViewer = 3;
+  std::mt19937 rng(4321);
+  for (int game_num = 0; game_num < 50; ++game_num) {
+    std::unique_ptr<State> state = game->NewInitialState();
+    int num_swaps = 0;
+    while (true) {
+      const std::vector<Action> history = state->History();
+      if (history.size() > kNumCards) {
+        // Who was dealt each card: the deal is round-robin from North.
+        std::vector<Player> dealt_to(kNumCards);
+        for (int i = 0; i < kNumCards; ++i) {
+          dealt_to[history[1 + i]] = i % kNumPlayers;
+        }
+        auto full = state->ToStruct();
+        const auto* hearts_full =
+            static_cast<const HeartsStateStruct*>(full.get());
+        // Cards still held by the player they were dealt to.
+        std::vector<std::vector<Action>> unmoved(kNumPlayers);
+        for (Player p = 0; p < kNumPlayers; ++p) {
+          for (const std::string& card_str : hearts_full->hands[p]) {
+            const Action card = card_int[card_str];
+            if (dealt_to[card] == p && card != Card(Suit::kClubs, 0) &&
+                card != Card(Suit::kSpades, 10)) {
+              unmoved[p].push_back(card);
+            }
+          }
+        }
+        for (Player viewer = 0; viewer < kNumPlayers; ++viewer) {
+          int swaps = 0;
+          for (Player p = 0; p < kNumPlayers && swaps < kMaxSwapsPerViewer;
+               ++p) {
+            for (Player q = p + 1;
+                 q < kNumPlayers && swaps < kMaxSwapsPerViewer; ++q) {
+              if (p == viewer || q == viewer) continue;
+              for (Action a : unmoved[p]) {
+                for (Action b : unmoved[q]) {
+                  if (swaps == kMaxSwapsPerViewer) break;
+                  if (CardSuit(a) != CardSuit(b)) continue;
+                  std::unique_ptr<State> twin =
+                      ReplayWithSwap(*game, history, a, b);
+                  CheckSameView(*state, *twin, viewer);
+                  ++swaps;
+                }
+              }
+            }
+          }
+          num_swaps += swaps;
+        }
+      }
+      if (state->IsTerminal()) break;
+      std::vector<Action> actions = state->LegalActions();
+      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      state->ApplyAction(actions[dis(rng)]);
+    }
+    SPIEL_CHECK_GT(num_swaps, 0);
+  }
+}
+
 }  // namespace
 }  // namespace hearts
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::hearts::BasicGameTests();
+  open_spiel::hearts::ResamplePassPhasePrivacyTest();
   open_spiel::hearts::ShootTheMoonTest();
   open_spiel::hearts::InformationStateTensorTest();
   open_spiel::hearts::TestStructs();
+  open_spiel::hearts::ReceivedCardsHiddenDuringPassTest();
+  open_spiel::hearts::ObservationHidesOtherHandsTest();
 }

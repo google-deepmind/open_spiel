@@ -28,6 +28,7 @@ target_link_libraries(open_spiel_games_hearts_hearts_test PRIVATE
   open_spiel::games::hearts::hearts
   absl::strings
   absl::optional
+  absl::span
   nlohmann_json::nlohmann_json
   open_spiel::open_spiel
   open_spiel::basic_tests
