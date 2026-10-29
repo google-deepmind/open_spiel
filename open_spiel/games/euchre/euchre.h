@@ -20,12 +20,19 @@
 // https://en.wikipedia.org/wiki/Euchre
 // https://www.pagat.com/euchre/euchre.html
 //
-// This implementation uses standard North American rules with "super-Euchres",
-// i.e. the makers lose 4 points if they fail to win a single trick. By default,
-// only the declarer has the option of playing alone, but optionally the
-// defenders can go alone as well. The popular variation "stick the dealer" is
-// enabled by default as it has interesting strategic implications and increases
-// playability by avoiding drawn hands.
+// This implementation uses standard North American rules. Makers who fail to
+// win three tricks are euchred and lose 2 points, whether they won one, two or
+// no tricks (there is no "super-Euchre"); the loss is 4 points only when a
+// defender played alone. By default, only the declarer (the player who fixed
+// trump) has the option of playing alone, but optionally the defenders can go
+// alone as well. The declarer announces whether they play alone before the
+// dealer takes up the up-card, so when the dealer's partner orders up and plays
+// alone the dealer sits out and does not take the up-card. The popular
+// variation "stick the dealer" is enabled by default as it has interesting
+// strategic implications and increases playability by avoiding drawn hands.
+//
+// Every action is validated: applying an action that is not in LegalActions()
+// (or, at a chance node, not in ChanceOutcomes()) is a fatal error.
 
 #include <functional>
 #include <map>
@@ -69,6 +76,7 @@ inline constexpr int kInformationStateTensorSize =
     + kNumCards                       // Upcard
     + (kNumSuits + 1) * kMaxBids      // Bidding
     + 3                               // Go alone (declarer, defender 1 & 2)
+    + kNumCards                       // Dealer's discard (dealer only)
     + kNumCards                       // Current hand
     + kNumTricks * kTrickTensorSize;  // History of tricks
 
@@ -193,6 +201,16 @@ class EuchreState : public State {
   void ApplyGoAloneAction(int action);
   void ApplyPlayAction(int card);
 
+  // True once trump was fixed in the first round of bidding, i.e. the up-card
+  // was ordered up (or picked up) and goes to the dealer if the dealer plays.
+  bool UpcardAccepted() const {
+    return trump_suit_ != Suit::kInvalidSuit && num_passes_ < kNumPlayers;
+  }
+  // Called once every go-alone decision has been made: the dealer takes up
+  // the up-card and discards if it was accepted and the dealer plays,
+  // otherwise play starts.
+  void EndGoAlonePhase();
+  void StartPlay();
   void ComputeScore();
 
   std::array<std::string, kNumSuits> FormatHand(int player,

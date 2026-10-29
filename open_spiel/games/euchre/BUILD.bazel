@@ -31,6 +31,7 @@ cc_test(
     srcs = ["euchre_test.cc"],
     deps = [
         ":euchre",
+        "@abseil-cpp//absl/strings",
         "//open_spiel",
         "//open_spiel:basic_tests",
     ],

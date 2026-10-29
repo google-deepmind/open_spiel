@@ -24,6 +24,7 @@ add_executable(open_spiel_games_euchre_euchre_test
 )
 target_link_libraries(open_spiel_games_euchre_euchre_test PRIVATE
   open_spiel::games::euchre::euchre
+  absl::strings
   open_spiel::open_spiel
   open_spiel::basic_tests
 )
