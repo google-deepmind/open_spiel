@@ -18,6 +18,7 @@ cc_library(
     copts = ["-fexceptions"],
     features = ["-use_header_modules"],
     deps = [
+        "@abseil-cpp//absl/algorithm:container",
         "@abseil-cpp//absl/types:optional",
         "//open_spiel",
         "//open_spiel/games/gin_rummy",
@@ -29,6 +30,7 @@ cc_test(
     srcs = ["simple_gin_rummy_bot_test.cc"],
     deps = [
         ":simple_gin_rummy_bot",
+        "@abseil-cpp//absl/algorithm:container",
         "//open_spiel",
         "//open_spiel/game_transforms:repeated_game",
         "//open_spiel/games:all_games",  # build-cleaner: keep

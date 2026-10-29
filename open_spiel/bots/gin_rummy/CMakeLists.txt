@@ -5,6 +5,7 @@ add_library(open_spiel_bots_gin_rummy_simple_gin_rummy_bot_objs OBJECT
   simple_gin_rummy_bot.h
 )
 target_link_libraries(open_spiel_bots_gin_rummy_simple_gin_rummy_bot_objs PUBLIC
+  absl::algorithm_container
   absl::optional
   open_spiel::open_spiel
   open_spiel::games::gin_rummy::gin_rummy
@@ -22,6 +23,7 @@ add_executable(open_spiel_bots_gin_rummy_simple_gin_rummy_bot_test
 )
 target_link_libraries(open_spiel_bots_gin_rummy_simple_gin_rummy_bot_test PRIVATE
   open_spiel::bots::gin_rummy::simple_gin_rummy_bot
+  absl::algorithm_container
   open_spiel::open_spiel
   open_spiel::game_transforms::repeated_game
   open_spiel::games::all_games

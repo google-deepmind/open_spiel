@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <map>
 #include <set>
 #include <string>
 #include <utility>
@@ -327,6 +328,19 @@ int GinRummyUtils::MinDeadwood(VecInt hand, absl::optional<int> card) const {
 
 // Minimum deadwood count over all meld groups.
 int GinRummyUtils::MinDeadwood(const VecInt &hand) const {
+  // A hand that has just drawn must discard. The best meld group of all
+  // hand_size + 1 cards need not leave the best hand after the discard, so
+  // minimize over the discard and solve each remaining hand exactly.
+  if (hand.size() == hand_size + 1) {
+    int best = TotalCardValue(hand);
+    for (int i = 0; i < hand.size(); ++i) {
+      VecInt remaining(hand);
+      remaining.erase(remaining.begin() + i);
+      best = std::min(best, MinDeadwood(remaining));
+      if (best == 0) return 0;
+    }
+    return best;
+  }
   VecInt deadwood = hand;
   VecVecInt best_melds = BestMeldGroup(hand);
 
@@ -335,11 +349,6 @@ int GinRummyUtils::MinDeadwood(const VecInt &hand) const {
       deadwood.erase(std::remove(deadwood.begin(), deadwood.end(), card),
                      deadwood.end());
     }
-  }
-  // If we have just drawn a card, we can discard the one worth the most points.
-  if (hand.size() == hand_size + 1 && !deadwood.empty()) {
-    absl::c_sort(deadwood, rank_comp);
-    deadwood.pop_back();
   }
   int deadwood_total = 0;
   for (int card : deadwood) deadwood_total += CardValue(card);
@@ -418,13 +427,21 @@ VecInt GinRummyUtils::AllLayoffs(const VecInt &layed_melds,
     if (IsRankMeld(meld) && meld.size() == 3) {
       layoffs.insert(RankMeldLayoff(meld));
     } else if (IsSuitMeld(meld)) {
+      // Each card laid off on a run exposes a new end, so extend the run
+      // until no previous layoff attaches. This allows chains of layoffs on
+      // the same end, in whatever order previous_layoffs lists them.
       VecInt suit_layoffs = SuitMeldLayoffs(meld);
-      for (int card : previous_layoffs) {
-        if (absl::c_linear_search(suit_layoffs, card)) {
-          meld.push_back(card);
+      bool extended = true;
+      while (extended) {
+        extended = false;
+        for (int card : previous_layoffs) {
+          if (absl::c_linear_search(suit_layoffs, card)) {
+            meld.push_back(card);
+            suit_layoffs = SuitMeldLayoffs(meld);
+            extended = true;
+          }
         }
       }
-      suit_layoffs = SuitMeldLayoffs(meld);
       for (int card : suit_layoffs) {
         layoffs.insert(card);
       }

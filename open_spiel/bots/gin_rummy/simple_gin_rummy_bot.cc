@@ -15,9 +15,13 @@
 #include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
 
 #include <algorithm>
+#include <iostream>
+#include <optional>
 #include <utility>
 #include <vector>
 
+#include "absl/algorithm/container.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
@@ -138,12 +142,30 @@ Action SimpleGinRummyBot::Step(const State& state) {
       }
       next_actions_.push_back(kPassAction);
     } else {
+      // Choose the discard that minimizes the deadwood of the ten cards kept,
+      // then lay the melds of that same hand. The best meld group of all
+      // eleven cards need not leave the best ten-card hand.
+      int best_discard = GetDiscard(hand);
+      std::vector<int> remaining = hand;
+      remaining.erase(
+          std::remove(remaining.begin(), remaining.end(), best_discard),
+          remaining.end());
+      int best_deadwood = utils_.MinDeadwood(remaining);
+      for (int card : hand) {
+        std::vector<int> candidate = hand;
+        candidate.erase(std::remove(candidate.begin(), candidate.end(), card),
+                        candidate.end());
+        int deadwood = utils_.MinDeadwood(candidate);
+        if (deadwood < best_deadwood) {
+          best_deadwood = deadwood;
+          best_discard = card;
+          remaining = std::move(candidate);
+        }
+      }
       next_actions_.push_back(kPassAction);
-      std::vector<int> melds_to_lay = GetMelds(hand);
-      for (int meld_id : melds_to_lay) {
+      for (int meld_id : GetMelds(remaining)) {
         next_actions_.push_back(kMeldActionBase + meld_id);
       }
-      int best_discard = GetDiscard(hand);
       next_actions_.push_back(best_discard);
     }
     Action action = next_actions_.back();
