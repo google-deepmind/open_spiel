@@ -31,6 +31,7 @@ namespace open_spiel {
 namespace {
 
 constexpr bool kDefaultEnableInformationState = false;
+constexpr bool kDefaultRelative = false;
 constexpr int kDefaultRecall = 1;
 
 // These parameters represent the most general case. Game specific params are
@@ -54,10 +55,13 @@ const GameType kGameType{
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
      {"num_repetitions",
       GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/true)},
-     {"recall", GameParameter(kDefaultRecall)}},
+     {"recall", GameParameter(kDefaultRecall)},
+     {"enable_infostate", GameParameter(kDefaultEnableInformationState)},
+     {"relative", GameParameter(kDefaultRelative)}},
     /*default_loadable=*/false,
     /*provides_factored_observation_string=*/false,
-    /*is_concrete=*/false};
+    /*is_concrete=*/false
+};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return CreateRepeatedGame(*LoadGame(params.at("stage_game").game_value()),
@@ -71,12 +75,14 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RepeatedState::RepeatedState(std::shared_ptr<const Game> game,
                              std::shared_ptr<const Game> stage_game,
                              int num_repetitions,
-                             int recall)
+                             int recall,
+                             bool relative)
     : SimMoveState(game),
       stage_game_(stage_game),
       stage_game_state_(stage_game->NewInitialState()),
       num_repetitions_(num_repetitions),
-      recall_(recall) {
+      recall_(recall),
+      relative_(relative) {
   actions_history_.reserve(num_repetitions_);
   rewards_history_.reserve(num_repetitions_);
 }
@@ -132,13 +138,18 @@ std::vector<double> RepeatedState::Returns() const {
   return returns;
 }
 
-std::string RepeatedState::InformationStateString(Player /*player*/) const {
+std::string RepeatedState::InformationStateString(Player player) const {
+  if (relative_) {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
+  }
   std::string rv;
   if (actions_history_.empty()) return rv;
   for (int j = 0; j < actions_history_.size(); ++j) {
     for (int i = 0; i < num_players_; ++i) {
+      const int p = relative_ ? (i + player) % num_players_ : i;
       absl::StrAppend(
-          &rv, stage_game_state_->ActionToString(i, actions_history_[j][i]),
+          &rv, stage_game_state_->ActionToString(p, actions_history_[j][p]),
           " ");
     }
     absl::StrAppend(&rv, ";");
@@ -146,9 +157,15 @@ std::string RepeatedState::InformationStateString(Player /*player*/) const {
   return rv;
 }
 
-std::string RepeatedState::ObservationString(Player /*player*/) const {
+std::string RepeatedState::ObservationString(Player player) const {
+  if (relative_) {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
+  }
   std::string rv;
-  if (actions_history_.empty()) { return rv; }
+  if (actions_history_.empty()) { 
+    return rv;
+  }
 
   // Starting from the back of the history, show each player's moves:
   for (int j = 0;
@@ -158,8 +175,9 @@ std::string RepeatedState::ObservationString(Player /*player*/) const {
     SPIEL_CHECK_GE(hist_idx, 0);
     SPIEL_CHECK_LT(hist_idx, actions_history_.size());
     for (int i = 0; i < num_players_; ++i) {
+      const int p = relative_ ? (i + player) % num_players_ : i;
       absl::StrAppend(&rv,
-          stage_game_state_->ActionToString(i, actions_history_[hist_idx][i]),
+          stage_game_state_->ActionToString(p, actions_history_[hist_idx][p]),
           " ");
     }
   }
@@ -178,8 +196,9 @@ void RepeatedState::InformationStateTensor(Player player,
   auto ptr = values.begin();
   for (int j = 0; j < actions_history_.size(); ++j) {
     for (int i = 0; i < num_players_; ++i) {
-      ptr[actions_history_[j][i]] = 1;
-      ptr += stage_game_state_->LegalActions(i).size();
+      const int p = relative_ ? (i + player) % num_players_ : i;
+      ptr[actions_history_[j][p]] = 1;
+      ptr += stage_game_state_->LegalActions(p).size();
     }
   }
 }
@@ -202,8 +221,9 @@ void RepeatedState::ObservationTensor(Player player,
     SPIEL_CHECK_GE(hist_idx, 0);
     SPIEL_CHECK_LT(hist_idx, actions_history_.size());
     for (int i = 0; i < num_players_; ++i) {
-      ptr[actions_history_[hist_idx][i]] = 1;
-      ptr += stage_game_state_->LegalActions(i).size();
+      const int p = relative_ ? (i + player) % num_players_ : i;
+      ptr[actions_history_[hist_idx][p]] = 1;
+      ptr += stage_game_state_->LegalActions(p).size();
     }
   }
 
@@ -261,7 +281,8 @@ RepeatedGame::RepeatedGame(std::shared_ptr<const Game> stage_game,
           params),
       stage_game_(stage_game),
       num_repetitions_(ParameterValue<int>("num_repetitions")),
-      recall_(ParameterValue<int>("recall", kDefaultRecall)) {
+      recall_(ParameterValue<int>("recall", kDefaultRecall)),
+      relative_(ParameterValue<bool>("relative", false)) {
   SPIEL_CHECK_GE(recall_, 1);
 }
 
@@ -291,7 +312,7 @@ std::shared_ptr<const Game> CreateRepeatedGame(
 std::unique_ptr<State> RepeatedGame::NewInitialState() const {
   return std::unique_ptr<State>(
       new RepeatedState(shared_from_this(), stage_game_,
-                        num_repetitions_, recall_));
+                        num_repetitions_, recall_, relative_));
 }
 
 std::vector<int> RepeatedGame::InformationStateTensorShape() const {

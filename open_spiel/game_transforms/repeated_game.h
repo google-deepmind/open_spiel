@@ -34,6 +34,9 @@
 //   "recall"             int      Number of previous steps that defines the
 //                                 observations when enable_infostate is false
 //                                 (default: 1).
+//   "relative"            bool    Whether observation and information-state
+//                                 values are presented relative to player_id
+//                                 (default false)
 
 namespace open_spiel {
 
@@ -41,7 +44,7 @@ class RepeatedState : public SimMoveState {
  public:
   RepeatedState(std::shared_ptr<const Game> game,
                 std::shared_ptr<const Game> stage_game, int num_repetitions,
-                int recall);
+                int recall, bool relative);
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : kSimultaneousPlayerId;
@@ -73,6 +76,7 @@ class RepeatedState : public SimMoveState {
   std::shared_ptr<const State> stage_game_state_;
   int num_repetitions_;
   int recall_;
+  bool relative_;
   std::vector<std::vector<Action>> actions_history_{};
   std::vector<std::vector<double>> rewards_history_{};
 };
@@ -108,6 +112,7 @@ class RepeatedGame : public SimMoveGame {
   std::shared_ptr<const Game> stage_game_;
   const int num_repetitions_;
   const int recall_;
+  const bool relative_;
 };
 
 // Creates a repeated game based on the stage game.
