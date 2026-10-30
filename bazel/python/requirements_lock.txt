@@ -736,9 +736,9 @@ joblib==1.6.0 \
     --hash=sha256:2ccc96785b12046c08fd6d55839c12857831b54a3c1673ffadd2f04bfc4eda03 \
     --hash=sha256:3dbbf9f6e4b592a2357b854608e980fe6390d131d7a82f011a377ef2ebef7aba
     # via osqp
-joserfc==1.7.5 \
-    --hash=sha256:add2c2c84e8373b084d526a8b53daba5d7a513a118cd2dcd9fc9f979d0922159 \
-    --hash=sha256:d5ff536e658e17664f8c1b1ab60dc4aa62aa973fcef1edd33cc44bda45d6f5ea
+joserfc==1.7.6 \
+    --hash=sha256:e2d72e3fa937ed8ddd42ad8c1cc337a43e7ffd02efa572a2aa15e2764a05b506 \
+    --hash=sha256:fb1cf6d2977318bef976c2ed2ef2167cc5f8ade8fc96f034e38f7abd656907c4
     # via authlib
 jsonref==1.1.0 \
     --hash=sha256:32fe8e1d85af0fdefbebce950af85590b22b60f9e95443176adbde4e1ecea552 \
