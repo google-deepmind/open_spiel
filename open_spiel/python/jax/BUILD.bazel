@@ -206,3 +206,34 @@ py_test(
         "@py_deps//optax",
     ],
 )
+
+py_library(
+    name = "nash_pg",
+    srcs = ["nash_pg.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "@py_deps//chex",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+py_test(
+    name = "nash_pg_jax_test",
+    srcs = ["nash_pg_jax_test.py"],
+    deps = [
+        ":nash_pg",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
