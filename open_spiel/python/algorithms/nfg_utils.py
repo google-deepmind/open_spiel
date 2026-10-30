@@ -53,7 +53,8 @@ class StrategyAverager(object):
       for p in range(self._num_players):
         self._sum_meta_strategies[p] += meta_strategies[p]
     else:
-      self._window.append(meta_strategies)
+      # Keep submitted values even when the caller reuses its strategy arrays.
+      self._window.append([np.copy(strategy) for strategy in meta_strategies])
     self._num += 1
 
   def average_strategies(self):
