@@ -71,10 +71,11 @@ void init_pyspiel_game_transforms(py::module& m) {
       },
       "Creates an extra info game from a wrapped game.");
 
-  m.def("create_extra_info_game",
-        py::overload_cast<const std::string&, const GameParameters&>(
-            &CreateRepeatedGame),
-        "Creates an extra info game from a wrapped game.");
+  m.def(
+    "create_extra_info_game",
+    py::overload_cast<const std::string&, const GameParameters&>(
+        &CreateExtraInfoGame),
+    "Creates an extra info game from a wrapped game.");
 
   m.def("convert_to_cached_tree",
         [](std::shared_ptr<const Game> game) {

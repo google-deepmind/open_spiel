@@ -191,6 +191,7 @@ if(OPEN_SPIEL_BUILD_WITH_PYTHON)
     open_spiel::python::pybind11::pybind11
     open_spiel::open_spiel
     open_spiel::game_transforms::cached_tree
+    open_spiel::game_transforms::extra_info_game
     open_spiel::game_transforms::normal_form_extensive_game
     open_spiel::game_transforms::repeated_game
     open_spiel::game_transforms::turn_based_simultaneous_game
@@ -459,6 +460,25 @@ if(OPEN_SPIEL_BUILD_WITH_PYTHON)
     $<TARGET_OBJECTS:open_spiel_python_pybind11_games_euchre_objs>
   )
   add_library(open_spiel::python::pybind11::games_euchre ALIAS open_spiel_python_pybind11_games_euchre)
+endif()
+
+if(OPEN_SPIEL_BUILD_WITH_PYTHON)
+  add_library(open_spiel_python_pybind11_games_extra_info_objs OBJECT
+    games_extra_info.cc
+    games_extra_info.h
+  )
+  target_link_libraries(open_spiel_python_pybind11_games_extra_info_objs PUBLIC
+    open_spiel::python::pybind11::pybind11
+    open_spiel::open_spiel
+    open_spiel::game_transforms::extra_info_game
+    open_spiel_ext::pybind11
+  )
+  add_library(open_spiel_python_pybind11_games_extra_info INTERFACE)
+  target_link_libraries(open_spiel_python_pybind11_games_extra_info INTERFACE
+    open_spiel_python_pybind11_games_extra_info_objs
+    $<TARGET_OBJECTS:open_spiel_python_pybind11_games_extra_info_objs>
+  )
+  add_library(open_spiel::python::pybind11::games_extra_info ALIAS open_spiel_python_pybind11_games_extra_info)
 endif()
 
 if(OPEN_SPIEL_BUILD_WITH_PYTHON)
@@ -921,6 +941,7 @@ if(OPEN_SPIEL_BUILD_WITH_PYTHON)
     open_spiel::python::pybind11::games_crazyhouse
     open_spiel::python::pybind11::games_crossword
     open_spiel::python::pybind11::games_dots_and_boxes
+    open_spiel::python::pybind11::games_extra_info
     open_spiel::python::pybind11::games_euchre
     open_spiel::python::pybind11::games_gin_rummy
     open_spiel::python::pybind11::games_go
