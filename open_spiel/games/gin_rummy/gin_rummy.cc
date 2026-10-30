@@ -947,11 +947,11 @@ std::vector<std::vector<int>> GinRummyState::KnownCards() const {
 // of samples, and the resulting hand distribution may be skewed.
 std::unique_ptr<State> GinRummyState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
-  // If the game is in the layoff phase, all hands are public. If the opponent
-  // has knocked, their hand is public. In these cases, resampling is
-  // unnecessary.
-  if (phase_ == Phase::kLayoff ||
-      (phase_ == Phase::kKnock && cur_player_ != player_id)) {
+  // A hand becomes public when its owner knocks and lays it face up, and only
+  // then is resampling unnecessary. The layoff phase does not make every hand
+  // public: the defender lays off from a hand it still holds privately, and
+  // the player resampling may be the knocker.
+  if (knocked_[Opponent(player_id)]) {
     return std::make_unique<GinRummyState>(*this);
   }
   auto new_state = std::make_unique<GinRummyState>(*this);
