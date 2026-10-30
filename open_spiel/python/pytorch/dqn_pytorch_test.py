@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pathlib
 import random
 
 from absl.testing import absltest
@@ -142,6 +143,49 @@ class DQNTest(absltest.TestCase):
 
     for agent in agents:
       agent.step(time_step)
+
+  def test_save_and_load(self):
+    game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
+    env = rl_environment.Environment(game=game)
+    agent_kwargs = dict(
+        player_id=0,
+        state_representation_size=game.information_state_tensor_shape()[0],
+        num_actions=game.num_distinct_actions(),
+        hidden_layers_sizes=[16],
+        min_buffer_size_to_learn=4,
+        batch_size=4,
+        learn_every=10,
+        optimizer_str="adam",
+    )
+    agent = dqn.DQN(seed=0, **agent_kwargs)
+    for _ in range(20):
+      time_step = env.reset()
+      while not time_step.last():
+        agent_output = agent.step(time_step)
+        time_step = env.step([agent_output.action])
+      agent.step(time_step)
+    self.assertIsNotNone(agent.loss)
+
+    checkpoint_path = pathlib.Path(self.create_tempdir().full_path) / "dqn.pt"
+    agent.save(checkpoint_path)
+    restored_agent = dqn.DQN(seed=1, **agent_kwargs)
+    restored_agent.load(checkpoint_path)
+
+    # pylint: disable=protected-access
+    torch.testing.assert_close(
+        restored_agent._q_network.state_dict(), agent._q_network.state_dict()
+    )
+    # The target network lags the online one, so it must be restored separately.
+    torch.testing.assert_close(
+        restored_agent._target_q_network.state_dict(),
+        agent._target_q_network.state_dict(),
+    )
+    torch.testing.assert_close(
+        restored_agent._optimizer.state_dict(), agent._optimizer.state_dict()
+    )
+    # pylint: enable=protected-access
+    self.assertEqual(restored_agent.step_counter, agent.step_counter)
+    self.assertEqual(restored_agent.loss, agent.loss)
 
 if __name__ == "__main__":
   random.seed(SEED)

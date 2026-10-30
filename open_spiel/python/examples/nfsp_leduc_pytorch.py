@@ -168,7 +168,11 @@ def main(unused_argv):
 
   if FLAGS.use_checkpoints:
     for agent in agents:
-      agent.restore(FLAGS.checkpoint_dir)
+      checkpoint_dir = os.path.join(
+          FLAGS.checkpoint_dir, f"agent_{agent.player_id}"
+      )
+      if os.path.exists(checkpoint_dir):
+        agent.restore(checkpoint_dir)
 
   for ep in range(FLAGS.num_train_episodes):
     if (ep + 1) % FLAGS.eval_every == 0:
@@ -191,7 +195,9 @@ def main(unused_argv):
         )
       if FLAGS.use_checkpoints:
         for agent in agents:
-          agent.save(FLAGS.checkpoint_dir)
+          agent.save(
+              os.path.join(FLAGS.checkpoint_dir, f"agent_{agent.player_id}")
+          )
       logging.info("_____________________________________________")
 
     time_step = env.reset()
