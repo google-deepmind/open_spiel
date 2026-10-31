@@ -43,8 +43,9 @@ and filters by it.
 
 ## Development
 
-Requires Node.js 22.22.2 or later, the oldest release jsdom, the test
-environment, supports. From this directory:
+Requires Node.js `^22.22.2 || ^24.15.0 || >=26.0.0`, the releases every
+pinned dependency supports (jsdom, the test environment, among them); `npm ci`
+warns `EBADENGINE` on another. From this directory:
 
 ```sh
 npm ci                     # install the pinned dependencies

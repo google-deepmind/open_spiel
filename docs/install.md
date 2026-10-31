@@ -95,6 +95,26 @@ In a nutshell:
     ./install.sh
     ```
 
+    `./install.sh` downloads the C++ dependencies into the checkout, which
+    `pip install -e .` and the CMake build need (without them they stop with
+    `add_subdirectory given source "abseil-cpp" which is not an existing
+    directory`). It also installs system packages: with `sudo apt-get` on
+    Debian or Ubuntu, and with Homebrew on macOS, where it can install a
+    Python and, under `CI`, relink `python3` to it (on macOS, clang++ comes
+    from Xcode's command-line tools, `xcode-select --install`, which
+    `./install.sh` does not install). It prints each such
+    command before it runs it. To install the system packages yourself and
+    only download the C++ dependencies, run
+
+    ```bash
+    OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0 ./install.sh
+    ```
+
+    which runs no package command and lists, at the end, the ones it
+    skipped. On a machine that has just booted (a fresh cloud VM, say),
+    `apt-get` can wait several minutes for the lock held by the image's own
+    boot-time update.
+
 3.  Install your [Python dependencies](#installing-python-dependencies), e.g. in
     Python 3 using
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):

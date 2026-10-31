@@ -21,12 +21,15 @@
 starts the reference bot server (`remote_bot_server`) serving `--bot` on a
 free port of this machine, with the checkpoint in the environment
 variables CHECKPOINT_ENVS (both names a bot's factory may read), or in
-`--checkpoint-env` alone; waits until its `/health` answers; starts the GUI
-server; opens a session of the game whose seat `--bot-seat` is a Remote bot
-seat at that URL (state `--state`, its `checkpoint` setting the checkpoint,
-autoplay on) and every other seat human; and prints the address to play it
-at. Ctrl-C, SIGTERM or SIGHUP (closing the terminal) stops both servers, as
-does any error, at any point of the launch or after it.
+`--checkpoint-env` alone; waits until its `/health` answers, and stops,
+naming the `--state` to rerun with, if its `/info` does not take `--state`;
+starts the GUI server; opens a session of the game whose seat `--bot-seat`
+is a Remote bot seat at that URL (state `--state`, seat_view unless asked,
+its `checkpoint` setting the checkpoint, autoplay on) and every other seat
+human; and prints the address to play it at. With `--state full_state` in a game that hides
+information, it first prints one line saying the bot sees the whole state.
+Ctrl-C, SIGTERM or SIGHUP (closing the terminal) stops both servers, as does
+any error, at any point of the launch or after it.
 
 The bot runs in its own process: this module imports neither the bot nor
 anything it needs. `--bot random` plays a uniformly random legal action, and
@@ -52,6 +55,7 @@ import webbrowser
 import pyspiel
 
 from open_spiel.python.gui import child_servers
+from open_spiel.python.gui import information
 from open_spiel.python.gui import remote_bot
 from open_spiel.python.gui import remote_bot_server
 from open_spiel.python.gui import static
@@ -97,7 +101,8 @@ class Options:
     checkpoint_envs: The environment variables the bot server is given the
       checkpoint in.
     bot_seat: The seat the bot plays.
-    state: What the bot is sent: seat_view or full_state.
+    state: What the bot is sent: seat_view (the default), what its seat may
+      see; or full_state, the whole state, for a bot that needs it.
     host: The address the GUI server listens on.
     port: The GUI server's port; 0 picks a free one.
     client_dir: The built browser client.
@@ -114,7 +119,7 @@ class Options:
   checkpoint: str = ""
   checkpoint_envs: tuple[str, ...] = CHECKPOINT_ENVS
   bot_seat: int = 1
-  state: str = remote_bot.FULL_STATE
+  state: str = remote_bot.SEAT_VIEW
   host: str = "127.0.0.1"
   port: int = 8080
   client_dir: str = str(static.DEFAULT_ROOT)
@@ -139,6 +144,24 @@ def parse_game(text: str) -> tuple[str, dict[str, Any]]:
   if name not in pyspiel.registered_names():
     raise LaunchError(f"--game {text!r} names no registered game.")
   return name, parameters
+
+
+def full_state_note(options: Options, game: pyspiel.Game) -> str | None:
+  """Returns the line saying the bot sees what its seat may not, or None.
+
+  That is when the bot is sent the full state of a game that hides
+  information (another seat's cards, say); None otherwise.
+  """
+  if options.state != remote_bot.FULL_STATE:
+    return None
+  if not information.hides_information(game.get_type()):
+    return None
+  return (
+      "Note: --state full_state sends the bot the whole state of "
+      f"{game.get_type().short_name}, which hides information, so it sees "
+      "what its seat may not (the other seats' private cards, say); "
+      "--state seat_view sends only what its seat may see."
+  )
 
 
 def _request(
@@ -192,6 +215,25 @@ def bot_unready(bot_url: str) -> str | None:
   if not isinstance(health, dict) or health.get("ok") is not True:
     return f"The bot server's /health answered {health!r}."
   return None
+
+
+def state_refused(bot_url: str, state: str) -> str | None:
+  """Returns why the bot server at `bot_url` refuses `state`, or None.
+
+  The reason names the `--state` that fixes it: a bot that takes only the
+  full state (a checkpoint bot that replays the game, say) refuses the
+  default seat_view, and the session would otherwise fail on creation.
+  """
+  info = _request("GET", bot_url + "/info")
+  modes = info.get("state_modes") if isinstance(info, dict) else None
+  if not isinstance(modes, list) or not modes:
+    return f"The bot server's /info names no state_modes: {info!r}."
+  if state in modes:
+    return None
+  return (
+      f"The bot server takes {', '.join(map(str, modes))}, not {state}: "
+      f"rerun with --state {modes[0]}."
+  )
 
 
 def seat_config(options: Options, bot_url: str) -> dict[str, Any]:
@@ -281,8 +323,9 @@ def launch(
       so no signal finds them running and in no one's hands.
 
   Raises:
-    LaunchError: If the options are invalid, a server does not start, or
-      the session cannot be opened.
+    LaunchError: If the options are invalid, the GUI's port is taken (found
+      before the bot server starts), a server does not start, or the
+      session cannot be opened.
   """
   name, _ = parse_game(options.game)
   game = pyspiel.load_game(options.game)
@@ -298,6 +341,12 @@ def launch(
     raise LaunchError(
         f"--state {options.state!r} is not seat_view or full_state."
     )
+  reason = child_servers.port_unavailable(options.host, options.port)
+  if reason is not None:
+    raise LaunchError(reason)
+  note = full_state_note(options, game)
+  if note is not None:
+    print(note, file=out, flush=True)
   env = dict(os.environ)
   if options.checkpoint:
     for variable in options.checkpoint_envs:
@@ -323,7 +372,7 @@ def launch(
         out,
     )
     bot_url = bot.wait_ready(options.bot_start_seconds)
-    reason = bot_unready(bot_url)
+    reason = bot_unready(bot_url) or state_refused(bot_url, options.state)
     if reason is not None:
       raise LaunchError(reason)
     gui = child_servers.ChildServer(
@@ -429,9 +478,14 @@ def parse_args(argv: Sequence[str] | None = None) -> Options:
   )
   parser.add_argument(
       "--state",
-      default=remote_bot.FULL_STATE,
+      default=remote_bot.SEAT_VIEW,
       choices=remote_bot.STATE_MODES,
-      help="What the bot is sent. Default: %(default)s.",
+      help=(
+          "What the bot is sent: seat_view, what its seat may see; or "
+          "full_state, the whole state, for a bot that needs it (in a game "
+          "that hides information, the bot then sees what its seat may "
+          "not). Default: %(default)s."
+      ),
   )
   parser.add_argument("--host", default="127.0.0.1")
   parser.add_argument(

@@ -17,17 +17,33 @@ then served by the server as static files.
 
 ## Requirements
 
--   OpenSpiel installed for Python (see [Installation](install.md)).
--   Node.js 22.22.2 or later, with `npm`, to build the client.
+-   OpenSpiel installed for Python (see [Installation](install.md)): Python
+    3.12 with `venv`, and `./install.sh` run once from the repository root
+    before `pip install -e .`. On Debian or Ubuntu, `sudo apt-get update`
+    and then `sudo apt-get install python3.12-venv` (on a machine that has
+    just booted, `apt-get` can wait several minutes for the lock held by the
+    image's own boot-time update). On macOS, clang++ comes from Xcode's
+    command-line tools (`xcode-select --install`), and if `python3.12` is
+    not on `PATH`, `brew install python@3.12` or `uv python install 3.12`.
+-   Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` (22.22.2 or a later 22,
+    24.15.0 or a later 24, or 26 or later), with `npm`, to build the client:
+    the client's dependencies need it, and `npm ci` warns `EBADENGINE` on
+    another version. [nvm](https://github.com/nvm-sh/nvm) (`nvm install 22`)
+    installs one; after installing nvm, load it with `. "$HOME/.nvm/nvm.sh"`
+    or open a new shell, or `nvm` is not found. (Homebrew's `node@22` is not
+    linked: after `brew install node@22`, put `$(brew --prefix node@22)/bin`
+    first on `PATH`.)
 -   A checkout of the OpenSpiel repository, which holds the client's source.
 
 ## From a source checkout
 
-From the root of the repository, with OpenSpiel installed from it (for
-example with `python3 -m pip install -e .`, or the `PYTHONPATH` setup in
-[Installation](install.md)):
+From the root of the repository, with OpenSpiel installed from it (as
+below, or with the `PYTHONPATH` setup in [Installation](install.md)):
 
 ```sh
+./install.sh  # once: the C++ dependencies `pip install -e .` builds against
+python3.12 -m venv venv && . venv/bin/activate
+python3 -m pip install -e .
 (cd open_spiel/gui && npm ci && npm run build)
 python3 -m open_spiel.python.gui
 ```
@@ -107,9 +123,13 @@ gin rummy against the pretrained `scale` checkpoint:
 
 ```sh
 python3 -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
-  --bot open_spiel.python.scale.serve.remote_bot:make_bot \
+  --bot open_spiel.python.scale.serve.remote_bot:make_bot --state full_state \
   --checkpoint https://storage.googleapis.com/openspiel-data/checkpoints/scale/gin_rummy/v1@30000
 ```
+
+`--state full_state` sends the bot the whole state, which this bot needs:
+it replays the hand into its own environment, where its policy sees only
+its seat's view. Without the flag `play` sends only the seat's view.
 
 The checkpoint is a variable: the seat's settings carry it as
 `checkpoint`, so another one can be chosen in Setup without a restart.

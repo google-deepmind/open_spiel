@@ -28,6 +28,12 @@
 // E2E_PLAY_CHECKPOINT naming its checkpoint, the same hand is played against
 // that bot, a trained checkpoint say; E2E_PLAY_CHECKPOINT_2, if set, is the
 // checkpoint the field is changed to, and otherwise the field is left as it is.
+//
+// The stand-in plays on the launcher's default state, seat_view, and the
+// launcher prints no full-state note. A given bot is launched with
+// `--state full_state`, as the gin recipe does (the gin checkpoint bot takes
+// only the full state), and the launcher prints its one-line note that the
+// bot sees what its seat may not.
 
 /// <reference types="node" />
 
@@ -47,6 +53,9 @@ import {CLIENT_ROOT, REPOSITORY_ROOT} from './server.ts';
 const GAME = 'gin_rummy';
 const STAND_IN = 'open_spiel.python.gui.stand_in_checkpoint_bot:make_bot';
 const PLAY = /^Play (http:\/\/\S+)$/m;
+// The launcher's one line when it sends the full state of a game that hides
+// information.
+const FULL_STATE_NOTE = /^Note: --state full_state .*gin_rummy/m;
 // The bot server's ready line, as the launcher copies it to its stderr.
 const BOT_SERVING = /^\[bot server\] Serving the .* bot at (http:\/\/\S+)$/m;
 // Milliseconds: the launcher starts two servers.
@@ -70,7 +79,11 @@ interface Launcher {
 }
 
 /** Starts the launcher; resolves with the address it prints. */
-async function launch(bot: string, checkpoint: string): Promise<Launcher> {
+async function launch(
+  bot: string,
+  checkpoint: string,
+  state: 'seat_view' | 'full_state' | null,
+): Promise<Launcher> {
   const child = spawn(
     process.env['E2E_PYTHON'] ?? 'python3',
     [
@@ -86,6 +99,7 @@ async function launch(bot: string, checkpoint: string): Promise<Launcher> {
       '0',
       '--client-dir',
       path.join(CLIENT_ROOT, 'dist'),
+      ...(state === null ? [] : ['--state', state]),
     ],
     {
       cwd: REPOSITORY_ROOT,
@@ -159,6 +173,24 @@ async function stopAndExpectBothGone(
   );
 }
 
+/**
+ * The bot seat is sent `sent`, as every viewer reads in its settings, and
+ * the launcher printed its full-state note exactly when that is full_state.
+ */
+function expectStateSent(
+  opened: Frame,
+  launcher: Launcher,
+  sent: 'seat_view' | 'full_state',
+): void {
+  expect(opened.seats[1]?.config['state']).toBe(sent);
+  const output = launcher.output.join('');
+  if (sent === 'full_state') {
+    expect(output).toMatch(FULL_STATE_NOTE);
+  } else {
+    expect(output).not.toMatch(FULL_STATE_NOTE);
+  }
+}
+
 test('play launcher: gin rummy against a checkpoint in one step, to the end', async ({
   app,
   page,
@@ -179,7 +211,10 @@ test('play launcher: gin rummy against a checkpoint in one step, to the end', as
     );
     second = process.env['E2E_PLAY_CHECKPOINT_2'] ?? null;
   }
-  const launcher = await launch(bot, first);
+  // The stand-in on the default (seat_view); a given bot, the gin
+  // checkpoint bot say, on the full state it needs.
+  const state = given === '' ? null : 'full_state';
+  const launcher = await launch(bot, first, state);
   try {
     const url = new URL(launcher.playUrl);
     expect(url.pathname).toBe(`/game/${GAME}`);
@@ -198,6 +233,7 @@ test('play launcher: gin rummy against a checkpoint in one step, to the end', as
     );
     expect(opened.session.game).toBe(GAME);
     expect(opened.seats[1]?.controller).toBe('remote');
+    expectStateSent(opened, launcher, state ?? 'seat_view');
     expect(opened.seats[0]?.controller).toBe('human');
 
     // Seat 1's settings carry the checkpoint; in analysis, change it.

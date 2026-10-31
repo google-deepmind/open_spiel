@@ -169,7 +169,8 @@ installed server does not find the client in the checkout, so
 
     (cd open_spiel/gui && npm ci && npm run build)
     python3 -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
-        --bot open_spiel.python.scale.serve.remote_bot:make_bot --checkpoint "$CKPT@30000"
+        --bot open_spiel.python.scale.serve.remote_bot:make_bot --checkpoint "$CKPT@30000" \
+        --state full_state
 
 Once the bot has loaded and compiled (tens of seconds), open the printed
 `http://127.0.0.1:8080/game/gin_rummy?...` address to play (see

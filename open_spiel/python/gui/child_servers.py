@@ -25,6 +25,7 @@ from collections.abc import Mapping, Sequence
 import os
 import re
 import signal
+import socket
 import subprocess
 import threading
 from typing import TextIO
@@ -180,3 +181,24 @@ def signal_group(process: subprocess.Popen[str], signum: int) -> None:
     os.killpg(process.pid, signum)
   except ProcessLookupError:
     pass  # The group has exited already.
+
+
+def port_unavailable(host: str, port: int) -> str | None:
+  """Returns why the GUI server could not listen at `host`:`port`, or None.
+
+  It binds a socket there as the GUI server does (IPv6 for an address with
+  a colon, the address reusable) and closes it again, so a port in use is
+  found before the bot server loads and warms up its checkpoint. Port 0
+  checks only the host: the GUI server then picks a free port itself.
+  """
+  family = socket.AF_INET6 if ":" in host else socket.AF_INET
+  with socket.socket(family, socket.SOCK_STREAM) as probe:
+    probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+      probe.bind((host, port))
+    except OSError as e:
+      return (
+          f"The GUI cannot listen on --host {host} --port {port}: {e}. "
+          "Pass another --port, or --port 0 to pick a free one."
+      )
+  return None

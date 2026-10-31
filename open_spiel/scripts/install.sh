@@ -35,6 +35,33 @@ ${PYBIN} --version
 
 MYDIR="$(dirname "$(realpath "$0")")"
 
+# OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0 fetches the source dependencies only: no
+# apt-get, brew or other system package command runs, and the ones skipped are
+# listed at the end for you to run yourself. The default, 1, runs them.
+OPEN_SPIEL_INSTALL_SYSTEM_DEPS=${OPEN_SPIEL_INSTALL_SYSTEM_DEPS:-1}
+if [[ "$OPEN_SPIEL_INSTALL_SYSTEM_DEPS" != "0" ]] && \
+   [[ "$OPEN_SPIEL_INSTALL_SYSTEM_DEPS" != "1" ]]; then
+  die "OPEN_SPIEL_INSTALL_SYSTEM_DEPS must be 0 or 1, not" \
+      "'${OPEN_SPIEL_INSTALL_SYSTEM_DEPS}'."
+fi
+SKIPPED_SYSTEM_COMMANDS=()
+# The dpkg-query that reports which Debian packages are installed (a test
+# substitutes its own).
+DPKG_QUERY=${DPKG_QUERY:-/usr/bin/dpkg-query}
+
+# Runs a command that changes system packages ("$@"), saying so first; with
+# OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0, records it as skipped instead.
+function system_install() {
+  if [[ "$OPEN_SPIEL_INSTALL_SYSTEM_DEPS" == "0" ]]; then
+    echo -e "\e[33m** install.sh skips (OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0): $*\e[0m"
+    SKIPPED_SYSTEM_COMMANDS+=("$*")
+    return 0
+  fi
+  echo -e "\e[33m** install.sh runs a system package command: $*" \
+          "(OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0 skips these)\e[0m"
+  "$@"
+}
+
 # This function is only run on Github Actions!
 function ci_check_install_python() {
   if [[ ! "$CI" ]]; then
@@ -48,7 +75,7 @@ function ci_check_install_python() {
   if [[ "$output" = "" ]]; then
     # The --force is needed because there seems to be a phantom installation in /usr/local/
     # and errors show up for files that already exist
-    brew install --force "python@${OS_PYTHON_VERSION}"
+    system_install brew install --force "python@${OS_PYTHON_VERSION}"
   fi
   return 0
 }
@@ -89,14 +116,16 @@ DOWNLOAD_CACHE_DIR=${DOWNLOAD_CACHE_DIR:-$DEFAULT_DOWNLOAD_CACHE_DIR}
 if [[ ! -x `which git` ]]; then
   echo "Did not find git, attempting to install it."
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
-    sudo apt-get install git
+    system_install sudo apt-get install git
   elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
-    brew install git
+    system_install brew install git
   else
     echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
          "Feel free to contribute the install for a new OS."
     exit 1
   fi
+  [[ -x `which git` ]] || die "git is needed to fetch the dependencies;" \
+      "install it and run ./install.sh again."
 fi
 
 # Cache git clone of the dependencies.
@@ -237,10 +266,10 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     # Julia installed needs wget, make sure it's accessible.
     if [[ "$OSTYPE" == "linux-gnu" ]]
     then
-      [[ -x `which wget` ]] || sudo apt-get install wget
+      [[ -x `which wget` ]] || system_install sudo apt-get install wget
     elif [[ "$OSTYPE" == "darwin"* ]]
     then
-      [[ -x `which wget` ]] || brew install wget
+      [[ -x `which wget` ]] || system_install brew install wget
     fi
     # Now install Julia
     JULIA_INSTALLER="open_spiel/scripts/jill.sh"
@@ -269,7 +298,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     # Need to special-case this until it's installed by default.
     # https://vegastack.com/tutorials/how-to-install-python-3-11-on-ubuntu-22-04/
     echo "Adding Python 3.11 ppa repos"
-    sudo add-apt-repository ppa:deadsnakes/ppa
+    system_install sudo add-apt-repository ppa:deadsnakes/ppa
     PYTHON_PKGS="python3.11 python3.11-dev python3-pip python3-setuptools python3-wheel python3-tk python3.11-venv"
   elif [[ "$OS_PYTHON_VERSION" == "3.12" ]]; then
     # Need to special-case this until it's installed by default.
@@ -290,7 +319,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   if command -v apt-get &> /dev/null
   then
       APT_GET=$(command -v apt-get)
-  else
+  elif [[ "$OPEN_SPIEL_INSTALL_SYSTEM_DEPS" == "1" ]]; then
     echo "This script assumes a Debian-based Linux distribution. Please install these packages manually or using your distribution's package manager:"
     echo "$EXT_DEPS"
     exit 1
@@ -299,51 +328,51 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   # We install the packages only if they are not present yet.
   # See https://stackoverflow.com/questions/18621990/bash-get-exit-status-of-command-when-set-e-is-active
   already_installed=0
-  /usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' $EXT_DEPS || already_installed=$?
+  "$DPKG_QUERY" --show --showformat='${db:Status-Status}\n' $EXT_DEPS || already_installed=$?
   if [ $already_installed -eq 0 ]
   then
     echo -e "\e[33mSystem wide packages already installed, skipping their installation.\e[0m"
   else
     echo "System wide packages missing. Installing them..."
-    sudo apt-get -y update
-    sudo apt-get -y install $EXT_DEPS
+    system_install sudo apt-get -y update
+    system_install sudo apt-get -y install $EXT_DEPS
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
     if [[ ! -f $HOME/.cargo/bin/bindgen ]]; then
-      cargo install bindgen-cli
+      system_install cargo install bindgen-cli
     fi
   fi
 
   if [[ "$TRAVIS" ]]; then
-    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
+    system_install sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
   fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
-  brew search python
-  [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
-  [[ -x `which cmake` ]] || brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
-  [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
+  [[ "$OPEN_SPIEL_INSTALL_SYSTEM_DEPS" == "0" ]] || brew search python
+  [[ -x `which realpath` ]] || system_install brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
+  [[ -x `which cmake` ]] || system_install brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
+  [[ -x `which python3` ]] || system_install brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
   # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
     # Set brew to use the specific python version
     ci_check_install_python
-    brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
+    system_install brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
-  `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
+  `python3 -c "import tkinter" > /dev/null 2>&1` || system_install brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
   python3 --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
-  [[ -x `which curl` ]] || brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
+  [[ -x `which curl` ]] || system_install brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
-    [[ -x `which go` ]] || brew install golang || echo "** Warning: failed 'brew install golang' -- continuing"
+    [[ -x `which go` ]] || system_install brew install golang || echo "** Warning: failed 'brew install golang' -- continuing"
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    [[ -x `which rustc` ]] || brew install rust || echo "** Warning: failed 'brew install rust' -- continuing"
+    [[ -x `which rustc` ]] || system_install brew install rust || echo "** Warning: failed 'brew install rust' -- continuing"
     if [[ ! -f $HOME/.cargo/bin/bindgen ]]; then
-      cargo install bindgen-cli
+      system_install cargo install bindgen-cli
     fi
   fi
   # Removed getting pip via git-pip.py. See #1200.
-  brew install virtualenv   # May be the required way to do this as of Python 3.12?
+  system_install brew install virtualenv   # May be the required way to do this as of Python 3.12?
   # ${PYBIN} -m pip install virtualenv
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
@@ -359,4 +388,11 @@ CMAKE_VERSION=$(cmake --version 2>/dev/null | head -n1 | sed -E 's/[^0-9]*([0-9.
 if [[ -z "$CMAKE_VERSION" ]] || \
    [[ "$(printf '%s\n' "$OPEN_SPIEL_MIN_CMAKE_VERSION" "$CMAKE_VERSION" | sort -V | head -n1)" != "$OPEN_SPIEL_MIN_CMAKE_VERSION" ]]; then
   echo -e "\e[33m** Warning: CMake >= ${OPEN_SPIEL_MIN_CMAKE_VERSION} is required, found '${CMAKE_VERSION}'. Install a recent one, e.g. with 'python3 -m pip install cmake'.\e[0m"
+fi
+
+if [[ ${#SKIPPED_SYSTEM_COMMANDS[@]} -gt 0 ]]; then
+  echo -e "\e[33m** OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0: the source dependencies" \
+          "are fetched, and these system package commands were skipped;" \
+          "install what the build needs yourself:\e[0m"
+  printf '   %s\n' "${SKIPPED_SYSTEM_COMMANDS[@]}"
 fi

@@ -294,6 +294,7 @@ pytype_strict_library(
     srcs = ["play.py"],
     deps = [
         ":child_servers",
+        ":information",
         ":remote_bot",
         ":remote_bot_server",
         ":static",
@@ -869,9 +870,10 @@ pytype_strict_contrib_test(
     data = [":gui_server"],  # `python -m open_spiel.python.gui` needs __main__.py.
     deps = [
         ":child_servers",
-        ":cli",  # The GUI server it starts as a process runs cli.
+        ":cli",  # keep: the GUI server it starts as a process runs cli.
         ":play",
         ":stand_in_checkpoint_bot",
+        "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//absl/testing:absltest",
     ],
 )
