@@ -62,6 +62,11 @@ class SerializableCircularBuffer : public CircularBuffer<T> {
 
     deserializer.Read(&(this->total_added_));
     deserializer.Read(&(this->data_));
+
+    // libnop reads vectors of non-integral elements one push_back at a time,
+    // which can leave them up to twice the capacity they need. A copy of each
+    // element holds only what it needs.
+    for (T& element : this->data_) element = T(element);
   }
 };
 }  // namespace open_spiel

@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <iterator>
 #include <random>
+#include <utility>
 #include <vector>
 
 namespace open_spiel {
@@ -29,12 +30,15 @@ class CircularBuffer {
   explicit CircularBuffer(int max_size)
       : max_size_(max_size), total_added_(0) {}
 
-  // Add one element, replacing the oldest once it's full.
-  void Add(const T& value) {
+  // Add one element, replacing the oldest once it's full. The element is moved
+  // into its slot: copy-assigning would let a slot keep the storage of the
+  // largest element it ever held (a std::vector keeps its capacity when assigned
+  // a smaller one).
+  void Add(T value) {
     if (data_.size() < max_size_) {
-      data_.push_back(value);
+      data_.push_back(std::move(value));
     } else {
-      data_[total_added_ % max_size_] = value;
+      data_[total_added_ % max_size_] = std::move(value);
     }
     total_added_ += 1;
   }
