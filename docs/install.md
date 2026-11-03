@@ -100,7 +100,7 @@ In a nutshell:
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):
 
     ```bash
-    virtualenv -p python3 venv
+    python3 -m venv ./venv
     source venv/bin/activate
     ```
 
@@ -309,9 +309,10 @@ By default, Clang C++ compiler is used (and potentially installed by
 Build and run tests (Python 3):
 
 ```bash
+source venv/bin/activate
 mkdir build
 cd build
-CXX=clang++ cmake -DPython3_EXECUTABLE=$(which python3) -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
+CXX=clang++ cmake -DPython3_EXECUTABLE=python -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
 make -j$(nproc)
 ctest -j$(nproc)
 ```
