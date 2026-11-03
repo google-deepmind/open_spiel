@@ -409,16 +409,20 @@ class NFSP(rl_agent.AbstractAgent):
     return loss.item()
 
   def save(
-      self, checkpoint_dir: pathlib.Path, save_optimiser: bool = True
+      self, checkpoint_dir: pathlib.Path | str, save_optimiser: bool = True
   ) -> None:
     """Saves the average policy network and the inner RL agent's q-network.
 
     Args:
-      checkpoint_dir (pathlib.Path): target checkpoint directory.
-      save_optimiser (bool, optional): whether save only the optimiser or just
-        the network's weights. Defaults to True.
+      checkpoint_dir (pathlib.Path | str): target checkpoint directory, created
+        if missing. The q-network is saved to `q_network.pt` and the average
+        policy network to `avg_network.pt`.
+      save_optimiser (bool, optional): whether to also save the optimisers'
+        state. Defaults to True.
     """
-    self._rl_agent.save(checkpoint_dir / "avg_network", save_optimiser)
+    checkpoint_dir = pathlib.Path(checkpoint_dir)
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    self._rl_agent.save(checkpoint_dir / "q_network.pt", save_optimiser)
     checkpoint = {
         "iteration": self._iteration,
         "last_loss_value": self._last_sl_loss_value,
@@ -426,27 +430,31 @@ class NFSP(rl_agent.AbstractAgent):
     }
     if save_optimiser:
       checkpoint.update({"optimiser": self._optimizer.state_dict()})
-    torch.save(checkpoint, checkpoint_dir)
+    torch.save(checkpoint, checkpoint_dir / "avg_network.pt")
 
   def restore(
-      self, checkpoint_dir: pathlib.Path, load_optimiser: bool = True
+      self, checkpoint_dir: pathlib.Path | str, load_optimiser: bool = True
   ) -> None:
     """Restores the average policy network and the inner RL agent's q-network.
 
     Args:
-      checkpoint_dir (pathlib.Path): target checkpoint directory.
-      load_optimiser (bool, optional): whether load only the optimiser or just
-        the network's weights. Defaults to True.
+      checkpoint_dir (pathlib.Path | str): checkpoint directory written by
+        `save`.
+      load_optimiser (bool, optional): whether to also load the optimisers'
+        state. Defaults to True.
     """
-    self._rl_agent.load(checkpoint_dir / "avg_network", load_optimiser)
+    checkpoint_dir = pathlib.Path(checkpoint_dir)
+    self._rl_agent.load(checkpoint_dir / "q_network.pt", load_optimiser)
 
     checkpoint = torch.load(
-        checkpoint_dir, weights_only=True, map_location=self._device
+        checkpoint_dir / "avg_network.pt",
+        weights_only=True,
+        map_location=self._device,
     )
-    self._avg_network.load_state_dict(checkpoint["model_state_dict"])
+    self._avg_network.load_state_dict(checkpoint["model"])
 
     if load_optimiser:
-      self._optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+      self._optimizer.load_state_dict(checkpoint["optimiser"])
 
     self._iteration = checkpoint["iteration"]
     self._last_sl_loss_value = checkpoint["last_loss_value"]
