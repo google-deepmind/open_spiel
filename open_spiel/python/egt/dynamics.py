@@ -52,8 +52,10 @@ def boltzmannq(state, fitness, temperature=1.):
     Time derivative of the population state.
   """
   exploitation = (1. / temperature) * replicator(state, fitness)
-  exploration = (np.log(state) - state.dot(np.log(state).transpose()))
-  return exploitation - state * exploration
+  # Extend x * log(x) continuously to zero-probability strategies.
+  weighted_logs = state * np.log(np.where(state == 0, 1., state))
+  exploration = weighted_logs - state * np.sum(weighted_logs)
+  return exploitation - exploration
 
 
 def qpg(state, fitness):
