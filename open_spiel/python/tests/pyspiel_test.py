@@ -152,6 +152,7 @@ EXPECTED_MANDATORY_GAMES = frozenset([
     "restricted_nash_response",
     "sheriff",
     "shogi",
+    "siguo_junqi",
     "skat",
     "snake",
     "social_deduction",

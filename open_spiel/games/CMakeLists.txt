@@ -207,6 +207,8 @@ set(GAME_SOURCES
   shogi/shogi.h
   shogi/shogi_board.cc
   shogi/shogi_board.h
+  siguo_junqi/siguo_junqi.cc
+  siguo_junqi/siguo_junqi.h
   skat/skat.cc
   skat/skat.h
   snake/snake.cc
@@ -713,6 +715,10 @@ add_test(sheriff_test sheriff_test)
 add_executable(shogi_test shogi/shogi_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(shogi_test shogi_test)
+
+add_executable(siguo_junqi_test siguo_junqi/siguo_junqi_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(siguo_junqi_test siguo_junqi_test)
 
 add_executable(skat_test skat/skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
