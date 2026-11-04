@@ -42,7 +42,7 @@ class STVTest(parameterized.TestCase):
         base.WeightedVote(3, ["Chicken", "Hamburger"]),
     ]
     profile = base.PreferenceProfile(votes=votes,
-                                     alternatives=alternatives)
+                                     alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = stv.STVVoting(num_winners=3)
     outcome = method.run_election(profile)
     self.assertListEqual(outcome.ranking,
@@ -58,7 +58,7 @@ class STVTest(parameterized.TestCase):
         base.WeightedVote(2, ["C", "A", "B"]),
         base.WeightedVote(1, ["B", "C", "A"]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = stv.STVVoting()
     outcome = method.run_election(profile)
     self.assertListEqual(outcome.ranking, ["C", "A", "B"])

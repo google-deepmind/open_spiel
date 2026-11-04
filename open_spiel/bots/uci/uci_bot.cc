@@ -30,12 +30,12 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/match.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
@@ -142,13 +142,13 @@ std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
 }
 
 void UCIBot::Restart() {
-  ponder_move_ = absl::nullopt;
+  ponder_move_ = std::nullopt;
   was_ponder_hit_ = false;
   UciNewGame();
 }
 
 void UCIBot::RestartAt(const State& state) {
-  ponder_move_ = absl::nullopt;
+  ponder_move_ = std::nullopt;
   was_ponder_hit_ = false;
   auto chess_state = down_cast<const chess::ChessState&>(state);
   PositionFromState(chess_state);
@@ -294,7 +294,7 @@ std::pair<std::string, absl::optional<std::string>> UCIBot::ReadBestMove(
     std::istringstream response_line(response);
     std::string token;
     std::string move_str;
-    absl::optional<std::string> ponder_str = absl::nullopt;
+    absl::optional<std::string> ponder_str = std::nullopt;
     response_line >> std::skipws;
     while (response_line >> token) {
       if (token == "bestmove") {

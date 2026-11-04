@@ -1,0 +1,41 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "tic_tac_toe",
+    srcs = ["tic_tac_toe.cc"],
+    hdrs = ["tic_tac_toe.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/utils:tensor_view",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "tic_tac_toe_test",
+    srcs = ["tic_tac_toe_test.cc"],
+    deps = [
+        ":tic_tac_toe",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:status",
+    ],
+)

@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -110,6 +110,9 @@ struct GinRummyUtils {
   VecInt LegalMelds(const VecInt &hand, int knock_card) const;
   VecInt LegalDiscards(const VecInt &hand, int knock_card) const;
 
+  // Returns the cards that can be laid off on layed_melds, given the cards
+  // already laid off. A run accepts cards that extend it through earlier
+  // layoffs, so 9c-Tc-Jc with 8c and 7c laid off accepts 6c and Qc.
   VecInt AllLayoffs(const VecInt &layed_melds,
                     const VecInt &previous_layoffs) const;
 

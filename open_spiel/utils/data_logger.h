@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/time/time.h"
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/json.h"
 

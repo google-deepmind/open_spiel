@@ -33,7 +33,7 @@ class ApprovalVotingTest(absltest.TestCase):
         ["a", "c", "d", "b"],
         ["d", "b", "c", "a"]
     ]
-    profile = base.PreferenceProfile(votes=votes)
+    profile = base.PreferenceProfile(votes=votes)  # pyrefly: ignore[bad-argument-type]
     method = approval.ApprovalVoting(k=2)
     outcome = method.run_election(profile)
     with self.subTest("Approval voting gets basic ranking correct"):

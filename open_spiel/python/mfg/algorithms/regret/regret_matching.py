@@ -142,7 +142,7 @@ class RegretMatching(regret_minimizer.RegretMinimizer):
     mu = utils.MixedDistribution(self._policy_mus, nu)
     for _ in range(self._value_estimation_n):
       for index, policy in enumerate(self._policies):
-        rewards[index] += self._value_estimator(policy, mu, self._game)
+        rewards[index] += self._value_estimator(policy, mu, self._game)  # pyrefly: ignore[bad-argument-type]
     rewards /= self._value_estimation_n
 
     welfare = np.sum(np.array(rewards) * np.array(nu))

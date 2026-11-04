@@ -157,18 +157,18 @@ class MunchausenDQN(rl_agent.AbstractAgent):
       raise ValueError("Not implemented, choose from 'mse', 'huber'.")
 
     if optimizer == "adam":
-      optimizer = optax.adam(learning_rate)
+      optimizer = optax.adam(learning_rate)  # pyrefly: ignore[bad-assignment]
     elif optimizer == "sgd":
-      optimizer = optax.sgd(learning_rate)
+      optimizer = optax.sgd(learning_rate)  # pyrefly: ignore[bad-assignment]
     else:
       raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
 
     # Clipping the gradients prevent divergence and allow more stable training.
     if gradient_clipping:
-      optimizer = optax.chain(optimizer,
+      optimizer = optax.chain(optimizer,  # pyrefly: ignore[bad-argument-type, bad-assignment]
                               optax.clip_by_global_norm(gradient_clipping))
 
-    opt_init, opt_update = optimizer.init, optimizer.update
+    opt_init, opt_update = optimizer.init, optimizer.update  # pyrefly: ignore[missing-attribute]
 
     def _stochastic_gradient_descent(params, opt_state, gradient):
       updates, opt_state = opt_update(gradient, opt_state)
@@ -239,7 +239,7 @@ class MunchausenDQN(rl_agent.AbstractAgent):
       else:
         self._prev_time_step = time_step
         self._prev_action = action
-        self._prev_legal_action = legal_actions
+        self._prev_legal_action = legal_actions  # pyrefly: ignore[unbound-name]
 
     return rl_agent.StepOutput(action=action, probs=probs)
 

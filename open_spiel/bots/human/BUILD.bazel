@@ -1,0 +1,36 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "human_bot",
+    srcs = ["human_bot.cc"],
+    hdrs = ["human_bot.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "human_bot_test",
+    srcs = ["human_bot_test.cc"],
+    deps = [
+        ":human_bot",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/game_transforms:repeated_game",
+        "//open_spiel/games:all_games",  # build-cleaner: keep
+    ],
+)

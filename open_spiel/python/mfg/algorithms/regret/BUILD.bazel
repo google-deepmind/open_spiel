@@ -1,0 +1,77 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+pytype_strict_library(
+    name = "c_ce_optimization",
+    srcs = ["c_ce_optimization.py"],
+    deps = [
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytype_strict_library(
+    name = "hedge",
+    srcs = ["hedge.py"],
+    deps = [
+        ":polynomial_weights",
+        "//open_spiel/python/mfg/algorithms:utils",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "regret_matching",
+    srcs = ["regret_matching.py"],
+    deps = [
+        ":regret_minimizer",
+        "//open_spiel/python/mfg/algorithms:utils",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "polynomial_weights",
+    srcs = ["polynomial_weights.py"],
+    deps = [
+        ":regret_minimizer",
+        "//open_spiel/python/mfg/algorithms:utils",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "regret_minimizer",
+    srcs = ["regret_minimizer.py"],
+    deps = [
+        ":c_ce_optimization",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:utils",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "nash_random_search",
+    srcs = ["nash_random_search.py"],
+    deps = [
+        ":regret_minimizer",
+        "//open_spiel/python/mfg/algorithms:utils",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "nash_evolutionary_search",
+    srcs = ["nash_evolutionary_search.py"],
+    deps = [
+        ":regret_minimizer",
+        "//open_spiel/python/mfg/algorithms:utils",
+        "@py_deps//cma",
+        "@py_deps//numpy",
+    ],
+)

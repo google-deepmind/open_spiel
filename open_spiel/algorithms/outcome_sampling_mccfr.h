@@ -19,7 +19,7 @@
 #include <random>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_real_distribution.h"
+#include "absl/random/uniform_real_distribution.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"

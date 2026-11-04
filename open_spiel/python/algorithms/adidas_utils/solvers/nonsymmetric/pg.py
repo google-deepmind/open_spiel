@@ -30,7 +30,7 @@ class Solver(updates.Solver):
     """Ctor."""
     del kwargs
     super().__init__(proj_grad, euclidean, rnd_init, seed)
-    self.lrs = lrs
+    self.lrs = lrs  # pyrefly: ignore[bad-assignment]
 
   def compute_gradients(self, params, payoff_matrices):
     """Compute and return gradients for all parameters.
@@ -45,7 +45,7 @@ class Solver(updates.Solver):
       unregularized exploitability (stochastic estimate)
       unregularized exploitability (stochastic estimate) *duplicate
     """
-    return gradients(*params, payoff_matrices, self.num_players, self.proj_grad)
+    return gradients(*params, payoff_matrices, self.num_players, self.proj_grad)  # pyrefly: ignore[bad-argument-count]
 
   def exploitability(self, params, payoff_matrices):
     """Policy gradient does not minimize any exploitability so return NaN.

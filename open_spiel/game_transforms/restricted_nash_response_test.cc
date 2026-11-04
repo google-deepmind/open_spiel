@@ -16,12 +16,12 @@
 
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "absl/random/uniform_int_distribution.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 
 namespace open_spiel {
 namespace {

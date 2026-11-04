@@ -18,12 +18,12 @@
 #include <string>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_map.h"
 #include "open_spiel/games/shogi/shogi.h"
 #include "open_spiel/games/shogi/shogi_board.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/cast.h"
+#include "pybind11/pybind11.h"
 
 namespace py = ::pybind11;
 using open_spiel::Game;

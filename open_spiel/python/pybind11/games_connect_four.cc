@@ -18,7 +18,7 @@
 #include <string>
 #include <utility>
 
-#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
+#include "nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/games/connect_four/connect_four.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"

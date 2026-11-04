@@ -1,0 +1,310 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "dagger",
+    srcs = ["dagger.py"],
+    strict_deps = True,
+    deps = [
+        ":targets",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:decide",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/policies:opening",
+        "//open_spiel/python/scale/policies:routed",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "deals",
+    srcs = ["deals.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//etils/epath",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "decisions",
+    srcs = ["decisions.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/policies:routed",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "helpers",
+    testonly = True,
+    srcs = ["tests/helpers.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:tabular",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "replay",
+    srcs = ["replay.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "shards",
+    srcs = ["shards.py"],
+    strict_deps = True,
+    deps = [
+        ":deals",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "@py_deps//etils/epath",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "sources",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "targets",
+    srcs = ["targets.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:advantages",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/policies:operator_vocab",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+pytest_test(
+    name = "bridge_deals_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/bridge_deals_test.py"],
+    deps = [
+        ":deals",
+        ":shards",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:bridge",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "dagger_options_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/dagger_options_test.py"],
+    deps = [
+        ":dagger",
+        ":targets",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/connect_four:teacher",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:endgame",
+        "//open_spiel/python/scale/envs/gin:rule_bot",
+        "//open_spiel/python/scale/league:sampler",
+        "//open_spiel/python/scale/policies:opening",
+        "//open_spiel/python/scale/policies:routed",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "dagger_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/dagger_test.py"],
+    deps = [
+        ":dagger",
+        ":helpers",
+        ":targets",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/league:sampler",
+        "//open_spiel/python/scale/testing:check_policy",
+        "//open_spiel/python/scale/testing:fixtures",
+        "//open_spiel/python/scale/testing:steps",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "deals_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/deals_test.py"],
+    deps = [
+        ":deals",
+        ":shards",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs:stub",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "replay_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/replay_test.py"],
+    deps = [
+        ":helpers",
+        ":replay",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "search_targets_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/search_targets_test.py"],
+    deps = [
+        ":helpers",
+        ":targets",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/policies:operator_vocab",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "shards_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/shards_test.py"],
+    deps = [
+        ":dagger",
+        ":helpers",
+        ":shards",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "targets_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/targets_test.py"],
+    deps = [
+        ":helpers",
+        ":targets",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

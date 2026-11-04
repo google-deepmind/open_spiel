@@ -1,0 +1,208 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "deep_cfr",
+    srcs = ["deep_cfr.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:lru_cache",
+        "@py_deps//chex",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+py_test(
+    name = "deep_cfr_jax_test",
+    srcs = ["deep_cfr_jax_test.py"],
+    deps = [
+        ":deep_cfr",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_library(
+    name = "dqn",
+    srcs = ["dqn.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "@py_deps//chex",
+        "@py_deps//etils/epath",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+        "@py_deps//optax",
+        "@py_deps//orbax/checkpoint",
+    ],
+)
+
+py_test(
+    name = "dqn_jax_test",
+    srcs = ["dqn_jax_test.py"],
+    deps = [
+        ":dqn",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "boltzmann_dqn",
+    srcs = ["boltzmann_dqn.py"],
+    strict_deps = True,
+    deps = [
+        ":dqn",
+        "@py_deps//chex",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "boltzmann_dqn_jax_test",
+    srcs = ["boltzmann_dqn_jax_test.py"],
+    deps = [
+        ":boltzmann_dqn",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "nfsp",
+    srcs = ["nfsp.py"],
+    strict_deps = True,
+    deps = [
+        ":dqn",
+        "//open_spiel/python:rl_agent",
+        "@py_deps//chex",
+        "@py_deps//etils/epath",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//orbax/checkpoint",
+    ],
+)
+
+py_test(
+    name = "nfsp_jax_test",
+    srcs = ["nfsp_jax_test.py"],
+    deps = [
+        ":nfsp",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//scipy",
+    ],
+)
+
+pytype_strict_library(
+    name = "policy_gradient",
+    srcs = ["policy_gradient.py"],
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "@py_deps//chex",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//rlax",
+    ],
+)
+
+py_test(
+    name = "policy_gradient_jax_test",
+    srcs = ["policy_gradient_jax_test.py"],
+    deps = [
+        ":policy_gradient",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "opponent_shaping",
+    srcs = ["opponent_shaping.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//chex",
+        "@py_deps//distrax",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//rlax",
+    ],
+)
+
+py_test(
+    name = "opponent_shaping_jax_test",
+    size = "medium",
+    srcs = ["opponent_shaping_jax_test.py"],
+    deps = [
+        ":opponent_shaping",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//distrax",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "rcfr",
+    srcs = ["rcfr.py"],
+    strict_deps = True,
+    deps = [
+        ":deep_cfr",
+        "@py_deps//chex",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "rcfr_jax_test",
+    srcs = ["rcfr_jax_test.py"],
+    deps = [
+        ":rcfr",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//chex",
+        "@py_deps//flax/nnx:v1",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)

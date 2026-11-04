@@ -1,0 +1,38 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "backgammon",
+    srcs = ["backgammon.cc"],
+    hdrs = ["backgammon.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "backgammon_test",
+    srcs = ["backgammon_test.cc"],
+    deps = [
+        ":backgammon",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:init",
+    ],
+)

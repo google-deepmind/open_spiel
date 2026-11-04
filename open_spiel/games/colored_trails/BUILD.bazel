@@ -1,0 +1,62 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "colored_trails",
+    srcs = [
+        "colored_trails.cc",
+        "colored_trails_utils.cc",
+    ],
+    hdrs = ["colored_trails.h"],
+    copts = ["-fexceptions"],
+    data = [
+        "boards100.txt",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+    ],
+    alwayslink = 1,
+)
+
+cc_binary(
+    name = "colored_trails_board_generator",
+    srcs = ["colored_trails_board_generator.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":colored_trails",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_test(
+    name = "colored_trails_test",
+    srcs = ["colored_trails_test.cc"],
+    deps = [
+        ":colored_trails",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:init",
+    ],
+)

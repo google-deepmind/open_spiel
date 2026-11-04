@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "absl/algorithm/container.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel::universal_poker::logic {

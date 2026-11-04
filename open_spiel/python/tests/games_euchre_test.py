@@ -81,6 +81,67 @@ class GamesEuchreTest(absltest.TestCase):
     self.assertEqual(trick.winner(), pyspiel.PlayerId.INVALID)
     self.assertEqual(trick.cards(), [pyspiel.INVALID_ACTION])
 
+  def _suit_deal(self, game_string='euchre'):
+    """North deals, player p holds the 9 to K of suit p, the ace of clubs up."""
+    game = pyspiel.load_game(game_string)
+    state = game.new_initial_state()
+    state.apply_action(0)  # North deals.
+    hands = [[rank * euchre.NUM_SUITS + player for rank in range(5)]
+             for player in range(4)]
+    for dealt in range(20):
+      state.apply_action(hands[dealt % 4][dealt // 4])
+    state.apply_action(5 * euchre.NUM_SUITS)  # The ace of clubs.
+    return state
+
+  def _assert_illegal(self, state, action):
+    history = state.history()
+    self.assertNotIn(action, state.legal_actions())
+    with self.assertRaises(pyspiel.SpielError):
+      state.apply_action(action)
+    self.assertEqual(state.history(), history)
+
+  def test_illegal_actions_raise(self):
+    # A card dealt twice.
+    state = pyspiel.load_game('euchre').new_initial_state()
+    state.apply_action(0)
+    state.apply_action(3)
+    with self.assertRaises(pyspiel.SpielError):
+      state.apply_action(3)
+    # Round one: only the up-card's suit may be named.
+    state = self._suit_deal()
+    self._assert_illegal(state, euchre.HEARTS_TRUMP_ACTION)
+    self._assert_illegal(state, euchre.GO_ALONE_ACTION)
+    self._assert_illegal(state, 0)
+    # Round two: not the turned-down suit; stick the dealer.
+    for _ in range(4):
+      state.apply_action(euchre.PASS_ACTION)
+    self._assert_illegal(state, euchre.CLUBS_TRUMP_ACTION)
+    for _ in range(3):
+      state.apply_action(euchre.PASS_ACTION)
+    self._assert_illegal(state, euchre.PASS_ACTION)
+    # The dealer may not discard the up-card.
+    state = self._suit_deal()
+    for _ in range(3):
+      state.apply_action(euchre.PASS_ACTION)
+    state.apply_action(euchre.CLUBS_TRUMP_ACTION)
+    state.apply_action(euchre.PLAY_WITH_PARTNER_ACTION)
+    self._assert_illegal(state, 5 * euchre.NUM_SUITS)
+    self._assert_illegal(state, 1)  # A card of another player.
+    state.apply_action(0)  # The dealer discards the nine of clubs.
+    # Trump is clubs, so the jack of spades (West's) is the left bower.
+    state.apply_action(1)  # East leads the nine of diamonds.
+    self._assert_illegal(state, 5)  # East's card, not South's.
+    state.apply_action(2)  # South, void in diamonds: the nine of hearts.
+    state.apply_action(3)  # West, void in diamonds: the nine of spades.
+    state.apply_action(4)  # North trumps with the ten of clubs and wins.
+    self._assert_illegal(state, 5 * euchre.NUM_SUITS + 1)  # A kitty card.
+    state.apply_action(12)  # North leads the queen of clubs.
+    state.apply_action(5)  # East, void in clubs: the ten of diamonds.
+    state.apply_action(6)  # South, void in clubs: the ten of hearts.
+    # West holds the left bower, a club, so must follow suit with it.
+    self._assert_illegal(state, 7)  # A revoke: the ten of spades.
+    self.assertEqual(state.legal_actions(), [11])  # The jack of spades.
+
 
 if __name__ == '__main__':
   absltest.main()

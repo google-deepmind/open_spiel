@@ -17,8 +17,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "open_spiel/algorithms/alpha_zero_torch/alpha_zero.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"

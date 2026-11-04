@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/btree_set.h"
+#include "absl/container/btree_set.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/history_tree.h"
 #include "open_spiel/policy.h"

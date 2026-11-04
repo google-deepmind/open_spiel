@@ -23,9 +23,9 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/algorithm/container.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
@@ -586,7 +586,7 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 DarkChessGame::DarkChessGame(const GameParameters& params)

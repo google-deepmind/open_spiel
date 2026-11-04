@@ -69,3 +69,5 @@ open_spiel/.vs
 
 # Editor swap files
 *.swp
+
+open_spiel.egg-info/

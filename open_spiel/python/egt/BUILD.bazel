@@ -1,0 +1,170 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "dynamics",
+    srcs = ["dynamics.py"],
+    deps = [
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "dynamics_test",
+    srcs = ["dynamics_test.py"],
+    deps = [
+        ":dynamics",
+        ":utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "heuristic_payoff_table",
+    srcs = ["heuristic_payoff_table.py"],
+    strict_deps = True,
+    deps = [
+        ":utils",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "alpharank_test",
+    srcs = ["alpharank_test.py"],
+    deps = [
+        ":alpharank",
+        ":heuristic_payoff_table",
+        ":utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "heuristic_payoff_table_test",
+    srcs = ["heuristic_payoff_table_test.py"],
+    deps = [
+        ":heuristic_payoff_table",
+        ":utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "utils_test",
+    srcs = ["utils_test.py"],
+    deps = [
+        ":utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "alpharank",
+    srcs = ["alpharank.py"],
+    deps = [
+        ":alpharank_visualizer",
+        ":utils",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+py_library(
+    name = "alpharank_visualizer",
+    srcs = ["alpharank_visualizer.py"],
+    strict_deps = True,
+    deps = [
+        ":utils",
+        "@py_deps//absl/logging",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//networkx",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "visualization",
+    srcs = ["visualization.py"],
+    deps = [
+        ":utils",
+        "@py_deps//absl/logging",
+        "@py_deps//matplotlib",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "alpharank_visualizer_test",
+    srcs = ["alpharank_visualizer_test.py"],
+    deps = [
+        ":alpharank",
+        ":alpharank_visualizer",
+        ":utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//mock",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "alpharank_example",
+    srcs = ["examples/alpharank_example.py"],
+    strict_deps = False,
+    deps = [
+        ":alpharank",
+        ":alpharank_visualizer",
+        ":utils",
+        "//open_spiel/python/algorithms:fictitious_play",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+    ],
+)
+
+py_test(
+    name = "visualization_test",
+    srcs = ["visualization_test.py"],
+    deps = [
+        ":dynamics",
+        ":utils",
+        ":visualization",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//matplotlib:matplotlib_interactive",  # buildcleaner: keep
+        "@py_deps//numpy",
+    ],
+)

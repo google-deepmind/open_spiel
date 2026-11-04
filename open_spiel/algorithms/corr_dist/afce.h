@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCE_H_
 #define OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCE_H_
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/game_transforms/game_wrapper.h"
 #include "open_spiel/policy.h"

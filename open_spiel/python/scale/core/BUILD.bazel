@@ -1,0 +1,566 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "advantages",
+    srcs = ["advantages.py"],
+    strict_deps = True,
+    deps = ["@py_deps//jax"],
+)
+
+py_library(
+    name = "arena",
+    srcs = ["arena.py"],
+    strict_deps = True,
+    deps = [
+        ":auxiliary",
+        ":chance",
+        ":decide",
+        ":plies",
+        ":sequence",
+        ":slots",
+        ":x64",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "arena_engine",
+    srcs = ["arena_engine.py"],
+    strict_deps = True,
+    deps = [
+        ":arena",
+        ":deadline",
+        ":host_arena",
+        ":rng",
+        ":sequence",
+        ":x64",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "arena_fixtures",
+    testonly = True,
+    srcs = ["tests/arena_fixtures.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/jax/games:leduc_poker",
+        "//open_spiel/python/scale/envs:jax_game_env",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "arena_golden",
+    testonly = True,
+    srcs = ["tests/arena_golden.py"],
+    strict_deps = True,
+    deps = [
+        ":arena",
+        ":frameworks",
+        ":schedules",
+        ":sequence",
+        ":x64",
+        "//open_spiel/python/scale/configs:az_connect_four",
+        "//open_spiel/python/scale/configs:recipes",
+        "//open_spiel/python/scale/envs/gin:rule_bot",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:refs",
+        "//open_spiel/python/scale/league:sampler",
+        "//open_spiel/python/scale/learners:az",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/parallel:data_parallel",
+        "//open_spiel/python/scale/parallel:probe_arena",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "auxiliary",
+    srcs = ["auxiliary.py"],
+    strict_deps = True,
+    deps = [":sequence"],
+)
+
+py_library(
+    name = "chance",
+    srcs = ["chance.py"],
+    strict_deps = True,
+    deps = [
+        ":sequence",
+        ":x64",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "core",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "deadline",
+    srcs = ["deadline.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "decide",
+    srcs = ["decide.py"],
+    strict_deps = True,
+    deps = [
+        ":sequence",
+        ":x64",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "frameworks",
+    srcs = ["frameworks.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "game_tree",
+    srcs = ["game_tree.py"],
+    strict_deps = True,
+    deps = [
+        ":decide",
+        ":plies",
+        ":sequence",
+        ":x64",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "host_arena",
+    srcs = ["host_arena.py"],
+    strict_deps = True,
+    deps = [
+        ":arena",
+        ":plies",
+        ":sequence",
+        "//open_spiel/python/scale/interop:host",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "named_fns",
+    testonly = True,
+    srcs = ["tests/named_fns.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/scale/envs:kuhn"],
+)
+
+py_library(
+    name = "numpy_policies",
+    testonly = True,
+    srcs = ["tests/numpy_policies.py"],
+    strict_deps = True,
+    deps = [
+        ":sequence",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "plies",
+    srcs = ["plies.py"],
+    strict_deps = True,
+    deps = [
+        ":sequence",
+        ":x64",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "rng",
+    srcs = ["rng.py"],
+    strict_deps = True,
+    deps = [
+        ":frameworks",
+        ":x64",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "schedules",
+    srcs = ["schedules.py"],
+    strict_deps = True,
+    deps = ["@py_deps//jax"],
+)
+
+py_library(
+    name = "sequence",
+    srcs = [
+        "sequence.py",
+        "types.py",
+    ],
+    strict_deps = True,
+    deps = ["@py_deps//jax"],
+)
+
+py_library(
+    name = "sharding_probe",
+    testonly = True,
+    srcs = ["tests/sharding_probe.py"],
+    strict_deps = True,
+    deps = [
+        ":arena",
+        ":frameworks",
+        ":sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//absl:app",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "slots",
+    srcs = ["slots.py"],
+    strict_deps = True,
+    deps = [":sequence"],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "x64",
+    srcs = ["x64.py"],
+    strict_deps = True,
+    deps = [
+        ":frameworks",
+        "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "arena_golden_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/arena_golden_test.py"],
+    deps = [
+        ":arena_golden",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "arena_regressions_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/arena_regressions_test.py"],
+    deps = [
+        ":arena",
+        ":decide",
+        ":sequence",
+        "//open_spiel/python/jax/games:game",
+        "//open_spiel/python/jax/games:leduc_poker",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:jax_game_env",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:check_policy",
+        "//open_spiel/python/scale/testing:errors",
+        "//open_spiel/python/scale/testing:fixtures",
+        "//open_spiel/python/scale/testing:steps",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "arena_rows_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/arena_rows_test.py"],
+    deps = [
+        ":arena",
+        ":frameworks",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "arena_sharding_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/arena_sharding_test.py"],
+    deps = [
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/launch:subprocess_env",
+    ],
+)
+
+pytest_test(
+    name = "arena_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/arena_test.py"],
+    deps = [
+        ":arena",
+        ":arena_fixtures",
+        ":chance",
+        ":named_fns",
+        ":numpy_policies",
+        ":sequence",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "components_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/components_test.py"],
+    deps = [
+        ":chance",
+        ":plies",
+        ":sequence",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "decide_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/decide_test.py"],
+    deps = [
+        ":arena",
+        ":decide",
+        ":sequence",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/testing:check_decide",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "host_arena_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/host_arena_test.py"],
+    deps = [
+        ":arena",
+        ":host_arena",
+        ":numpy_policies",
+        ":sequence",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "padding_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/padding_test.py"],
+    deps = [
+        ":arena",
+        ":numpy_policies",
+        ":sequence",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "rng_matches_jax_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/rng_matches_jax_test.py"],
+    deps = [
+        ":arena",
+        ":rng",
+        ":slots",
+        ":x64",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/league:controller",
+        "//open_spiel/python/scale/league:sampler",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "rng_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/rng_test.py"],
+    deps = [
+        ":rng",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "slots_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/slots_test.py"],
+    deps = [
+        ":sequence",
+        ":slots",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "temperature_drop_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/temperature_drop_test.py"],
+    deps = [
+        ":arena",
+        ":decide",
+        ":host_arena",
+        ":numpy_policies",
+        ":sequence",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "types_hygiene_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/types_hygiene_test.py"],
+    deps = [
+        ":frameworks",
+        ":sequence",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/launch:subprocess_env",
+    ],
+)
+
+pytest_test(
+    name = "x64_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/x64_test.py"],
+    deps = [
+        ":arena",
+        ":arena_fixtures",
+        ":chance",
+        ":plies",
+        ":sequence",
+        ":x64",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

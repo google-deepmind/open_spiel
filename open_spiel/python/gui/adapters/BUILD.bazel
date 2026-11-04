@@ -1,0 +1,258 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_contrib_test", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "adapters",
+    srcs = ["__init__.py"],
+    deps = [
+        ":checkers_adapter",
+        ":chess_adapter",
+        ":connect_four_adapter",
+        ":euchre_adapter",
+        ":gin_rummy_adapter",
+        ":hearts_adapter",
+        ":kuhn_poker_adapter",
+        ":leduc_poker_adapter",
+        ":tic_tac_toe_adapter",
+        "//open_spiel/python/gui:adapter",
+    ],
+)
+
+pytype_strict_library(
+    name = "checkers_adapter",
+    srcs = ["checkers_adapter.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "chess_adapter",
+    srcs = ["chess_adapter.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "connect_four_adapter",
+    srcs = ["connect_four_adapter.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "euchre_adapter",
+    srcs = ["euchre_adapter.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "gin_rummy_adapter",
+    srcs = ["gin_rummy_adapter.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "hearts_adapter",
+    srcs = ["hearts_adapter.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "kuhn_poker_adapter",
+    srcs = ["kuhn_poker_adapter.py"],
+    deps = [
+        ":poker_table",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "leduc_poker_adapter",
+    srcs = ["leduc_poker_adapter.py"],
+    deps = [
+        ":poker_table",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "poker_table",
+    srcs = ["poker_table.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+    ],
+)
+
+pytype_strict_library(
+    name = "tic_tac_toe_adapter",
+    srcs = ["tic_tac_toe_adapter.py"],
+    deps = [
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "checkers_adapter_test",
+    srcs = ["checkers_adapter_test.py"],
+    deps = [
+        ":checkers_adapter",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/gui:controllers",
+        "//open_spiel/python/gui:loader",
+        "//open_spiel/python/gui:presenters",
+        "//open_spiel/python/gui:views",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "chess_adapter_test",
+    srcs = ["chess_adapter_test.py"],
+    deps = [
+        ":chess_adapter",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/gui:presenters",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "connect_four_adapter_test",
+    srcs = ["connect_four_adapter_test.py"],
+    deps = [
+        ":connect_four_adapter",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/gui:controllers",
+        "//open_spiel/python/gui:loader",
+        "//open_spiel/python/gui:plies",
+        "//open_spiel/python/gui:presenters",
+        "//open_spiel/python/gui:views",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "euchre_adapter_test",
+    srcs = ["euchre_adapter_test.py"],
+    deps = [
+        ":euchre_adapter",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/gui:controllers",
+        "//open_spiel/python/gui:presenters",
+        "//open_spiel/python/gui:session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "gin_rummy_adapter_test",
+    srcs = ["gin_rummy_adapter_test.py"],
+    deps = [
+        ":gin_rummy_adapter",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/gui:controllers",
+        "//open_spiel/python/gui:presenters",
+        "//open_spiel/python/gui:session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "hearts_adapter_test",
+    srcs = ["hearts_adapter_test.py"],
+    deps = [
+        ":hearts_adapter",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/gui:controllers",
+        "//open_spiel/python/gui:presenters",
+        "//open_spiel/python/gui:session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "kuhn_poker_adapter_test",
+    srcs = ["kuhn_poker_adapter_test.py"],
+    deps = [
+        ":kuhn_poker_adapter",
+        ":poker_table",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "leduc_poker_adapter_test",
+    srcs = ["leduc_poker_adapter_test.py"],
+    deps = [
+        ":leduc_poker_adapter",
+        ":poker_table",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "tic_tac_toe_adapter_test",
+    srcs = ["tic_tac_toe_adapter_test.py"],
+    deps = [
+        ":tic_tac_toe_adapter",
+        "//open_spiel/python/gui:adapter",
+        "//open_spiel/python/gui:contract",
+        "//open_spiel/python/gui:controllers",
+        "//open_spiel/python/gui:loader",
+        "//open_spiel/python/gui:plies",
+        "//open_spiel/python/gui:presenters",
+        "//open_spiel/python/gui:views",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)

@@ -1,0 +1,59 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "dynamic_routing_utils",
+    srcs = ["dynamic_routing_utils.cc"],
+    hdrs = ["dynamic_routing_utils.h"],
+    deps = [
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "dynamic_routing_utils_test",
+    srcs = ["dynamic_routing_utils_test.cc"],
+    deps = [
+        ":dynamic_routing_utils",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/memory",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "dynamic_routing_data",
+    srcs = ["dynamic_routing_data.cc"],
+    hdrs = ["dynamic_routing_data.h"],
+    deps = [
+        ":dynamic_routing_utils",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "dynamic_routing_data_test",
+    srcs = ["dynamic_routing_data_test.cc"],
+    deps = [
+        ":dynamic_routing_data",
+        ":dynamic_routing_utils",
+        "//open_spiel",
+    ],
+)

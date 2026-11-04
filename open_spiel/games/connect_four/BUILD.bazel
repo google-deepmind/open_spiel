@@ -1,0 +1,40 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "connect_four",
+    srcs = ["connect_four.cc"],
+    hdrs = ["connect_four.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel/utils:tensor_view",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "connect_four_test",
+    srcs = ["connect_four_test.cc"],
+    deps = [
+        ":connect_four",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

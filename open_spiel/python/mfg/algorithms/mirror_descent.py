@@ -159,7 +159,7 @@ class MirrorDescent(object):
     self._state_value = value.TabularValueFunction(self._game)
     for state in self._root_states:
       self.eval_state(state, learning_rate if learning_rate else self._lr)
-    self._policy = self.get_projected_policy()
+    self._policy = self.get_projected_policy()  # pyrefly: ignore[bad-assignment]
     self._distribution = distribution.DistributionPolicy(
         self._game, self._policy)
 

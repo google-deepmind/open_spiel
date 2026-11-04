@@ -21,11 +21,11 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/strip.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/strip.h"
+#include "absl/types/span.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"

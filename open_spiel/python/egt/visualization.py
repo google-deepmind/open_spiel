@@ -578,7 +578,7 @@ class Dynamics3x3Axes(axes.Axes):
       mid_idx = np.searchsorted(cum_len, cum_len[-1] / 2.)
 
       if linewidth == "velocity" or color == "velocity":
-        vel = (velocities[i] - vel_min) / vel_max
+        vel = (velocities[i] - vel_min) / vel_max  # pyrefly: ignore[unbound-name]
 
         if linewidth == "velocity":
           lc_linewidth = 3. * vel + 0.5

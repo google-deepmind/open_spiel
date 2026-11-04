@@ -22,9 +22,9 @@
 #include <string>
 #include <unordered_set>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/random/distributions.h"
 #include "open_spiel/games/bargaining/bargaining.h"
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/init.h"

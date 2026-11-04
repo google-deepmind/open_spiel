@@ -1,0 +1,236 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_binary")
+load("//bazel/python:py_binary.bzl", "py_binary")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_binary(
+    name = "linear_quadratic_example",
+    srcs = ["linear_quadratic_example.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg/algorithms:best_response_value",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:fictitious_play",
+        "//open_spiel/python/mfg/algorithms:greedy_policy",
+        "//open_spiel/python/mfg/algorithms:mirror_descent",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/mfg/games:linear_quadratic",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)
+
+py_binary(
+    name = "mfg_dqn_jax",
+    srcs = ["mfg_dqn_jax.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "mfg_dqn_test",
+    srcs = ["mfg_dqn_jax.py"],
+    args = [
+        "--num_train_episodes=2",
+        "--replay_buffer_capacity=100",
+    ],
+    main = "mfg_dqn_jax.py",
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+    ],
+)
+
+py_binary(
+    name = "mfg_munchausen_domd_jax",
+    srcs = ["mfg_munchausen_domd_jax.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/mfg:utils",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:munchausen_deep_mirror_descent",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "mfg_munchausen_domd_test",
+    srcs = ["mfg_munchausen_domd_jax.py"],
+    args = [
+        # Use a simpler setting for the test to avoid timeouts.
+        "--env_setting='mfg_crowd_modelling_2d'",
+        "--hidden_layers_sizes=128",
+        "--num_episodes_per_iteration=100",
+        "--num_iterations=2",
+    ],
+    main = "mfg_munchausen_domd_jax.py",
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/mfg:utils",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:munchausen_deep_mirror_descent",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+    ],
+)
+
+py_binary(
+    name = "mfg_fictitious_play",
+    srcs = ["mfg_fictitious_play.py"],
+    deps = [
+        "//open_spiel/python/mfg:utils",
+        "//open_spiel/python/mfg/algorithms:fictitious_play",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "mfg_mirror_descent",
+    srcs = ["mfg_mirror_descent.py"],
+    deps = [
+        "//open_spiel/python/mfg:utils",
+        "//open_spiel/python/mfg/algorithms:mirror_descent",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "mfg_dqn_fp_jax",
+    srcs = ["mfg_dqn_fp_jax.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:fictitious_play",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "mfg_dqn_fp_test",
+    srcs = ["mfg_dqn_fp_jax.py"],
+    args = [
+        "--num_iterations=2",
+        "--num_episodes_per_iteration=100",
+        "--min_buffer_size_to_learn=100",
+    ],
+    main = "mfg_dqn_fp_jax.py",
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:fictitious_play",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+    ],
+)
+
+py_binary(
+    name = "mfg_average_network_fp_jax",
+    srcs = ["mfg_average_network_fp_jax.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/mfg:utils",
+        "//open_spiel/python/mfg/algorithms:average_network_fictitious_play",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/algorithms:policy_value",
+        "//open_spiel/python/mfg/games:factory",
+        "//open_spiel/python/utils:app",
+        "//open_spiel/python/utils:metrics",
+        "//open_spiel/python/utils:training",
+        "@py_deps//absl/flags",
+        "@py_deps//jax",
+    ],
+)
+
+pytype_strict_binary(
+    name = "mfg_psro",
+    srcs = ["mfg_psro.py"],
+    deps = [
+        "//open_spiel/python/mfg/algorithms:correlated_equilibrium",
+        "//open_spiel/python/mfg/algorithms:mf_psro",
+        "//open_spiel/python/mfg/algorithms:utils",
+        "//open_spiel/python/mfg/algorithms/regret:hedge",
+        "//open_spiel/python/mfg/algorithms/regret:polynomial_weights",
+        "//open_spiel/python/mfg/algorithms/regret:regret_matching",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/mfg/games:dynamic_routing",
+        "//open_spiel/python/mfg/games:normal_form_game",
+        "//open_spiel/python/mfg/games:predator_prey",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+    ],
+)

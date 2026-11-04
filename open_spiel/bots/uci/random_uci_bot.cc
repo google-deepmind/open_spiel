@@ -19,11 +19,11 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/random/distributions.h"
+#include "absl/strings/match.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

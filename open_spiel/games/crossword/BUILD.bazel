@@ -1,0 +1,65 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "crossword_board",
+    srcs = ["crossword_board.cc"],
+    hdrs = ["crossword_board.h"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:status",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "crossword",
+    srcs = ["crossword.cc"],
+    hdrs = [
+        "crossword.h",
+        "crossword_default_puzzle.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":crossword_board",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:status",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "crossword_test",
+    srcs = ["crossword_test.cc"],
+    deps = [
+        ":crossword",
+        ":crossword_board",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:action_struct_tests",
+        "//open_spiel/utils:init",
+        "//open_spiel/utils:status",
+    ],
+)

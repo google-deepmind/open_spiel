@@ -19,9 +19,9 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/strings/match.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"

@@ -1,0 +1,336 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+"""The registry of controllers: every kind of controller a seat may have.
+
+A controller is registered by name with `register`, and `kinds` lists every
+registered controller in the order registered, `human` first. `controllers`
+registers `human`, `random` and `mcts`, and builds and asks controllers for
+moves; a program that serves the GUI may register its own before it starts
+serving, since the catalogue and the health report read the registry once.
+"""
+
+from collections.abc import Callable, Mapping
+import dataclasses
+import enum
+import random
+import re
+import threading
+import types
+from typing import Protocol
+
+import pyspiel
+
+from open_spiel.python.gui import contract
+from open_spiel.python.gui import controller_settings
+from open_spiel.python.gui import errors
+from open_spiel.python.gui import information
+
+HUMAN = contract.HUMAN
+
+# A controller's settings, as a client sends them.
+Config = controller_settings.Config
+
+_SEED_BOUND = 2**31
+
+
+class UnavailableError(errors.ControllerUnavailableError):
+  """A controller cannot be built for a seat.
+
+  The controller is unknown, cannot play the game, or was given invalid
+  settings. The message says which, and is safe to show to anyone.
+  """
+
+
+class Controller(Protocol):
+  """Plays a seat.
+
+  A controller may also have a `last_notice` attribute: a short plain-text
+  note about its latest choice, or None. `controllers.choose` reads it right
+  after `choose_action` returns, and the seat shows it (`SeatView.notice`) to
+  its own viewer and to omniscient viewers only. It has no effect on play.
+  """
+
+  def choose_action(self, state: pyspiel.State, seat: int) -> int:
+    """Returns the action `seat` plays at `state`, where it is to move."""
+
+
+# Builds a controller for a game from its parsed settings and a seed.
+Builder = Callable[
+    [pyspiel.Game, Mapping[str, contract.ParameterValue], int], Controller
+]
+
+
+# The explicit None reads as "no refusal", which is what a refusal returns.
+# pylint: disable-next=useless-return
+def plays_every_game(game: pyspiel.Game) -> str | None:
+  """Refuses no game: returns None, the refusal callback's "can play"."""
+  del game
+  return None
+
+
+# Says why a controller cannot play a game with these parsed settings.
+ConfigRefusal = Callable[
+    [pyspiel.Game, Mapping[str, contract.ParameterValue]], str | None
+]
+
+# Says whether a controller with these parsed settings reads the full state.
+ConfigReadsFullState = Callable[[Mapping[str, contract.ParameterValue]], bool]
+
+
+# pylint: disable-next=useless-return
+def accepts_every_config(
+    game: pyspiel.Game, config: Mapping[str, contract.ParameterValue]
+) -> str | None:
+  """Refuses no settings: returns None, the config refusal's "can play"."""
+  del game, config
+  return None
+
+
+class StatePolicy(enum.Enum):
+  """What a seat whose settings make it read the full state may play.
+
+  ANALYSIS: such a seat plays any game, hidden information included, as the
+    seat's public settings say; the controller is trusted to use only what
+    its seat may see where that matters. It is the only policy. A stricter
+    policy (a match, say) would refuse such a seat in a game that hides
+    information, in `full_state_refusal`.
+  """
+
+  ANALYSIS = "analysis"
+
+
+def state_policy() -> StatePolicy:
+  """Returns the policy on seats that read the full state."""
+  return StatePolicy.ANALYSIS
+
+
+# The explicit None reads as "no refusal", as `plays_every_game` returns it.
+# pylint: disable-next=useless-return
+def full_state_refusal(
+    label: str, game: pyspiel.Game, reads_full_state: bool
+) -> str | None:
+  """Returns why a seat that reads the full state cannot play `game`, or None.
+
+  A seat reads the full state when its controller's settings say so
+  (`Kind.config_reads_full_state`). Under `StatePolicy.ANALYSIS` no such
+  seat is refused: this is where a stricter policy would refuse one.
+
+  Args:
+    label: The controller's label.
+    game: The game the seat plays.
+    reads_full_state: Whether the seat's settings make it read the full state.
+  """
+  del label, game, reads_full_state
+  policy = state_policy()
+  assert policy == StatePolicy.ANALYSIS, policy
+  return None
+
+
+def full_state_notice(
+    game: pyspiel.Game, reads_full_state: bool, notice: str | None
+) -> str | None:
+  """Returns the notice a seat's viewer is shown, from its controller's.
+
+  A notice (`SeatView.notice`) reaches the seat's own viewer. A controller
+  that reads the full state sees what its seat may not, and its notice is
+  free text it writes, so a notice can carry hidden information to the
+  seat's viewer: opponents' cards, say, from a full-state bot playing that
+  viewer's seat. Under `StatePolicy.ANALYSIS` every notice is passed on, as
+  the seat's public settings say it reads the full state and the controller
+  is trusted, as with its moves. This is where a stricter policy (a match)
+  would drop or limit the notices of seats that read the full state, in a
+  game that hides information.
+
+  Args:
+    game: The game the seat plays.
+    reads_full_state: Whether the seat's controller, with its settings,
+      reads the full state.
+    notice: The controller's notice about its latest choice, or None.
+  """
+  del game, reads_full_state
+  policy = state_policy()
+  assert policy == StatePolicy.ANALYSIS, policy
+  return notice
+
+
+@dataclasses.dataclass(frozen=True)
+class Kind:
+  """A kind of controller, as it is registered.
+
+  Attributes:
+    label: The human-readable name.
+    settings: The settings the controller takes.
+    reads_full_state: Whether the controller reads more of the state than the
+      seat may see. Such a controller cannot play a game that hides
+      information from its players.
+    build: Builds the controller for a game from its parsed settings and a
+      seed, which seeds every random choice it makes.
+    refusal: Returns why the controller cannot play a game, or None, beyond
+      what `reads_full_state` already refuses.
+    config_refusal: Returns why the controller cannot play a game with
+      particular parsed settings, or None; checked when a seat is given it.
+    config_reads_full_state: Whether the controller, with particular parsed
+      settings, reads the full state, for a controller that reads it or not
+      as its settings say (a remote bot). Such a seat is subject to
+      `full_state_refusal`; `reads_full_state` stays False for its kind.
+  """
+
+  label: str
+  settings: tuple[controller_settings.Setting, ...]
+  reads_full_state: bool
+  build: Builder
+  refusal: Callable[[pyspiel.Game], str | None] = plays_every_game
+  config_refusal: ConfigRefusal = accepts_every_config
+  config_reads_full_state: ConfigReadsFullState | None = None
+
+  def __post_init__(self) -> None:
+    if not self.label.strip():
+      raise ValueError("A controller's label is blank.")
+
+  def unavailable_reason(self, game: pyspiel.Game) -> str | None:
+    """Returns why the controller cannot play `game`, or None if it can."""
+    game_type = game.get_type()
+    if self.reads_full_state and information.hides_information(game_type):
+      return (
+          f"{self.label} reads the full state, which "
+          f"{game_type.short_name} hides from its players."
+      )
+    return self.refusal(game)
+
+  def seat_refusal(
+      self, game: pyspiel.Game, config: Mapping[str, contract.ParameterValue]
+  ) -> str | None:
+    """Returns why a seat with parsed settings `config` cannot play `game`."""
+    reason = self.config_refusal(game, config)
+    if reason is not None or self.config_reads_full_state is None:
+      return reason
+    return full_state_refusal(
+        self.label, game, self.config_reads_full_state(config)
+    )
+
+  def seat_reads_full_state(
+      self, config: Mapping[str, contract.ParameterValue]
+  ) -> bool:
+    """Whether a seat with parsed settings `config` reads the full state."""
+    return self.reads_full_state or (
+        self.config_reads_full_state is not None
+        and self.config_reads_full_state(config)
+    )
+
+  def config_schema(self) -> dict[str, contract.Json]:
+    """Returns the JSON Schema of the controller's settings."""
+    return controller_settings.schema(self.settings)
+
+  def parse(self, config: Config) -> dict[str, contract.ParameterValue]:
+    """Returns `config` with its defaults filled in.
+
+    Raises:
+      UnavailableError: If `config` names an unknown setting, leaves out a
+        required one or holds an invalid value; raised from the
+        `controller_settings.InvalidSettingError` that says which.
+    """
+    try:
+      return controller_settings.parse(self.settings, config, self.label)
+    except controller_settings.InvalidSettingError as e:
+      raise UnavailableError(str(e)) from e
+
+
+# A controller's name: lower case letters, digits and underscores, starting
+# with a letter, so that it reads the same in a URL, a log and a config file.
+_NAME = re.compile(r"[a-z][a-z0-9_]*")
+
+# Every controller, in the order clients list them: in the order registered,
+# `human` first.
+_REGISTRY: dict[str, Kind] = {}
+_REGISTRY_LOCK = threading.Lock()
+
+
+def register(name: str, kind: Kind) -> None:
+  """Registers a controller under `name`.
+
+  Register before serving: the catalogue and the health report list the
+  controllers registered when they are first built.
+
+  Args:
+    name: The controller's stable identifier, as `Spec.kind` and the
+      contract's `Controller.name` give it.
+    kind: The controller.
+
+  Raises:
+    ValueError: If `name` is not lower case letters, digits and underscores
+      starting with a letter, or a controller is already registered under it,
+      or the first controller registered is not `human`.
+  """
+  if not _NAME.fullmatch(name):
+    raise ValueError(
+        f"Controller name {name!r} is not lower case letters, digits and "
+        "underscores starting with a letter."
+    )
+  with _REGISTRY_LOCK:
+    if name in _REGISTRY:
+      raise ValueError(f"A controller is already registered as {name!r}.")
+    if not _REGISTRY and name != HUMAN:
+      raise ValueError(f"The first controller registered is {HUMAN!r}.")
+    _REGISTRY[name] = kind
+
+
+def replace(name: str, kind: Kind) -> None:
+  """Registers `kind` in place of the controller registered as `name`.
+
+  The controller keeps its place in the order. Replace before serving, as
+  `register` says.
+
+  Raises:
+    ValueError: If no controller is registered as `name`, or `name` is
+      `human`.
+  """
+  if name == HUMAN:
+    raise ValueError(f"{HUMAN!r} cannot be replaced.")
+  with _REGISTRY_LOCK:
+    if name not in _REGISTRY:
+      raise ValueError(f"No controller is registered as {name!r}.")
+    _REGISTRY[name] = kind
+
+
+def unregister(name: str) -> None:
+  """Removes the controller registered under `name`.
+
+  Raises:
+    ValueError: If `name` is `human`, which every session offers, or no
+      controller is registered under it.
+  """
+  if name == HUMAN:
+    raise ValueError(f"{HUMAN!r} cannot be unregistered.")
+  with _REGISTRY_LOCK:
+    if _REGISTRY.pop(name, None) is None:
+      raise ValueError(f"No controller is registered as {name!r}.")
+
+
+def kinds() -> Mapping[str, Kind]:
+  """Returns every registered controller by name, `human` first; read-only."""
+  with _REGISTRY_LOCK:
+    return types.MappingProxyType(dict(_REGISTRY))
+
+
+def choice_seed(seed: int, state: pyspiel.State) -> int:
+  """Returns the seed of a controller's choice at `state`: one per ply.
+
+  Args:
+    seed: The controller's seed.
+    state: The position it chooses at.
+  """
+  key = f"{seed}/{len(state.history())}"
+  return random.Random(key).randrange(_SEED_BOUND)

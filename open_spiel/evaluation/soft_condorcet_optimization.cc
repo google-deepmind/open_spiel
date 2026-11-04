@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "absl/random/distributions.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

@@ -25,11 +25,11 @@ import logging
 import typing
 
 import numpy as np
-import open_spiel
 import torch
 
-from open_spiel.python.algorithms import exploitability as _
-from open_spiel.python.pytorch import deep_cfr as _
+from open_spiel.python import policy as policy_lib
+from open_spiel.python.algorithms import exploitability
+from open_spiel.python.pytorch import deep_cfr
 
 # pylint: disable=invalid-name
 
@@ -88,7 +88,7 @@ class Agent:
     action_dim = game.num_distinct_actions()
 
     # Initialize average policy network.
-    ReservoirBuffer = open_spiel.python.pytorch.deep_cfr.ReservoirBuffer
+    ReservoirBuffer = deep_cfr.ReservoirBuffer
     infoset = np.zeros(obs_dim, dtype=float)
     policy = np.zeros(action_dim, dtype=float)
     scalar = np.array(0, dtype=float)
@@ -96,7 +96,7 @@ class Agent:
         cfg.avg_policy_memory_capacity,
         Behaviour(state=infoset, policy=policy, t=scalar),
     )
-    MLP = open_spiel.python.pytorch.deep_cfr.MLP
+    MLP = deep_cfr.MLP
     self.avg_policy_net = MLP(obs_dim, cfg.avg_policy_net, action_dim)
 
     # Initialize regret network.
@@ -545,10 +545,10 @@ def _calc_nashconv(game, agent):
         prob_dict[a] = probs[a]
     return prob_dict
 
-  policy = open_spiel.python.policy.tabular_policy_from_callable(
+  policy = policy_lib.tabular_policy_from_callable(
       game, _action_probabilities
   )
-  conv = open_spiel.python.algorithms.exploitability.nash_conv(game, policy)
+  conv = exploitability.nash_conv(game, policy)
   return conv
 
 

@@ -1,0 +1,429 @@
+# Description:
+#   Spiel utility libraries
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files([
+    "CMakeLists.txt",
+    "thread_test.cc",
+])
+
+cc_library(
+    name = "circular_buffer",
+    hdrs = ["circular_buffer.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+)
+
+cc_test(
+    name = "circular_buffer_test",
+    srcs = ["circular_buffer_test.cc"],
+    deps = [
+        ":circular_buffer",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "combinatorics",
+    srcs = ["combinatorics.cc"],
+    hdrs = ["combinatorics.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "combinatorics_test",
+    srcs = ["combinatorics_test.cc"],
+    deps = [
+        ":combinatorics",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "data_logger",
+    srcs = ["data_logger.cc"],
+    hdrs = ["data_logger.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":file",
+        ":json",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "data_logger_test",
+    srcs = ["data_logger_test.cc"],
+    deps = [
+        ":data_logger",
+        ":file",
+        ":json",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "init",
+    srcs = ["init.cc"],
+    hdrs = ["init.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "file",
+    srcs = select({
+        "//conditions:default": ["file.cc"],
+    }),
+    hdrs = ["file.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/log",
+        "@abseil-cpp//absl/log:check",
+        "@abseil-cpp//absl/status",
+        "@abseil-cpp//absl/strings",
+    ] + select({
+        "//conditions:default": ["//open_spiel"],
+    }),
+)
+
+# Make sure the open-source version works.
+cc_test(
+    name = "file_test",
+    srcs = [
+        "file.cc",  # The public version
+        "file.h",
+        "file_test.cc",
+    ],
+    deps = [
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "logger",
+    hdrs = ["logger.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":file",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/time",
+    ],
+)
+
+cc_test(
+    name = "logger_test",
+    srcs = ["logger_test.cc"],
+    deps = [
+        ":file",
+        ":logger",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "json",
+    srcs = ["json.cc"],
+    hdrs = ["json.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "json_test",
+    srcs = ["json_test.cc"],
+    deps = [
+        ":json",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "nlohmann_json",
+    hdrs = ["nlohmann_json.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["@nlohmann_json//:json"],
+)
+
+cc_test(
+    name = "nlohmann_json_test",
+    srcs = ["nlohmann_json_test.cc"],
+    deps = [
+        ":nlohmann_json",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "functional",
+    hdrs = ["functional.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+)
+
+cc_test(
+    name = "functional_test",
+    srcs = ["functional_test.cc"],
+    deps = [
+        ":functional",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "lru_cache",
+    hdrs = ["lru_cache.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/synchronization",
+    ],
+)
+
+cc_test(
+    name = "lru_cache_test",
+    srcs = ["lru_cache_test.cc"],
+    deps = [
+        ":lru_cache",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "serialization",
+    hdrs = ["serialization.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+    ],
+)
+
+cc_library(
+    name = "sgf_reader",
+    srcs = ["sgf_reader.cc"],
+    hdrs = ["sgf_reader.h"],
+    deps = [
+        ":status",
+        "@abseil-cpp//absl/strings",
+    ],
+)
+
+cc_test(
+    name = "sgf_reader_test",
+    srcs = ["sgf_reader_test.cc"],
+    deps = [
+        ":sgf_reader",
+        ":status",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "stats",
+    hdrs = ["stats.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":json",
+        "@abseil-cpp//absl/algorithm:container",
+    ],
+)
+
+cc_test(
+    name = "stats_test",
+    srcs = ["stats_test.cc"],
+    deps = [
+        ":json",
+        ":stats",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "status",
+    srcs = ["status.cc"],
+    hdrs = ["status.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+)
+
+cc_library(
+    name = "tensor_view",
+    hdrs = ["tensor_view.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "tensor_view_test",
+    srcs = ["tensor_view_test.cc"],
+    deps = [
+        ":tensor_view",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "thread",
+    srcs = select({
+        "//conditions:default": ["thread.cc"],
+    }),
+    hdrs = ["thread.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+    ],
+)
+
+# Make sure the open-source version works.
+cc_test(
+    name = "thread_test",
+    srcs = [
+        "thread.cc",  # The public version
+        "thread.h",  # The public version
+        "thread_test.cc",
+    ],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "threaded_queue",
+    hdrs = ["threaded_queue.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/synchronization",
+        "@abseil-cpp//absl/time",
+        "@abseil-cpp//absl/types:optional",
+    ],
+)
+
+cc_library(
+    name = "trajectories",
+    srcs = ["trajectories.cc"],
+    hdrs = ["trajectories.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@nlohmann_json//:json",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "trajectories_test",
+    srcs = ["trajectories_test.cc"],
+    deps = [
+        ":trajectories",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:all_games",
+    ],
+)
+
+cc_library(
+    name = "random",
+    srcs = ["random.cc"],
+    hdrs = ["random.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["@abseil-cpp//absl/random:distributions"],
+)
+
+cc_test(
+    name = "threaded_queue_test",
+    srcs = ["threaded_queue_test.cc"],
+    deps = [
+        ":threaded_queue",
+        "@abseil-cpp//absl/time",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "random_test",
+    srcs = ["random_test.cc"],
+    deps = [
+        ":random",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "usage_logging",
+    srcs = ["usage_logging.cc"],
+    hdrs = ["usage_logging.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+)
+
+cc_library(
+    name = "serializable_circular_buffer",
+    hdrs = ["serializable_circular_buffer.h"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_libnop_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":circular_buffer",
+        "@abseil-cpp//absl/strings:str_format",
+        "@libnop",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "serializable_circular_buffer_test",
+    srcs = ["serializable_circular_buffer_test.cc"],
+    deps = [
+        ":file",
+        ":init",
+        ":serializable_circular_buffer",
+        "@libnop",
+        "//open_spiel",
+    ],
+)

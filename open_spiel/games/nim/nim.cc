@@ -20,8 +20,8 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

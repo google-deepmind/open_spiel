@@ -75,7 +75,7 @@ If you need to build from source or contribute to the project:
 
 -   **Python 3.11+** (get from [python.org](https://python.org))
 -   **Git** (get from [git-scm.com](https://git-scm.com))
--   **CMake 3.15+** (get from [cmake.org](https://cmake.org))
+-   **CMake 3.21+** (get from [cmake.org](https://cmake.org))
 -   **Visual Studio 2019 or later** with C++ development tools from
     [Microsoft](https://visualstudio.microsoft.com/vs/features/cplusplus/)
 

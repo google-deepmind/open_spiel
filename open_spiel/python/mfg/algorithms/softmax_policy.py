@@ -61,5 +61,5 @@ class SoftmaxPolicy(policy.Policy):
           for i, action in enumerate(legal_actions)
       ]
     denom = sum(exp_q)
-    smax_q = exp_q if denom == 0 else exp_q / denom
-    return dict(zip(legal_actions, smax_q))
+    smax_q = exp_q if denom == 0 else exp_q / denom  # pyrefly: ignore[unsupported-operation]
+    return dict(zip(legal_actions, smax_q))  # pyrefly: ignore[bad-argument-type]

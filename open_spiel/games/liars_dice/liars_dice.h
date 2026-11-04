@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_GAMES_LIARS_DICE_H_
 
 #include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -73,6 +74,8 @@ class LiarsDiceState : public State {
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::vector<Action> LegalActions() const override;
 

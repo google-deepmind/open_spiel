@@ -1,0 +1,283 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_contrib_test", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "voting",
+    srcs = [
+        "__init__.py",
+    ],
+    deps = [
+        ":approval",
+        ":base",
+        ":borda",
+        ":copeland",
+        ":kemeny_young",
+        ":maximal_lotteries",
+        ":pairwise_helpers",
+        ":plurality",
+        ":preflib_util",
+        ":ranked_pairs",
+        ":schulze",
+        ":stv",
+    ],
+)
+
+pytype_strict_library(
+    name = "base",
+    srcs = ["base.py"],
+    deps = [
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "base_test",
+    srcs = ["base_test.py"],
+    deps = [
+        ":base",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "approval",
+    srcs = ["approval.py"],
+    deps = [":base"],
+)
+
+pytype_strict_contrib_test(
+    name = "approval_test",
+    srcs = ["approval_test.py"],
+    deps = [
+        ":approval",
+        ":base",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "borda",
+    srcs = ["borda.py"],
+    deps = [":base"],
+)
+
+pytype_strict_contrib_test(
+    name = "borda_test",
+    srcs = ["borda_test.py"],
+    deps = [
+        ":base",
+        ":borda",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_library(
+    name = "copeland",
+    srcs = ["copeland.py"],
+    deps = [":base"],
+)
+
+pytype_strict_contrib_test(
+    name = "copeland_test",
+    srcs = ["copeland_test.py"],
+    deps = [
+        ":base",
+        ":copeland",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "elo",
+    srcs = ["elo.py"],
+    deps = [
+        ":base",
+        "//open_spiel/python/algorithms:elo",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "elo_test",
+    srcs = ["elo_test.py"],
+    deps = [
+        ":base",
+        ":elo",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_library(
+    name = "kemeny_young",
+    srcs = ["kemeny_young.py"],
+    deps = [
+        ":base",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "kemeny_young_test",
+    srcs = ["kemeny_young_test.py"],
+    deps = [
+        ":base",
+        ":kemeny_young",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "maximal_lotteries",
+    srcs = ["maximal_lotteries.py"],
+    deps = [
+        ":base",
+        "//open_spiel/python/algorithms:lp_solver",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "maximal_lotteries_test",
+    srcs = ["maximal_lotteries_test.py"],
+    deps = [
+        ":base",
+        ":maximal_lotteries",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "pairwise_helpers",
+    srcs = ["pairwise_helpers.py"],
+    deps = [
+        ":base",
+        "@py_deps//absl/logging",
+    ],
+)
+
+pytype_strict_library(
+    name = "plurality",
+    srcs = ["plurality.py"],
+    deps = [":base"],
+)
+
+pytype_strict_contrib_test(
+    name = "plurality_test",
+    srcs = ["plurality_test.py"],
+    deps = [
+        ":base",
+        ":plurality",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_library(
+    name = "ranked_pairs",
+    srcs = ["ranked_pairs.py"],
+    deps = [
+        ":base",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "ranked_pairs_test",
+    srcs = ["ranked_pairs_test.py"],
+    deps = [
+        ":base",
+        ":ranked_pairs",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "schulze",
+    srcs = ["schulze.py"],
+    deps = [
+        ":base",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "schulze_test",
+    srcs = ["schulze_test.py"],
+    deps = [
+        ":base",
+        ":schulze",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "stv",
+    srcs = ["stv.py"],
+    deps = [":base"],
+)
+
+pytype_strict_contrib_test(
+    name = "stv_test",
+    srcs = ["stv_test.py"],
+    deps = [
+        ":base",
+        ":stv",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_library(
+    name = "preflib_util",
+    srcs = ["preflib_util.py"],
+    deps = [
+        ":base",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "preflib_util_test",
+    srcs = ["preflib_util_test.py"],
+    deps = [
+        ":base",
+        ":preflib_util",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_library(
+    name = "soft_condorcet_optimization",
+    srcs = ["soft_condorcet_optimization.py"],
+    deps = [
+        ":base",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "soft_condorcet_optimization_test",
+    srcs = ["soft_condorcet_optimization_test.py"],
+    deps = [
+        ":base",
+        ":soft_condorcet_optimization",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)

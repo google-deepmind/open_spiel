@@ -1,0 +1,664 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "bargaining",
+    srcs = ["bargaining.py"],
+    data = ["bargaining_instances.txt"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "breakthrough",
+    srcs = ["breakthrough.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "bridge",
+    srcs = ["bridge.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "bridge_reference",
+    srcs = ["bridge_reference.py"],
+    strict_deps = True,
+    deps = [
+        ":bridge",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+py_library(
+    name = "connect_four",
+    srcs = ["connect_four.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "dark_hex",
+    srcs = ["dark_hex.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//chex",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "dark_hex_ir",
+    srcs = ["dark_hex_ir.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//chex",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "game",
+    srcs = ["game.py"],
+    strict_deps = True,
+    deps = ["@py_deps//jax"],
+)
+
+py_library(
+    name = "games",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":registry",
+        "//open_spiel:__init__",
+        "//open_spiel/python",
+    ],
+)
+
+py_library(
+    name = "go",
+    srcs = ["go.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "gomoku",
+    srcs = ["gomoku.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "hex",
+    srcs = ["hex.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "interop",
+    srcs = ["interop.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "kuhn_poker",
+    srcs = ["kuhn_poker.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "leduc_poker",
+    srcs = ["leduc_poker.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "liars_dice",
+    srcs = ["liars_dice.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//chex",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "lines_of_action",
+    srcs = ["lines_of_action.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "no_limit_holdem",
+    srcs = ["no_limit_holdem.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "openspiel_equivalence",
+    srcs = ["openspiel_equivalence.py"],
+    strict_deps = True,
+    deps = [
+        ":bridge",
+        ":game",
+        ":no_limit_holdem",
+        ":optional_pyspiel_games",
+        ":registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "optional_pyspiel_games",
+    srcs = ["optional_pyspiel_games.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_library(
+    name = "othello",
+    srcs = ["othello.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//chex",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "phantom_ttt",
+    srcs = ["phantom_ttt.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//chex",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "phantom_ttt_ir",
+    srcs = ["phantom_ttt_ir.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//chex",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "registry",
+    srcs = ["registry.py"],
+    strict_deps = True,
+    deps = [
+        ":bargaining",
+        ":breakthrough",
+        ":bridge",
+        ":connect_four",
+        ":dark_hex",
+        ":dark_hex_ir",
+        ":game",
+        ":go",
+        ":gomoku",
+        ":hex",
+        ":kuhn_poker",
+        ":leduc_poker",
+        ":liars_dice",
+        ":lines_of_action",
+        ":no_limit_holdem",
+        ":othello",
+        ":phantom_ttt",
+        ":phantom_ttt_ir",
+        ":tic_tac_toe",
+        "//open_spiel/python/jax/games/gin_rummy",
+    ],
+)
+
+py_library(
+    name = "tic_tac_toe",
+    srcs = ["tic_tac_toe.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "bargaining_test",
+    timeout = "long",
+    srcs = ["bargaining_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":bargaining",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "breakthrough_test",
+    srcs = ["breakthrough_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":breakthrough",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "bridge_test",
+    timeout = "long",
+    srcs = ["bridge_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":bridge",
+        ":bridge_reference",
+        ":game",
+        ":registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "cached_jax_array_lint_test",
+    srcs = ["cached_jax_array_lint_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = ["@py_deps//absl/testing:absltest"],
+)
+
+py_test(
+    name = "connect_four_test",
+    srcs = ["connect_four_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":connect_four",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "games_test",
+    timeout = "long",
+    srcs = ["games_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":connect_four",
+        ":game",
+        ":kuhn_poker",
+        ":liars_dice",
+        ":registry",
+        ":tic_tac_toe",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//jax/experimental",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "go_test",
+    timeout = "long",
+    srcs = ["go_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":go",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "gomoku_test",
+    srcs = ["gomoku_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":gomoku",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "hex_test",
+    srcs = ["hex_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":hex",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "kuhn_poker_test",
+    srcs = ["kuhn_poker_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":kuhn_poker",
+        ":registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "lazy_registry_test",
+    srcs = ["lazy_registry_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":game",
+        ":registry",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "leduc_poker_test",
+    srcs = ["leduc_poker_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":leduc_poker",
+        ":registry",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "lines_of_action_test",
+    timeout = "long",
+    srcs = ["lines_of_action_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":lines_of_action",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "no_limit_holdem_test",
+    timeout = "long",
+    srcs = ["no_limit_holdem_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":game",
+        ":no_limit_holdem",
+        ":optional_pyspiel_games",
+        ":registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "openspiel_equivalence_shard1_test",
+    timeout = "long",
+    srcs = ["openspiel_equivalence_shard1_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":openspiel_equivalence",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "openspiel_equivalence_shard2_test",
+    timeout = "long",
+    srcs = ["openspiel_equivalence_shard2_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":openspiel_equivalence",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "openspiel_equivalence_shard3_test",
+    timeout = "long",
+    srcs = ["openspiel_equivalence_shard3_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":openspiel_equivalence",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "openspiel_equivalence_test",
+    timeout = "long",
+    srcs = ["openspiel_equivalence_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":bridge_reference",
+        ":no_limit_holdem",
+        ":openspiel_equivalence",
+        ":registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "othello_test",
+    timeout = "long",
+    srcs = ["othello_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":othello",
+        ":registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ) + [
+        "//open_spiel/python/jax/games/benchmarks:all_files",
+        "//open_spiel/python/jax/games/gin_rummy:all_files",
+    ],
+    visibility = ["//visibility:public"],
+)

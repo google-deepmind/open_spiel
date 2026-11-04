@@ -38,7 +38,7 @@ def main(_):
   alternatives = ["A", "B", "C"]
 
   # Easiest way to make this profile:
-  _ = base.PreferenceProfile(alternatives=alternatives, votes=[
+  _ = base.PreferenceProfile(alternatives=alternatives, votes=[  # pyrefly: ignore[bad-argument-type]
       ["A", "B", "C"], ["A", "C", "B"], ["C", "A", "B"], ["C", "A", "B"],
       ["B", "C", "A"]
   ])
@@ -50,7 +50,7 @@ def main(_):
   #   2: C > A > B
   #   1: B > C > A
   # and can be created with the WeightedVote type directly.
-  profile = base.PreferenceProfile(alternatives=alternatives, votes=[
+  profile = base.PreferenceProfile(alternatives=alternatives, votes=[  # pyrefly: ignore[bad-argument-type]
       base.WeightedVote(1, ["A", "B", "C"]),
       base.WeightedVote(1, ["A", "C", "B"]),
       base.WeightedVote(2, ["C", "A", "B"]),

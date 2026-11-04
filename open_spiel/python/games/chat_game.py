@@ -207,7 +207,7 @@ class ChatGame(chat_game_base.BaseChatGame):
     """Returns LLM generated string given prompt and seed."""
     # Define generate response here
     if self._llm_type == chat_test_utils.TestLLM.MOCK:
-      return self._lm.generate_response(prompt, seed, num_output_tokens)
+      return self._lm.generate_response(prompt, seed, num_output_tokens)  # pyrefly: ignore[bad-argument-type]
     else:
       raise NotImplementedError(f'llm_type {self._llm_type} not available.')
     # Define generate response here

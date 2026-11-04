@@ -23,7 +23,7 @@
 #include <unordered_map>
 
 #include "open_spiel/policy.h"
-#include "pybind11/include/pybind11/trampoline_self_life_support.h"
+#include "pybind11/trampoline_self_life_support.h"
 
 namespace open_spiel {
 namespace py = pybind11;

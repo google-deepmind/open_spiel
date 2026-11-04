@@ -16,8 +16,8 @@
 
 #include <array>
 
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/strings/match.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

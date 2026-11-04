@@ -19,8 +19,8 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/random/random.h"
+#include "absl/random/distributions.h"
+#include "absl/random/random.h"
 #include "open_spiel/games/catch/catch.h"
 #include "open_spiel/spiel.h"
 

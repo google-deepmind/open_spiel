@@ -1,0 +1,44 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+line-length = 80
+indent-width = 2
+
+[lint]
+# N818: exception names end in Error; S301: no pickle loads; PLC0415: imports
+# at module level (pylint import-outside-toplevel).
+select = ["E9", "F", "W605", "E501", "I", "D", "N818", "S301", "PLC0415"]
+ignore = ["D105", "D107"]
+
+[lint.per-file-ignores]
+"**/tests/**" = ["D1"]
+"**/*_test.py" = ["D1"]
+"**/conftest.py" = ["D1"]
+# load_game_module imports each game module lazily by contract.
+"registry.py" = ["PLC0415"]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.isort]
+force-single-line = true
+force-sort-within-sections = true
+# Imported names sort case-insensitively, constants among the rest (Google
+# style, as the downstream import sorts them): order-by-type would put
+# NUM_CARDS before get_card_points.
+order-by-type = false
+single-line-exclusions = ["typing", "collections.abc"]
+# OpenSpiel and its extension module are first-party (staging #12, the
+# importer's shared rules): pyspiel sorts with the open_spiel imports.
+known-first-party = ["open_spiel", "pyspiel"]

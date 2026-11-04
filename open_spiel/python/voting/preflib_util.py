@@ -49,17 +49,17 @@ def parse_preflib_data(string_data: str) -> base.PreferenceProfile:
       elif line.startswith("# ALTERNATIVE NAME "):
         num = int(parts[3].split(":")[0])
         index_of_colon = line.index(":")
-        assert 1 <= num <= num_alternatives
-        alternatives[num-1] = line[index_of_colon+2:]
+        assert 1 <= num <= num_alternatives  # pyrefly: ignore[unsupported-operation]
+        alternatives[num-1] = line[index_of_colon+2:]  # pyrefly: ignore[unsupported-operation]
     else:
       if profile.num_alternatives() == 0:
-        profile = base.PreferenceProfile(alternatives=alternatives)
+        profile = base.PreferenceProfile(alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
       index_of_colon = line.index(":")
       weight = int(line[:index_of_colon])
       vote_parts = line[index_of_colon+2:].split(",")
       vote = [alternatives[int(part) - 1] for part in vote_parts]
       if weight > 0:
-        profile.add_vote(vote, weight)
+        profile.add_vote(vote, weight)  # pyrefly: ignore[bad-argument-type]
   assert num_votes == profile.num_votes()
   return profile
 

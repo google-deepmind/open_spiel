@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "absl/strings/string_view.h"
 
 namespace open_spiel::file {
 

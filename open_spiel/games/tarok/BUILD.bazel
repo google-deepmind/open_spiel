@@ -1,0 +1,55 @@
+# Tarok implementation details
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "tarok",
+    srcs = ["tarok.cc"],
+    hdrs = ["tarok.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":tarok_core",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "tarok_test",
+    srcs = ["tarok_test.cc"],
+    deps = [
+        ":tarok",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "tarok_core",
+    srcs = [
+        "cards.cc",
+        "contracts.cc",
+    ],
+    hdrs = [
+        "cards.h",
+        "contracts.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+    ],
+)

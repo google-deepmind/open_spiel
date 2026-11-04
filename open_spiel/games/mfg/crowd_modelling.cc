@@ -20,11 +20,11 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/substitute.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/substitute.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -273,7 +273,7 @@ std::unique_ptr<State> CrowdModellingGame::DeserializeState(
     SPIEL_CHECK_TRUE(absl::SimpleAtod(v, &parsed_weight));
     distribution.push_back(parsed_weight);
   }
-  return absl::make_unique<CrowdModellingState>(
+  return std::make_unique<CrowdModellingState>(
       shared_from_this(), size_, horizon_, current_player, is_chance_init, x, t,
       last_action, return_value, distribution);
 }

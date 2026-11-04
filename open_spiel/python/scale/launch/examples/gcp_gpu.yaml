@@ -1,0 +1,90 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# The GCP backend on GPU machines: a complete config (every field is
+# required; nothing defaults). ${NAME} reads the environment, so set:
+#   PROJECT          your project id
+#   BUCKET           a bucket the service account can write (runs live under
+#                    gs://$BUCKET/runs/<run_id>)
+#   SERVICE_ACCOUNT  the VMs' service account (it reads and writes the bucket)
+# With PATH the path of this file:
+#   python -m open_spiel.python.scale.launch.run --backend_config=PATH \
+#       --run_id=ttt-gpu-1 --dry_run -- --config=ppo_tic_tac_toe
+# (drop --dry_run to launch). Machines are tried in order, from what a new
+# project can usually get to what few can: an L4 on demand (g2-standard-8,
+# the L4 built in) in two zones, then a T4 on demand (n1-standard-8 with one
+# T4 attached), then an H100 SPOT VM, then an H100 by FLEX_START (queued
+# capacity, at most 24 h per VM). A new project has little or no GPU quota:
+# before launching, check the project-wide GPUS_ALL_REGIONS quota and the
+# per-family, per-region one (NVIDIA_L4_GPUS, NVIDIA_T4_GPUS, the H100 ones)
+# under IAM & Admin > Quotas, and delete the machines you have no quota
+# for. From the command line (the first needs the Cloud Quotas API on):
+#   gcloud beta quotas info describe GPUS-ALL-REGIONS-per-project \
+#       --service=compute.googleapis.com --project=$PROJECT \
+#       --format="value(dimensionsInfos[0].details.value)"
+#   gcloud compute regions describe us-central1 --project=$PROJECT \
+#       --flatten=quotas --format="table(quotas.metric,quotas.limit)" | grep NVIDIA
+# The on-demand machines set max_run_duration: GCE deletes the VM at
+# that age even if the supervisor has died; set it above the run's length
+# (a VM deleted at its max run counts as a preemption, and the next attempt
+# resumes from the checkpoint). The one image carries the NVIDIA driver for
+# all of these GPUs; setup installs the package's tested dependency pins,
+# then the CUDA build of jax (every machine here is platform: gpu, so the VM
+# tells the trainer to expect platform gpu, and the trainer refuses to run
+# if JAX does not see a GPU), and gcsfs (the gs:// checkpoint dir).
+backend: gcp
+project: ${PROJECT}
+storage: gs://${BUCKET}/runs
+image: {family: common-cu129-ubuntu-2404-nvidia-580, name: null,
+        project: deeplearning-platform-release}
+network: {network: default, subnetwork: null, external_ip: true}
+service_account:
+  email: ${SERVICE_ACCOUNT}
+  scopes: [https://www.googleapis.com/auth/cloud-platform]
+labels: {}
+# The package folder and the JAX games package ship under their import names
+# (PACKAGE_ROOT, PACKAGE_PATH and GAMES_PACKAGE_PATH are built in:
+# launch/config.py), and the VM imports them from there. Every game but
+# kuhn_poker_jax needs the games package; the launcher refuses, before any VM
+# exists, a run whose game needs a package this list does not ship.
+code: {root: "${PACKAGE_ROOT}", paths: ["${PACKAGE_PATH}", "${GAMES_PACKAGE_PATH}"]}
+# The image's own boot-time apt may hold the package-list lock, which
+# DPkg::Lock::Timeout does not wait for: each apt line retries for up to
+# 15 minutes, then fails the setup.
+setup:
+  - for i in $(seq 1 90); do apt-get -o DPkg::Lock::Timeout=60 update -qq && exit 0;
+    echo "apt busy (attempt $i/90)"; sleep 10; done; exit 1
+  - for i in $(seq 1 90); do DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60
+    install -yqq python3-venv && exit 0; echo "apt busy (attempt $i/90)"; sleep 10; done; exit 1
+  - python3 -m venv /opt/venv
+  - /opt/venv/bin/pip install -q "jax==0.12.0.1" "jaxlib==0.12.0.1" "flax==0.12.10" "optax==0.2.8" "mctx==0.0.6"
+    "orbax-checkpoint==0.12.8" "chex==0.1.92" "distrax==0.1.9" "numpy==2.5.4"
+    "scipy==1.16.3" "absl-py==2.5.1" "ml-collections==1.1.0" "etils==1.14.0"
+    "ml_dtypes==0.6.0" "PyYAML==6.0.3" "gcsfs==2026.10.1"
+  - /opt/venv/bin/pip install -q "jax[cuda12]==0.12.0.1"
+python: /opt/venv/bin/python
+create_lock: null
+machines:
+  - {name: l4, machine_type: g2-standard-8, accelerator: null, platform: gpu,
+     zones: [us-central1-a, us-central1-b], provisioning: STANDARD, boot_disk_gb: 100,
+     max_run_duration: 24h}
+  - {name: t4, machine_type: n1-standard-8, accelerator: {type: nvidia-tesla-t4, count: 1},
+     platform: gpu, zones: [us-central1-b], provisioning: STANDARD, boot_disk_gb: 100,
+     max_run_duration: 24h}
+  - {name: h100-spot, machine_type: a3-highgpu-1g, accelerator: null, platform: gpu,
+     zones: [us-central1-a, us-east4-a], provisioning: SPOT, boot_disk_gb: 200,
+     max_run_duration: null}
+  - {name: h100-flex, machine_type: a3-highgpu-1g, accelerator: null, platform: gpu,
+     zones: [us-central1-a], provisioning: FLEX_START, boot_disk_gb: 200,
+     max_run_duration: 24h}

@@ -1,0 +1,60 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# The GCP backend on CPU machines (the built-in game trains in minutes on
+# one): set PROJECT, BUCKET and SERVICE_ACCOUNT as for gcp_gpu.yaml, then,
+# with PATH the path of this file:
+#   python -m open_spiel.python.scale.launch.run --backend_config=PATH \
+#       --run_id=ttt-cpu-1 -- --config=ppo_tic_tac_toe
+# A SPOT VM first, then the same machine on demand. Setup installs the
+# package's tested dependency pins (CPU jax) and gcsfs for the gs://
+# checkpoint dir. The code ships the package and the JAX games package, which
+# is all the JAX games need; a game that uses pyspiel also needs OpenSpiel
+# installed by a setup line.
+backend: gcp
+project: ${PROJECT}
+storage: gs://${BUCKET}/runs
+image: {family: ubuntu-2404-lts-amd64, name: null, project: ubuntu-os-cloud}
+network: {network: default, subnetwork: null, external_ip: true}
+service_account:
+  email: ${SERVICE_ACCOUNT}
+  scopes: [https://www.googleapis.com/auth/cloud-platform]
+labels: {}
+# The package folder and the JAX games package ship under their import names
+# (PACKAGE_ROOT, PACKAGE_PATH and GAMES_PACKAGE_PATH are built in:
+# launch/config.py), and the VM imports them from there. Every game but
+# kuhn_poker_jax needs the games package; the launcher refuses, before any VM
+# exists, a run whose game needs a package this list does not ship.
+code: {root: "${PACKAGE_ROOT}", paths: ["${PACKAGE_PATH}", "${GAMES_PACKAGE_PATH}"]}
+# The image's own boot-time apt may hold the package-list lock, which
+# DPkg::Lock::Timeout does not wait for: each apt line retries for up to
+# 15 minutes, then fails the setup.
+setup:
+  - for i in $(seq 1 90); do apt-get -o DPkg::Lock::Timeout=60 update -qq && exit 0;
+    echo "apt busy (attempt $i/90)"; sleep 10; done; exit 1
+  - for i in $(seq 1 90); do DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60
+    install -yqq python3-venv && exit 0; echo "apt busy (attempt $i/90)"; sleep 10; done; exit 1
+  - python3 -m venv /opt/venv
+  - /opt/venv/bin/pip install -q "jax==0.12.0.1" "jaxlib==0.12.0.1" "flax==0.12.10" "optax==0.2.8" "mctx==0.0.6"
+    "orbax-checkpoint==0.12.8" "chex==0.1.92" "distrax==0.1.9" "numpy==2.5.4"
+    "scipy==1.16.3" "absl-py==2.5.1" "ml-collections==1.1.0" "etils==1.14.0"
+    "ml_dtypes==0.6.0" "PyYAML==6.0.3" "gcsfs==2026.10.1"
+python: /opt/venv/bin/python
+create_lock: null
+machines:
+  - {name: cpu-spot, machine_type: e2-standard-8, accelerator: null, platform: cpu,
+     zones: [us-central1-a, us-central1-b], provisioning: SPOT, boot_disk_gb: 50,
+     max_run_duration: null}
+  - {name: cpu-standard, machine_type: e2-standard-8, accelerator: null, platform: cpu,
+     zones: [us-central1-a], provisioning: STANDARD, boot_disk_gb: 50, max_run_duration: null}

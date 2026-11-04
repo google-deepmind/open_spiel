@@ -32,7 +32,7 @@ class MaximalLotteriesTest(parameterized.TestCase):
     # "a" is a dominant strategy of the margin game, so it should be chosen with
     # probablity 1.
     votes = [["a", "b", "c"], ["a", "c", "b"], ["b", "a", "c"]]
-    profile = base.PreferenceProfile(votes=votes)
+    profile = base.PreferenceProfile(votes=votes)  # pyrefly: ignore[bad-argument-type]
     method = maximal_lotteries.MaximalLotteriesVoting(iterative=False)
     outcome = method.run_election(profile)
     with self.subTest("Top-rank the condorcet winner"):
@@ -44,7 +44,7 @@ class MaximalLotteriesTest(parameterized.TestCase):
 
   def test_maximal_lotteries_basic_iterative(self):
     votes = [["a", "b", "c"], ["a", "c", "b"], ["b", "a", "c"]]
-    profile = base.PreferenceProfile(votes=votes)
+    profile = base.PreferenceProfile(votes=votes)  # pyrefly: ignore[bad-argument-type]
     # "a" is a dominant strategy, so in the iterative version it should be
     # chosen first, leading to a new matrix with the first row and column
     # deleted. This then means that "b" is dominant in the subgame.
@@ -67,7 +67,7 @@ class MaximalLotteriesTest(parameterized.TestCase):
   def test_maximal_lotteries_cycle(self):
     # Cyclical profile leads to a Rock, Paper, Scissors margin game.
     votes = [["a", "b", "c"], ["b", "c", "a"], ["c", "a", "b"]]
-    profile = base.PreferenceProfile(votes=votes)
+    profile = base.PreferenceProfile(votes=votes)  # pyrefly: ignore[bad-argument-type]
     method = maximal_lotteries.MaximalLotteriesVoting()
     outcome = method.run_election(profile)
     with self.subTest("Check prob 1/3"):
@@ -81,7 +81,7 @@ class MaximalLotteriesTest(parameterized.TestCase):
     # Iterative maximal lotteries should yield the same result as the
     # non-iterative version.
     votes = [["a", "b", "c"], ["b", "c", "a"], ["c", "a", "b"]]
-    profile = base.PreferenceProfile(votes=votes)
+    profile = base.PreferenceProfile(votes=votes)  # pyrefly: ignore[bad-argument-type]
     method = maximal_lotteries.MaximalLotteriesVoting(iterative=True)
     outcome = method.run_election(profile)
     with self.subTest("Check prob 1/3"):

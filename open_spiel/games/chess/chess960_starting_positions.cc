@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/strings/str_split.h"
 
 namespace open_spiel {
 namespace chess {

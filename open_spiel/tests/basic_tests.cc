@@ -24,11 +24,11 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/btree_set.h"
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/container/btree_set.h"
+#include "absl/container/flat_hash_set.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/types/optional.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"

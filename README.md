@@ -39,6 +39,7 @@ Please choose among the following options:
 *   [API Reference](docs/api_reference.md)
 *   [Overview of Implemented Games](docs/games.md)
 *   [Overview of Implemented Algorithms](docs/algorithms.md)
+*   [Playing Games in a Browser](docs/gui.md)
 *   [Developer Guide](docs/developer_guide.md)
 *   [Using OpenSpiel as a C++ Library](docs/library.md)
 *   [Guidelines and Contributing](docs/contributing.md)
@@ -85,6 +86,13 @@ BibTeX:
   url       = {http://arxiv.org/abs/1908.09453},
 }
 ```
+
+## Pretrained Checkpoints and Data
+
+Pretrained baseline checkpoints and reference game datasets are published at
+[`gs://openspiel-data`](https://storage.googleapis.com/openspiel-data/README.md)
+(for example, the Oklahoma gin rummy agent at
+[`checkpoints/scale/gin_rummy/v1`](https://storage.googleapis.com/openspiel-data/checkpoints/scale/gin_rummy/v1/README.md)).
 
 ## Versioning
 

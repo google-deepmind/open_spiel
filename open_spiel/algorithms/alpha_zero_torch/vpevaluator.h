@@ -18,7 +18,7 @@
 #include <future>  // NOLINT
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/hash/hash.h"
+#include "absl/hash/hash.h"
 #include "open_spiel/algorithms/alpha_zero_torch/device_manager.h"
 #include "open_spiel/algorithms/alpha_zero_torch/vpnet.h"
 #include "open_spiel/algorithms/mcts.h"

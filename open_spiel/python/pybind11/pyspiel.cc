@@ -20,10 +20,10 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/flags/flag.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
@@ -84,10 +84,10 @@
 #include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
 #include "open_spiel/utils/status.h"
-#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
+#include "pybind11_json/pybind11_json.hpp"
 
 // Includes needed for absl::optional.
-#include "pybind11/include/pybind11/detail/common.h"
+#include "pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 #include "pybind11_abseil/status_casters.h"
 
@@ -103,7 +103,7 @@
 #include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
-#define PYSPIEL_VERSION "2.0.1"
+#define PYSPIEL_VERSION "2.0.2"
 
 // Flags governing Open Spiel behaviour
 ABSL_FLAG(bool, log_exceptions_to_stderr, true,

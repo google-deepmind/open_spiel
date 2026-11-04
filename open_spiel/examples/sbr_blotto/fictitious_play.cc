@@ -17,9 +17,9 @@
 #include <cmath>
 #include <limits>
 
-#include "open_spiel/abseil-cpp/absl/random/discrete_distribution.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/random/discrete_distribution.h"
+#include "absl/random/distributions.h"
+#include "absl/time/time.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"

@@ -18,9 +18,9 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
-#include "open_spiel/json/include/nlohmann/json_fwd.hpp"
+#include "absl/flags/parse.h"
+#include "absl/strings/match.h"
+#include "nlohmann/json_fwd.hpp"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"

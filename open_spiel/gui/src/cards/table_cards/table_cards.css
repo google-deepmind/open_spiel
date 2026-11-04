@@ -1,0 +1,130 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* TableCardSettingsFields. Its fields are
+   .ogs-config-field / .ogs-config-toggle labels, styled by whichever panel
+   holds them; this file styles the colour swatches and the deck hint. */
+.table-cards-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* The layout every panel already gives them, so they also read right where
+   no panel styles them. */
+.table-cards-fields .ogs-config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* The picked deck's "best for" line, under the deck picker. */
+.table-cards-hint {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+.table-cards-fields .ogs-config-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.table-cards-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.table-cards-swatch:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+.table-cards-swatch {
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  position: relative;
+  overflow: hidden;
+}
+/* The theme's own felt, whatever the theme. Resolved on <html>, so a game's
+   chosen surface (--color-felt on its root, around its View menu) cannot
+   repaint this swatch. */
+:root {
+  --color-felt-theme: var(--color-felt);
+  --color-felt-text-theme: var(--color-felt-text);
+}
+.table-cards-swatch--theme {
+  background: var(--color-felt-theme);
+}
+.table-cards-swatch--theme::after {
+  content: 'T';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  font-family: system-ui, sans-serif;
+  color: var(--color-felt-text-theme);
+}
+.table-cards-swatch[aria-checked='true'],
+.table-cards-swatch--custom.is-on {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.table-cards-swatch:focus-visible,
+.table-cards-swatch--custom:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+/* Custom: a rainbow until a colour is picked. */
+.table-cards-swatch--custom {
+  background: var(--felt-swatch-rainbow);
+}
+.table-cards-swatch--custom input {
+  /* Out of sight but in the accessibility tree: the swatch is its label,
+     so a press on the circle opens the native picker. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+/* A refused custom pick (too light for the white table text): the circle
+   shows the pick, ringed in the error colour, and the field says why, on the
+   label's own line and in the hint line under the swatches. The hint line is
+   always there and holds two lines, so neither moves the picker. */
+.table-cards-swatch--custom.is-refused {
+  outline: 2px dashed var(--color-error-text);
+  outline-offset: 2px;
+}
+.table-cards-refused-tag {
+  color: var(--color-error-text);
+  font-weight: 600;
+}
+.table-cards-colour-hint {
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 2.8em;
+  color: var(--color-text-muted);
+}
+.table-cards-colour-hint.is-refused {
+  color: var(--color-error-text);
+}

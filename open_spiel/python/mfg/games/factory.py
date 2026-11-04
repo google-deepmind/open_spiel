@@ -124,7 +124,7 @@ def create_game_with_setting(game_name: str,
     # Create a copy since we modify it below removing the network key.
     params = params.copy()
     network = params.pop("network")
-    network, od_demand = DYNAMIC_ROUTING_NETWORK[network]
+    network, od_demand = DYNAMIC_ROUTING_NETWORK[network]  # pyrefly: ignore[bad-index]
     return dynamic_routing.MeanFieldRoutingGame(
         params, network=network, od_demand=od_demand)
 

@@ -46,10 +46,10 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -213,6 +213,11 @@ class HeartsState : public State {
   void ApplyPlayAction(int card);
 
   void ComputeScore();
+  // Cards are not received until all players have completed passing. West is
+  // the last player to pass.
+  bool PassingComplete() const {
+    return passed_cards_[static_cast<int>(kWest)].size() == kNumCardsInPass;
+  }
   int CurrentTrickIndex() const {
     return std::min(num_cards_played_ / kNumPlayers,
                     static_cast<int>(tricks_.size()));

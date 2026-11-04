@@ -15,9 +15,9 @@
 #include <memory>
 #include <random>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

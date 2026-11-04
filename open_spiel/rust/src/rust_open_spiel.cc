@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "absl/algorithm/container.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"

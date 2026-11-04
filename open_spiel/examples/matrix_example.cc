@@ -15,7 +15,7 @@
 #include <memory>
 #include <random>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "absl/random/uniform_int_distribution.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/spiel.h"
 

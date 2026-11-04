@@ -93,6 +93,32 @@ class IsmctsTest(parameterized.TestCase):
     self.assertEqual(policy[0][0], pyspiel.INVALID_ACTION)
     self.assertEqual(action, pyspiel.INVALID_ACTION)
 
+  def test_resample_from_infostate_is_seeded(self):
+    game = pyspiel.load_game("kuhn_poker")
+    state = game.new_initial_state()
+    state.apply_action(state.legal_actions()[0])
+    state.apply_action(state.legal_actions()[0])
+
+    def make_bot(seed):
+      return ismcts.ISMCTSBot(
+          game=game,
+          uct_c=4.0,
+          evaluator=mcts.RandomRolloutEvaluator(1, np.random.RandomState(seed)),
+          max_simulations=10,
+          random_state=np.random.RandomState(seed),
+      )
+
+    bot_a = make_bot(1234)
+    bot_b = make_bot(1234)
+
+    resamples_a = [
+        str(bot_a.resample_from_infostate(state)) for _ in range(20)
+    ]
+    resamples_b = [
+        str(bot_b.resample_from_infostate(state)) for _ in range(20)
+    ]
+    self.assertEqual(resamples_a, resamples_b)
+
   @absltest.skip("Skipping. This one does not work.")
   def test_play_universal_poker(self):
     if "universal_poker" in pyspiel.registered_names():

@@ -1,0 +1,164 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* Notices over the gameplay table. See gameplay_notice.tsx.
+
+   The shell root is the containing block; the layer is absolute, so it has no
+   layout footprint: showing or hiding a notice never moves the board. */
+.gameplay-shell {
+  position: relative;
+}
+
+.gameplay-notice-layer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 24px));
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  /* The layer is an overlay on a live board: clicks go through to the cards
+       and squares under it. Only a dismiss button takes the pointer. */
+  pointer-events: none;
+}
+
+.gameplay-notice-layer--top {
+  top: 10px;
+}
+
+.gameplay-notice-layer--bottom {
+  bottom: 10px;
+  flex-direction: column-reverse;
+}
+
+.gameplay-notice-layer:empty {
+  display: none;
+}
+
+/* A notice is a plain, squared plaque: one quiet full border, the raised
+   surface, a shadow just deep enough to lift it off the board. Its tone is
+   told by the text (weight and colour), never by a coloured edge or stripe. */
+.gameplay-notice {
+  box-sizing: border-box;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border-strong);
+  /* Opaque, not a tint: the notice sits on felt, wood and board art, and a
+       translucent wash is unreadable over a busy board. */
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: 0 1px 3px var(--color-shadow);
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.gameplay-notice__text {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+.gameplay-notice--turn {
+  font-weight: 600;
+}
+
+.gameplay-notice--waiting {
+  color: var(--color-text-secondary);
+}
+
+.gameplay-notice--warning {
+  color: var(--color-warning);
+  font-weight: 500;
+}
+
+.gameplay-notice--error {
+  color: var(--color-error-text);
+  font-weight: 500;
+}
+
+/* Any control inside a notice takes the pointer, whatever its class: the
+   layer passes clicks through, and a button written without the action class
+   was drawn but could not be clicked. */
+.gameplay-notice
+  :is(button, a[href], input, select, textarea, [role='button']) {
+  pointer-events: auto;
+}
+
+.gameplay-notice__dismiss {
+  pointer-events: auto;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-none);
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.gameplay-notice__dismiss:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.gameplay-notice__dismiss:not([aria-disabled='true']):hover,
+.gameplay-notice__dismiss:focus-visible {
+  background: var(--color-surface-sunken);
+}
+
+/* Phone: smaller type and two lines at most, so a
+   notice covers a strip of the board, not the board. */
+@media (max-width: 640px) {
+  .gameplay-notice-layer {
+    width: calc(100% - 12px);
+  }
+
+  .gameplay-notice-layer--top {
+    top: 4px;
+  }
+
+  .gameplay-notice {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .gameplay-notice__text {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+/* An error is never clamped: it may carry an instruction ("press Done to
+   resume") that a two-line cut would drop. It scrolls past
+   a third of the panel instead of covering it. */
+.gameplay-notice--error .gameplay-notice__text {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+  max-height: 33vh;
+  overflow-y: auto;
+}

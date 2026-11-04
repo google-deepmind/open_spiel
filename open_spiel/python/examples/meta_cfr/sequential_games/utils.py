@@ -81,7 +81,7 @@ def mask(cfvalues: np.ndarray, infoset: List[InfostateNode], num_actions: int,
     for j in range(cfvalues.shape[1]):
       np.put(masked_cfvalues[i][j], legal_actions[i][j], cfvalues[i][j])
 
-  return np.stack(masked_cfvalues)
+  return np.stack(masked_cfvalues)  # pyrefly: ignore[no-matching-overload]
 
 
 def filter_terminal_infostates(infostates_map: InfostateMapping):

@@ -32,7 +32,7 @@ class RankedPairsTest(absltest.TestCase):
         base.WeightedVote(1, ["y", "w", "x", "z"]),
         base.WeightedVote(8, ["y", "z", "w", "x"]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = ranked_pairs.RankedPairsVoting()
     outcome = method.run_election(profile)
     with self.subTest("Ranking and scores"):
@@ -60,7 +60,7 @@ class RankedPairsTest(absltest.TestCase):
             17, ["Knoxville", "Chattanooga", "Nashville", "Memphis"]
         ),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = ranked_pairs.RankedPairsVoting()
     outcome = method.run_election(profile)
     with self.subTest("Ranking and scores"):
@@ -82,7 +82,7 @@ class RankedPairsTest(absltest.TestCase):
         base.WeightedVote(2, ["C", "A", "B"]),
         base.WeightedVote(1, ["B", "C", "A"]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = ranked_pairs.RankedPairsVoting()
     outcome = method.run_election(profile)
     with self.subTest("Ranking and scores"):
@@ -99,7 +99,7 @@ class RankedPairsTest(absltest.TestCase):
         base.WeightedVote(1, ["A", "B"]),
         base.WeightedVote(1, ["B", "A"]),
     ]
-    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)
+    profile = base.PreferenceProfile(votes=votes, alternatives=alternatives)  # pyrefly: ignore[bad-argument-type]
     method = ranked_pairs.RankedPairsVoting()
     outcome = method.run_election(profile)
     with self.subTest("Check the graph is empty"):

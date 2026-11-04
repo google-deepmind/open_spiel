@@ -17,8 +17,8 @@
 
 #include <list>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/synchronization/mutex.h"
 
 namespace open_spiel {
 

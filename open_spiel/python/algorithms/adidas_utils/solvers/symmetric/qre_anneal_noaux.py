@@ -79,16 +79,16 @@ class Solver(object):
     """
     if self.cheap and self.vr:
       grads, pm_vr, exp_sto, exp_solver_sto = self.cheap_gradients_vr(
-          self.random, *params, payoff_matrices, self.num_players, self.pm_vr,
+          self.random, *params, payoff_matrices, self.num_players, self.pm_vr,  # pyrefly: ignore[bad-argument-count]
           self.temperature, self.proj_grad,)
       self.pm_vr = pm_vr
       return grads, exp_sto, exp_solver_sto
     elif self.cheap and not self.vr:
-      return self.cheap_gradients(self.random, *params, payoff_matrices,
+      return self.cheap_gradients(self.random, *params, payoff_matrices,  # pyrefly: ignore[bad-argument-count]
                                   self.num_players, self.temperature,
                                   self.proj_grad)
     else:
-      return self.gradients(*params, payoff_matrices, self.num_players,
+      return self.gradients(*params, payoff_matrices, self.num_players,  # pyrefly: ignore[bad-argument-count]
                             self.temperature, self.proj_grad)
 
   def exploitability(self, params, payoff_matrices):
@@ -286,14 +286,14 @@ class Solver(object):
       other_player_fx_translated += pm_mod * other_player_fx - r
 
     grad_dist = -policy_gradient
-    grad_dist += (num_players - 1) * other_player_fx_translated
+    grad_dist += (num_players - 1) * other_player_fx_translated  # pyrefly: ignore[unbound-name]
     if proj_grad:
       grad_dist = simplex.project_grad(grad_dist)
 
     if version == 0:
-      pm_vr[:, action_u] = payoff_matrices[1, :, action_u]
+      pm_vr[:, action_u] = payoff_matrices[1, :, action_u]  # pyrefly: ignore[unbound-name]
     elif version == 1:
-      pm_vr[:, action_u] = payoff_matrices[1, :, action_u] * other_player_fx
+      pm_vr[:, action_u] = payoff_matrices[1, :, action_u] * other_player_fx  # pyrefly: ignore[unbound-name]
 
     return (grad_dist, None), pm_vr, unreg_exp, reg_exp
 

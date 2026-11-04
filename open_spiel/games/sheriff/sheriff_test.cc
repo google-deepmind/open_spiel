@@ -17,7 +17,7 @@
 #include <iostream>
 #include <limits>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "absl/container/flat_hash_set.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/get_all_states.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"

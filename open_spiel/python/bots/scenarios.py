@@ -94,7 +94,7 @@ def play_bot_in_scenarios(game, bots, scenarios=None):
       if action == expected_action:
         actual_prob = prob
         break
-    score = 1 - abs(actual_prob - scenario.expected_prob)
+    score = 1 - abs(actual_prob - scenario.expected_prob)  # pyrefly: ignore[unbound-name]
     results.append((scenario.name, score, scenario.expected_action_str,
                     scenario.expected_prob, actual_prob))
     total_score += score
