@@ -51,14 +51,14 @@ jobs:
           OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: macos-14
-          OS_PYTHON_VERSION: "3.12"
+        - os: macos-26
+          OS_PYTHON_VERSION: "3.13"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: macos-14
+        - os: macos-15
           OS_PYTHON_VERSION: "3.11"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
@@ -163,7 +163,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-14]
+        os: [ubuntu-24.04, macos-26]
 
     runs-on: ${{ matrix.os }}
 
