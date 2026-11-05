@@ -21,18 +21,58 @@ checkpoints, as the trainer writes them) is not one; convert the step you
 want into an artifact folder first, with the converter of the package that
 trained it, and name the folder it writes.
 
-0. **Prerequisites**: Python 3.12 with `venv`, and Node.js 22 or later to
-   build the browser client. On Debian or Ubuntu, with
+0. **Prerequisites**: Python 3.12 with `venv`, and Node.js
+   `^22.22.2 || ^24.15.0 || >=26.0.0` (what the client's dependencies
+   require) to build the browser client.
+
+   On Debian or Ubuntu, the `python3.12-venv` package (it brings
+   `ensurepip`; on a fresh machine `apt-get install` reports "no
+   installation candidate" until `apt-get update` has run), and
    [nvm](https://github.com/nvm-sh/nvm) for Node.js (a distribution's
-   `nodejs` package is often older than 22):
+   `nodejs` package is often older). Install nvm by its own instructions
+   (the link above); nvm is a shell function, so a shell started before the
+   install answers `nvm: command not found` until it loads it (or a new
+   shell is opened):
 
    ```sh
+   sudo apt-get update
    sudo apt-get install -y python3.12-venv
+   . "$HOME/.nvm/nvm.sh"  # after installing nvm
    nvm install 22
    ```
 
-   Check: `python3.12 -m venv --help` prints its usage, and `node --version`
-   prints `v22.` or later.
+   On a machine that has just booted, a cloud VM say, `apt-get` can wait
+   several minutes for the lock held by the image's own boot-time update;
+   let it finish.
+
+   On macOS, clang++ comes from Xcode's command-line tools
+   (`xcode-select --install`). Homebrew's `python3` may be another version,
+   with no `python3.12` on `PATH`: install one with `brew install
+   python@3.12`, and Node.js with nvm, as above. (Homebrew's `node@22` is
+   not linked: after `brew install node@22`, put `$(brew --prefix
+   node@22)/bin` first on `PATH`.)
+
+   With [uv](https://docs.astral.sh/uv/) instead of Homebrew's Python,
+   `uv python install 3.12` puts a `python3.12` on `PATH` that is a symlink
+   (in `~/.local/bin`), and `python3.12 -m venv` fails on it at `ensurepip`
+   with `ModuleNotFoundError: No module named 'encodings'`. Let uv make the
+   virtualenv instead, and use it in step 1 in place of `python3.12 -m venv
+   venv`:
+
+   ```sh
+   uv python install 3.12
+   uv venv -p 3.12 --seed venv
+   ```
+
+   (or run the interpreter `uv python find 3.12` prints, which is not a
+   symlink: `"$(uv python find 3.12)" -m venv venv`).
+
+   Check: `python3.12 -m venv /tmp/venv-check` creates a virtualenv with no
+   error (`--help` alone passes without `ensurepip`), and `node --version`
+   prints a version in that range. If the check fails with `No module named
+   'encodings'`, that `python3.12` is uv's symlink: run `brew install
+   python@3.12`, or make the virtualenv with `uv venv -p 3.12 --seed venv`,
+   as above.
 
 1. **Install** OpenSpiel into a virtualenv, build the client, and install
    whatever the bot that plays the checkpoint needs (for `scale`'s pretrained
@@ -41,18 +81,29 @@ trained it, and name the folder it writes.
    unauthenticated `gs://` URL uses `gcsfs`), from the repository root:
 
    ```sh
-   python3.12 -m venv venv && . venv/bin/activate
+   ./install.sh
+   python3.12 -m venv venv && . venv/bin/activate  # uv: see step 0
    pip install -e .
    source open_spiel/scripts/python_extra_deps.sh python3
    echo "$OPEN_SPIEL_PYTHON_JAX_DEPS" | xargs pip install
    (cd open_spiel/gui && npm ci && npm run build)
    ```
 
-   Check: `open_spiel/gui/dist/index.html` exists.
+   `./install.sh` runs once first: it fetches the C++ dependencies that
+   `pip install -e .` builds against, and installs system packages with
+   `apt-get` on Debian or Ubuntu, or Homebrew on macOS (where clang++ comes
+   from `xcode-select --install`). To leave your system packages alone, run
+   `OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0 ./install.sh` instead and install what
+   [docs/install.md](../../../docs/install.md) lists yourself.
+
+   Check: `clang++ --version` prints a version before `pip install -e .`, and
+   `open_spiel/gui/dist/index.html` exists after the build.
 
 2. **Name the bot and the checkpoint, and play**, from the repository root.
    `BOT` is the bot's factory, `MODULE:FACTORY` (step 4 of the next section), as
-   the package that trained the checkpoint names it:
+   the package that trained the checkpoint names it: for example, a factory
+   `make_bot` in the module `my_package.serve.remote_bot` that loads a
+   checkpoint is `my_package.serve.remote_bot:make_bot`.
 
    ```sh
    BOT=open_spiel.python.scale.serve.remote_bot:make_bot
@@ -61,11 +112,21 @@ trained it, and name the folder it writes.
      --bot "$BOT" --checkpoint "$CHECKPOINT"
    ```
 
+   This bot takes only the full state (the other seat's cards included):
+   it replays the hand into its own environment, where its policy sees only
+   its seat's view. Without `--state`, `play` sends a bot the one state it
+   takes, or only its seat's view (`seat_view`) if it takes both, and prints
+   a note whenever it sends the full state of a game that hides information.
+
    Check: once the bot has loaded its checkpoint (a minute or so), it
    prints `Play http://127.0.0.1:8080/game/gin_rummy?session=<id>&viewer=0`.
    Open that address: you are seat 0, and Setup › Players reads Player 1
    "Remote bot". Every move you make is answered by the bot. Ctrl-C stops
    both servers, as do SIGTERM and closing the terminal.
+
+   If port 8080 is taken, `play` stops at once, before it loads the bot:
+   `--port <n>` serves the GUI on another port, and `--port 0` on a free
+   one, which the printed address shows.
 
    **On a remote machine** (a cloud VM, say) the address is that machine's
    loopback, which your browser cannot reach directly. Forward the port over
@@ -76,7 +137,43 @@ trained it, and name the folder it writes.
    ```
 
    (With `gcloud compute ssh <vm> -- -L 8080:127.0.0.1:8080` on Compute
-   Engine.) Keep that session open while you play.
+   Engine.) The first `8080` is the port on your own machine, the second
+   the one `play` serves on the remote machine. If 8080 is taken on your
+   own machine, forward another local port, 9090 say, and change the port
+   in the printed address to it:
+
+   ```sh
+   ssh -L 9090:127.0.0.1:8080 <user>@<vm>
+   # open http://127.0.0.1:9090/game/gin_rummy?session=<id>&viewer=0
+   ```
+
+   With another `--port` on the remote machine, forward to that port
+   instead of the second 8080.
+
+   `play` stops when its terminal closes, so a dropped SSH session ends the
+   game. On a remote machine, run it where a disconnect does not reach it:
+   in `tmux` (or `screen`), reattaching after you reconnect, or detached
+   with its output in a file:
+
+   ```sh
+   setsid nohup python -m open_spiel.python.gui.play ... > play.log 2>&1 &
+   grep '^Play ' play.log  # the address, once the bot has loaded
+   pkill -f -- '-m open_spiel[.]python[.]gui[.]play'  # later: stops both servers
+   ```
+
+   The SSH session that forwards the port must stay open while you play;
+   reconnect it if it drops.
+
+   On the board, double-click the stock or the upcard to draw from it (a
+   single click does not draw), and double-click a card in your hand to
+   discard it (a single click does not discard); Actions › Legal does the
+   same. A seat may
+   draw the upcard and discard that same card at once: OpenSpiel's
+   `gin_rummy` allows every card in hand as a discard and has no parameter
+   against it, and when both seats do so on consecutive turns the hand ends
+   in a draw. When the bot knocks, lay off by double-clicking each card in
+   your hand that fits one of its melds, then press Done: a double-click
+   only stages a lay-off, and Done plays them.
 
 3. **Play again** once a hand ends: Setup › Position › **Reset**, then
    **Reset** in the "Reset Game?" confirmation. A new hand starts with the
@@ -94,8 +191,8 @@ trained it, and name the folder it writes.
    `--move-budget-seconds`.
 
 To try the steps without a trained checkpoint, write a stand-in and serve
-the stand-in bot, which plays random legal moves and needs nothing beyond
-OpenSpiel:
+the stand-in bot, which plays random legal moves, takes either state (so
+no `--state`) and needs nothing beyond OpenSpiel:
 
 ```sh
 CHECKPOINT=$(python -m open_spiel.python.gui.stand_in_checkpoint_bot write /tmp/stand_in --game gin_rummy --step 1)
@@ -110,8 +207,10 @@ the checkpoint in the environment variables `OPEN_SPIEL_REMOTE_BOT_CHECKPOINT`
 and `OPEN_SPIEL_SCALE_REMOTE_BOT_CHECKPOINT`, the names a bot's factory may read
 (`--checkpoint-env VAR` sets `VAR` alone instead), waits for its `/health`,
 starts the GUI server, and opens a session whose seat `--bot-seat` (1) is a
-Remote bot at that URL, with state `--state` (`full_state`), the checkpoint in
-its **Checkpoint** setting and autoplay on, every other seat human. Any game and
+Remote bot at that URL, with state `--state` (unless given, the one state the
+bot server takes, or `seat_view` if it takes both), the
+checkpoint in its **Checkpoint** setting and autoplay on, every other seat
+human. Any game and
 any bot work the same way (`--game`, `--bot random`). The bot runs in its own
 process, so the GUI imports nothing of it. Flags after `--` go to the GUI
 server; `--move-budget-seconds` (60, so that a checkpoint switched in the seat

@@ -95,6 +95,16 @@ In a nutshell:
     ./install.sh
     ```
 
+    `./install.sh` downloads the C++ dependencies into the checkout, which
+    `pip install -e .` and the CMake build need. It also installs system
+    packages, with `sudo apt-get` on Debian or Ubuntu and with Homebrew on
+    macOS. To install the system packages yourself (see above) and only
+    download the C++ dependencies, run
+
+    ```bash
+    OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0 ./install.sh
+    ```
+
 3.  Install your [Python dependencies](#installing-python-dependencies), e.g. in
     Python 3 using
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):

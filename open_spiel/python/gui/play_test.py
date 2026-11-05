@@ -24,6 +24,7 @@ import json
 import os
 import re
 import signal
+import socket
 import subprocess
 import sys
 import threading
@@ -33,6 +34,8 @@ from unittest import mock
 import urllib.parse
 
 from absl.testing import absltest
+
+import pyspiel
 
 from open_spiel.python.gui import child_servers
 from open_spiel.python.gui import play
@@ -119,8 +122,48 @@ class ParseTest(absltest.TestCase):
     )
     self.assertEqual(options.move_budget_seconds, 60.0)
     self.assertEqual(options.gui_flags, ("--exclude-games", "backgammon"))
-    self.assertEqual(options.state, "full_state")
+    # Unless --state is given, the bot server's /info decides (LaunchTest).
+    self.assertIsNone(options.state)
+    self.assertIsNone(play.Options(game="kuhn_poker", bot="random").state)
     self.assertEqual(options.bot_seat, 1)
+
+  def test_the_full_state_is_given_by_name(self) -> None:
+    options = play.parse_args(
+        ["--game", "gin_rummy", "--bot", STAND_IN, "--state", "full_state"]
+    )
+    self.assertEqual(options.state, "full_state")
+
+  def test_the_full_state_of_a_game_that_hides_information_is_noted(
+      self,
+  ) -> None:
+    gin = pyspiel.load_game("gin_rummy")
+    note = play.full_state_note(
+        play.Options(game="gin_rummy", bot=STAND_IN, state="full_state"), gin
+    )
+    assert note is not None
+    self.assertNotIn("\n", note)
+    self.assertIn("--state full_state", note)
+    self.assertIn("gin_rummy", note)
+    # Not for seat_view, nor for a game that hides nothing.
+    self.assertIsNone(
+        play.full_state_note(play.Options(game="gin_rummy", bot=STAND_IN), gin)
+    )
+    self.assertIsNone(
+        play.full_state_note(
+            play.Options(game="tic_tac_toe", bot=STAND_IN, state="full_state"),
+            pyspiel.load_game("tic_tac_toe"),
+        )
+    )
+    # Chosen from the bot server's one state mode, the line says so.
+    chosen = play.full_state_note(
+        play.Options(game="gin_rummy", bot=STAND_IN, state="full_state"),
+        gin,
+        chosen=True,
+    )
+    assert chosen is not None
+    self.assertNotIn("\n", chosen)
+    self.assertTrue(chosen.startswith("Note: --state full_state "), chosen)
+    self.assertIn("only state this bot server takes", chosen)
 
   def test_a_named_checkpoint_variable_is_the_only_one_set(self) -> None:
     options = play.parse_args(
@@ -141,7 +184,10 @@ class ParseTest(absltest.TestCase):
 
   def test_the_session_seats_the_bot_and_humans_elsewhere(self) -> None:
     options = play.Options(
-        game="gin_rummy(oklahoma=true)", bot=STAND_IN, checkpoint="/c@3"
+        game="gin_rummy(oklahoma=true)",
+        bot=STAND_IN,
+        checkpoint="/c@3",
+        state="full_state",
     )
     body = play.session_body(options, "http://127.0.0.1:9", 2)
     self.assertEqual(body["game"], "gin_rummy")
@@ -162,6 +208,14 @@ class ParseTest(absltest.TestCase):
             },
         ],
     )
+
+
+  def test_a_seat_whose_state_is_not_resolved_is_refused(self) -> None:
+    # launch resolves a missing --state from the bot server's /info first.
+    with self.assertRaisesRegex(ValueError, "not resolved"):
+      play.seat_config(
+          play.Options(game="kuhn_poker", bot="random"), "http://127.0.0.1:9"
+      )
 
 
 class ChildServerTest(absltest.TestCase):
@@ -260,8 +314,9 @@ class LaunchTest(absltest.TestCase):
     seat = frame["seats"][1]
     self.assertEqual(seat["controller"], "remote")
     self.assertEqual(seat["config"]["url"], running.bot_url)
-    self.assertEqual(seat["config"]["state"], "full_state")
+    self.assertEqual(seat["config"]["state"], "seat_view")
     self.assertEqual(seat["config"]["checkpoint"], self.checkpoint)
+    self.assertNotIn("--state full_state", self.out.getvalue())
     self.assertEqual(frame["seats"][0]["controller"], "human")
     _post(api + "/actions?viewer=0", {"action": 0, "ply": None})
     deadline = time.monotonic() + 30
@@ -280,12 +335,27 @@ class LaunchTest(absltest.TestCase):
   def test_the_checkpoint_is_in_every_variable_a_factory_may_read(
       self,
   ) -> None:
+    # With the full state, asked for by name: the launch says, in one line,
+    # that the bot sees what its seat may not.
     running = play.launch(
-        self.options(bot=f"{TEST_MODULE}:make_second_variable_bot"),
+        self.options(
+            bot=f"{TEST_MODULE}:make_second_variable_bot", state="full_state"
+        ),
         self.out,
     )
     self.addCleanup(running.stop)
     self.assertEqual(_get(running.bot_url + "/info")["games"], ["kuhn_poker"])
+    frame = _get(
+        f"{running.gui_url}/api/sessions/{running.session}?viewer=oracle"
+    )
+    self.assertEqual(frame["seats"][1]["config"]["state"], "full_state")
+    notes = [
+        line
+        for line in self.out.getvalue().splitlines()
+        if line.startswith("Note: --state full_state")
+    ]
+    self.assertEqual(len(notes), 1)
+    self.assertIn("kuhn_poker", notes[0])
 
   def test_a_checkpoint_switched_in_the_seat_may_warm_up(self) -> None:
     # A checkpoint named only in the seat loads at the bot's first move. It
@@ -297,7 +367,9 @@ class LaunchTest(absltest.TestCase):
     running = play.launch(self.options(), self.out)
     self.addCleanup(running.stop)
     api = f"{running.gui_url}/api/sessions/{running.session}"
-    config = play.seat_config(self.options(checkpoint=slow), running.bot_url)
+    config = play.seat_config(
+        self.options(checkpoint=slow, state="seat_view"), running.bot_url
+    )
     status, raw = _call(
         api + "/seats/1?viewer=oracle",
         {"controller": "remote", "config": config, "autoplay": True},
@@ -331,6 +403,96 @@ class LaunchTest(absltest.TestCase):
           self.out,
       )
     self.assertNotIn("[gui server] ", self.out.getvalue())
+
+  def test_a_taken_port_fails_before_the_bot_or_checkpoint_loads(
+      self,
+  ) -> None:
+    # Another service listens on the GUI's port. The launch stops at once,
+    # naming --port, and never starts the bot server, which is what loads
+    # (downloads, warms up) the checkpoint; main says so as its error.
+    taken = socket.create_server(("127.0.0.1", 0))
+    self.addCleanup(taken.close)
+    port = taken.getsockname()[1]
+    argv = ["--game", "kuhn_poker", "--bot", STAND_IN, "--port", str(port)]
+    with (
+        mock.patch.object(signal, "signal"),
+        mock.patch.object(child_servers, "ChildServer") as child_server,
+    ):
+      with self.assertRaisesRegex(play.LaunchError, rf"--port {port}\b"):
+        play.launch(self.options(port=port), self.out)
+      with self.assertRaises(SystemExit) as stopped:
+        play.main(argv)
+    child_server.assert_not_called()
+    self.assertEqual(self.out.getvalue(), "")
+    self.assertRegex(str(stopped.exception.code), r"^error: .*--port 0")
+
+  def test_port_zero_picks_a_free_port_the_play_address_shows(self) -> None:
+    running = play.launch(self.options(port=0), self.out)
+    self.addCleanup(running.stop)
+    port = urllib.parse.urlsplit(running.play_url).port
+    self.assertNotIn(port, (None, 0))
+    self.assertEqual(urllib.parse.urlsplit(running.gui_url).port, port)
+    self.assertTrue(_get(f"http://127.0.0.1:{port}/api/health"))
+    stopping = threading.Event()
+    stopping.set()
+    with mock.patch.object(sys, "stdout", io.StringIO()) as printed:
+      self.assertEqual(play.serve(running, stopping), 0)
+    self.assertEqual(printed.getvalue(), f"Play {running.play_url}\n")
+
+  def test_a_bot_that_takes_one_state_is_sent_it_with_the_note(
+      self,
+  ) -> None:
+    # The reference server's mcts bot takes only the full state. With no
+    # --state, the launcher sends it that, and prints its one-line note
+    # once, after the bot server's /info and before the GUI server starts.
+    running = play.launch(self.options(bot="mcts", checkpoint=""), self.out)
+    self.addCleanup(running.stop)
+    frame = _get(
+        f"{running.gui_url}/api/sessions/{running.session}?viewer=oracle"
+    )
+    self.assertEqual(frame["seats"][1]["config"]["state"], "full_state")
+    self.assertIsNone(frame["seats"][1].get("failure"))
+    lines = self.out.getvalue().splitlines()
+    notes = [
+        i
+        for i, line in enumerate(lines)
+        if line.startswith("Note: --state full_state")
+    ]
+    self.assertEqual(len(notes), 1, lines)
+    self.assertIn("only state this bot server takes", lines[notes[0]])
+    self.assertIn("kuhn_poker", lines[notes[0]])
+    gui_lines = [
+        i for i, line in enumerate(lines) if line.startswith("[gui server] ")
+    ]
+    self.assertTrue(gui_lines, lines)
+    self.assertLess(notes[0], gui_lines[0])
+
+  def test_a_bot_that_takes_both_states_is_sent_the_seat_view(self) -> None:
+    # The stand-in takes both, so no --state means seat_view and no note
+    # (test_it_opens_the_session_and_the_bot_plays_its_checkpoint).
+    running = play.launch(self.options(bot="random", checkpoint=""), self.out)
+    self.addCleanup(running.stop)
+    frame = _get(
+        f"{running.gui_url}/api/sessions/{running.session}?viewer=oracle"
+    )
+    self.assertEqual(frame["seats"][1]["config"]["state"], "seat_view")
+    self.assertNotIn("Note: --state full_state", self.out.getvalue())
+
+  def test_a_bot_that_refuses_the_given_state_names_the_flag_that_fixes_it(
+      self,
+  ) -> None:
+    # --state still overrides: an explicit seat_view the mcts bot does not
+    # take is refused before the GUI server starts, and the error names
+    # the flag to rerun with.
+    with self.assertRaisesRegex(
+        play.LaunchError,
+        r"takes full_state, not seat_view: rerun with --state full_state\.$",
+    ):
+      play.launch(
+          self.options(bot="mcts", checkpoint="", state="seat_view"), self.out
+      )
+    self.assertNotIn("[gui server] ", self.out.getvalue())
+    self.assertNotIn("Note: --state full_state", self.out.getvalue())
 
   def test_a_seat_the_game_does_not_have_starts_nothing(self) -> None:
     with self.assertRaisesRegex(play.LaunchError, "not a seat"):
