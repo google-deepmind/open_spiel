@@ -68,9 +68,14 @@ Scripted phases (`fold_routed`). When the base is a RoutedPolicy whose
 override is a scripted phase (for example gin's endgame), every node the
 route sends to the override is folded into the dynamics: the override's
 action is applied and the transition continues until a node the base
-decides. A root the route sends to the override is not searched; evaluate
-returns the base's output there. This needs a tree without stochastic
-chance nodes.
+decides. In zero_sum mode the folded plies are played by the override
+alone (only on the rows still folding) and the base is evaluated once per
+expansion, at the node the fold ends at (_fold_routed); the plies, rewards,
+discounts and that leaf are those of evaluating the base at every folded
+ply. Under the per-row vmap of a batched search, a folded ply runs only for
+the rows that still have a folding node (_gated_rows). A root the route
+sends to the override is not searched; evaluate returns the base's output
+there. This needs a tree without stochastic chance nodes.
 
 Outputs. evaluate returns logits log(visit distribution + 1e-8)
 (`act="weights"`) or 0 at mctx's selected action and -inf elsewhere
@@ -119,6 +124,7 @@ import dataclasses
 from typing import Any, NamedTuple, Optional
 
 import jax
+from jax import custom_batching
 import jax.numpy as jnp
 import mctx
 
@@ -345,6 +351,100 @@ def _where(cond, a, b):
     return jnp.where(c, x, y)
 
   return tree_map(sel, a, b)
+
+
+def _gated_rows(fn):
+  """Wraps fn(args, on) with a vmap rule (jax.custom_batching).
+
+  on is bool[N]; fn's outputs are used only where on. Unbatched it is fn.
+  Vmapped, as a search is one program per row (SearchPolicy.search, the
+  Arena's per-row vmap), only the vmapped rows with any `on` run: they are
+  gathered into core.arena.on_rows' chunks and the others get zeros. Each
+  vmapped row's program is fn on that row's inputs, so a row's outputs do not
+  depend on the rows it is gathered with. The routed fold uses it: late in a
+  search a few of hundreds of rows still fold, and without the rule every row
+  runs every folded ply until the deepest fold ends.
+
+  Args:
+    fn: fn(args, on) -> outputs, used only where on.
+
+  Returns:
+    The wrapped function.
+  """
+
+  @custom_batching.custom_vmap
+  def gated(args, on):
+    """Runs fn itself, unbatched.
+
+    Args:
+      args: fn's arguments.
+      on: bool[N], where the outputs are used.
+
+    Returns:
+      fn(args, on).
+    """
+    return fn(args, on)
+
+  @gated.def_vmap
+  def _rule(axis_size, in_batched, args, on):
+    """The batching rule: fn over only the rows some output is used at.
+
+    Args:
+      axis_size: The vmapped axis size.
+      in_batched: Which of (args, on) are batched (pytrees of bools).
+      args: fn's arguments.
+      on: bool, where the outputs are used.
+
+    Returns:
+      (outputs, out_batched).
+    """
+
+    def is_none(x):
+      """Whether `x` is None (a tree_map leaf test).
+
+      Args:
+        x: A node.
+
+      Returns:
+        True for None.
+      """
+      return x is None
+
+    axes = tree_map(lambda b: 0 if b else None, in_batched[0])
+    on_b = (
+        on
+        if in_batched[1]
+        else jnp.broadcast_to(on, (axis_size,) + jnp.shape(on))
+    )
+    need = jnp.any(jnp.reshape(on_b, (axis_size, -1)), axis=1)
+
+    def compute(idx):
+      """Runs fn vmapped over the rows `idx` (None: every row).
+
+      Args:
+        idx: the row indices, or None.
+
+      Returns:
+        The rows' outputs.
+      """
+      if idx is None:
+        sub, sub_on, n = args, on_b, axis_size
+      else:
+        sub = tree_map(
+            lambda ax, x: x if ax is None else x[idx],
+            axes,
+            args,
+            is_leaf=is_none,
+        )
+        sub_on, n = on_b[idx], idx.shape[0]
+      return jax.vmap(fn, in_axes=(axes, 0), axis_size=n)(sub, sub_on)
+
+    shapes = jax.eval_shape(compute, None)
+    zeros = tree_map(lambda sd: jnp.zeros(sd.shape, sd.dtype), shapes)
+    out = arena_lib.on_rows(need, compute, zeros)
+    return out, tree_map(lambda _: True, out)
+
+  return gated
 
 
 def search_chunks(rows: int) -> tuple[int, ...]:
@@ -800,16 +900,36 @@ class SearchPolicy(types.Policy):
     )
 
   def _transition(self, pb, after: After, s_new, key):
-    """The transition into s_new: (Node, reward, discount, logits, value).
+    """The transition into s_new.
+
+    (Node, reward, discount, logits, value, routed); the leaf is evaluated at
+    the new node.
 
     Args:
-      pb: The base params.
-      after: The afterstate.
-      s_new: The new state.
-      key: The key.
+      pb: the base's params.
+      after: the After of the action.
+      s_new: the state after the chance resolution.
+      key: the leaf's PRNG key.
 
     Returns:
-      (Node, reward, discount, logits, value, routed).
+      (node, reward, discount, logits, value, routed).
+    """
+    node, reward, disc, steps = self._transition_dynamics(pb, after, s_new)
+    logits, value, routed = self._leaf(pb, node, steps, key)
+    return node, reward, disc, logits, value, routed
+
+  def _transition_dynamics(self, pb, after: After, s_new):
+    """The transition into s_new without its leaf.
+
+    (Node, reward, discount, every seat's SeatStep [N, P] at the new node).
+
+    Args:
+      pb: the base's params.
+      after: the After of the action.
+      s_new: the state after the chance resolution.
+
+    Returns:
+      (node, reward, discount, steps).
     """
     env = self.env
     was = after.was_terminal
@@ -840,15 +960,32 @@ class SearchPolicy(types.Policy):
     else:
       disc = jnp.ones_like(reward)
     disc = jnp.where(term, F32(0.0), disc)
-    logits, value, routed = self._leaf(pb, node, steps, key)
-    return node, reward, disc, logits, value, routed
+    return node, reward, disc, steps
+
+  def _routed(self, node: Node, steps):
+    """bool[N]: a live node whose mover's InfoState goes to the override.
+
+    The base's route hands it to its override (as _leaf's routed).
+
+    Args:
+      node: the Node.
+      steps: every seat's SeatStep at the node.
+
+    Returns:
+      bool[N].
+    """
+    step_a = tree_map(lambda x: _take(x, jnp.maximum(node.actor, 0)), steps)
+    return jnp.asarray(self._route(step_a.info), jnp.bool_) & ~node.terminal
 
   def _fold(self, pb, node, reward, disc, logits, value, routed, key):
     """Folds plies into the dynamics until a node the search decides.
 
     Or until the end of the hand: single_agent, the other seats act (base
     policy, opponent_rule); fold_routed, a routed node plays the override's
-    action (argmax of the base's logits, the override's one-hot).
+    action (argmax of the base's logits, the override's one-hot). The base is
+    evaluated at every folded ply. zero_sum with fold_routed runs
+    _fold_routed instead, which is equal to this and evaluates the base once,
+    at the node the fold ends at.
 
     Args:
       pb: the base's params.
@@ -934,6 +1071,117 @@ class SearchPolicy(types.Policy):
     )
     return node, reward, disc, logits, value
 
+  def _fold_routed(self, pb, node, reward, disc, steps, key_node, key):
+    """The zero_sum fold_routed fold without the base.
+
+    (Node, reward, discount, SeatSteps) at the node the fold ends at (the search
+    decides there, the hand is over, or env.max_len plies were folded).
+
+    Each folded ply plays the override's action (argmax of its logits on the
+    legal actions) for the live routed rows only; the base, which the
+    per-ply fold (_fold) evaluates at every folded node and whose output it
+    uses only at the last one, is left to the caller's single leaf there.
+    The override is evaluated with the key the per-ply fold's leaf gives it
+    (the key of the transition into the node: key_node, then each folded
+    ply's), and the loop's keys and rule are _fold's, so the folded plies,
+    rewards and discounts are _fold's. The leaf at the end equals _fold's
+    when the base's output does not depend on its key (a network forward).
+
+    Args:
+      pb: the base's params.
+      node: the Node.
+      reward: f32[N], the reward so far.
+      disc: f32[N], the discount so far.
+      steps: every seat's SeatStep at the node.
+      key_node: the key of the transition into the node.
+      key: the fold's PRNG key.
+
+    Returns:
+      (node, reward, discount, steps) at the node the fold ends at.
+    """
+    routed = self._routed(node, steps)
+    ply = _gated_rows(self._fold_ply)
+
+    def active(nd, rt):
+      """The nodes still folding.
+
+      Args:
+        nd: the nodes.
+        rt: whether each is routed.
+
+      Returns:
+        bool[N].
+      """
+      return ~nd.terminal & rt
+
+    def cond(c):
+      """Whether any node still folds (within max_len plies).
+
+      Args:
+        c: the loop carry.
+
+      Returns:
+        bool.
+      """
+      i, nd, rt = c[0], c[1], c[5]
+      return (i < self.env.max_len) & jnp.any(active(nd, rt))
+
+    def body(c):
+      """One folded ply on the active nodes.
+
+      Args:
+        c: the loop carry.
+
+      Returns:
+        The next carry.
+      """
+      i, nd, r, d, st, rt, kn = c
+      on = active(nd, rt)
+      k = x64.fold_in64(key, i)
+      kd, kc, kl = jax.random.split(k, 3)
+      nd2, r2, d2, st2, rt2 = ply((pb, nd, st, kn, kd, kc), on)
+      return (
+          i + jnp.int64(1),
+          _where(on, nd2, nd),
+          jnp.where(on, r + d * r2, r),
+          jnp.where(on, d * d2, d),
+          _where(on, st2, st),
+          jnp.where(on, rt2, rt),
+          kl,
+      )
+
+    _, node, reward, disc, steps, _, _ = jax.lax.while_loop(
+        cond, body, (jnp.int64(0), node, reward, disc, steps, routed, key_node)
+    )
+    return node, reward, disc, steps
+
+  def _fold_ply(self, args, on):
+    """One folded ply of _fold_routed on the rows where `on`.
+
+    Other rows' outputs are unused: the override's action at each node, then
+    the transition. (Node, reward, discount, SeatSteps, routed) after it.
+
+    Args:
+      args: (pb, node, steps, override key, decide key, chance key).
+      on: bool[N], the rows still folding.
+
+    Returns:
+      (node, reward, discount, steps, routed) after the ply.
+    """
+    pb, nd, st, kn, kd, kc = args
+    a_safe = jnp.maximum(nd.actor, 0)
+    step_a = tree_map(lambda x: _take(x, a_safe), st)
+    c_a = tree_map(lambda x: _take(x, a_safe), nd.carries)
+    out = self.base.override_evaluate_rows(pb, c_a, step_a, kn, on)
+    lg = jnp.where(step_a.legal_mask, out.logits.astype(F32), F32(NEG))
+    a, _ = decide_lib.decide(
+        lg, lg > F32(NEG / 2), types.DecisionRule("argmax", 1.0), kd
+    )
+    after = self._after(nd, jnp.maximum(a, 0))
+    s_new = self._resolve_rest(after.state, kc, after.chance_scores)
+    nd2, r2, d2, st2 = self._transition_dynamics(pb, after, s_new)
+    return nd2, r2, d2, st2, self._routed(nd2, st2)
+
   def _recurrent_fn(self, pb, rng, action, node: Node):
     """The mctx recurrent function: one action and its chance resolution.
 
@@ -949,11 +1197,16 @@ class SearchPolicy(types.Policy):
     kc, kl, kf = jax.random.split(rng, 3)
     after = self._after(node, action)
     s_new = self._resolve_rest(after.state, kc, after.chance_scores)
-    node2, r, d, logits, v, routed = self._transition(pb, after, s_new, kl)
-    if self.cfg.mode == "single_agent" or self._route is not None:
-      node2, r, d, logits, v = self._fold(
-          pb, node2, r, d, logits, v, routed, kf
-      )
+    if self.cfg.mode == "zero_sum" and self._route is not None:
+      node2, r, d, steps = self._transition_dynamics(pb, after, s_new)
+      node2, r, d, steps = self._fold_routed(pb, node2, r, d, steps, kl, kf)
+      logits, v, _ = self._leaf(pb, node2, steps, kl)
+    else:
+      node2, r, d, logits, v, routed = self._transition(pb, after, s_new, kl)
+      if self.cfg.mode == "single_agent" or self._route is not None:
+        node2, r, d, logits, v = self._fold(
+            pb, node2, r, d, logits, v, routed, kf
+        )
     return (
         mctx.RecurrentFnOutput(
             reward=r, discount=d, prior_logits=logits, value=v

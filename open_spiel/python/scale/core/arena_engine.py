@@ -28,7 +28,10 @@ Keys: deal i of a job is k_i = fold_in64(job key, i); duplicate deals give
 both rows of k_i one deal key and separate policy keys
 (core.arena.duplicate_keys), otherwise each row gets its own deal
 (core.arena.independent_keys). A numpy uint32[2] job key (core.rng) is
-wrapped as a typed threefry key with the same bits.
+wrapped as a typed threefry key with the same bits. Tables of any design
+(eval.designs) take their keys from `table_keys`, which follows the
+design's KeyPlan with the same per-deal derivation; for swap2's plan it
+equals `deal_keys` bit for bit.
 
 Ply segments: a rollout materialises its TrajectoryBatch, roughly rows x
 plies x num_actions values several times over (behaviour logits, target
@@ -143,6 +146,54 @@ def deal_keys(key, n: int, duplicate: bool):
   return deal.reshape((2 * n,)), pol.reshape((2 * n, 2))
 
 
+def table_keys(key, n: int, plan, num_players: int):
+  """The deal and policy keys of rows (i, r) of n deals of a design.
+
+  (deal_key [n*R], policy_key [n*R, P]) per its eval.designs.KeyPlan: from
+  k_i = fold_in64(key, i), (dk, pk) = split(k_i); row r takes deal key
+  split(dk, D)[deal_index[r]] and the P policy keys of row policy_index[r] of
+  split(pk, U * P) as [U, P].
+
+  With swap2's duplicate plan (deal 0, 0; policy 0, 1) these are
+  core.arena.duplicate_keys(k_i, 1, 2), with its independent plan
+  core.arena.independent_keys(k_i, 2, 2): `deal_keys` exactly.
+
+  Args:
+    key: the job key.
+    n: the deals.
+    plan: the design's KeyPlan.
+    num_players: P.
+
+  Returns:
+    (deal_key [n*R], policy_key [n*R, P]).
+  """
+  deal_index = jnp.asarray(plan.deal_index, jnp.int32)
+  policy_index = jnp.asarray(plan.policy_index, jnp.int32)
+  nd, nu, p = plan.num_deal_keys, plan.num_policy_rows, int(num_players)
+  r = int(deal_index.shape[0])
+  assert policy_index.shape == (r,) and r >= 1, (plan, r)
+  key = rng.to_jax_key(key)
+  ks = jax.vmap(lambda i: x64.fold_in64(key, i))(jnp.arange(n, dtype=jnp.int64))
+
+  def per_deal(k):
+    """One deal's row keys.
+
+    Args:
+      k: the deal's key k_i.
+
+    Returns:
+      (deal keys [R], policy keys [R, P]).
+    """
+    dk, pk = jax.random.split(k)
+    deal = jax.random.split(dk, nd)[deal_index]
+    pol = jax.random.split(pk, nu * p)
+    pol = pol.reshape((nu, p) + pol.shape[1:])[policy_index]
+    return deal, pol
+
+  deal, pol = jax.vmap(per_deal)(ks)
+  return deal.reshape((n * r,)), pol.reshape((n * r, p))
+
+
 class ArenaEngine:
   """eval.payoff.MatchEngine over the Arena / HostArena (module doc).
 
@@ -204,6 +255,23 @@ class ArenaEngine:
       (deal keys, policy keys) over all jobs' rows.
     """
     dks, pks = zip(*(deal_keys(k, n, duplicate) for k in keys))
+    return jnp.concatenate(dks), jnp.concatenate(pks)
+
+  def table_keys(
+      self, keys: Sequence[Any], n: int, plan, num_players: int
+  ) -> tuple[Any, ...]:
+    """table_keys of every job key, concatenated.
+
+    Args:
+      keys: one key per job.
+      n: deals per job.
+      plan: the design's KeyPlan.
+      num_players: P.
+
+    Returns:
+      (deal keys, policy keys).
+    """
+    dks, pks = zip(*(table_keys(k, n, plan, num_players) for k in keys))
     return jnp.concatenate(dks), jnp.concatenate(pks)
 
   def _arena(self, slot_list, cache_key, perspective):

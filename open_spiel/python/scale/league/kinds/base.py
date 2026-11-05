@@ -69,6 +69,7 @@ import jax
 import jax.numpy as jnp
 from jax.sharding import NamedSharding
 from jax.sharding import PartitionSpec
+import numpy as np
 
 from open_spiel.python.scale.core import arena as arena_lib
 from open_spiel.python.scale.core import host_arena
@@ -750,20 +751,70 @@ class Driver:
         raise ValueError(f"learner {name} already has a source")
       self._sources[name] = commit.restore_source(self.arena, snap)
 
-  def _arena(
-      self, league, mesh, learner_slot: arena_lib.Slot, host: bool = False
-  ):
-    """The learner's arena against the league's opponents.
+  def check_table(self, table) -> None:
+    """Raises when a table's perspective shape changes.
+
+    When it differs from the first table this driver trained on. The Arena
+    emits B * M trajectory rows for a [B, M] perspective (B for [B]), so the
+    update's batch shape is the perspective shape. The sampler keeps it fixed
+    for one Lineup and Sides (league.sampler module doc); a change means two
+    seatings share one Arena, which would recompile the update or break a
+    carried source, so it is refused.
 
     Args:
-      league: The league.
-      mesh: The mesh.
-      learner_slot: The learner's slot.
-      host: Whether to build a HostArena.
+      table: the SlotTable.
+
+    Raises:
+      ValueError: the perspective shape changed.
+    """
+    shape = tuple(np.shape(table.perspective_seat))
+    seen = getattr(self, "_perspective_shape", None)
+    if seen is None:
+      self._perspective_shape = shape
+    elif shape != seen:
+      raise ValueError(
+          f"the {self.kind} driver trains on perspective_seat {seen}; a table "
+          f"with perspective_seat {shape} would change the trajectory rows per "
+          "update (one seating per Arena: league.sampler module doc)"
+      )
+
+  def _arena(
+      self,
+      league,
+      mesh,
+      learner_slot: arena_lib.Slot,
+      host: bool = False,
+      credit: str = "seat",
+  ):
+    """The Arena (or HostArena) over the learner slot and the opponents.
+
+    Args:
+      league: the League whose env and opponent slots the Arena plays.
+      mesh: the device mesh, or None.
+      learner_slot: the learner's Slot, seated first.
+      host: a HostArena instead of the in-graph Arena.
+      credit: the Arena's reward credit (core.arena "Credit"); "side" is for
+        the in-graph Arena only.
 
     Returns:
-      The arena.
+      The Arena or HostArena.
+
+    Raises:
+      NotImplementedError: credit is not "seat" and host is set.
     """
+    if credit != "seat":
+      if host:
+        raise NotImplementedError(
+            f"the {self.kind} kind: credit={credit!r} needs the in-graph "
+            "Arena; HostArena emits seat credit only"
+        )
+      return arena_lib.Arena(
+          league.env,
+          [learner_slot, *league.opponent_slots()],
+          perspective_slot=0,
+          mesh=mesh,
+          credit=credit,
+      )
     cls = host_arena.HostArena if host else arena_lib.Arena
     return cls(
         league.env,

@@ -31,11 +31,16 @@ Builders:
   gin_tfv2.card_tokens(...)  the gin card-token transformer (networks.gin_tfv2).
 A key equal to the module default ("lecun" init, value hidden 0, no tanh) is
 left out.
+
+LAZY maps a named network to the module that registers it (catalog.register at
+its import), imported by `get` when that name is asked for, so the name
+resolves with no import by the caller.
 """
 
 from __future__ import annotations
 
 import copy
+import importlib
 from typing import Any, Mapping, Sequence
 
 from open_spiel.python.scale.networks import gin_tfv2
@@ -197,6 +202,16 @@ NAMED: dict[str, dict[str, Any]] = {
 }
 
 
+#: Named network -> the module whose import registers it (imported by `get`).
+LAZY = {
+    name: f"{__name__.rpartition('.')[0]}.card_move_transformer"
+    for name in (
+        "hearts_card_move_transformer_bf16",
+        "euchre_card_move_transformer_bf16",
+    )
+}
+
+
 def register(name: str, config: dict[str, Any]) -> None:
   """Adds a named network config; a name holds one config.
 
@@ -229,6 +244,8 @@ def get(name: str) -> dict[str, Any]:
   Raises:
     KeyError: an unknown name.
   """
+  if name not in NAMED and name in LAZY:
+    importlib.import_module(LAZY[name])
   if name not in NAMED:
     raise KeyError(f"unknown network {name!r} (catalog: {sorted(NAMED)})")
   return copy.deepcopy(NAMED[name])

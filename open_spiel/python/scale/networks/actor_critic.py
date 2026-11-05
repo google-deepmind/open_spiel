@@ -39,12 +39,17 @@ Network config (JSON; every key is a module field, unknown keys raise):
 Outputs (all float32): logits [N, A], value [N], value_logits [N, bins] or
 None, aux {key: ...}. Param tree: torso/..., policy_head/..., value_head/...,
 aux_<key>/.... register_torso / register_policy_head add a module kind, so a
-plugin's network family builds from the same config format.
+plugin's network family builds from the same config format. LAZY_TORSOS and
+LAZY_POLICY_HEADS map an open kind to the module that registers it, imported
+when a config names that kind, so an artifact's recorded network config builds
+with no import by the caller and a process that never builds the kind never
+loads its module.
 """
 
 from __future__ import annotations
 
 import dataclasses
+import importlib
 from typing import Any, Mapping, Optional
 
 import flax.linen as nn
@@ -58,6 +63,26 @@ F32 = jnp.float32
 
 TORSOS = {"mlp": torsos.MLPTorso, "cnn": torsos.CNNTorso}
 POLICY_HEADS = {"dense": heads.DensePolicyHead}
+_NETWORKS = __name__.rpartition(".")[0]
+#: Torso kind -> the module whose import registers it (imported on a miss).
+LAZY_TORSOS = {"card_move_transformer": f"{_NETWORKS}.card_move_transformer"}
+#: Policy head kind -> the module whose import registers it (imported on a
+#: miss).
+LAZY_POLICY_HEADS = {"card_move_pointer": f"{_NETWORKS}.card_move_transformer"}
+
+
+def _load_lazy(
+    kind: str, table: Mapping[str, Any], lazy: Mapping[str, str]
+) -> None:
+  """Imports the module that registers `kind` when `table` lacks it.
+
+  Args:
+    kind: the config's kind.
+    table: TORSOS or POLICY_HEADS.
+    lazy: LAZY_TORSOS or LAZY_POLICY_HEADS.
+  """
+  if kind not in table and kind in lazy:
+    importlib.import_module(lazy[kind])
 
 
 def register_torso(kind: str, module: Any) -> None:
@@ -389,6 +414,7 @@ def _torso(cfg: Mapping[str, Any], compute_dtype: str) -> nn.Module:
     inner = _torso(cfg["inner"], compute_dtype)
     rest.setdefault("dtype", compute_dtype)
     return torsos.RecurrentTorso(inner=inner, **rest)
+  _load_lazy(kind, TORSOS, LAZY_TORSOS)
   if kind not in TORSOS:
     raise ValueError(
         f"unknown torso kind {kind!r}; known {sorted(TORSOS) + ['recurrent']}"
@@ -426,6 +452,7 @@ def build_network(cfg: Mapping[str, Any], num_actions: int) -> ActorCritic:
   torso = _torso(cfg["torso"], cdt)
   ph = dict(cfg["policy_head"])
   kind = ph.pop("kind")
+  _load_lazy(kind, POLICY_HEADS, LAZY_POLICY_HEADS)
   if kind not in POLICY_HEADS:
     raise ValueError(
         f"unknown policy head kind {kind!r}; known {sorted(POLICY_HEADS)}"

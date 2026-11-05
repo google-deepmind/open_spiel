@@ -61,6 +61,15 @@ with train_state "wall_budget" {budget_s, reached_at, of}, and the result's
 the call runs under an eval deadline (`core.deadline`) wall_budget_s +
 eval_grace_s after the start, so an eval still running then raises
 EvalOverBudgetError instead of running on.
+
+Run hooks. A deployment may change when the artifact learner's in-loop evals
+run and when a run stops (register_run_hook): a hook can skip the update-0
+eval, replace the evals' `every` schedule, make every eval due, and stop the
+run after an update, keeping running state in LearnerSlot.tallies (saved in
+every checkpoint). With no hook registered nothing changes.
+
+Stages. The run marks build, evals, first-update and training
+(`metrics.stage`).
 """
 
 from __future__ import annotations
@@ -83,6 +92,9 @@ from open_spiel.python.scale.ckpt import records
 from open_spiel.python.scale.ckpt import run_state
 from open_spiel.python.scale.core import arena as arena_lib
 from open_spiel.python.scale.core import deadline as deadline_lib
+from open_spiel.python.scale.core import hash_compat
+from open_spiel.python.scale.core import hooks as hooks_lib
+from open_spiel.python.scale.core import sides as sides_lib
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.core import x64
 from open_spiel.python.scale.envs import registry as env_registry
@@ -96,6 +108,7 @@ from open_spiel.python.scale.league import config_common as common
 from open_spiel.python.scale.league import controller as controller_lib
 from open_spiel.python.scale.league import kinds
 from open_spiel.python.scale.league import loop
+from open_spiel.python.scale.league import payoff_views
 from open_spiel.python.scale.league import refs
 from open_spiel.python.scale.league import resume
 from open_spiel.python.scale.league import sampler
@@ -282,12 +295,114 @@ def register_on_commit(
     _ALWAYS_ON_COMMIT.append(name)
 
 
+# -- run hooks -----------------------------------------------------------------
+class UpdateVerdict(NamedTuple):
+  """A run hook's decision after an update of the artifact learner.
+
+  Attributes:
+    evals_due: None (each in-loop eval's own `every` schedule), or whether
+      every in-loop eval is due at this update (replacing that schedule; the
+      last update always evaluates).
+    force: every in-loop eval and the exact eval are due at this update.
+    exact: the exact eval is due at this update.
+    stop: None, or why the run stops after this update (League.stopped,
+      committed; num_iterations stays the ceiling).
+  """
+
+  evals_due: Optional[bool] = None
+  force: bool = False
+  exact: bool = False
+  stop: Optional[str] = None
+
+
+RunHookFactory = Callable[[Any], Any]
+_RUN_HOOKS: list[Any] = []
+
+#: The hooks a run hook defines (core.hooks; register_run_hook). A hook that
+#: defines neither is refused when the run starts (run_hooks).
+RUN_HOOKS = hooks_lib.Protocol(
+    "run hook",
+    [
+        hooks_lib.method(
+            "initial_eval",
+            "initial_eval() -> bool: whether a fresh run evaluates its "
+            "artifact learner at update 0 (absent: True)",
+        ),
+        hooks_lib.method(
+            "after_update",
+            "after_update(lg, ls, u, metrics, row) -> None or an "
+            "UpdateVerdict, after each update of the artifact learner",
+        ),
+    ],
+    at_least_one=True,
+)
+
+
+def register_run_hook(factory: RunHookFactory) -> None:
+  """Adds a run hook factory.
+
+  factory(cfg) -> None or a hook, called at the start of every run() of a
+  LeagueRunConfig cfg. A hook may define:
+
+    initial_eval() -> bool: whether a fresh run evaluates its artifact
+      learner at update 0 (default True);
+    after_update(lg, ls, u, metrics, row) -> None or an UpdateVerdict:
+      called after each update u of the artifact learner (slot ls, the
+      update's metrics), before its train row is written; it may add
+      entries to `row` and keep running state in ls.tallies.
+
+  Registering a factory twice has no effect. A hook that defines neither, or
+  defines one that is not callable, is refused when the run starts
+  (RUN_HOOKS).
+
+  Args:
+    factory: the hook factory.
+
+  Raises:
+    TypeError: the factory is not callable.
+  """
+  if not callable(factory):
+    raise TypeError(f"run hook factory {factory!r} is not callable")
+  if factory not in _RUN_HOOKS:
+    _RUN_HOOKS.append(factory)
+
+
+def run_hooks(cfg: Any) -> list[Any]:
+  """The hooks of a run of cfg (register_run_hook).
+
+  Args:
+    cfg: the run config.
+
+  Returns:
+    The hooks the registered factories return for cfg (None dropped).
+
+  Raises:
+    core.hooks.MissingHookError: a hook defines none of RUN_HOOKS.
+    core.hooks.MalformedHookError: a hook that is not callable.
+  """
+  return [
+      RUN_HOOKS.check(h)
+      for h in (f(cfg) for f in list(_RUN_HOOKS))
+      if h is not None
+  ]
+
+
 # -- in-loop evals -------------------------------------------------------------
-# Game-agnostic in-loop evaluators, defined on every 2-player game:
-#   vs_uniform  against the uniform-random policy (SAMPLE)
+# Game-agnostic in-loop evaluators:
+#   vs_uniform  against the uniform-random policy (SAMPLE), on any sides: head
+#               to head at two sides (bridge: swap2 tables scored by the env's
+#               pair scorer), and at more than two the learner on one side
+#               against a field of uniform players (Evaluator.vs_field, its
+#               side return per deal under InLoopEval.design)
 #   vs_mcts     against the random-rollout MCTS bot with InLoopEval.simulations
-#               simulations (perfect-information games only)
+#               simulations (perfect-information two-player games only: the
+#               search is two-player)
 GENERIC_EVALS = ("vs_uniform", "vs_mcts")
+
+
+#: InLoopEval designs: "auto", or a field design at more than two sides
+#: (league.payoff_views.FIELD_DESIGNS).
+EVAL_DESIGNS = ("auto", "cyclic", "cyclic+reversed")
 
 
 class _EvalEntry(NamedTuple):
@@ -380,6 +495,11 @@ class InLoopEval:
     reference: a reference eval's reference.
     label: the metric key.
     simulations: vs_mcts's simulations per move (0 for every other eval).
+    design: the duplicate seating design of a field eval at more than two
+      sides ("auto": cyclic; or "cyclic+reversed"); at two sides only
+      "auto" (the seat-swapped pair). Left out of the config hash at its
+      default (core.hash_compat.added). Checked against the env's sides
+      when the eval is built.
   """
 
   name: str
@@ -389,8 +509,22 @@ class InLoopEval:
   reference: Optional[Any] = None
   label: str = ""
   simulations: int = 0
+  design: str = hash_compat.added("auto")
 
   def __post_init__(self):
+    if not isinstance(self.design, str):
+      raise TypeError(
+          f"eval {self.name!r}: design must be a str, got {self.design!r}"
+      )
+    if self.design not in EVAL_DESIGNS:
+      raise ValueError(
+          f"eval {self.name!r}: design {self.design!r} not in {EVAL_DESIGNS}"
+      )
+    if self.design != "auto" and self.name != "vs_uniform":
+      raise ValueError(
+          f"eval {self.name!r}: design {self.design!r}: only vs_uniform plays "
+          "a field design"
+      )
     known = eval_names()
     assert self.name in known or self.name in GENERIC_EVALS, (
         self.name,
@@ -474,6 +608,11 @@ class LeagueRunConfig:
       never reads them.
     on_commit: registered on-commit hook names (`register_on_commit`).
     notes: free text.
+    league_evaluator: "" (default: the env's registered payoff Evaluator,
+      else the League's own) or the name of a payoff Evaluator registered
+      with register_league_evaluator(env, build, name=...): an explicit
+      opt-in for this run's payoff cells and gate (payoff="evaluator" only;
+      core.hash_compat.added: left out of the config hash at "").
   """
 
   name: str
@@ -495,6 +634,7 @@ class LeagueRunConfig:
   metadata: Mapping[str, str] = dataclasses.field(default_factory=dict)
   on_commit: tuple[Any, ...] = ()
   notes: str = ""
+  league_evaluator: str = hash_compat.added("")
 
   def __post_init__(self):
     assert self.env in common.env_names(), self.env
@@ -528,6 +668,15 @@ class LeagueRunConfig:
     if unknown:
       raise KeyError(
           f"on_commit hooks {unknown} are not registered ({sorted(_ON_COMMIT)})"
+      )
+    if not isinstance(self.league_evaluator, str):
+      raise TypeError(
+          f"league_evaluator is a str, got {self.league_evaluator!r}"
+      )
+    if self.league_evaluator and self.league.payoff != "evaluator":
+      raise ValueError(
+          f"league_evaluator {self.league_evaluator!r} plays the payoff "
+          f"cells; league.payoff is {self.league.payoff!r}, not 'evaluator'"
       )
     names = [o.name for o in self.fixed_opponents]
     for o in self.fixed_opponents:
@@ -568,7 +717,7 @@ class LeagueRunConfig:
     games = eval_names()
     for ev in evals:
       if ev.name in GENERIC_EVALS:
-        continue  # any 2-player game (eval.match.Evaluator checks at build)
+        continue  # any game (build_generic_eval checks the sides at build)
       if games[ev.name] != self.env:
         raise ValueError(
             f"eval {ev.name!r} is defined on {games[ev.name]!r}, "
@@ -698,6 +847,109 @@ def scratch_dir_for(
   )
 
 
+# -- payoff evaluators ---------------------------------------------------------
+# env name -> build(cfg, env, mesh) -> the eval.match.Evaluator of the
+# league's payoff cells and gate (League(evaluator=...)).
+_LEAGUE_EVALUATORS: dict[str, Callable[..., Any]] = {}
+# evaluator name -> (env name, build): payoff Evaluators a run opts into by
+# name (LeagueRunConfig.league_evaluator).
+_NAMED_LEAGUE_EVALUATORS: dict[str, tuple[Any, ...]] = {}
+
+
+def register_league_evaluator(
+    env: str, build_fn: Callable[..., Any], *, name: str = ""
+) -> None:
+  """Registers a payoff Evaluator of payoff="evaluator" leagues on `env`.
+
+  build_fn(cfg, env, mesh) -> an eval.match.Evaluator (for example a game's
+  duplicate scoring or row cap). Without a name it is the Evaluator of every
+  such league on env; with one, only of runs whose
+  LeagueRunConfig.league_evaluator names it (an explicit opt-in). Without
+  either the League builds the default Evaluator over the env (its pair
+  scorer included).
+
+  Args:
+    env: the game name.
+    build_fn: the builder.
+    name: "" for the env's default, else the name a run opts in with.
+
+  Raises:
+    TypeError: build_fn is not callable, or name is not a str.
+    ValueError: another builder is registered for env (or under name).
+  """
+  if not callable(build_fn):
+    raise TypeError(f"league evaluator builder {build_fn!r} is not callable")
+  if not isinstance(name, str):
+    raise TypeError(f"league evaluator name is a str, got {name!r}")
+  if name:
+    old = _NAMED_LEAGUE_EVALUATORS.get(name)
+    if old is not None and old != (env, build_fn):
+      raise ValueError(
+          f"a league evaluator named {name!r} is already registered"
+      )
+    _NAMED_LEAGUE_EVALUATORS[name] = (env, build_fn)
+    return
+  old = _LEAGUE_EVALUATORS.get(env)
+  if old is not None and old is not build_fn:
+    raise ValueError(f"a league evaluator is already registered for {env!r}")
+  _LEAGUE_EVALUATORS[env] = build_fn
+
+
+def league_evaluator_names() -> tuple[str, ...]:
+  """The names runs may opt into (LeagueRunConfig.league_evaluator), sorted.
+
+  Returns:
+    The names.
+  """
+  return tuple(sorted(_NAMED_LEAGUE_EVALUATORS))
+
+
+def league_evaluator(cfg: LeagueRunConfig, env: types.Env, mesh=None):
+  """The registered payoff Evaluator of cfg's league.
+
+  The one cfg.league_evaluator names, else the env's
+  (register_league_evaluator), else None (the League's default); None too
+  when the league plays no sampled payoffs.
+
+  Args:
+    cfg: the run config.
+    env: the run's env.
+    mesh: the device mesh.
+
+  Returns:
+    The Evaluator, or None.
+
+  Raises:
+    KeyError: cfg names an evaluator nobody registered.
+    ValueError: the named evaluator is registered for another env.
+    TypeError: the builder returned something other than an Evaluator.
+  """
+  name = getattr(cfg, "league_evaluator", "")
+  if name:
+    if name not in _NAMED_LEAGUE_EVALUATORS:
+      raise KeyError(
+          f"league_evaluator {name!r} is not registered "
+          f"({league_evaluator_names()})"
+      )
+    want, fn = _NAMED_LEAGUE_EVALUATORS[name]
+    if want != cfg.env:
+      raise ValueError(
+          f"league_evaluator {name!r} is registered for env {want!r}, the "
+          f"run plays {cfg.env!r}"
+      )
+  else:
+    fn = _LEAGUE_EVALUATORS.get(cfg.env)
+  if fn is None or cfg.league.payoff != "evaluator":
+    return None
+  ev = fn(cfg, env, mesh)
+  if not isinstance(ev, match.Evaluator):
+    raise TypeError(
+        f"the league evaluator of {cfg.env!r} returned {type(ev).__name__}, "
+        "not an eval.match.Evaluator"
+    )
+  return ev
+
+
 def build(
     cfg: LeagueRunConfig,
     run_dir: str,
@@ -707,6 +959,7 @@ def build(
     data_dir: Optional[str] = None,
     scratch_dir: Optional[str] = None,
     on_update=None,
+    evaluator=None,
 ) -> loop.League:
   """The League of cfg, with its members under run_dir.
 
@@ -718,6 +971,8 @@ def build(
     data_dir: BC from recorded shards.
     scratch_dir: a local dir for kinds that need one.
     on_update: called after each update.
+    evaluator: the payoff Evaluator (default: the registered one,
+      league_evaluator, else the League's own).
 
   Returns:
     The League.
@@ -750,6 +1005,8 @@ def build(
       )
     fixed[o.name] = (pol, params, o.rule)
   store = artifact_store.ArtifactStore(os.path.join(run_dir, STORE_DIR))
+  if evaluator is None:
+    evaluator = league_evaluator(cfg, env, mesh)
   return loop.League(
       env,
       driver.policy,
@@ -764,6 +1021,7 @@ def build(
       git_commit=git_commit,
       driver=driver,
       on_update=on_update,
+      evaluator=evaluator,
   )
 
 
@@ -786,6 +1044,45 @@ def is_timing_key(key: str) -> bool:
     True for a timing.
   """
   return key == "seconds" or key.endswith("_seconds")
+
+
+#: The metrics prefix of device memory rows (device_memory_row).
+MEM_PREFIX = "mem"
+_MEMORY_STATS = ("bytes_in_use", "peak_bytes_in_use", "bytes_limit")
+_NO_MEMORY_STATS_LOGGED: list[bool] = []
+
+
+def device_memory_row(
+    devices: Optional[Sequence[Any]] = None,
+) -> dict[str, int]:
+  """Device memory now, from each local device's memory_stats().
+
+  {bytes_in_use, peak_bytes_in_use: the largest over the devices;
+  bytes_limit: the smallest}, written by run() after every update as
+  mem/<name> (OOM headroom and leaks before a long run dies). A backend
+  without memory stats (CPU) gives {} and one info line per process.
+
+  Args:
+    devices: the devices (default jax.local_devices()).
+
+  Returns:
+    The row.
+  """
+  stats = [d.memory_stats() for d in (devices or jax.local_devices())]
+  stats = [st for st in stats if st]
+  if not stats:
+    if not _NO_MEMORY_STATS_LOGGED:
+      _NO_MEMORY_STATS_LOGGED.append(True)
+      logging.info(
+          "league run: the devices report no memory_stats(); no mem/ rows"
+      )
+    return {}
+  out: dict[str, int] = {}
+  for k in _MEMORY_STATS:
+    vals = [int(st[k]) for st in stats if k in st]
+    if vals:
+      out[k] = min(vals) if k == "bytes_limit" else max(vals)
+  return out
 
 
 def league_held(row: Mapping[str, Any]) -> tuple[Any, ...]:
@@ -868,13 +1165,17 @@ def build_exact_eval(
 def _exact_row(tree, lg: loop.League, ls) -> dict[str, Any]:
   """{exploitability, nash_conv} of the learner's policy (SAMPLE rule).
 
+  {nash_conv} alone in a game of more than two players, where NashConv / P is
+  not a distance to an equilibrium (it is OpenSpiel's exploitability only for
+  two-player zero-sum games).
+
   Args:
-    tree: The game tree.
-    lg: The league.
-    ls: The learner slot.
+    tree: the env's exploitability.GameTree.
+    lg: the League.
+    ls: the learner slot.
 
   Returns:
-    {exploitability, nash_conv}.
+    The metrics row.
   """
   r = exploitability.exploitability(
       lg.env,
@@ -883,6 +1184,8 @@ def _exact_row(tree, lg: loop.League, ls) -> dict[str, Any]:
       types.SAMPLE,
       tree=tree,
   )
+  if int(lg.env.num_players) != 2:
+    return {"nash_conv": float(r.nash_conv)}
   return {
       "exploitability": float(r.exploitability),
       "nash_conv": float(r.nash_conv),
@@ -921,6 +1224,35 @@ def _summary(lg: loop.League, rec: Mapping[str, Any]) -> dict[str, Any]:
 EVAL_SERIES = "eval"  # an in-loop eval's series mean: eval/<key>
 
 
+def set_eval_series(prefix: str) -> None:
+  """Sets EVAL_SERIES, the prefix of an in-loop eval's series mean.
+
+  The series is named <prefix>/<key>.
+
+  For a deployment whose tracking names its eval series otherwise. Set it
+  once, at import (a plugin), before the run emits metrics.
+
+  Args:
+    prefix: a non-empty string with no "/".
+
+  Raises:
+    ValueError: prefix is not a non-empty string without "/".
+  """
+  global EVAL_SERIES
+  if not isinstance(prefix, str) or not prefix or "/" in prefix:
+    raise ValueError(
+        "an eval series prefix is a non-empty string without '/', got "
+        f"{prefix!r}"
+    )
+  EVAL_SERIES = prefix
+
+
+#: What a run's metrics step counts: the league's updates (updates_total).
+#: run() records it in the writer's params as "step_unit" (a tracking sink
+#: labels the run's x axis with it), and every series line it emits carries it.
+STEP_UNIT = "updates"
+
+
 def eval_series_mean(key: str, est) -> dict[str, Any]:
   """An in-loop eval's estimate as the series mean of its n samples.
 
@@ -953,7 +1285,43 @@ def eval_series_mean(key: str, est) -> dict[str, Any]:
   }
 
 
-def _eval_row(
+def eval_estimate(ev: InLoopEval, evaluator, ent, key) -> tuple[Any, ...]:
+  """(Estimate, deals, variance ratio) of one in-loop eval.
+
+  The head-to-head against the reference at two sides, and at more than two
+  sides the subject's side return against a field of the reference (vs_field,
+  no variance ratio: nan).
+
+  Args:
+    ev: the InLoopEval.
+    evaluator: its Evaluator.
+    ent: the subject Entrant.
+    key: the eval key.
+
+  Returns:
+    (Estimate, deals, variance ratio).
+
+  Raises:
+    ValueError: more than two sides and no reference configured.
+  """
+  sides = match.EVALUATOR_HOOKS.get(evaluator, "sides")
+  if sides is None or sides.num_sides == 2:
+    r = evaluator.vs_reference(ent, ev.deals, key)
+    return r.mean, r.n_deals, float(r.variance_reduction)
+  if evaluator.config.reference is None:
+    raise ValueError(f"eval {ev.key}: no reference configured")
+  res = evaluator.vs_field(
+      ent,
+      [evaluator.config.reference()],
+      [1.0],
+      ev.deals,
+      key,
+      design=payoff_views.resolve_design(ev.design, sides),
+  )
+  return res.position_score(0), res.n_deals, float("nan")
+
+
+def eval_row(
     ev: InLoopEval,
     evaluator,
     lg: loop.League,
@@ -980,26 +1348,26 @@ def _eval_row(
   pol, params = lg.driver.artifact(ls)  # what the run publishes
   ent = match.Entrant(f"{ls.name}@{u}", pol, params, types.ARGMAX)
   key = x64.fold_in64(jax.random.key(ev.seed), np.int64(u))
-  r = evaluator.vs_reference(ent, ev.deals, key)
+  est, n_deals, vr = eval_estimate(ev, evaluator, ent, key)
   name = ev.key
   if series_step is not None:
     metrics_lib.emit_series(
         int(series_step),
         {},
-        step_unit="updates",
-        mean=eval_series_mean(name, r.mean),
+        step_unit=STEP_UNIT,
+        mean=eval_series_mean(name, est),
     )
   row = {
-      f"{name}/mean": r.mean.mean,
-      f"{name}/se": r.mean.se,
-      f"{name}/lo": r.mean.lo,
-      f"{name}/hi": r.mean.hi,
-      f"{name}/n_deals": int(r.n_deals),
+      f"{name}/mean": est.mean,
+      f"{name}/se": est.se,
+      f"{name}/lo": est.lo,
+      f"{name}/hi": est.hi,
+      f"{name}/n_deals": int(n_deals),
   }
   # The duplicate-deal variance ratio is undefined when the pair SE is 0 (inf:
-  # every pair sums to zero; nan: every game scored the same). The metrics
-  # writer refuses non-finite values, so the row says which case it is.
-  vr = float(r.variance_reduction)
+  # every pair sums to zero; nan: every game scored the same), and for a pair
+  # scorer or a field table, which have no unpaired counterpart (nan). The
+  # metrics writer refuses non-finite values, so the row says which case it is.
   row[f"{name}/variance_reduction_defined"] = int(np.isfinite(vr))
   if np.isfinite(vr):
     row[f"{name}/variance_reduction"] = vr
@@ -1060,7 +1428,21 @@ def build_generic_eval(ev: InLoopEval, env: types.Env, mesh=None):
 
   Raises:
     KeyError: not a generic eval.
+    ValueError: vs_mcts on a game that is not two-player, or a design not
+      valid for the env's sides.
   """
+  sides = sides_lib.sides_of(env)
+  if ev.design != "auto" and sides.num_sides == 2:
+    raise ValueError(
+        f"eval {ev.key}: design {ev.design!r} is a field design; {env.name} "
+        "has two sides (the seat-swapped pair: design 'auto')"
+    )
+  payoff_views.resolve_design(ev.design, sides)
+  if ev.name == "vs_mcts" and int(env.num_players) != 2:
+    raise ValueError(
+        f"eval {ev.key}: vs_mcts is two-player (its search is); {env.name} has "
+        f"{env.num_players} players"
+    )
   if ev.name == "vs_uniform":
 
     ref = match.Entrant(
@@ -1575,7 +1957,15 @@ def run(
   total = cfg.run_updates()
   rows, upd_rows = [], []
   last_heldout: list[Any] = [None]
-  state = dict(writer=None, evaluators=[], exact=None, clock={})
+  state = dict(
+      writer=None, evaluators=[], exact=None, clock={}, first_update=True
+  )
+  hooks = run_hooks(cfg)
+  initial_eval = all(
+      fn()
+      for fn in (RUN_HOOKS.get(h, "initial_eval") for h in hooks)
+      if fn is not None
+  )
 
   exact_every = exact_eval_every(total)
 
@@ -1593,7 +1983,7 @@ def run(
     for ev, evaluator in state["evaluators"]:
       if due(ev):
         row.update(
-            _eval_row(
+            eval_row(
                 ev, evaluator, lg, ls, u, series_step=int(lg.updates_total)
             )
         )
@@ -1603,8 +1993,14 @@ def run(
       state["writer"].write(int(lg.updates_total), row, prefix="eval")
 
   def before(lg: loop.League, ls) -> None:
-    if ls.name == cfg.artifact_learner and int(ls.updates) == 0:
+    if (
+        ls.name == cfg.artifact_learner
+        and int(ls.updates) == 0
+        and initial_eval
+    ):
       evaluate(lg, ls, 0, lambda ev: True, exact_due=True)
+    if state["first_update"]:
+      metrics_lib.stage("first-update")
     # Throughput clock: this learner's rollout + update, evals excluded.
     state["clock"][ls.name] = (
         time.perf_counter(),
@@ -1636,6 +2032,12 @@ def run(
       if (every and u % every == 0) or u == total:
         last_heldout[0] = lg.driver.heldout_metrics(ls)
         row.update(last_heldout[0])
+    verdicts = []
+    for h in hooks if main else ():
+      after = RUN_HOOKS.get(h, "after_update")
+      v = None if after is None else after(lg, ls, u, m, row)
+      if v is not None:
+        verdicts.append(UpdateVerdict(*v))
     held = getattr(lg.learner, "held_metrics", lambda: ())()
     state["writer"].write(
         step,
@@ -1643,16 +2045,53 @@ def run(
         prefix="train",
         held=[f"{ls.name}/{k}" for k in held],
     )
+    mem = device_memory_row()
+    if mem:
+      state["writer"].write(step, mem, prefix=MEM_PREFIX)
+    if state["first_update"]:
+      state["first_update"] = False
+      metrics_lib.stage("training")
     if main:
       upd_rows.append(row)
+      stop = next((v.stop for v in verdicts if v.stop is not None), None)
+      if stop is not None and not lg.stopped:
+        logging.info(
+            "league run: a run hook stops the run after update %d: %s", u, stop
+        )
+        lg.stopped = True
+        lg.stop_reason = stop
+      force = any(v.force for v in verdicts)
+      sched = [v.evals_due for v in verdicts if v.evals_due is not None]
+      on = any(sched) if sched else None
+
+      def due(ev):
+        """Whether in-loop eval `ev` runs after this update.
+
+        Its own `every` schedule, unless a run hook set the schedule; the
+        last update and a forced update run every eval.
+
+        Args:
+          ev: The eval.
+
+        Returns:
+          True when it runs.
+        """
+        return (u % ev.every == 0 if on is None else on) or u == total or force
+
       evaluate(
           lg,
           ls,
           u,
-          lambda ev: u % ev.every == 0 or u == total,
-          exact_due=u % exact_every == 0 or u == total,
+          due,
+          exact_due=(
+              u % exact_every == 0
+              or u == total
+              or force
+              or any(v.exact for v in verdicts)
+          ),
       )
 
+  metrics_lib.stage("build")
   lg = build(
       cfg,
       run_dir,
@@ -1701,6 +2140,7 @@ def run(
         start,
         int(lg.updates_total),
     )
+  metrics_lib.stage("evals")
   state["evaluators"] = build_evals(cfg, lg.env, mesh, run_dir)
   state["exact"] = build_exact_eval(cfg, lg.env, lg.slot_policy)
   state["writer"] = metrics_lib.MetricsWriter(
@@ -1712,6 +2152,9 @@ def run(
       sinks=sinks,
   )
   writer = state["writer"]
+  # The run's x axis is the trainer's to name (STEP_UNIT), set before any
+  # row: a sink that labels the run's axis takes it from here.
+  writer.params({"step_unit": STEP_UNIT})
   if run_id is not None or attempt_id is not None:
     # The run's identity is a setting of this attempt, not a series.
     ids = records.encode({
@@ -2011,6 +2454,7 @@ def one_slot(
     eval: Any = None,  # pylint: disable=redefined-builtin
     metadata: Optional[Mapping[str, str]] = None,
     notes: str = "",
+    lineup: Optional[Any] = None,
 ) -> LeagueRunConfig:
   """A plain run: learner "main" under controller fixed_mix.
 
@@ -2027,9 +2471,11 @@ def one_slot(
     policy_kwargs: the network's arch_kwargs.
     learner_rule: the learner's decision rule.
     self_play: every seat is the learner and every seat a perspective (B * P
-      rows); else the learner sits at seat row % P against `opponents`
-      (refs.FixedOpponent) mixed by `weights` (default uniform), with the
-      table drawn once.
+      rows); else the learner holds one side (seat row % P in a two-player
+      game) against `opponents` (refs.FixedOpponent) mixed by `weights`
+      (default uniform), every other side drawn independently from that mix
+      (league.sampler.draw_table), or seated by `lineup` (a
+      core.sides.Lineup), with the table drawn once.
     opponents: the fixed opponents.
     weights: the opponents' mix.
     keep_every: iterations between keeps.
@@ -2038,12 +2484,21 @@ def one_slot(
     eval: an InLoopEval, a tuple of them, or None.
     metadata: free-form string labels recorded with the run.
     notes: free text recorded with the run.
+    lineup: a core.sides.Lineup seating the sides (not with self_play).
 
   Returns:
     The LeagueRunConfig.
+
+  Raises:
+    ValueError: a lineup with self_play.
   """
   if self_play:
     assert not opponents and not weights, "self-play has no opponents"
+    if lineup is not None:
+      raise ValueError(
+          "one_slot: self_play seats the learner on every seat; a lineup is "
+          "for a run against opponents"
+      )
     ctl = dict(learner="main", self_play=1.0, weights={})
   else:
     assert opponents, "a non-self-play run needs opponents"
@@ -2064,6 +2519,7 @@ def one_slot(
       redraw="on_change",
       self_play_seats="all" if self_play else "one",
       algo=learner.kind,
+      lineup=lineup,
   )
   return LeagueRunConfig(
       name=name,
@@ -2109,6 +2565,7 @@ def snapshot_pool(
     eval: Any = None,  # pylint: disable=redefined-builtin
     metadata: Optional[Mapping[str, str]] = None,
     notes: str = "",
+    lineup: Optional[Any] = None,
 ) -> LeagueRunConfig:
   """Self-play against a lagged snapshot plus a pool of harvested snapshots.
 
@@ -2120,7 +2577,10 @@ def snapshot_pool(
   defaults. The pool is 1 + pool_slots single-member Arena slots
   (pool_layout "slots": no per-row gather of a large network); the rest of
   the harvest waits off the Arena (bench). The table is drawn per round and
-  the round's hands continue across its updates.
+  the round's hands continue across its updates. With more than two sides
+  (or two sides of several seats) the learner holds one side and every
+  other side draws its own opponent from the round's mix
+  (league.sampler.draw_table), or the sides are seated by `lineup`.
 
   Args:
     name: the run name.
@@ -2143,6 +2603,7 @@ def snapshot_pool(
     eval: an InLoopEval, a tuple of them, or None.
     metadata: free-form string labels recorded with the run.
     notes: free text recorded with the run.
+    lineup: a core.sides.Lineup seating the sides.
 
   Returns:
     The LeagueRunConfig.
@@ -2161,6 +2622,7 @@ def snapshot_pool(
       pool_layout="slots",
       bench=True,
       algo="pg",
+      lineup=lineup,
   )
   ctl = dict(
       main="main",

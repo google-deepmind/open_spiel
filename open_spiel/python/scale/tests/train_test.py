@@ -299,8 +299,25 @@ def test_run_logs_telemetry_and_keeps_settings_out_of_the_series(tmp_path):
       "update_seconds",
       "frames_per_s",
       "decisions_per_s",
+      "rollout_seconds",  # phase timers (kinds.PG)
+      "learn_seconds",
+      "approx_kl_max",  # the update's largest minibatch approx_kl
   ):
     assert all(PAIR + k in r for r in upd), k
+  for r in upd:
+    assert r[PAIR + "approx_kl_max"] >= r[PAIR + "approx_kl"] - 1e-9
+    assert r[PAIR + "rollout_seconds"] + r[PAIR + "learn_seconds"] <= (
+        r[PAIR + "update_seconds"] + 1e-6
+    )
+    mods = [
+        k[len(PAIR + "grad_norm/") :]
+        for k in r
+        if k.startswith(PAIR + "grad_norm/")
+    ]
+    assert mods, sorted(r)
+    for mod in mods:  # per module, beside the global update norms
+      assert r[PAIR + f"update_norm/{mod}"] >= 0.0
+      assert r[PAIR + f"update_ratio/{mod}"] >= 0.0
   settings = (
       "train/main/lr",
       "train/main/ent_coef_effective",
@@ -315,6 +332,7 @@ def test_run_logs_telemetry_and_keeps_settings_out_of_the_series(tmp_path):
   params = json.loads((ck / "metrics" / metrics.PARAMS_NAME).read_text())
   for k in settings:
     assert k in params, k
+  assert params["step_unit"] == "updates"  # the trainer names its x axis
   expl = [
       (r["step"], r["eval/exploitability"])
       for r in rows

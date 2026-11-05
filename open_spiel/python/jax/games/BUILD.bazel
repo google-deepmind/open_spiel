@@ -109,6 +109,23 @@ py_library(
 )
 
 py_library(
+    name = "euchre",
+    srcs = ["euchre.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "euchre_golden",
+    srcs = ["euchre_golden.py"],
+    strict_deps = True,
+)
+
+py_library(
     name = "game",
     srcs = ["game.py"],
     strict_deps = True,
@@ -150,6 +167,17 @@ py_library(
         "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//jax",
         "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "hearts",
+    srcs = ["hearts.py"],
+    strict_deps = True,
+    deps = [
+        ":game",
+        ":interop",
+        "@py_deps//jax",
     ],
 )
 
@@ -248,6 +276,7 @@ py_library(
     deps = [
         ":bridge",
         ":game",
+        ":hearts",
         ":no_limit_holdem",
         ":optional_pyspiel_games",
         ":registry",
@@ -316,9 +345,11 @@ py_library(
         ":connect_four",
         ":dark_hex",
         ":dark_hex_ir",
+        ":euchre",
         ":game",
         ":go",
         ":gomoku",
+        ":hearts",
         ":hex",
         ":kuhn_poker",
         ":leduc_poker",
@@ -379,12 +410,8 @@ py_test(
 
 py_test(
     name = "bridge_test",
-    timeout = "long",
     srcs = ["bridge_test.py"],
     data = ["//open_spiel/python/jax/games:all_files"],
-    tags = [
-        "manual",
-    ],
     deps = [
         ":bridge",
         ":bridge_reference",
@@ -420,6 +447,28 @@ py_test(
 )
 
 py_test(
+    name = "euchre_test",
+    timeout = "long",
+    srcs = ["euchre_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":euchre",
+        ":euchre_golden",
+        ":game",
+        ":openspiel_equivalence",
+        ":registry",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
     name = "games_test",
     timeout = "long",
     srcs = ["games_test.py"],
@@ -444,12 +493,8 @@ py_test(
 
 py_test(
     name = "go_test",
-    timeout = "long",
     srcs = ["go_test.py"],
     data = ["//open_spiel/python/jax/games:all_files"],
-    tags = [
-        "manual",
-    ],
     deps = [
         ":go",
         "//open_spiel/python/pybind11:pyspiel",
@@ -466,6 +511,21 @@ py_test(
     data = ["//open_spiel/python/jax/games:all_files"],
     deps = [
         ":gomoku",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "hearts_test",
+    srcs = ["hearts_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":hearts",
+        ":registry",
         "//open_spiel/python/pybind11:pyspiel",
         "@py_deps//absl/testing:absltest",
         "@py_deps//absl/testing:parameterized",

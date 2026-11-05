@@ -15,8 +15,10 @@
 """The one estimate behind every Evaluator number: mean, SE and 95% CI.
 
 f64 numpy. The SE is the sample standard deviation (ddof=1) over sqrt(n), and
-the interval is the normal one, mean +- Z95 * SE (the unit of a sample is one
-duplicate deal pair, n is in the hundreds or more). Raises ValueError on
+the interval is the normal one, mean +- Z95 * SE. The unit of a sample is
+one deal with all its duplicate replays: a seat-swapped pair in two-player
+head-to-head, the R rows of a seating design in a table (eval.designs,
+eval.tables). n is in the hundreds or more. Raises ValueError on
 fewer than two samples or a non-finite one.
 """
 

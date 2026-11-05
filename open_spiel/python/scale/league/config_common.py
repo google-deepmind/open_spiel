@@ -19,7 +19,11 @@ Every run config is a `league.runner.LeagueRunConfig`: an env, a learner kind
 `get_config()`. `load_config` takes a config name (a module of this
 package, `configs`, or of a package registered with
 `register_config_package`), a "<prefix><rest>" name that a resolver
-registered with `register_config_resolver` builds, or a path to a .py file.
+registered with `register_config_resolver` builds, a name a deployment
+replaced with `register_config_overlay`, or a path to a .py file
+(`register_hidden_config` leaves a config name unlisted). A name
+that two of these could answer (two nested prefixes, an overlay and a
+prefix, a config module and a prefix) raises instead of picking one.
 
   cfg = common.load_config("mmd_kuhn_poker_jax")
   cfg = common.apply_overrides(cfg, ["seed=3", "league.num_envs=64"])
@@ -38,7 +42,9 @@ Hashing. `config_hash` is the SHA-256 of the canonical JSON of the config:
 `plain(cfg)` (every dataclass field, nothing else) passed through each
 registered hash transform in registration order. A transform is a
 canonicalisation step: it decides which form of a config identifies it, for
-example by dropping a field that only labels a run.
+example by dropping a field that only labels a run. A field added to a
+config class after configs were hashed is declared with `hash_compat.added`
+and is left out of the hash while it holds its default (core.hash_compat).
 `resume_hash` is the same hash with the run-length fields cleared when the
 learner's step sizes do not depend on the run length, so such a run may be
 extended on resume; a resumed run must match it.
@@ -56,6 +62,7 @@ import os
 from typing import Any, Callable, Mapping, Optional
 
 from open_spiel.python.scale import plugins
+from open_spiel.python.scale.core import hash_compat
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.envs import registry as env_registry
 
@@ -400,11 +407,59 @@ def plain(x: Any) -> Any:
   return x
 
 
-def _transformed(d: dict[str, Any]) -> dict[str, Any]:
-  """`d` after every registered hash transform.
+def _hash_plain(x: Any) -> Any:
+  """plain(x) with hash_compat.OMITTED for the added fields at their defaults.
+
+  The value of every added field (hash_compat.added) that holds its default.
 
   Args:
-    d: The config dict.
+    x: a config value.
+
+  Returns:
+    plain(x) with the added fields at their defaults replaced by
+    hash_compat.OMITTED.
+  """
+  if dataclasses.is_dataclass(x) and not isinstance(x, type):
+    return {
+        f.name: (
+            hash_compat.OMITTED
+            if hash_compat.is_added(f) and hash_compat.at_default(x, f, plain)
+            else _hash_plain(getattr(x, f.name))
+        )
+        for f in dataclasses.fields(x)
+    }
+  if isinstance(x, Mapping):
+    return {str(k): _hash_plain(v) for k, v in x.items()}
+  if isinstance(x, (list, tuple)):
+    return [_hash_plain(v) for v in x]
+  return x
+
+
+def hashed_form(x: Any) -> Any:
+  """X (a dataclass or plain value) as it appears inside a hashed config.
+
+  plain(x) in the recorded form the hash_compat registrations give it
+  (hash_compat.recorded_form); the registered hash transforms are not
+  applied.
+
+  Args:
+    x: a config value.
+
+  Returns:
+    The plain value in its recorded form.
+  """
+  return hash_compat.recorded_form(plain(x), plain)
+
+
+def _transformed(d: dict[str, Any]) -> dict[str, Any]:
+  """`d` in its recorded form, through every registered hash transform.
+
+  First hash_compat.recorded_form (the hash_compat registrations), then the
+  registered hash transforms, then without the added fields at their
+  defaults (hash_compat.drop_omitted, always the last step).
+
+  Args:
+    d: a plain config dict.
 
   Returns:
     The transformed dict.
@@ -412,17 +467,21 @@ def _transformed(d: dict[str, Any]) -> dict[str, Any]:
   Raises:
     TypeError: A transform returned something else.
   """
+  d = hash_compat.recorded_form(d, plain)
   for fn in _HASH_TRANSFORMS:
     d = fn(d)
     if not isinstance(d, dict):
       raise TypeError(
           f"hash transform {fn!r} returned {type(d).__name__}, not a dict"
       )
-  return d
+  return hash_compat.drop_omitted(d)
 
 
 def config_dict(cfg: Any) -> dict[str, Any]:
-  """The dict a config hashes as: `plain(cfg)` through every hash transform.
+  """The dict a config hashes as.
+
+  `plain(cfg)` through every hash transform, without the added fields that
+  hold their defaults (core.hash_compat).
 
   Args:
     cfg: a run config.
@@ -430,7 +489,7 @@ def config_dict(cfg: Any) -> dict[str, Any]:
   Returns:
     The dict.
   """
-  return _transformed(json.loads(json.dumps(plain(cfg))))
+  return _transformed(json.loads(json.dumps(_hash_plain(cfg))))
 
 
 def _sha(d: dict[str, Any]) -> str:
@@ -482,7 +541,7 @@ def resume_hash(cfg: Any) -> str:
     The hex digest.
   """
   kind = _kind(cfg)
-  d = json.loads(json.dumps(plain(cfg)))
+  d = json.loads(json.dumps(_hash_plain(cfg)))
   if cfg.learner.constant_lr():
     _clear(d, "num_iterations")
     for p in kind.extendable_hash_fields():
@@ -595,6 +654,10 @@ HELPER_MODULES = ("__init__.py", "common.py", "recipes.py")
 _PACKAGES: list[Any] = [__name__.rsplit(".", 2)[0] + ".configs"]
 # name prefix -> fn(rest) -> config; register_config_resolver
 _RESOLVERS: dict[str, Any] = {}
+# exact config name -> fn() -> config; register_config_overlay
+_OVERLAYS: dict[str, Any] = {}
+# config names left out of config_modules; register_hidden_config
+_HIDDEN: set[str] = set()
 
 
 def register_config_package(package: str) -> None:
@@ -626,13 +689,70 @@ def register_config_resolver(prefix: str, fn) -> None:
     prefix: the config name prefix.
     fn: rest -> run config.
 
+  A prefix answers every name that starts with it, so two prefixes where one
+  starts with the other would both answer the longer one's names: that is
+  refused here. To replace or refuse ONE config name, use
+  register_config_overlay; a resolver prefix must not answer a config
+  module's name either (load_config raises).
+
   Raises:
-    ValueError: the prefix is taken.
+    ValueError: the prefix is taken, or it and a registered prefix nest.
   """
   assert isinstance(prefix, str) and prefix and callable(fn), (prefix, fn)
-  if prefix in _RESOLVERS and _RESOLVERS[prefix] is not fn:
-    raise ValueError(f"config prefix {prefix!r} is already registered")
+  if prefix in _RESOLVERS:
+    if _RESOLVERS[prefix] is not fn:
+      raise ValueError(f"config prefix {prefix!r} is already registered")
+    return
+  for other in _RESOLVERS:
+    if other.startswith(prefix) or prefix.startswith(other):
+      raise ValueError(
+          f"config prefix {prefix!r} and the registered prefix {other!r} "
+          "nest, so a name could match both; register exact names with "
+          "register_config_overlay"
+      )
   _RESOLVERS[prefix] = fn
+
+
+def register_config_overlay(name: str, fn) -> None:
+  """Makes load_config(name) return fn(), for that exact name only.
+
+  An overlay replaces the config of one name: typically a deployment's
+  version of a config module of the same name (the open recipe plus the
+  deployment's own evals), or a refusal that raises with the fix. Unlike a
+  resolver it answers no other name: load_config(name + "_large") is still the
+  config module of that name. config_modules, config_names and
+  config_module are unchanged by an overlay; only load_config builds it.
+
+  Args:
+    name: the exact config name.
+    fn: () -> run config.
+
+  Raises:
+    ValueError: an overlay of `name` with another fn is registered.
+  """
+  assert isinstance(name, str) and name and callable(fn), (name, fn)
+  if name in _OVERLAYS and _OVERLAYS[name] is not fn:
+    raise ValueError(f"config overlay {name!r} is already registered")
+  _OVERLAYS[name] = fn
+
+
+def register_hidden_config(name: str) -> None:
+  """Hides config `name` from config_modules, config_names and config_module.
+
+  The effect lasts for this process.
+
+  For a config module this process cannot build: typically one a deployment
+  runs only in processes set up for it, where an overlay of the same name
+  (register_config_overlay) refuses it with the fix everywhere else. A
+  hidden name is not listed, so a loop over config_names never builds it;
+  load_config(name) still answers through its overlay, and without one
+  raises KeyError like any unknown name.
+
+  Args:
+    name: the exact config name.
+  """
+  assert isinstance(name, str) and name, name
+  _HIDDEN.add(name)
 
 
 def defines_get_config(path: str) -> bool:
@@ -694,6 +814,8 @@ def _package_configs(package: str) -> dict[str, Any]:
 def config_modules() -> dict[str, Any]:
   """{config name: module path} over every registered config package.
 
+  Names hidden with register_hidden_config are left out.
+
   Returns:
     The mapping.
 
@@ -707,7 +829,7 @@ def config_modules() -> dict[str, Any]:
       if name in out:
         raise ValueError(f"config {name!r} is in {out[name]} and {mod}")
       out[name] = mod
-  return out
+  return {name: mod for name, mod in out.items() if name not in _HIDDEN}
 
 
 def config_names() -> tuple[str, ...]:
@@ -776,13 +898,37 @@ def _load_config(name_or_path: str) -> Any:
   Raises:
     FileNotFoundError: a path that does not exist.
     KeyError: an unknown config name.
+    ValueError: the name is ambiguous: it matches two resolver prefixes, an
+      overlay and a resolver prefix, or a config module and a resolver
+      prefix.
   """
   plugins.load_env()
-  for prefix, fn in _RESOLVERS.items():
-    if name_or_path.startswith(prefix):
-      cfg = fn(name_or_path[len(prefix) :])
-      learner_kind(cfg)
-      return cfg
+  matches = [p for p in _RESOLVERS if name_or_path.startswith(p)]
+  if len(matches) > 1:
+    raise ValueError(
+        f"config {name_or_path!r} matches the resolver prefixes {matches}"
+    )
+  if name_or_path in _OVERLAYS:
+    if matches:
+      raise ValueError(
+          f"config {name_or_path!r} has an overlay and matches the resolver "
+          f"prefix {matches[0]!r}"
+      )
+    cfg = _OVERLAYS[name_or_path]()
+    learner_kind(cfg)
+    return cfg
+  if matches:
+    (prefix,) = matches
+    mods = config_modules()
+    if name_or_path in mods:
+      raise ValueError(
+          f"config {name_or_path!r} is the config module "
+          f"{mods[name_or_path]} and matches the resolver prefix {prefix!r}; "
+          "replace one config name with register_config_overlay"
+      )
+    cfg = _RESOLVERS[prefix](name_or_path[len(prefix) :])
+    learner_kind(cfg)
+    return cfg
   if name_or_path.endswith(".py") or os.sep in name_or_path:
     path = os.path.abspath(name_or_path)
     if not os.path.exists(path):

@@ -60,6 +60,7 @@ py_library(
     deps = [
         ":jax_game_env",
         "//open_spiel/python/jax/games:bridge",
+        "//open_spiel/python/scale/core:sides",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],
@@ -93,6 +94,19 @@ py_library(
     name = "envs",
     srcs = ["__init__.py"],
     strict_deps = True,
+)
+
+py_library(
+    name = "euchre",
+    srcs = ["euchre.py"],
+    strict_deps = True,
+    deps = [
+        ":jax_game_env",
+        "//open_spiel/python/jax/games:euchre",
+        "//open_spiel/python/scale/core:sides",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
 )
 
 py_library(
@@ -173,6 +187,19 @@ py_library(
 )
 
 py_library(
+    name = "hearts",
+    srcs = ["hearts.py"],
+    strict_deps = True,
+    deps = [
+        ":jax_game_env",
+        "//open_spiel/python/jax/games:hearts",
+        "//open_spiel/python/scale/core:sides",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
     name = "hex",
     srcs = ["hex.py"],
     strict_deps = True,
@@ -227,6 +254,16 @@ py_library(
 )
 
 py_library(
+    name = "kuhn_nplayer",
+    srcs = ["kuhn_nplayer.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:chance",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
     name = "liars_dice",
     srcs = ["liars_dice.py"],
     strict_deps = True,
@@ -245,6 +282,18 @@ py_library(
         ":jax_game_env",
         "//open_spiel/python/jax/games:lines_of_action",
         "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "nplayer_matrix",
+    srcs = ["nplayer_matrix.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "@py_deps//jax",
+        "@py_deps//numpy",
     ],
 )
 
@@ -290,8 +339,11 @@ py_library(
     strict_deps = True,
     deps = [
         ":bridge",
+        ":euchre",
         ":go",
+        ":hearts",
         ":lines_of_action",
+        ":nplayer_matrix",
         ":stub",
         "//open_spiel/python/scale:deps",
         "//open_spiel/python/scale:registry",
@@ -483,6 +535,23 @@ pytest_test(
 )
 
 pytest_test(
+    name = "bridge_sides_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/bridge_sides_test.py"],
+    deps = [
+        ":bridge",
+        ":registry",
+        "//open_spiel/python/jax/games:bridge",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/testing:infoset_invariance",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
     name = "bridge_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
@@ -551,6 +620,29 @@ pytest_test(
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "euchre_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/euchre_test.py"],
+    deps = [
+        ":euchre",
+        ":registry",
+        "//open_spiel/python/jax/games:euchre",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/encoders:euchre",
+        "//open_spiel/python/scale/encoders:registry",
         "//open_spiel/python/scale/testing:check_env",
         "@py_deps//jax",
         "@py_deps//numpy",
@@ -635,6 +727,40 @@ pytest_test(
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/envs/gin",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "gin_knock_agent_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/gin_knock_agent_test.py"],
+    deps = [
+        ":gin_games",
+        ":gin_helpers",
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:endgame",
+        "//open_spiel/python/scale/envs/gin:reference_eval",
+        "//open_spiel/python/scale/envs/gin:search",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/sources:decisions",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],
@@ -802,12 +928,30 @@ pytest_test(
 )
 
 pytest_test(
-    name = "hex_test",
+    name = "hearts_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
     tags = [
         "manual",
     ],
+    tests = ["tests/hearts_test.py"],
+    deps = [
+        ":hearts",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/encoders:hearts",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "hex_test",
+    data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/hex_test.py"],
     deps = [
         ":board_helpers",
@@ -853,12 +997,31 @@ pytest_test(
 )
 
 pytest_test(
-    name = "kuhn_test",
+    name = "kuhn_nplayer_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
     tags = [
         "manual",
     ],
+    tests = ["tests/kuhn_nplayer_test.py"],
+    deps = [
+        ":differential_vs_openspiel",
+        ":kuhn_jax",
+        ":kuhn_nplayer",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:game_tree",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "kuhn_test",
+    data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/kuhn_test.py"],
     deps = [
         ":kuhn",
@@ -925,6 +1088,25 @@ pytest_test(
 )
 
 pytest_test(
+    name = "nplayer_matrix_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/nplayer_matrix_test.py"],
+    deps = [
+        ":nplayer_matrix",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:game_tree",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/launch:subprocess_env",
+        "//open_spiel/python/scale/testing:check_env",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
     name = "othello_test",
     data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/othello_test.py"],
@@ -979,10 +1161,12 @@ pytest_test(
     tests = ["tests/registry_test.py"],
     deps = [
         ":registry",
+        "//open_spiel/python/jax/games/gin_rummy:dense_cache_game",
         "//open_spiel/python/scale:deps",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs/gin",
         "//open_spiel/python/scale/envs/gin:search",
         "//open_spiel/python/scale/league:config_common",
         "//open_spiel/python/scale/league:slot_factories",
@@ -992,11 +1176,7 @@ pytest_test(
 
 pytest_test(
     name = "small_envs_dtypes_test",
-    timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
-    ],
     tests = ["tests/small_envs_dtypes_test.py"],
     deps = [
         ":bargaining",
@@ -1066,6 +1246,7 @@ filegroup(
     ) + [
         "//open_spiel/python/scale/envs/connect_four:all_files",
         "//open_spiel/python/scale/envs/gin:all_files",
+        "//open_spiel/python/scale/envs/hearts_telemetry:all_files",
         "//open_spiel/python/scale/envs/leduc:all_files",
     ],
     visibility = ["//open_spiel/python/scale:__subpackages__"],

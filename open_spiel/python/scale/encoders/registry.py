@@ -38,6 +38,10 @@ Concepts:
   (a plugin's). A built-in module whose game package (the JAX games, pyspiel) is
   not installed is skipped, and a lookup that misses names the skipped
   package.
+* `LAZY` maps an encoder name to the module that registers it, imported only
+  when that name is asked for, so a process that never reads it never loads
+  it. Every open encoder is a built-in or lazy entry: a recorded obs_format
+  loads with no import by the caller.
 """
 
 import dataclasses
@@ -71,8 +75,18 @@ _BUILTIN_MODULES = tuple(
         "lines_of_action",
         "dark_hex",
         "bridge",
+        "hearts",
+        "euchre",
+        "kuhn_nplayer",
+        "nplayer_matrix",
     )
 )
+#: Encoder name -> the module whose import registers it, imported on a lookup
+#: of that name only.
+LAZY = {
+    name: f"{__name__.rpartition('.')[0]}.{name}"
+    for name in ("hearts_card_planes", "euchre_card_planes")
+}
 OPTIONAL_DEPS = (deps.GAMES_PACKAGE, deps.PYSPIEL)
 
 
@@ -282,6 +296,24 @@ def _load_builtins() -> None:
       _SKIPPED[mod] = root
 
 
+def _load_lazy(name: str) -> None:
+  """Imports the LAZY module of encoder `name` (bare or "family@k=v"), if any.
+
+  Args:
+    name: the obs_format.
+  """
+  module = LAZY.get(name.partition("@")[0])
+  if module is None or module in _SKIPPED:
+    return
+  try:
+    importlib.import_module(module)
+  except ModuleNotFoundError as e:
+    root = path_registry.absent_package(e.name, OPTIONAL_DEPS)
+    if root is None:
+      raise
+    _SKIPPED[module] = root
+
+
 def _family(name: str) -> _Family:
   """The encoder family `name`, loading the built-ins on a miss.
 
@@ -296,6 +328,7 @@ def _family(name: str) -> _Family:
   """
   if name not in _FAMILIES:
     _load_builtins()
+    _load_lazy(name)
   if name not in _FAMILIES:
     raise KeyError(f"no encoder family {name!r}; families: {sorted(_FAMILIES)}")
   return _FAMILIES[name]
@@ -374,6 +407,8 @@ def get(name: str) -> Encoder:
       module skipped for a missing game package.
   """
   _load_builtins()
+  if name not in _ENCODERS:
+    _load_lazy(name)
   if name in _ENCODERS:
     return _ENCODERS[name]
   enc = _member(name)
@@ -404,6 +439,7 @@ def known(name: str) -> bool:
     bool.
   """
   _load_builtins()
+  _load_lazy(name)
   return name in _ENCODERS or name.partition("@")[0] in _FAMILIES
 
 
@@ -414,9 +450,11 @@ def names(game: Optional[str] = None) -> tuple[str, ...]:
     game: the game name, or None for every game.
 
   Returns:
-    The sorted names.
+    The sorted names (the LAZY ones are imported to read their game).
   """
   _load_builtins()
+  for lazy in LAZY:
+    _load_lazy(lazy)
   out = {n for n, e in _ENCODERS.items() if game is None or e.game == game}
   out |= {n for n, f in _FAMILIES.items() if game is None or f.game == game}
   return tuple(sorted(out))
@@ -429,4 +467,6 @@ def families() -> tuple[str, ...]:
     The sorted names.
   """
   _load_builtins()
+  for lazy in LAZY:
+    _load_lazy(lazy)
   return tuple(sorted(_FAMILIES))

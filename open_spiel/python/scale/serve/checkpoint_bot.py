@@ -78,6 +78,7 @@ from open_spiel.python.scale.ckpt import artifact as artifact_lib
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.core import x64
 from open_spiel.python.scale.envs import registry as env_registry
+from open_spiel.python.scale.serve import build_check
 from open_spiel.python.scale.serve import games
 from open_spiel.python.scale.serve import server as server_lib
 
@@ -87,7 +88,8 @@ _MAX_VARIANTS = 4096
 # Plies a warmup playout makes before it gives up on reaching a terminal.
 _MAX_WARMUP_PLIES = 100_000
 
-#: The longest notice contract 9 carries (the GUI's NOTICE_MAX_LENGTH).
+#: The longest notice the protocol carries (the GUI's NOTICE_MAX_LENGTH,
+#: contracts 8 and 9).
 NOTICE_MAX_LENGTH = 200
 #: The notice of a move the env could not replay (decider "fallback"): what
 #: the seat may see, the replay's error left to the log (module doc).
@@ -207,9 +209,13 @@ def game_string_of(
 
   The game's default variant (its short name) when the artifact plays it;
   otherwise the first combination of the game's finitely-valued served
-  parameters whose env is the artifact's training env, written for the
-  installed pyspiel (games.game_string_params: parameters at pyspiel's
-  default are dropped).
+  parameters whose env is the artifact's training env and that the installed
+  pyspiel plays (games.stock_params: parameters at pyspiel's default are
+  dropped; a parameter the installed pyspiel lacks is dropped when it matches
+  that build's implicit value). The string loads in the installed pyspiel.
+  A game whose ServingSpec maps the env's options back to pyspiel's
+  (pyspiel_params_of) writes those parameters instead, under the env's
+  pyspiel game name (games.pyspiel_name).
 
   Args:
     manifest: the artifact's manifest.
@@ -220,9 +226,10 @@ def game_string_of(
     The game string.
 
   Raises:
-    ValueError: the game is not served, no pyspiel game string plays the
-      artifact's training env, or the installed pyspiel's game lacks a
-      parameter of that string.
+    ValueError: the game is not served, or no pyspiel game string plays the
+      artifact's training env.
+    games.UpstreamGapError: (a ValueError) every combination that plays the
+      training env needs a parameter value the installed pyspiel lacks.
   """
   name = manifest.game
   if name not in games.served_games():
@@ -230,27 +237,47 @@ def game_string_of(
         f"no pyspiel game plays the artifact's game {name!r}; served: "
         f"{games.served_games()}"
     )
+  pyname = games.pyspiel_name(name)
   if manifest.env_spec is None:
-    return name
+    return pyname
   trained = env_registry.EnvSpec.from_json(manifest.env_spec)
-  if env_registry.covers(trained, games.env_spec_for(name, {})):
-    return name
+  mapped = games.pyspiel_params_of(trained)
+  if mapped is not None:
+    if games.env_spec_for(pyname, mapped) != trained:
+      raise ValueError(
+          f"{name}: pyspiel_params_of({trained.to_json()}) = {mapped} plays "
+          f"{games.env_spec_for(pyname, mapped).to_json()}, not the training "
+          "env"
+      )
+    if parameter_specification is None:
+      parameter_specification = installed_parameter_specification(pyname)
+    return format_game_string(
+        pyname, games.stock_params(name, mapped, parameter_specification)
+    )
+  if env_registry.covers(trained, games.env_spec_for(pyname, {})):
+    return pyname
   allowed = env_registry.game(name).serving.pyspiel_params
   finite = sorted(
       (k, tuple(v)) for k, v in allowed.items() if v is not games.ANY
   )
   keys = [k for k, _ in finite]
+  gap = None
   for n, values in enumerate(itertools.product(*(v for _, v in finite))):
     if n >= _MAX_VARIANTS:
       break
     params = dict(zip(keys, values))
-    if games.env_spec_for(name, params) != trained:
+    if games.env_spec_for(pyname, params) != trained:
       continue
     if parameter_specification is None:
-      parameter_specification = installed_parameter_specification(name)
-    return format_game_string(
-        name, games.game_string_params(name, params, parameter_specification)
-    )
+      parameter_specification = installed_parameter_specification(pyname)
+    try:
+      return format_game_string(
+          pyname, games.stock_params(name, params, parameter_specification)
+      )
+    except games.UpstreamGapError as e:
+      gap = gap or e
+  if gap is not None:
+    raise gap
   raise ValueError(
       f"no pyspiel game string of {name!r} plays the artifact's training env "
       f"{trained.to_json()}"
@@ -269,7 +296,11 @@ class CheckpointBot:
     seed: the seed of its sampling keys.
     manifest: the artifact's manifest.
     num_players: the players of its game.
-    game_string: the game string for the installed pyspiel.
+    game_string: the game string for the installed pyspiel; None when the
+      artifact needs a parameter value the installed pyspiel lacks (upstream_gap
+      says which): then check_serves and warmup refuse.
+    upstream_gap: None, or the games.UpstreamGapError that left game_string
+      None.
     last_probs: None, or the action probabilities of the last choose_action.
     last_notice: None, or the seat's notice about a rules difference the
       last move played through (module doc, "Rules differences").
@@ -293,7 +324,14 @@ class CheckpointBot:
     art = server.artifact(path, self.step)
     self.manifest = art.manifest
     self.num_players = int(art.policy.spec.num_players)
-    self.game_string: str = game_string_of(art.manifest)
+    # The game string for the installed pyspiel; None when the artifact needs
+    # a parameter value the installed pyspiel lacks (upstream_gap says which):
+    # then check_serves and warmup refuse.
+    self.upstream_gap: Optional[games.UpstreamGapError] = None
+    try:
+      self.game_string: Optional[str] = game_string_of(art.manifest)
+    except games.UpstreamGapError as e:
+      self.game_string, self.upstream_gap = None, e
     self._game = None  # the pyspiel game last accepted by check_serves
     self.last_probs: Optional[dict[int, float]] = None
     self.last_notice: Optional[str] = None
@@ -315,13 +353,19 @@ class CheckpointBot:
       ValueError: the artifact plays another game, the game's parameters are
         a variant its training env does not cover (or no env plays them), the
         env refuses the artifact's policy (a stateful policy in a game that
-        hides moves), or the player counts differ.
+        hides moves), the player counts differ, or the artifact needs a
+        parameter value the game's pyspiel lacks (upstream_gap).
     """
     name = game.get_type().short_name
     params = dict(game.get_parameters())
-    if name != self.manifest.game:
+    gap = self.upstream_gap
+    if gap is not None and name == gap.game and gap.param not in params:
+      raise ValueError(str(gap)) from gap
+    pyname = games.pyspiel_name(self.manifest.game)
+    if name != pyname:
       raise ValueError(
-          f"the checkpoint plays {self.manifest.game!r}, not {name!r}"
+          f"the checkpoint plays {games.describe(self.manifest.game)}, not "
+          f"{name!r}"
       )
     if int(game.num_players()) != self.num_players:
       raise ValueError(
@@ -329,6 +373,7 @@ class CheckpointBot:
           f"{game.num_players()}"
       )
     try:
+      build_check.check_pyspiel_game(game)
       for seat in range(self.num_players):
         self._server.agent(
             self.path, self.step, seat, name, params, rule=self.rule
@@ -342,8 +387,14 @@ class CheckpointBot:
 
     Returns:
       The pyspiel game.
+
+    Raises:
+      ValueError: The installed pyspiel cannot serve this game
+        (upstream_gap).
     """
     if self._game is None:
+      if self.upstream_gap is not None:
+        raise ValueError(str(self.upstream_gap)) from self.upstream_gap
       # Lazy: pyspiel is optional (the serve package imports without it).
       import pyspiel  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
 

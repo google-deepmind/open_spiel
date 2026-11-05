@@ -42,13 +42,13 @@ import pyspiel
 
 @pytest.fixture(name="leduc_dir", scope="module")
 def _leduc_dir(tmp_path_factory):
-  """A leduc artifact on disk, written once per module.
+  """A leduc_poker checkpoint folder, shared by the module's tests.
 
   Args:
-    tmp_path_factory: pytest's temporary directory factory.
+    tmp_path_factory: pytest's temporary folder factory.
 
   Returns:
-    The artifact's directory.
+    The folder.
   """
   return rbh.write_leduc(tmp_path_factory.mktemp("leduc"))
 
@@ -82,11 +82,11 @@ def test_reply_is_checkpoint_bots_move(leduc_dir):
   for g in range(8):
 
     def choose(s, seat):
-      """The served reply at `s` for `seat`; checks its bot output.
+      """The served bot's move and notice at s; checks its bot output.
 
       Args:
         s: the state.
-        seat: the seat to move.
+        seat: the bot's seat.
 
       Returns:
         (action, notice).
@@ -240,11 +240,11 @@ def test_divergence_notice_keeps_to_the_seat():
   secret = "replay failed at history index 1: action 3 is not legal"
 
   def reply(decider, notice):
-    """A Reply of action 1 by `decider` with `notice`.
+    """A server reply with this decider and notice.
 
     Args:
-      decider: the Reply's decider.
-      notice: the Reply's notice.
+      decider: the reply's decider.
+      notice: its notice.
 
     Returns:
       The Reply.

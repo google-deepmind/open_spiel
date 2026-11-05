@@ -1,5 +1,6 @@
 {
  "_meta": {
+  "cpu_class": "x86_64 GenuineIntel family 6 model 85 [avx avx2 avx512_vnni avx512bw avx512cd avx512dq avx512f avx512vl f16c fma sse4_1 sse4_2]",
   "jax": "0.12.0.1",
   "platform": "cpu"
  },

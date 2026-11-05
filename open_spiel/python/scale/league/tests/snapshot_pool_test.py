@@ -20,6 +20,7 @@ pool_layout "slots", bench and redraw "on_change". Known answers on synthetic
 views first, then a small league on kuhn.
 """
 
+import copy
 import dataclasses
 import gc
 import glob
@@ -187,6 +188,299 @@ def test_scheduled_promotion_known_answers():
     late.step(_view(1, 6, ()))
 
 
+# -- gated pool: what max_pool counts -----------------------------------------
+class _ScriptedGate:
+  """A PromotionGate whose verdict per generation is scripted."""
+
+  name = "scripted"
+
+  def __init__(self, passes):
+    self._passes = dict(passes)
+
+  def seed(self, generation):
+    """The gate's seed for a generation.
+
+    Args:
+      generation: the generation.
+
+    Returns:
+      The generation itself.
+    """
+    return int(generation)
+
+  def passes(self, candidate, incumbent, result):
+    """The scripted verdict of the result's generation.
+
+    Args:
+      candidate: unused.
+      incumbent: unused.
+      result: the gate result (its generation picks the verdict).
+
+    Returns:
+      Whether that generation passes.
+    """
+    del candidate, incumbent
+    return bool(self._passes[int(result.generation)])
+
+
+def _gated_play(ctl, verdicts, every):
+  """Ticks ctl at every round start, applying its actions to a member book.
+
+  Round r starts at u = r * every, r = 0..len(verdicts), each with generation
+  r's gate cell.
+
+  Args:
+    ctl: a gated ScheduledPromotion (its gate a _ScriptedGate).
+    verdicts: the gate verdict of generation 1, 2, ... (unused here: the gate
+      holds them; only the count matters).
+    every: snapshot_every.
+
+  Returns:
+    (live members, [(update, pool names, evicted names)] per round).
+  """
+  members, rounds = {}, []
+  for r in range(len(verdicts) + 1):
+    u = r * every
+    gate = None
+    if r:
+      req = ctl.gate_request(_view(u, u, members.values()))
+      assert req is not None and req.generation == r
+      gate = controller.GateCell(
+          r, "main", req.opponent, req.seed, 4, 0.0, 0.1, -0.2, 0.2
+      )
+    learners = () if not r else (controller.LearnerInfo("main", "main", u),)
+    view = controller.LeagueView(
+        iteration=u,
+        members=tuple(members.values()),
+        learners=learners,
+        payoff=None,
+        gate=gate,
+    )
+    acts = ctl.step(view)
+    gone = []
+    for a in acts:
+      if isinstance(a, controller.Admit):
+        members[a.member] = controller.MemberInfo(
+            a.member, a.role, a.lifecycle, a.learner, u
+        )
+      elif isinstance(a, controller.SetLifecycle):
+        gone.append(a.member)
+        del members[a.member]
+    rounds.append((u, ctl._pool, tuple(gone)))  # pylint: disable=protected-access
+  return members, rounds
+
+
+def _gated(verdicts, pool_counts=None, max_pool=2):
+  """A ScheduledPromotion gated by a _ScriptedGate of `verdicts`.
+
+  Args:
+    verdicts: generation g + 1 passes iff verdicts[g].
+    pool_counts: the pool_counts field (None: the default).
+    max_pool: the pool size.
+
+  Returns:
+    The controller.
+  """
+  kw = {} if pool_counts is None else {"pool_counts": pool_counts}
+  gate = _ScriptedGate({g + 1: v for g, v in enumerate(verdicts)})
+  return controller.ScheduledPromotion(
+      snapshot_every=2,
+      harvest_every=2,
+      max_pool=max_pool,
+      pool_slots=1,
+      self_weight=0.5,
+      seed=0,
+      gate=gate,
+      gate_deals=4,
+      **kw,
+  )
+
+
+def test_failed_gate_never_pushes_a_passed_member_out_with_pool_counts_passed():
+  """With pool_counts "passed" a failed gate never evicts a passed member.
+
+  Generations 1 and 2 pass, 3..8 fail. "passed": main@2 and main@4 stay the
+  pool through every failed gate; "attempts" (the default) drops them once
+  the newest max_pool harvest STEPS move past them (the attempts bug).
+  """
+  verdicts = [True, True] + [False] * 6
+  live, rounds = _gated_play(_gated(verdicts, "passed"), verdicts, 2)
+  assert all(pool == ("main@2", "main@4") for u, pool, _ in rounds if u >= 4)
+  assert not any({"main@2", "main@4"} & set(gone) for _, _, gone in rounds)
+  assert sorted(live) == [
+      "main@16",
+      "main@2",
+      "main@4",
+  ]  # + the lagged snapshot
+  _, attempts = _gated_play(_gated(verdicts), verdicts, 2)
+  assert [(u, pool) for u, pool, _ in attempts] == [
+      (0, ()),
+      (2, ("main@2",)),
+      (4, ("main@2", "main@4")),
+      (6, ("main@4",)),
+      (8, ()),
+      (10, ()),
+      (12, ()),
+      (14, ()),
+      (16, ()),
+  ]
+  # A third pass pushes the oldest passed member out ("past max_pool").
+  verdicts = [True, True, False, False, True]
+  _, rounds = _gated_play(_gated(verdicts, "passed"), verdicts, 2)
+  assert rounds[-1] == (10, ("main@4", "main@10"), ("main@2", "main@8"))
+
+
+def _old_scheduled_pool(passed, u, every, max_pool):
+  """The pool rule before pool_counts existed, verbatim.
+
+  Args:
+    passed: the steps whose gate passed.
+    u: the current update.
+    every: the snapshot period, in updates.
+    max_pool: the window, in snapshot steps.
+
+  Returns:
+    The pool: the last max_pool snapshot steps (pool_steps), then the passed
+    among them, as member names.
+  """
+  steps = tuple(range(every, u + 1, every))[-max_pool:]
+  return tuple(f"main@{s}" for s in steps if s in passed)
+
+
+@pytest.mark.parametrize("seed", [0, 1, 2])
+def test_pool_counts_attempts_reproduces_the_old_window_exactly(seed):
+  """The default pool_counts keeps the old rule's pool and evictions.
+
+  The default (and "attempts", and an instance pickled before the field
+  existed) gives the old rule's pool and evictions at every round of a random
+  pass / fail sequence.
+
+  Args:
+    seed: the seed of the pass / fail sequence.
+  """
+  rng_ = np.random.default_rng(seed)
+  verdicts = [bool(v) for v in rng_.random(40) < 0.3]
+  passed = {2 * (g + 1) for g, v in enumerate(verdicts) if v}
+  old = _gated(verdicts, max_pool=3)
+  pickled = copy.deepcopy(old)
+  del pickled.__dict__["pool_counts"]  # as unpickled from before the field
+  assert pickled.pool_counts == controller.POOL_COUNTS_ATTEMPTS
+  runs = [
+      _gated_play(c, verdicts, 2)[1]
+      for c in (old, _gated(verdicts, "attempts", max_pool=3), pickled)
+  ]
+  assert runs[0] == runs[1] == runs[2]
+  prev = ()
+  for u, pool, gone in runs[0]:
+    want = _old_scheduled_pool(passed, u, 2, 3)
+    assert pool == want, (u, pool, want)
+    prev_snap = () if u == 0 else (f"main@{u - 2}",)
+    assert set(gone) == (set(prev) | set(prev_snap)) - set(want) - {f"main@{u}"}
+    prev = pool
+
+
+def test_every_eviction_logs_its_member_reason_and_update(caplog):
+  """One ScheduledPromotion log line per eviction.
+
+  Each names the member, the update and the reason.
+
+  Args:
+    caplog: pytest's log capture fixture.
+  """
+  verdicts = [True, False, False, False]
+  with caplog.at_level("INFO"):
+    _, rounds = _gated_play(_gated(verdicts), verdicts, 2)
+  lines = [
+      r.getMessage()
+      for r in caplog.records
+      if "ScheduledPromotion: evict" in r.getMessage()
+  ]
+  gone = []
+  for u, _, g in rounds:
+    gone += [(u, n) for n in g]
+  assert len(lines) == len(gone) and gone
+  assert (
+      "ScheduledPromotion: evict main@2 at update 6 (round 3, pool_counts "
+      "attempts): outside the newest max_pool 2 harvest steps (pool_counts "
+      "attempts: failed gates count)"
+  ) in lines
+  assert (
+      "ScheduledPromotion: evict main@4 at update 6 (round 3, pool_counts "
+      "attempts): superseded snapshot (its gate failed)"
+  ) in lines
+
+
+def test_league_logs_and_emits_every_eviction(caplog, monkeypatch):
+  """League._log_evictions: a log line per evicted member, a record per call.
+
+  The record is one series record (league/evictions,
+  league/evicted/<origin>).
+
+  Args:
+    caplog: pytest's log capture fixture.
+    monkeypatch: pytest's monkeypatch fixture.
+  """
+  from open_spiel.python.scale import metrics as metrics_lib  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+  from open_spiel.python.scale.league import loop  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+
+  got = []
+  monkeypatch.setattr(metrics_lib, "_SERIES_EMITTERS", [got.append])
+  fake = type("L", (), {"updates_total": np.int64(1046)})()
+  evicted = [
+      (
+          "main@50",
+          controller.MemberInfo("main@50", "snapshot", "fixed", "main", 50),
+          "superseded snapshot / past max_pool",
+      ),
+      (
+          "exploiter-x3@111",
+          controller.MemberInfo(
+              "exploiter-x3@111", "exploiter", "candidate", "exploiter", 111
+          ),
+          "superseded by exploiter-x4@189",
+      ),
+  ]
+  with caplog.at_level("INFO"):
+    loop.League._log_evictions(fake, evicted, 523)  # pylint: disable=protected-access
+  lines = [
+      r.getMessage()
+      for r in caplog.records
+      if r.getMessage().startswith("league: evicted member")
+  ]
+  assert lines == [
+      (
+          "league: evicted member main@50 (role snapshot, from main, admitted"
+          " at iteration 50) at iteration 523, update 1046: superseded snapshot"
+          " / past max_pool"
+      ),
+      (
+          "league: evicted member exploiter-x3@111 (role exploiter, from"
+          " exploiter, admitted at iteration 111) at iteration 523, update"
+          " 1046: superseded by exploiter-x4@189"
+      ),
+  ]
+  assert len(got) == 1 and got[0]["step"] == 1046
+  assert got[0]["league/evictions"] == 2
+  assert got[0]["league/evicted/main"] == 50
+  assert got[0]["league/evicted/exploiter"] == 111
+
+
+def test_pool_counts_kwargs_leave_the_legacy_mode_out_of_the_config():
+  kwargs = controller.pool_counts_kwargs("attempts")
+  assert isinstance(kwargs, dict) and not kwargs, kwargs
+  assert controller.pool_counts_kwargs("passed") == {"pool_counts": "passed"}
+  with pytest.raises(ValueError):
+    controller.pool_counts_kwargs("newest")
+  with pytest.raises(ValueError):
+    controller.ScheduledPromotion(
+        snapshot_every=2,
+        harvest_every=2,
+        max_pool=2,
+        self_weight=0.5,
+        pool_counts="newest",
+    )
+
+
 # -- a snapshot-pool league on kuhn --------------------------------------------
 def _kuhn_snapshot_pool(updates):
   """A Kuhn snapshot-pool run config.
@@ -315,7 +609,6 @@ def test_kill_before_the_commit_resumes_the_same_trajectory_stream(
   snap = commit.state_path(d, 4, ts["league_ref"])
 
   # The state file the league under test just wrote.
-  # pylint: disable-next=g-unsafe-pickle-load
   sources = pickle.loads(snap.read_bytes())["sources"]  # noqa: S301
   # live hands
   assert set(sources) == {"main"} and sources["main"]["state"] is not None

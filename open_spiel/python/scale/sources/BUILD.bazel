@@ -47,6 +47,7 @@ py_library(
     deps = [
         "//open_spiel/python/scale/core:arena",
         "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:hooks",
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/envs:registry",
         "@py_deps//etils/epath",

@@ -30,6 +30,8 @@ rounding.
              choose_action(state, seat).
   controller register_into: the "checkpoint" controller of OpenSpiel's game GUI
              (imported only by the GUI's opt-in loader, never by this package).
+  remote_bot make_bot: an artifact as a full_state Remote bot of the GUI,
+             served by its reference bot server (never imported here).
   host_agent HostAgent: one seat's decision over a replayed history.
   replay     a recorded match to the SeatSteps one seat saw.
   wire       pyspiel histories to raw env histories, and the node check.

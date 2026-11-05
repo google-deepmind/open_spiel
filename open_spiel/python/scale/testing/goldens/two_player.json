@@ -1,0 +1,3522 @@
+{
+ "_meta": {
+  "cpu_class": "x86_64 GenuineIntel family 6 model 85 [avx avx2 avx512_vnni avx512bw avx512cd avx512dq avx512f avx512vl f16c fma sse4_1 sse4_2]"
+ },
+ "evaluator/kuhn/head_to_head/argmax": {
+  "net0_vs_net0.a_payoff": "float64 [16, 2] 1efd43e4633ec9a318176f0a",
+  "net0_vs_net0.b_payoff": "float64 [16, 2] db8fd8a4c197c4d13e9c5a4d",
+  "net0_vs_net0.diff": [
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   16
+  ],
+  "net0_vs_net0.mean": [
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   16
+  ],
+  "net0_vs_net0.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "net0",
+   "DecisionRule(kind='argmax', temperature=1.0)",
+   "DecisionRule(kind='argmax', temperature=1.0)"
+  ],
+  "net0_vs_net0.se_unpaired": "0x1.0c19e0ec44750p-2",
+  "net0_vs_net0.seat0": [
+   "-0x1.4000000000000p-1",
+   "0x1.5c3298dd40b25p-2",
+   "-0x1.4a9d1c28f3952p+0",
+   "0x1.53a3851e72a30p-5",
+   16
+  ],
+  "net0_vs_net0.seat1": [
+   "0x1.4000000000000p-1",
+   "0x1.5c3298dd40b25p-2",
+   "-0x1.53a3851e72a30p-5",
+   "0x1.4a9d1c28f3952p+0",
+   16
+  ],
+  "net0_vs_net0.shape": [
+   16,
+   1,
+   true
+  ],
+  "net0_vs_net0.variance_reduction": "inf",
+  "net0_vs_uniform.a_payoff": "float64 [48, 2] cd950d7ea719b39685eb216a",
+  "net0_vs_uniform.b_payoff": "float64 [48, 2] ee33c224ee3be19a692894f2",
+  "net0_vs_uniform.diff": [
+   "0x1.8000000000000p-1",
+   "0x1.213edb4ab3c9ap-3",
+   "0x1.e48b69f7edf7fp-2",
+   "0x1.06dd258204820p+0",
+   48
+  ],
+  "net0_vs_uniform.mean": [
+   "0x1.8000000000000p-2",
+   "0x1.213edb4ab3c9ap-4",
+   "0x1.e48b69f7edf7fp-3",
+   "0x1.06dd258204820p-1",
+   48
+  ],
+  "net0_vs_uniform.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='argmax', temperature=1.0)",
+   "DecisionRule(kind='argmax', temperature=1.0)"
+  ],
+  "net0_vs_uniform.se_unpaired": "0x1.8592d6890b800p-4",
+  "net0_vs_uniform.seat0": [
+   "-0x1.0000000000000p-2",
+   "0x1.213edb4ab3c9ap-3",
+   "-0x1.0dba4b0409040p-1",
+   "0x1.b749608120810p-6",
+   48
+  ],
+  "net0_vs_uniform.seat1": [
+   "0x1.0000000000000p+0",
+   "0x0.0p+0",
+   "0x1.0000000000000p+0",
+   "0x1.0000000000000p+0",
+   48
+  ],
+  "net0_vs_uniform.shape": [
+   48,
+   1,
+   true
+  ],
+  "net0_vs_uniform.variance_reduction": "0x1.d0649a7f8d062p+0",
+  "net1_vs_net2.a_payoff": "float64 [48, 2] f40e9a9a8651adda56fe7d8c",
+  "net1_vs_net2.b_payoff": "float64 [48, 2] aa60ec1877103c06ac58bd1b",
+  "net1_vs_net2.diff": [
+   "-0x1.d555555555555p-3",
+   "0x1.27fad4c1b0f88p-2",
+   "-0x1.97636222043fbp-1",
+   "0x1.59716eeeb32a2p-2",
+   48
+  ],
+  "net1_vs_net2.mean": [
+   "-0x1.d555555555555p-4",
+   "0x1.27fad4c1b0f88p-3",
+   "-0x1.97636222043fbp-2",
+   "0x1.59716eeeb32a2p-3",
+   48
+  ],
+  "net1_vs_net2.names": [
+   "kuhn_poker",
+   "h2h",
+   "net1",
+   "net2",
+   "DecisionRule(kind='argmax', temperature=1.0)",
+   "DecisionRule(kind='argmax', temperature=1.0)"
+  ],
+  "net1_vs_net2.se_unpaired": "0x1.339a87b90c4dbp-3",
+  "net1_vs_net2.seat0": [
+   "0x1.9555555555555p-2",
+   "0x1.a9b6605fd960dp-3",
+   "-0x1.7b6ddbbf94360p-7",
+   "0x1.9b430cc453a62p-1",
+   48
+  ],
+  "net1_vs_net2.seat1": [
+   "-0x1.4000000000000p-1",
+   "0x1.896a9d17af8e1p-3",
+   "-0x1.0062a07e9e9cep+0",
+   "-0x1.fceafc0b0b192p-3",
+   48
+  ],
+  "net1_vs_net2.shape": [
+   48,
+   1,
+   true
+  ],
+  "net1_vs_net2.variance_reduction": "0x1.1480956a7ca7cp+0"
+ },
+ "evaluator/kuhn/head_to_head/independent": {
+  "net0_vs_uniform.a_payoff": "float64 [32, 2] dbde001505c9cd873777fd24",
+  "net0_vs_uniform.b_payoff": "float64 [32, 2] 6a00a4a5cbbf4da164bf7f1f",
+  "net0_vs_uniform.diff": [
+   "0x1.4000000000000p-2",
+   "0x1.71163588f4d2fp-2",
+   "-0x1.936591213516ap-2",
+   "0x1.04d964484d45ap+0",
+   32
+  ],
+  "net0_vs_uniform.mean": [
+   "0x1.4000000000000p-3",
+   "0x1.71163588f4d2fp-3",
+   "-0x1.936591213516ap-3",
+   "0x1.04d964484d45ap-1",
+   32
+  ],
+  "net0_vs_uniform.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net0_vs_uniform.se_unpaired": "0x1.64e2452c56b1cp-3",
+  "net0_vs_uniform.seat0": [
+   "0x1.0000000000000p-2",
+   "0x1.f7ac9b1db11bfp-3",
+   "-0x1.db2ef199b3242p-3",
+   "0x1.76cbbc666cc90p-1",
+   32
+  ],
+  "net0_vs_uniform.seat1": [
+   "0x1.0000000000000p-4",
+   "0x1.ff7bcde6d0fddp-3",
+   "-0x1.b53ea6794f0c9p-2",
+   "0x1.1a9f533ca7864p-1",
+   32
+  ],
+  "net0_vs_uniform.shape": [
+   32,
+   1,
+   false
+  ],
+  "net0_vs_uniform.variance_reduction": "0x1.deb42c50ec4a1p-1"
+ },
+ "evaluator/kuhn/head_to_head/sample": {
+  "net0_vs_net0.a_payoff": "float64 [16, 2] 819102bcc694842af480c338",
+  "net0_vs_net0.b_payoff": "float64 [16, 2] c85c5a45a4cb74e06ebe25d5",
+  "net0_vs_net0.diff": [
+   "-0x1.8000000000000p-3",
+   "0x1.53dd0e77c6734p-2",
+   "-0x1.ad0f637caec97p-1",
+   "0x1.da1ec6f95d92ep-2",
+   16
+  ],
+  "net0_vs_net0.mean": [
+   "-0x1.8000000000000p-4",
+   "0x1.53dd0e77c6734p-3",
+   "-0x1.ad0f637caec97p-2",
+   "0x1.da1ec6f95d92ep-3",
+   16
+  ],
+  "net0_vs_net0.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "net0",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net0_vs_net0.se_unpaired": "0x1.f244779874c8ap-3",
+  "net0_vs_net0.seat0": [
+   "0x1.0000000000000p-1",
+   "0x1.43d136248490fp-2",
+   "-0x1.eaae321f8aac0p-4",
+   "0x1.1eaae321f8aacp+0",
+   16
+  ],
+  "net0_vs_net0.seat1": [
+   "-0x1.6000000000000p-1",
+   "0x1.4000000000000p-2",
+   "-0x1.4ccc0ff9aafd9p+0",
+   "-0x1.333f006550270p-4",
+   16
+  ],
+  "net0_vs_net0.shape": [
+   16,
+   1,
+   true
+  ],
+  "net0_vs_net0.variance_reduction": "0x1.131f557351efbp+1",
+  "net0_vs_uniform.a_payoff": "float64 [48, 2] d9fb6d2f19a81b7980ce2dfb",
+  "net0_vs_uniform.b_payoff": "float64 [48, 2] ddc74e59028abb0553ee7b48",
+  "net0_vs_uniform.diff": [
+   "-0x1.d555555555555p-3",
+   "0x1.d9472fa76d2b5p-3",
+   "-0x1.5d3c3e5f8701dp-1",
+   "0x1.ca464ed3715cbp-3",
+   48
+  ],
+  "net0_vs_uniform.mean": [
+   "-0x1.d555555555555p-4",
+   "0x1.d9472fa76d2b5p-4",
+   "-0x1.5d3c3e5f8701dp-2",
+   "0x1.ca464ed3715cbp-4",
+   48
+  ],
+  "net0_vs_uniform.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net0_vs_uniform.se_unpaired": "0x1.2f15c9dd87fc6p-3",
+  "net0_vs_uniform.seat0": [
+   "-0x1.d555555555555p-3",
+   "0x1.b47e717191d26p-3",
+   "-0x1.4b361fd5e75dfp-1",
+   "0x1.822dd4acf2cd1p-3",
+   48
+  ],
+  "net0_vs_uniform.seat1": [
+   "0x0.0p+0",
+   "0x1.a6785b41bacf8p-3",
+   "-0x1.9e035c9c8e188p-2",
+   "0x1.9e035c9c8e188p-2",
+   48
+  ],
+  "net0_vs_uniform.shape": [
+   48,
+   1,
+   true
+  ],
+  "net0_vs_uniform.variance_reduction": "0x1.a3f2e7f53ecaep+0",
+  "net1_vs_net2.a_payoff": "float64 [48, 2] 77923d333b82d9103e43cc04",
+  "net1_vs_net2.b_payoff": "float64 [48, 2] 9efef343c1db5e36d4729198",
+  "net1_vs_net2.diff": [
+   "0x1.aaaaaaaaaaaabp-4",
+   "0x1.bcee5a17c91b6p-3",
+   "-0x1.495b964c0503ap-2",
+   "0x1.0f5875d0ad2c8p-1",
+   48
+  ],
+  "net1_vs_net2.mean": [
+   "0x1.aaaaaaaaaaaabp-5",
+   "0x1.bcee5a17c91b6p-4",
+   "-0x1.495b964c0503ap-3",
+   "0x1.0f5875d0ad2c8p-2",
+   48
+  ],
+  "net1_vs_net2.names": [
+   "kuhn_poker",
+   "h2h",
+   "net1",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net1_vs_net2.se_unpaired": "0x1.2fd7c5fe75dbep-3",
+  "net1_vs_net2.seat0": [
+   "-0x1.5555555555555p-5",
+   "0x1.b34b5934b762bp-3",
+   "-0x1.d53f4d2c82b34p-2",
+   "0x1.7fe9f7d72d5dep-2",
+   48
+  ],
+  "net1_vs_net2.seat1": [
+   "0x1.2aaaaaaaaaaabp-3",
+   "0x1.aacd854b4c5f6p-3",
+   "-0x1.0cecfd4817fe4p-2",
+   "0x1.1bcbd3f961548p-1",
+   48
+  ],
+  "net1_vs_net2.shape": [
+   48,
+   1,
+   true
+  ],
+  "net1_vs_net2.variance_reduction": "0x1.dd8b099d85ceep+0"
+ },
+ "evaluator/kuhn/mixture_head_to_head": {
+  "a_members": "int32 [40] 1f087a5d53fa97c27a566c9b",
+  "a_weights": "float64 [2] a084810e7c2a939ffa5af0a8",
+  "b_members": "int32 [40] b598231ceda37955baa7a5ed",
+  "b_weights": "float64 [2] 0b2da2ec1eccae41f0083ffe",
+  "result.a_payoff": "float64 [40, 2] de3dd7eac3e50b684155109a",
+  "result.b_payoff": "float64 [40, 2] 30bb0864c1e88952d17d6a7a",
+  "result.diff": [
+   "0x1.3333333333333p-3",
+   "0x1.de55d64f171e5p-3",
+   "-0x1.3b28f48d9c3fap-2",
+   "0x1.372e13e067b97p-1",
+   40
+  ],
+  "result.mean": [
+   "0x1.3333333333333p-4",
+   "0x1.de55d64f171e5p-4",
+   "-0x1.3b28f48d9c3fap-3",
+   "0x1.372e13e067b97p-2",
+   40
+  ],
+  "result.names": [
+   "kuhn_poker",
+   "h2h",
+   "A",
+   "B",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "result.se_unpaired": "0x1.5b1ca76a78613p-3",
+  "result.seat0": [
+   "0x1.ccccccccccccdp-2",
+   "0x1.e0941124771d0p-3",
+   "-0x1.450faf7321c00p-7",
+   "0x1.d1e10b8a9953dp-1",
+   40
+  ],
+  "result.seat1": [
+   "-0x1.3333333333333p-2",
+   "0x1.dc5d2b035f030p-3",
+   "-0x1.8303982518b90p-1",
+   "0x1.3f4193c796176p-3",
+   40
+  ],
+  "result.shape": [
+   40,
+   1,
+   true
+  ],
+  "result.variance_reduction": "0x1.0d9d75acc8570p+1"
+ },
+ "evaluator/kuhn/payoff_matrix": {
+  "cell00.a_payoff": "float64 [24, 2] 498154b2e6a7c9e91740c132",
+  "cell00.b_payoff": "float64 [24, 2] f5ecda115dace8d02c606497",
+  "cell00.diff": [
+   "0x1.8000000000000p-2",
+   "0x1.f9772e2898feep-3",
+   "-0x1.bd63774fcbaf0p-4",
+   "0x1.b7ac6ee9f975ep-1",
+   24
+  ],
+  "cell00.mean": [
+   "0x1.8000000000000p-3",
+   "0x1.f9772e2898feep-4",
+   "-0x1.bd63774fcbaf0p-5",
+   "0x1.b7ac6ee9f975ep-2",
+   24
+  ],
+  "cell00.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "net0",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell00.se_unpaired": "0x1.b643da695d3a8p-3",
+  "cell00.seat0": [
+   "0x1.0000000000000p-3",
+   "0x1.58e8a7bf5f187p-2",
+   "-0x1.120121d3ae505p-1",
+   "0x1.920121d3ae505p-1",
+   24
+  ],
+  "cell00.seat1": [
+   "0x1.0000000000000p-2",
+   "0x1.155e772523d42p-2",
+   "-0x1.1fa21d6861c78p-2",
+   "0x1.8fd10eb430e3cp-1",
+   24
+  ],
+  "cell00.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell00.variance_reduction": "0x1.80e942d6ff402p+1",
+  "cell01.a_payoff": "float64 [24, 2] d3b8d542196091a0d0a75101",
+  "cell01.b_payoff": "float64 [24, 2] 29b797fcc43e1db6ca8447e2",
+  "cell01.diff": [
+   "-0x1.0000000000000p-2",
+   "0x1.5301ae10f2e6cp-2",
+   "-0x1.cc38674e02dd7p-1",
+   "0x1.9870ce9c05baep-2",
+   24
+  ],
+  "cell01.mean": [
+   "-0x1.0000000000000p-3",
+   "0x1.5301ae10f2e6cp-3",
+   "-0x1.cc38674e02dd7p-2",
+   "0x1.9870ce9c05baep-3",
+   24
+  ],
+  "cell01.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "net1",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell01.se_unpaired": "0x1.9758d4accbb0ap-3",
+  "cell01.seat0": [
+   "-0x1.5555555555555p-2",
+   "0x1.115843e394044p-2",
+   "-0x1.b68a257d1f64cp-1",
+   "0x1.84d3409f283dap-3",
+   24
+  ],
+  "cell01.seat1": [
+   "0x1.5555555555555p-4",
+   "0x1.2d6fba069ecdep-2",
+   "-0x1.f978a1b6d4217p-2",
+   "0x1.5211a630bf661p-1",
+   24
+  ],
+  "cell01.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell01.variance_reduction": "0x1.719e2333a1d44p+0",
+  "cell02.a_payoff": "float64 [24, 2] 2b858ea2ace9dc151be8ad98",
+  "cell02.b_payoff": "float64 [24, 2] ad1a6b5b76c4b46b2d276b4b",
+  "cell02.diff": [
+   "0x1.5555555555555p-5",
+   "0x1.1009e49cc391fp-2",
+   "-0x1.ea84ef7a6e59bp-2",
+   "0x1.1fed2267e1d78p-1",
+   24
+  ],
+  "cell02.mean": [
+   "0x1.5555555555555p-6",
+   "0x1.1009e49cc391fp-3",
+   "-0x1.ea84ef7a6e59bp-3",
+   "0x1.1fed2267e1d78p-2",
+   24
+  ],
+  "cell02.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell02.se_unpaired": "0x1.c63c4df347257p-3",
+  "cell02.seat0": [
+   "-0x1.0000000000000p-1",
+   "0x1.2df60c5df2c9ep-2",
+   "-0x1.13f54ec2693d4p+0",
+   "0x1.3f54ec2693d38p-4",
+   24
+  ],
+  "cell02.seat1": [
+   "0x1.1555555555555p-1",
+   "0x1.340f314544b32p-2",
+   "-0x1.88f2cd58d0c80p-5",
+   "0x1.219cebc01bdb9p+0",
+   24
+  ],
+  "cell02.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell02.variance_reduction": "0x1.64deedc8a57d5p+1",
+  "cell03.a_payoff": "float64 [24, 2] c92268a91074a792b6d11d79",
+  "cell03.b_payoff": "float64 [24, 2] 26c7a0059518f8f9b80b5bf7",
+  "cell03.diff": [
+   "-0x1.5555555555555p-3",
+   "0x1.115843e394043p-2",
+   "-0x1.6134d027ca0f5p-1",
+   "0x1.6d144afa3ec96p-2",
+   24
+  ],
+  "cell03.mean": [
+   "-0x1.5555555555555p-4",
+   "0x1.115843e394043p-3",
+   "-0x1.6134d027ca0f5p-2",
+   "0x1.6d144afa3ec96p-3",
+   24
+  ],
+  "cell03.names": [
+   "kuhn_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell03.se_unpaired": "0x1.b2c297072ceb0p-3",
+  "cell03.seat0": [
+   "0x1.aaaaaaaaaaaabp-3",
+   "0x1.20f8066dc0d14p-2",
+   "-0x1.610902f89c8d2p-2",
+   "0x1.85d9d6d1a39bfp-1",
+   24
+  ],
+  "cell03.seat1": [
+   "-0x1.8000000000000p-2",
+   "0x1.3f2a04243afc2p-2",
+   "-0x1.f8c66cacf9c49p-1",
+   "0x1.e319b2b3e7124p-3",
+   24
+  ],
+  "cell03.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell03.variance_reduction": "0x1.43cee2eb69b49p+1",
+  "cell11.a_payoff": "float64 [24, 2] a8934a8654137627883d7a0e",
+  "cell11.b_payoff": "float64 [24, 2] bc61054cb123c73132abf1b6",
+  "cell11.diff": [
+   "-0x1.0000000000000p-3",
+   "0x1.2febb06e9e289p-2",
+   "-0x1.69d636debe924p-1",
+   "0x1.d3ac6dbd7d248p-2",
+   24
+  ],
+  "cell11.mean": [
+   "-0x1.0000000000000p-4",
+   "0x1.2febb06e9e289p-3",
+   "-0x1.69d636debe924p-2",
+   "0x1.d3ac6dbd7d248p-3",
+   24
+  ],
+  "cell11.names": [
+   "kuhn_poker",
+   "h2h",
+   "net1",
+   "net1",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell11.se_unpaired": "0x1.9f65b39eccf0cp-3",
+  "cell11.seat0": [
+   "0x1.0000000000000p-1",
+   "0x1.1a7571ec9b9f2p-2",
+   "-0x1.4cdf438831f10p-5",
+   "0x1.0a66fa1c418f8p+0",
+   24
+  ],
+  "cell11.seat1": [
+   "-0x1.4000000000000p-1",
+   "0x1.0423f33d8701ep-2",
+   "-0x1.1f776a7c1c386p+0",
+   "-0x1.0444ac1f1e3d0p-3",
+   24
+  ],
+  "cell11.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell11.variance_reduction": "0x1.de3db172c668cp+0",
+  "cell12.a_payoff": "float64 [24, 2] 0907cde7b1dfabe2e973e4c2",
+  "cell12.b_payoff": "float64 [24, 2] 6b4cfbdc2d7beb62d59720a0",
+  "cell12.diff": [
+   "-0x1.aaaaaaaaaaaabp-3",
+   "0x1.1a51917e7a2cfp-2",
+   "-0x1.7f55764fabbd1p-1",
+   "0x1.540041f4accf6p-2",
+   24
+  ],
+  "cell12.mean": [
+   "-0x1.aaaaaaaaaaaabp-4",
+   "0x1.1a51917e7a2cfp-3",
+   "-0x1.7f55764fabbd1p-2",
+   "0x1.540041f4accf6p-3",
+   24
+  ],
+  "cell12.names": [
+   "kuhn_poker",
+   "h2h",
+   "net1",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell12.se_unpaired": "0x1.b8bb90f01b24fp-3",
+  "cell12.seat0": [
+   "-0x1.8000000000000p-2",
+   "0x1.3f2a04243afc2p-2",
+   "-0x1.f8c66cacf9c49p-1",
+   "0x1.e319b2b3e7124p-3",
+   24
+  ],
+  "cell12.seat1": [
+   "0x1.5555555555555p-3",
+   "0x1.2bdb59fcc8cafp-2",
+   "-0x1.a10abcd57797ap-2",
+   "0x1.7b30091566767p-1",
+   24
+  ],
+  "cell12.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell12.variance_reduction": "0x1.37f28ae412d85p+1",
+  "cell13.a_payoff": "float64 [24, 2] 2ac81b8accd73e8979db5bd6",
+  "cell13.b_payoff": "float64 [24, 2] 58b5ba709bad7d279679ddc7",
+  "cell13.diff": [
+   "-0x1.aaaaaaaaaaaabp-3",
+   "0x1.1a51917e7a2cfp-2",
+   "-0x1.7f55764fabbd1p-1",
+   "0x1.540041f4accf6p-2",
+   24
+  ],
+  "cell13.mean": [
+   "-0x1.aaaaaaaaaaaabp-4",
+   "0x1.1a51917e7a2cfp-3",
+   "-0x1.7f55764fabbd1p-2",
+   "0x1.540041f4accf6p-3",
+   24
+  ],
+  "cell13.names": [
+   "kuhn_poker",
+   "h2h",
+   "net1",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell13.se_unpaired": "0x1.b8bb90f01b24fp-3",
+  "cell13.seat0": [
+   "-0x1.5555555555555p-2",
+   "0x1.3845196c23398p-2",
+   "-0x1.dcaf812244200p-1",
+   "0x1.0eb45799dd957p-2",
+   24
+  ],
+  "cell13.seat1": [
+   "0x1.0000000000000p-3",
+   "0x1.361ba449b880ep-2",
+   "-0x1.dfcceb2c79070p-2",
+   "0x1.6fe675963c838p-1",
+   24
+  ],
+  "cell13.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell13.variance_reduction": "0x1.37f28ae412d85p+1",
+  "cell22.a_payoff": "float64 [24, 2] 6264ac5dc281f9e4f24f0f0b",
+  "cell22.b_payoff": "float64 [24, 2] 669220b476d761b4df6332ad",
+  "cell22.diff": [
+   "-0x1.5555555555555p-3",
+   "0x1.0a4dffa1329bdp-2",
+   "-0x1.5a4e9fcf4a26dp-1",
+   "0x1.5f47ea493ef86p-2",
+   24
+  ],
+  "cell22.mean": [
+   "-0x1.5555555555555p-4",
+   "0x1.0a4dffa1329bdp-3",
+   "-0x1.5a4e9fcf4a26dp-2",
+   "0x1.5f47ea493ef86p-3",
+   24
+  ],
+  "cell22.names": [
+   "kuhn_poker",
+   "h2h",
+   "net2",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell22.se_unpaired": "0x1.8a66566f7a1c9p-3",
+  "cell22.seat0": [
+   "0x1.5555555555555p-4",
+   "0x1.19e5d4cec38b5p-2",
+   "-0x1.d32d18cdc5001p-2",
+   "0x1.3eebe1bc37d56p-1",
+   24
+  ],
+  "cell22.seat1": [
+   "-0x1.0000000000000p-2",
+   "0x1.155e772523d42p-2",
+   "-0x1.8fd10eb430e3cp-1",
+   "0x1.1fa21d6861c78p-2",
+   24
+  ],
+  "cell22.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell22.variance_reduction": "0x1.18c0f8ff38cd5p+1",
+  "cell23.a_payoff": "float64 [24, 2] f254e18fe2a1435b1fffe775",
+  "cell23.b_payoff": "float64 [24, 2] 2c4698254903ae0173c63b08",
+  "cell23.diff": [
+   "-0x1.2aaaaaaaaaaabp-2",
+   "0x1.f46dfd9e20481p-3",
+   "-0x1.8a8a134619273p-1",
+   "0x1.7f7da26db9f20p-3",
+   24
+  ],
+  "cell23.mean": [
+   "-0x1.2aaaaaaaaaaabp-3",
+   "0x1.f46dfd9e20481p-4",
+   "-0x1.8a8a134619273p-2",
+   "0x1.7f7da26db9f20p-4",
+   24
+  ],
+  "cell23.names": [
+   "kuhn_poker",
+   "h2h",
+   "net2",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell23.se_unpaired": "0x1.aacd854b4c5f6p-3",
+  "cell23.seat0": [
+   "0x1.0000000000000p-3",
+   "0x1.2326deb0ac29bp-2",
+   "-0x1.baa5a91ab345ap-2",
+   "0x1.5d52d48d59a2dp-1",
+   24
+  ],
+  "cell23.seat1": [
+   "-0x1.aaaaaaaaaaaabp-2",
+   "0x1.33ac782eb914dp-2",
+   "-0x1.016c8c2a321ecp+0",
+   "0x1.60b9b6a6e64b2p-3",
+   24
+  ],
+  "cell23.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell23.variance_reduction": "0x1.746cb73fe8a49p+1",
+  "cell33.a_payoff": "float64 [24, 2] 46e9dc199644523f313ea167",
+  "cell33.b_payoff": "float64 [24, 2] 1011cef40af07e3d701353ed",
+  "cell33.diff": [
+   "0x1.aaaaaaaaaaaabp-3",
+   "0x1.2dd47d62bfde1p-2",
+   "-0x1.7a3e1fb0c5078p-2",
+   "0x1.9274652db7d92p-1",
+   24
+  ],
+  "cell33.mean": [
+   "0x1.aaaaaaaaaaaabp-4",
+   "0x1.2dd47d62bfde1p-3",
+   "-0x1.7a3e1fb0c5078p-3",
+   "0x1.9274652db7d92p-2",
+   24
+  ],
+  "cell33.names": [
+   "kuhn_poker",
+   "h2h",
+   "uniform",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell33.se_unpaired": "0x1.abe3f41bb77c4p-3",
+  "cell33.seat0": [
+   "0x0.0p+0",
+   "0x1.1a7571ec9b9f2p-2",
+   "-0x1.14cdf438831f1p-1",
+   "0x1.14cdf438831f1p-1",
+   24
+  ],
+  "cell33.seat1": [
+   "0x1.aaaaaaaaaaaabp-3",
+   "0x1.4608afd8c7c96p-2",
+   "-0x1.a9ae726cede8ap-2",
+   "0x1.aa2c8e8bcc49bp-1",
+   24
+  ],
+  "cell33.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell33.variance_reduction": "0x1.013f37ceabcf0p+1",
+  "pm.hi": "float64 [4, 4] 902f9a68556068a1df429543",
+  "pm.lo": "float64 [4, 4] f5810c78fc727c5e61e1ec89",
+  "pm.mean": "float64 [4, 4] d59582ff085fb78278af94b3",
+  "pm.n_deals": 24,
+  "pm.names": [
+   "net0",
+   "net1",
+   "net2",
+   "uniform"
+  ],
+  "pm.se": "float64 [4, 4] 50d5bc4c5fe0faa4b7b09097"
+ },
+ "evaluator/leduc/head_to_head/argmax": {
+  "net0_vs_net0.a_payoff": "float64 [16, 2] ec971fd3564229a30b091987",
+  "net0_vs_net0.b_payoff": "float64 [16, 2] 5d62ec0034804d0ff4dbebed",
+  "net0_vs_net0.diff": [
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   16
+  ],
+  "net0_vs_net0.mean": [
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   "0x0.0p+0",
+   16
+  ],
+  "net0_vs_net0.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "net0",
+   "DecisionRule(kind='argmax', temperature=1.0)",
+   "DecisionRule(kind='argmax', temperature=1.0)"
+  ],
+  "net0_vs_net0.se_unpaired": "0x1.cb36e7ef9a6c4p+0",
+  "net0_vs_net0.seat0": [
+   "0x1.b000000000000p+1",
+   "0x1.36a9ef26f762fp+1",
+   "-0x1.61c79d080a45cp+0",
+   "0x1.0438f3a10148cp+3",
+   16
+  ],
+  "net0_vs_net0.seat1": [
+   "-0x1.b000000000000p+1",
+   "0x1.36a9ef26f762fp+1",
+   "-0x1.0438f3a10148cp+3",
+   "0x1.61c79d080a45cp+0",
+   16
+  ],
+  "net0_vs_net0.shape": [
+   16,
+   1,
+   true
+  ],
+  "net0_vs_net0.variance_reduction": "inf",
+  "net0_vs_uniform.a_payoff": "float64 [48, 2] 9b102308525df85d4056d6d6",
+  "net0_vs_uniform.b_payoff": "float64 [48, 2] 9512f683c759f8657e10a35d",
+  "net0_vs_uniform.diff": [
+   "0x1.0000000000000p+1",
+   "0x0.0p+0",
+   "0x1.0000000000000p+1",
+   "0x1.0000000000000p+1",
+   48
+  ],
+  "net0_vs_uniform.mean": [
+   "0x1.0000000000000p+0",
+   "0x0.0p+0",
+   "0x1.0000000000000p+0",
+   "0x1.0000000000000p+0",
+   48
+  ],
+  "net0_vs_uniform.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='argmax', temperature=1.0)",
+   "DecisionRule(kind='argmax', temperature=1.0)"
+  ],
+  "net0_vs_uniform.se_unpaired": "0x0.0p+0",
+  "net0_vs_uniform.seat0": [
+   "0x1.0000000000000p+0",
+   "0x0.0p+0",
+   "0x1.0000000000000p+0",
+   "0x1.0000000000000p+0",
+   48
+  ],
+  "net0_vs_uniform.seat1": [
+   "0x1.0000000000000p+0",
+   "0x0.0p+0",
+   "0x1.0000000000000p+0",
+   "0x1.0000000000000p+0",
+   48
+  ],
+  "net0_vs_uniform.shape": [
+   48,
+   1,
+   true
+  ],
+  "net0_vs_uniform.variance_reduction": "nan",
+  "net1_vs_net2.a_payoff": "float64 [48, 2] be83544a43cf84448ad42770",
+  "net1_vs_net2.b_payoff": "float64 [48, 2] ad93dc1cfd8b3120a9164899",
+  "net1_vs_net2.diff": [
+   "0x1.2aaaaaaaaaaabp-3",
+   "0x1.74c9cb0d1d9ddp-1",
+   "-0x1.47fe10bfc5566p+0",
+   "0x1.92a8bb6a70010p+0",
+   48
+  ],
+  "net1_vs_net2.mean": [
+   "0x1.2aaaaaaaaaaabp-4",
+   "0x1.74c9cb0d1d9ddp-2",
+   "-0x1.47fe10bfc5566p-1",
+   "0x1.92a8bb6a70010p-1",
+   48
+  ],
+  "net1_vs_net2.names": [
+   "leduc_poker",
+   "h2h",
+   "net1",
+   "net2",
+   "DecisionRule(kind='argmax', temperature=1.0)",
+   "DecisionRule(kind='argmax', temperature=1.0)"
+  ],
+  "net1_vs_net2.se_unpaired": "0x1.8aa1580a12761p-2",
+  "net1_vs_net2.seat0": [
+   "0x1.0555555555555p+0",
+   "0x1.7e2d4a75f6ab2p-1",
+   "-0x1.c4c5ccae7ddccp-2",
+   "0x1.3dee0eeb2510ep+1",
+   48
+  ],
+  "net1_vs_net2.seat1": [
+   "-0x1.c000000000000p-1",
+   "0x1.213edb4ab3c9ap-4",
+   "-0x1.036e92c102410p+0",
+   "-0x1.7922da7dfb7e0p-1",
+   48
+  ],
+  "net1_vs_net2.shape": [
+   48,
+   1,
+   true
+  ],
+  "net1_vs_net2.variance_reduction": "0x1.1ee09a5bb5639p+0"
+ },
+ "evaluator/leduc/head_to_head/independent": {
+  "net0_vs_uniform.a_payoff": "float64 [32, 2] 08b57f63f0f69137ccdfbcb8",
+  "net0_vs_uniform.b_payoff": "float64 [32, 2] 1e30035d8236489d80b03b26",
+  "net0_vs_uniform.diff": [
+   "0x1.7800000000000p+1",
+   "0x1.33fe7f9ef8208p+0",
+   "0x1.28af67ba8272cp-1",
+   "0x1.52ea1308afb1ap+2",
+   32
+  ],
+  "net0_vs_uniform.mean": [
+   "0x1.7800000000000p+0",
+   "0x1.33fe7f9ef8208p-1",
+   "0x1.28af67ba8272cp-2",
+   "0x1.52ea1308afb1ap+1",
+   32
+  ],
+  "net0_vs_uniform.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net0_vs_uniform.se_unpaired": "0x1.39521df7853f1p-1",
+  "net0_vs_uniform.seat0": [
+   "0x1.e000000000000p-1",
+   "0x1.afe514e08270bp-1",
+   "-0x1.6e7f93e9dc834p-1",
+   "0x1.4b9fe4fa7720dp+1",
+   32
+  ],
+  "net0_vs_uniform.seat1": [
+   "0x1.0000000000000p+1",
+   "0x1.c7bfa802af4dbp-1",
+   "0x1.057f82e4f58acp-2",
+   "0x1.df500fa3614eap+1",
+   32
+  ],
+  "net0_vs_uniform.shape": [
+   32,
+   1,
+   false
+  ],
+  "net0_vs_uniform.variance_reduction": "0x1.08ee708c82212p+0"
+ },
+ "evaluator/leduc/head_to_head/sample": {
+  "net0_vs_net0.a_payoff": "float64 [16, 2] d08f004f4f68702e7a2f3b42",
+  "net0_vs_net0.b_payoff": "float64 [16, 2] 9a7dae5969bbc9058af0ebda",
+  "net0_vs_net0.diff": [
+   "-0x1.b000000000000p+0",
+   "0x1.69d3940bb55b7p+0",
+   "-0x1.1d4aadeab4ca4p+2",
+   "0x1.152ab7aad3290p+0",
+   16
+  ],
+  "net0_vs_net0.mean": [
+   "-0x1.b000000000000p-1",
+   "0x1.69d3940bb55b7p-1",
+   "-0x1.1d4aadeab4ca4p+1",
+   "0x1.152ab7aad3290p-1",
+   16
+  ],
+  "net0_vs_net0.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "net0",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net0_vs_net0.se_unpaired": "0x1.278da3d392a50p+0",
+  "net0_vs_net0.seat0": [
+   "0x0.0p+0",
+   "0x1.8df7da2e66e87p+0",
+   "-0x1.86006bac7560ap+1",
+   "0x1.86006bac7560ap+1",
+   16
+  ],
+  "net0_vs_net0.seat1": [
+   "-0x1.b000000000000p+0",
+   "0x1.bb3b5522afb42p+0",
+   "-0x1.452df8a7c790ep+2",
+   "0x1.b4b7e29f1e436p+0",
+   16
+  ],
+  "net0_vs_net0.shape": [
+   16,
+   1,
+   true
+  ],
+  "net0_vs_net0.variance_reduction": "0x1.559e3a34251d4p+1",
+  "net0_vs_uniform.a_payoff": "float64 [48, 2] b3b26f641a73a0bbd336732b",
+  "net0_vs_uniform.b_payoff": "float64 [48, 2] 3990b26973359f291d8f9070",
+  "net0_vs_uniform.diff": [
+   "0x1.cd55555555555p+1",
+   "0x1.db3719d6f7fe7p-1",
+   "0x1.c8f6dbc56c5b2p+0",
+   "0x1.5b179e63fa3e8p+2",
+   48
+  ],
+  "net0_vs_uniform.mean": [
+   "0x1.cd55555555555p+0",
+   "0x1.db3719d6f7fe7p-2",
+   "0x1.c8f6dbc56c5b2p-1",
+   "0x1.5b179e63fa3e8p+1",
+   48
+  ],
+  "net0_vs_uniform.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net0_vs_uniform.se_unpaired": "0x1.1aa42888557d8p-1",
+  "net0_vs_uniform.seat0": [
+   "0x1.eaaaaaaaaaaabp-1",
+   "0x1.75b66492b3dddp-1",
+   "-0x1.e397b728ba2bep-2",
+   "0x1.31c84c3a6c9adp+1",
+   48
+  ],
+  "net0_vs_uniform.seat1": [
+   "0x1.52aaaaaaaaaabp+1",
+   "0x1.a2bcd822e1e26p-1",
+   "0x1.0afa5b37095e5p+0",
+   "0x1.0fec13dce8532p+2",
+   48
+  ],
+  "net0_vs_uniform.shape": [
+   48,
+   1,
+   true
+  ],
+  "net0_vs_uniform.variance_reduction": "0x1.6a3c2380205d4p+0",
+  "net1_vs_net2.a_payoff": "float64 [48, 2] 0b667b2ee264ca29326c2eac",
+  "net1_vs_net2.b_payoff": "float64 [48, 2] a0108065e1d66d7eba2c34ba",
+  "net1_vs_net2.diff": [
+   "-0x1.3800000000000p+1",
+   "0x1.537b14f25e91fp-1",
+   "-0x1.de57b006252b2p+1",
+   "-0x1.23509ff3b5a9dp+0",
+   48
+  ],
+  "net1_vs_net2.mean": [
+   "-0x1.3800000000000p+0",
+   "0x1.537b14f25e91fp-2",
+   "-0x1.de57b006252b2p+0",
+   "-0x1.23509ff3b5a9dp-1",
+   48
+  ],
+  "net1_vs_net2.names": [
+   "leduc_poker",
+   "h2h",
+   "net1",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "net1_vs_net2.se_unpaired": "0x1.7de25ce114e9ap-2",
+  "net1_vs_net2.seat0": [
+   "-0x1.e555555555555p+0",
+   "0x1.481bec54a5faep-1",
+   "-0x1.936fe9a8b2798p+1",
+   "-0x1.4795aeb28b6f6p-1",
+   48
+  ],
+  "net1_vs_net2.seat1": [
+   "-0x1.1555555555555p-1",
+   "0x1.741d9423b642ap-2",
+   "-0x1.40fffb84a17bap+0",
+   "0x1.5d55317a6132cp-3",
+   48
+  ],
+  "net1_vs_net2.shape": [
+   48,
+   1,
+   true
+  ],
+  "net1_vs_net2.variance_reduction": "0x1.43f2400224177p+0"
+ },
+ "evaluator/leduc/mixture_head_to_head": {
+  "a_members": "int32 [40] 1f087a5d53fa97c27a566c9b",
+  "a_weights": "float64 [2] a084810e7c2a939ffa5af0a8",
+  "b_members": "int32 [40] b598231ceda37955baa7a5ed",
+  "b_weights": "float64 [2] 0b2da2ec1eccae41f0083ffe",
+  "result.a_payoff": "float64 [40, 2] a6139fdc3deba0880bbeacba",
+  "result.b_payoff": "float64 [40, 2] 84cc2a0074f1ab4945982ce5",
+  "result.diff": [
+   "-0x1.0000000000000p-2",
+   "0x1.772552136d5f8p-1",
+   "-0x1.afa2d843ac7f8p+0",
+   "0x1.2fa2d843ac7f8p+0",
+   40
+  ],
+  "result.mean": [
+   "-0x1.0000000000000p-3",
+   "0x1.772552136d5f8p-2",
+   "-0x1.afa2d843ac7f8p-1",
+   "0x1.2fa2d843ac7f8p-1",
+   40
+  ],
+  "result.names": [
+   "leduc_poker",
+   "h2h",
+   "A",
+   "B",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "result.se_unpaired": "0x1.d4d28ac605d35p-2",
+  "result.seat0": [
+   "-0x1.4cccccccccccdp-2",
+   "0x1.4b3305bd55011p-1",
+   "-0x1.97c4f484b62b3p+0",
+   "0x1.e2bd1c3c9f89ap-1",
+   40
+  ],
+  "result.seat1": [
+   "0x1.3333333333333p-4",
+   "0x1.4f3bd41623f6ep-1",
+   "-0x1.3552afbcb68c0p+0",
+   "0x1.5bb916231cf26p+0",
+   40
+  ],
+  "result.shape": [
+   40,
+   1,
+   true
+  ],
+  "result.variance_reduction": "0x1.8fd00d5759bafp+0"
+ },
+ "evaluator/leduc/payoff_matrix": {
+  "cell00.a_payoff": "float64 [24, 2] fd2cfc2107a2a014be1547f1",
+  "cell00.b_payoff": "float64 [24, 2] d82c1917c5bcab281b7abe14",
+  "cell00.diff": [
+   "-0x1.0000000000000p-3",
+   "0x1.531db14772a7ap+0",
+   "-0x1.5c53daf6d752dp+1",
+   "0x1.3c53daf6d752dp+1",
+   24
+  ],
+  "cell00.mean": [
+   "-0x1.0000000000000p-4",
+   "0x1.531db14772a7ap-1",
+   "-0x1.5c53daf6d752dp+0",
+   "0x1.3c53daf6d752dp+0",
+   24
+  ],
+  "cell00.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "net0",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell00.se_unpaired": "0x1.e50e9abd2fa04p-1",
+  "cell00.seat0": [
+   "-0x1.aaaaaaaaaaaabp+0",
+   "0x1.75de9db8e36c1p+0",
+   "-0x1.21dc01bd1497ep+2",
+   "0x1.321ab19efd0a1p+0",
+   24
+  ],
+  "cell00.seat1": [
+   "0x1.8aaaaaaaaaaabp+0",
+   "0x1.252cd91dd762fp+0",
+   "-0x1.67e46cd5df1e2p-1",
+   "0x1.e4a3c5e022724p+1",
+   24
+  ],
+  "cell00.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell00.variance_reduction": "0x1.05e0c743da22fp+1",
+  "cell01.a_payoff": "float64 [24, 2] ea16a487bf4764c957533fdb",
+  "cell01.b_payoff": "float64 [24, 2] e5fc5eaf76d97e11167664ac",
+  "cell01.diff": [
+   "0x1.0aaaaaaaaaaabp+0",
+   "0x1.fcb94c1e10320p-1",
+   "-0x1.cfbf3d30fba7ep-1",
+   "0x1.7e9a79f6e994ap+1",
+   24
+  ],
+  "cell01.mean": [
+   "0x1.0aaaaaaaaaaabp-1",
+   "0x1.fcb94c1e10320p-2",
+   "-0x1.cfbf3d30fba7ep-2",
+   "0x1.7e9a79f6e994ap+0",
+   24
+  ],
+  "cell01.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "net1",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell01.se_unpaired": "0x1.db44cb0cafd3dp-2",
+  "cell01.seat0": [
+   "0x1.aaaaaaaaaaaabp-2",
+   "0x1.2f663c2e06fa6p-1",
+   "-0x1.7d5187b3e936cp-1",
+   "0x1.93fe192f49f0cp+0",
+   24
+  ],
+  "cell01.seat1": [
+   "0x1.4000000000000p-1",
+   "0x1.742540f506246p-1",
+   "-0x1.99644e60a1efep-1",
+   "0x1.06591398287c0p+1",
+   24
+  ],
+  "cell01.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell01.variance_reduction": "0x1.bedf889b84770p-1",
+  "cell02.a_payoff": "float64 [24, 2] 085425eeee0622fce48b58ce",
+  "cell02.b_payoff": "float64 [24, 2] 4e7d01305d33d267a901cc73",
+  "cell02.diff": [
+   "0x1.0555555555555p+2",
+   "0x1.1850607248803p+0",
+   "0x1.efed945374572p+0",
+   "0x1.8eaf4595cd94ep+2",
+   24
+  ],
+  "cell02.mean": [
+   "0x1.0555555555555p+1",
+   "0x1.1850607248803p-1",
+   "0x1.efed945374572p-1",
+   "0x1.8eaf4595cd94ep+1",
+   24
+  ],
+  "cell02.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell02.se_unpaired": "0x1.4eac2f88f38ecp-1",
+  "cell02.seat0": [
+   "0x1.1555555555555p+0",
+   "0x1.02452719350e9p+0",
+   "-0x1.c9bbcf3e9ecb4p-1",
+   "0x1.87c44924fd082p+1",
+   24
+  ],
+  "cell02.seat1": [
+   "0x1.8000000000000p+1",
+   "0x1.9c53c04dbb9bcp-1",
+   "0x1.6bed43c090f4bp+0",
+   "0x1.2504af0fdbc2dp+2",
+   24
+  ],
+  "cell02.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell02.variance_reduction": "0x1.6cea0a934d166p+0",
+  "cell03.a_payoff": "float64 [24, 2] af69b2e12f32344eac4efb74",
+  "cell03.b_payoff": "float64 [24, 2] a5b24a2fa624bc541f30b6b2",
+  "cell03.diff": [
+   "0x1.4555555555555p+1",
+   "0x1.4e0f68cf4b3c0p+0",
+   "-0x1.0512edc3f7880p-6",
+   "0x1.465a6843194cep+2",
+   24
+  ],
+  "cell03.mean": [
+   "0x1.4555555555555p+0",
+   "0x1.4e0f68cf4b3c0p-1",
+   "-0x1.0512edc3f7880p-7",
+   "0x1.465a6843194cep+1",
+   24
+  ],
+  "cell03.names": [
+   "leduc_poker",
+   "h2h",
+   "net0",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell03.se_unpaired": "0x1.ba8cbcf2cd8bap-1",
+  "cell03.seat0": [
+   "0x1.e000000000000p+0",
+   "0x1.1f96642f99f66p+0",
+   "-0x1.4ea4f1280cb08p-2",
+   "0x1.04ea4f1280cb0p+2",
+   24
+  ],
+  "cell03.seat1": [
+   "0x1.5555555555555p-1",
+   "0x1.5396f9d5455e4p+0",
+   "-0x1.eeeac14f33d4ep+0",
+   "0x1.a2200b5244951p+1",
+   24
+  ],
+  "cell03.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell03.variance_reduction": "0x1.c1470e068288ap+0",
+  "cell11.a_payoff": "float64 [24, 2] 129000122f0bb78659d7db32",
+  "cell11.b_payoff": "float64 [24, 2] efae29f999d28ae421031089",
+  "cell11.diff": [
+   "-0x1.5555555555555p-3",
+   "0x1.2f01fe6aff191p-1",
+   "-0x1.539bdd1ec7625p+0",
+   "0x1.fc8d0f92e419fp-1",
+   24
+  ],
+  "cell11.mean": [
+   "-0x1.5555555555555p-4",
+   "0x1.2f01fe6aff191p-2",
+   "-0x1.539bdd1ec7625p-1",
+   "0x1.fc8d0f92e419fp-2",
+   24
+  ],
+  "cell11.names": [
+   "leduc_poker",
+   "h2h",
+   "net1",
+   "net1",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell11.se_unpaired": "0x1.6c627ef5f3253p-2",
+  "cell11.seat0": [
+   "0x1.2aaaaaaaaaaabp-2",
+   "0x1.c6f26377ac9cdp-2",
+   "-0x1.2881a1513449cp-1",
+   "0x1.299625fdef7a4p+0",
+   24
+  ],
+  "cell11.seat1": [
+   "-0x1.d555555555555p-2",
+   "0x1.1c19ab9d3923ep-1",
+   "-0x1.8bbf19c0c1f55p+0",
+   "0x1.4228de2c2e956p-1",
+   24
+  ],
+  "cell11.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell11.variance_reduction": "0x1.7236c4c2e20fcp+0",
+  "cell12.a_payoff": "float64 [24, 2] ad1ebd39873412a8bf23e22e",
+  "cell12.b_payoff": "float64 [24, 2] 8eef86e1e6d412983fefc38e",
+  "cell12.diff": [
+   "-0x1.6aaaaaaaaaaabp-1",
+   "0x1.12fee7a9ec93ap+0",
+   "-0x1.6828536652483p+1",
+   "0x1.65a5fc21f9e5ap+0",
+   24
+  ],
+  "cell12.mean": [
+   "-0x1.6aaaaaaaaaaabp-2",
+   "0x1.12fee7a9ec93ap-1",
+   "-0x1.6828536652483p+0",
+   "0x1.65a5fc21f9e5ap-1",
+   24
+  ],
+  "cell12.names": [
+   "leduc_poker",
+   "h2h",
+   "net1",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell12.se_unpaired": "0x1.0a032298a6560p-1",
+  "cell12.seat0": [
+   "0x1.5555555555555p-4",
+   "0x1.d144af31f900cp-1",
+   "-0x1.b29f084f381a3p+0",
+   "0x1.dd49b2f9e2c4dp+0",
+   24
+  ],
+  "cell12.seat1": [
+   "-0x1.9555555555555p-1",
+   "0x1.0577d9fb57330p-1",
+   "-0x1.cae6988416874p+0",
+   "0x1.ac8a1976098fcp-3",
+   24
+  ],
+  "cell12.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell12.variance_reduction": "0x1.df183ccee2a7fp-1",
+  "cell13.a_payoff": "float64 [24, 2] 7194d2e5832e1b0424c530f1",
+  "cell13.b_payoff": "float64 [24, 2] cd1e55d296ecc100b6951933",
+  "cell13.diff": [
+   "-0x1.0aaaaaaaaaaabp+1",
+   "0x1.99ebaf8cf83edp-1",
+   "-0x1.d3862af62d040p+1",
+   "-0x1.073ca97ca1458p-1",
+   24
+  ],
+  "cell13.mean": [
+   "-0x1.0aaaaaaaaaaabp+0",
+   "0x1.99ebaf8cf83edp-2",
+   "-0x1.d3862af62d040p+0",
+   "-0x1.073ca97ca1458p-2",
+   24
+  ],
+  "cell13.names": [
+   "leduc_poker",
+   "h2h",
+   "net1",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell13.se_unpaired": "0x1.e4eb76eac8329p-2",
+  "cell13.seat0": [
+   "-0x1.6000000000000p+0",
+   "0x1.584e4f446ca32p-1",
+   "-0x1.58b4f0276468ep+1",
+   "-0x1.d2c3f626e5c60p-5",
+   24
+  ],
+  "cell13.seat1": [
+   "-0x1.6aaaaaaaaaaabp-1",
+   "0x1.593965389fb1ap-1",
+   "-0x1.03d2cb6fa34a2p+1",
+   "0x1.39f5d86937d33p-1",
+   24
+  ],
+  "cell13.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell13.variance_reduction": "0x1.663ebab8791e1p+0",
+  "cell22.a_payoff": "float64 [24, 2] 5983ef0d142794414563515f",
+  "cell22.b_payoff": "float64 [24, 2] 32689191752e67a2fcaed55e",
+  "cell22.diff": [
+   "0x1.aaaaaaaaaaaabp-3",
+   "0x1.a8c8c4d2b2f33p-1",
+   "-0x1.6af294f6503efp+0",
+   "0x1.d59d3fa0fae99p+0",
+   24
+  ],
+  "cell22.mean": [
+   "0x1.aaaaaaaaaaaabp-4",
+   "0x1.a8c8c4d2b2f33p-2",
+   "-0x1.6af294f6503efp-1",
+   "0x1.d59d3fa0fae99p-1",
+   24
+  ],
+  "cell22.names": [
+   "leduc_poker",
+   "h2h",
+   "net2",
+   "net2",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell22.se_unpaired": "0x1.9cb8354127e0cp-2",
+  "cell22.seat0": [
+   "-0x1.5555555555555p-4",
+   "0x1.517c4d9549e41p-1",
+   "-0x1.6010278f484ecp+0",
+   "0x1.35657ce49da42p+0",
+   24
+  ],
+  "cell22.seat1": [
+   "0x1.2aaaaaaaaaaabp-2",
+   "0x1.e734d9f3fd7ffp-2",
+   "-0x1.481ec666d9df6p-1",
+   "0x1.3964b888c2451p+0",
+   24
+  ],
+  "cell22.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell22.variance_reduction": "0x1.e3545661caabdp-1",
+  "cell23.a_payoff": "float64 [24, 2] 2aedd44f2eda9c448e818491",
+  "cell23.b_payoff": "float64 [24, 2] 2bf082a70d3f40d3fff5e4b4",
+  "cell23.diff": [
+   "-0x1.8aaaaaaaaaaabp+0",
+   "0x1.17eaa79775237p+0",
+   "-0x1.d7a58644abe3ap+1",
+   "0x1.33eb6e6804e3ap-1",
+   24
+  ],
+  "cell23.mean": [
+   "-0x1.8aaaaaaaaaaabp-1",
+   "0x1.17eaa79775237p-1",
+   "-0x1.d7a58644abe3ap+0",
+   "0x1.33eb6e6804e3ap-2",
+   24
+  ],
+  "cell23.names": [
+   "leduc_poker",
+   "h2h",
+   "net2",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell23.se_unpaired": "0x1.4e6c46e369d39p-1",
+  "cell23.seat0": [
+   "-0x1.aaaaaaaaaaaabp+1",
+   "0x1.32205575bc380p-1",
+   "-0x1.205538e97382ep+2",
+   "-0x1.14aae3826e4fap+1",
+   24
+  ],
+  "cell23.seat1": [
+   "0x1.caaaaaaaaaaabp+0",
+   "0x1.ce42a14776270p-1",
+   "0x1.6a3c2d8c483c0p-6",
+   "0x1.c7d6324f921a4p+1",
+   24
+  ],
+  "cell23.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell23.variance_reduction": "0x1.6d67bd309a0b4p+0",
+  "cell33.a_payoff": "float64 [24, 2] 0238067a902dcc6fe0b49706",
+  "cell33.b_payoff": "float64 [24, 2] 85a7505a389ed8a8a8db9d68",
+  "cell33.diff": [
+   "-0x1.7555555555555p+0",
+   "0x1.1b4a18e6c481dp+0",
+   "-0x1.d049041ad0164p+1",
+   "0x1.6bcebb15eb03ep-1",
+   24
+  ],
+  "cell33.mean": [
+   "-0x1.7555555555555p-1",
+   "0x1.1b4a18e6c481dp-1",
+   "-0x1.d049041ad0164p+0",
+   "0x1.6bcebb15eb03ep-2",
+   24
+  ],
+  "cell33.names": [
+   "leduc_poker",
+   "h2h",
+   "uniform",
+   "uniform",
+   "DecisionRule(kind='sample', temperature=1.0)",
+   "DecisionRule(kind='sample', temperature=1.0)"
+  ],
+  "cell33.se_unpaired": "0x1.2e1ca1ab979d9p-1",
+  "cell33.seat0": [
+   "-0x1.8aaaaaaaaaaabp+0",
+   "0x1.cc337525d2533p-1",
+   "-0x1.a6d3e30585042p+1",
+   "0x1.c29385ada5970p-3",
+   24
+  ],
+  "cell33.seat1": [
+   "0x1.5555555555555p-4",
+   "0x1.7e58f52b5ca3fp-1",
+   "-0x1.615c3e1a7fe9fp+0",
+   "0x1.8c06e8c52a949p+0",
+   24
+  ],
+  "cell33.shape": [
+   24,
+   1,
+   true
+  ],
+  "cell33.variance_reduction": "0x1.232609a55f3f9p+0",
+  "pm.hi": "float64 [4, 4] 40a0fa0a348dea06b12a7665",
+  "pm.lo": "float64 [4, 4] 623bde6e71b90e223628ab4a",
+  "pm.mean": "float64 [4, 4] 3395858bfd7a84685bc68176",
+  "pm.n_deals": 24,
+  "pm.names": [
+   "net0",
+   "net1",
+   "net2",
+   "uniform"
+  ],
+  "pm.se": "float64 [4, 4] 2c7747d98108c8ae80d09c07"
+ },
+ "keys/deal_keys/dup0/s0": {
+  "deal": "uint32 [18, 2] d88ffb69e5ad6d6b2df7e860",
+  "policy": "uint32 [18, 2, 2] d8f2cd90c492f878050b55ec"
+ },
+ "keys/deal_keys/dup0/s11": {
+  "deal": "uint32 [18, 2] b11a267bd7bd6a18fa115a18",
+  "policy": "uint32 [18, 2, 2] 4f5e707e53ac5baa86f25251"
+ },
+ "keys/deal_keys/dup1/s0": {
+  "deal": "uint32 [18, 2] 708cb3f0112ea7626c88357c",
+  "policy": "uint32 [18, 2, 2] d8f2cd90c492f878050b55ec"
+ },
+ "keys/deal_keys/dup1/s11": {
+  "deal": "uint32 [18, 2] 579e0d33185f891128fc3f30",
+  "policy": "uint32 [18, 2, 2] 4f5e707e53ac5baa86f25251"
+ },
+ "keys/duplicate_keys/p2": {
+  "deal": "uint32 [10, 2] 6711dcc5dc07de1d8f3283f7",
+  "policy": "uint32 [10, 2, 2] 4f4a127a27bae3b3d0063d98"
+ },
+ "keys/duplicate_keys/p4": {
+  "deal": "uint32 [20, 2] 1510872f9fbf0cd504ad3619",
+  "policy": "uint32 [20, 4, 2] b21174b0ae8709358b592bbc"
+ },
+ "keys/independent_keys/p2": {
+  "deal": "uint32 [6, 2] fc11d00f11b35517982722b3",
+  "policy": "uint32 [6, 2, 2] 66f16747b60ad0020404fab3"
+ },
+ "keys/independent_keys/p4": {
+  "deal": "uint32 [6, 2] fc11d00f11b35517982722b3",
+  "policy": "uint32 [6, 4, 2] e1de038a69f104ef8c36c3d3"
+ },
+ "league/kuhn/psro_evaluator": {
+  "draws": [
+   [
+    "br0",
+    0,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 5341e6b2646979a70e576530",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "init@0": 32
+    }
+   ],
+   [
+    "br0",
+    1,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 5341e6b2646979a70e576530",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "init@0": 32
+    }
+   ],
+   [
+    "br1",
+    0,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 651e4b471cf5f64e72bc7f74",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "psro1@2": 32
+    }
+   ],
+   [
+    "br1",
+    1,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 651e4b471cf5f64e72bc7f74",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "psro1@2": 32
+    }
+   ]
+  ],
+  "it0.meta": [
+   [
+    "init@0"
+   ],
+   [
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it0.payoff.hi": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it0.payoff.lo": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it0.payoff.mean": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it0.payoff.n_deals": 0,
+  "it0.payoff.names": [
+   "init@0",
+   "br0"
+  ],
+  "it0.payoff.se": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it1.meta": [
+   [
+    "init@0"
+   ],
+   [
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it1.payoff.hi": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it1.payoff.lo": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it1.payoff.mean": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it1.payoff.n_deals": 0,
+  "it1.payoff.names": [
+   "init@0",
+   "br0"
+  ],
+  "it1.payoff.se": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it2.meta": [
+   [
+    "init@0",
+    "psro1@2"
+   ],
+   [
+    "0x0.0p+0",
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it2.payoff.hi": "float64 [3, 3] 7c9c59d98a42bc120ebb941e",
+  "it2.payoff.lo": "float64 [3, 3] 61f76230e62099d244d98a80",
+  "it2.payoff.mean": "float64 [3, 3] 73b1d1f1f52dfda1c87c10fb",
+  "it2.payoff.n_deals": 0,
+  "it2.payoff.names": [
+   "init@0",
+   "psro1@2",
+   "br1"
+  ],
+  "it2.payoff.se": "float64 [3, 3] 943bdd43ee83037580051a25",
+  "it3.meta": [
+   [
+    "init@0",
+    "psro1@2"
+   ],
+   [
+    "0x0.0p+0",
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it3.payoff.hi": "float64 [3, 3] becd90a0004fd87a3b25ee8f",
+  "it3.payoff.lo": "float64 [3, 3] fda49af517ce5b47bbda959b",
+  "it3.payoff.mean": "float64 [3, 3] 9abf465925afb7b2e68a9a16",
+  "it3.payoff.n_deals": 0,
+  "it3.payoff.names": [
+   "init@0",
+   "psro1@2",
+   "br1"
+  ],
+  "it3.payoff.se": "float64 [3, 3] 9e8860d1f364b041d136d0ee",
+  "it4.meta": [
+   [
+    "init@0",
+    "psro1@2",
+    "psro2@2"
+   ],
+   [
+    "0x1.0d79435e50d79p-1",
+    "0x1.0d79435e50d7ap-2",
+    "0x1.af286bca1af28p-3"
+   ]
+  ],
+  "it4.payoff.hi": "float64 [3, 3] 8faa083d92c2eea23e59ff1a",
+  "it4.payoff.lo": "float64 [3, 3] 9dbcead9446e76c9e35a9fdc",
+  "it4.payoff.mean": "float64 [3, 3] e6f51dd81d4cad7825d421af",
+  "it4.payoff.n_deals": 0,
+  "it4.payoff.names": [
+   "init@0",
+   "psro1@2",
+   "psro2@2"
+  ],
+  "it4.payoff.se": "float64 [3, 3] 7f82f79de90e3f17c9391d8a",
+  "member.init@0.params": "fe1ac681990f511e5e4b7ff8",
+  "member.psro1@2.params": "6148fd7fe8db5c11ef4d39a9",
+  "member.psro2@2.params": "81285fcbf715781bee7ff7c5",
+  "members": [
+   [
+    "init@0",
+    "init",
+    "fixed",
+    "",
+    0
+   ],
+   [
+    "psro1@2",
+    "psro",
+    "fixed",
+    "br0",
+    2
+   ],
+   [
+    "psro2@2",
+    "psro",
+    "fixed",
+    "br1",
+    4
+   ]
+  ],
+  "stopped": [
+   true,
+   "psro: 2 iterations"
+  ]
+ },
+ "league/kuhn/psro_exact": {
+  "draws": [
+   [
+    "br0",
+    0,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 5341e6b2646979a70e576530",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "init@0": 32
+    }
+   ],
+   [
+    "br0",
+    1,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 5341e6b2646979a70e576530",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "init@0": 32
+    }
+   ],
+   [
+    "br1",
+    0,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 651e4b471cf5f64e72bc7f74",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "psro1@2": 32
+    }
+   ],
+   [
+    "br1",
+    1,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 651e4b471cf5f64e72bc7f74",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "psro1@2": 32
+    }
+   ]
+  ],
+  "it0.meta": [
+   [
+    "init@0"
+   ],
+   [
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it0.payoff.hi": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it0.payoff.lo": "float64 [2, 2] 9e36673a278e023992b653aa",
+  "it0.payoff.mean": "float64 [2, 2] 9e36673a278e023992b653aa",
+  "it0.payoff.n_deals": 0,
+  "it0.payoff.names": [
+   "init@0",
+   "br0"
+  ],
+  "it0.payoff.se": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it1.meta": [
+   [
+    "init@0"
+   ],
+   [
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it1.payoff.hi": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it1.payoff.lo": "float64 [2, 2] 9e36673a278e023992b653aa",
+  "it1.payoff.mean": "float64 [2, 2] 9e36673a278e023992b653aa",
+  "it1.payoff.n_deals": 0,
+  "it1.payoff.names": [
+   "init@0",
+   "br0"
+  ],
+  "it1.payoff.se": "float64 [2, 2] 66687aadf862bd776c8fc18b",
+  "it2.meta": [
+   [
+    "init@0",
+    "psro1@2"
+   ],
+   [
+    "0x0.0p+0",
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it2.payoff.hi": "float64 [3, 3] 6c96176672dd67ad3fa075a5",
+  "it2.payoff.lo": "float64 [3, 3] 6c96176672dd67ad3fa075a5",
+  "it2.payoff.mean": "float64 [3, 3] 6c96176672dd67ad3fa075a5",
+  "it2.payoff.n_deals": 0,
+  "it2.payoff.names": [
+   "init@0",
+   "psro1@2",
+   "br1"
+  ],
+  "it2.payoff.se": "float64 [3, 3] 834a709ba2534ebe3ee1397f",
+  "it3.meta": [
+   [
+    "init@0",
+    "psro1@2"
+   ],
+   [
+    "0x0.0p+0",
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it3.payoff.hi": "float64 [3, 3] 87e8a7ccc5b499da37f3570a",
+  "it3.payoff.lo": "float64 [3, 3] d7ea8bec72b66705c8ca7a3b",
+  "it3.payoff.mean": "float64 [3, 3] d7ea8bec72b66705c8ca7a3b",
+  "it3.payoff.n_deals": 0,
+  "it3.payoff.names": [
+   "init@0",
+   "psro1@2",
+   "br1"
+  ],
+  "it3.payoff.se": "float64 [3, 3] 834a709ba2534ebe3ee1397f",
+  "it4.meta": [
+   [
+    "init@0",
+    "psro1@2",
+    "psro2@2"
+   ],
+   [
+    "0x0.0p+0",
+    "0x0.0p+0",
+    "0x1.0000000000000p+0"
+   ]
+  ],
+  "it4.payoff.hi": "float64 [3, 3] 87e8a7ccc5b499da37f3570a",
+  "it4.payoff.lo": "float64 [3, 3] d7ea8bec72b66705c8ca7a3b",
+  "it4.payoff.mean": "float64 [3, 3] d7ea8bec72b66705c8ca7a3b",
+  "it4.payoff.n_deals": 0,
+  "it4.payoff.names": [
+   "init@0",
+   "psro1@2",
+   "psro2@2"
+  ],
+  "it4.payoff.se": "float64 [3, 3] 834a709ba2534ebe3ee1397f",
+  "member.init@0.params": "fe1ac681990f511e5e4b7ff8",
+  "member.psro1@2.params": "6148fd7fe8db5c11ef4d39a9",
+  "member.psro2@2.params": "81285fcbf715781bee7ff7c5",
+  "members": [
+   [
+    "init@0",
+    "init",
+    "fixed",
+    "",
+    0
+   ],
+   [
+    "psro1@2",
+    "psro",
+    "fixed",
+    "br0",
+    2
+   ],
+   [
+    "psro2@2",
+    "psro",
+    "fixed",
+    "br1",
+    4
+   ]
+  ],
+  "stopped": [
+   true,
+   "psro: 2 iterations"
+  ]
+ },
+ "league/kuhn/scheduled_promotion_gate": {
+  "draws": [
+   [
+    "main",
+    0,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 651e4b471cf5f64e72bc7f74",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "main@0": 32
+    }
+   ],
+   [
+    "main",
+    1,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 6657ede851f92bffe4db7dec",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "main@1": 32
+    }
+   ],
+   [
+    "main",
+    2,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] c6a998f4f16eefa3a477c5ca",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "main@1": 16,
+     "main@2": 16
+    }
+   ],
+   [
+    "main",
+    3,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 6a4246de49c754efcf029b24",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "main@3": 32
+    }
+   ],
+   [
+    "main",
+    4,
+    "int32 [32, 2] cc167c69a81f2241d6453fc0",
+    "int32 [32, 2] 651e4b471cf5f64e72bc7f74",
+    "int32 [32] 36027316e4fa62fd3138e9d4",
+    {
+     "main@4": 32
+    }
+   ]
+  ],
+  "gate.1": {
+   "generation": 1,
+   "hi": "0x1.c4256bade968ep-1",
+   "lo": "0x1.6f6a51485a5cap-3",
+   "mean": "0x1.1000000000000p-1",
+   "n_deals": 16,
+   "opponent": "main@0",
+   "passed": true,
+   "predicate": "mean_above_zero",
+   "se": "0x1.6fa6ea162d0f0p-3",
+   "seed": 2654845770,
+   "snapshot": "main@1",
+   "subject": "main"
+  },
+  "gate.2": {
+   "generation": 2,
+   "hi": "0x0.0p+0",
+   "lo": "0x0.0p+0",
+   "mean": "0x0.0p+0",
+   "n_deals": 16,
+   "opponent": "main@1",
+   "passed": false,
+   "predicate": "mean_above_zero",
+   "se": "0x0.0p+0",
+   "seed": 120908528,
+   "snapshot": "main@2",
+   "subject": "main"
+  },
+  "gate.3": {
+   "generation": 3,
+   "hi": "0x0.0p+0",
+   "lo": "0x0.0p+0",
+   "mean": "0x0.0p+0",
+   "n_deals": 16,
+   "opponent": "main@2",
+   "passed": false,
+   "predicate": "mean_above_zero",
+   "se": "0x0.0p+0",
+   "seed": 1882446438,
+   "snapshot": "main@3",
+   "subject": "main"
+  },
+  "gate.4": {
+   "generation": 4,
+   "hi": "0x0.0p+0",
+   "lo": "0x0.0p+0",
+   "mean": "0x0.0p+0",
+   "n_deals": 16,
+   "opponent": "main@3",
+   "passed": false,
+   "predicate": "mean_above_zero",
+   "se": "0x0.0p+0",
+   "seed": 3998699461,
+   "snapshot": "main@4",
+   "subject": "main"
+  },
+  "it0.info": {
+   "pool_seated": 0,
+   "pool_size": 0,
+   "snapshot_step": 0
+  },
+  "it1.info": {
+   "gate_lo": "0x1.6f6a51485a5cap-3",
+   "gate_mean": "0x1.1000000000000p-1",
+   "gate_passed": 1,
+   "pool_seated": 1,
+   "pool_size": 1,
+   "snapshot_step": 1
+  },
+  "it2.info": {
+   "gate_lo": "0x0.0p+0",
+   "gate_mean": "0x0.0p+0",
+   "gate_passed": 0,
+   "pool_seated": 1,
+   "pool_size": 1,
+   "snapshot_step": 2
+  },
+  "it3.info": {
+   "gate_lo": "0x0.0p+0",
+   "gate_mean": "0x0.0p+0",
+   "gate_passed": 0,
+   "pool_seated": 0,
+   "pool_size": 0,
+   "snapshot_step": 3
+  },
+  "it4.info": {
+   "gate_lo": "0x0.0p+0",
+   "gate_mean": "0x0.0p+0",
+   "gate_passed": 0,
+   "pool_seated": 0,
+   "pool_size": 0,
+   "snapshot_step": 4
+  },
+  "learner.main.params": "a83bb9e0af4b9a8ab28493d3",
+  "learner.main.updates": 5,
+  "member.init@0.params": "fe1ac681990f511e5e4b7ff8",
+  "member.main@4.params": "1ab7fde9d296542b76059713",
+  "members": [
+   [
+    "init@0",
+    "init",
+    "fixed",
+    "",
+    0
+   ],
+   [
+    "main@0",
+    "snapshot",
+    "evicted",
+    "main",
+    0
+   ],
+   [
+    "main@1",
+    "snapshot",
+    "evicted",
+    "main",
+    1
+   ],
+   [
+    "main@2",
+    "snapshot",
+    "evicted",
+    "main",
+    2
+   ],
+   [
+    "main@3",
+    "snapshot",
+    "evicted",
+    "main",
+    3
+   ],
+   [
+    "main@4",
+    "snapshot",
+    "fixed",
+    "main",
+    4
+   ]
+  ],
+  "stopped": [
+   false,
+   ""
+  ]
+ },
+ "league/kuhn/self_play_all_seats": {
+  "draws": [
+   [
+    "main",
+    0,
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 36027316e4fa62fd3138e9d4",
+    {
+     "self": 16
+    }
+   ],
+   [
+    "main",
+    1,
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 36027316e4fa62fd3138e9d4",
+    {
+     "self": 16
+    }
+   ],
+   [
+    "main",
+    2,
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 36027316e4fa62fd3138e9d4",
+    {
+     "self": 16
+    }
+   ],
+   [
+    "main",
+    3,
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 38723a2e5e8a17aa7950dc00",
+    "int32 [16, 2] 36027316e4fa62fd3138e9d4",
+    {
+     "self": 16
+    }
+   ]
+  ],
+  "learner.main.params": "726debe981e39d7c72912876",
+  "learner.main.updates": 4,
+  "member.init@0.params": "fe1ac681990f511e5e4b7ff8",
+  "members": [
+   [
+    "init@0",
+    "init",
+    "fixed",
+    "",
+    0
+   ]
+  ],
+  "stopped": [
+   false,
+   ""
+  ]
+ },
+ "sampler/entries_table/p2": {
+  "s0.perspective_seat": "int32 [50] b34d83a7b02247d4d5b11bfb",
+  "s0.seat_member": "int32 [50, 2] 96b527bf8145f547d6162de0",
+  "s0.seat_slot": "int32 [50, 2] ff2e58722dc96ef730f77233",
+  "s7.perspective_seat": "int32 [50] b34d83a7b02247d4d5b11bfb",
+  "s7.seat_member": "int32 [50, 2] 8818168a6bb23ca0765a5cce",
+  "s7.seat_slot": "int32 [50, 2] 2405a8724f74ccbec9936e21"
+ },
+ "sampler/entries_table/p4": {
+  "s0.perspective_seat": "int32 [50] 4dc329b14dbd43e473554023",
+  "s0.seat_member": "int32 [50, 4] 0334fe970ced07ef82de9f02",
+  "s0.seat_slot": "int32 [50, 4] 78d990b37207ff676f76bb72",
+  "s7.perspective_seat": "int32 [50] 4dc329b14dbd43e473554023",
+  "s7.seat_member": "int32 [50, 4] 0f99d16650ff9d75ea2d5933",
+  "s7.seat_slot": "int32 [50, 4] 8c5cc113aa174476eac44ff1"
+ },
+ "sampler/self_play_table/p2/all0": {
+  "table.perspective_seat": "int32 [12] d0af61e717f214fe35bc430f",
+  "table.seat_member": "int32 [12, 2] 2ea9ab9198d1638007400cd2",
+  "table.seat_slot": "int32 [12, 2] 2ea9ab9198d1638007400cd2"
+ },
+ "sampler/self_play_table/p2/all1": {
+  "table.perspective_seat": "int32 [12, 2] 7d1032d7b4b10b67602d049c",
+  "table.seat_member": "int32 [12, 2] 2ea9ab9198d1638007400cd2",
+  "table.seat_slot": "int32 [12, 2] 2ea9ab9198d1638007400cd2"
+ },
+ "sampler/self_play_table/p4/all0": {
+  "table.perspective_seat": "int32 [12] 5208c38bea536435b2b2e582",
+  "table.seat_member": "int32 [12, 4] 5d89f056865052bcb89c910d",
+  "table.seat_slot": "int32 [12, 4] 5d89f056865052bcb89c910d"
+ },
+ "sampler/self_play_table/p4/all1": {
+  "table.perspective_seat": "int32 [12, 4] 86bb101877c587a93cec80ab",
+  "table.seat_member": "int32 [12, 4] 5d89f056865052bcb89c910d",
+  "table.seat_slot": "int32 [12, 4] 5d89f056865052bcb89c910d"
+ },
+ "sampler/table_from_mix/p2/learner_slot/s5": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 10,
+   "self": 10
+  },
+  "table.perspective_seat": "int32 [40] 551908da5f3caa589b289eb6",
+  "table.seat_member": "int32 [40, 2] 0908cda8643ae3fd3b06e904",
+  "table.seat_slot": "int32 [40, 2] d72cc44367a7aafd0c31b305"
+ },
+ "sampler/table_from_mix/p2/one/b37/strat0/s0": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 6737b99d24d61d39724d7f12"
+ },
+ "sampler/table_from_mix/p2/one/b37/strat0/s1": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 6737b99d24d61d39724d7f12"
+ },
+ "sampler/table_from_mix/p2/one/b37/strat0/s2": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 6737b99d24d61d39724d7f12"
+ },
+ "sampler/table_from_mix/p2/one/b37/strat1/s0": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 6737b99d24d61d39724d7f12"
+ },
+ "sampler/table_from_mix/p2/one/b37/strat1/s1": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 6737b99d24d61d39724d7f12"
+ },
+ "sampler/table_from_mix/p2/one/b37/strat1/s2": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 6737b99d24d61d39724d7f12"
+ },
+ "sampler/table_from_mix/p2/one/b64/strat0/s0": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 933f43976daca80d0f0973a2"
+ },
+ "sampler/table_from_mix/p2/one/b64/strat0/s1": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 933f43976daca80d0f0973a2"
+ },
+ "sampler/table_from_mix/p2/one/b64/strat0/s2": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 933f43976daca80d0f0973a2"
+ },
+ "sampler/table_from_mix/p2/one/b64/strat1/s0": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 933f43976daca80d0f0973a2"
+ },
+ "sampler/table_from_mix/p2/one/b64/strat1/s1": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 933f43976daca80d0f0973a2"
+ },
+ "sampler/table_from_mix/p2/one/b64/strat1/s2": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 933f43976daca80d0f0973a2"
+ },
+ "sampler/table_from_mix/p2/self/b37/strat0/s0": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7"
+ },
+ "sampler/table_from_mix/p2/self/b37/strat0/s1": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7"
+ },
+ "sampler/table_from_mix/p2/self/b37/strat0/s2": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7"
+ },
+ "sampler/table_from_mix/p2/self/b37/strat1/s0": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7"
+ },
+ "sampler/table_from_mix/p2/self/b37/strat1/s1": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7"
+ },
+ "sampler/table_from_mix/p2/self/b37/strat1/s2": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7",
+  "table.seat_slot": "int32 [37, 2] 250f52cb2d6f1966a29f6ac7"
+ },
+ "sampler/table_from_mix/p2/self/b64/strat0/s0": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd"
+ },
+ "sampler/table_from_mix/p2/self/b64/strat0/s1": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd"
+ },
+ "sampler/table_from_mix/p2/self/b64/strat0/s2": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd"
+ },
+ "sampler/table_from_mix/p2/self/b64/strat1/s0": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd"
+ },
+ "sampler/table_from_mix/p2/self/b64/strat1/s1": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd"
+ },
+ "sampler/table_from_mix/p2/self/b64/strat1/s2": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd",
+  "table.seat_slot": "int32 [64, 2] 076a27c79e5ace2a3d47f9dd"
+ },
+ "sampler/table_from_mix/p2/self_two/b37/strat0/s0": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 10,
+   "self": 7
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] f67d39c12b31d96208e1c6d1",
+  "table.seat_slot": "int32 [37, 2] 5ae8d36bc89175ed0be77422"
+ },
+ "sampler/table_from_mix/p2/self_two/b37/strat0/s1": {
+  "counts": {
+   "a@1": 16,
+   "b@2": 10,
+   "self": 11
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 238b20e3897aabbe26ee2bd6",
+  "table.seat_slot": "int32 [37, 2] 6e6cca1bb4b4f96c2875e30f"
+ },
+ "sampler/table_from_mix/p2/self_two/b37/strat0/s2": {
+  "counts": {
+   "a@1": 16,
+   "b@2": 14,
+   "self": 7
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] fce76275fd8026f96423366b",
+  "table.seat_slot": "int32 [37, 2] 218104cceeaf8fb7ea37fdde"
+ },
+ "sampler/table_from_mix/p2/self_two/b37/strat1/s0": {
+  "counts": {
+   "a@1": 18,
+   "b@2": 9,
+   "self": 10
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 498d670ec027d1cecb4cf386",
+  "table.seat_slot": "int32 [37, 2] 8a5bffc4d17cc033a0930746"
+ },
+ "sampler/table_from_mix/p2/self_two/b37/strat1/s1": {
+  "counts": {
+   "a@1": 18,
+   "b@2": 9,
+   "self": 10
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] dd50a1271a6190cb4545ee2f",
+  "table.seat_slot": "int32 [37, 2] 0eecedb0b2798fe270bf2d89"
+ },
+ "sampler/table_from_mix/p2/self_two/b37/strat1/s2": {
+  "counts": {
+   "a@1": 18,
+   "b@2": 9,
+   "self": 10
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 5754913ac477b0ea6b5add71",
+  "table.seat_slot": "int32 [37, 2] 3b8f5bb820ff724f1b01677b"
+ },
+ "sampler/table_from_mix/p2/self_two/b64/strat0/s0": {
+  "counts": {
+   "a@1": 34,
+   "b@2": 18,
+   "self": 12
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 1994505dff01497df6204989",
+  "table.seat_slot": "int32 [64, 2] 2762576def63d8c6fdf843c0"
+ },
+ "sampler/table_from_mix/p2/self_two/b64/strat0/s1": {
+  "counts": {
+   "a@1": 31,
+   "b@2": 16,
+   "self": 17
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 4a8b9bad444f4e932fea03c5",
+  "table.seat_slot": "int32 [64, 2] fa03bb688ca85b10e7ecb9cb"
+ },
+ "sampler/table_from_mix/p2/self_two/b64/strat0/s2": {
+  "counts": {
+   "a@1": 27,
+   "b@2": 21,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 4f9b5fcdca12794c7f82722e",
+  "table.seat_slot": "int32 [64, 2] d81cd45b3223b45f7f6ceae2"
+ },
+ "sampler/table_from_mix/p2/self_two/b64/strat1/s0": {
+  "counts": {
+   "a@1": 32,
+   "b@2": 16,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] b77d73fa2a9daae12f9d5adf",
+  "table.seat_slot": "int32 [64, 2] c41615fae71d7fb9fb0abf21"
+ },
+ "sampler/table_from_mix/p2/self_two/b64/strat1/s1": {
+  "counts": {
+   "a@1": 32,
+   "b@2": 16,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 9fb8c7227ec17ad5a6117756",
+  "table.seat_slot": "int32 [64, 2] 431dda82610b935758915b9e"
+ },
+ "sampler/table_from_mix/p2/self_two/b64/strat1/s2": {
+  "counts": {
+   "a@1": 32,
+   "b@2": 16,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] f513cbef0f0eadf3849fa050",
+  "table.seat_slot": "int32 [64, 2] 6bea1d064f9b7c47290819c8"
+ },
+ "sampler/table_from_mix/p2/thirds/b37/strat0/s0": {
+  "counts": {
+   "a@1": 9,
+   "b@2": 13,
+   "c@3": 12,
+   "self": 3
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 9d2df262c70e2c1a7b6cd487",
+  "table.seat_slot": "int32 [37, 2] 2998f167a813c2c2beaf49af"
+ },
+ "sampler/table_from_mix/p2/thirds/b37/strat0/s1": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 10,
+   "c@3": 11,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] e6e7d3395fdf338cbaddffbe",
+  "table.seat_slot": "int32 [37, 2] bb8411a716576e7de06688da"
+ },
+ "sampler/table_from_mix/p2/thirds/b37/strat0/s2": {
+  "counts": {
+   "a@1": 11,
+   "b@2": 8,
+   "c@3": 16,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 1a4802e804a91ea7e5131262",
+  "table.seat_slot": "int32 [37, 2] ebece38dfddc30a1eed6ee97"
+ },
+ "sampler/table_from_mix/p2/thirds/b37/strat1/s0": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 11,
+   "c@3": 10,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 99d921d6d7126defe2bd648f",
+  "table.seat_slot": "int32 [37, 2] 07b64f3cb25f8b1fdc45e5ca"
+ },
+ "sampler/table_from_mix/p2/thirds/b37/strat1/s1": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 11,
+   "c@3": 10,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 22597e540ff5a8566112c394",
+  "table.seat_slot": "int32 [37, 2] 0b6e84d47d2278f4799659f9"
+ },
+ "sampler/table_from_mix/p2/thirds/b37/strat1/s2": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 11,
+   "c@3": 10,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] f61e73714bb09136ed8e1132",
+  "table.seat_slot": "int32 [37, 2] cd3d7a81b3b044d871765632"
+ },
+ "sampler/table_from_mix/p2/thirds/b64/strat0/s0": {
+  "counts": {
+   "a@1": 17,
+   "b@2": 20,
+   "c@3": 22,
+   "self": 5
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 5327300cb0abb177d4871268",
+  "table.seat_slot": "int32 [64, 2] 90639074146be269f395f0c4"
+ },
+ "sampler/table_from_mix/p2/thirds/b64/strat0/s1": {
+  "counts": {
+   "a@1": 17,
+   "b@2": 18,
+   "c@3": 21,
+   "self": 8
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] bedebe01cdf3eb3975cb4677",
+  "table.seat_slot": "int32 [64, 2] 838aedce432eec67741391cd"
+ },
+ "sampler/table_from_mix/p2/thirds/b64/strat0/s2": {
+  "counts": {
+   "a@1": 17,
+   "b@2": 17,
+   "c@3": 24,
+   "self": 6
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 90fc02cc969342a3dbcfd144",
+  "table.seat_slot": "int32 [64, 2] 84b34a7a076bc24b2f4ca0ec"
+ },
+ "sampler/table_from_mix/p2/thirds/b64/strat1/s0": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 20,
+   "c@3": 18,
+   "self": 6
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 51a249d3340d2f9debad0528",
+  "table.seat_slot": "int32 [64, 2] f33cbe056ece5d7d7533eedd"
+ },
+ "sampler/table_from_mix/p2/thirds/b64/strat1/s1": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 20,
+   "c@3": 18,
+   "self": 6
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 55ec87cf3843b727ce383e24",
+  "table.seat_slot": "int32 [64, 2] 73115fe98dbf0f706049afca"
+ },
+ "sampler/table_from_mix/p2/thirds/b64/strat1/s2": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 20,
+   "c@3": 18,
+   "self": 6
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 4b25800c6e13a77029d05e5c",
+  "table.seat_slot": "int32 [64, 2] feefb02cb15ae613b07cc0ea"
+ },
+ "sampler/table_from_mix/p2/uneven/b37/strat0/s0": {
+  "counts": {
+   "a@1": 23,
+   "b@2": 2,
+   "c@3": 5,
+   "d@4": 5,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 537a2d09f44467ec66097155",
+  "table.seat_slot": "int32 [37, 2] 343a2ef6b2c1e76e305970b8"
+ },
+ "sampler/table_from_mix/p2/uneven/b37/strat0/s1": {
+  "counts": {
+   "a@1": 23,
+   "b@2": 1,
+   "c@3": 9,
+   "d@4": 2,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] e3b7526a562813632f03b521",
+  "table.seat_slot": "int32 [37, 2] 175a4ae428a1263cd715399d"
+ },
+ "sampler/table_from_mix/p2/uneven/b37/strat0/s2": {
+  "counts": {
+   "a@1": 19,
+   "b@2": 3,
+   "c@3": 9,
+   "d@4": 6
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 98367b5b5b5e5d3dbdcf2ddd",
+  "table.seat_slot": "int32 [37, 2] 71811a6603cb82d4c2ed54ef"
+ },
+ "sampler/table_from_mix/p2/uneven/b37/strat1/s0": {
+  "counts": {
+   "a@1": 23,
+   "b@2": 2,
+   "c@3": 7,
+   "d@4": 3,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 945625dbd92cc22700c15ef4",
+  "table.seat_slot": "int32 [37, 2] 199afff65ad95efdf5f216ec"
+ },
+ "sampler/table_from_mix/p2/uneven/b37/strat1/s1": {
+  "counts": {
+   "a@1": 23,
+   "b@2": 2,
+   "c@3": 7,
+   "d@4": 3,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] a082d3742c03e86bc864aa31",
+  "table.seat_slot": "int32 [37, 2] aa66649a2964b2d4a08f621d"
+ },
+ "sampler/table_from_mix/p2/uneven/b37/strat1/s2": {
+  "counts": {
+   "a@1": 23,
+   "b@2": 2,
+   "c@3": 7,
+   "d@4": 3,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] 31949b3f82e91d3646f04ca9",
+  "table.seat_member": "int32 [37, 2] 05369366acd018395ab0d033",
+  "table.seat_slot": "int32 [37, 2] 91aab754bff94599b786ab21"
+ },
+ "sampler/table_from_mix/p2/uneven/b64/strat0/s0": {
+  "counts": {
+   "a@1": 36,
+   "b@2": 5,
+   "c@3": 12,
+   "d@4": 7,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 9bc95dcc9c52c47d2e82f148",
+  "table.seat_slot": "int32 [64, 2] 9ba168d5505ad6898323251a"
+ },
+ "sampler/table_from_mix/p2/uneven/b64/strat0/s1": {
+  "counts": {
+   "a@1": 37,
+   "b@2": 5,
+   "c@3": 12,
+   "d@4": 5,
+   "self": 5
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 6e6f5294574e65acdffa9b1b",
+  "table.seat_slot": "int32 [64, 2] 893ee99209100ee517d64ca7"
+ },
+ "sampler/table_from_mix/p2/uneven/b64/strat0/s2": {
+  "counts": {
+   "a@1": 36,
+   "b@2": 6,
+   "c@3": 14,
+   "d@4": 8
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 96dbd7cb64c5ffdb53d6a6cf",
+  "table.seat_slot": "int32 [64, 2] 29efbc84b68b96b86e0de6f9"
+ },
+ "sampler/table_from_mix/p2/uneven/b64/strat1/s0": {
+  "counts": {
+   "a@1": 38,
+   "b@2": 4,
+   "c@3": 12,
+   "d@4": 6,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] fba51b0f4566a3ac564e26a7",
+  "table.seat_slot": "int32 [64, 2] 6c6a63b927fe7a48f2cb782e"
+ },
+ "sampler/table_from_mix/p2/uneven/b64/strat1/s1": {
+  "counts": {
+   "a@1": 38,
+   "b@2": 4,
+   "c@3": 12,
+   "d@4": 6,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 62e7360abf7a2ccf0d9074aa",
+  "table.seat_slot": "int32 [64, 2] 555d57809d5204f9353cf153"
+ },
+ "sampler/table_from_mix/p2/uneven/b64/strat1/s2": {
+  "counts": {
+   "a@1": 38,
+   "b@2": 4,
+   "c@3": 12,
+   "d@4": 6,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] b1fdabf0c354fe8b68f944f7",
+  "table.seat_member": "int32 [64, 2] 582a57ae3c79e9b5f34be488",
+  "table.seat_slot": "int32 [64, 2] a54c65be3ca3e7ef65ca083f"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b37/strat0/s0": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 47337406cbd0ee2f21077b4b"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b37/strat0/s1": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 47337406cbd0ee2f21077b4b"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b37/strat0/s2": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 47337406cbd0ee2f21077b4b"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b37/strat1/s0": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 47337406cbd0ee2f21077b4b"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b37/strat1/s1": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 47337406cbd0ee2f21077b4b"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b37/strat1/s2": {
+  "counts": {
+   "a@1": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 47337406cbd0ee2f21077b4b"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b64/strat0/s0": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 46023729b064aac00603a9b2"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b64/strat0/s1": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 46023729b064aac00603a9b2"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b64/strat0/s2": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 46023729b064aac00603a9b2"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b64/strat1/s0": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 46023729b064aac00603a9b2"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b64/strat1/s1": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 46023729b064aac00603a9b2"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/one/b64/strat1/s2": {
+  "counts": {
+   "a@1": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 46023729b064aac00603a9b2"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b37/strat0/s0": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b37/strat0/s1": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b37/strat0/s2": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b37/strat1/s0": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b37/strat1/s1": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b37/strat1/s2": {
+  "counts": {
+   "self": 37
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc",
+  "table.seat_slot": "int32 [37, 4] 2b73f6b3cd6cd9f97ccbbedc"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b64/strat0/s0": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 5f70bf18a086007016e948b0"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b64/strat0/s1": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 5f70bf18a086007016e948b0"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b64/strat0/s2": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 5f70bf18a086007016e948b0"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b64/strat1/s0": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 5f70bf18a086007016e948b0"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b64/strat1/s1": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 5f70bf18a086007016e948b0"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self/b64/strat1/s2": {
+  "counts": {
+   "self": 64
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 5f70bf18a086007016e948b0",
+  "table.seat_slot": "int32 [64, 4] 5f70bf18a086007016e948b0"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b37/strat0/s0": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 10,
+   "self": 7
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 6e504255fd52b0c8d90d9868",
+  "table.seat_slot": "int32 [37, 4] 4f704928c37037f4f4fd1142"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b37/strat0/s1": {
+  "counts": {
+   "a@1": 16,
+   "b@2": 10,
+   "self": 11
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 5d980430d27b0d2104c8ea19",
+  "table.seat_slot": "int32 [37, 4] 7deffdab7e6dd8a2d5f983ce"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b37/strat0/s2": {
+  "counts": {
+   "a@1": 16,
+   "b@2": 14,
+   "self": 7
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] c96436495f7801c7f0b2c273",
+  "table.seat_slot": "int32 [37, 4] 665dc4774e422f2af0c84164"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b37/strat1/s0": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 8,
+   "self": 9
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 96ab68846b63d0ed81c96580",
+  "table.seat_slot": "int32 [37, 4] 59887dc9c69152fff3e16465"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b37/strat1/s1": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 8,
+   "self": 9
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] b73105052922a93b5ca83efd",
+  "table.seat_slot": "int32 [37, 4] 1ad36bb71e04fa1572618d90"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b37/strat1/s2": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 8,
+   "self": 9
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 5570ebab8c7a3837a975b0e3",
+  "table.seat_slot": "int32 [37, 4] 552f36727eeaf8e0b7d71e74"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b64/strat0/s0": {
+  "counts": {
+   "a@1": 34,
+   "b@2": 18,
+   "self": 12
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 2595d0dc22cd4dde8194fc4d",
+  "table.seat_slot": "int32 [64, 4] ca051cd7756f8ff62521291a"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b64/strat0/s1": {
+  "counts": {
+   "a@1": 31,
+   "b@2": 16,
+   "self": 17
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 6af9cb064665a1c6282126b9",
+  "table.seat_slot": "int32 [64, 4] 5cd31566c94535ce9fc1008f"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b64/strat0/s2": {
+  "counts": {
+   "a@1": 27,
+   "b@2": 21,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] a7653a8fcfda857abab6c4e6",
+  "table.seat_slot": "int32 [64, 4] 06d40fefce139f32bc54a5f5"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b64/strat1/s0": {
+  "counts": {
+   "a@1": 32,
+   "b@2": 16,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 938c5fcd8e557a4e817f0066",
+  "table.seat_slot": "int32 [64, 4] 8cb2cae55abfaa26717dd50a"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b64/strat1/s1": {
+  "counts": {
+   "a@1": 32,
+   "b@2": 16,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 29f26e186bb51852765869e4",
+  "table.seat_slot": "int32 [64, 4] 29311f0cd7a87b535887752d"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/self_two/b64/strat1/s2": {
+  "counts": {
+   "a@1": 32,
+   "b@2": 16,
+   "self": 16
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 2357f343a2bdaefecaa70397",
+  "table.seat_slot": "int32 [64, 4] d65b5e87a9c1aa00480dc9e7"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b37/strat0/s0": {
+  "counts": {
+   "a@1": 9,
+   "b@2": 13,
+   "c@3": 12,
+   "self": 3
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 16d22cf87999927bc00b0b3b",
+  "table.seat_slot": "int32 [37, 4] 93417837825e09dfc832b48c"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b37/strat0/s1": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 10,
+   "c@3": 11,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 88d61c3be8e63128f5abfc06",
+  "table.seat_slot": "int32 [37, 4] fc52a27bba57f450fadeec21"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b37/strat0/s2": {
+  "counts": {
+   "a@1": 11,
+   "b@2": 8,
+   "c@3": 16,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] a8d292b236f32b050d606116",
+  "table.seat_slot": "int32 [37, 4] d1f644912742838243d13f4c"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b37/strat1/s0": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 12,
+   "c@3": 9,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] e45c972fabdc94b7e13e90d1",
+  "table.seat_slot": "int32 [37, 4] 43d407c9d184cd04965f8bc0"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b37/strat1/s1": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 12,
+   "c@3": 9,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 475b4bc88b5a4828cd923511",
+  "table.seat_slot": "int32 [37, 4] d0b793ea424b4e0bb3240d51"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b37/strat1/s2": {
+  "counts": {
+   "a@1": 12,
+   "b@2": 12,
+   "c@3": 9,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 0490943d1a63611d7b458461",
+  "table.seat_slot": "int32 [37, 4] 9747b84041bed99c64fcc042"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b64/strat0/s0": {
+  "counts": {
+   "a@1": 17,
+   "b@2": 20,
+   "c@3": 22,
+   "self": 5
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 60e52a96e08a78cd7d7c1070",
+  "table.seat_slot": "int32 [64, 4] 3f7ab196c661d5c80667794c"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b64/strat0/s1": {
+  "counts": {
+   "a@1": 17,
+   "b@2": 18,
+   "c@3": 21,
+   "self": 8
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 30805081ed31de6c04f50708",
+  "table.seat_slot": "int32 [64, 4] 53215aca47bea6c355f55664"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b64/strat0/s2": {
+  "counts": {
+   "a@1": 17,
+   "b@2": 17,
+   "c@3": 24,
+   "self": 6
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] fb8f17eb1d9c6bb98d4f76a8",
+  "table.seat_slot": "int32 [64, 4] 76d87aedbacb8de6ae26643d"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b64/strat1/s0": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 20,
+   "c@3": 20,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] b802080982eb390ed8754145",
+  "table.seat_slot": "int32 [64, 4] 6a8adf377cbb754994a9a1dc"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b64/strat1/s1": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 20,
+   "c@3": 20,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] ccd9e343ba8a4270189eff93",
+  "table.seat_slot": "int32 [64, 4] 8930c2edffa8bc8b2e518ab6"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/thirds/b64/strat1/s2": {
+  "counts": {
+   "a@1": 20,
+   "b@2": 20,
+   "c@3": 20,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 56f2365447ec7250db8218c6",
+  "table.seat_slot": "int32 [64, 4] 677e09a3c11f4e4b8148d186"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b37/strat0/s0": {
+  "counts": {
+   "a@1": 23,
+   "b@2": 2,
+   "c@3": 5,
+   "d@4": 5,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 961fd83e15bbe05fe8c66079",
+  "table.seat_slot": "int32 [37, 4] b0809fa1d8c3a0e32a6b8ad2"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b37/strat0/s1": {
+  "counts": {
+   "a@1": 23,
+   "b@2": 1,
+   "c@3": 9,
+   "d@4": 2,
+   "self": 2
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 33aa8c4091f6fb9408637eea",
+  "table.seat_slot": "int32 [37, 4] 0bb5c7e126b0a97742a7373c"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b37/strat0/s2": {
+  "counts": {
+   "a@1": 19,
+   "b@2": 3,
+   "c@3": 9,
+   "d@4": 6
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 8f7a0a125eb5466557cb39fa",
+  "table.seat_slot": "int32 [37, 4] 207e556b9df9ffa88c44fe10"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b37/strat1/s0": {
+  "counts": {
+   "a@1": 21,
+   "b@2": 4,
+   "c@3": 8,
+   "d@4": 4
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 25983a686942491deefe3ad5",
+  "table.seat_slot": "int32 [37, 4] 179508d7c43da63175f4321a"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b37/strat1/s1": {
+  "counts": {
+   "a@1": 21,
+   "b@2": 4,
+   "c@3": 8,
+   "d@4": 4
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] dc16779370cbd9ce28487981",
+  "table.seat_slot": "int32 [37, 4] 678cd94bf79295ae5171a1ae"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b37/strat1/s2": {
+  "counts": {
+   "a@1": 21,
+   "b@2": 4,
+   "c@3": 8,
+   "d@4": 4
+  },
+  "table.perspective_seat": "int32 [37] e58a280f3b573aef917ac2f4",
+  "table.seat_member": "int32 [37, 4] 4953044f84be6707c13a184c",
+  "table.seat_slot": "int32 [37, 4] 34d404600c141272086ddfb5"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b64/strat0/s0": {
+  "counts": {
+   "a@1": 36,
+   "b@2": 5,
+   "c@3": 12,
+   "d@4": 7,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] c3ab9732f9daed33add12aad",
+  "table.seat_slot": "int32 [64, 4] fcdc9efd90381e332fc40476"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b64/strat0/s1": {
+  "counts": {
+   "a@1": 37,
+   "b@2": 5,
+   "c@3": 12,
+   "d@4": 5,
+   "self": 5
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 222f5fceec400f5c56bbafca",
+  "table.seat_slot": "int32 [64, 4] a593ccbeb0c75b766e0cc091"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b64/strat0/s2": {
+  "counts": {
+   "a@1": 36,
+   "b@2": 6,
+   "c@3": 14,
+   "d@4": 8
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 846be1d3b0d5b813db0418bf",
+  "table.seat_slot": "int32 [64, 4] 416ca0070af170b8146d57b9"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b64/strat1/s0": {
+  "counts": {
+   "a@1": 40,
+   "b@2": 4,
+   "c@3": 12,
+   "d@4": 4,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] df86c64f3e601d4f1db21122",
+  "table.seat_slot": "int32 [64, 4] a8a14e585d03d4f1938139d8"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b64/strat1/s1": {
+  "counts": {
+   "a@1": 40,
+   "b@2": 4,
+   "c@3": 12,
+   "d@4": 4,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 0aafabf0c9743563bca01170",
+  "table.seat_slot": "int32 [64, 4] 94e0d8af3735262119eb8a1c"
+ },
+ "sampler/table_from_mix_legacy_p4/p4/uneven/b64/strat1/s2": {
+  "counts": {
+   "a@1": 40,
+   "b@2": 4,
+   "c@3": 12,
+   "d@4": 4,
+   "self": 4
+  },
+  "table.perspective_seat": "int32 [64] 8477318cc56a9de4a5e02d38",
+  "table.seat_member": "int32 [64, 4] 8058a058d7ce339dc5bf96ab",
+  "table.seat_slot": "int32 [64, 4] 9531b11e31a069394b5b2863"
+ }
+}

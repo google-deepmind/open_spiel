@@ -61,7 +61,7 @@ lists them and the tiny settings below make a smoke test.
 | `ppo_tic_tac_toe.py` | PPO self-play on tic-tac-toe built from the framework's parts, then a win rate against a uniform-random player. |
 | `mmd_kuhn_poker.py` | Magnetic mirror descent on Kuhn poker with the exact exploitability printed as it trains (a custom metric sink), against the exact entropy-regularised equilibrium it converges to. |
 | `alphazero_tic_tac_toe.py` | AlphaZero-style MCTS self-play training, then the raw network and the search over it against a random player. |
-| `play_checkpoints.py` | Two checkpoints (or a checkpoint and a uniform-random player) played against each other in seat-swapped pairs: the head-to-head with its standard error, and every game saved with OpenSpiel action ids and replayed in `pyspiel`. |
+| `play_checkpoints.py` | Two checkpoints (or a checkpoint and a uniform-random player) played against each other on duplicate deals, side a in each seat in turn and side b in every other seat (seat-swapped pairs at two players; a against three copies of b in four-player hearts): the head-to-head with its standard error, and every game saved with OpenSpiel action ids and replayed in `pyspiel`. |
 
 Everything here runs locally on a CPU, with no cloud account.
 
@@ -108,7 +108,7 @@ own code. Do not set `JAX_ENABLE_X64=0`.
     python -m open_spiel.python.scale.examples.alphazero_tic_tac_toe
     python -m open_spiel.python.scale.examples.play_checkpoints --a=/tmp/ttt_a@150 --b=uniform --games=1024 --out=/tmp/a_vs_uniform  # after Getting started step 1
 
-Each example (and the trainer, `open_spiel/python/scale:train`) is also a
+Each example (and the trainer, the package's `train` target) is also a
 Bazel target, run with the JAX dependency group, for example:
 
     bazel run --config=jax //open_spiel/python/scale/examples:ppo_tic_tac_toe -- --num_updates=20

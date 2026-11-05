@@ -16,11 +16,15 @@
 
 Fast.
 
-A parameter at pyspiel's default is dropped; a parameter the installed
-pyspiel's game does not have is refused with a ValueError naming it.
+A parameter at pyspiel's default is dropped; a parameter the installed pyspiel
+omits (for example gin_rummy's starting_player in standard pyspiel) is
+dropped at its implicit value and refused at any other, and checkpoint_bot's
+check_serves and warmup then refuse with a message naming the parameter.
 """
 
+import dataclasses
 import sys
+import types as pytypes
 
 import pytest
 
@@ -28,6 +32,7 @@ from open_spiel.python.scale.core import types
 from open_spiel.python.scale.envs import registry as env_registry
 from open_spiel.python.scale.serve import checkpoint_bot as checkpoint_bot_lib
 from open_spiel.python.scale.serve import games
+from open_spiel.python.scale.serve import server as server_lib
 import pyspiel
 
 
@@ -72,18 +77,42 @@ def _gin_manifest(**kwargs):
   )
 
 
-def _gin_spec():
-  """gin_rummy's parameter specification in the installed pyspiel.
+# Extended gin_rummy parameters omitted by standard pyspiel.
+_NOT_UPSTREAM = ("starting_player",) + tuple(env_registry.GIN_RULE_DEFAULTS)
+
+# gin_rummy's parameter_specification when extended rule parameters are exposed.
+EXTENDED_GIN_SPEC = {
+    "allow_upcard_throwback": True,
+    "gin_bonus": 25,
+    "hand_size": 10,
+    "knock_card": 10,
+    "num_ranks": 13,
+    "num_suits": 4,
+    "oklahoma": False,
+    "spade_doubles": False,
+    "starting_player": 0,
+    "undercut_bonus": 25,
+    "wall_knock_pick": True,
+}
+
+
+def _stock_gin_spec():
+  """gin_rummy's parameters as standard pyspiel has them.
+
+  No starting_player and none of the rule parameters (GIN_RULE_DEFAULTS).
 
   Returns:
     The parameter specification.
   """
-  return checkpoint_bot_lib.installed_parameter_specification("gin_rummy")
+  spec = checkpoint_bot_lib.installed_parameter_specification("gin_rummy")
+  for k in _NOT_UPSTREAM:
+    spec.pop(k, None)
+  return spec
 
 
-def test_game_string_params_drops_defaults():
-  """A parameter at pyspiel's default is dropped; the others are kept."""
-  spec = _gin_spec()
+def test_stock_params_drops_defaults_and_upstream_values():
+  """Stock params drops defaults and upstream values."""
+  spec = _stock_gin_spec()
   params = {
       "gin_bonus": 25,
       "hand_size": 10,
@@ -91,43 +120,95 @@ def test_game_string_params_drops_defaults():
       "num_ranks": 13,
       "num_suits": 4,
       "oklahoma": True,
+      "starting_player": 0,
       "undercut_bonus": 25,
   }
-  assert games.game_string_params("gin_rummy", params, spec) == {
-      "oklahoma": True
-  }
-  assert not games.game_string_params("gin_rummy", {"oklahoma": False}, spec)
-  # A non-default value is kept; a bool is not an int.
-  assert games.game_string_params("gin_rummy", {"knock_card": 9}, spec) == {
+  assert games.stock_params("gin_rummy", params, spec) == {"oklahoma": True}
+  assert not games.stock_params(
+      "gin_rummy", {"oklahoma": False, "starting_player": 0}, spec
+  )
+  # A parameter the pyspiel knows keeps a non-default value; a bool is not an
+  # int.
+  assert games.stock_params("gin_rummy", {"knock_card": 9}, spec) == {
       "knock_card": 9
   }
-  assert games.game_string_params("gin_rummy", {"oklahoma": 1}, spec) == {
+  assert games.stock_params("gin_rummy", {"oklahoma": 1}, spec) == {
       "oklahoma": 1
   }
+  # A pyspiel build that exposes the parameter drops it at its default too.
+  assert not games.stock_params(
+      "gin_rummy", {"starting_player": 0}, {**spec, "starting_player": 0}
+  )
+  assert games.stock_params(
+      "gin_rummy", {"starting_player": 1}, {**spec, "starting_player": 0}
+  ) == {"starting_player": 1}
 
 
-def test_game_string_params_refuses_a_parameter_pyspiel_lacks():
-  """A parameter the pyspiel game does not have is refused, naming it."""
-  spec = {k: v for k, v in _gin_spec().items() if k != "oklahoma"}
-  with pytest.raises(ValueError, match="has no 'oklahoma' parameter"):
-    games.game_string_params("gin_rummy", {"oklahoma": True}, spec)
-  with pytest.raises(ValueError, match="has no 'oklahoma' parameter"):
-    checkpoint_bot_lib.game_string_of(
-        _gin_manifest(oklahoma_frac=1.0), spec
+def test_stock_params_refuses_an_upstream_gap():
+  """Stock params refuses an upstream gap."""
+  with pytest.raises(games.UpstreamGapError) as e:
+    games.stock_params("gin_rummy", {"starting_player": 1}, _stock_gin_spec())
+  assert (e.value.game, e.value.param, e.value.value) == (
+      "gin_rummy",
+      "starting_player",
+      1,
+  )
+  msg = str(e.value)
+  assert (
+      "starting_player=1" in msg and "has no 'starting_player' parameter" in msg
+  )
+  assert (
+      "without that parameter gin_rummy plays starting_player=0" in msg
+      and "cannot play this artifact" in msg
+  )
+
+
+def test_stock_params_refuses_an_unknown_parameter_with_no_upstream_value(
+    monkeypatch,
+):
+  """Stock params refuses an unknown parameter with no upstream value."""
+  g = env_registry.game("gin_rummy")
+  serving = dataclasses.replace(g.serving, upstream_values={})
+  # Reaches private _GAMES of the code under test: a gin row without the
+  # upstream values, undone by monkeypatch.
+  monkeypatch.setitem(
+      env_registry._GAMES,  # pylint: disable=protected-access
+      "gin_rummy",
+      dataclasses.replace(g, serving=serving),
+  )
+  with pytest.raises(
+      games.UpstreamGapError, match="no implicit value of 'starting_player'"
+  ):
+    games.stock_params("gin_rummy", {"starting_player": 0}, _stock_gin_spec())
+
+
+def test_upstream_values_must_be_served_parameters():
+  """Upstream values must be served parameters."""
+  with pytest.raises(ValueError, match="does not play"):
+    env_registry.ServingSpec(
+        pyspiel_params={"a": (0,)}, upstream_values={"b": 0}
     )
 
 
-def test_gin_oklahoma_string_loads():
+def test_gin_oklahoma_string_loads_on_stock_pyspiel():
   """An Oklahoma gin artifact's env (Oklahoma deals, first player at chance).
 
-  The installed pyspiel loads its string, a game in which player 0 moves
-  first.
+  The default-valued starting_player=0 is dropped when absent from pyspiel, and
+  standard pyspiel loads the string, a game in which player 0 moves first.
   """
   m = _gin_manifest(oklahoma_frac=1.0)
-  s = checkpoint_bot_lib.game_string_of(m, _gin_spec())
+  s = checkpoint_bot_lib.game_string_of(m, _stock_gin_spec())
   assert s == "gin_rummy(oklahoma=true)"
-  assert checkpoint_bot_lib.game_string_of(m) == s
-  game = pyspiel.load_game(s)
+  # A pyspiel with starting_player known (default 0) gets the same
+  # string.
+  assert (
+      checkpoint_bot_lib.game_string_of(
+          m, {**_stock_gin_spec(), "starting_player": 0}
+      )
+      == s
+  )
+  # And the installed pyspiel, whichever it is, loads its string.
+  game = pyspiel.load_game(checkpoint_bot_lib.game_string_of(m))
   assert game.get_parameters()["oklahoma"]
   state = game.new_initial_state()
   while state.is_chance_node():
@@ -138,16 +219,147 @@ def test_gin_oklahoma_string_loads():
 def test_gin_default_artifact_is_the_short_name():
   """Gin default artifact is the short name."""
   assert (
-      checkpoint_bot_lib.game_string_of(_gin_manifest(), _gin_spec())
+      checkpoint_bot_lib.game_string_of(_gin_manifest(), _stock_gin_spec())
       == "gin_rummy"
   )
+
+
+def _gap_registry(monkeypatch):
+  """gin_rummy whose served env depends on starting_player.
+
+  1 deals Oklahoma hands, 0 standard ones (a stand-in for an artifact trained
+  with a fixed first player standard pyspiel does not play).
+
+  Args:
+    monkeypatch: pytest's monkeypatch.
+  """
+  g = env_registry.game("gin_rummy")
+  serving = env_registry.ServingSpec(
+      pyspiel_params={"starting_player": (0, 1)},
+      served_kwargs=lambda p: {
+          "oklahoma_frac": 1.0 if p.get("starting_player", 0) == 1 else None
+      },
+      covers=env_registry.gin_covers,
+      upstream_values={"starting_player": 0},
+  )
+  # Reaches private _GAMES of the code under test: a gin row without the
+  # upstream values, undone by monkeypatch.
+  monkeypatch.setitem(
+      env_registry._GAMES,  # pylint: disable=protected-access
+      "gin_rummy",
+      dataclasses.replace(g, serving=serving),
+  )
+
+
+def test_non_upstream_value_is_refused(monkeypatch):
+  """Non upstream value is refused."""
+  _gap_registry(monkeypatch)
+  m = _gin_manifest(oklahoma_frac=1.0)
+  with pytest.raises(games.UpstreamGapError, match="starting_player=1"):
+    checkpoint_bot_lib.game_string_of(m, _stock_gin_spec())
+  # A pyspiel with the parameter plays it.
+  assert (
+      checkpoint_bot_lib.game_string_of(
+          m, {**_stock_gin_spec(), "starting_player": 0}
+      )
+      == "gin_rummy(starting_player=1)"
+  )
+  # The upstream value itself (standard deals) is dropped.
+  assert (
+      checkpoint_bot_lib.game_string_of(_gin_manifest(), _stock_gin_spec())
+      == "gin_rummy"
+  )
+
+
+class _Game:
+  """A pyspiel-like gin_rummy without starting_player (standard pyspiel's)."""
+
+  def __init__(self, params):
+    self._params = params
+
+  def get_type(self):
+    """The game type.
+
+    Returns:
+      A stand-in with short_name "gin_rummy".
+    """
+    return pytypes.SimpleNamespace(short_name="gin_rummy")
+
+  def get_parameters(self):
+    """The game parameters.
+
+    Returns:
+      The parameters.
+    """
+    return dict(self._params)
+
+  def num_players(self):
+    """Two players.
+
+    Returns:
+      2.
+    """
+    return 2
+
+
+def test_check_serves_and_warmup_refuse_an_upstream_gap(monkeypatch):
+  """Check serves and warmup refuse an upstream gap."""
+  _gap_registry(monkeypatch)
+  stock = _stock_gin_spec()
+  monkeypatch.setattr(
+      checkpoint_bot_lib,
+      "installed_parameter_specification",
+      lambda name: dict(stock),
+  )
+  m = _gin_manifest(oklahoma_frac=1.0)
+  policy = pytypes.SimpleNamespace(spec=pytypes.SimpleNamespace(num_players=2))
+  srv = server_lib.PolicyServer(
+      loader=lambda path, step: types.Artifact(
+          manifest=m, params=None, policy=policy, path=path
+      )
+  )
+  bot = checkpoint_bot_lib.checkpoint_bot("mem://gap", step=1, server=srv)
+  assert bot.game_string is None and bot.upstream_gap.param == "starting_player"
+  with pytest.raises(
+      ValueError,
+      match=r"starting_player=1.*has no 'starting_player'.*"
+      r"without that parameter gin_rummy plays starting_player=0.*"
+      r"cannot play this artifact",
+  ):
+    bot.check_serves(_Game(stock))
+  with pytest.raises(ValueError, match="cannot play this artifact"):
+    bot.warmup([0])
+
+
+@pytest.mark.parametrize("oklahoma", [False, True])
+def test_extended_gin_parameters_map_to_the_env(oklahoma):
+  """Every parameter in EXTENDED_GIN_SPEC maps to the env.
+
+  A served game reports all its parameters (get_parameters), the rule ones
+  included; they map to the env's rule options of the same name.
+
+  Args:
+    oklahoma: The parametrized case.
+  """
+  params = {**EXTENDED_GIN_SPEC, "oklahoma": oklahoma}
+  games.check_params("gin_rummy", params)
+  spec = games.env_spec_for("gin_rummy", params)
+  assert spec == env_registry.spec(
+      "gin_rummy", oklahoma_frac=1.0 if oklahoma else None
+  )
+  for k, v in env_registry.GIN_RULE_DEFAULTS.items():
+    assert spec.kwargs[k] is v
+  # Standard pyspiel's game (no rule parameters) is the same env.
+  stock = {k: v for k, v in params.items() if k not in _NOT_UPSTREAM}
+  assert games.env_spec_for("gin_rummy", stock) == spec
 
 
 @pytest.mark.parametrize("oklahoma", [False, True])
 def test_installed_gin_parameters_are_served(oklahoma):
   """The installed pyspiel's gin_rummy, all its parameters, is served.
 
-  A game reports every parameter it has (get_parameters).
+  Whichever pyspiel is installed (standard, or an extended build with the rule
+  parameters): a game reports every parameter it has.
 
   Args:
     oklahoma: The parametrized case.
@@ -160,11 +372,52 @@ def test_installed_gin_parameters_are_served(oklahoma):
   )
 
 
-def test_gin_artifact_with_a_non_default_rule_has_no_game_string():
-  """An artifact trained under a non-default gin rule has no game string."""
+@pytest.mark.parametrize(
+    "param,value",
+    [
+        ("allow_upcard_throwback", False),
+        ("wall_knock_pick", False),
+        ("spade_doubles", True),
+    ],
+)
+def test_non_default_gin_rule_parameter_is_refused(param, value):
+  """A rule parameter off its default is refused, naming it."""
+  params = {**EXTENDED_GIN_SPEC, "oklahoma": True, param: value}
+  with pytest.raises(ValueError, match=rf"{param}={value!r}; the env plays"):
+    games.check_params("gin_rummy", params)
+  with pytest.raises(ValueError, match=param):
+    games.env_spec_for("gin_rummy", params)
+
+
+def test_oklahoma_env_string_with_and_without_extended_params():
+  """The env -> game string direction with and without extended parameters.
+
+  With extended parameters the rule parameters (at their defaults) and
+  starting_player=0 are dropped as defaults; standard pyspiel omits them and
+  plays each at its implicit value, so they are dropped there too.
+  """
+  m = _gin_manifest(oklahoma_frac=1.0)
+  assert (
+      checkpoint_bot_lib.game_string_of(m, EXTENDED_GIN_SPEC)
+      == "gin_rummy(oklahoma=true)"
+  )
+  stock = {k: v for k, v in EXTENDED_GIN_SPEC.items() if k not in _NOT_UPSTREAM}
+  assert checkpoint_bot_lib.game_string_of(m, stock) == (
+      "gin_rummy(oklahoma=true)"
+  )
+  assert checkpoint_bot_lib.game_string_of(_gin_manifest(), stock) == (
+      "gin_rummy"
+  )
+  # An artifact trained under a non-default rule has no served game string.
   odd = _gin_manifest(oklahoma_frac=1.0, allow_upcard_throwback=False)
   with pytest.raises(ValueError, match="no pyspiel game string"):
-    checkpoint_bot_lib.game_string_of(odd, _gin_spec())
+    checkpoint_bot_lib.game_string_of(odd, EXTENDED_GIN_SPEC)
+  # stock_params drops each rule parameter at its default and
+  # refuses any other value.
+  for k, v in env_registry.GIN_RULE_DEFAULTS.items():
+    assert not games.stock_params("gin_rummy", {k: v}, stock)
+    with pytest.raises(games.UpstreamGapError, match=k):
+      games.stock_params("gin_rummy", {k: not v}, stock)
 
 
 if __name__ == "__main__":

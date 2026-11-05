@@ -38,6 +38,14 @@ small enough to enumerate (kuhn, leduc).
   symmetric_payoff(tree, a, b)     a's exact expected return against b,
                                    averaged over the two seat assignments (the
                                    Evaluator's duplicate-deal estimand).
+                                   Two-player games.
+  field_payoff(tree, sides, a, b)  any sides: a's exact side return with a on
+                                   one side and b on every other, and b's mean
+                                   side return in the same games, averaged
+                                   over the side a holds (the estimand of a
+                                   rotation-balanced design: a league's field
+                                   cell, and at two sides the pair cell of
+                                   league.payoff_views).
 """
 
 from __future__ import annotations
@@ -46,6 +54,7 @@ from typing import Sequence
 
 import numpy as np
 
+from open_spiel.python.scale.core import sides as sides_lib
 from open_spiel.python.scale.eval import exploitability as expl
 
 F64 = np.float64
@@ -161,3 +170,45 @@ def symmetric_payoff(tree: expl.GameTree, a, b) -> float:
           + tree.expected_returns([tb, ta])[1]
       )
   )
+
+
+def field_payoff(
+    tree: expl.GameTree, sides: sides_lib.Sides, a, b
+) -> tuple[float, float]:
+  """Exact (a's side return, b's mean side return), a against a field of b.
+
+  a on one side and b on every other, averaged over the T sides a holds
+  (module doc). At two sides of one seat each the first value is
+  symmetric_payoff(tree, a, b) up to float rounding; two-player leagues keep
+  symmetric_payoff.
+
+  Args:
+    tree: the GameTree.
+    sides: the game's core.sides.Sides.
+    a: a's table.
+    b: b's table.
+
+  Returns:
+    (a's side return, b's mean side return).
+
+  Raises:
+    TypeError: sides is not a core.sides.Sides.
+    ValueError: the sides and the tree differ in seats.
+  """
+  if not isinstance(sides, sides_lib.Sides):
+    raise TypeError(
+        f"field_payoff takes a core.sides.Sides, got {type(sides).__name__}"
+    )
+  if sides.num_players != tree.num_players:
+    raise ValueError(
+        f"sides have {sides.num_players} seats, the tree {tree.num_players}"
+    )
+  ta, tb = tree.check_table(a), tree.check_table(b)
+  t = sides.num_sides
+  mine, theirs = 0.0, 0.0
+  for s in range(t):
+    seats = [ta if sides.side(p) == s else tb for p in range(sides.num_players)]
+    sr = np.asarray(sides.side_returns(tree.expected_returns(seats)), F64)
+    mine += float(sr[s])
+    theirs += float((sr.sum() - sr[s]) / (t - 1))
+  return mine / t, theirs / t

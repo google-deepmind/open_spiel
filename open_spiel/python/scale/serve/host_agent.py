@@ -87,7 +87,8 @@ from open_spiel.python.scale.serve import replay
 
 tree_map = jax.tree_util.tree_map
 
-# The JAX path evaluates the request as this many replicas of one row. On
+# The JAX path evaluates the request as this many replicas of one row (1: the
+# row alone, as a plain batch-1 call with no vmap). On
 # XLA:CPU a dense layer's f32 result for a row of a 1-3 row batch can differ
 # by ULPs from the same row in a larger batch (another dot kernel), so a lone
 # row would not reproduce the Arena's batched logits bit for bit. This is an
@@ -243,6 +244,7 @@ class HostAgent:
     identity: the artifact identity echoed with every decision (identity_of).
     host_driven: whether the policy is HOST_DRIVEN (no JAX path).
     pad_rows: rows the JAX path evaluates the request in.
+    compiler_options: the XLA options of the policy path ({}: defaults).
     stateful: whether the policy carries state across plies (its spec's
       stateful).
     warmed_plies: the longest match warmup has compiled for (0: none).
@@ -257,6 +259,7 @@ class HostAgent:
       pad_rows: int = PAD_ROWS,
       allow_cross_variant: bool = False,
       share: Optional["HostAgent"] = None,
+      compiler_options: Optional[Mapping[str, Any]] = None,
   ):
     """Builds the agent; jits the policy path once.
 
@@ -275,6 +278,10 @@ class HostAgent:
         and pad_rows whose jitted calls this one reuses (the seat is an
         argument of every one), so a second seat compiles nothing; None jits
         its own.
+      compiler_options: XLA options the policy path is compiled with
+        (jax.jit compiler_options, e.g. {"xla_allow_excess_precision":
+        False}); None: the process defaults. For an engine that must
+        reproduce another engine's rounding bit for bit, per artifact.
 
     Raises:
       ValueError: the artifact's game, actions or players do not match the
@@ -290,11 +297,15 @@ class HostAgent:
     spec = self.policy.spec
     trained = artifact.manifest.env_spec
     if env is None:
-      env = (
-          games.env_for(spec.game, {})
-          if trained is None
-          else env_registry.training_env(artifact.manifest)
-      )
+      if trained is not None:
+        env = env_registry.training_env(artifact.manifest)
+      elif games.pyspiel_name(spec.game) != spec.game:
+        # A legacy artifact (no env_spec) of an env serving a pyspiel game of
+        # another name: its own env, not whichever env plays that game's
+        # defaults.
+        env = env_registry.make(env_registry.spec(spec.game))
+      else:
+        env = games.env_for(spec.game, {})
     self.env = env
     if spec.game != self.env.name or artifact.manifest.game != self.env.name:
       raise ValueError(
@@ -330,6 +341,7 @@ class HostAgent:
     if int(pad_rows) < 1:
       raise ValueError(f"pad_rows must be >= 1, got {pad_rows}")
     self.pad_rows = int(pad_rows)
+    self.compiler_options = dict(compiler_options or {})
     self.stateful = bool(spec.stateful)
     # The longest match warmup has compiled for (0: none).
     self.warmed_plies = 0
@@ -339,9 +351,11 @@ class HostAgent:
           or share.env is not self.env
           or share.rule != self.rule
           or share.pad_rows != self.pad_rows
+          or share.compiler_options != self.compiler_options
       ):
         raise ValueError(
-            "a shared agent must serve the same policy, env, rule and pad_rows"
+            "a shared agent must serve the same policy, env, rule, pad_rows "
+            "and compiler_options"
         )
       # Its jitted calls read only the policy, the rule and pad_rows.
       self._decide, self._keys = share._decide, share._keys  # pylint: disable=protected-access
@@ -349,8 +363,13 @@ class HostAgent:
         self._serve = share._serve  # pylint: disable=protected-access
         self._serve_last = share._serve_last  # pylint: disable=protected-access
     elif not self.host_driven:
-      self._serve = jax.jit(self._serve_rows)
-      self._serve_last = jax.jit(self._serve_last_rows)
+      opts = (
+          {"compiler_options": self.compiler_options}
+          if self.compiler_options
+          else {}
+      )
+      self._serve = jax.jit(self._serve_rows, **opts)
+      self._serve_last = jax.jit(self._serve_last_rows, **opts)
 
   def act(
       self,
@@ -476,6 +495,9 @@ class HostAgent:
           lambda x: x[0], pol.evaluate(params, carry, last, eval_key)
       )
 
+    if n == 1:
+      # One row: the batch-1 call itself, no vmap (pad_rows=1 below).
+      return tree_map(lambda x: x[None], _one(tree_map(lambda x: x[0], steps)))
     out = jax.vmap(_one)(rows)
     return tree_map(lambda x: x[:1], out)
 
@@ -514,6 +536,15 @@ class HostAgent:
       carry = pol.observe(params, carry, s1)
       return tree_map(lambda x: x[0], pol.evaluate(params, carry, s1, eval_key))
 
+    if n == 1:
+      # One row: the batch-1 call itself, no vmap. A vmap of one row is the
+      # same function, but XLA:CPU fuses it differently: a bf16 network's
+      # logits move by bf16 ulps, so an engine that must reproduce another
+      # engine's plain batch-1 forward (an older gin engine that evaluates
+      # one row at a time) is served with pad_rows=1.
+      carry = pol.init_carry(params, 1, seat, init_key)
+      carry = pol.observe(params, carry, last)
+      return pol.evaluate(params, carry, last, eval_key)
     out = jax.vmap(one)(rows)
     return tree_map(lambda x: x[:1], out)
 
@@ -582,16 +613,14 @@ class HostAgent:
         jnp.asarray, replay.first_decision_step(self.env, self.seat)
     )
     mask = jnp.asarray(np.ones((1, self.env.num_actions), np.bool_))
-    jax.block_until_ready(
-        self._decide(
-            jnp.zeros((1, self.env.num_actions), jnp.float32), mask, decide_key
-        )
-    )
-    # act lifts the policy's numpy logits with jnp.asarray, which since JAX
-    # 0.12 compiles a staging op per shape and dtype on first use: lift one.
-    jax.block_until_ready(
-        jnp.asarray(np.zeros((1, self.env.num_actions), np.float32))
-    )
+    # The logits as act builds them: jnp.zeros on a forced move, and
+    # jnp.asarray of the policy's numpy logits otherwise (since jax 0.12 a
+    # compiled lax.stage per shape and dtype, not a transfer).
+    for logits in (
+        jnp.zeros((1, self.env.num_actions), jnp.float32),
+        jnp.asarray(np.zeros((1, self.env.num_actions), np.float32)),
+    ):
+      jax.block_until_ready(self._decide(logits, mask, decide_key))
     if not self.host_driven and not self.stateful:
       last = last._replace(legal_mask=mask)
       out = self._serve_last(

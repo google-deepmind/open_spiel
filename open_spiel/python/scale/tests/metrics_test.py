@@ -452,6 +452,232 @@ def test_emit_series_reaches_every_emitter(monkeypatch):
   assert got == [rec] == [{"step": 7, "step_unit": "repeats", "a/b": 1.5}]
 
 
+# -- gs:// record: one upload per flush, retried, never stopping training ----
+class _FakeGcs:
+  """The three calls JsonlSink makes on a gs:// filesystem, in memory.
+
+  Attributes:
+    objects: {url: bytes}.
+    uploads: the urls of successful pipe_file calls, in order.
+    attempts: pipe_file calls, failed or not.
+    fail: pipe_file calls left to fail (a GCS 400 for an unaligned chunk).
+    fail_reads: exists/cat_file calls left to fail.
+  """
+
+  def __init__(self):
+    self.objects: dict[str, bytes] = {}
+    self.uploads: list[str] = []
+    self.attempts = 0
+    self.fail = 0
+    self.fail_reads = 0
+
+  def _read_fault(self):
+    if self.fail_reads:
+      self.fail_reads -= 1
+      raise OSError("503 backend error")
+
+  def exists(self, url):
+    """Whether an object exists (after any injected read fault).
+
+    Args:
+      url: the object.
+
+    Returns:
+      Whether it was written.
+    """
+    self._read_fault()
+    return url in self.objects
+
+  def cat_file(self, url):
+    """An object's bytes (after any injected read fault).
+
+    Args:
+      url: the object.
+
+    Returns:
+      Its bytes.
+    """
+    self._read_fault()
+    return self.objects[url]
+
+  def pipe_file(self, url, data):
+    assert isinstance(data, bytes), type(data)
+    self.attempts += 1
+    if self.fail:
+      self.fail -= 1
+      raise OSError(
+          "400 number of bytes uploaded is required to be equal or "
+          "greater than 262144"
+      )
+    self.objects[url] = data
+    self.uploads.append(url)
+
+
+@pytest.fixture(name="gcs")
+def _gcs(monkeypatch):
+  """Routes the metrics module's GCS calls to a fresh _FakeGcs, no retry wait.
+
+  Args:
+    monkeypatch: pytest's monkeypatch fixture.
+
+  Returns:
+    The fake.
+  """
+  fake = _FakeGcs()
+  monkeypatch.setattr(metrics, "_record_fs", lambda url: fake)
+  monkeypatch.setattr(metrics, "GCS_RETRY_BASE_S", 0.0)
+  return fake
+
+
+RUN = "gs://bucket/experiments/1/metrics"
+JSONL = f"{RUN}/{metrics.JSONL_NAME}"
+
+
+def _rows(gcs):
+  """The JSONL rows written to the fake bucket.
+
+  Args:
+    gcs: the _FakeGcs.
+
+  Returns:
+    The parsed rows, in order.
+  """
+  return [json.loads(ln) for ln in gcs.objects[JSONL].decode().splitlines()]
+
+
+def test_gcs_flush_is_one_whole_upload_and_a_transient_error_is_retried(gcs):
+  """A flush is one pipe_file of the whole file, retried on an error.
+
+  No streamed file write; a failed attempt is retried and the run never sees
+  it.
+
+  Args:
+    gcs: the fake filesystem.
+  """
+  w = metrics.MetricsWriter(RUN, flush_every=1000)
+  w.params({"lr": 0.1})
+  for s in (1, 2, 3):
+    w.write(s, {"x": float(s)})
+  assert JSONL not in gcs.objects  # buffered: fewer than flush_every rows
+  gcs.fail = 1
+  w.flush()
+  assert [r["step"] for r in _rows(gcs)] == [1, 2, 3]
+  assert gcs.uploads.count(JSONL) == 1
+  w.write(4, {"x": 4.0})
+  w.close()
+  assert [r["step"] for r in _rows(gcs)] == [1, 2, 3, 4]
+  assert all(metrics.WRITE_FAILURES_KEY not in r for r in _rows(gcs))
+  assert json.loads(gcs.objects[f"{RUN}/{metrics.PARAMS_NAME}"]) == {"lr": 0.1}
+
+
+def test_a_persistent_upload_failure_is_counted_and_training_goes_on(gcs):
+  """Every attempt of one flush fails: logged and counted, not raised.
+
+  Later rows carry the count; the next upload carries every buffered row.
+
+  Args:
+    gcs: the fake filesystem.
+  """
+  w = metrics.MetricsWriter(RUN, flush_every=1000)
+  w.write(1, {"x": 1.0})
+  gcs.fail = metrics.GCS_WRITE_ATTEMPTS
+  w.flush()  # does not raise
+  assert JSONL not in gcs.objects
+  w.write(2, {"x": 2.0})
+  w.flush()
+  rows = _rows(gcs)
+  assert [r["step"] for r in rows] == [1, 2]
+  assert metrics.WRITE_FAILURES_KEY not in rows[0]
+  assert rows[1][metrics.WRITE_FAILURES_KEY] == 1
+  w.close()
+
+
+def test_close_raises_when_the_record_still_cannot_be_uploaded(gcs):
+  """close() raises after ONE retry ladder (the writer's flush), not two.
+
+  Args:
+    gcs: the fake filesystem.
+  """
+  w = metrics.MetricsWriter(RUN, flush_every=1000)
+  w.write(1, {"x": 1.0})
+  gcs.fail = 10 * metrics.GCS_WRITE_ATTEMPTS
+  gcs.attempts = 0
+  with pytest.raises(OSError, match="could not be uploaded at close"):
+    w.close()
+  assert gcs.attempts == metrics.GCS_WRITE_ATTEMPTS
+
+
+def test_gcs_params_are_read_at_open_and_never_again(gcs):
+  """params.json is read when the sink opens; later params() never read.
+
+  A read failure at open raises (before training); once open, a GCS read
+  outage cannot stop the run through params() or a held key that moves.
+
+  Args:
+    gcs: the fake filesystem.
+  """
+  gcs.objects[f"{RUN}/{metrics.PARAMS_NAME}"] = b'{"lr": 0.1}'
+  gcs.fail_reads = 10 * metrics.GCS_WRITE_ATTEMPTS
+  with pytest.raises(OSError, match="503"):
+    metrics.MetricsWriter(RUN, flush_every=1000)
+  gcs.fail_reads = 0
+  w = metrics.MetricsWriter(RUN, flush_every=1000)
+  gcs.fail_reads = 10 * metrics.GCS_WRITE_ATTEMPTS
+  w.params({"seed": 3})
+  w.write(1, {"sched": 1.0}, held=("sched",))
+  w.write(2, {"sched": 2.0}, held=("sched",))  # moves: a params update
+  w.close()
+  assert gcs.fail_reads == 10 * metrics.GCS_WRITE_ATTEMPTS  # no read
+  doc = json.loads(gcs.objects[f"{RUN}/{metrics.PARAMS_NAME}"])
+  assert doc["lr"] == 0.1 and doc["seed"] == 3
+
+
+def test_a_failed_params_upload_is_retried_at_the_next_flush(gcs):
+  w = metrics.MetricsWriter(RUN, flush_every=1000)
+  gcs.fail = metrics.GCS_WRITE_ATTEMPTS
+  w.params({"lr": 0.1})  # does not raise
+  assert f"{RUN}/{metrics.PARAMS_NAME}" not in gcs.objects
+  w.params({"seed": 3})
+  w.close()
+  assert json.loads(gcs.objects[f"{RUN}/{metrics.PARAMS_NAME}"]) == {
+      "lr": 0.1,
+      "seed": 3,
+  }
+
+
+def test_automatic_gcs_uploads_are_rate_limited_but_flush_is_not(gcs):
+  """Automatic uploads come at most every min_flush_s seconds.
+
+  An explicit flush (the runner's, before a checkpoint) uploads at once.
+
+  Args:
+    gcs: the fake filesystem.
+  """
+  sink = metrics.JsonlSink(RUN, flush_every=2, min_flush_s=3600.0)
+  for s in range(1, 11):
+    sink.write(s, {"train/x": float(s)})
+  assert gcs.uploads.count(JSONL) == 1  # the first, at row 2
+  assert [r["step"] for r in _rows(gcs)] == [1, 2]
+  sink.flush()
+  assert gcs.uploads.count(JSONL) == 2 and len(_rows(gcs)) == 10
+  sink.close()  # nothing pending: no upload
+  assert gcs.uploads.count(JSONL) == 2
+
+
+def test_a_gcs_record_reopens_and_resume_drops_rows_past_the_checkpoint(gcs):
+  w = metrics.MetricsWriter(RUN)
+  for s in (1, 2, 3, 4, 5):
+    w.write(s, {"x": float(s)})
+  w.close()
+  resumed = metrics.MetricsWriter(RUN, resume_step=3)
+  with pytest.raises(ValueError, match="goes back"):
+    resumed.write(2, {"x": 0.0})
+  resumed.write(4, {"x": 40.0})
+  resumed.close()
+  assert [r["step"] for r in _rows(gcs)] == [1, 2, 3, 4]
+  assert _rows(gcs)[-1]["train/x"] == 40.0
+
+
 if __name__ == "__main__":
   sys.exit(
       pytest.main(

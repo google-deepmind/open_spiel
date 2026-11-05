@@ -201,11 +201,7 @@ pytest_test(
 
 pytest_test(
     name = "public_test",
-    timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
-    ],
     tests = ["tests/public_test.py"],
     deps = [
         ":artifact",

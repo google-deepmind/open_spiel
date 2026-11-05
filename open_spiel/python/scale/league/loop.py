@@ -29,7 +29,8 @@ PBT are the same loop with another controller. The pieces are pluggable:
   controller  reads the view and returns actions (`controller`)
 
     lg = League(env, policy, learner,
-                controller.FixedMix("main", S.Mix(1.0, {})), store, run_dir,
+                controller.FixedMix("main", sampler.Mix(1.0, {})), store,
+                run_dir,
                 LeagueConfig(num_envs=64, num_steps=32,
                              updates_per_iteration=1, pool_capacity=0))
     lg.run(100)
@@ -47,8 +48,34 @@ Residency: only the Arena's positions hold member weights on the device. A
 benched member (bench=True, no free position) keeps its weights in host
 memory; an evicted member keeps only its artifact, loaded on demand.
 
-Payoffs, meta-solvers and PSRO are two-player zero-sum; the sampler and the
-Arena are P-player.
+Sides (any player count, core.sides). A table's seats split into sides, and
+the league draws one entrant per side: the learner's side, then every other
+side drawn independently from the learner's mix (league.sampler.draw_table;
+a LeagueConfig.lineup says who fills each side explicitly). Two-player
+tables are the sampler's table_from_mix, unchanged.
+
+Payoffs (league.payoff_views) are read by the controllers as a K x K matrix.
+At two sides it is a side-against-side two-player zero-sum matrix: the
+Evaluator's head-to-head cell in a two-player game (unchanged), and at two
+sides of several seats (bridge) half the paired difference of the sides'
+pair scores on swap2 tables (bridge: IMPs), exactly antisymmetric. At more
+than two sides cell (i, j) is i's side return against a field of j under a
+rotation-balanced design; it is relative to that field, not a two-player
+game, so controllers that solve the matrix as one (GatedPool,
+ContinualExploiter, BROracle, PBT: `pairwise` True) are refused there; a
+controller that declares supports_sides(sides) is asked at any sides and
+returns True or raises why not, and one that declares neither hook is refused
+at a field view (controller.CONTROLLER_HOOKS). Two uneven sides (a pair
+against one seat) are a field view too, its cell averaged over the side the
+subject holds. PSRO at a field view
+solves the symmetric meta-game over the members (view.symmetric,
+meta_solvers.SymmetricGame: u(i; others) for every multiset of co-players,
+from every distinct arrangement of each full table; exact on a GameTree,
+else Evaluator.table under the eval design), built only when a controller
+has needs_symmetric_game and capped at SYMMETRIC_MAX_TABLES tables. The
+promotion gate (gate_cell) is head to head at two sides, and the
+seat-balanced substitution test (eval.match Evaluator.substitute) at more
+than two or when a field is requested.
 """
 
 from __future__ import annotations
@@ -56,6 +83,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import io
+import itertools
 import json
 import os
 import pickle
@@ -66,10 +94,14 @@ from absl import logging
 import jax
 import numpy as np
 
+from open_spiel.python.scale import metrics as metrics_lib
+from open_spiel.python.scale import registry as path_registry
 from open_spiel.python.scale.ckpt import artifact
 from open_spiel.python.scale.ckpt import run_state
 from open_spiel.python.scale.core import arena as arena_lib
+from open_spiel.python.scale.core import hash_compat
 from open_spiel.python.scale.core import rng
+from open_spiel.python.scale.core import sides as sides_lib
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.core import x64
 from open_spiel.python.scale.envs import registry as env_registry
@@ -81,7 +113,9 @@ from open_spiel.python.scale.league import commit
 from open_spiel.python.scale.league import config_common as common
 from open_spiel.python.scale.league import controller as controller_lib
 from open_spiel.python.scale.league import kinds
+from open_spiel.python.scale.league import meta_solvers
 from open_spiel.python.scale.league import mixture
+from open_spiel.python.scale.league import payoff_views
 from open_spiel.python.scale.league import pool_params
 from open_spiel.python.scale.league import sampler
 from open_spiel.python.scale.policies import members as members_lib
@@ -90,6 +124,7 @@ PAYOFFS = ("evaluator", "exact", "none")
 REDRAWS = ("update", "on_change")
 SELF_PLAY_SEATS = ("one", "all")
 POOL_LAYOUTS = ("stacked", "slots")
+FIXED_LAYOUTS = ("stacked", "slots")
 #: The newest League.history records and LearnerSlot.draw_counts entries kept
 #: (and saved): a checkpoint's size does not grow with the length of the run.
 #: The metrics stream has every iteration and update.
@@ -135,9 +170,9 @@ def read_state(path: Any) -> dict[str, Any]:
     The state dict (migrate_state).
   """
   # The run's own state file, written by this league's commit; not untrusted
-  # input.
-  # pylint: disable-next=g-unsafe-pickle-load
-  return migrate_state(pickle.loads(path.read_bytes()), path)  # noqa: S301
+  # input. Its globals resolve as recorded paths do (registry.Unpickler), so
+  # a state written under an earlier module or package name still loads.
+  return migrate_state(path_registry.loads(path.read_bytes()), path)
 
 
 def migrate_state(blob: dict[str, Any], where: Any) -> dict[str, Any]:
@@ -168,6 +203,10 @@ def migrate_state(blob: dict[str, Any], where: Any) -> dict[str, Any]:
 class LeagueConfig:
   """The shape and policies of a League.
 
+  The N-player and team fields lineup, payoff_view and eval_design, and
+  fixed_layout, are core.hash_compat.added: left out of the config hash at
+  their defaults.
+
   Attributes:
     num_envs: Arena rows per update.
     num_steps: plies per update.
@@ -191,12 +230,31 @@ class LeagueConfig:
     pool_layout: "stacked" is one Arena slot of K stacked members (one params
       gather per row); "slots" is K slots of one member each (no gather, for
       large networks).
+    fixed_layout: "stacked" seats the fixed opponents of one (spec, rule) in
+      one Arena slot of stacked members (one params gather per row when it
+      holds more than one); "slots" seats each fixed opponent in its own
+      slot of one member (no gather, for large networks: a gather
+      materializes the network's params once per row).
     bench: members beyond the pool's positions wait off the Arena, host-side,
       and are seated when a mix names them.
     reset_optimizer_each_iteration: give every live learner a fresh optimizer
       state at the start of each training phase (params, value EMA and
       counters carry on), so each best-response phase starts its adaptive
       moments from scratch.
+    lineup: a core.sides.Lineup, who fills each side (or each seat of a
+      side) of a training table (league.sampler.table_from_lineup); None: the
+      learner on one side and every other side drawn from its mix
+      (sampler.lineup_from_mix), which at two players is table_from_mix. Not
+      with self_play_seats="all".
+    payoff_view: how the league reduces table results to the payoffs its
+      controllers read; only "auto" (league.payoff_views: the side-against-
+      side matrix at two sides, the field matrix at more).
+    eval_design: the duplicate seating design of payoff cells: "auto"
+      (swap2 at two sides, cyclic at more, cyclic+classes at more uneven
+      sides), "swap2", or a field design ("cyclic", "cyclic+reversed",
+      "cyclic+classes") at more than two sides
+      (payoff_views.resolve_design, checked against the env's sides when the
+      League is built).
   """
 
   num_envs: int
@@ -217,6 +275,10 @@ class LeagueConfig:
   pool_layout: str = "stacked"
   bench: bool = False
   reset_optimizer_each_iteration: bool = False
+  lineup: Optional[sides_lib.Lineup] = hash_compat.added(None)
+  payoff_view: str = hash_compat.added("auto")
+  eval_design: str = hash_compat.added("auto")
+  fixed_layout: str = hash_compat.added("stacked")
 
   def __post_init__(self):
     for name, low in (
@@ -236,6 +298,7 @@ class LeagueConfig:
         ("redraw", REDRAWS),
         ("self_play_seats", SELF_PLAY_SEATS),
         ("pool_layout", POOL_LAYOUTS),
+        ("fixed_layout", FIXED_LAYOUTS),
     ):
       if getattr(self, name) not in allowed:
         raise ValueError(
@@ -248,6 +311,32 @@ class LeagueConfig:
             f"LeagueConfig.{name} must be a DecisionRule, got "
             f"{getattr(self, name)!r}"
         )
+    if self.lineup is not None:
+      if not isinstance(self.lineup, sides_lib.Lineup):
+        raise TypeError(
+            "LeagueConfig.lineup must be a core.sides.Lineup or None, got "
+            f"{type(self.lineup).__name__}"
+        )
+      if self.self_play_seats == "all":
+        raise ValueError(
+            "LeagueConfig: self_play_seats='all' seats the learner on every "
+            "side; a lineup says who fills each side: give one or the other"
+        )
+    for name in ("payoff_view", "eval_design"):
+      if not isinstance(getattr(self, name), str):
+        raise TypeError(
+            f"LeagueConfig.{name} must be a str, got {getattr(self, name)!r}"
+        )
+    if self.payoff_view != "auto":
+      raise NotImplementedError(
+          f"LeagueConfig.payoff_view={self.payoff_view!r}: only 'auto' "
+          "is implemented (league.payoff_views)"
+      )
+    if self.eval_design not in payoff_views.design_names():
+      raise ValueError(
+          f"LeagueConfig.eval_design={self.eval_design!r} not in "
+          f"{payoff_views.design_names()}"
+      )
 
 
 @dataclasses.dataclass
@@ -270,6 +359,8 @@ class LearnerSlot:
     last_metrics: the last update's metrics.
     draw: None, or the current draw (redraw="on_change").
     draw_sig: the signature of the mix and seating the draw was made for.
+    tallies: running state a run hook keeps for this slot
+      (runner.register_run_hook), checkpointed.
   """
 
   name: str
@@ -286,6 +377,9 @@ class LearnerSlot:
   # newest RECORD_CAP
   draw_counts: list[Any] = dataclasses.field(default_factory=list)
   last_metrics: dict[str, Any] = dataclasses.field(default_factory=dict)
+  # Running state a run hook keeps per slot (runner.register_run_hook),
+  # checkpointed.
+  tallies: dict[str, Any] = dataclasses.field(default_factory=dict)
   # (SlotTable, counts) of the standing table (redraw on_change)
   draw: Optional[tuple[Any, ...]] = None
   # the (mix, pool seating) the standing table was drawn for
@@ -353,6 +447,80 @@ def refusal_message(
   )
 
 
+def hashed_config(config: LeagueConfig) -> dict[str, Any]:
+  """dataclasses.asdict(config) without the added fields at their defaults.
+
+  core.hash_compat: what a League's config hash (its saved state's and its
+  member artifacts' config_hash) reads, so a field added to LeagueConfig
+  leaves the hash of every league built before it unchanged.
+
+  Args:
+    config: the LeagueConfig.
+
+  Returns:
+    The hashed dict.
+  """
+  d = dataclasses.asdict(config)
+  for f in dataclasses.fields(config):
+    if hash_compat.is_added(f) and hash_compat.at_default(
+        config, f, common.plain
+    ):
+      del d[f.name]
+  return d
+
+
+#: Network torso keys that change no function or param (a League of the same
+#: shape): card_move_transformer center_keys.
+#: Dropped from the League's config hash, so a fork that turns one on
+#: restores its parent's league; absent keys leave every hash unchanged.
+FUNCTION_PRESERVING_TORSO_KEYS = ("center_keys",)
+
+
+def hashed_arch_kwargs(arch_kwargs: Mapping[str, Any]) -> dict[str, Any]:
+  """arch_kwargs as the League's config hash reads them.
+
+  Args:
+    arch_kwargs: the slot policy's arch_kwargs.
+
+  Returns:
+    A copy without FUNCTION_PRESERVING_TORSO_KEYS in network.torso.
+  """
+  d = dict(arch_kwargs)
+  net = d.get("network")
+  if isinstance(net, Mapping) and isinstance(net.get("torso"), Mapping):
+    torso = {
+        k: v
+        for k, v in net["torso"].items()
+        if k not in FUNCTION_PRESERVING_TORSO_KEYS
+    }
+    if len(torso) != len(net["torso"]):
+      d["network"] = dict(net, torso=torso)
+  return d
+
+
+#: The most distinct table arrangements a field view's symmetric meta-game may
+#: play (League._symmetric_game); beyond it the league refuses (cap the
+#: members).
+SYMMETRIC_MAX_TABLES = 4096
+
+
+def _controller_leaves(ctl: Any) -> list[Any]:
+  """The non-composite controllers under `ctl`, in order.
+
+  Args:
+    ctl: A controller.
+
+  Returns:
+    The leaf controllers.
+  """
+  if isinstance(ctl, controller_lib.Composite):
+    leaves = []
+    for c in ctl.controllers:
+      leaves.extend(_controller_leaves(c))
+    return leaves
+  return [ctl]
+
+
 class League:
   """A league over one Env and one population architecture (module doc).
 
@@ -360,7 +528,7 @@ class League:
   role, init, mix and state, never in kind or network. Actions that rewrite a
   learner state's params or optimizer (CopyMutate, SpawnLearner(init_from),
   the optimizer reset) are refused for a learner whose state_dict has no
-  "params" / "opt_state" entry. Payoffs need a 2-player game.
+  "params" / "opt_state" entry. Payoffs at any sides (module doc, "Payoffs").
 
   Attributes:
     env: the game.
@@ -390,6 +558,7 @@ class League:
     stop_reason: the Stop's reason.
     history: the newest RECORD_CAP iteration records.
     iteration: the league iteration.
+    sides: the env's core.sides.Sides.
   """
 
   def __init__(
@@ -442,10 +611,8 @@ class League:
     """
     x64.assert_x64("League")
     assert isinstance(config, LeagueConfig), type(config)
-    if config.payoff != "none":
-      assert (
-          env.num_players == 2
-      ), "the league's payoffs are 2-player (Evaluator)"
+    self.sides = sides_lib.sides_of(env)
+    self._check_sides(env, controller, config)
     if driver is None:
       driver = kinds.PGDriver(policy, learner)
     if driver.policy is not policy or driver.learner is not learner:
@@ -471,12 +638,25 @@ class League:
     self.on_update = on_update
     self.before_update: Optional[Callable[["League", LearnerSlot], None]] = None
     if draw_guards is None:
-      draw_guards = getattr(controller, "draw_guards", lambda: ())()
+      fn = controller_lib.CONTROLLER_HOOKS.get(controller, "draw_guards")
+      draw_guards = () if fn is None else fn()
     self.draw_guards = tuple(draw_guards)
     self._template = driver.wrap_member(policy.init_params(jax.random.key(0)))
     self._pool_params = pool_params.for_policy(self.member_policy)
-    # The population pool: K positions over one stacked slot or K slots.
-    k = config.pool_capacity
+    # The population pool: K positions over one stacked slot or K slots, K =
+    # pool_capacity plus the positions the controller reserves.
+    self._reserved_positions = controller_lib.reserved_pool_positions(
+        controller
+    )
+    k = config.pool_capacity + self._reserved_positions
+    if self._reserved_positions:
+      logging.info(
+          "league: pool of %d positions (pool_capacity %d + %d reserved by "
+          "the controller)",
+          k,
+          config.pool_capacity,
+          self._reserved_positions,
+      )
     if k == 0:
       shapes = []
     elif config.pool_layout == "stacked":
@@ -495,13 +675,15 @@ class League:
     self._positions = []
     for i, n in enumerate(shapes):
       self._positions.extend((i, m) for m in range(n))
-    # Fixed opponents: same (spec, rule) -> one slot, members stacked in order.
+    # Fixed opponents: same (spec, rule) -> one slot, members stacked in
+    # order; fixed_layout "slots": one slot per opponent.
     groups: dict[str, list[Any]] = {}
     for name, (pol, params, rule) in dict(fixed_opponents or {}).items():
       pol, params = driver.wrap_opponent(pol, params)
-      groups.setdefault(_group_key(pol, rule), []).append(
-          (name, pol, params, rule)
-      )
+      key = _group_key(pol, rule)
+      if config.fixed_layout == "slots":
+        key = json.dumps([key, name])
+      groups.setdefault(key, []).append((name, pol, params, rule))
     self.fixed: list[sampler.Pool] = []
     for members in groups.values():
       pol, rule = members[0][1], members[0][3]
@@ -532,10 +714,10 @@ class League:
     self._config_hash = hashlib.sha256(
         json.dumps(
             dict(
-                config=dataclasses.asdict(config),
+                config=hashed_config(config),
                 controller=type(controller).__name__,
                 arch=spec.arch_name,
-                arch_kwargs=dict(spec.arch_kwargs),
+                arch_kwargs=hashed_arch_kwargs(spec.arch_kwargs),
                 kind=driver.kind,
             ),
             sort_keys=True,
@@ -593,6 +775,56 @@ class League:
       self.members[aid] = controller_lib.MemberInfo(
           aid, "init", "fixed", None, 0
       )
+
+  def _check_sides(
+      self, env: types.Env, controller: Any, config: LeagueConfig
+  ) -> None:
+    """The league's capability checks for the env's sides (module doc).
+
+    Args:
+      env: the game.
+      controller: the LeagueController.
+      config: the LeagueConfig.
+
+    Raises:
+      ValueError: the lineup does not fit the sides, the eval design is not
+        valid for them, or a controller that reads the payoff matrix as a
+        two-player game (`pairwise`) runs at a field view.
+      core.hooks.MissingHookError: at a field view, a leaf controller
+        declares neither supports_sides nor pairwise.
+      core.hooks.MalformedHookError: a controller hook of the wrong kind.
+    """
+    sides = self.sides
+    if config.lineup is not None:
+      config.lineup.check(sides)
+    self.view_kind = payoff_views.view_kind(sides)
+    self.eval_design = payoff_views.resolve_design(config.eval_design, sides)
+    proto = controller_lib.CONTROLLER_HOOKS
+    declared = set()
+    for c in _controller_leaves(controller):
+      proto.check(c)
+      ok = proto.get(c, "supports_sides")
+      if ok is not None:
+        declared.add(id(c))
+        if not ok(sides):
+          raise ValueError(
+              f"controller {type(c).__name__} does not support sides "
+              f"{sides.side_of_seat} (its supports_sides)"
+          )
+    if self.view_kind == "pair":
+      return
+    for c in _controller_leaves(controller):
+      if id(c) in declared:
+        continue
+      # PSRO with the "uniform" meta-solver (fictitious play over the
+      # population) reads no payoff: its pairwise is False.
+      if proto.require(c, "pairwise"):
+        raise ValueError(
+            f"controller {type(c).__name__} reads the payoff matrix as a "
+            f"two-player game; {env.name} has {sides.num_sides} sides, where a "
+            "league's payoff cell is a field score, not a pairwise payoff "
+            "(league.payoff_views); not supported at more than two sides yet"
+        )
 
   def _empty(self, n: int) -> Any:
     """Empty pool params for n members.
@@ -686,7 +918,7 @@ class League:
     """
     return RuntimeError(
         "the population pool is full (pool_capacity="
-        f"{self.config.pool_capacity}: "
+        f"{self.config.pool_capacity} + {self._reserved_positions} reserved: "
         f"{self.placed()}); evict members, raise pool_capacity or set "
         "bench=True"
     )
@@ -992,37 +1224,195 @@ class League:
       )
     return self._tables[key]
 
-  def _cell(self, a: tuple[Any, ...], b: tuple[Any, ...]) -> tuple[Any, ...]:
-    """The payoff cell of entrant `a` against `b`, cached.
+  def _entrant(self, name: str) -> match.Entrant:
+    """Pool member `name` as an Entrant under the pool rule.
 
     Args:
-      a: the row entrant, (name, version).
-      b: the column entrant, (name, version).
+      name: The member.
 
     Returns:
-      (a's mean, its se, b's mean, its se).
+      The match.Entrant.
+    """
+    return match.Entrant(
+        name, self.member_policy, self._params_of(name), self.config.pool_rule
+    )
+
+  def _cell(self, a: tuple[Any, ...], b: tuple[Any, ...]) -> tuple[Any, ...]:
+    """A pair view's cell (mean_ab, se_ab, mean_ba, se_ba) of entrants a, b.
+
+    a, b are (name, version): the two-player head-to-head (unchanged), or at
+    two sides of several seats payoff_views.side_cell of a swap2 table.
+
+    Args:
+      a: the first entrant, (name, version).
+      b: the second entrant, (name, version).
+
+    Returns:
+      (mean_ab, se_ab, mean_ba, se_ba).
     """
     key = (a, b)
     if key not in self._cells:
+      two_player = self.env.num_players == 2
       if self._tree is not None:
-        v = mixture.symmetric_payoff(
-            self._tree, self._table(*a), self._table(*b)
-        )
-        self._cells[key] = (v, 0.0, -v, 0.0)
+        if two_player:
+          v = mixture.symmetric_payoff(
+              self._tree, self._table(*a), self._table(*b)
+          )
+          self._cells[key] = (v, 0.0, -v, 0.0)
+        else:
+          va, vb = mixture.field_payoff(
+              self._tree, self.sides, self._table(*a), self._table(*b)
+          )
+          v = 0.5 * (va - vb)
+          self._cells[key] = (v, 0.0, -v, 0.0)
       else:
         tag = f"{a[0]}|{a[1]}|{b[0]}|{b[1]}".encode()
         k = rng.fold_in(self._k_eval, zlib.crc32(tag))
-        rule = self.config.pool_rule
-        ea = match.Entrant(
-            a[0], self.member_policy, self._params_of(a[0]), rule
-        )
-        eb = match.Entrant(
-            b[0], self.member_policy, self._params_of(b[0]), rule
-        )
-        r = self.evaluator.head_to_head(ea, eb, self.config.eval_deals, k)
-        eb_est = stats.estimate(r.b_payoff.mean(1))
-        self._cells[key] = (r.mean.mean, r.mean.se, eb_est.mean, eb_est.se)
+        ea, eb = self._entrant(a[0]), self._entrant(b[0])
+        if two_player:
+          r = self.evaluator.head_to_head(ea, eb, self.config.eval_deals, k)
+          eb_est = stats.estimate(r.b_payoff.mean(1))
+          self._cells[key] = (r.mean.mean, r.mean.se, eb_est.mean, eb_est.se)
+        else:
+          tab = self.evaluator.table(
+              [ea, eb], self.config.eval_deals, k, self.eval_design
+          )
+          self._cells[key] = payoff_views.side_cell(
+              tab, self.evaluator.pair_scorer
+          )
     return self._cells[key]
+
+  def _field_cell(
+      self, a: tuple[Any, ...], b: tuple[Any, ...]
+  ) -> tuple[Any, ...]:
+    """A field view's cell (mean, se).
+
+    Entrant a's side return against a field of b (payoff_views), exact on a
+    GameTree, else vs_field under the league's eval design.
+
+    Args:
+      a: the entrant scored, (name, version).
+      b: the field's entrant, (name, version).
+
+    Returns:
+      (mean, se).
+    """
+    key = ("field", a, b)
+    if key not in self._cells:
+      if self._tree is not None:
+        v, _ = mixture.field_payoff(
+            self._tree, self.sides, self._table(*a), self._table(*b)
+        )
+        self._cells[key] = (v, 0.0)
+      elif self.sides.fully_rotatable:
+        tag = f"field|{a[0]}|{a[1]}|{b[0]}|{b[1]}".encode()
+        k = rng.fold_in(self._k_eval, zlib.crc32(tag))
+        res = self.evaluator.vs_field(
+            self._entrant(a[0]),
+            [self._entrant(b[0])],
+            [1.0],
+            self.config.eval_deals,
+            k,
+            design=self.eval_design,
+        )
+        self._cells[key] = payoff_views.field_cell(res)
+      else:
+        # Uneven sides: a's side position is not rotated by the design, so the
+        # cell averages a's return over the T positions (mixture.field_payoff's
+        # estimand), one table per position, independent keys.
+        ea, eb = self._entrant(a[0]), self._entrant(b[0])
+        t = self.sides.num_sides
+        means, ses = [], []
+        for pos in range(t):
+          tag = f"field|{a[0]}|{a[1]}|{b[0]}|{b[1]}|{pos}".encode()
+          k = rng.fold_in(self._k_eval, zlib.crc32(tag))
+          fills = [ea if q == pos else eb for q in range(t)]
+          est = self.evaluator.table(
+              fills, self.config.eval_deals, k, self.eval_design
+          ).position_score(pos)
+          means.append(est.mean)
+          ses.append(est.se)
+        self._cells[key] = (
+            float(np.mean(means)),
+            float(np.sqrt(np.sum(np.square(ses))) / t),
+        )
+    return self._cells[key]
+
+  def _arrangement_returns(self, arr: tuple[Any, ...]) -> np.ndarray:
+    """The side returns f64[T] of one table arrangement.
+
+    An entrant (name, version) per side position, exact on a GameTree, else
+    position scores of Evaluator.table under the eval design. Cached.
+
+    Args:
+      arr: an entrant (name, version) per side position.
+
+    Returns:
+      f64[T] side returns.
+    """
+    key = ("arrangement", arr)
+    if key not in self._cells:
+      t = self.sides.num_sides
+      if self._tree is not None:
+        tabs = [
+            self._table(*arr[self.sides.side(p)])
+            for p in range(self.sides.num_players)
+        ]
+        out = np.asarray(
+            self.sides.side_returns(self._tree.expected_returns(tabs)),
+            np.float64,
+        )
+      else:
+        tag = "arr|" + "|".join(f"{n}|{v}" for n, v in arr)
+        k = rng.fold_in(self._k_eval, zlib.crc32(tag.encode()))
+        res = self.evaluator.table(
+            [self._entrant(n) for n, _ in arr],
+            self.config.eval_deals,
+            k,
+            self.eval_design,
+        )
+        out = np.asarray(
+            [res.position_score(q).mean for q in range(t)], np.float64
+        )
+      self._cells[key] = (out,)
+    return self._cells[key][0]
+
+  def _symmetric_game(self) -> "meta_solvers.SymmetricGame":
+    """The symmetric meta-game over the non-evicted members (module doc).
+
+    u(x; M) = x's side return averaged over every distinct arrangement of the
+    full table M + {x} over the side positions and over the positions x holds,
+    which is x in a uniformly drawn side position against co-players arranged
+    uniformly: fitness(sigma) is then vs_field(x, sigma).
+
+    Returns:
+      The meta_solvers.SymmetricGame.
+    """
+    ents = [(n, 0) for n, m in self.members.items() if m.lifecycle != "evicted"]
+    k, t = len(ents), self.sides.num_sides
+    full = list(itertools.combinations_with_replacement(range(k), t))
+    plays = sum(len(set(itertools.permutations(s))) for s in full)
+    if plays > SYMMETRIC_MAX_TABLES:
+      raise ValueError(
+          f"the symmetric meta-game over {k} members at {t} sides plays "
+          f"{plays} table arrangements > SYMMETRIC_MAX_TABLES "
+          f"{SYMMETRIC_MAX_TABLES}: cap the population (or use PSRO "
+          "meta_solver='uniform')"
+      )
+    acc: dict[tuple[Any, ...], list[Any]] = {}
+    for s in full:
+      for arr in sorted(set(itertools.permutations(s))):
+        r = self._arrangement_returns(tuple(ents[i] for i in arr))
+        for x in set(arr):
+          others = list(s)
+          others.remove(x)
+          acc.setdefault((x, tuple(others)), []).append(
+              float(np.mean([r[q] for q in range(t) if arr[q] == x]))
+          )
+    names = [n for n, _ in ents]
+    return meta_solvers.SymmetricGame.from_function(
+        t, names, lambda i, m: float(np.mean(acc[(i, tuple(m))]))
+    )
 
   def evaluate(self) -> Optional[match.PayoffMatrix]:
     """Computes the payoff matrix over the entrants (None when payoff="none").
@@ -1036,12 +1426,58 @@ class League:
     ents = self._entrants()
     n = len(ents)
     mean, se = np.zeros((n, n)), np.zeros((n, n))
-    for i in range(n):
-      for j in range(i + 1, n):
-        ma, sa, mb, sb = self._cell(ents[i], ents[j])
-        mean[i, j], se[i, j], mean[j, i], se[j, i] = ma, sa, mb, sb
+    if self.view_kind == "pair":
+      for i in range(n):
+        for j in range(i + 1, n):
+          ma, sa, mb, sb = self._cell(ents[i], ents[j])
+          mean[i, j], se[i, j], mean[j, i], se[j, i] = ma, sa, mb, sb
+    else:
+      for i in range(n):
+        for j in range(n):
+          mean[i, j], se[i, j] = self._field_cell(ents[i], ents[j])
     self.payoff = controller_lib.payoff_matrix([e[0] for e in ents], mean, se)
     return self.payoff
+
+  def field_scores(
+      self,
+      n_deals: Optional[int] = None,
+      seed: int = 0,
+      names: Optional[Sequence[str]] = None,
+  ) -> tuple[Any, ...]:
+    """payoff_views.FieldScore per entrant (default: every entrant).
+
+    Its vs_field against the uniform mixture of the same entrants, every other
+    side drawn independently per deal, n_deals deals (default eval_deals) keyed
+    by key(seed). A report, relative to that field; at more than two sides only,
+    with payoff="evaluator".
+
+    Args:
+      n_deals: deals per entrant (default eval_deals).
+      seed: the key's seed.
+      names: the entrants (default every entrant).
+
+    Returns:
+      A tuple of FieldScore.
+
+    Raises:
+      ValueError: not a field view with payoff="evaluator".
+    """
+    if self.view_kind != "field" or self.evaluator is None:
+      raise ValueError(
+          "field_scores: a league at more than two sides with "
+          "payoff='evaluator'"
+      )
+    names = [e[0] for e in self._entrants()] if names is None else list(names)
+    ents = [self._entrant(n) for n in names]
+    w = np.full(len(ents), 1.0 / len(ents))
+    return payoff_views.field_scores(
+        self.evaluator,
+        ents,
+        w,
+        int(n_deals or self.config.eval_deals),
+        jax.random.key(int(seed)),
+        design=self.eval_design,
+    )
 
   def view(self) -> controller_lib.LeagueView:
     """The LeagueView the controller steps on.
@@ -1064,13 +1500,29 @@ class League:
         )
         for l in self.learners.values()
     )
+    sym = None
+    if (
+        self.view_kind == "field"
+        and self.config.payoff != "none"
+        and any(
+            getattr(c, "needs_symmetric_game", False)
+            for c in _controller_leaves(self.controller)
+        )
+    ):
+      sym = self._symmetric_game()
     v = controller_lib.LeagueView(
         iteration=self.iteration,
         members=tuple(self.members.values()),
         learners=learners,
         payoff=self.payoff,
+        kind=self.view_kind,
+        num_sides=self.sides.num_sides,
+        constant_sum=self.sides.constant_sum,
+        symmetric=sym,
     )
-    req_fn = getattr(self.controller, "gate_request", None)
+    req_fn = controller_lib.CONTROLLER_HOOKS.get(
+        self.controller, "gate_request"
+    )
     req = req_fn(v) if req_fn is not None else None
     if req is None:
       return v
@@ -1083,8 +1535,25 @@ class League:
 
     `req.subject` (the learner's params as the plain policy) against
     `req.opponent` (the member's, unwrapped), ARGMAX both sides, on req.deals
-    duplicate deal pairs keyed by req.seed. A repeated request for a generation
-    gets the same cell. Two-player only.
+    duplicate deals keyed by req.seed. A repeated request for a generation
+    gets the same cell.
+
+    Two-player games: the subject's head-to-head payoff per deal pair.
+    Two sides of several seats (bridge): the head-to-head on
+    swap2 tables, the subject's pair score per deal (the env's pair scorer:
+    bridge IMPs). More than two sides, or a request with a field (any
+    sides): eval.match Evaluator.substitute, the seat-balanced replacement
+    test, the subject's block minus the opponent's (the incumbent's) against
+    the same field draws per deal: the field is req.field (a sampler.Mix
+    over members), else the incumbent itself. The cell's mean is that
+    difference; above 0 means the subject does better in the incumbent's
+    place.
+
+    An Evaluator that defines gate_estimate(subject, incumbent, field,
+    weights, n_deals, key) -> stats.Estimate replaces all of the above with
+    its own statistic, at any sides (field: the req.field members and their
+    normalised weights, else [the incumbent] and [1.0]); e.g. a game's team
+    duplicate block difference in its own scoring unit.
 
     Args:
       req: the GateRequest.
@@ -1093,7 +1562,8 @@ class League:
       The GateCell.
 
     Raises:
-      ValueError: the game is not two-player.
+      TypeError: the field is not a sampler.Mix.
+      ValueError: the field is malformed or names no member.
     """
     if req.generation in self._gate_cells:
       cell = self._gate_cells[req.generation]
@@ -1102,8 +1572,6 @@ class League:
           req,
       )
       return cell
-    if self.env.num_players != 2:
-      raise ValueError("the promotion gate is two-player (the Evaluator's)")
     seed, n = int(req.seed), int(req.deals)
     if self._gate_evaluator is None:
       self._gate_evaluator = self.evaluator or match.Evaluator(
@@ -1115,17 +1583,45 @@ class League:
     # The plain network (the driver's plain_policy: the learner's policy, or
     # the slot factory's plain_member, e.g. a base routed to a scripted phase).
     pol, plain = self.driver.plain_policy, self.driver.plain_params
+
+    def member(name):
+      """The plain network of pool member `name`, argmax.
+
+      Args:
+        name: The member.
+
+      Returns:
+        The match.Entrant.
+      """
+      return match.Entrant(
+          name,
+          pol,
+          plain(self.driver.unwrap_member(self.member_params(name))),
+          types.ARGMAX,
+      )
+
     a = match.Entrant(
         req.subject, pol, plain(self.learner_params(req.subject)), types.ARGMAX
     )
-    b = match.Entrant(
-        req.opponent,
-        pol,
-        plain(self.driver.unwrap_member(self.member_params(req.opponent))),
-        types.ARGMAX,
-    )
-    r = self._gate_evaluator.head_to_head(a, b, n, jax.random.key(seed))
-    est = stats.estimate(np.asarray(r.a_payoff, np.float64).mean(1))
+    b = member(req.opponent)
+    field = req.field  # a declared GateRequest field: never optional
+    custom = match.EVALUATOR_HOOKS.get(self._gate_evaluator, "gate_estimate")
+    if custom is not None:
+      f_ents, f_w = self._gate_field(field, b, member)
+      est = custom(a, b, f_ents, f_w, n, jax.random.key(seed))
+    elif self.env.num_players == 2 and field is None:
+      r = self._gate_evaluator.head_to_head(a, b, n, jax.random.key(seed))
+      est = stats.estimate(np.asarray(r.a_payoff, np.float64).mean(1))
+    elif self.sides.num_sides == 2 and field is None:
+      est = self._gate_evaluator.head_to_head(
+          a, b, n, jax.random.key(seed)
+      ).mean
+    else:
+      f_ents, f_w = self._gate_field(field, b, member)
+      res = self._gate_evaluator.substitute(
+          a, b, f_ents, f_w, n, jax.random.key(seed)
+      )
+      est = res.block_diff(0)
     cell = controller_lib.GateCell(
         generation=int(req.generation),
         subject=req.subject,
@@ -1140,6 +1636,41 @@ class League:
     self._gate_cells[req.generation] = cell
     logging.info("league: gate cell generation %d: %s", req.generation, cell)
     return cell
+
+  @classmethod
+  def _gate_field(
+      cls, field, incumbent: match.Entrant, member
+  ) -> tuple[Any, ...]:
+    """(entrants, weights f64[k]) of a gate's field (gate_cell).
+
+    Args:
+      field: The GateRequest's field, a sampler.Mix, or None.
+      incumbent: The gate's opponent.
+      member: fn(name) -> the member's Entrant.
+
+    Returns:
+      (entrants, weights f64[k]).
+
+    Raises:
+      TypeError: field is not a sampler.Mix.
+      ValueError: A field with self-play, or one naming no member.
+    """
+    if field is None:
+      return [incumbent], np.ones(1)
+    if not isinstance(field, sampler.Mix):
+      raise TypeError(
+          f"GateRequest.field is a sampler.Mix, got {type(field).__name__}"
+      )
+    if field.self_play > 0.0:
+      raise ValueError(
+          f"gate field {field}: a field of members only (self_play 0); the "
+          "subject's own seats are the substitution"
+      )
+    names = [nm for nm, w in sorted(field.weights.items()) if w > 0.0]
+    if not names:
+      raise ValueError(f"gate field {field} names no member")
+    f_w = np.asarray([field.weights[nm] for nm in names], np.float64)
+    return [member(nm) for nm in names], f_w / f_w.sum()
 
   def _score(self, ls: LearnerSlot, pm: match.PayoffMatrix) -> float:
     """The learner's mix-weighted mean payoff.
@@ -1198,6 +1729,17 @@ class League:
             f"{sorted(self._fixed_names())})"
         )
 
+  def _lineup_members(self) -> list[Any]:
+    """The members the config's lineup seats by name ("fixed" fills).
+
+    Returns:
+      The member names.
+    """
+    lu = self.config.lineup
+    return (
+        [] if lu is None else [f.member for f in lu.units if f.kind == "fixed"]
+    )
+
   def _seat(self) -> None:
     """Bench: seats every population name a live mix references.
 
@@ -1210,6 +1752,9 @@ class League:
     """
     fixed = self._fixed_names()
     wanted: list[Any] = []
+    for n in self._lineup_members():
+      if n not in fixed and n not in wanted:
+        wanted.append(n)
     for ls in self.learners.values():
       for n in ls.mix.support():
         if n not in fixed and n not in wanted:
@@ -1217,7 +1762,9 @@ class League:
     if len(wanted) > len(self._positions):
       raise RuntimeError(
           f"the live mixes name {len(wanted)} population entrants {wanted} but "
-          f"the pool has {len(self._positions)} positions (pool_capacity)"
+          f"the pool has {len(self._positions)} positions (pool_capacity "
+          f"{self.config.pool_capacity} + {self._reserved_positions} reserved "
+          "by the controller)"
       )
     for n in wanted:
       if self._position_of(n) is not None:
@@ -1460,6 +2007,7 @@ class League:
       TypeError: an action is unknown.
     """
     structural = False
+    evicted: list[tuple[str, Any, str]] = []
     for a in actions:
       if isinstance(a, controller_lib.SpawnLearner):
         self._spawn(a, it)
@@ -1490,6 +2038,7 @@ class League:
         m = self.members[a.member]
         if a.lifecycle == "evicted" and m.lifecycle != "evicted":
           self._evict(a.member)
+          evicted.append((a.member, m, a.reason))
         elif m.lifecycle == "evicted" and a.lifecycle != "evicted":
           raise ValueError(
               f"{a.member} was evicted; re-entry is a new admission"
@@ -1506,8 +2055,17 @@ class League:
         self.stopped, self.stop_reason = True, a.reason
       else:
         raise TypeError(f"unknown action {a!r}")
+    if evicted:
+      self._log_evictions(evicted, it)
     if self.config.bench:
       self._seat()
+    for n in self._lineup_members():
+      if not self._known(n):
+        raise KeyError(
+            f"LeagueConfig.lineup seats {n!r}, which is not in the pool "
+            f"(members: {[x for x in self.placed() if x]}; fixed: "
+            f"{sorted(self._fixed_names())})"
+        )
     for ls in self.learners.values():
       self._check_mix(ls.name, ls.mix)
       if self.config.bench:
@@ -1517,6 +2075,44 @@ class League:
               self.placed(),
           )
     return structural
+
+  def _log_evictions(
+      self, evicted: Sequence[tuple[str, Any, str]], it: int
+  ) -> None:
+    """One absl line per eviction and one series record per call.
+
+    Metrics only, so that no eviction is silent: nothing here
+    changes the league. The series record, at step updates_total (unit
+    "updates"), is "league/evictions" (how many this call evicted) and
+    "league/evicted/<origin>" (the newest evicted member step of each
+    learner, e.g. 50 for main@50); every member and reason is in the log
+    lines.
+
+    Args:
+      evicted: (member, its MemberInfo before eviction, the action's reason).
+      it: the iteration.
+    """
+    step = int(self.updates_total)
+    newest: dict[str, int] = {}
+    for name, m, reason in evicted:
+      logging.info(
+          "league: evicted member %s (role %s, from %s, admitted at "
+          "iteration %d) at iteration %d, update %d: %s",
+          name,
+          m.role,
+          m.origin,
+          int(m.admitted_at),
+          int(it),
+          step,
+          reason,
+      )
+      _, at, st = name.rpartition("@")
+      if at and st.isdigit() and m.origin:
+        newest[str(m.origin)] = max(newest.get(str(m.origin), -1), int(st))
+    values: dict[str, Any] = {"league/evictions": len(evicted)}
+    for base, st in sorted(newest.items()):
+      values[f"league/evicted/{base}"] = st
+    metrics_lib.emit_series(step, values, step_unit="updates")
 
   # -- the loop ----------------------------------------------------------------
   def tick(self, it: int) -> list[Any]:
@@ -1558,9 +2154,15 @@ class League:
   def _draw(self, ls: LearnerSlot, g: np.int64) -> tuple[Any, ...]:
     """(table, opponent params, counts, fresh) for learner ls's update g.
 
+    The table is seated by the env's sides (league.sampler.draw_table): pure
+    self-play on every seat (self_play_seats="all"), the config's lineup, or
+    the learner on one side and every other side drawn from its mix
+    (two-player: table_from_mix, unchanged). counts: category -> side draws
+    (rows at two players).
+
     Args:
-      ls: The learner slot.
-      g: The global update index.
+      ls: the learner slot.
+      g: its update counter.
 
     Returns:
       (table, opponent params, counts, fresh).
@@ -1590,6 +2192,9 @@ class League:
                 pools=pools,
                 mix=ls.mix,
                 stratified=cfg.stratified,
+                sides=self.sides,
+                lineup=cfg.lineup,
+                self_play_seats=cfg.self_play_seats,
             ),
             rng.fold_in64(self._k_draw, g),
         )
@@ -1825,7 +2430,22 @@ class League:
             old.path,
         )
     names = tuple(blob["pool_names"])
-    assert len(names) == len(self._positions), (names, self._positions)
+    if len(names) > len(self._positions):
+      raise ValueError(
+          f"{path}: {len(names)} saved pool positions, this league has "
+          f"{len(self._positions)}"
+      )
+    if len(names) < len(self._positions):
+      # Saved before the controller reserved positions (the config hash
+      # does not see them): the added positions start empty.
+      logging.info(
+          "league: %d saved pool positions into %d (the controller reserves "
+          "%d); the rest start empty",
+          len(names),
+          len(self._positions),
+          self._reserved_positions,
+      )
+      names += (None,) * (len(self._positions) - len(names))
     for p in range(len(self._positions)):
       self._set_position(p, None, None)
     self._off_arena = {}

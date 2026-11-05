@@ -80,7 +80,7 @@ def _add(table, path, step, digest, run=42, arch_name="stub"):
     step: The step.
     digest: The params digest.
     run: The run id, or None.
-    arch_name: The arch.
+    arch_name: The architecture name.
 
   Returns:
     The path.

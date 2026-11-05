@@ -22,6 +22,7 @@ from typing import Any, Mapping, Optional
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 
 from open_spiel.python.scale.core import arena as arena_lib
 from open_spiel.python.scale.core import types
@@ -202,6 +203,41 @@ def leaves_equal(a, b) -> bool:
       x.dtype == y.dtype and x.shape == y.shape and bool(jnp.array_equal(x, y))
       for x, y in zip(la, lb)
   )
+
+
+def leaves_close(a, b, rtol: float = 1e-5, atol: float = 1e-9) -> bool:
+  """Whether two trees agree leaf for leaf, floats up to f32 rounding.
+
+  Integer, bool and key leaves are compared exactly; float leaves within
+  rtol and atol (np.allclose). The defaults, rel 1e-5 and abs 1e-9, are f32
+  rounding of one program against another. Dtypes, shapes and the tree
+  structure must match exactly.
+
+  Args:
+    a: a tree.
+    b: a tree.
+    rtol: the relative tolerance of float leaves.
+    atol: the absolute tolerance of float leaves.
+
+  Returns:
+    True when they agree.
+  """
+  la, ta = jax.tree_util.tree_flatten(a)
+  lb, tb = jax.tree_util.tree_flatten(b)
+  if ta != tb:
+    return False
+  for x, y in zip(la, lb):
+    if x.dtype != y.dtype or x.shape != y.shape:
+      return False
+    if jax.dtypes.issubdtype(x.dtype, jax.dtypes.prng_key):
+      x, y = jax.random.key_data(x), jax.random.key_data(y)
+    x, y = np.asarray(x), np.asarray(y)
+    if np.issubdtype(x.dtype, np.inexact):
+      if not np.allclose(x, y, rtol=rtol, atol=atol):
+        return False
+    elif not np.array_equal(x, y):
+      return False
+  return True
 
 
 def max_abs_diff(a, b) -> float:

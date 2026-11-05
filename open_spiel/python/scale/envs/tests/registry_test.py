@@ -251,6 +251,81 @@ def test_rules_source_survives_a_rename_and_a_reformat(monkeypatch):
   assert registry.rules_source(changed) != want
 
 
+def test_a_rules_source_alias_keeps_the_recorded_identity(monkeypatch):
+  """A source alias hashes the recorded digest in the module's place.
+
+  Under RAW_SOURCE (a deployment whose recorded hashes predate the canonical
+  form) the alias names the module's raw bytes. Every variant of the module
+  keeps its recorded identity; other modules do not move; a conflicting or
+  malformed alias is refused.
+
+  Args:
+    monkeypatch: pytest monkeypatch fixture.
+  """
+  aliases = registry._SOURCE_ALIASES  # pylint: disable=protected-access
+  monkeypatch.setattr(registry, "_SOURCE_ALIASES", dict(aliases))
+  tag = registry._RULES_SHA_TAG  # pylint: disable=protected-access
+  monkeypatch.setitem(tag, "tag", tag["tag"])
+  monkeypatch.setitem(tag, "source", tag["source"])
+  registry.set_rules_sha_tag("rules/1", source=registry.RAW_SOURCE)
+  std = registry.make("gin_rummy")
+  okl = registry.make("gin_rummy", oklahoma_frac=1.0)
+  other = registry.make("kuhn_poker")
+  before = [registry.rules_sha(e) for e in (std, okl, other)]
+  with open(inspect.getsourcefile(type(std.game)), "rb") as f:
+    now = hashlib.sha256(f.read()).hexdigest()
+  recorded = hashlib.sha256(b"the module's bytes before a reformat").hexdigest()
+  registry.register_rules_source_alias(now, recorded)
+  registry.register_rules_source_alias(now, recorded)  # the same: a no-op
+  assert registry.rules_source_aliases() == {**aliases, now: recorded}
+  for env in (std, okl):
+    key = registry.spec_of(env).key()
+    want = hashlib.sha256(
+        b"rules/1\0" + recorded.encode() + b"\0" + key.encode() + b"\0"
+    ).hexdigest()
+    assert registry.rules_sha(env) == want
+  assert registry.rules_sha(std) != registry.rules_sha(okl)
+  assert registry.rules_sha(std) != before[0]
+  assert registry.rules_sha(other) == before[2]
+  with pytest.raises(ValueError, match="already an alias"):
+    registry.register_rules_source_alias(now, now[::-1])
+  with pytest.raises(ValueError, match="to itself"):
+    registry.register_rules_source_alias(recorded, recorded)
+  with pytest.raises(ValueError, match="sha256 hex digest"):
+    registry.register_rules_source_alias("abc", recorded)
+
+
+def test_a_rules_source_alias_names_the_canonical_digest(monkeypatch):
+  """Under CANONICAL_SOURCE an alias names the module's canonical digest.
+
+  Args:
+    monkeypatch: pytest monkeypatch fixture.
+  """
+  aliases = registry._SOURCE_ALIASES  # pylint: disable=protected-access
+  monkeypatch.setattr(registry, "_SOURCE_ALIASES", dict(aliases))
+  tag = registry._RULES_SHA_TAG  # pylint: disable=protected-access
+  monkeypatch.setitem(tag, "tag", tag["tag"])
+  monkeypatch.setitem(tag, "source", tag["source"])
+  registry.set_rules_sha_tag("rules/2")
+  std = registry.make("gin_rummy")
+  with open(inspect.getsourcefile(type(std.game)), encoding="utf-8") as f:
+    text = f.read()
+  raw = hashlib.sha256(text.encode()).hexdigest()
+  canonical = hashlib.sha256(registry.rules_source(text).encode()).hexdigest()
+  before = registry.rules_sha(std)
+  recorded = hashlib.sha256(b"the canonical form before a rename").hexdigest()
+  registry.register_rules_source_alias(raw, recorded)  # names nothing here
+  assert registry.rules_sha(std) == before
+  registry.register_rules_source_alias(canonical, recorded)
+  key = registry.spec_of(std).key()
+  assert (
+      registry.rules_sha(std)
+      == hashlib.sha256(
+          b"rules/2\0" + recorded.encode() + b"\0" + key.encode() + b"\0"
+      ).hexdigest()
+  )
+
+
 @pytest.mark.parametrize(
     "trained,served,want",
     [
@@ -451,14 +526,14 @@ def test_the_other_tables_are_views_of_the_registry():
   assert (
       registry.by_field("endgame")["gin_rummy.scripted_endgame"] == "gin_rummy"
   )
-  assert set(games.served_games()) >= set(registry.builtin_names()) - {
+  unserved = {
       "kuhn_poker_jax",
       "bridge",
+      "kuhn_nplayer",
+      "nplayer_matrix",
   }
-  assert (
-      "kuhn_poker_jax" not in games.served_games()
-      and "bridge" not in games.served_games()
-  )
+  assert set(games.served_games()) >= set(registry.builtin_names()) - unserved
+  assert not unserved & set(games.served_games())
   for name in registry.builtin_names():
     assert config_common.build_env_by_name(name).name == name
 
@@ -524,6 +599,30 @@ def test_training_env_of_a_manifest():
   assert registry.training_env(m).oklahoma_frac == 1.0
   with pytest.raises(ValueError, match="not its game"):
     registry.training_env(m._replace(game="kuhn_poker"))
+
+
+def test_gin_rule_parameters_are_the_envs_rule_options():
+  """Gin's served rule parameters are the env's and the games' rule options.
+
+  Same names, same defaults (GIN_RULE_DEFAULTS); each is served at that
+  default only, standard pyspiel plays it there, and the served map passes it to
+  the env option of the same name.
+  """
+  from open_spiel.python.jax.games.gin_rummy import game as games_gin  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+  from open_spiel.python.scale.envs import gin  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+
+  rules = registry.GIN_RULE_DEFAULTS
+  assert rules == gin.DEFAULT_RULES == games_gin.DEFAULT_RULES
+  assert {k: GIN_DEFAULTS[k] for k in rules} == rules
+  g = registry.game("gin_rummy")
+  for k, v in rules.items():
+    assert g.serving.pyspiel_params[k] == (v,)
+    assert g.serving.upstream_values[k] is v
+  assert g.serving.served_kwargs({"oklahoma": True}) == {
+      "oklahoma_frac": 1.0,
+      **rules,
+  }
+  assert g.serving.served_kwargs({"spade_doubles": True})["spade_doubles"]
 
 
 if __name__ == "__main__":

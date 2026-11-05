@@ -38,6 +38,8 @@ Modules:
   meta_solvers    Nash (LP), fictitious play, regret matching, alpha-rank,
                   replicator dynamics, maximum-entropy Nash, uniform
   mixture         population mixtures as behaviour policies; exact payoffs
+  payoff_views    the payoffs controllers read, from table results, for any
+                  sides (side against side, or against a field)
   population      a run's final population and its exact exploitability
   refs            PolicyRef, FixedOpponent: policies named in configs
   artifact_store  member artifacts by id
@@ -47,6 +49,6 @@ Modules:
   siblings        expert-iteration sibling artifacts and their manifest records
   slot_factories  operators an expert-iteration run builds over its network
 
-The sampler, controller, meta-solvers, the artifact store's index and
-pool_params import no array framework.
+The sampler, controller, meta-solvers, payoff_views, the artifact store's
+index and pool_params import no array framework.
 """

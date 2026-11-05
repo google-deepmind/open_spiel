@@ -104,6 +104,13 @@ py_library(
 )
 
 py_library(
+    name = "cpu_class",
+    testonly = True,
+    srcs = ["cpu_class.py"],
+    strict_deps = True,
+)
+
+py_library(
     name = "errors",
     testonly = True,
     srcs = ["errors.py"],
@@ -118,6 +125,42 @@ py_library(
     deps = [
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/policies:registry",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "goldens",
+    testonly = True,
+    srcs = ["goldens/__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "goldens_two_player",
+    testonly = True,
+    srcs = ["goldens/two_player.py"],
+    strict_deps = True,
+    deps = [
+        ":cpu_class",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:frameworks",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/league:artifact_store",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:controller",
+        "//open_spiel/python/scale/league:sampler",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:uniform",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],
@@ -234,6 +277,19 @@ py_library(
 )
 
 py_library(
+    name = "registries",
+    testonly = True,
+    srcs = ["registries.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale:metrics",
+        "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/learners:pg",
+    ],
+)
+
+py_library(
     name = "steps",
     testonly = True,
     srcs = ["steps.py"],
@@ -286,6 +342,18 @@ pytest_test(
 )
 
 pytest_test(
+    name = "cpu_class_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/cpu_class_test.py"],
+    deps = [
+        ":cpu_class",
+        ":goldens_two_player",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
     name = "dtypes_test",
     data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/dtypes_test.py"],
@@ -297,6 +365,22 @@ pytest_test(
         "@py_deps//flax:core",
         "@py_deps//jax",
         "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "goldens_two_player_golden_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["goldens/two_player_golden_test.py"],
+    deps = [
+        ":goldens_two_player",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//jax",
     ],
 )
 

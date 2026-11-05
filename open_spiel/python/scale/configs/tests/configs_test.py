@@ -37,10 +37,21 @@ SHIPPED = {
     "az_connect_four": ("az", "connect_four"),
     "bc_connect_four": ("bc", "connect_four"),
     "psro_connect_four": ("pg", "connect_four"),
+    "kuhn3_league_smoke": ("pg", "kuhn_nplayer"),
+    "hearts_league_smoke": ("pg", "hearts"),
+    "euchre_smoke": ("pg", "euchre"),
+    "hearts_mmd_from_scratch": ("pg", "hearts"),
+    "euchre_mmd_from_scratch": ("pg", "euchre"),
+    "hearts_move_transformer_self_play": ("pg", "hearts"),
+    "euchre_move_transformer_self_play": ("pg", "euchre"),
 }
 
 #: Shipped configs whose metadata records the rules get_config checked.
-RECORDS_RULES = ("gin_mmd_from_scratch",)
+RECORDS_RULES = (
+    "gin_mmd_from_scratch",
+    "hearts_mmd_from_scratch",
+    "euchre_mmd_from_scratch",
+)
 
 
 def test_the_shipped_configs_are_exactly_these():

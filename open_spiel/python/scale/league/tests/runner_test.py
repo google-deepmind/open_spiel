@@ -377,6 +377,41 @@ class _StopError(Exception):
   pass
 
 
+class _Dev:
+  """A device with fixed memory_stats()."""
+
+  def __init__(self, stats):
+    self._stats = stats
+
+  def memory_stats(self):
+    """The fixed stats.
+
+    Returns:
+      The stats given at construction.
+    """
+    return self._stats
+
+
+def test_device_memory_row_takes_the_worst_device():
+  """mem/ rows (runner.device_memory_row): device maxima and the least limit.
+
+  The largest in-use and peak bytes over the devices and the smallest limit;
+  {} where no device reports.
+  """
+  devs = [
+      _Dev({"bytes_in_use": 5, "peak_bytes_in_use": 9, "bytes_limit": 100}),
+      _Dev({"bytes_in_use": 7, "peak_bytes_in_use": 8, "bytes_limit": 90}),
+  ]
+  assert runner.device_memory_row(devs) == {
+      "bytes_in_use": 7,
+      "peak_bytes_in_use": 9,
+      "bytes_limit": 90,
+  }
+  row = runner.device_memory_row([_Dev(None), _Dev({})])
+  assert isinstance(row, dict) and not row, row
+  assert runner.STEP_UNIT == "updates" and runner.MEM_PREFIX == "mem"
+
+
 if __name__ == "__main__":
   sys.exit(
       pytest.main(

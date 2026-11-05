@@ -48,6 +48,7 @@ from __future__ import annotations
 from typing import Any, Mapping, Optional
 
 from open_spiel.python.scale.ckpt import artifact
+from open_spiel.python.scale.ckpt import formats
 from open_spiel.python.scale.ckpt import provenance
 from open_spiel.python.scale.core import types
 
@@ -179,9 +180,15 @@ def sibling_record(
 
   if mode not in MODES:
     raise ValueError(f"mode {mode!r} not in {MODES}")
-  # The digest of the tree write_artifact writes; another framework's
-  # artifact records its own digest in its manifest.
-  sha = artifact.tree_sha256(params) if policy.spec.framework == "jax" else None
+  # The digest of the tree write_artifact writes (under the writer format's
+  # own tree tag when it declares one, as the native format does); another
+  # framework's artifact records its own digest in its manifest.
+  tag = getattr(formats.writer(), "tree_sha_tag", None)
+  sha = (
+      artifact.tree_sha256(params, tag)
+      if policy.spec.framework == "jax"
+      else None
+  )
   return dict(
       mode=mode,
       decider=operators.decider_of(policy),

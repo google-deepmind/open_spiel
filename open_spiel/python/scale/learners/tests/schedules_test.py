@@ -19,6 +19,7 @@ from an int64 counter (no int32 wrap, no f32 rounding of the counter) and
 returned as f64 (`value`) or f32 (`f32`).
 """
 
+import dataclasses
 import math
 import sys
 
@@ -27,6 +28,7 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
+from open_spiel.python.scale.core import hash_compat
 from open_spiel.python.scale.core import schedules
 
 I64 = jnp.int64
@@ -172,6 +174,54 @@ def test_jittable_with_traced_counter():
   np.testing.assert_allclose(
       float(f(jnp.asarray(5, I64))), float(s.f32(jnp.asarray(5, I64)))
   )
+
+
+def test_anneal_freezes_the_value_at_start_then_decays_linearly_and_holds():
+  """The step-size anneal (module doc) against hand values.
+
+  The plain value before A, then the value AT A times a factor linear 1 -> f
+  over [A, E], held at f after.
+  """
+  base = schedules.Schedule(
+      "inverse_power", 0.5, power=1.1, floor=5e-6, ceil=1e-4
+  )
+  s = dataclasses.replace(
+      base, anneal_start=3000, anneal_end=3250, anneal_final_frac=0.1
+  )
+  v0 = 0.5 / 3001.0**1.1
+  for t in (0, 2500, 2999):
+    assert _v(s, t) == pytest.approx(_v(base, t), rel=1e-12)
+  assert _v(s, 3000) == pytest.approx(v0, rel=1e-12)
+  assert _v(s, 3125) == pytest.approx(v0 * 0.55, rel=1e-12)
+  assert _v(s, 3250) == pytest.approx(v0 * 0.1, rel=1e-12)
+  assert _v(s, 9000) == pytest.approx(v0 * 0.1, rel=1e-12)
+  assert not s.is_constant()
+  f = jax.jit(s.f32)
+  np.testing.assert_allclose(
+      float(f(jnp.asarray(3100, I64))), float(s.f32(jnp.asarray(3100, I64)))
+  )
+
+
+def test_anneal_fields_validate_and_stay_out_of_the_hash_at_default():
+  """All 0 is off; on needs A < E and f in (0, 1); the fields are added.
+
+  They are hash_compat.added: an off schedule hashes as before they existed.
+  """
+  assert set(hash_compat.added_fields(schedules.Schedule)) == {
+      "anneal_start",
+      "anneal_end",
+      "anneal_final_frac",
+  }
+  for kw in (
+      {"anneal_start": 5},
+      {"anneal_final_frac": 0.1},
+      {"anneal_start": 5, "anneal_end": 5, "anneal_final_frac": 0.1},
+      {"anneal_start": 0, "anneal_end": 5, "anneal_final_frac": 1.0},
+      {"anneal_start": 0, "anneal_end": 5, "anneal_final_frac": 0.0},
+      {"anneal_start": 1.5, "anneal_end": 5, "anneal_final_frac": 0.1},
+  ):
+    with pytest.raises(ValueError):
+      schedules.Schedule("constant", 1.0, **kw)
 
 
 if __name__ == "__main__":

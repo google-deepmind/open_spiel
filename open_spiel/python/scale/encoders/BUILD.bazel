@@ -93,6 +93,30 @@ py_library(
 )
 
 py_library(
+    name = "euchre",
+    srcs = ["euchre.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/jax/games:euchre",
+        "//open_spiel/python/scale/envs:euchre",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "euchre_card_planes",
+    srcs = ["euchre_card_planes.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/jax/games:euchre",
+        "//open_spiel/python/scale/envs:euchre",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
     name = "gin",
     srcs = ["gin.py"],
     strict_deps = True,
@@ -128,12 +152,47 @@ py_library(
 )
 
 py_library(
+    name = "hearts",
+    srcs = ["hearts.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/jax/games:hearts",
+        "//open_spiel/python/scale/envs:hearts",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "hearts_card_planes",
+    srcs = ["hearts_card_planes.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/jax/games:hearts",
+        "//open_spiel/python/scale/envs:hearts",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
     name = "kuhn",
     srcs = ["kuhn.py"],
     strict_deps = True,
     deps = [
         ":registry",
         "//open_spiel/python/scale/envs:kuhn_jax",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "kuhn_nplayer",
+    srcs = ["kuhn_nplayer.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:kuhn_nplayer",
         "@py_deps//jax",
     ],
 )
@@ -167,6 +226,17 @@ py_library(
     deps = [
         ":registry",
         "//open_spiel/python/scale/envs:lines_of_action",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "nplayer_matrix",
+    srcs = ["nplayer_matrix.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/envs:nplayer_matrix",
         "@py_deps//jax",
     ],
 )
@@ -264,6 +334,28 @@ pytest_test(
 )
 
 pytest_test(
+    name = "euchre_card_planes_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/euchre_card_planes_test.py"],
+    deps = [
+        ":euchre_card_planes",
+        ":registry",
+        "//open_spiel/python/jax/games:euchre",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:euchre",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
     name = "gin_card_tokens_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
@@ -321,6 +413,28 @@ pytest_test(
 )
 
 pytest_test(
+    name = "hearts_card_planes_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/hearts_card_planes_test.py"],
+    deps = [
+        ":hearts_card_planes",
+        ":registry",
+        "//open_spiel/python/jax/games:hearts",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs:hearts",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
     name = "imperfect_breadth_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
@@ -368,6 +482,23 @@ pytest_test(
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/envs:kuhn",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "nplayer_encoders_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/nplayer_encoders_test.py"],
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:differential_vs_openspiel",
+        "//open_spiel/python/scale/envs:kuhn_nplayer",
+        "//open_spiel/python/scale/envs:nplayer_matrix",
+        "//open_spiel/python/scale/envs:registry",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],

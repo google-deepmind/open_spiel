@@ -26,6 +26,7 @@ import dataclasses
 import os
 import re
 import sys
+import types
 
 import pytest
 
@@ -34,6 +35,7 @@ from open_spiel.python.scale import registry
 from open_spiel.python.scale.ckpt import codecs
 from open_spiel.python.scale.ckpt import formats
 from open_spiel.python.scale.ckpt import provenance
+from open_spiel.python.scale.eval import match
 from open_spiel.python.scale.league import config_common
 from open_spiel.python.scale.league import kinds
 from open_spiel.python.scale.league import runner
@@ -308,6 +310,7 @@ def test_run_ids_and_code_repo(monkeypatch):
   )
   monkeypatch.setenv("ACME_ATTEMPT", "42")
   monkeypatch.delenv(provenance.CODE_REPO_ENV, raising=False)
+  monkeypatch.delenv(plugins.ENV, raising=False)  # no plugin may name one
   assert provenance.resolve_run_ids(None) == provenance.RunIds(
       None, None
   )  # no env named
@@ -323,6 +326,52 @@ def test_run_ids_and_code_repo(monkeypatch):
   assert provenance.code_repo() == "acme/rl"
   monkeypatch.setenv(provenance.CODE_REPO_ENV, "acme/other")
   assert provenance.code_repo() == "acme/other"
+
+
+def test_run_ids_load_the_plugins_named_in_the_environment_first(
+    tmp_path, monkeypatch
+):
+  """Run ids read before any plugin loaded still see the plugins' hooks.
+
+  A process that reads its run ids before anything else loaded its plugins
+  still gets the attempt id variable, parser and code repo they declare.
+
+  Args:
+    tmp_path: pytest's temporary folder (the plugin module goes there).
+    monkeypatch: pytest's monkeypatch fixture.
+  """
+  # A plugpkg imported by another test lives in another tmp_path.
+  monkeypatch.delitem(sys.modules, "plugpkg", raising=False)
+  mod = _module(
+      tmp_path,
+      monkeypatch,
+      "acme_ids",
+      "import importlib\n"
+      f"provenance = importlib.import_module({provenance.__name__!r})\n"
+      "provenance.set_attempt_id_env('ACME_ATTEMPT', id_parser=int)\n"
+      "provenance.set_code_repo('acme/rl')\n",
+  )
+  monkeypatch.setattr(
+      provenance,
+      "_STATE",
+      {
+          "attempt_id_env": None,
+          # Reaches private _as_string of the code under test.
+          "parse": provenance._as_string,  # pylint: disable=protected-access
+          "code_repo": None,
+      },
+  )
+  monkeypatch.setattr(plugins, "_LOADED", [])
+  monkeypatch.setenv(plugins.ENV, mod)
+  monkeypatch.setenv("ACME_ATTEMPT", "42")
+  monkeypatch.delenv(provenance.CODE_REPO_ENV, raising=False)
+  assert mod not in sys.modules
+  before = plugins.loaded()
+  assert isinstance(before, tuple) and not before, before
+  assert provenance.resolve_run_ids("7") == provenance.RunIds(7, 42)
+  assert plugins.loaded() == (mod,)
+  assert provenance.attempt_id_env() == "ACME_ATTEMPT"
+  assert provenance.code_repo() == "acme/rl"
 
 
 def test_reference_eval_registry(monkeypatch):
@@ -357,6 +406,46 @@ def test_reference_eval_registry(monkeypatch):
     runner.InLoopEval("toy_h2h", every=1, deals=2)
   with pytest.raises(TypeError, match="Ref"):
     runner.InLoopEval("toy_h2h", every=1, deals=2, reference="r1")
+
+
+def test_league_evaluator_registry(monkeypatch):
+  """League evaluator registry."""
+  evaluators = runner._LEAGUE_EVALUATORS  # pylint: disable=protected-access
+  monkeypatch.setattr(runner, "_LEAGUE_EVALUATORS", dict(evaluators))
+  cfg = config_common.load_config("psro_connect_four")
+  env = config_common.build_env(cfg)
+  ev = match.Evaluator(env, match.EvaluatorConfig(name="mine", max_rows=64))
+
+  def build(c, e, mesh):
+    """The builder: `ev` whatever it is given.
+
+    Args:
+      c: The run config.
+      e: The env.
+      mesh: The mesh.
+
+    Returns:
+      ev.
+    """
+    del c, e, mesh
+    return ev
+
+  runner.register_league_evaluator("connect_four", build)
+  assert runner.league_evaluator(cfg, env) is ev
+  # the same builder again: no-op
+  runner.register_league_evaluator("connect_four", build)
+  with pytest.raises(ValueError, match="already"):
+    runner.register_league_evaluator("connect_four", lambda c, e, mesh: ev)
+  # payoff "none": no evaluator
+  plain = config_common.load_config("mmd_kuhn_poker_jax")
+  runner.register_league_evaluator(plain.env, build)
+  assert runner.league_evaluator(plain, config_common.build_env(plain)) is None
+  runner.register_league_evaluator(
+      "tic_tac_toe", lambda c, e, mesh: "not an evaluator"
+  )
+  ttt = types.SimpleNamespace(env="tic_tac_toe", league=cfg.league)
+  with pytest.raises(TypeError, match="Evaluator"):
+    runner.league_evaluator(ttt, env)
 
 
 # Module-level register_* / set_* functions that are not extension points.

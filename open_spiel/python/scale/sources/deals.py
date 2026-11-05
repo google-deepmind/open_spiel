@@ -20,7 +20,10 @@ of a deal (registered with `register_canon`), computed from what a training
 row carries at the first ply of a hand (`steps.new_hand`): the seat's
 InfoState and the privileged labels. The hash is
 sha256(tag + game + rules_sha + canonical bytes), so two rule sets never
-share a hash (tag: HASH_TAG).
+share a hash (tag: HASH_TAG). A canonical form may carry its own tag
+(`hash_tag`, NUL-terminated bytes, an attribute of the function): its hash is
+then sha256(hash_tag + canonical bytes), the deal alone whatever the rules,
+so hashes another producer of that form computes are checked as they are.
 
     index = deals.DealIndex.from_eval_sets(env, [("eval", seed, num_pairs)])
     index.save(path)
@@ -64,6 +67,7 @@ import numpy as np
 
 from open_spiel.python.scale.core import arena as arena_lib
 from open_spiel.python.scale.core import arena_engine
+from open_spiel.python.scale.core import hooks
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.envs import registry as env_registry
 
@@ -73,8 +77,64 @@ HASH_TAG = b"deal_hash\0"
 INDEX_FORMAT = "deal_index"
 
 
+def set_hash_tag(tag: bytes) -> None:
+  """Sets HASH_TAG, the tag every deal hash starts with (read at call time).
+
+  For a deployment whose recorded deal hashes use another tag. Set it once,
+  at import (a plugin), before anything is hashed.
+
+  Args:
+    tag: non-empty bytes ending in a NUL.
+
+  Raises:
+    ValueError: tag is not non-empty bytes ending in a NUL.
+  """
+  global HASH_TAG
+  if not isinstance(tag, bytes) or not tag.endswith(b"\0") or len(tag) < 2:
+    raise ValueError(
+        f"a deal hash tag is non-empty bytes ending in NUL, got {tag!r}"
+    )
+  HASH_TAG = tag
+
+
+def set_index_format(name: str) -> None:
+  """Sets INDEX_FORMAT, the "format" a DealIndex writes and requires.
+
+  For a deployment whose recorded deal indexes use another name. Set it once,
+  at import (a plugin), before an index is written or read.
+
+  Args:
+    name: a non-empty string.
+
+  Raises:
+    ValueError: name is not a non-empty string.
+  """
+  global INDEX_FORMAT
+  if not isinstance(name, str) or not name:
+    raise ValueError(f"a deal index format is a non-empty string, got {name!r}")
+  INDEX_FORMAT = name
+
+
 Canon = Callable[[Any, Mapping[str, Any]], np.ndarray]
 _CANON: dict[str, Canon] = {}
+
+#: The optional attributes of a canonical deal form, a function (module doc;
+#: core.hooks): checked by register_canon and read by hash_tag / every_ply.
+CANON_HOOKS = hooks.Protocol(
+    "canonical deal form",
+    [
+        hooks.value(
+            "hash_tag",
+            "the form's own rules-free hash tag, NUL-terminated bytes",
+            check=lambda t: isinstance(t, bytes) and t.endswith(b"\0"),
+        ),
+        hooks.value(
+            "every_ply",
+            "a bool: the labels carry the whole deal on every ply",
+            check=hooks.is_bool,
+        ),
+    ],
+)
 
 
 def register_canon(game: str, fn: Canon) -> None:
@@ -89,7 +149,12 @@ def register_canon(game: str, fn: Canon) -> None:
 
   Raises:
     ValueError: game has another canonical form.
+    TypeError: fn is not callable, or its hash_tag or every_ply is malformed
+      (CANON_HOOKS).
   """
+  if not callable(fn):
+    raise TypeError(f"canonical deal form {fn!r} of {game!r} is not callable")
+  CANON_HOOKS.check(fn)
   if _CANON.get(game, fn) is not fn:
     raise ValueError(f"game {game!r} already has a canonical deal form")
   _CANON[game] = fn
@@ -120,6 +185,37 @@ def canon_of(game: str) -> Canon:
   )
 
 
+def hash_tag(game: str) -> Optional[bytes]:
+  """The rules-free tag of game's canonical form (module doc), or None.
+
+  Args:
+    game: the game name.
+
+  Returns:
+    The tag (NUL-terminated bytes), or None.
+
+  Raises:
+    TypeError: a tag that is not NUL-terminated bytes.
+  """
+  return CANON_HOOKS.get(canon_of(game), "hash_tag")
+
+
+def hash_prefix(game: str, rules_sha: str) -> bytes:
+  """The bytes hashed before a row's canonical bytes (module doc).
+
+  Args:
+    game: the game name.
+    rules_sha: the rules' sha (unused under a hash tag).
+
+  Returns:
+    The prefix bytes.
+  """
+  tag = hash_tag(game)
+  if tag is not None:
+    return tag
+  return HASH_TAG + game.encode() + b"\0" + rules_sha.encode() + b"\0"
+
+
 def deal_hashes(
     game: str, rules_sha: str, info: Any, labels: Mapping[str, Any]
 ) -> list[str]:
@@ -135,7 +231,7 @@ def deal_hashes(
     The hex hashes, one per row.
   """
   canon = canon_of(game)(jax.device_get(info), jax.device_get(dict(labels)))
-  pre = HASH_TAG + game.encode() + b"\0" + rules_sha.encode() + b"\0"
+  pre = hash_prefix(game, rules_sha)
   return [hashlib.sha256(pre + row.tobytes()).hexdigest() for row in canon]
 
 
@@ -166,7 +262,7 @@ def every_ply(game: str) -> bool:
   Returns:
     True for an every-ply game.
   """
-  return bool(getattr(canon_of(game), "every_ply", False))
+  return bool(CANON_HOOKS.get(canon_of(game), "every_ply"))
 
 
 def batch_hashes(

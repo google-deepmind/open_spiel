@@ -585,6 +585,16 @@ def test_az_connect_four_end_to_end_smoke():
     ):
       assert np.isfinite(m[k]), (k, m)
     assert 7 <= m["avg_game_length"] <= 42
+  for m in hist:  # search health (az.search_health), every update
+    for k in az.SEARCH_HEALTH + az.SEARCH_VALUE_HEALTH:
+      assert np.isfinite(m[f"search/{k}"]), (k, m)
+    assert 0.0 <= m["search/prior_argmax_agree"] <= 1.0
+    assert (
+        m["search/target_entropy"] >= 0.0
+        and m["search/kl_target_prior"] >= -1e-6
+    )
+    assert 0.0 <= m["search/prior_entropy"] <= np.log(7) + 1e-5
+    assert m["search/root_value_outcome_mse"] >= 0.0
   ls = out.league.learners["main"]
   assert isinstance(ls.frames, np.int64) and ls.frames == 2 * 4 * 43
   assert isinstance(ls.decisions, np.int64)
@@ -700,6 +710,73 @@ def test_az_policy_kwargs_pass_through_to_the_base():
     )
   with pytest.raises(ValueError, match="env_name"):
     az.build(cfg, env=env_registry.make("tic_tac_toe"))
+
+
+class _FixedPrior:
+  """A stateless policy whose prior logits are fixed (search_health's stub)."""
+
+  def __init__(self, logits):
+    self.logits = jnp.asarray(logits, jnp.float32)
+    self.spec = dataclasses.make_dataclass("S", [("stateful", bool)])(False)
+
+  def evaluate_seq(self, params, carry, steps, key):
+    """Fixed logits at every step, value 0.
+
+    Args:
+      params: unused.
+      carry: returned as is.
+      steps: the steps ([B, T] leading dims).
+      key: unused.
+
+    Returns:
+      (carry, the PolicyOutput).
+    """
+    del params, key
+    b, t = steps.seat.shape
+    return carry, types.PolicyOutput(
+        logits=jnp.broadcast_to(self.logits, (b, t) + self.logits.shape[-1:]),
+        value=jnp.zeros((b, t, 2), jnp.float32),
+        aux={},
+    )
+
+
+def test_search_health_known_answer():
+  """One decision's search metrics, against hand values.
+
+  A one-hot search target against a uniform prior over 3 legal actions (KL =
+  log 3, target entropy 0, prior entropy log 3, the argmaxes agree: both
+  action 0), root value 0.5 against the hand's outcome 1 (error -0.5). The
+  second ply is not a decision and does not count.
+  """
+  tp = np.zeros((1, 2, 3), np.float32)
+  tp[0, 0, 0] = 1.0
+  tp[0, 1] = 1.0 / 3
+  batch = _batch(
+      [[0.0, 1.0]], [[False, True]], [[True, False]], target_policy=tp
+  )
+  batch = batch._replace(
+      aux={az.search.AUX_SEARCH_VALUE: jnp.asarray([[0.5, 0.0]], jnp.float32)}
+  )
+  m = {
+      k: float(v)
+      for k, v in az.search_health(
+          _FixedPrior([0.0, 0.0, 0.0]), None, batch
+      ).items()
+  }
+  assert m["target_entropy"] == pytest.approx(0.0, abs=1e-6)
+  assert m["prior_entropy"] == pytest.approx(np.log(3), rel=1e-5)
+  assert m["kl_target_prior"] == pytest.approx(np.log(3), rel=1e-5)
+  assert m["prior_argmax_agree"] == 1.0
+  assert m["root_value_outcome_bias"] == pytest.approx(-0.5, rel=1e-6)
+  assert m["root_value_outcome_mse"] == pytest.approx(0.25, rel=1e-6)
+  # A prior that prefers another action: the argmaxes disagree.
+  m2 = az.search_health(_FixedPrior([0.0, 2.0, 0.0]), None, batch)
+  assert float(m2["prior_argmax_agree"]) == 0.0
+  # No root value in the batch: the policy terms only.
+  m3 = az.search_health(
+      _FixedPrior([0.0, 0.0, 0.0]), None, batch._replace(aux={})
+  )
+  assert set(m3) == set(az.SEARCH_HEALTH)
 
 
 if __name__ == "__main__":

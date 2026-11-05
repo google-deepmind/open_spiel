@@ -8,11 +8,20 @@ reference implementation. Coverage, by game:
   gomoku, hex (with the swap rule on), kuhn_poker, leduc_poker, liars_dice,
   lines_of_action, othello, phantom_ttt, phantom_ttt_ir, tic_tac_toe and
   heads-up no-limit hold'em (`universal_poker`);
+- hearts: every field but the observation tensor (OpenSpiel's hearts has
+  none), at OpenSpiel's defaults and three configs that between them flip
+  every one of its eight parameters;
 - bridge: checked on every field for boards North deals; boards another
   player deals are checked only against an OpenSpiel with dealer-relative
   bridge observations (`bridge_reference.py` probes the installed pyspiel),
   because releases up to 2.0.2 place auction calls as if North always dealt
   while the JAX auction view is dealer-relative;
+- euchre: not checked against released OpenSpiel (`NEEDS_REFERENCE_BUILD`):
+  the JAX game is OpenSpiel's corrected euchre, with a 959-entry
+  information-state tensor; `euchre_test.py` runs `EUCHRE_CONFIGS` (the
+  defaults and every combination of its two parameters) through
+  `run_playouts`, every field but the observation tensor (OpenSpiel's euchre
+  has none), when the installed pyspiel is that build, and skips otherwise;
 - gin_rummy: not checked against released OpenSpiel (`NEEDS_REFERENCE_BUILD`
   in the test says why); `run_playouts` with a loader for an OpenSpiel build
   that has the same rules checks it.

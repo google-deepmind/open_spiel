@@ -97,10 +97,33 @@ class ServingSpec:
     pyspiel_params: every pyspiel game parameter the env plays, mapped to its
       allowed values (a tuple) or ANY; a request naming another parameter or
       another value is refused.
-    served_kwargs: pyspiel game parameters -> the env's constructor options.
+    served_kwargs: pyspiel game parameters -> the env's constructor options;
+      parameters the env does not play are refused with ValueError (anything
+      else it raises is a bug, not a refusal: serve.games.env_name_for).
     covers: covers(trained_kwargs, served_kwargs) -> whether an artifact
       trained with the first options plays every deal of the second. None
       means the options must be equal.
+    upstream_values: parameters in pyspiel_params that an extended pyspiel
+      build may expose while standard pyspiel omits them, each mapped to the
+      fixed value played when the parameter is absent. A game string for a
+      pyspiel build without the parameter omits it at that value and refuses
+      any other (serve.games.stock_params).
+    pyspiel_game: the short name of the pyspiel game the env serves, when it
+      is not the env's own name (an env of its own name for one variant of a
+      broader pyspiel game); None: the env's name. Requests and game strings
+      use this name; artifacts keep the env's.
+    pyspiel_params_of: the env's options -> the pyspiel parameters of the
+      same game, the inverse of served_kwargs (served_kwargs(
+      pyspiel_params_of(kw)) are the options kw), for a game whose served
+      parameters are not all finitely valued; None: game strings are found
+      among the finitely-valued parameters (serve.checkpoint_bot.
+      game_string_of).
+    game_check: game_check(pyspiel_game) raises ValueError when that pyspiel
+      game object is not the game the env plays although its name and
+      parameters are (another rules version of the engine: euchre's released
+      engine against the corrected one); None: every build of the game is
+      the env's. Run by serving on the requested game
+      (serve.games.check_pyspiel_game); it must not import pyspiel.
   """
 
   pyspiel_params: Mapping[str, Any]
@@ -108,6 +131,26 @@ class ServingSpec:
   covers: Optional[Callable[[Mapping[str, Any], Mapping[str, Any]], bool]] = (
       None
   )
+  upstream_values: Mapping[str, Any] = dataclasses.field(default_factory=dict)
+  pyspiel_game: Optional[str] = None
+  pyspiel_params_of: Optional[Callable[[Mapping[str, Any]], dict[str, Any]]] = (
+      None
+  )
+  game_check: Optional[Callable[[Any], None]] = None
+
+  def __post_init__(self):
+    extra = sorted(set(self.upstream_values) - set(self.pyspiel_params))
+    if extra:
+      raise ValueError(
+          f"upstream_values names parameters the env does not play: {extra}"
+      )
+    if self.pyspiel_game is not None and (
+        not isinstance(self.pyspiel_game, str) or not self.pyspiel_game
+    ):
+      raise ValueError(
+          "pyspiel_game is None or a non-empty string, got "
+          f"{self.pyspiel_game!r}"
+      )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -115,7 +158,8 @@ class GameSpec:
   """Everything the framework knows about one game.
 
   Attributes:
-    name: the Env's name; for an OpenSpiel game, its pyspiel short name.
+    name: the Env's name; for an OpenSpiel game, its pyspiel short name
+      (unless serving.pyspiel_game names the pyspiel game).
     ctor: "module:attr" of the Env constructor, called with the options.
     default_kwargs: every constructor option and its default (JSON scalars).
     options_of: Env -> its options; None reads the attributes named by
@@ -154,6 +198,13 @@ class GameSpec:
     exact_eval: the game tree is small enough to build whole
       (eval.exploitability.GameTree), so a training run can track exact
       exploitability in-run.
+    recorded_options: for a game a plugin re-registers with another option
+      set, fn(kwargs) -> this GameSpec's options for the kwargs of an
+      EnvSpec recorded under another GameSpec of this name (an artifact the
+      library's own row wrote, read where the plugin's row is registered);
+      it raises ValueError when they name an env this GameSpec does not
+      build. EnvSpec.from_json applies it only to kwargs whose option names
+      are not this GameSpec's; None: such kwargs are refused.
   """
 
   name: str
@@ -173,6 +224,9 @@ class GameSpec:
   )
   serving: Optional[ServingSpec] = None
   exact_eval: bool = False
+  recorded_options: Optional[
+      Callable[[Mapping[str, Any]], Mapping[str, Any]]
+  ] = None
 
   def __post_init__(self):
     if not isinstance(self.name, str) or not self.name:
@@ -278,8 +332,14 @@ class EnvSpec:
       raise ValueError(f"an EnvSpec is {{name, kwargs}}, got {d!r}")
     if not isinstance(d["kwargs"], Mapping):
       raise ValueError(f"EnvSpec kwargs must be a mapping, got {d['kwargs']!r}")
-    s = spec(d["name"], **dict(d["kwargs"]))
-    if s.to_json() != {"name": d["name"], "kwargs": dict(d["kwargs"])}:
+    kwargs = dict(d["kwargs"])
+    g = game(d["name"])
+    if g.recorded_options is not None and set(kwargs) != set(g.default_kwargs):
+      # Recorded under another GameSpec of this name
+      # (GameSpec.recorded_options).
+      kwargs = dict(g.recorded_options(kwargs))
+    s = spec(d["name"], **kwargs)
+    if s.to_json() != {"name": d["name"], "kwargs": kwargs}:
       raise ValueError(
           f"{d!r} is not a canonical EnvSpec (canonical: {s.to_json()})"
       )
@@ -370,8 +430,23 @@ def gin_covers(trained: Mapping[str, Any], served: Mapping[str, Any]) -> bool:
   ) <= _gin_variants(trained)
 
 
+# Optional gin_rummy rule parameters matching the env's rule options of the
+# same name at their defaults (envs.gin.DEFAULT_RULES and jax.games.gin_rummy
+# DEFAULT_RULES). Standard pyspiel gin_rummy omits these parameters and plays
+# each rule at this default.
+GIN_RULE_DEFAULTS = {
+    "allow_upcard_throwback": True,
+    "wall_knock_pick": True,
+    "spade_doubles": False,
+}
+
+
 def gin_served_kwargs(params: Mapping[str, Any]) -> dict[str, Any]:
-  """A served pyspiel gin game deals only Oklahoma or only standard hands.
+  """The env options of a served pyspiel gin game.
+
+  It deals only Oklahoma or only standard hands; each rule parameter
+  (GIN_RULE_DEFAULTS) is the env option of the same name, at its default when
+  the pyspiel game omits that parameter.
 
   Args:
     params: The pyspiel game parameters.
@@ -379,7 +454,10 @@ def gin_served_kwargs(params: Mapping[str, Any]) -> dict[str, Any]:
   Returns:
     The env options of the served game.
   """
-  return {"oklahoma_frac": 1.0 if params.get("oklahoma", False) else None}
+  out = {"oklahoma_frac": 1.0 if params.get("oklahoma", False) else None}
+  for k, default in GIN_RULE_DEFAULTS.items():
+    out[k] = params.get(k, default)
+  return out
 
 
 GIN_PYSPIEL_PARAMS = {
@@ -390,7 +468,18 @@ GIN_PYSPIEL_PARAMS = {
     "num_ranks": (13,),
     "num_suits": (4,),
     "oklahoma": (False, True),
+    "starting_player": (0, 1),
+    # Served only at the env's default. The env implements the other values
+    # too, but no served artifact plays them and the env's non-default rules
+    # are not checked against the served pyspiel here, so a game string with
+    # one is refused (serve.games.check_params) rather than played.
+    **{k: (v,) for k, v in GIN_RULE_DEFAULTS.items()},
 }
+# Standard pyspiel gin_rummy always deals player 0 first (starting_player=0)
+# and omits the rule parameters above, playing each at its default. The env
+# draws the first player at chance (1/2 each), so it plays both
+# starting_player values.
+GIN_UPSTREAM_VALUES = {"starting_player": 0, **GIN_RULE_DEFAULTS}
 
 
 def _int_options(game_name: str) -> Callable[[dict[str, Any]], dict[str, Any]]:
@@ -721,6 +810,201 @@ def _bridge_covers(
   return bridge.covers(trained, other)
 
 
+_HEARTS_OPTIONS = {
+    "pass_cards": True,
+    "no_pts_on_first_trick": True,
+    "can_lead_any_club": False,
+    "jd_bonus": False,
+    "avoid_all_tricks_bonus": False,
+    "must_break_hearts": True,
+    "qs_breaks_hearts": True,
+    "can_lead_hearts_instead_of_qs": False,
+}
+
+
+def _hearts_options(kw: dict[str, Any]) -> dict[str, Any]:
+  """Checks hearts' options.
+
+  Args:
+    kw: The options.
+
+  Returns:
+    The checked options.
+  """
+  # Lazy: the hearts env needs the optional JAX games package.
+  from open_spiel.python.scale.envs import hearts  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+
+  return hearts.options_check(kw)
+
+
+def _hearts_served(params: Mapping[str, Any]) -> dict[str, Any]:
+  """Hearts' options of pyspiel params: each its pyspiel parameter.
+
+  The env's eight options are pyspiel hearts' eight game parameters, of the
+  same names and defaults; a parameter the game string leaves out is at its
+  default.
+
+  Args:
+    params: The pyspiel params.
+
+  Returns:
+    The env options.
+  """
+  return {k: bool(params.get(k, v)) for k, v in _HEARTS_OPTIONS.items()}
+
+
+# Hearts is served at every value of its eight game parameters: the engine
+# implements all of them and is checked move for move against pyspiel with
+# each flipped (envs/tests/hearts_test.py). An artifact still plays only the
+# variant it was trained on (covers None: the options must be equal).
+HEARTS_PYSPIEL_PARAMS = {k: (False, True) for k in _HEARTS_OPTIONS}
+
+
+_EUCHRE_OPTIONS = {"allow_lone_defender": False, "stick_the_dealer": True}
+
+
+def _euchre_options(kw: dict[str, Any]) -> dict[str, Any]:
+  """Checks euchre's options.
+
+  Args:
+    kw: The options.
+
+  Returns:
+    The checked options.
+  """
+  # Lazy: the euchre env needs the optional JAX games package.
+  from open_spiel.python.scale.envs import euchre  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+
+  return euchre.options_check(kw)
+
+
+#: The size of the corrected euchre's information-state tensor (envs.euchre:
+#: OpenSpiel's corrected engine); released OpenSpiel (2.0.2 and earlier) has
+#: 935 entries and the older rules (the up-card is taken before the go-alone
+#: decisions), so its histories are another game's.
+EUCHRE_CORRECTED_TENSOR = 959
+
+
+def _euchre_served(params: Mapping[str, Any]) -> dict[str, Any]:
+  """Euchre's options of pyspiel params: each its pyspiel parameter.
+
+  Args:
+    params: The pyspiel params.
+
+  Returns:
+    The env options.
+  """
+  return {k: bool(params.get(k, v)) for k, v in _EUCHRE_OPTIONS.items()}
+
+
+#: The go-alone decisions of euchre (envs.euchre: 29 alone, 30 with partner).
+_EUCHRE_GO_ALONE = [29, 30]
+
+
+def _euchre_game_check(pyspiel_game: Any) -> None:
+  """Refuses a pyspiel euchre that is not the corrected engine's rules.
+
+  The env plays OpenSpiel's corrected euchre; a pyspiel whose euchre is the
+  released one plays other rules, and its histories would replay into
+  another game. Two checks, each on the game object (no pyspiel import):
+  the rules themselves, on one probe hand (the first chance outcome at every
+  chance node, then the first bidder orders up the up-card's suit: in the
+  corrected engine the declarer decides at once whether to go alone, legal
+  actions [29, 30]; in the released engine the dealer takes the up-card and
+  discards first), and the information-state tensor, which must be the
+  corrected engine's EUCHRE_CORRECTED_TENSOR entries (released: 935).
+
+  Args:
+    pyspiel_game: The pyspiel game.
+
+  Raises:
+    ValueError: Either check fails.
+  """
+  shape = list(pyspiel_game.information_state_tensor_shape())
+  if shape != [EUCHRE_CORRECTED_TENSOR]:
+    raise ValueError(
+        "euchre: this pyspiel's euchre has an information-state tensor of "
+        f"{shape}, not [{EUCHRE_CORRECTED_TENSOR}]: it is released "
+        "OpenSpiel's euchre (other rules), and the env plays the corrected "
+        "engine's; serve it from a pyspiel with the corrected euchre"
+    )
+  state = pyspiel_game.new_initial_state()
+  while state.is_chance_node():
+    state.apply_action(int(state.chance_outcomes()[0][0]))
+  bidder = state.current_player()
+  order_up = [a for a in state.legal_actions() if a != 24]
+  if len(order_up) != 1:
+    raise ValueError(
+        f"euchre: the first bidder's legal actions {state.legal_actions()} "
+        "are not pass plus one order-up: not the euchre the env plays"
+    )
+  state.apply_action(order_up[0])
+  if (
+      state.current_player() != bidder
+      or sorted(state.legal_actions()) != _EUCHRE_GO_ALONE
+  ):
+    raise ValueError(
+        f"euchre: after an order-up, player {state.current_player()} moves "
+        f"with legal actions {sorted(state.legal_actions())[:8]}, not the "
+        f"declarer {bidder} deciding whether to go alone "
+        f"{_EUCHRE_GO_ALONE}: this pyspiel's euchre takes up the up-card "
+        "first (released OpenSpiel's rules); the env plays the corrected "
+        "engine's"
+    )
+
+
+# Euchre is served at both values of its two game parameters (the engine is
+# checked move for move against the corrected pyspiel at every combination:
+# open_spiel/python/jax/games/euchre_test.py, envs/tests/euchre_test.py).
+# An artifact still plays only the variant it was trained on (covers None).
+EUCHRE_PYSPIEL_PARAMS = {k: (False, True) for k in _EUCHRE_OPTIONS}
+
+
+def _kuhn_nplayer_options(kw: dict[str, Any]) -> dict[str, Any]:
+  """Checks kuhn_nplayer's options.
+
+  Args:
+    kw: The options.
+
+  Returns:
+    The checked options.
+
+  Raises:
+    ValueError: players is not an int in [2, 10].
+  """
+  n = kw["players"]
+  if isinstance(n, bool) or not isinstance(n, int) or not 2 <= n <= 10:
+    raise ValueError(
+        f"kuhn_nplayer players must be an int in [2, 10], got {n!r}"
+    )
+  return {"players": int(n)}
+
+
+def _nplayer_matrix_options(kw: dict[str, Any]) -> dict[str, Any]:
+  """Checks nplayer_matrix's options.
+
+  Args:
+    kw: The options.
+
+  Returns:
+    The checked options.
+
+  Raises:
+    ValueError: An unknown variant.
+  """
+  # Lazy: the env imports JAX, and this registry is part of the JAX-free
+  # control plane.
+  from open_spiel.python.scale.envs import nplayer_matrix  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+
+  v = kw["variant"]
+  if v not in nplayer_matrix.GAMES:
+    raise ValueError(
+        "nplayer_matrix variant must be one of "
+        f"{sorted(nplayer_matrix.GAMES)}, got {v!r}"
+    )
+  return {"variant": v}
+
+
 #: The package of the built-in envs (this module's parent), so the table's
 #: "module:attr" strings follow the package's import name.
 _ENVS = __name__.rpartition(".")[0]
@@ -837,6 +1121,7 @@ BUILTIN = (
             GIN_PYSPIEL_PARAMS,
             served_kwargs=gin_served_kwargs,
             covers=gin_covers,
+            upstream_values=GIN_UPSTREAM_VALUES,
         ),
     ),
     GameSpec(
@@ -879,6 +1164,9 @@ BUILTIN = (
                 "plain_obs_tensor": (False,),
             },
             served_kwargs=_hex_served,
+            # Older pyspiel builds omit plain_obs_tensor and emit the 9-plane
+            # tensor (False).
+            upstream_values={"plain_obs_tensor": False},
         ),
     ),
     GameSpec("othello", f"{_ENVS}.othello:OthelloEnv", serving=_served({})),
@@ -903,7 +1191,13 @@ BUILTIN = (
         f"{_ENVS}.lines_of_action:LinesOfActionEnv",
         default_kwargs={"max_game_length": 1000},
         normalize_options=_loa_options,
-        serving=_served({"max_game_length": ANY}, served_kwargs=_loa_served),
+        # Standard pyspiel lines_of_action fixes max_game_length at 1000
+        # without exposing a parameter.
+        serving=_served(
+            {"max_game_length": ANY},
+            served_kwargs=_loa_served,
+            upstream_values={"max_game_length": 1000},
+        ),
     ),
     GameSpec(
         "dark_hex",
@@ -927,6 +1221,54 @@ BUILTIN = (
         normalize_options=_bridge_options,
         canon=f"{_ENVS}.bridge:deal_canon",
         covers=_bridge_covers,
+    ),
+    # Hearts: four players, each for themselves (envs.hearts); the options are
+    # pyspiel hearts' eight game parameters at its defaults, and a pyspiel
+    # history is the env's raw history (same chance and action ids). Served:
+    # pyspiel's hearts plays through the checkpoint seat at any of its
+    # parameters. Its rules identity is declared by the env.
+    GameSpec(
+        "hearts",
+        f"{_ENVS}.hearts:HeartsEnv",
+        default_kwargs=_HEARTS_OPTIONS,
+        normalize_options=_hearts_options,
+        serving=_served(HEARTS_PYSPIEL_PARAMS, served_kwargs=_hearts_served),
+    ),
+    # Euchre: two partnerships (envs.euchre), OpenSpiel's corrected euchre;
+    # the options are its two game parameters at their defaults, and a
+    # pyspiel history is the env's raw history (same chance and action ids).
+    # Served: the corrected pyspiel's euchre plays through the checkpoint
+    # seat at any of its parameters; a released pyspiel's euchre (other
+    # rules) is refused. Its rules identity is declared by the env.
+    GameSpec(
+        "euchre",
+        f"{_ENVS}.euchre:EuchreEnv",
+        default_kwargs=_EUCHRE_OPTIONS,
+        normalize_options=_euchre_options,
+        serving=_served(
+            EUCHRE_PYSPIEL_PARAMS,
+            served_kwargs=_euchre_served,
+            game_check=_euchre_game_check,
+        ),
+    ),
+    # N-player test games, self-contained JAX (no game package); not served.
+    # Kuhn poker with `players` seats (OpenSpiel's kuhn_poker(players=N)),
+    # 2..10; its own name, so it never shares artifacts with kuhn_poker.
+    GameSpec(
+        "kuhn_nplayer",
+        f"{_ENVS}.kuhn_nplayer:KuhnNPlayerEnv",
+        default_kwargs={"players": 3},
+        normalize_options=_kuhn_nplayer_options,
+        exact_eval=True,
+    ),
+    # One-shot N-player matrix games with known equilibria
+    # (envs.nplayer_matrix).
+    GameSpec(
+        "nplayer_matrix",
+        f"{_ENVS}.nplayer_matrix:NPlayerMatrixEnv",
+        default_kwargs={"variant": "matching_pennies_3p"},
+        normalize_options=_nplayer_matrix_options,
+        exact_eval=True,
     ),
 )
 
@@ -1121,7 +1463,11 @@ GAME_PACKAGES = {
     deps.GAMES_PACKAGE: "the JAX games package (open_spiel/python/jax/games)",
     deps.PYSPIEL: "pyspiel (open_spiel: pip install open-spiel)",
 }
-BUILTIN_STANDALONE = ("kuhn_poker_jax",)  # games that need no game package
+BUILTIN_STANDALONE = (
+    "kuhn_poker_jax",
+    "kuhn_nplayer",
+    "nplayer_matrix",
+)  # need no game package
 
 
 class MissingGamePackageError(ModuleNotFoundError):
@@ -1597,6 +1943,81 @@ def rules_source(text: str) -> str:
   return "\n".join(sorted(imports) + [_canonical_dump(rest)])
 
 
+# source sha256 -> the source sha256 rules_sha hashes in its place.
+_SOURCE_ALIASES: dict[str, str] = {}
+
+
+def _is_sha256(x: Any) -> bool:
+  """Whether `x` is a lowercase sha256 hex digest.
+
+  Args:
+    x: A value.
+
+  Returns:
+    True for 64 lowercase hex digits.
+  """
+  return (
+      isinstance(x, str)
+      and len(x) == 64
+      and all(c in "0123456789abcdef" for c in x)
+  )
+
+
+def register_rules_source_alias(
+    source_sha256: str, recorded_sha256: str
+) -> None:
+  """Keeps a rules identity across an edit that does not change the rules.
+
+  rules_sha hashes a digest of the module that defines a game: of its raw
+  bytes under RAW_SOURCE, so a reformat or a docstring edit of that module
+  changes the identity every recorded artifact, deal index and run config
+  carries; of its canonical form (rules_source) under CANONICAL_SOURCE, so
+  an edit to the code that keeps the rules (a rename, say) does. After such
+  an edit a deployment registers the module's digest now as an alias of the
+  digest it recorded before: rules_sha then hashes `recorded_sha256`
+  wherever the module's digest is `source_sha256`, and every rules_sha of
+  that module (every variant, under any tag) is the recorded one. The alias
+  names an exact digest: any further edit of the module drops it, and the
+  identity moves again until the deployment decides. A plugin registers its
+  aliases at import, before any rules_sha is computed.
+
+  Registering the same alias twice has no effect.
+
+  Args:
+    source_sha256: The module's digest now (sha256 hex of its raw bytes or
+      of its canonical form, per the rules_sha source).
+    recorded_sha256: The digest rules_sha hashed when the identity was
+      recorded.
+
+  Raises:
+    ValueError: A digest is not 64 lowercase hex digits, the two are equal,
+      or source_sha256 already has another alias.
+  """
+  for d in (source_sha256, recorded_sha256):
+    if not _is_sha256(d):
+      raise ValueError(
+          f"a rules source alias is a sha256 hex digest, got {d!r}"
+      )
+  if source_sha256 == recorded_sha256:
+    raise ValueError(f"a rules source alias of {source_sha256} to itself")
+  old = _SOURCE_ALIASES.get(source_sha256)
+  if old is not None and old != recorded_sha256:
+    raise ValueError(
+        f"rules source {source_sha256} is already an alias of {old}, not "
+        f"{recorded_sha256}"
+    )
+  _SOURCE_ALIASES[source_sha256] = recorded_sha256
+
+
+def rules_source_aliases() -> dict[str, str]:
+  """The registered rules source aliases (register_rules_source_alias).
+
+  Returns:
+    {source sha256: recorded sha256}, a copy.
+  """
+  return dict(_SOURCE_ALIASES)
+
+
 def rules_sha(env: types.Env) -> str:
   """The rules identity of an env.
 
@@ -1613,7 +2034,8 @@ def rules_sha(env: types.Env) -> str:
   still narrow: a rules change in another module of the engine (a helper the
   game calls) leaves it unchanged. An engine that wants a complete identity
   declares it with `declared_rules_sha` (a versioned description of its
-  rules, as envs.bridge does).
+  rules, as envs.bridge does). A source edit that keeps the rules can keep
+  the identity too: register_rules_source_alias.
 
   Args:
     env: The env.
@@ -1653,6 +2075,7 @@ def rules_sha(env: types.Env) -> str:
     src = hashlib.sha256(raw).hexdigest()
   else:
     src = hashlib.sha256(rules_source(raw.decode("utf-8")).encode()).hexdigest()
+  src = _SOURCE_ALIASES.get(src, src)
   h = hashlib.sha256()
   for part in (_RULES_SHA_TAG["tag"], src, spec_of(env).key()):
     h.update(part.encode())

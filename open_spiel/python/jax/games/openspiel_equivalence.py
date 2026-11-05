@@ -26,7 +26,7 @@ The tests are openspiel_equivalence_test.py and its shard files
 The reference games come from `reference_loader`, by default
 `pyspiel.load_game`. `run_playouts` is public so another test can check a
 game against a different OpenSpiel build, for example gin rummy rule
-variants that stock OpenSpiel does not implement:
+variants that standard pyspiel does not expose:
 
   run_playouts(test_case, [GameConfig("gin_rummy", ...)], my_loader)
 """
@@ -45,6 +45,7 @@ import numpy as np
 
 from open_spiel.python.jax.games import bridge
 from open_spiel.python.jax.games import game as game_lib
+from open_spiel.python.jax.games import hearts
 from open_spiel.python.jax.games import no_limit_holdem
 from open_spiel.python.jax.games import optional_pyspiel_games
 from open_spiel.python.jax.games import registry
@@ -212,6 +213,36 @@ GAME_CONFIGS = (
     GameConfig(
         "othello", playouts=100, max_steps=130, check_information_state=False
     ),
+    # Hearts at OpenSpiel's defaults, then every non-default parameter. The
+    # terminal tensor is never compared (the lockstep stops at terminal), so
+    # pyspiel's thermometer overflow after a moon is out of reach.
+    GameConfig(
+        "hearts",
+        playouts=500,
+        max_steps=hearts.MAX_GAME_LENGTH + 53,
+        check_observation=False,
+    ),
+    GameConfig(
+        "hearts(pass_cards=false,no_pts_on_first_trick=false,"
+        "can_lead_any_club=true,jd_bonus=true)",
+        playouts=150,
+        max_steps=hearts.MAX_GAME_LENGTH + 53,
+        check_observation=False,
+    ),
+    GameConfig(
+        "hearts(avoid_all_tricks_bonus=true,must_break_hearts=false,"
+        "qs_breaks_hearts=false,can_lead_hearts_instead_of_qs=true)",
+        playouts=150,
+        max_steps=hearts.MAX_GAME_LENGTH + 53,
+        check_observation=False,
+    ),
+    GameConfig(
+        "hearts(jd_bonus=true,avoid_all_tricks_bonus=true,"
+        "can_lead_hearts_instead_of_qs=true)",
+        playouts=150,
+        max_steps=hearts.MAX_GAME_LENGTH + 53,
+        check_observation=False,
+    ),
     # Non-default game parameters.
     GameConfig("bargaining(discount=0.9)", playouts=100, max_steps=64),
     GameConfig("connect_four(rows=7,columns=8)", playouts=100, max_steps=56),
@@ -245,8 +276,8 @@ REFUSES_OPENSPIEL_DEFAULTS = {
     ),
 }
 
-# Games whose rules differ from released OpenSpiel's, so stock OpenSpiel is
-# not their reference.
+# Games whose rules differ from released OpenSpiel wheels (2.0.2 and earlier),
+# so an older pre-built wheel is not their reference.
 NEEDS_REFERENCE_BUILD = {
     "gin_rummy": (
         "one scoring rule differs from released OpenSpiel (2.0.2 and earlier): "
@@ -256,7 +287,41 @@ NEEDS_REFERENCE_BUILD = {
         "both; check it with run_playouts and a loader for an OpenSpiel build "
         "with that rule"
     ),
+    "euchre": (
+        "the JAX game is OpenSpiel's corrected euchre (information-state "
+        "tensor of 959 entries, go-alone decisions before the dealer takes "
+        "up the up-card); released OpenSpiel (2.0.2 and earlier) has the 935 "
+        "entry tensor and the older order. euchre_test checks EUCHRE_CONFIGS "
+        "with run_playouts when the installed pyspiel is the corrected build "
+        "and skips otherwise"
+    ),
 }
+
+# Euchre at OpenSpiel's defaults, then every non-default parameter, for an
+# OpenSpiel build with the corrected euchre (NEEDS_REFERENCE_BUILD). Seven
+# bids, a go-alone decision and twenty plays fit in a playout of
+# max_steps (22 chance nodes, at most 31 decisions).
+EUCHRE_CONFIGS = (
+    GameConfig("euchre", playouts=1000, max_steps=60, check_observation=False),
+    GameConfig(
+        "euchre(allow_lone_defender=true)",
+        playouts=500,
+        max_steps=60,
+        check_observation=False,
+    ),
+    GameConfig(
+        "euchre(stick_the_dealer=false)",
+        playouts=500,
+        max_steps=60,
+        check_observation=False,
+    ),
+    GameConfig(
+        "euchre(allow_lone_defender=true,stick_the_dealer=false)",
+        playouts=500,
+        max_steps=60,
+        check_observation=False,
+    ),
+)
 
 
 def _shard_for_current_process(cases: list[tuple[GameConfig, int]]):

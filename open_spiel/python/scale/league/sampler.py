@@ -42,13 +42,43 @@ Rules (pure numpy, each returns a Mix):
                  pipeline workers (pipeline PSRO).
 
 `sample(state, key)` returns the Draw (table, pool params, counts).
-`table_from_mix` is the one row allocation `sample` uses; `entries_table`
-draws a weighted (slot, member) pool with it. The learner is slot 0 member 0
-in seat row % P (the perspective seat); an opponent row seats the drawn
-member in every other seat. Stratified draws (the default) allocate rows per
-seat class by largest remainder over the categories ["self", then names
-sorted] and permute them with `key`, so counts are exact and balanced per
-seat; iid draws are categorical per row. Pool params pass through untouched.
+`table_from_mix` is the two-player row allocation; `entries_table` draws a
+weighted (slot, member) pool with it. The learner is slot 0 member 0 in seat
+row % P (the perspective seat); an opponent row seats the drawn member in
+every other seat. Stratified draws (the default) allocate rows per seat class
+by largest remainder over the categories ["self", then names sorted] and
+permute them with `key`, so counts are exact and balanced per seat; iid draws
+are categorical per row. Pool params pass through untouched.
+
+Sides (any player count). A table's seats split into sides (core.sides): a
+member is drawn per side, never per table, so no opponent fills the learner's
+partner seat (bridge) and the other players of a free-for-all are drawn
+independently (hearts, kuhn with N players).
+
+  table_from_lineup  the table of a core.sides.Lineup: the learner's sides
+                     (every seat of them a perspective seat), "self" sides
+                     (the learner's params, not trained on), "fixed" sides
+                     (one member) and "pool" sides, each pool side drawing
+                     its own member from the Mix (stratified per learner
+                     position, or iid), independently of the other sides. A
+                     position may instead be filled seat by seat (a mixed
+                     side: learner + fixed partner, two pool draws, ...).
+                     Rotation shifts positions within the sides' rotation
+                     classes only (equal-size sides; core.sides), so uneven
+                     sides (2v1, 3v1v1) are seated too.
+  lineup_from_mix    the Lineup a Mix is played through at P > 2: the learner
+                     on one side, rotating over the sides of its size by row,
+                     every other side a pool draw. Two-player tables are
+                     table_from_mix's.
+  draw_table         the one dispatch the league's draw uses: pure self-play
+                     on every seat (self_play_seats="all"), else a Lineup,
+                     else table_from_mix at P = 2, else lineup_from_mix.
+
+The perspective width M (seats emitted per row) is the same on every row of a
+lineup table, and on every table of one Lineup and Sides: the size of the
+learner's sides (1 at P = 2 and in free-for-all games, where the table keeps
+today's [B] perspective; 2 for a bridge partnership), or P for pure
+self-play on every seat. An Arena's trajectory batch keeps one shape.
 
 Keys are `core.rng` keys: a jax key and a numpy key with the same data draw
 the same table, so this module imports no array framework.
@@ -63,6 +93,7 @@ from typing import Any, Mapping, NamedTuple, Optional, Sequence
 import numpy as np
 
 from open_spiel.python.scale.core import rng
+from open_spiel.python.scale.core import sides as sides_lib
 from open_spiel.python.scale.core import slots as slots_lib
 from open_spiel.python.scale.core import types
 
@@ -533,6 +564,11 @@ class LeagueSlots:
     pools: the opponent pools.
     mix: the learner's Mix.
     stratified: stratified (True) or iid draws.
+    sides: the table's core.sides.Sides; None: table_from_mix, the seating
+      before sides (at P > 2 one drawn member fills every other seat;
+      sample's doc).
+    lineup: draw_table's lineup (needs sides).
+    self_play_seats: draw_table's self_play_seats (needs sides).
   """
 
   num_players: int
@@ -540,11 +576,31 @@ class LeagueSlots:
   pools: tuple[Any, ...]
   mix: Mix
   stratified: bool = True
+  sides: Optional[sides_lib.Sides] = None
+  lineup: Optional[sides_lib.Lineup] = None
+  self_play_seats: str = "one"
 
   def __post_init__(self):
     object.__setattr__(self, "pools", tuple(self.pools))
     assert self.num_players >= 2 and self.batch >= 1
     assert isinstance(self.mix, Mix), type(self.mix)
+    if self.sides is None:
+      if self.lineup is not None or self.self_play_seats != "one":
+        raise ValueError(
+            "LeagueSlots: a lineup or self_play_seats other than 'one' needs "
+            "sides"
+        )
+    else:
+      if not isinstance(self.sides, sides_lib.Sides):
+        raise TypeError(
+            "LeagueSlots.sides is a core.sides.Sides, got "
+            f"{type(self.sides).__name__}"
+        )
+      if self.sides.num_players != self.num_players:
+        raise ValueError(
+            f"LeagueSlots: sides have {self.sides.num_players} seats, the "
+            f"table {self.num_players}"
+        )
     seen: set[str] = set()
     for pool in self.pools:
       assert isinstance(pool, Pool), type(pool)
@@ -687,6 +743,12 @@ def table_from_mix(
 def sample(state: LeagueSlots, key) -> Draw:
   """The slot table for one learner batch; pure in (state, key).
 
+  With state.sides, draw_table (module doc). Without, table_from_mix, which
+  seats one drawn member on every other seat: at P > 2 that is the table
+  before sides (the opponent also fills the learner's partner seats, and one
+  opponent fills every seat of a free-for-all table), kept as is for callers
+  that do not pass sides yet; a caller seating by sides passes them.
+
   Args:
     state: the LeagueSlots.
     key: a core.rng key.
@@ -698,11 +760,364 @@ def sample(state: LeagueSlots, key) -> Draw:
   for n, m in state.mix.categories()[1:]:
     if m > 0.0:
       where[n] = state.locate(n)
-  table, counts = table_from_mix(
-      state.mix, where, state.batch, state.num_players, key, state.stratified
-  )
+  if state.sides is None:
+    table, counts = table_from_mix(
+        state.mix, where, state.batch, state.num_players, key, state.stratified
+    )
+  else:
+    if state.lineup is not None:
+      for f in state.lineup.units:
+        if f.kind == "fixed":
+          where[f.member] = state.locate(f.member)
+    table, counts = draw_table(
+        state.mix,
+        where,
+        state.batch,
+        state.sides,
+        key,
+        stratified=state.stratified,
+        lineup=state.lineup,
+        self_play_seats=state.self_play_seats,
+    )
   return Draw(
       table=table, params=[pool.params for pool in state.pools], counts=counts
+  )
+
+
+# -- sides: lineups and the draw dispatch --------------------------------------
+#: draw_table's self_play_seats: "one" (the learner's sides' seats), "all"
+#: (every seat of a pure self-play row).
+SELF_PLAY_SEATS = ("one", "all")
+# The salt of the keys of a lineup's second and later pool sides: the first
+# pool side draws with the table key itself, exactly as table_from_mix draws
+# its opponent, and rng.split(key, n)[i] == rng.fold_in(key, i), so later
+# sides fold their position into a salted key, never into the table key.
+_SIDE_KEY_SALT = 0x51DE5
+# The fold-in id of a per-seat pool unit (position q, seat j of the side):
+# above every side position id q < T, so a per-seat unit never shares a key
+# with a whole-side unit.
+_SEAT_UNIT_BASE = 0x10000
+
+
+def _check_learner(learner) -> tuple[int, int]:
+  """A learner (slot, member) pair, checked.
+
+  Args:
+    learner: (slot, member).
+
+  Returns:
+    (slot, member) as ints.
+
+  Raises:
+    ValueError: A negative index.
+  """
+  j, m = (int(x) for x in learner)
+  if j < 0 or m < 0:
+    raise ValueError(f"learner (slot, member) must be >= 0, got {learner}")
+  return j, m
+
+
+def lineup_from_mix(
+    sides: sides_lib.Sides, learner_side: int = 0
+) -> sides_lib.Lineup:
+  """The Lineup a learner's Mix is played through at P > 2 (module doc).
+
+  The learner at position `learner_side`, cyclic by row over the sides of its
+  rotation class (every side when the sides are fully rotatable; the sides of
+  its size when they are uneven), every other side drawing its own member from
+  the Mix (table_from_lineup takes the Mix at draw time; a Mix changes at run
+  time, a Lineup is a config value).
+
+  Uneven sides: the learner's perspective width is the size of its side on
+  every row, so one table seats it on sides of one size; a learner that
+  should play every role takes one lineup per side size (learner_side).
+  Sides that are not rotatable keep the learner at learner_side ("none").
+
+  Args:
+    sides: the table's core.sides.Sides.
+    learner_side: the learner's side position.
+
+  Returns:
+    The Lineup.
+
+  Raises:
+    TypeError: sides is not a core.sides.Sides.
+    ValueError: learner_side is out of range.
+  """
+  if not isinstance(sides, sides_lib.Sides):
+    raise TypeError(
+        f"lineup_from_mix takes a core.sides.Sides, got {type(sides).__name__}"
+    )
+  ls = int(learner_side)
+  if not 0 <= ls < sides.num_sides:
+    raise ValueError(
+        f"lineup_from_mix: learner_side {learner_side} not in "
+        f"0..{sides.num_sides - 1}"
+    )
+  fills = [sides_lib.SideFill("pool")] * sides.num_sides
+  fills[ls] = sides_lib.SideFill("learner")
+  return sides_lib.Lineup(tuple(fills), "cyclic" if sides.rotatable else "none")
+
+
+def table_from_lineup(
+    lineup: sides_lib.Lineup,
+    mix: Mix,
+    where: Mapping[str, tuple[int, int]],
+    batch: int,
+    sides: sides_lib.Sides,
+    key,
+    stratified: bool = True,
+    learner: tuple[int, int] = (0, 0),
+) -> tuple[slots_lib.SlotTable, dict[str, Any]]:
+  """The table of a Lineup (module doc): (SlotTable, counts).
+
+  Row r shifts every fill position by r % L within its rotation class under
+  rotate="cyclic" (core.sides.Sides.rotate_side: fill position q sits at
+  side rotate_side(q, r); L = sides.rotation_period, T for fully rotatable
+  sides), by 0 under "none". A whole-side fill seats every seat of its side;
+  a per-seat fill seats the j-th seat of its side with its j-th SideFill.
+  A "learner" unit seats `learner` (slot, member), every seat of it a
+  perspective seat; a "self" unit seats `learner` with no perspective seat;
+  a "fixed" unit seats where[member]; a "pool" unit draws a category of
+  `mix` ("self": the learner's params, not trained on; a name: where[name]).
+  Pool units draw independently of each other: the first pool unit's draw is
+  keyed by `key`, the others by fold_in(fold_in(key, salt), id) (id = q for
+  a whole side at position q, a salted id for a seat of a per-seat fill),
+  and stratified draws allocate each shift class's rows by largest remainder
+  over the categories and permute them (exact marginals per unit and
+  shift); iid draws are categorical per row and unit. With one pool side at
+  P = 2 this is table_from_mix bit for bit.
+
+  perspective_seat is [B] when the learner holds one seat in all, else
+  [B, M] in increasing seat order (M = the learner's seats, the same on every
+  row: rotation keeps every fill on a side of its size). counts: category ->
+  pool-unit draws (rows at P = 2), plus "self" for self units and each fixed
+  member's rows (positive counts only).
+
+  Args:
+    lineup: the core.sides.Lineup.
+    mix: the learner's Mix.
+    where: member name -> (slot, member).
+    batch: the rows.
+    sides: the table's core.sides.Sides.
+    key: the draw key.
+    stratified: stratified (True) or iid (False) pool draws.
+    learner: the learner's (slot, member).
+
+  Returns:
+    (SlotTable, counts).
+
+  Raises:
+    TypeError: lineup, sides or mix of the wrong type.
+    KeyError: a positive-mass name or a fixed member is not in `where`.
+    ValueError: the lineup does not fit the sides, or batch < 1.
+    NotImplementedError: a "learner" fill names a learning slot other than 0:
+      a table is one learner's batch (perspective seats of one slot); seat a
+      second learning slot's current params as a "fixed" member instead
+      (why a second index is refused rather than remapped: core.sides
+      SideFill.learner).
+  """
+  if not isinstance(lineup, sides_lib.Lineup):
+    raise TypeError(
+        "table_from_lineup takes a core.sides.Lineup, got "
+        f"{type(lineup).__name__}"
+    )
+  if not isinstance(sides, sides_lib.Sides):
+    raise TypeError(
+        "table_from_lineup takes a core.sides.Sides, got "
+        f"{type(sides).__name__}"
+    )
+  if not isinstance(mix, Mix):
+    raise TypeError(f"table_from_lineup takes a Mix, got {type(mix).__name__}")
+  lineup.check(sides)
+  b, p, t = int(batch), sides.num_players, sides.num_sides
+  if b < 1:
+    raise ValueError(f"batch must be >= 1, got {batch}")
+  learner = _check_learner(learner)
+  fills = lineup.fills
+  for f in lineup.units:
+    if f.kind == "learner" and f.learner != 0:
+      raise NotImplementedError(
+          f"a Lineup with learning slot {f.learner}: a table is one learner's "
+          "batch, whose perspective seats are learning slot 0's (the `learner` "
+          "argument); seat another learning slot's current params as a 'fixed' "
+          "member, or draw that slot's own batch with it as the learner"
+      )
+    if f.kind == "fixed" and f.member not in where:
+      raise KeyError(f"no slot holds the fixed member {f.member!r}")
+  # Units: (position q, seat index j or None for a whole side, SideFill).
+  units = []
+  for q, f in enumerate(fills):
+    if isinstance(f, tuple):
+      units.extend((q, j, g) for j, g in enumerate(f))
+    else:
+      units.append((q, None, f))
+  pool_units = [(q, j) for q, j, f in units if f.kind == "pool"]
+  cats = mix.categories()
+  names = [n for n, _ in cats]
+  masses = np.asarray([m for _, m in cats], F64)
+  loc = [learner]
+  for n, m in cats[1:]:
+    if m > 0.0 and pool_units and n not in where:
+      raise KeyError(f"no slot holds member {n!r}")
+    loc.append(tuple(where[n]) if (m > 0.0 and pool_units) else (-1, -1))
+  cyclic = lineup.rotate == "cyclic"
+  period = sides.rotation_period if cyclic else 1
+  shift = (np.arange(b) % period).astype(np.int64)
+  cat = {}  # (q, j) -> i64[B] category per row
+  for i, (q, j) in enumerate(pool_units):
+    if i == 0:
+      k_q = key
+    else:
+      uid = q if j is None else _SEAT_UNIT_BASE + q * 256 + j
+      k_q = rng.fold_in(rng.fold_in(key, _SIDE_KEY_SALT), uid)
+    col = np.full(b, -1, np.int64)
+    if stratified:
+      perm_keys = rng.split(k_q, period)
+      for c in range(period):
+        rows = np.flatnonzero(shift == c)
+        counts_c = _largest_remainder(masses, rows.size)
+        cats_c = np.repeat(np.arange(masses.size), counts_c)
+        perm = np.asarray(rng.permutation(perm_keys[c], rows.size))
+        col[rows] = cats_c[perm]
+    else:
+      col[:] = np.asarray(
+          rng.choice(k_q, masses.size, (b,), p=masses), np.int64
+      )
+    cat[(q, j)] = col
+  side_seats = [sides.seats(s) for s in range(t)]
+  # Where fill position q sits on each shift: rotation keeps sizes, so a
+  # per-seat fill always meets a side of its size (Lineup.check sized it).
+  side_at = [[sides.rotate_side(q, c) for q in range(t)] for c in range(period)]
+  for c in range(period):
+    assert sorted(side_at[c]) == list(range(t)), side_at[c]
+    for q in range(t):
+      assert sides.side_sizes[side_at[c][q]] == sides.side_sizes[q], (c, q)
+  m_width = sum(
+      len(side_seats[q]) if j is None else 1
+      for q, j, f in units
+      if f.kind == "learner"
+  )
+  slot = np.zeros((b, p), np.int32)
+  member = np.zeros((b, p), np.int32)
+  persp = np.zeros((b, m_width), np.int32)
+  for r in range(b):
+    held = []
+    for q, j, f in units:
+      s = side_at[int(shift[r])][q]
+      seats = side_seats[s] if j is None else (side_seats[s][j],)
+      if f.kind in ("learner", "self"):
+        jm = learner
+        if f.kind == "learner":
+          held.extend(seats)
+      elif f.kind == "fixed":
+        jm = tuple(where[f.member])
+      else:
+        jm = loc[int(cat[(q, j)][r])]
+        assert jm[0] >= 0, (r, q, j, names[int(cat[(q, j)][r])])
+      for seat in seats:
+        slot[r, seat], member[r, seat] = jm
+    assert len(held) == m_width, (r, held, m_width)
+    persp[r] = sorted(held)
+  counts: dict[str, Any] = {}
+  for c in range(masses.size):
+    n = int(sum(int((col == c).sum()) for col in cat.values()))
+    if n:
+      counts[names[c]] = n
+  n_self = b * sum(1 for _, _, f in units if f.kind == "self")
+  if n_self:
+    counts[SELF] = counts.get(SELF, 0) + n_self
+  for _, _, f in units:
+    if f.kind == "fixed":
+      counts[f.member] = counts.get(f.member, 0) + b
+  table = slots_lib.SlotTable(
+      seat_slot=slot,
+      seat_member=member,
+      perspective_seat=persp[:, 0].copy() if m_width == 1 else persp,
+  )
+  return table, counts
+
+
+def draw_table(
+    mix: Mix,
+    where: Mapping[str, tuple[int, int]],
+    batch: int,
+    sides: sides_lib.Sides,
+    key,
+    *,
+    stratified: bool = True,
+    learner: tuple[int, int] = (0, 0),
+    lineup: Optional[sides_lib.Lineup] = None,
+    self_play_seats: str = "one",
+) -> tuple[slots_lib.SlotTable, dict[str, Any]]:
+  """The league's table for one learner batch (module doc).
+
+  (SlotTable, counts).
+
+  self_play_seats="all"  core.arena.self_play_table(all_seats=True); the mix
+                         must be pure self-play and there is no lineup.
+  lineup                 table_from_lineup(lineup, mix, ...).
+  P = 2                  table_from_mix (the two-player seating, unchanged).
+  otherwise              table_from_lineup(lineup_from_mix(sides), mix, ...).
+
+  Args:
+    mix: the learner's Mix.
+    where: member name -> (slot, member).
+    batch: the rows.
+    sides: the table's core.sides.Sides.
+    key: the draw key.
+    stratified: stratified (True) or iid (False) pool draws.
+    learner: the learner's (slot, member).
+    lineup: a core.sides.Lineup, or None.
+    self_play_seats: a SELF_PLAY_SEATS name.
+
+  Returns:
+    (SlotTable, counts).
+
+  Raises:
+    TypeError: sides is not a core.sides.Sides.
+    ValueError: an unknown self_play_seats, or "all" with a lineup or a mix
+      that is not pure self-play.
+  """
+  if not isinstance(sides, sides_lib.Sides):
+    raise TypeError(
+        f"draw_table takes a core.sides.Sides, got {type(sides).__name__}"
+    )
+  if self_play_seats not in SELF_PLAY_SEATS:
+    raise ValueError(
+        f"self_play_seats {self_play_seats!r} not in {SELF_PLAY_SEATS}"
+    )
+  if self_play_seats == "all":
+    if lineup is not None:
+      raise ValueError(
+          "self_play_seats='all' seats the learner on every side; a lineup "
+          "says who fills each side: give one or the other"
+      )
+    if mix.self_play != 1.0:
+      raise ValueError(
+          "self_play_seats='all' emits every seat of a self-play row and "
+          f"needs a pure self-play mix, got {mix}"
+      )
+    # core.arena.self_play_table(all_seats=True) with the learner's (slot,
+    # member); built here so this module imports no array framework.
+    j, m = _check_learner(learner)
+    p, b = sides.num_players, int(batch)
+    table = slots_lib.SlotTable(
+        seat_slot=np.full((b, p), j, np.int32),
+        seat_member=np.full((b, p), m, np.int32),
+        perspective_seat=np.broadcast_to(
+            np.arange(p, dtype=np.int32), (b, p)
+        ).copy(),
+    )
+    return table, {SELF: b}
+  if lineup is not None:
+    return table_from_lineup(
+        lineup, mix, where, batch, sides, key, stratified, learner
+    )
+  if sides.num_players == 2:
+    return table_from_mix(mix, where, batch, 2, key, stratified, learner)
+  return table_from_lineup(
+      lineup_from_mix(sides), mix, where, batch, sides, key, stratified, learner
   )
 
 

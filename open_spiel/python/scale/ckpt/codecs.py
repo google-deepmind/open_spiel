@@ -50,11 +50,13 @@ state codec: a learner that trains NumPy params registers one.
 
 from __future__ import annotations
 
+import contextlib
+import contextvars
 import hashlib
 import io
 import json
 import sys
-from typing import Any, Mapping, Optional, Protocol
+from typing import Any, Iterator, Mapping, Optional, Protocol
 
 from etils import epath
 import numpy as np
@@ -362,22 +364,109 @@ def _orbax():
   return ocp
 
 
-#: The domain-separation tag hashed first into every tree_sha256.
-TREE_SHA_TAG = b"params_tree_sha256\0"
+#: The library's own tree tag: the native artifact format's digests are under
+#: it in every process (ckpt.artifact.NativeFormat.tree_sha_tag).
+DEFAULT_TREE_SHA_TAG = b"params_tree_sha256\0"
+
+#: The domain-separation tag hashed first into every tree_sha256 that names no
+#: tag and runs outside `format_tree_sha_tag`.
+TREE_SHA_TAG = DEFAULT_TREE_SHA_TAG
+
+# The tag of the artifact format being read or written in this context
+# (`format_tree_sha_tag`); None: TREE_SHA_TAG.
+_FORMAT_TREE_SHA_TAG: contextvars.ContextVar[Optional[bytes]] = (
+    contextvars.ContextVar(f"{__name__}.format_tree_sha_tag", default=None)
+)
+
+
+def _check_tag(tag: Any) -> bytes:
+  """Checks a tree_sha256 tag.
+
+  Args:
+    tag: the candidate tag.
+
+  Returns:
+    tag, which is non-empty bytes ending in a NUL.
+
+  Raises:
+    ValueError: it is not.
+  """
+  if not isinstance(tag, bytes) or not tag.endswith(b"\0") or len(tag) < 2:
+    raise ValueError(
+        f"a tree_sha256 tag is non-empty bytes ending in NUL, got {tag!r}"
+    )
+  return tag
+
+
+def set_tree_sha_tag(tag: bytes) -> None:
+  """Sets TREE_SHA_TAG, the tag tree_sha256 hashes first (read at call time).
+
+  For a deployment whose recorded digests use another tag. Set it once, at
+  import (a plugin), before anything is hashed. It does not change the
+  digests of an artifact format that declares its own tag (the native
+  format's is DEFAULT_TREE_SHA_TAG): artifacts the open library wrote verify
+  in the deployment's processes too. A deployment writing native-layout
+  artifacts under its tag registers its own format with that tag (a
+  NativeFormat subclass with its own `tag` and `tree_sha_tag`).
+
+  Args:
+    tag: non-empty bytes ending in a NUL.
+
+  Raises:
+    ValueError: tag is not non-empty bytes ending in a NUL.
+  """
+  global TREE_SHA_TAG
+  TREE_SHA_TAG = _check_tag(tag)
+
+
+@contextlib.contextmanager
+def format_tree_sha_tag(tag: bytes) -> Iterator[None]:
+  """Makes tree_sha256 / flat_sha256 calls without a tag hash under `tag`.
+
+  An artifact format reads and writes its params through a codec inside this
+  block, so a digest is checked under the tag of the format that recorded it,
+  whatever TREE_SHA_TAG this process set. Context-local (contextvars):
+  concurrent loads in other threads are unaffected.
+
+  Args:
+    tag: the format's tree tag (non-empty bytes ending in a NUL).
+
+  Raises:
+    ValueError: tag is not non-empty bytes ending in a NUL.
+
+  Yields:
+    None, once: the block runs under `tag`.
+  """
+  token = _FORMAT_TREE_SHA_TAG.set(_check_tag(tag))
+  try:
+    yield
+  finally:
+    _FORMAT_TREE_SHA_TAG.reset(token)
+
+
+def current_tree_sha_tag() -> bytes:
+  """The tag a tree_sha256 naming none hashes under here.
+
+  Returns:
+    The enclosing format_tree_sha_tag's tag, else TREE_SHA_TAG.
+  """
+  tag = _FORMAT_TREE_SHA_TAG.get()
+  return TREE_SHA_TAG if tag is None else tag
 
 
 def tree_sha256(tree: Any, tag: Optional[bytes] = None) -> str:
   """sha256 of a pytree of arrays, computed in memory.
 
-  The digest covers a tag (TREE_SHA_TAG), then per leaf in flatten order its
-  key path, dtype name, shape and the sha256 of its C-order little-endian
-  bytes. Equal trees (structure, dtypes, shapes and bits) hash equal on any
-  device layout.
+  The digest covers a tag (current_tree_sha_tag()), then per leaf in flatten
+  order its key path, dtype name, shape and the sha256 of its C-order
+  little-endian bytes. Equal trees (structure, dtypes, shapes and bits) hash
+  equal on any device layout.
 
   Args:
     tree: a pytree of arrays.
-    tag: the domain-separation tag; None is TREE_SHA_TAG (read at call time).
-      A reader of digests another deployment recorded passes its tag.
+    tag: the domain-separation tag; None is current_tree_sha_tag() (read at
+      call time). A reader of digests another deployment recorded passes its
+      tag.
 
   Returns:
     The hex digest.
@@ -390,7 +479,7 @@ def tree_sha256(tree: Any, tag: Optional[bytes] = None) -> str:
     raise ArtifactError(
         "tree_sha256 hashes little-endian bytes; this host is big-endian"
     )
-  h = hashlib.sha256(TREE_SHA_TAG if tag is None else tag)
+  h = hashlib.sha256(current_tree_sha_tag() if tag is None else tag)
   jax = _jax()
   for path, leaf in jax.tree_util.tree_leaves_with_path(tree):
     if isinstance(leaf, jax.Array) and not leaf.is_fully_addressable:
@@ -798,8 +887,8 @@ class JaxStateCodec:
 def flat_sha256(params: Any) -> str:
   """sha256 of a flat {str: array} mapping. Needs no jax.
 
-  TREE_SHA_TAG, then per key in sorted order the key, the dtype name, the
-  shape and the sha256 of the array's C-order little-endian bytes.
+  current_tree_sha_tag(), then per key in sorted order the key, the dtype
+  name, the shape and the sha256 of the array's C-order little-endian bytes.
 
   Args:
     params: the flat mapping.
@@ -814,7 +903,7 @@ def flat_sha256(params: Any) -> str:
     raise ArtifactError(
         "flat_sha256 hashes little-endian bytes; this host is big-endian"
     )
-  h = hashlib.sha256(TREE_SHA_TAG)
+  h = hashlib.sha256(current_tree_sha_tag())
   for key in sorted(_flat(params, "flat_sha256")):
     a = np.ascontiguousarray(np.asarray(params[key]))
     h.update(key.encode())

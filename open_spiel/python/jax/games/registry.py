@@ -39,9 +39,11 @@ _BUILTIN_GAMES = (
     ("connect_four", "connect_four", "ConnectFour"),
     ("dark_hex", "dark_hex", "DarkHex"),
     ("dark_hex_ir", "dark_hex_ir", "DarkHexIR"),
+    ("euchre", "euchre", "Euchre"),
     ("gin_rummy", "gin_rummy", "GinRummy"),
     ("gomoku", "gomoku", "Gomoku"),
     ("go", "go", "Go"),
+    ("hearts", "hearts", "Hearts"),
     ("hex", "hex", "Hex"),
     ("kuhn_poker", "kuhn_poker", "KuhnPoker"),
     ("leduc_poker", "leduc_poker", "LeducPoker"),
@@ -90,12 +92,16 @@ def load_game_module(module: str) -> types.ModuleType:
     from open_spiel.python.jax.games import dark_hex as mod
   elif module == "dark_hex_ir":
     from open_spiel.python.jax.games import dark_hex_ir as mod
+  elif module == "euchre":
+    from open_spiel.python.jax.games import euchre as mod
   elif module == "gin_rummy":
     from open_spiel.python.jax.games import gin_rummy as mod
   elif module == "gomoku":
     from open_spiel.python.jax.games import gomoku as mod
   elif module == "go":
     from open_spiel.python.jax.games import go as mod
+  elif module == "hearts":
+    from open_spiel.python.jax.games import hearts as mod
   elif module == "hex":
     from open_spiel.python.jax.games import hex as mod
   elif module == "kuhn_poker":

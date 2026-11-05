@@ -252,7 +252,7 @@ def test_evals_are_skipped_once_the_notice_is_up(tmp_path, monkeypatch):
   )
   monkeypatch.setattr(
       runner,
-      "_eval_row",
+      "eval_row",
       lambda ev, evaluator, lg, ls, u, **kw: calls.append(u) or {},
   )
   real_write = metrics_lib.MetricsWriter.write

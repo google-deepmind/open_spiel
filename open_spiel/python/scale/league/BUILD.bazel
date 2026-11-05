@@ -67,7 +67,9 @@ py_library(
         ":kinds_base",
         ":kinds_host",
         ":kinds_pg",
+        ":meta_solvers",
         ":mixture",
+        ":payoff_views",
         ":pool_params",
         ":refs",
         ":resume",
@@ -75,15 +77,19 @@ py_library(
         ":siblings",
         "//open_spiel/python/scale:metrics",
         "//open_spiel/python/scale:plugins",
+        "//open_spiel/python/scale:registry",
         "//open_spiel/python/scale/ckpt:artifact",
         "//open_spiel/python/scale/ckpt:layout",
         "//open_spiel/python/scale/ckpt:records",
         "//open_spiel/python/scale/ckpt:run_state",
         "//open_spiel/python/scale/core:arena",
         "//open_spiel/python/scale/core:deadline",
+        "//open_spiel/python/scale/core:hash_compat",
+        "//open_spiel/python/scale/core:hooks",
         "//open_spiel/python/scale/core:rng",
         "//open_spiel/python/scale/core:schedules",
         "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
         "//open_spiel/python/scale/core:x64",
         "//open_spiel/python/scale/envs:registry",
         "//open_spiel/python/scale/eval:exploitability",
@@ -114,6 +120,8 @@ py_library(
     deps = [
         ":meta_solvers",
         ":sampler",
+        "//open_spiel/python/scale/core:hash_compat",
+        "//open_spiel/python/scale/core:hooks",
         "//open_spiel/python/scale/core:rng",
         "//open_spiel/python/scale/eval:payoff",
         "//open_spiel/python/scale/eval:stats",
@@ -165,6 +173,7 @@ py_library(
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/policies:members",
         "@py_deps//jax",
+        "@py_deps//numpy",
     ],
 )
 
@@ -188,6 +197,7 @@ py_library(
         ":kinds_base",
         ":refs",
         "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:hash_compat",
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/envs:registry",
         "//open_spiel/python/scale/learners:pg",
@@ -240,7 +250,23 @@ py_library(
     srcs = ["mixture.py"],
     strict_deps = True,
     deps = [
+        "//open_spiel/python/scale/core:sides",
         "//open_spiel/python/scale/eval:exploitability",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "payoff_views",
+    srcs = ["payoff_views.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/eval:designs",
+        "//open_spiel/python/scale/eval:payoff",
+        "//open_spiel/python/scale/eval:stats",
+        "//open_spiel/python/scale/eval:tables",
         "@py_deps//numpy",
     ],
 )
@@ -310,6 +336,7 @@ py_library(
     deps = [
         "//open_spiel/python/scale/core:rng",
         "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
         "//open_spiel/python/scale/core:slots",
         "@py_deps//numpy",
     ],
@@ -321,6 +348,7 @@ py_library(
     strict_deps = True,
     deps = [
         "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/ckpt:formats",
         "//open_spiel/python/scale/ckpt:provenance",
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/policies:operators",
@@ -379,6 +407,17 @@ pytest_test(
 )
 
 pytest_test(
+    name = "config_overlay_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/config_overlay_test.py"],
+    deps = [
+        ":config_common",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+    ],
+)
+
+pytest_test(
     name = "controller_regressions_test",
     data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/controller_regressions_test.py"],
@@ -423,12 +462,21 @@ pytest_test(
 )
 
 pytest_test(
-    name = "generic_eval_test",
-    timeout = "long",
+    name = "fixed_layout_test",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
+    tests = ["tests/fixed_layout_test.py"],
+    deps = [
+        ":config_common",
+        ":league_fixtures",
+        ":refs",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
     ],
+)
+
+pytest_test(
+    name = "generic_eval_test",
+    data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/generic_eval_test.py"],
     deps = [
         ":config_common",
@@ -494,12 +542,21 @@ pytest_test(
 )
 
 pytest_test(
-    name = "meta_solvers_test",
-    timeout = "long",
+    name = "meta_solvers_symmetric_test",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
+    tests = ["tests/meta_solvers_symmetric_test.py"],
+    deps = [
+        ":meta_solvers",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:nplayer_matrix",
+        "@py_deps//numpy",
     ],
+)
+
+pytest_test(
+    name = "meta_solvers_test",
+    data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/meta_solvers_test.py"],
     deps = [
         ":meta_solvers",
@@ -519,6 +576,143 @@ pytest_test(
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/envs:kuhn",
         "//open_spiel/python/scale/eval:exploitability",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "nplayer_psro_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/nplayer_psro_test.py"],
+    deps = [
+        ":artifact_store",
+        ":config_common",
+        ":controller",
+        ":league_fixtures",
+        ":meta_solvers",
+        ":sampler",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/configs:kuhn3_league_smoke",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:nplayer_matrix",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:tabular",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytest_test(
+    name = "nplayer_smoke_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/nplayer_smoke_test.py"],
+    deps = [
+        ":artifact_store",
+        ":config_common",
+        ":controller",
+        ":league_fixtures",
+        ":mixture",
+        ":payoff_views",
+        ":sampler",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/configs:kuhn3_league_smoke",
+        "//open_spiel/python/scale/core:hash_compat",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/eval:exploitability",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/policies:registry",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "payoff_views_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/payoff_views_test.py"],
+    deps = [
+        ":payoff_views",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/eval:designs",
+        "//open_spiel/python/scale/eval:payoff",
+        "//open_spiel/python/scale/eval:tables",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_scripted_route_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_scripted_route_test.py"],
+    deps = [
+        ":config_common",
+        ":kinds_pg",
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:endgame",
+        "//open_spiel/python/scale/envs/gin:rule_bot",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/policies:routed",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/sources:decisions",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_teacher_kind_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_teacher_kind_test.py"],
+    deps = [
+        ":config_common",
+        ":kinds_pg",
+        ":league_fixtures",
+        ":refs",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+        "@py_deps//jax",
         "@py_deps//numpy",
     ],
 )
@@ -622,6 +816,59 @@ pytest_test(
 )
 
 pytest_test(
+    name = "sampler_general_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/sampler_general_test.py"],
+    deps = [
+        ":sampler",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:sides",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "sampler_sides_arena_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/sampler_sides_arena_test.py"],
+    deps = [
+        ":kinds_base",
+        ":sampler",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/envs:bridge",
+        "//open_spiel/python/scale/envs:nplayer_matrix",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:goldens_two_player",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "sampler_sides_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/sampler_sides_test.py"],
+    deps = [
+        ":sampler",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/envs:stub",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytest_test(
     name = "sampler_test",
     data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/sampler_test.py"],
@@ -649,6 +896,7 @@ pytest_test(
         ":controller",
         ":league_fixtures",
         ":sampler",
+        "//open_spiel/python/scale:metrics",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/ckpt:artifact",

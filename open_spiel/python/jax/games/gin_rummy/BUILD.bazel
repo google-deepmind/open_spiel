@@ -23,6 +23,16 @@ package(
 licenses(["notice"])
 
 py_library(
+    name = "backends",
+    srcs = ["backends.py"],
+    strict_deps = True,
+    deps = [
+        ":deadwood",
+        ":dense_cache_game",
+    ],
+)
+
+py_library(
     name = "cards_and_melds",
     srcs = ["cards_and_melds.py"],
     strict_deps = True,
@@ -115,6 +125,21 @@ py_library(
         ":deadwood",
         ":dense_cache_game",
         "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "backends_test",
+    srcs = ["backends_test.py"],
+    data = ["//open_spiel/python/jax/games:all_files"],
+    deps = [
+        ":backends",
+        ":cards_and_melds",
+        ":dense_cache",
+        ":dense_cache_game",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//jax",
+        "@py_deps//numpy",
     ],
 )
 

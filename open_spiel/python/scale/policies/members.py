@@ -53,7 +53,7 @@ from open_spiel.python.scale.core import types
 
 
 def _arch(policy: types.Policy) -> tuple[str, dict[str, Any]]:
-  """The policy's (arch name, arch kwargs).
+  """The policy's (architecture name, architecture kwargs).
 
   Args:
     policy: The policy.

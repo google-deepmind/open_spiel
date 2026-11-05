@@ -395,14 +395,18 @@ def test_mixture_head_to_head_draws_members_by_weight():
     _ev().mixture_head_to_head(pa, [0.5, 0.5], pb, [1.0], 4, rng.key(2))
 
 
-def test_evaluator_refuses_non_two_player_games():
-  """The Evaluator refuses games without 2 players."""
+def test_pairwise_methods_refuse_more_than_two_sides():
+  """Three individual seats: no pairwise payoff.
+
+  tables_test plays them, and two partnerships of four seats head to head.
+  """
 
   class _Env3(_Env):
-    num_players = 3
+    num_players, zero_sum = 3, True
 
-  with pytest.raises(ValueError, match="2 players"):
-    match.Evaluator(_Env3(), engine=_ToyEngine())
+  ev = match.Evaluator(_Env3(), engine=_ToyEngine())
+  with pytest.raises(ValueError, match="design not valid for these sides"):
+    ev.head_to_head(_ent("a", 1.0), _ent("b", 0.0), 4, rng.key(0))
 
 
 if __name__ == "__main__":

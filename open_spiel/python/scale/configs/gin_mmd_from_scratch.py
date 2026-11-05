@@ -64,7 +64,6 @@ import dataclasses
 import json
 from typing import Any
 
-from open_spiel.python.jax.games.gin_rummy import game as gin_game
 from open_spiel.python.scale.core import schedules
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.envs import gin
@@ -215,9 +214,11 @@ def check_standard_rules(cfg: runner.LeagueRunConfig) -> dict[str, str]:
   row = env_registry.game("gin_rummy")
   assert row == _builtin_gin_spec(), f"gin_rummy is not the built-in row: {row}"
   assert row.endgame == STANDARD_ENDGAME, row.endgame
-  assert dict(RULES) == dict(gin_game.DEFAULT_RULES), (
+  # The env's rule defaults, which envs/tests/registry_test pins equal to
+  # the games package's gin_rummy DEFAULT_RULES.
+  assert dict(RULES) == dict(gin.DEFAULT_RULES), (
       RULES,
-      gin_game.DEFAULT_RULES,
+      gin.DEFAULT_RULES,
   )
   assert cfg.env == "gin_rummy" and dict(cfg.env_kwargs) == ENV_KWARGS, (
       cfg.env,

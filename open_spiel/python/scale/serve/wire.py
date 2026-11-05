@@ -42,6 +42,7 @@ import numpy as np
 from open_spiel.python.scale import registry as path_registry
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.envs import registry as env_registry
+from open_spiel.python.scale.serve import games
 from open_spiel.python.scale.serve import replay
 
 
@@ -57,16 +58,18 @@ def game_params(game: Any) -> dict[str, Any]:
   return dict(game.get_parameters())
 
 
-def _translator(game_name: str):
+def _translator(game_name: str, params: Mapping[str, Any]):
   """The game's pyspiel-history translator, if it has one.
 
   Args:
-    game_name: The game.
+    game_name: The pyspiel game's short name.
+    params: The game's parameters (which env serves them).
 
   Returns:
     The translator, or None.
   """
-  path = getattr(env_registry.game(game_name), "pyspiel_history_to_raw", None)
+  env_name = games.env_name_for(game_name, params)
+  path = getattr(env_registry.game(env_name), "pyspiel_history_to_raw", None)
   if path is None:
     return None
   return path_registry.load_object(path)
@@ -87,7 +90,7 @@ def pyspiel_history_to_raw(
   Returns:
     [raw history].
   """
-  fn = _translator(game_name)
+  fn = _translator(game_name, params)
   hist = [int(a) for a in history]
   return [hist if fn is None else [int(a) for a in fn(hist, params)]]
 

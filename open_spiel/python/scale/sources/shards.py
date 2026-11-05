@@ -72,6 +72,11 @@ and holds the concatenated dataset in device memory for its lifetime.
 Shards written outside ShardWriter (an external labeller, for example) can
 carry extra checks in the manifest; `validator` runs one on the manifest and
 the stored rows (for example, one that verifies a receipt the producer wrote).
+A writer can add such blocks itself: `close(blocks=..., validator=...)`
+adds extra top-level manifest blocks and runs the validator on the manifest
+and the rows read back from the written files (`stored_arrays`) before the
+manifest is written, so a shard whose blocks fail their own check is never
+completed.
 """
 
 import datetime
@@ -92,6 +97,28 @@ from open_spiel.python.scale.sources import deals
 
 #: The manifest's "format" a ShardWriter writes and a ShardReader requires.
 MANIFEST_FORMAT = "trajectory_shards"
+
+
+def set_manifest_format(name: str) -> None:
+  """Sets MANIFEST_FORMAT, the "format" a ShardWriter writes and reads.
+
+  For a deployment whose recorded shards use another name. Set it once, at
+  import (a plugin), before a shard is written or read.
+
+  Args:
+    name: a non-empty string.
+
+  Raises:
+    ValueError: name is not a non-empty string.
+  """
+  global MANIFEST_FORMAT
+  if not isinstance(name, str) or not name:
+    raise ValueError(
+        f"a shard manifest format is a non-empty string, got {name!r}"
+    )
+  MANIFEST_FORMAT = name
+
+
 FORMAT_VERSION = 1
 MANIFEST = "manifest.json"
 _ROW_TIME = 2  # leading [N, T] dims of every TrajectoryBatch leaf ...
@@ -560,13 +587,66 @@ class ShardWriter:
         dict(file=name, rows=int(batch.valid.shape[0]), sha256=_sha256(data))
     )
 
-  def close(self) -> None:
-    """Writes the manifest (once).
+  def stored_arrays(self) -> list[Any]:
+    """The rows written so far, one array per manifest leaf.
+
+    All shards, in order, read back from the files (each checked against its
+    sha256).
+
+    Returns:
+      One array per manifest leaf.
+
+    Raises:
+      Error: nothing was written, or a shard changed since it was written.
+    """
+    if not self._shards:
+      raise Error("no batch was written: no rows to read back")
+    cols = [[] for _ in self._layout["leaves"]]
+    for sh in self._shards:
+      data = (self.root / sh["file"]).read_bytes()
+      if _sha256(data) != sh["sha256"]:
+        raise Error(f"{self.root / sh['file']}: changed since it was written")
+      with np.load(io.BytesIO(data), allow_pickle=False) as z:
+        for i in range(len(cols)):
+          cols[i].append(z[f"leaf_{i:05d}"])
+    return [np.concatenate(c, axis=0) for c in cols]
+
+  def manifest_leaves(self) -> list[Any]:
+    """The manifest's leaves of the rows written so far.
+
+    Returns:
+      [{path, dtype, shape}], one per leaf.
 
     Raises:
       Error: nothing was written.
     """
+    if self._layout is None:
+      raise Error("no batch was written: no layout yet")
+    return [dict(x) for x in self._layout["leaves"]]
+
+  def close(
+      self,
+      blocks: Optional[dict[str, Any]] = None,
+      validator: Optional[
+          Callable[[epath.Path, dict[str, Any], list[Any]], Any]
+      ] = None,
+  ) -> None:
+    """Writes the manifest (once).
+
+    Args:
+      blocks: extra top-level manifest blocks {key: JSON value}; a key the
+        writer sets itself is refused.
+      validator: validator(root, manifest, arrays), run on the full manifest
+        and the rows read back from the files before the manifest is
+        written; it raises to refuse the shard.
+
+    Raises:
+      Error: nothing was written, a block names a writer key, or blocks
+        are passed to a closed writer.
+    """
     if self._closed:
+      if blocks or validator is not None:
+        raise Error("the writer is closed: its manifest is already written")
       return
     if not self._shards:
       raise Error("no batch was written; refusing an empty shard directory")
@@ -593,6 +673,13 @@ class ShardWriter:
           refused_rows=int(self._refused_rows),
           checked_hands=int(self._checked_hands),
       )
+    if blocks:
+      taken = sorted(set(blocks) & set(manifest))
+      if taken:
+        raise Error(f"manifest blocks {taken} are the writer's own keys")
+      manifest.update(json.loads(json.dumps(dict(blocks), sort_keys=True)))
+    if validator is not None:
+      validator(self.root, manifest, self.stored_arrays())
     artifact.atomic_write(
         self.root / MANIFEST,
         json.dumps(manifest, indent=2, sort_keys=True).encode(),

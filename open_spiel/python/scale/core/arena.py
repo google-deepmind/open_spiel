@@ -78,10 +78,23 @@ temperature 1, which is decide's own arithmetic, so a drop to T and
 DecisionRule(kind, T) give the same probabilities and samples bit for bit.
 behavior_logits stay the policy's own logits; behavior_logp is the tempered
 rule's. Policies own no temperature.
+
+Credit. A TrajectoryBatch's reward is the perspective seat's own reward
+(credit="seat", the default). credit="side" emits instead the mean reward of
+the perspective seat's side (core.sides: env.sides, else one side per seat),
+ply by ply, so every seat of a side is credited with the side's return (the
+learner optimises its side, learners.pg PGConfig.credit); the batch then
+carries the label types.SIDE_CREDIT (bool, True at every ply) so a learner
+can tell which reward it was given. A side of one seat gets its seat's reward
+bit for bit, and so does a two-seat partnership whose seats score alike
+(bridge, team_pennies_2v2: (r + r) / 2 is r in f32), so there side credit is
+seat credit exactly; it changes the reward where partners score differently
+(nplayer_matrix team_dilemma_2v2). The PlyLog keeps every seat's own reward.
 """
 
+import contextlib
 import functools
-from typing import Any, NamedTuple, Optional, Sequence
+from typing import Any, Callable, Iterator, NamedTuple, Optional, Sequence
 
 import jax
 import jax.numpy as jnp
@@ -94,11 +107,15 @@ from open_spiel.python.scale.core import auxiliary as aux_lib
 from open_spiel.python.scale.core import chance as chance_lib
 from open_spiel.python.scale.core import decide as decide_lib
 from open_spiel.python.scale.core import plies
+from open_spiel.python.scale.core import sides as sides_lib
 from open_spiel.python.scale.core import slots as slots_lib
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.core import x64
 
 tree_map = jax.tree_util.tree_map
+
+#: Arena credit modes (module doc, "Credit").
+CREDITS = ("seat", "side")
 
 # The slot records live in core.slots, which imports no jax.
 IN_GRAPH = slots_lib.IN_GRAPH
@@ -582,6 +599,8 @@ class Arena:
     perspective_slot: the slot whose seats the TrajectoryBatch is emitted for.
     hands_per_match: hands before a match restarts (new_match, carry reset).
     mesh: a 1-D mesh named "batch" (default: every device).
+    credit: a CREDITS name: the reward emitted for a perspective seat, its own
+      ("seat") or its side's mean ("side"; module doc, "Credit").
   """
 
   accepted = IN_GRAPH
@@ -593,9 +612,12 @@ class Arena:
       perspective_slot: int = 0,
       hands_per_match: int = 1,
       mesh: Optional[Mesh] = None,
+      credit: str = "seat",
   ):
     x64.assert_x64(type(self).__name__)
     assert slots, "need at least one slot"
+    if credit not in CREDITS:
+      raise ValueError(f"Arena credit must be one of {CREDITS}, got {credit!r}")
     assert 0 <= perspective_slot < len(slots)
     assert hands_per_match >= 1
     for sl in slots:
@@ -615,6 +637,8 @@ class Arena:
     self.slots = tuple(slots)
     self.perspective_slot = perspective_slot
     self.hands_per_match = hands_per_match
+    self.credit = credit
+    self._sides = sides_lib.sides_of(env) if credit == "side" else None
     self.mesh = (
         mesh if mesh is not None else Mesh(np.array(jax.devices()), ("batch",))
     )
@@ -1325,6 +1349,15 @@ class Arena:
           "the plies whose target_value a value-target writer filled (types "
           "doc)"
       )
+    if types.SIDE_CREDIT in labels:
+      raise ValueError(
+          f"{env.name}.labels emits {types.SIDE_CREDIT!r}: that key marks a "
+          "batch whose reward is the side's (Arena credit='side')"
+      )
+    seat_rewards = rewards
+    if self._sides is not None:
+      labels[types.SIDE_CREDIT] = jnp.ones((b, m), jnp.bool_)
+      seat_rewards = self._side_credit(rewards)
     if emits_value:
       # The perspective slot's AUX_TARGET_VALUE (a teacher's value) is the
       # target where it acted, which makes the Arena this batch's one
@@ -1340,7 +1373,7 @@ class Arena:
         value_pred=jnp.where(valid[..., None], bm(value), jnp.float32(0.0)),
         target_policy=tp.astype(jnp.float32),
         target_value=tv.astype(jnp.float32),
-        reward=_take_seats(rewards, ps),
+        reward=_take_seats(seat_rewards, ps),
         done=bm(done),
         valid=valid,
         labels=labels,
@@ -1363,6 +1396,19 @@ class Arena:
         bad=bad,
     )
     return new_state, record, log
+
+  def _side_credit(self, rewards):
+    """f32[B, P]: each seat's side's mean reward (module doc, "Credit").
+
+    Args:
+      rewards: f32[B, P], each seat's reward.
+
+    Returns:
+      f32[B, P].
+    """
+    side = jnp.asarray(self._sides.side_of_seat, jnp.int32)
+    out = jnp.take(self._sides.side_returns(rewards), side, axis=-1)
+    return out.astype(rewards.dtype)
 
   def _ply(self, params, table, st: ArenaState):
     """One ply of every row: each slot observes, evaluates and decides; advance.
@@ -1878,6 +1924,45 @@ def independent_keys(key, batch: int, num_players: int):
   )
 
 
+#: The active ArenaSource.next override (override_source_next), or None.
+_SOURCE_NEXT_OVERRIDE: list[Callable[["ArenaSource", Any], Any]] = []
+
+
+@contextlib.contextmanager
+def override_source_next(
+    fn: Callable[["ArenaSource", Any], Optional[types.TrajectoryBatch]],
+) -> Iterator[None]:
+  """Within the block, every ArenaSource.next(key) first calls fn(source, key).
+
+  The extension point for a tool that needs the source a League built (a
+  program dump, a profiler) without replacing ArenaSource.next: fn returns
+  None to let the rollout run, or a TrajectoryBatch to return in its place,
+  or raises (the exception propagates out of next, e.g. to stop a League
+  after it built its source). Overrides do not nest.
+
+  Args:
+    fn: fn(source, key) -> None or a TrajectoryBatch.
+
+  Yields:
+    None.
+
+  Raises:
+    ValueError: fn is not callable.
+    RuntimeError: an override is already active.
+  """
+  if not callable(fn):
+    raise ValueError(f"an ArenaSource.next override is callable, got {fn!r}")
+  if _SOURCE_NEXT_OVERRIDE:
+    raise RuntimeError(
+        "an ArenaSource.next override is already active: overrides do not nest"
+    )
+  _SOURCE_NEXT_OVERRIDE.append(fn)
+  try:
+    yield
+  finally:
+    _SOURCE_NEXT_OVERRIDE.clear()
+
+
 class ArenaSource:
   """TrajectorySource over an Arena (or HostArena) and a slot table.
 
@@ -1941,8 +2026,12 @@ class ArenaSource:
       key: this batch's key.
 
     Returns:
-      the TrajectoryBatch.
+      the TrajectoryBatch (or what an active override_source_next returns).
     """
+    if _SOURCE_NEXT_OVERRIDE:
+      out = _SOURCE_NEXT_OVERRIDE[0](self, key)
+      if out is not None:
+        return out
     dk, pk = independent_keys(key, self.batch, self.arena.env.num_players)
     if self.state is None:
       state = self.arena.reset(self.params, self.table, dk, pk)

@@ -28,7 +28,19 @@ Record (every case, or only some with --only=a,b):
 
   python -m open_spiel.python.scale.core.tests.arena_golden --write
 
-Record only from a tree whose rollouts are known good.
+Record only from a tree whose rollouts are known good, on CPU. The digests
+are XLA:CPU bits, and those of the network cases (NETWORK_CASES: a float
+forward pass decides every action) also depend on the CPU model
+(testing.cpu_class): when recorded they reproduced on Cascade Lake (GCE n2,
+the recorded class) and not on Broadwell or AMD Rome (GCE e2/n1). So --write
+stamps the file with the host's class under _meta.cpu_class, a partial
+--write on another class is refused, and on another class the test and the
+compare skip the network cases, naming both classes (they fail instead under
+cpu_class.REQUIRE_CLASS_ENV=1). NETWORK_CASES is every case with a float
+forward pass, by kind, not by observation: of its 6 cases only 3 (the leduc
+pair and kuhn_rnn) were seen to differ off-class; the gin and c4 cases
+matched there but are skipped too, since nothing makes their bits portable.
+The probe cases (uniform and scripted policies) run anywhere.
 
 Cases (each crosses hand boundaries so the deal path runs):
   kuhn_history_self_play   stateful HistoryPolicy, every seat a perspective
@@ -47,7 +59,7 @@ import hashlib
 import json
 import os
 import sys
-from typing import Any
+from typing import Any, Optional
 
 import jax
 import jax.numpy as jnp
@@ -72,6 +84,7 @@ from open_spiel.python.scale.networks import catalog
 from open_spiel.python.scale.parallel import data_parallel as dpl
 from open_spiel.python.scale.policies import registry
 from open_spiel.python.scale.policies import uniform
+from open_spiel.python.scale.testing import cpu_class
 
 tree_map = jax.tree_util.tree_map
 #: This module's import name, under any import root (`python -m` runs it as
@@ -80,6 +93,37 @@ _MODULE = __spec__.name if __spec__ is not None else __name__
 GOLDEN = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "arena_golden.json"
 )
+#: Cases whose digests follow a float network's forward pass, so XLA:CPU's
+#: last bits on the host's CPU class pick their actions (module doc).
+NETWORK_CASES = frozenset({
+    "leduc_network_self_play",
+    "leduc_network_vs_uniform",
+    "gin_network_vs_uniform",
+    "gin_network_vs_rule_bot",
+    "kuhn_rnn_network_self_play",
+    "c4_search_self_play",
+})
+#: The file's one non-case entry: the jax version, platform and CPU class it
+#: was recorded with.
+META = "_meta"
+
+
+def class_mismatch(golden: dict[str, Any]) -> Optional[str]:
+  """Why the network cases cannot be compared on this host, or None.
+
+  Args:
+    golden: The loaded golden file.
+
+  Returns:
+    A message naming the recorded and the host CPU class when they differ,
+    None when they are the same.
+
+  Raises:
+    ValueError: a golden file with no recorded CPU class.
+  """
+  return cpu_class.mismatch(golden.get(META, {}).get("cpu_class"), GOLDEN)
+
+
 #: The gin cases deal with every hand's knock limit at the deadwood maximum.
 GIN_OKLAHOMA_FRAC = 1.0
 
@@ -515,36 +559,65 @@ def run_case(name) -> dict[str, Any]:
 
 
 def main(argv):
-  """With --write [--only=a,b], (re)digests cases into GOLDEN.
+  """With --write [--only=a,b], (re)digests cases into GOLDEN; else compares.
 
   Args:
     argv: the command line.
+
+  Raises:
+    ValueError: a partial --write, or a compare under
+      cpu_class.REQUIRE_CLASS_ENV=1, on a host of another CPU class.
+    SystemExit: a compare found a case that differs.
   """
   frameworks.enable_x64()  # a script: x64 on before any array is made
-  if "--write" in argv:  # [--only=a,b]: (re)digest those cases, keep the others
-    only = [
-        a.split("=", 1)[1].split(",") for a in argv if a.startswith("--only=")
-    ]
-    out = json.load(open(GOLDEN, encoding="utf-8")) if only else {}
+  recorded = {}
+  if os.path.exists(GOLDEN):
+    with open(GOLDEN, encoding="utf-8") as f:
+      recorded = json.load(f)
+  write = "--write" in argv
+  only = [
+      a.split("=", 1)[1].split(",") for a in argv if a.startswith("--only=")
+  ]
+  # A full --write re-records every case and the class, so the old file's
+  # class (or its lack of one) does not matter; a partial one and a compare do.
+  full_write = write and not only
+  mismatch = class_mismatch(recorded) if recorded and not full_write else None
+  print(f"host CPU class [{cpu_class.host()}]")
+  if write:  # [--only=a,b]: (re)digest those cases, keep the others
+    if only and mismatch:
+      raise ValueError(f"refusing a partial --write: {mismatch}")
+    out = recorded if only else {}
     for name in only[0] if only else cases():
       out[name] = run_case(name)
-    out["_meta"] = {
+    out[META] = {
+        "cpu_class": cpu_class.host(),
         "jax": jax.__version__,
         "platform": jax.devices()[0].platform,
     }
+    unknown = set(out) - set(cases()) - {META}
+    if unknown:
+      raise ValueError(f"recorded cases no longer defined: {sorted(unknown)}")
     with open(GOLDEN, "w", encoding="utf-8") as f:
       json.dump(out, f, indent=1, sort_keys=True)
       f.write("\n")
     print(f"wrote {GOLDEN}")
     return
-  want = json.load(open(GOLDEN, encoding="utf-8"))
+  if mismatch and cpu_class.class_required():
+    raise ValueError(f"{cpu_class.REQUIRE_CLASS_ENV}=1 and {mismatch}")
+  bad_cases = 0
   for name in cases():
+    if mismatch and name in NETWORK_CASES:
+      print(name, "SKIP (another CPU class)")
+      continue
     got = run_case(name)
-    bad = sorted(k for k in want[name] if got.get(k) != want[name][k])
-    print(
-        name,
-        "OK" if not bad and set(got) == set(want[name]) else f"DIFF {bad[:8]}",
-    )
+    bad = sorted(k for k in recorded[name] if got.get(k) != recorded[name][k])
+    ok = not bad and set(got) == set(recorded[name])
+    bad_cases += not ok
+    print(name, "OK" if ok else f"DIFF {bad[:8]}")
+  if mismatch:
+    print(f"SKIPPED the network cases: {mismatch}")
+  if bad_cases:
+    raise SystemExit(f"{bad_cases} case(s) differ from {GOLDEN}")
 
 
 if __name__ == "__main__":

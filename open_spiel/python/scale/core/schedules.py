@@ -44,6 +44,13 @@ warmup_steps W > 0 prepends a linear ramp from 0: with s = t +
 warmup_offset, value = start * s / W while s < W, else the kind's value at
 t - W. warmup_offset 0 is optax.join_schedules of a 0 -> start ramp;
 warmup_offset 1 with "constant" gives start * min((t + 1) / W, 1).
+
+anneal_end E > 0 (with anneal_start A < E and anneal_final_frac f in (0, 1);
+all 0, the default, is off) is a step-size anneal for a run continued from
+a checkpoint at step A: the value above for t < A; from A on, the value AT A
+(frozen) times a factor linear from 1 at A to f at E, held at f after. The
+three fields were added after configs were hashed and are left out of the
+hash at their defaults (core.hash_compat.added).
 """
 
 from __future__ import annotations
@@ -54,6 +61,8 @@ from typing import Any, Optional
 
 import jax
 import jax.numpy as jnp
+
+from open_spiel.python.scale.core import hash_compat
 
 KINDS = ("constant", "linear", "cosine", "inverse_power", "power_law")
 F64 = jnp.float64
@@ -94,6 +103,9 @@ class Schedule:
     ceil: an upper clamp, optional.
     time_scale: multiplies the counter.
     floor_step: the step a floor applies from.
+    anneal_start: the step the LR anneal starts at (module doc).
+    anneal_end: the step it reaches anneal_final_frac at; 0 is off.
+    anneal_final_frac: the factor at and after anneal_end.
   """
 
   kind: str = "constant"
@@ -107,6 +119,9 @@ class Schedule:
   ceil: Optional[float] = None
   time_scale: float = 1.0
   floor_step: int = 0
+  anneal_start: int = hash_compat.added(0)
+  anneal_end: int = hash_compat.added(0)
+  anneal_final_frac: float = hash_compat.added(0.0)
 
   def __post_init__(self):
     if self.kind not in KINDS:
@@ -159,10 +174,40 @@ class Schedule:
           f"floor_step needs start > floor > 0, got start {self.start}, floor "
           f"{self.floor}"
       )
+    self._check_anneal()
     if self.kind == "cosine" and self.end > self.start:
       raise ValueError(
           f"a cosine schedule decays start -> end, got start {self.start}, end "
           f"{self.end}"
+      )
+
+  def _check_anneal(self) -> None:
+    """The anneal fields: all 0 (off), or ints 0 <= A < E and f in (0, 1)."""
+    a, e, f = self.anneal_start, self.anneal_end, self.anneal_final_frac
+    for name, v in (("anneal_start", a), ("anneal_end", e)):
+      if isinstance(v, bool) or not isinstance(v, int) or v < 0:
+        raise ValueError(f"schedule {name} must be an int >= 0, got {v!r}")
+    if (
+        isinstance(f, bool)
+        or not isinstance(f, (int, float))
+        or not math.isfinite(f)
+    ):
+      raise ValueError(
+          f"schedule anneal_final_frac must be a finite number, got {f!r}"
+      )
+    if e == 0:
+      if a != 0 or f != 0.0:
+        raise ValueError(
+            "schedule anneal off (anneal_end 0) needs anneal_start 0 and "
+            f"anneal_final_frac 0, got {a}, {f}"
+        )
+      return
+    if not a < e:
+      raise ValueError(f"schedule anneal_end {e} must be > anneal_start {a}")
+    if not 0.0 < float(f) < 1.0:
+      raise ValueError(
+          "schedule anneal_final_frac must be in (0, 1) when the anneal is on,"
+          f" got {f!r}"
       )
 
   def is_constant(self) -> bool:
@@ -173,7 +218,7 @@ class Schedule:
     Returns:
       Whether the schedule is constant.
     """
-    if float(self.warmup_steps) > 0.0:
+    if float(self.warmup_steps) > 0.0 or self.anneal_end:
       return False
     if self.kind == "constant":
       return True
@@ -225,6 +270,23 @@ class Schedule:
       The f64 value.
     """
     t = counter(step).astype(F64)
+    if not self.anneal_end:
+      return self._unannealed(t)
+    a, e = float(self.anneal_start), float(self.anneal_end)
+    frac = jnp.clip((t - a) / (e - a), 0.0, 1.0)
+    factor = 1.0 - (1.0 - float(self.anneal_final_frac)) * frac
+    at_start = self._unannealed(jnp.asarray(a, F64))
+    return jnp.where(t < a, self._unannealed(t), at_start * factor)
+
+  def _unannealed(self, t: jax.Array) -> jax.Array:
+    """The f64 value at f64 step t without the LR anneal (warmup included).
+
+    Args:
+      t: the f64 step.
+
+    Returns:
+      The f64 value.
+    """
     w = float(self.warmup_steps)
     if w <= 0.0:
       return self._base(t)

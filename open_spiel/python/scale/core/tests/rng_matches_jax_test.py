@@ -171,7 +171,6 @@ def test_arena_reexports_the_slot_records():
       np.arange(2, dtype=np.int32),
   )
   # A round trip of bytes this test just pickled.
-  # pylint: disable-next=g-unsafe-pickle-load
   assert pickle.loads(pickle.dumps(t)).__class__ is slots.SlotTable  # noqa: S301
 
 

@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Evaluation of policies: head-to-head matches and exact metrics.
+"""Evaluation of policies: head-to-head matches, tables and exact metrics.
 
   match           Evaluator: head-to-head on seat-swapped duplicate deals,
-                  payoff matrices and population mixtures, every mean with
-                  its SE and 95% CI
+                  payoff matrices and population mixtures, and tables of
+                  any sides (vs a field, the substitute gate), every mean
+                  with its SE and 95% CI
+  tables          TableResult, the per-seat record of a table design and
+                  its estimators
+  designs         duplicate seating designs (swap2, cyclic, substitute...)
   payoff          the numpy payoff accounting and the MatchEngine protocol
   stats           mean, SE and normal 95% interval
   exploitability  exact NashConv of a policy in a small game

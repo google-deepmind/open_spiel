@@ -38,8 +38,8 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from open_spiel.python.scale.core import arena as arena_lib
 from open_spiel.python.scale.core import schedules
+from open_spiel.python.scale.core import sides as sides_lib
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.eval import heldout as heldout_lib
 from open_spiel.python.scale.league import commit
@@ -521,6 +521,8 @@ class BCDriver(base.Driver):
         opponent table is fixed for the run).
     """
     self._single(ls)
+    if self.data_dir is None:  # shard-fed updates play no table
+      self.check_table(table)
     k_roll, k_upd = jax.random.split(key)
     src = self._sources.get(ls.name)
     params = self.learner.params(ls.state)
@@ -567,9 +569,10 @@ class BCDriver(base.Driver):
   def heldout_set(self, ls):
     """The fixed teacher-driven held-out state set (`eval.heldout.HeldoutSet`).
 
-    Built once: beta 1, the run's opening, episodes and opponents (ls's mix),
-    heldout_num_envs rows, keys from key(heldout_seed). Independent of the
-    training seed and of the student.
+    Built once: beta 1, the run's opening, episodes and opponents (ls's mix,
+    seated by the env's sides: league.sampler.draw_table), heldout_num_envs
+    rows, keys from key(heldout_seed). Independent of the training seed and
+    of the student.
 
     Args:
       ls: the learner slot.
@@ -581,21 +584,19 @@ class BCDriver(base.Driver):
       lg, s = self.league, self.spec
       n = s.heldout_num_envs or lg.config.num_envs
       k_held = jax.random.key(s.heldout_seed)
-      p = self.env.num_players
-      if lg.config.self_play_seats == "all":
-        assert ls.mix.self_play == 1.0, ls.mix
-        table = arena_lib.self_play_table(n, p, all_seats=True)
-      else:
-        table = sampler.sample(
-            sampler.LeagueSlots(
-                num_players=p,
-                batch=n,
-                pools=lg.all_pools(),
-                mix=ls.mix,
-                stratified=lg.config.stratified,
-            ),
-            jax.random.fold_in(k_held, 1),
-        ).table
+      table = sampler.sample(
+          sampler.LeagueSlots(
+              num_players=self.env.num_players,
+              batch=n,
+              pools=lg.all_pools(),
+              mix=ls.mix,
+              stratified=lg.config.stratified,
+              sides=sides_lib.sides_of(self.env),
+              lineup=lg.config.lineup,
+              self_play_seats=lg.config.self_play_seats,
+          ),
+          jax.random.fold_in(k_held, 1),
+      ).table
       src = self.dagger_source(
           table,
           [pool.params for pool in lg.all_pools()],

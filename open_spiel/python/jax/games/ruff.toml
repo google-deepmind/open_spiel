@@ -35,10 +35,9 @@ convention = "google"
 force-single-line = true
 force-sort-within-sections = true
 # Imported names sort case-insensitively, constants among the rest (Google
-# style, as the downstream import sorts them): order-by-type would put
-# NUM_CARDS before get_card_points.
+# Python style): order-by-type would put NUM_CARDS before get_card_points.
 order-by-type = false
 single-line-exclusions = ["typing", "collections.abc"]
-# OpenSpiel and its extension module are first-party (staging #12, the
-# importer's shared rules): pyspiel sorts with the open_spiel imports.
+# OpenSpiel and its C++ extension module are first-party: pyspiel sorts
+# with the open_spiel imports.
 known-first-party = ["open_spiel", "pyspiel"]

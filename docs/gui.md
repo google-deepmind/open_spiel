@@ -122,6 +122,9 @@ The first two lines install the bot's JAX dependencies, once. The whole
 walkthrough, from a fresh machine to a game against this checkpoint, is
 "Play gin rummy against a trained bot" in
 [`open_spiel/python/gui/REMOTE_BOTS.md`](../open_spiel/python/gui/REMOTE_BOTS.md#play-gin-rummy-against-a-trained-bot).
+In a four-player game `--bot` fills seats 1, 2 and 3, for example against
+the pretrained `scale` checkpoints `hearts/v1@6000` (`--game hearts`) and
+`euchre/v1@3000` (`--game euchre`; see `open_spiel/python/scale/README.md`).
 
 The checkpoint is a variable: the seat's settings carry it as
 `checkpoint`, so another one can be chosen in Setup without a restart.
