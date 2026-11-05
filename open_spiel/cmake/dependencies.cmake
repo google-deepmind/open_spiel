@@ -5,6 +5,14 @@
 # scripts/bazel_to_cmake/label_map.py). The sources of the dependencies are
 # fetched by install.sh into the directories used below.
 
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/abseil-cpp/CMakeLists.txt")
+  message (FATAL_ERROR
+    "The C++ dependencies are missing (open_spiel/abseil-cpp, among others). "
+    "Run ./install.sh from the repository root first, or "
+    "OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0 ./install.sh to fetch them without "
+    "installing system packages.")
+endif()
+
 ## Abseil.
 set (ABSL_PROPAGATE_CXX_STD ON)
 add_subdirectory (abseil-cpp)

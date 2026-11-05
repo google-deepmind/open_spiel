@@ -17,17 +17,22 @@ then served by the server as static files.
 
 ## Requirements
 
--   OpenSpiel installed for Python (see [Installation](install.md)).
--   Node.js 22.22.2 or later, with `npm`, to build the client.
+-   OpenSpiel installed for Python (see [Installation](install.md)), with
+    `./install.sh` run once from the repository root before
+    `pip install -e .`.
+-   Node.js `^22.22.2 || ^24.15.0 || >=26.0.0`, with `npm`, to build the
+    client.
 -   A checkout of the OpenSpiel repository, which holds the client's source.
 
 ## From a source checkout
 
-From the root of the repository, with OpenSpiel installed from it (for
-example with `python3 -m pip install -e .`, or the `PYTHONPATH` setup in
-[Installation](install.md)):
+From the root of the repository, with OpenSpiel installed from it (as
+below, or with the `PYTHONPATH` setup in [Installation](install.md)):
 
 ```sh
+./install.sh  # once: the C++ dependencies `pip install -e .` builds against
+python3.12 -m venv venv && . venv/bin/activate
+python3 -m pip install -e .
 (cd open_spiel/gui && npm ci && npm run build)
 python3 -m open_spiel.python.gui
 ```
@@ -106,10 +111,17 @@ server in one step and opens a game whose seat 1 is that bot, for example
 gin rummy against the pretrained `scale` checkpoint:
 
 ```sh
+source open_spiel/scripts/python_extra_deps.sh python3
+echo "$OPEN_SPIEL_PYTHON_JAX_DEPS" | xargs pip install  # the bot's JAX deps
 python3 -m open_spiel.python.gui.play --game 'gin_rummy(oklahoma=true)' \
-  --bot open_spiel.python.scale.serve.remote_bot:make_bot \
+  --bot open_spiel.python.scale.serve.remote_bot:make_bot --state full_state \
   --checkpoint https://storage.googleapis.com/openspiel-data/checkpoints/scale/gin_rummy/v1@30000
 ```
+
+The first two lines install the bot's JAX dependencies, once. The whole
+walkthrough, from a fresh machine to a game against this checkpoint, is
+"Play gin rummy against a trained bot" in
+[`open_spiel/python/gui/REMOTE_BOTS.md`](../open_spiel/python/gui/REMOTE_BOTS.md#play-gin-rummy-against-a-trained-bot).
 
 The checkpoint is a variable: the seat's settings carry it as
 `checkpoint`, so another one can be chosen in Setup without a restart.
@@ -145,7 +157,9 @@ python3 -m open_spiel.python.gui --help
 The server has no authentication, and the oracle viewer is shown every
 player's private information. Keep the default loopback address unless the
 network is trusted; to play from another machine, forward the port over SSH
-rather than listening on a public address.
+rather than listening on a public address ("On a remote machine" in
+`open_spiel/python/gui/REMOTE_BOTS.md` covers another local port and keeping
+`play` running when the SSH session drops).
 
 ## Tests
 
