@@ -17,13 +17,15 @@
 
 `send` posts or gets, with no proxy and no redirect, and tells a refusal (HTTP
 400, 409 or 422) from a failure; `parse_reply` checks a 2xx reply against the
-protocol (REMOTE_BOTS.md).
+protocol (REMOTE_BOTS.md), and `parse_bot_output` reads its optional policy,
+value and `decided_by`.
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 import http
 import http.client
 import json
+import math
 import socket
 import urllib.parse
 
@@ -204,3 +206,109 @@ def parse_reply(
         "characters."
     )
   return action, notice
+
+
+def _number(value: object) -> float | None:
+  """Returns `value` as a finite float, or None if it is not one."""
+  if isinstance(value, bool) or not isinstance(value, (int, float)):
+    return None
+  number = float(value)
+  return number if math.isfinite(number) else None
+
+
+def parse_bot_output(
+    reply: contract.JsonValue,
+    legal: Sequence[int],
+    label: Callable[[int], str],
+) -> contract.BotOutput | None:
+  """Returns what a bot server's 2xx reply says beyond its action, or None.
+
+  The reply may give a `policy`, a list of `{"action", "prob"}` objects over
+  the seat's legal actions (a `label` in one is read as the bot's, but the
+  game's own text is shown); a `value`, a number; and a `decided_by`, short
+  text. None when it gives none of them.
+
+  Args:
+    reply: The parsed reply, which `parse_reply` has accepted.
+    legal: The seat's legal actions.
+    label: Gives the game's text for one of the seat's legal actions.
+
+  Raises:
+    RemoteBotReplyError: If any of them is not the protocol's: a policy
+      entry with an action that is not legal or is listed twice, a
+      probability outside [0, 1], probabilities that sum to more than 1, a
+      value that is not a finite number, or a `decided_by` that is not text
+      of at most `contract.DECIDED_BY_MAX_LENGTH` characters.
+  """
+  assert isinstance(reply, dict)
+  raw_policy = reply.get("policy")
+  value = reply.get("value")
+  decided_by = reply.get("decided_by")
+  if raw_policy is None and value is None and decided_by is None:
+    return None
+  entries: list[contract.PolicyEntry] = []
+  if raw_policy is not None:
+    if not isinstance(raw_policy, list):
+      raise RemoteBotReplyError("The bot server's policy is not a list.")
+    allowed = {int(action) for action in legal}
+    seen: set[int] = set()
+    for item in raw_policy:
+      if not isinstance(item, dict):
+        raise RemoteBotReplyError(
+            f"The bot server's policy entry {controller_settings.shown(item)}"
+            " is not an object."
+        )
+      action, prob = item.get("action"), _number(item.get("prob"))
+      if (
+          isinstance(action, bool)
+          or not isinstance(action, int)
+          or action not in allowed
+          or action in seen
+      ):
+        raise RemoteBotReplyError(
+            f"The bot server's policy names {controller_settings.shown(action)}"
+            ", which is not a legal action it has not already named."
+        )
+      if prob is None or not 0.0 <= prob <= 1.0:
+        raise RemoteBotReplyError(
+            "The bot server's policy gives action "
+            f"{action} the probability "
+            f"{controller_settings.shown(item.get('prob'))}, not a number in "
+            "[0, 1]."
+        )
+      if "label" in item and not isinstance(item["label"], str):
+        raise RemoteBotReplyError(
+            f"The bot server's policy labels action {action} with something "
+            "that is not text."
+        )
+      seen.add(action)
+      entries.append(
+          contract.PolicyEntry(action=action, label=label(action), prob=prob)
+      )
+    total = sum(entry.prob for entry in entries)
+    if total > 1.0 + contract.POLICY_SUM_TOLERANCE:
+      raise RemoteBotReplyError(
+          f"The bot server's policy sums to {total:g}, over 1."
+      )
+  number = None
+  if value is not None:
+    number = _number(value)
+    if number is None:
+      raise RemoteBotReplyError(
+          f"The bot server's value {controller_settings.shown(value)} is not "
+          "a finite number."
+      )
+  if decided_by is not None and (
+      not isinstance(decided_by, str)
+      or not decided_by.strip()
+      or len(decided_by) > contract.DECIDED_BY_MAX_LENGTH
+  ):
+    raise RemoteBotReplyError(
+        f"The bot server's decided_by {controller_settings.shown(decided_by)}"
+        " is not non-blank text of at most "
+        f"{contract.DECIDED_BY_MAX_LENGTH} characters."
+    )
+  entries.sort(key=lambda entry: (-entry.prob, entry.action))
+  return contract.BotOutput(
+      policy=tuple(entries), value=number, decided_by=decided_by
+  )

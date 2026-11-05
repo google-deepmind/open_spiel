@@ -360,6 +360,8 @@ class RemoteBot:
 
   Attributes:
     last_notice: The bot server's notice about its latest choice, or None.
+    last_output: What the bot server said about its latest choice beyond the
+      action (its policy, value and `decided_by`), or None.
   """
 
   def __init__(
@@ -385,6 +387,7 @@ class RemoteBot:
     self._timeout_seconds = timeout_seconds
     self._seed = seed
     self.last_notice: str | None = None
+    self.last_output: contract.BotOutput | None = None
 
   def check(self) -> None:
     """Checks the bot server answers, and can play this game this way.
@@ -522,6 +525,7 @@ class RemoteBot:
         is not legal.
     """
     self.last_notice = None
+    self.last_output = None
     path, body = self.request(state, seat)
     status, reply = _request_json(self._url + path, body, self._timeout())
     if status in remote_bot_http.REFUSAL_STATUSES:
@@ -531,9 +535,12 @@ class RemoteBot:
       )
     if not 200 <= status < 300:
       raise RemoteBotUnreachableError(f"The bot server answered HTTP {status}.")
-    action, self.last_notice = remote_bot_http.parse_reply(
-        reply, state.legal_actions(seat)
+    legal = state.legal_actions(seat)
+    action, notice = remote_bot_http.parse_reply(reply, legal)
+    output = remote_bot_http.parse_bot_output(
+        reply, legal, lambda a: str(state.action_to_string(seat, a))
     )
+    self.last_notice, self.last_output = notice, output
     return action
 
 

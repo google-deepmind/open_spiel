@@ -18,16 +18,37 @@ import type {HistoryEntry} from '../contract/contract.ts';
 import {historyRows, rowText} from './history_rows.ts';
 
 function hidden(seat: number | null): HistoryEntry {
-  return {seat, action: null, label: null, rewards: null, public_label: null};
+  return {
+    seat,
+    action: null,
+    label: null,
+    rewards: null,
+    public_label: null,
+    bot_output: null,
+  };
 }
 
 function shown(seat: number | null, label: string): HistoryEntry {
-  return {seat, action: 0, label, rewards: null, public_label: null};
+  return {
+    seat,
+    action: 0,
+    label,
+    rewards: null,
+    public_label: null,
+    bot_output: null,
+  };
 }
 
 // Withheld from the viewer, with the label the game makes public.
 function published(seat: number | null, label: string): HistoryEntry {
-  return {seat, action: null, label: null, rewards: null, public_label: label};
+  return {
+    seat,
+    action: null,
+    label: null,
+    rewards: null,
+    public_label: label,
+    bot_output: null,
+  };
 }
 
 // Each row's two columns, joined by a space.

@@ -18,7 +18,7 @@ present and null, never absent. Objects admit no extra fields.
 
 ## Versioning
 
-Every response carries `contract_version`, currently `8`. It increases on any
+Every response carries `contract_version`, currently `10`. It increases on any
 change a client could break on: a field added, removed, renamed or retyped,
 an enum value added or removed, or a route changed. The server and the
 client change version together: the client refuses a response of any other
@@ -26,6 +26,8 @@ version.
 
 | Version | Change                                                                                                                                       |
 | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `10`    | `PolicyEntry.action` admits `null` in the schema (withheld moves carry `bot_output: null`, so a policy entry's `action` is always given on the wire) |
+| `9`     | `HistoryEntry.bot_output`, a `BotOutput` (a controller's policy, value and what decided its move), sent to omniscient viewers and to the acting seat's viewer (`null` whenever `HistoryEntry.action` is withheld) |
 | `8`     | `SeatView.notice`, a controller's note about its latest move, sent only to that seat's viewer and to omniscient viewers; `DELETE /api/sessions/{id}`, answered with `SessionClosed` |
 | `7`     | `CatalogueEntry.renderer`: the renderer the game's adapter names, so a client can show which games it draws as a board before opening one |
 | `6`     | `Health.capabilities.cpp_mcts_limits` (`simulations_or_clock` \| `simulations_only`): how the served pyspiel's C++ MCTS bounds a search, which sets MCTS's limits |
@@ -143,14 +145,22 @@ state; every other game is treated as hiding information.
 | `rewards`                                    | as the history entry that reached the position                               | as for a seat                          |
 | `seats[i].failure.message`                   | `null`                                                                       | `null`                                 |
 | `seats[i].notice`                            | seat `s`'s own (`i == s`), otherwise `null`                                  | `null`                                 |
+| `history[i].bot_output`                      | as the oracle receives it when `s` acted, otherwise `null`                    | `null`                                 |
 
 An `omniscient` viewer receives everything, except that `session.seed` goes to
-the oracle alone: the seed determines every chance outcome to come. A history
-entry's `seat` is always given, because which seat moved is public. A
-withheld entry's `public_label` is what the rules let every viewer read of
-the action, as the game's adapter says (`Adapter.public_action_label`): a
-card discarded face up, a draw from a face-up pile. It is null when the
-action is wholly hidden, and for a game whose adapter makes nothing public.
+the oracle alone: the seed determines every chance outcome to come. A
+history entry's `bot_output` goes with its action in full: to an omniscient
+viewer and to the seat that acted, and to no other. A bot chooses from its
+information state, so in a game that hides information its policy, value
+and `decided_by` all tell of its hand: the policy names the cards it may
+play, and its probabilities and value change with its cards even when its
+legal actions do not. In a game that hides nothing every viewer is
+omniscient and receives every bot output. A history entry's `seat` is always given, because
+which seat moved is public. A withheld entry's `public_label` is what the
+rules let every viewer read of the action, as the game's adapter says
+(`Adapter.public_action_label`): a card discarded face up, a draw from a
+face-up pile. It is null when the action is wholly hidden, and for a game
+whose adapter makes nothing public.
 `returns` are given to every viewer.
 
 ## Frame
@@ -160,7 +170,7 @@ and a **replay** of an earlier position otherwise.
 
 | Field                    | Type                                | Meaning                                                      |
 | ------------------------ | ----------------------------------- | ------------------------------------------------------------ |
-| `contract_version`       | `8`                                 |                                                              |
+| `contract_version`       | `10`                                |                                                              |
 | `session`                | `SessionInfo`                       | the session's fixed properties                               |
 | `viewer`                 | `Viewer`                            | who the frame is for                                         |
 | `omniscient`             | boolean                             | whether the viewer sees the full state                       |
@@ -214,7 +224,9 @@ shows it to every viewer.
 | `ToMove`            | `kind` (`seat` \| `chance` \| `terminal`), `seat`                                                                                                                                                                                                                                                        |
 | `Action`            | `id` (the OpenSpiel action id), `label`                                                                                                                                                                                                                                                                  |
 | `ChanceOutcome`     | `id`, `label`, `probability`                                                                                                                                                                                                                                                                             |
-| `HistoryEntry`      | `seat` (null for chance), `action`, `label`, `rewards`, `public_label`                                                                                                                                                                                                                                   |
+| `HistoryEntry`      | `seat` (null for chance), `action`, `label`, `rewards`, `public_label`, `bot_output` (a `BotOutput` or null)                                                                                                                                                                                             |
+| `BotOutput`         | `policy` (`PolicyEntry[]`, most probable first, each action at most once, summing to at most 1; empty when the bot gave none), `value` (the bot's estimate for its seat, or null), `decided_by` (what part of the bot chose, such as `network`, `search`, `scripted` or `forced`, at most 40 characters, or null) |
+| `PolicyEntry`       | `action` (a legal action where the bot chose; the schema admits null, but a bot output reaches only a viewer who sees the move in full, so the server always gives it), `label` (the game's text for it), `prob` (in [0, 1])                                                                                 |
 | `Presentation`      | `renderer`, `view` (any JSON), `actions` (`ActionHint[]` or null)                                                                                                                                                                                                                                        |
 | `ActionHint`        | `id` (a legal action's id), `hint` (any JSON)                                                                                                                                                                                                                                                            |
 
@@ -235,6 +247,10 @@ shows it to every viewer.
   messages, gets legal actions only as the seat to move, and, holding a seat,
   sees its own actions in full. It gets no seat's `notice` but its own.
 - A human seat has no `notice`.
+- A history entry's `bot_output` is null unless the entry is a seat's, and
+  null whenever the entry's `action` is withheld from the viewer; when given,
+  it is the oracle's. Its policy entries' `action` is null exactly when the
+  entry's `action` is (so never, as the server builds frames).
 - A history entry withholds its `action`, `label` and `rewards` together;
   only a withheld entry has a non-null `public_label`.
 - `0 <= ply <= num_plies == len(history)`.
@@ -313,6 +329,17 @@ it, which then reaches that seat's viewer. Every notice is passed on, as
 that seat's `config` says what it reads; the server's state policy
 (`controller_registry.full_state_notice`) is the place to drop or limit such
 a seat's notices.
+
+A controller may also give a **bot output** with a move: its policy over the
+seat's legal actions, its value estimate and what part of it decided
+(`BotOutput`). The move's history entry keeps it as `bot_output`, so a
+client shows it for any ply of the history. It reaches the viewers who see
+the move in full (omniscient viewers and the seat's own) and no other, since
+a bot's output follows from its hand; it has no effect on play. A bot
+output whose policy names an action that is not legal fails the seat
+(`InvalidBotOutput`). A full-state controller's policy can favour the moves
+hidden information makes good, as a notice can carry it;
+`controller_registry.full_state_output` is the place to drop such outputs.
 
 The server registers four controllers: `human`, `random` (a uniformly random
 legal action), `mcts`, and `remote`, a bot server the seat's `url` names, sent

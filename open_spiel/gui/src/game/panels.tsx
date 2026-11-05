@@ -16,6 +16,7 @@ import type {IDockviewPanelProps} from 'dockview-core';
 import type {FunctionComponent, JSX, ReactNode} from 'react';
 
 import {Note} from '../actions/note.tsx';
+import {BotOutputView} from '../bot_output/bot_output.tsx';
 import {useShowsSessionError} from '../dock/dock_context.ts';
 import {useGroupMinimumHeight} from '../dock/group_minimum.ts';
 import {PanelGroup} from '../dock/panel_group.tsx';
@@ -38,7 +39,11 @@ import './game.css';
 // The panels that show the position, and so have nothing to show without
 // one: while the session has failed, they and the sections popped out of
 // them point to its error.
-const POSITION_PANELS: ReadonlySet<string> = new Set(['actions', 'state']);
+const POSITION_PANELS: ReadonlySet<string> = new Set([
+  'actions',
+  'state',
+  'bot_output',
+]);
 
 // The panel `id` is, or the group a section popped out as `id` came from.
 function groupOf(id: string): string {
@@ -101,6 +106,10 @@ function SetupContent(props: IDockviewPanelProps): JSX.Element {
   );
 }
 
+function BotOutputContent(): JSX.Element {
+  return <BotOutputView frame={useGame().session.frame} />;
+}
+
 // A dock component that draws `Content` in panel `id`'s frame.
 function framed(
   id: GamePanelId,
@@ -139,6 +148,7 @@ export const PANEL_COMPONENTS: Readonly<
   gameplay: framed('gameplay', GameplayPanel),
   actions: grouped('actions', ACTIONS_GROUP),
   state: grouped('state', STATE_GROUP),
+  bot_output: framed('bot_output', BotOutputContent),
   session: grouped('session', SESSION_GROUP),
   setup: framed('setup', SetupContent),
   view: grouped('view', VIEW_GROUP),

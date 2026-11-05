@@ -91,6 +91,24 @@ export interface ApplyChanceOutcome {
 }
 
 /**
+ * What a bot said about one of its choices, beyond the action.
+ */
+export interface BotOutput {
+  /**
+   * The bot's probabilities over the legal actions where it chose, most probable first, each action at most once; empty when it gave none. Their sum is at most 1, as a bot may give only its likeliest actions. Either every entry has its action or none does.
+   */
+  policy: PolicyEntry[];
+  /**
+   * The bot's estimate of the position's value for its seat, or null when it gave none.
+   */
+  value: number | null;
+  /**
+   * What part of the bot made the choice, such as `network`, `search`, `scripted` or `forced`; null when it did not say.
+   */
+  decided_by: string | null;
+}
+
+/**
  * What the server can do, independent of any one game.
  */
 export interface Capabilities {
@@ -115,7 +133,7 @@ export interface Catalogue {
   /**
    * The contract version the catalogue was built against.
    */
-  contract_version: 8;
+  contract_version: 10;
   /**
    * One entry per game, ordered by name.
    */
@@ -294,7 +312,7 @@ export interface Error {
   /**
    * The contract version the error was built against.
    */
-  contract_version: 8;
+  contract_version: 10;
   /**
    * Why the request was refused.
    */
@@ -348,7 +366,7 @@ export interface Frame {
   /**
    * The contract version the frame was built against.
    */
-  contract_version: 8;
+  contract_version: 10;
   /**
    * The session's fixed properties.
    */
@@ -434,7 +452,7 @@ export interface Health {
   /**
    * The contract version the server speaks.
    */
-  contract_version: 8;
+  contract_version: 10;
   /**
    * The installed OpenSpiel package's version.
    */
@@ -473,6 +491,10 @@ export interface HistoryEntry {
    * What every viewer may read of a withheld action, as the game's adapter says, such as a card discarded face up; null when the action is shown in full or wholly hidden.
    */
   public_label: string | null;
+  /**
+   * What the seat's controller said about the action: its policy, value and what decided it. It goes with the action in full: to an omniscient viewer and to the seat's own, and null for any other viewer, since in a game that hides information a bot's policy, value and what decided its move all follow from its hand. Null also when the controller said nothing.
+   */
+  bot_output: BotOutput | null;
 }
 
 /**
@@ -560,6 +582,24 @@ export interface ParameterSpec {
  * - `string`: A string.
  */
 export type ParameterType = 'bool' | 'int' | 'float' | 'string';
+
+/**
+ * One action of a bot's policy, with the probability it gave it.
+ */
+export interface PolicyEntry {
+  /**
+   * The OpenSpiel action id, a legal action where the bot chose. The schema's type admits null, but a history entry carries a bot output only when its own action is given, and then every policy entry's action is given too, so no frame holds a null one.
+   */
+  action: number | null;
+  /**
+   * The game's text for the action.
+   */
+  label: string;
+  /**
+   * The probability the bot gave the action, in [0, 1].
+   */
+  prob: number;
+}
 
 /**
  * A position as the game's adapter presents it to one viewer.
@@ -661,7 +701,7 @@ export interface SessionClosed {
   /**
    * The contract version the answer was built against.
    */
-  contract_version: 8;
+  contract_version: 10;
   /**
    * The id of the session closed.
    */

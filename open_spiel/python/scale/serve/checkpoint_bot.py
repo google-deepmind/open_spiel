@@ -45,7 +45,7 @@ replay the hand at all, OpenSpiel's first legal action
 (server.PolicyServer.decide, repair). It is never silent: each such move is
 logged as a WARNING, counted in `stats` ("legal_mismatch", "diverged") and
 described in `last_notice` (None after an ordinary move), for a GUI to show.
-The GUI's controller contract (version 8) shows a controller's notice to
+The GUI's controller contract (version 9) shows a controller's notice to
 that seat's viewer and to omniscient viewers, and fails the seat on a notice
 that is blank or over NOTICE_MAX_LENGTH characters, so `last_notice` is the
 seat's notice (seat_notice): a legal-set notice names only the seat's own
@@ -87,7 +87,7 @@ _MAX_VARIANTS = 4096
 # Plies a warmup playout makes before it gives up on reaching a terminal.
 _MAX_WARMUP_PLIES = 100_000
 
-#: The longest notice contract 8 carries (the GUI's NOTICE_MAX_LENGTH).
+#: The longest notice contract 9 carries (the GUI's NOTICE_MAX_LENGTH).
 NOTICE_MAX_LENGTH = 200
 #: The notice of a move the env could not replay (decider "fallback"): what
 #: the seat may see, the replay's error left to the log (module doc).
@@ -98,7 +98,7 @@ DIVERGED_NOTICE = (
 
 
 def clip_notice(notice: Optional[str]) -> Optional[str]:
-  """`notice` as contract 8 takes it: non-blank, at most NOTICE_MAX_LENGTH.
+  """`notice` as contract 9 takes it: non-blank, at most NOTICE_MAX_LENGTH.
 
   A blank notice is None; a longer one is cut, with a trailing "...".
 

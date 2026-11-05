@@ -67,6 +67,8 @@ class Seat:
     notice: The controller's note about its latest choice, or None; cleared
       when it chooses again without one, and on an undo, a reset or a change
       of controller.
+    output: The controller's bot output about its latest choice, or None,
+      which the session keeps with the choice's ply.
   """
 
   spec: controllers.Spec
@@ -77,6 +79,7 @@ class Seat:
   message: str | None = None
   build: builds.Build[controllers.Controller] | None = None
   notice: str | None = None
+  output: contract.BotOutput | None = None
 
   @classmethod
   def human(cls) -> "Seat":
@@ -259,21 +262,24 @@ class Seat:
 
     Returns:
       A legal action, or None if the controller failed; `failure` then says
-      why. `notice` is the controller's note about this choice, or None.
+      why. `notice` is the controller's note about this choice, or None,
+      and `output` its bot output, or None.
 
     Raises:
       ValueError: If the seat is a human's (see `controllers.choose`).
     """
     assert self.controller is not None and self.ready
     self.notice = None
+    self.output = None
     try:
-      action, notice = controllers.choose_with_notice(
+      action, notice, output = controllers.choose_with_output(
           self.controller, state, index
       )
     except controllers.ControllerError as error:
       self.failure = error.failure(visible=True)
       return None
     self.notice = controllers.seat_notice(self.spec, state.get_game(), notice)
+    self.output = controllers.seat_output(self.spec, state.get_game(), output)
     return action
 
 

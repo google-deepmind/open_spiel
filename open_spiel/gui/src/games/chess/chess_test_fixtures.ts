@@ -41,6 +41,7 @@ export function chessHistory(labels: readonly string[]): HistoryEntry[] {
     label,
     rewards: [0, 0],
     public_label: null,
+    bot_output: null,
   }));
 }
 

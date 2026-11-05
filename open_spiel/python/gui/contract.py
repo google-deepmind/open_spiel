@@ -28,14 +28,22 @@ breaks them cannot be built.
 from collections.abc import Mapping, Sequence
 import dataclasses
 import enum
+import math
 from typing import Annotated, Literal
 
 # The contract's version, incremented on every change that breaks clients.
-ContractVersion = Literal[8]
-CONTRACT_VERSION: ContractVersion = 8
+ContractVersion = Literal[10]
+CONTRACT_VERSION: ContractVersion = 10
 
 # The most characters a seat's `SeatView.notice` holds.
 NOTICE_MAX_LENGTH = 200
+
+# The most characters a `BotOutput.decided_by` holds.
+DECIDED_BY_MAX_LENGTH = 40
+
+# How far above 1 the probabilities of a `BotOutput.policy` may sum, for
+# rounding.
+POLICY_SUM_TOLERANCE = 1e-3
 
 # The value of a game parameter or a controller setting.
 ParameterValue = bool | int | float | str
@@ -372,6 +380,90 @@ class ChanceOutcome:
 
 
 @dataclasses.dataclass(frozen=True)
+class PolicyEntry:
+  """One action of a bot's policy, with the probability it gave it.
+
+  Attributes:
+    action: The OpenSpiel action id, a legal action where the bot chose.
+      The schema's type admits null, but a history entry carries a bot
+      output only when its own action is given, and then every policy
+      entry's action is given too, so no frame holds a null one.
+    label: The game's text for the action.
+    prob: The probability the bot gave the action, in [0, 1].
+  """
+
+  action: int | None
+  label: str
+  prob: float
+
+  def __post_init__(self) -> None:
+    require(
+        0.0 <= self.prob <= 1.0,
+        f"Action {self.action} cannot have probability {self.prob}.",
+    )
+
+
+@dataclasses.dataclass(frozen=True)
+class BotOutput:
+  """What a bot said about one of its choices, beyond the action.
+
+  Attributes:
+    policy: The bot's probabilities over the legal actions where it chose,
+      most probable first, each action at most once; empty when it gave
+      none. Their sum is at most 1, as a bot may give only its likeliest
+      actions. Either every entry has its action or none does.
+    value: The bot's estimate of the position's value for its seat, or null
+      when it gave none.
+    decided_by: What part of the bot made the choice, such as `network`,
+      `search`, `scripted` or `forced`; null when it did not say.
+  """
+
+  policy: tuple[PolicyEntry, ...]
+  value: float | None
+  decided_by: str | None
+
+  def __post_init__(self) -> None:
+    actions = [entry.action for entry in self.policy]
+    probs = [entry.prob for entry in self.policy]
+    shown = [action for action in actions if action is not None]
+    require(
+        not shown or len(shown) == len(actions),
+        "A bot's policy shows every action's id or none.",
+    )
+    require(
+        len(set(shown)) == len(shown),
+        "A bot's policy names each action at most once.",
+    )
+    require(
+        probs == sorted(probs, reverse=True),
+        "A bot's policy lists its most probable action first.",
+    )
+    require(
+        sum(probs) <= 1.0 + POLICY_SUM_TOLERANCE,
+        f"A bot's policy cannot sum to {sum(probs)}.",
+    )
+    require(
+        self.value is None or math.isfinite(self.value),
+        f"A bot's value cannot be {self.value}.",
+    )
+    require(
+        self.decided_by is None
+        or (
+            bool(self.decided_by.strip())
+            and len(self.decided_by) <= DECIDED_BY_MAX_LENGTH
+        ),
+        "A bot's decided_by is non-blank text of at most "
+        f"{DECIDED_BY_MAX_LENGTH} characters.",
+    )
+    require(
+        bool(self.policy)
+        or self.value is not None
+        or self.decided_by is not None,
+        "A bot output says something.",
+    )
+
+
+@dataclasses.dataclass(frozen=True)
 class HistoryEntry:
   """One action of the live game, as the viewer may see it.
 
@@ -384,6 +476,12 @@ class HistoryEntry:
     public_label: What every viewer may read of a withheld action, as the
       game's adapter says, such as a card discarded face up; null when the
       action is shown in full or wholly hidden.
+    bot_output: What the seat's controller said about the action: its
+      policy, value and what decided it. It goes with the action in full: to
+      an omniscient viewer and to the seat's own, and null for any other
+      viewer, since in a game that hides information a bot's policy, value
+      and what decided its move all follow from its hand. Null also when the
+      controller said nothing.
   """
 
   seat: int | None
@@ -391,6 +489,7 @@ class HistoryEntry:
   label: str | None
   rewards: tuple[float, ...] | None
   public_label: str | None = None
+  bot_output: BotOutput | None = None
 
   def __post_init__(self) -> None:
     require(
@@ -400,6 +499,23 @@ class HistoryEntry:
     require(
         self.public_label is None or self.action is None,
         "Only a withheld history entry has a public label.",
+    )
+    require(
+        self.bot_output is None or self.seat is not None,
+        "Only a seat's history entry has a bot output.",
+    )
+    require(
+        self.bot_output is None
+        or all(
+            (entry.action is None) == (self.action is None)
+            for entry in self.bot_output.policy
+        ),
+        "A history entry withholds its bot's policy ids with its action.",
+    )
+    require(
+        self.bot_output is None or self.action is not None,
+        "A history entry withheld from the viewer carries no bot output: a"
+        " bot's output tells of its hand.",
     )
 
   @property

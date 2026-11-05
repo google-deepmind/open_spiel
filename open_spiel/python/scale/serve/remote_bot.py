@@ -15,7 +15,7 @@
 r"""An artifact as a Remote bot of OpenSpiel's game GUI (full_state mode).
 
 OpenSpiel's GUI plays a "Remote bot" seat by posting each position to a bot
-server (open_spiel/python/gui/REMOTE_BOTS.md, GUI contract 8). Its reference
+server (open_spiel/python/gui/REMOTE_BOTS.md, GUI contract 9). Its reference
 server loads any bot from a factory, so this module serves a trained
 artifact with no change to the GUI:
 
@@ -26,11 +26,12 @@ artifact with no change to the GUI:
 and a seat given the controller Remote bot, URL http://localhost:9001 and
 state `full_state` plays the artifact.
 
-The protocol (contract 8). The GUI sends the protocol version in the
-`Spiel-Protocol: 1` header (PROTOCOL_HEADER, PROTOCOL), never in the body,
-so the body is exactly the bot's input; the reference server hands the bot
-the body alone. The bot takes only `full_state` requests (POST /spiel/step),
-whose body has exactly the keys FULL_STATE_KEYS: `game` (str(game)), `state`
+The protocol (contracts 8 and 9; 9 adds the reply's bot output). The GUI
+sends the protocol version in the `Spiel-Protocol: 1` header
+(PROTOCOL_HEADER, PROTOCOL), never in the body, so the body is exactly the
+bot's input; the reference server hands the bot the body alone. The bot
+takes only `full_state` requests (POST /spiel/step), whose body has exactly
+the keys FULL_STATE_KEYS: `game` (str(game)), `state`
 (state.serialize()), `history` (action ids), `seat`, `legal_actions`,
 `seed`, `game_encoding` ({"num_distinct_actions"}) and `config` (the seat's
 JSON object). A request missing any of them is refused; other keys are
@@ -38,13 +39,14 @@ ignored. For each request the bot loads `game`, rebuilds the state with that
 game's deserializer (`game.deserialize_state(request["state"])`), checks it
 against the request (its history is `history`, the seat to move is `seat`,
 its legal actions are `legal_actions`, the game's action count is
-`game_encoding`'s) and answers `{"action": a, "notice": n}`: `a` is
-checkpoint_bot's move at that state, which replays the state's history into
-the artifact's env and lets the policy see only the seat's own view
-(checkpoint_bot), and `n` is the reply's notice (below) or None. A request
-it cannot answer (a seat view, no artifact, an artifact of another game, a
-state that disagrees with the request) is a ValueError, which the server
-answers as a refusal (HTTP 422).
+`game_encoding`'s) and answers `{"action": a, "notice": n, "policy": p,
+"value": v, "decided_by": d}`: `a` is checkpoint_bot's move at that state,
+which replays the state's history into the artifact's env and lets the
+policy see only the seat's own view (checkpoint_bot), `n` is the reply's
+notice (below) or None, and `p`, `v` and `d` are the bot output (below). A
+request it cannot answer (a seat view, no artifact, an artifact of another
+game, a state that disagrees with the request) is a ValueError, which the
+server answers as a refusal (HTTP 422).
 
 The notice. Contract 8 shows a seat's notice (`SeatView.notice`: non-blank
 text of at most NOTICE_MAX_LENGTH characters, else the seat fails) to that
@@ -60,6 +62,16 @@ played, and the replay's error, which can name another seat's action or a
 chance outcome, goes only to the bot server's log. A notice longer than
 NOTICE_MAX_LENGTH is cut to it (the whole notice is logged); a blank one
 is sent as None.
+
+The bot output (contract 9, REMOTE_BOTS.md "The bot output"), which the
+GUI keeps with the move's ply and shows to every viewer: `policy` is the decision's distribution over the seat's legal actions
+(checkpoint_bot's last_probs), most probable first, each `{"action",
+"label", "prob"}` with the game's label for the seat; `value` is the
+policy's value estimate for the seat, or None (a forced move runs no
+policy, and a value that is not finite is logged and sent as None);
+`decided_by` is the server's decider ("network", "search", "scripted",
+"forced", or "fallback" for a repaired move). Like the move, it comes from
+the seat's own view.
 
 The artifact: the request's `config.checkpoint`, else the environment
 variable CHECKPOINT_ENV, each "<dir or URL>@<step>" ("@<step>" left out: the
@@ -77,6 +89,7 @@ distinct artifact and rule is loaded once per process.
 
 from __future__ import annotations
 
+import math
 import os
 import threading
 from typing import Any, Mapping, Optional
@@ -90,7 +103,7 @@ from open_spiel.python.scale.serve import checkpoint_bot as checkpoint_bot_lib
 from open_spiel.python.scale.serve import controller as controller_lib
 
 FULL_STATE = "full_state"
-#: A full_state request's body keys (contract 8, POST /spiel/step).
+#: A full_state request's body keys (contract 8 and 9, POST /spiel/step).
 FULL_STATE_KEYS = (
     "game",
     "state",
@@ -101,7 +114,8 @@ FULL_STATE_KEYS = (
     "game_encoding",
     "config",
 )
-#: The header carrying the protocol version, and the version (contract 8).
+#: The header carrying the protocol version, and the version (contracts 8
+#: and 9).
 PROTOCOL_HEADER = "Spiel-Protocol"
 PROTOCOL = 1
 #: The environment variable naming the artifact a request's config does not.
@@ -113,6 +127,47 @@ DIVERGED_NOTICE = checkpoint_bot_lib.DIVERGED_NOTICE
 clip_notice = checkpoint_bot_lib.clip_notice
 seat_notice = checkpoint_bot_lib.seat_notice
 _HTTP_PREFIXES = ("https://", "http://")
+
+
+def bot_output(reply: Any, state: Any, seat: int) -> dict[str, Any]:
+  """The reply's bot output: `policy`, `value` and `decided_by` (module doc).
+
+  Args:
+    reply: the server's Reply for the decision.
+    state: the pyspiel state it was made at.
+    seat: the seat to move.
+
+  Returns:
+    {"policy": [{"action", "label", "prob"}, ...], "value": float or None,
+    "decided_by": str}.
+  """
+  ranked = sorted(
+      ((int(a), float(p)) for a, p in reply.probs.items()),
+      key=lambda item: (-item[1], item[0]),
+  )
+  policy = [
+      {
+          "action": a,
+          "label": str(state.action_to_string(seat, a)),
+          # float32 rounding can put a certain move a hair over 1.
+          "prob": min(1.0, max(0.0, p)),
+      }
+      for a, p in ranked
+  ]
+  value = reply.value
+  if value is not None and not math.isfinite(float(value)):
+    logging.warning(
+        "remote bot: seat %d move %d: value %r is not finite; sent as None",
+        seat,
+        len(state.history()),
+        value,
+    )
+    value = None
+  return {
+      "policy": policy,
+      "value": None if value is None else float(value),
+      "decided_by": str(reply.decider),
+  }
 
 
 def local_artifact(path: str, step: Optional[int]) -> tuple[str, int]:
@@ -300,14 +355,15 @@ class RemoteCheckpointBot:
     return game, state
 
   def step(self, mode: str, request: Mapping[str, Any]) -> dict[str, Any]:
-    """The reply to one request: {"action", "notice"} (module doc).
+    """The reply to one request: the move, its notice and bot output.
 
     Args:
       mode: "full_state" (a "seat_view" request is refused).
       request: the request's body.
 
     Returns:
-      {"action": int, "notice": str or None}.
+      {"action": int, "notice": str or None, "policy": [...], "value":
+      float or None, "decided_by": str} (module doc).
 
     Raises:
       ValueError: the request cannot be answered (module doc).
@@ -338,6 +394,7 @@ class RemoteCheckpointBot:
     return {
         "action": int(reply.action),
         "notice": seat_notice(reply, state, seat),
+        **bot_output(reply, state, seat),
     }
 
 

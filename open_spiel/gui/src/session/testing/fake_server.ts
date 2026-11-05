@@ -224,15 +224,15 @@ export class FakeServer {
         : [];
     const entries: HistoryEntry[] = history.map((action, index) => {
       const seat = index % SEATS;
-      return sees(seat)
-        ? {
-            seat,
-            action,
-            label: LABELS[action] ?? null,
-            rewards: [0, 0],
-            public_label: null,
-          }
-        : {seat, action: null, label: null, rewards: null, public_label: null};
+      const shown = sees(seat);
+      return {
+        seat,
+        action: shown ? action : null,
+        label: shown ? (LABELS[action] ?? null) : null,
+        rewards: shown ? [0, 0] : null,
+        public_label: null,
+        bot_output: null,
+      };
     });
     const seats: SeatView[] = Array.from({length: SEATS}, (_, seat) => ({
       seat,
@@ -245,7 +245,7 @@ export class FakeServer {
       notice: null,
     }));
     const body: Frame = {
-      contract_version: 8,
+      contract_version: 10,
       session: {
         id,
         game: 'count',
@@ -314,7 +314,7 @@ function json(body: unknown, status = 200): Response {
 
 function refuse(code: ErrorCode, message: string): Response {
   const body: ErrorBody = {
-    contract_version: 8,
+    contract_version: 10,
     code,
     message,
     seat: null,
@@ -324,7 +324,7 @@ function refuse(code: ErrorCode, message: string): Response {
 }
 
 const HEALTH: Health = {
-  contract_version: 8,
+  contract_version: 10,
   version: '0.0.0',
   revision: null,
   capabilities: {
@@ -342,7 +342,7 @@ const HEALTH: Health = {
 };
 
 const CATALOGUE: Catalogue = {
-  contract_version: 8,
+  contract_version: 10,
   games: [
     {
       name: 'count',
