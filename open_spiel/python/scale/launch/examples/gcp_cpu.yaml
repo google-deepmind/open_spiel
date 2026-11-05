@@ -46,7 +46,7 @@ setup:
   - for i in $(seq 1 90); do DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60
     install -yqq python3-venv && exit 0; echo "apt busy (attempt $i/90)"; sleep 10; done; exit 1
   - python3 -m venv /opt/venv
-  - /opt/venv/bin/pip install -q "jax==0.12.0.1" "jaxlib==0.12.0.1" "flax==0.12.10" "optax==0.2.8" "mctx==0.0.6"
+  - /opt/venv/bin/pip install -q "jax==0.12.0.1" "jaxlib==0.12.0.1" "flax==0.12.10" "optax==0.2.8" "mctx==0.0.71"
     "orbax-checkpoint==0.12.8" "chex==0.1.92" "distrax==0.1.9" "numpy==2.5.4"
     "scipy==1.16.3" "absl-py==2.5.1" "ml-collections==1.1.0" "etils==1.14.0"
     "ml_dtypes==0.6.0" "PyYAML==6.0.3" "gcsfs==2026.10.1"

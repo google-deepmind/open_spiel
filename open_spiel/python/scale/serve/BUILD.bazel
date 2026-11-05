@@ -39,10 +39,21 @@ py_library(
 )
 
 py_library(
+    name = "build_check",
+    srcs = ["build_check.py"],
+    strict_deps = True,
+    deps = [
+        ":games",
+        "//open_spiel/python/scale/envs:registry",
+    ],
+)
+
+py_library(
     name = "checkpoint_bot",
     srcs = ["checkpoint_bot.py"],
     strict_deps = True,
     deps = [
+        ":build_check",
         ":games",
         ":server",
         "//open_spiel/python/pybind11:pyspiel",
@@ -75,9 +86,24 @@ py_library(
     srcs = ["controller.py"],
     strict_deps = True,
     deps = [
+        ":build_check",
         ":checkpoint_bot",
         ":games",
         ":server",
+    ],
+)
+
+py_library(
+    name = "fresh_artifact",
+    testonly = True,
+    srcs = ["tests/fresh_artifact.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
     ],
 )
 
@@ -135,6 +161,7 @@ py_library(
     deps = [
         ":checkpoint_bot",
         ":controller",
+        ":games",
         "//open_spiel/python/pybind11:pyspiel",
         "//open_spiel/python/scale:plugins",
         "//open_spiel/python/scale/ckpt:artifact",
@@ -237,6 +264,7 @@ py_library(
     srcs = ["wire.py"],
     strict_deps = True,
     deps = [
+        ":games",
         ":replay",
         "//open_spiel/python/scale:registry",
         "//open_spiel/python/scale/core:sequence",
@@ -301,11 +329,7 @@ pytest_test(
 
 pytest_test(
     name = "checkpoint_bot_test",
-    timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
-    ],
     tests = ["tests/checkpoint_bot_test.py"],
     deps = [
         ":checkpoint_bot",
@@ -314,7 +338,6 @@ pytest_test(
         ":helpers",
         ":host_agent",
         ":server",
-        ":wire",
         "//open_spiel/python/pybind11:pyspiel",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
@@ -329,11 +352,7 @@ pytest_test(
 
 pytest_test(
     name = "controller_test",
-    timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
-    ],
     tests = ["tests/controller_test.py"],
     deps = [
         ":controller",
@@ -363,16 +382,42 @@ pytest_test(
 )
 
 pytest_test(
-    name = "game_string_test",
+    name = "euchre_serve_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
     tags = [
         "manual",
     ],
+    tests = ["tests/euchre_serve_test.py"],
+    deps = [
+        ":build_check",
+        ":checkpoint_bot",
+        ":checkpoint_bot_helpers",
+        ":controller",
+        ":fresh_artifact",
+        ":games",
+        ":remote_bot",
+        ":remote_bot_helpers",
+        ":replay",
+        ":server",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:registry",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "game_string_test",
+    data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/game_string_test.py"],
     deps = [
         ":checkpoint_bot",
         ":games",
+        ":server",
         "//open_spiel/python/pybind11:pyspiel",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
@@ -402,6 +447,34 @@ pytest_test(
         "//open_spiel/python/scale/envs:registry",
         "//open_spiel/python/scale/networks:catalog",
         "//open_spiel/python/scale/networks:policy",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "hearts_serve_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/hearts_serve_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":checkpoint_bot_helpers",
+        ":controller",
+        ":fresh_artifact",
+        ":games",
+        ":remote_bot",
+        ":remote_bot_helpers",
+        ":replay",
+        ":server",
+        ":wire",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:registry",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],
@@ -475,12 +548,23 @@ pytest_test(
 )
 
 pytest_test(
-    name = "remote_bot_http_test",
+    name = "lazy_registration_serve_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
     tags = [
         "manual",
     ],
+    tests = ["tests/lazy_registration_serve_test.py"],
+    deps = [
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/launch:subprocess_env",
+    ],
+)
+
+pytest_test(
+    name = "remote_bot_http_test",
+    data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/remote_bot_http_test.py"],
     deps = [
         ":checkpoint_bot",
@@ -497,11 +581,7 @@ pytest_test(
 
 pytest_test(
     name = "remote_bot_test",
-    timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
-    ],
     tests = ["tests/remote_bot_test.py"],
     deps = [
         ":checkpoint_bot",
@@ -593,12 +673,48 @@ pytest_test(
 )
 
 pytest_test(
-    name = "server_test",
+    name = "served_game_name_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/served_game_name_test.py"],
+    deps = [
+        ":checkpoint_bot",
+        ":controller",
+        ":games",
+        ":host_agent",
+        ":remote_bot",
+        ":server",
+        ":wire",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+    ],
+)
+
+pytest_test(
+    name = "server_options_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
     tags = [
         "manual",
     ],
+    tests = ["tests/server_options_test.py"],
+    deps = [
+        ":helpers",
+        ":host_agent",
+        ":server",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/ckpt:artifact",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+    ],
+)
+
+pytest_test(
+    name = "server_test",
+    data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/server_test.py"],
     deps = [
         ":helpers",

@@ -105,6 +105,23 @@ Options, each off by default:
   schedule_time_scale  the time stretch of a registered loss's magnet
                    temperature.
 
+SGD step gate (LossSpec.step_gate, a registered loss's extension point):
+a check run inside the update after each SGD step's loss and gradient and
+before its optimizer update. step_gate(loss_config) returns None (no gate
+for this config: the update is built exactly as without the hook) or
+gate(step_metrics) -> bool scalar, step_metrics being the step's metrics
+(the loss's terms, approx_kl, grad_norm and grad_norm/<module>, all
+measured at the params the step starts from). False skips that step's
+update and every remaining step of the update (later minibatches and
+epochs): params, optimizer state and value EMA stay as the last applied step
+left them, and the next update starts normally. The skip is a lax.cond on a
+bool carried through the SGD scan, so one program serves every update.
+With a gate, update() also reports sgd_steps_taken, sgd_steps_planned (the
+steps the update would take ungated), <name>_early_stopped (0/1) and
+<name>_stop_step (the steps applied before the stop; all of them when
+none), name = LossSpec.step_gate_name, and the loss metrics are means over
+the steps that computed a loss (the stopping step's included).
+
 Forward chunking. Every learner call of the policy runs on at most
 PGConfig.forward_chunk_rows rows at a time: larger calls are split into
 equal chunks (actor_critic.chunk_plan), each running the whole policy under
@@ -118,8 +135,27 @@ gradient are taken alone, every mean divided by the whole minibatch's count
 (losses.pg_stats: the normalized advantages, the advantage filter and the
 row counts come from the whole minibatch), and the chunks' gradients and
 summed metrics add up to the minibatch's, so each chunk's forward runs once.
-A registered loss (whose terms need not split over rows) keeps the
-rematerialized chunk scan, whose backward runs every chunk's forward again.
+A registered loss accumulates the same way when its LossSpec declares
+chunk_sums (its loss then takes counts=LossCounts, the whole minibatch's
+policy and value row counts, as every masked mean's denominator); one that
+does not (whose terms need not split over rows) keeps the rematerialized
+chunk scan, whose backward runs every chunk's forward again.
+
+Teacher distillation (kickstarting; off by default). PGLearner.set_teacher
+gives the learner a frozen teacher: another stateless NATIVE_JAX policy of
+the same game, action count and player count (its own spec, params and
+forward; never the learner's), with PGConfig.teacher_coef = c(t) > 0. Once
+per update, before the SGD epochs, the teacher's forward runs over the rows
+the update trains (flat plies, no gradient, at most forward_chunk_rows rows
+per call unless set_teacher names its own chunk), and its legal-masked action
+probabilities are cached beside the rows (the fixed-minibatch path: per
+minibatch, as the magnet's logits). The loss (pg_loss, so loss "ppo" / "mmd"
+only) gains c(t) * mean over the trained decision rows of KL(teacher || pi)
+(losses.kl_from_target); the magnet is untouched by it, and the teacher's
+params are in no optimizer and no PGState. update() adds teacher_kl, the
+applied teacher_coef and teacher_top1 (the share of trained rows where the
+learner's and the teacher's top legal action agree). With no teacher every
+traced program is the one without the option (bit for bit).
 
 x64. Asserted at init and update. Counters (update_step) are int64; params
 stay float32 (asserted), every loss input is float32, and the step size is
@@ -129,6 +165,9 @@ cast to the param dtype, so nothing promotes to float64.
 from __future__ import annotations
 
 import dataclasses
+import functools
+import importlib
+import itertools
 import math
 from typing import Any, Mapping, NamedTuple, Optional
 
@@ -139,6 +178,7 @@ import numpy as np
 import optax
 
 from open_spiel.python.scale.core import advantages as adv_lib
+from open_spiel.python.scale.core import hash_compat
 from open_spiel.python.scale.core import schedules
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.core import x64
@@ -150,8 +190,17 @@ from open_spiel.python.scale.policies import registry
 
 PG_LOSSES = ("ppo", "mmd")  # the built-in losses (losses.pg_loss)
 SHUFFLES = ("flat", "env_axis")
+#: PGConfig.credit values: a seat's own return, or its side's.
+CREDITS = ("seat", "side")
+#: PGConfig.teacher_coef's default: no teacher distillation.
+TEACHER_COEF_OFF = schedules.Schedule("constant", 0.0)
 # PGConfig.train_rows_buckets: compiled update programs per shape
 MAX_TRAIN_ROWS_BUCKETS = 8
+#: The value_rows forward sizes (PGLearner.value_rows_cap): 1024 x 2**i and
+#: 1536 x 2**i up to 2**26 rows, ascending.
+VALUE_ROWS_CAPS = tuple(
+    sorted({m << i for m, i in itertools.product((1024, 1536), range(17))})
+)
 F32 = jnp.float32
 I64 = jnp.int64
 tree_map = jax.tree_util.tree_map
@@ -176,11 +225,34 @@ class LossSpec:
       -> (advantages f32[B, T], targets f32[B, T]).
     loss: loss(loss_config, logits=, value=, legal=, action=,
       behavior_log_probs=, advantages=, returns=, policy_mask=, value_mask=,
-      temperature=, magnet_logits=) -> (total f32, terms dict).
+      temperature=, magnet_logits=[, step_coefs=]) -> (total f32, terms
+      dict).
     temperature: temperature(loss_config, step int64, floor_step, time_scale)
       -> f32, the magnet temperature of the counter schedules read.
     check: check(pg_config) raises on a PGConfig the loss refuses; None
       accepts every PGConfig.
+    chunk_sums: None, or the names of the loss's terms that add up over row
+      chunks of a minibatch. Declared, the loss also takes counts=LossCounts
+      (None: its own masks' counts) and divides every masked mean by them,
+      and a minibatch above forward_chunk_rows takes its gradient accumulated
+      over row chunks (module doc "Forward chunking"); every term not named
+      must be the same in every chunk (e.g. the temperature). None: the
+      rematerialized chunk scan.
+    step_coefs: None, or (loss_config, step int64, floor_step, time_scale)
+      -> dict of f32 scalars: the loss's OTHER coefficients on the same
+      counter (e.g. a guard term's weight), evaluated once per update as the
+      temperature is and handed to loss as step_coefs= (the learner passes it
+      only when this hook is declared and its value is not None); the same in
+      every minibatch and row chunk of the update.
+    step_gate: None, or (loss_config) -> None | gate(step_metrics) -> bool
+      scalar: the module doc's "SGD step gate" (None from the factory: no
+      gate for that config, the update exactly as without one).
+    step_gate_name: the prefix of the gate's metrics <name>_early_stopped and
+      <name>_stop_step (default "sgd").
+    stable_softmax: the loss takes stable_softmax=True (its softmax terms
+      through learners.stable_softmax); the learner passes it only when
+      PGConfig.pg.stable_softmax is set, and a PGConfig that sets it for a
+      loss that does not declare this is refused.
   """
 
   name: str
@@ -189,9 +261,45 @@ class LossSpec:
   loss: Any
   temperature: Any
   check: Any = None
+  chunk_sums: Optional[frozenset[str]] = None
+  step_coefs: Any = None
+  step_gate: Any = None
+  step_gate_name: str = "sgd"
+  stable_softmax: bool = False
+
+  def __post_init__(self):
+    if not (
+        isinstance(self.step_gate_name, str)
+        and self.step_gate_name.isidentifier()
+    ):
+      raise ValueError(
+          f"step_gate_name must be an identifier, got {self.step_gate_name!r}"
+      )
+    if self.chunk_sums is not None:
+      assert isinstance(self.chunk_sums, frozenset) and all(
+          isinstance(k, str) for k in self.chunk_sums
+      ), self.chunk_sums
+
+
+class LossCounts(NamedTuple):
+  """A registered loss's masked-mean denominators over a WHOLE minibatch.
+
+  LossSpec.chunk_sums, given with one chunk of its rows.
+
+  Attributes:
+    policy: f32, the policy_mask-True rows.
+    value: f32, the value_mask-True rows.
+  """
+
+  policy: jax.Array
+  value: jax.Array
 
 
 _EXTENSION_LOSSES: dict[str, LossSpec] = {}
+#: Open loss variant -> the module whose import registers it (register_loss),
+#: imported when a config names it, so a recorded config needs no import by
+#: the caller.
+LAZY_LOSSES = {"ppo_magnet": f"{__name__.rpartition('.')[0]}.ppo_magnet"}
 
 
 def register_loss(spec: LossSpec) -> LossSpec:
@@ -221,9 +329,10 @@ def losses() -> tuple[str, ...]:
   """Every loss PGConfig.loss may name: ppo, mmd and the registered variants.
 
   Returns:
-    The loss names, built-ins first.
+    The loss names, built-ins first (the LAZY_LOSSES ones whether or not
+    imported yet).
   """
-  return PG_LOSSES + tuple(sorted(_EXTENSION_LOSSES))
+  return PG_LOSSES + tuple(sorted(set(_EXTENSION_LOSSES) | set(LAZY_LOSSES)))
 
 
 def extension(loss: str) -> Optional[LossSpec]:
@@ -240,6 +349,8 @@ def extension(loss: str) -> Optional[LossSpec]:
   """
   if loss in PG_LOSSES:
     return None
+  if loss not in _EXTENSION_LOSSES and loss in LAZY_LOSSES:
+    importlib.import_module(LAZY_LOSSES[loss])
   if loss in _EXTENSION_LOSSES:
     return _EXTENSION_LOSSES[loss]
   raise _unknown_loss(loss)
@@ -329,13 +440,27 @@ class PGConfig:
     sgd_steps: with minibatch_size, the fewest SGD steps per epoch; the rows are
       dealt evenly over max(sgd_steps, ceil(rows / minibatch_size)) steps
       (module doc "Options, each off by default"). 0: full minibatches.
-    magnet_from_behavior: mmd with reference_update_every 1 only. The magnet is
-      then the params the update starts from; when the batch was played by those
-      same params (synchronous self-play, no replay of older batches), the
-      behaviour logits the rollout stored are the magnet's logits up to the
-      rollout's own rounding, so the update reads them instead of running the
-      magnet's forward. The caller vouches for that condition; nothing in the
-      batch can show it.
+    magnet_from_behavior: mmd with reference_update_every 1 only. The magnet
+      is then the params the update starts from; when the batch was played by
+      those same params (synchronous self-play, no replay of older batches),
+      the behaviour logits the rollout stored are the magnet's logits up to
+      the rollout's own rounding, so the update reads them instead of running
+      the magnet's forward. The caller vouches for that condition; nothing in
+      the batch can show it.
+    credit: "seat" (default) or "side" (CREDITS): whose return a perspective
+      seat's trajectory is credited with. "side" makes the seats of a side
+      share the side's return (core.sides: the mean over its seats) for the
+      advantages and value targets, so a team learner optimises the team, not
+      each seat; it differs from "seat" only where partners score
+      differently. The source emits it (core.arena Arena credit="side"; the
+      league's PG kind builds its Arena from this field) and marks the batch
+      (types.SIDE_CREDIT); update refuses a batch whose mark disagrees.
+    teacher_coef: the teacher-distillation coefficient c(t), a
+      schedules.Schedule over outer updates (module doc "Teacher
+      distillation"). The loss gains c(t) * KL(teacher || pi) over the
+      trained decision rows. It needs a teacher (PGLearner.set_teacher; the
+      league's kinds.PG.teacher); the default constant 0 is off and left out
+      of the config hash (core.hash_compat.added).
   """
 
   loss: str = "mmd"
@@ -376,8 +501,34 @@ class PGConfig:
   forward_chunk_rows: int = 16384
   sgd_steps: int = 0
   magnet_from_behavior: bool = False
+  # N-player credit (CREDITS): "seat" credits each seat's trajectory with its
+  # own seat return; "side" with its side's return (the mean over the side's
+  # seats, core.sides), so the learner's seats on a team optimise the team's
+  # return. The batch's source emits the side reward (core.arena Arena
+  # credit="side", which the league's PG kind builds from this field) and
+  # marks it with the label types.SIDE_CREDIT; check_batch refuses a batch
+  # whose mark disagrees. Left out of the config hash at its default
+  # (core.hash_compat.added).
+  credit: str = hash_compat.added("seat")
+  # Teacher distillation (module doc): off at its default, so left out of the
+  # config hash there (core.hash_compat.added).
+  teacher_coef: schedules.Schedule = hash_compat.added(TEACHER_COEF_OFF)
 
   def __post_init__(self):
+    if self.credit not in CREDITS:
+      raise ValueError(
+          f"PGConfig.credit must be one of {CREDITS}, got {self.credit!r}"
+      )
+    if not isinstance(self.teacher_coef, schedules.Schedule):
+      raise ValueError(
+          "PGConfig.teacher_coef is a schedules.Schedule, got "
+          f"{self.teacher_coef!r}"
+      )
+    if self.teacher_on() and self.loss not in PG_LOSSES:
+      raise ValueError(
+          "teacher_coef adds its KL to pg_loss (loss 'ppo' / 'mmd'); "
+          f"loss {self.loss!r} is a registered loss"
+      )
     ext = extension(self.loss) if self.loss in losses() else None
     assert (
         self.loss in losses()
@@ -409,6 +560,11 @@ class PGConfig:
           f"{ext.config_type.__name__}, got "
           f"{type(self.loss_config).__name__}"
       )
+      if self.pg.stable_softmax and not ext.stable_softmax:
+        raise ValueError(
+            f"loss {self.loss!r} does not declare stable_softmax "
+            "(LossSpec.stable_softmax); pg.stable_softmax cannot apply"
+        )
     assert int(self.update_epochs) >= 1 and int(self.num_minibatches) >= 1
     assert int(self.num_updates) >= 0, self.num_updates
     assert int(self.reference_update_every) >= 1, self.reference_update_every
@@ -546,6 +702,14 @@ class PGConfig:
           "(or anneal_lr=False)"
       )
 
+  def teacher_on(self) -> bool:
+    """Whether teacher_coef is anything but the off default (constant 0).
+
+    Returns:
+      True when the config distils from a teacher.
+    """
+    return self.teacher_coef != TEACHER_COEF_OFF
+
   def lr_schedule(self) -> schedules.Schedule:
     """The step size schedule.
 
@@ -593,6 +757,10 @@ _EV = "_explained_variance"
 
 class TrainRowsOverflowError(RuntimeError):
   """A batch holds more decisions than PGLearner.train_rows' static size."""
+
+
+#: Per-module update metrics (update_norm/<module>, update_ratio/<module>).
+_UPDATE_MODULE_PREFIXES = ("update_norm/", "update_ratio/")
 
 
 def _unknown_loss(loss: str) -> ValueError:
@@ -662,6 +830,22 @@ def _check_dtype(name: str, x: Any, want: Any) -> None:
   ), f"TrajectoryBatch.{name}: want {want}, got {x.dtype}"
 
 
+class Teacher(NamedTuple):
+  """A frozen distillation teacher (PGLearner.set_teacher).
+
+  Attributes:
+    policy: the teacher's policy (its own spec and forward).
+    params: its params, never trained (not in PGState).
+    chunk_rows: the most rows one teacher forward call runs on.
+    name: what the teacher is (an artifact id), for logs and checks.
+  """
+
+  policy: types.Policy
+  params: Any
+  chunk_rows: int
+  name: str
+
+
 class PGLearner:
   """The policy-gradient Learner (types.Learner) over one JAX Policy.
 
@@ -719,6 +903,7 @@ class PGLearner:
     self._lr = cfg.lr_schedule()
     self._policy = policy
     self.cfg = cfg
+    self._teacher: Optional[Teacher] = None  # set_teacher (module doc)
     parts = [
         optax.clip_by_global_norm(cfg.max_grad_norm),
         optax.scale_by_adam(eps=cfg.adam_eps),
@@ -728,7 +913,11 @@ class PGLearner:
     self._tx = optax.chain(*parts)
     self._prepare_jit = jax.jit(self._prepare)
     self._update_prepared_jit = jax.jit(self._update_prepared)
-    self._update_jit = jax.jit(self._update, static_argnames=("capacity",))
+    self._update_jit = jax.jit(
+        self._update, static_argnames=("capacity", "value_rows_cap")
+    )
+    # value_rows forward sizes (value_rows_cap) used so far (each a program)
+    self._value_rows_caps_used: set[int] = set()
     # (B, T, devices) -> (layout, static size, bucket sizes below it): pinned
     # at the first batch of a shape; the buckets each shape has trained at.
     self._train_rows: dict[
@@ -781,6 +970,90 @@ class PGLearner:
       s.params.
     """
     return s.params
+
+  @property
+  def teacher(self) -> Optional[Teacher]:
+    """The distillation teacher (set_teacher), or None."""
+    return self._teacher
+
+  def set_teacher(
+      self,
+      policy: types.Policy,
+      params: Any,
+      *,
+      name: str,
+      chunk_rows: Optional[int] = None,
+  ) -> None:
+    """Gives the learner a frozen teacher (module doc "Teacher distillation").
+
+    The teacher is its own policy: its own spec, params and forward. Its params
+    are never trained, never the magnet and not in PGState (a checkpoint does
+    not hold them; the caller rebuilds the teacher on resume).
+
+    Args:
+      policy: the teacher policy: stateless, NATIVE_JAX, the learner's game,
+        action count and player count.
+      params: its params (placed as the update's other inputs are; a data
+        parallel caller replicates them).
+      name: what the teacher is (an artifact id).
+      chunk_rows: the most rows one teacher forward runs on; None is
+        cfg.forward_chunk_rows (so no learner call of any network exceeds it).
+
+    Raises:
+      ValueError: the config has no teacher_coef, the policy does not fit the
+        learner, or a teacher is already set.
+    """
+    cfg = self.cfg
+    if not cfg.teacher_on():
+      raise ValueError(
+          "set_teacher: PGConfig.teacher_coef is the off default (constant 0)"
+      )
+    if self._teacher is not None:
+      raise ValueError(
+          f"set_teacher: the teacher is already {self._teacher.name}"
+      )
+    if cfg.shuffle != "flat":
+      raise ValueError(
+          "set_teacher: the teacher evaluates flat plies (shuffle 'flat')"
+      )
+    ts, ls = policy.spec, self._policy.spec
+    if ts.framework != "jax" or ts.capability != types.Capability.NATIVE_JAX:
+      raise ValueError(
+          f"teacher {name}: a NATIVE_JAX policy, got {ts.framework}/"
+          f"{ts.capability}"
+      )
+    if ts.stateful:
+      raise ValueError(f"teacher {name}: a stateless policy (flat plies)")
+    if (ts.game, ts.num_actions, ts.num_players) != (
+        ls.game,
+        ls.num_actions,
+        ls.num_players,
+    ):
+      raise ValueError(
+          f"teacher {name} plays {ts.game} ({ts.num_actions} actions, "
+          f"{ts.num_players} players), the learner {ls.game} "
+          f"({ls.num_actions} actions, {ls.num_players} players)"
+      )
+    chunk_rows = int(
+        cfg.forward_chunk_rows if chunk_rows is None else chunk_rows
+    )
+    if chunk_rows < 1:
+      raise ValueError(f"teacher chunk_rows must be >= 1, got {chunk_rows}")
+    for leaf in jax.tree_util.tree_leaves(params):
+      if jnp.issubdtype(leaf.dtype, jnp.floating):
+        assert (
+            leaf.dtype == F32
+        ), f"teacher params are float32, got {leaf.dtype}"
+    self._teacher = Teacher(
+        policy=policy, params=params, chunk_rows=chunk_rows, name=str(name)
+    )
+    logging.info(
+        "PGLearner: teacher %s (%s), chunk_rows %d, teacher_coef %s",
+        name,
+        ts.arch_name,
+        chunk_rows,
+        cfg.teacher_coef,
+    )
 
   def init(self, key: Any, env: Optional[types.Env] = None) -> PGState:
     """A fresh learner state from freshly initialised params.
@@ -835,13 +1108,20 @@ class PGLearner:
     grad_norm_max, grad_norm_clipped (the applied norm, min(grad_norm,
     max_grad_norm)), grad_clipped (the fraction of minibatch steps clipped),
     grad_norm/<module>, update_norm and update_ratio (the step's norm over the
-    params' before it), param_norm and param_norm/<module> (after the update),
+    params' before it) and per module update_norm/<module> and
+    update_ratio/<module>, approx_kl_max (the largest minibatch approx_kl of
+    the update, beside its mean approx_kl), param_norm and param_norm/<module>
+    (after the update),
     param_change_norm / _ratio (the whole update), episode_return_mean / _std,
     episode_return_mean/seat<p> and episode_length_mean (hands completed in the
     batch, telemetry.episode_sums; on a batch of every seat of each game the
     mean over rows, and reward_per_row, are the game's total payoff and are left
     out), value_explained_var (behaviour values vs the value targets over the
-    decisions). Loss terms that are off are left out (_not_computed). Raises
+    decisions), and the policy's game's batch metrics when the game registers
+    some (telemetry.register_batch_metrics). Loss terms that are off are left
+    out (_not_computed). With an SGD step gate (module doc) the loss metrics
+    are means over the steps that computed a loss, plus sgd_steps_taken,
+    sgd_steps_planned, <name>_early_stopped and <name>_stop_step. Raises
     FloatingPointError on a non-finite loss term or gradient norm,
     TrainRowsOverflowError when the decisions exceed train_rows.
 
@@ -859,7 +1139,25 @@ class PGLearner:
     x64.assert_x64("PGLearner.update")
     self.check_batch(batch)
     capacity = self.train_rows(batch)
-    s2, per_mb, info = self._update_jit(s, batch, key, capacity=capacity)
+    vr_cap = self.value_rows_cap(batch)
+    if self._teacher is None:
+      if self.cfg.teacher_on():
+        raise ValueError(
+            "PGConfig.teacher_coef distils from a teacher: call set_teacher "
+            "before update"
+        )
+      s2, per_mb, info = self._update_jit(
+          s, batch, key, capacity=capacity, value_rows_cap=vr_cap
+      )
+    else:
+      s2, per_mb, info = self._update_jit(
+          s,
+          batch,
+          key,
+          capacity=capacity,
+          teacher_params=self._teacher.params,
+          value_rows_cap=vr_cap,
+      )
     overlap = int(info.pop("value_row_overlap"))
     if overlap:
       raise ValueError(
@@ -979,6 +1277,48 @@ class PGLearner:
           len(sizes) + 1,
       )
     return pick
+
+  def value_rows_cap(self, batch: types.TrajectoryBatch) -> Optional[int]:
+    """The static row count of the update's value_rows forward, or None.
+
+    The behaviour values of value-only plies (PGConfig.value_rows) come from
+    one learner forward at the update's starting params. Only those plies are
+    evaluated: gathered (in time-major order, padded with copies of them) into
+    the smallest VALUE_ROWS_CAPS size that holds the batch's count, read on
+    the host here, so the program never truncates one. Each size is its own
+    compiled update (first use logged); the sizes are about 1.33x apart, so a
+    run whose value-row count is stable uses one or two. None: no value_rows,
+    or a size of at least B x T (then every ply is evaluated, as before).
+    Rows are independent, so the values equal the every-ply forward's up to
+    floating-point summation order.
+
+    Args:
+      batch: the TrajectoryBatch.
+
+    Returns:
+      The size, or None.
+    """
+    if self._value_rows_fn is None:
+      return None
+    valid = np.asarray(batch.valid)
+    vr = np.asarray(self._value_rows_jit(batch.steps.info)) & ~valid
+    k = int(vr.sum(dtype=np.int64))
+    n = int(valid.size)
+    cap = next((c for c in VALUE_ROWS_CAPS if c >= k), None)
+    if cap is None or cap >= n:
+      return None
+    if cap not in self._value_rows_caps_used:
+      self._value_rows_caps_used.add(cap)
+      logging.info(
+          "PGLearner.value_rows_cap: batch %s: %d value-only plies, forward "
+          "size %d of %d plies (size %d of this run)",
+          tuple(valid.shape),
+          k,
+          cap,
+          n,
+          len(self._value_rows_caps_used),
+      )
+    return cap
 
   def train_rows_bound(self, batch: types.TrajectoryBatch) -> int:
     """The static size of `batch`'s shape (the top bucket).
@@ -1264,7 +1604,10 @@ class PGLearner:
     Returns:
       The metric names.
     """
-    return ("lr", "ent_coef_effective", "kl_coef_effective", "train_rows")
+    held = ("lr", "ent_coef_effective", "kl_coef_effective", "train_rows")
+    if self.cfg.teacher_on():
+      held += ("teacher_coef",)
+    return held
 
   def _not_computed(self) -> tuple[str, ...]:
     """Loss metrics whose term is off in this config.
@@ -1314,6 +1657,55 @@ class PGLearner:
     ext = extension(self.cfg.loss)
     assert ext is not None, f"loss {self.cfg.loss!r} has no magnet temperature"
     return self._temperature(ext, self._sched_step(u))
+
+  def step_coefs_at(self, update_step: Any) -> Optional[dict[str, Any]]:
+    """A registered loss's LossSpec.step_coefs at update `update_step`.
+
+    As the update hands them to its loss.
+
+    Args:
+      update_step: the update step (int64).
+
+    Returns:
+      The coefficients, or None when the loss declares none.
+    """
+    u = jnp.asarray(update_step)
+    assert u.dtype == I64, f"update_step is int64, got {u.dtype}"
+    ext = extension(self.cfg.loss)
+    assert ext is not None, f"loss {self.cfg.loss!r} is not a registered loss"
+    return self._step_coefs(ext, self._sched_step(u))
+
+  def _step_coefs(self, ext: LossSpec, step: Any) -> Optional[dict[str, Any]]:
+    """The registered loss's step coefficients at `step`, or None.
+
+    Args:
+      ext: The loss spec.
+      step: The schedule step.
+
+    Returns:
+      {name: coefficient}, or None when the loss has none.
+    """
+    if ext.step_coefs is None:
+      return None
+    return ext.step_coefs(
+        self._loss_config(ext),
+        step,
+        self.cfg.temperature_floor_step,
+        self.cfg.schedule_time_scale,
+    )
+
+  def _step_gate(self):
+    """The SGD step gate of this config (module doc), or None.
+
+    Returns:
+      gate(step_metrics) -> bool, or None.
+    """
+    ext = extension(self.cfg.loss)
+    if ext is None or ext.step_gate is None:
+      return None
+    gate = ext.step_gate(self._loss_config(ext))
+    assert gate is None or callable(gate), f"step_gate gave {gate!r}"
+    return gate
 
   def _loss_config(self, ext: LossSpec) -> Any:
     """The loss's config: the configured one, else its default.
@@ -1368,6 +1760,15 @@ class PGLearner:
       ValueError: the first failed check.
     """
     assert isinstance(batch, types.TrajectoryBatch), type(batch)
+    side_marked = types.SIDE_CREDIT in batch.labels
+    if side_marked != (self.cfg.credit == "side"):
+      raise ValueError(
+          f"PGConfig.credit={self.cfg.credit!r}, but the batch's reward is "
+          f"the {'side' if side_marked else 'seat'}'s (label "
+          f"{types.SIDE_CREDIT!r} {'present' if side_marked else 'absent'}); "
+          "the source must emit the credit the learner is configured for "
+          "(core.arena Arena credit)"
+      )
     b, t = batch.valid.shape
     for name, want in (
         ("reward", F32),
@@ -1460,6 +1861,8 @@ class PGLearner:
       raise NotImplementedError(
           "minibatch_size compacts to train_rows: use update()"
       )
+    if self.cfg.teacher_on():
+      raise NotImplementedError("teacher distillation: use update()")
     self.check_batch(batch)
     for x in prep:
       assert x.dtype == F32 and x.shape == batch.valid.shape, (x.dtype, x.shape)
@@ -1553,7 +1956,7 @@ class PGLearner:
     )[..., 0]
     return out.logits, value, out.aux.get("value_logits")
 
-  def _chunked(self, fn, *trees):
+  def _chunked(self, fn, *trees, chunk: Optional[int] = None):
     """fn(*trees) over the trees' shared row axis, in row chunks.
 
     fn(*trees) over the trees' shared leading row axis, at most
@@ -1566,6 +1969,8 @@ class PGLearner:
     Args:
       fn: the function of the row-batched trees.
       *trees: pytrees sharing a leading row axis.
+      chunk: the most rows per call; None is cfg.forward_chunk_rows (the
+        teacher's forward passes its own).
 
     Returns:
       fn(*trees), rows in their input order.
@@ -1576,7 +1981,7 @@ class PGLearner:
           f"_chunked: the trees disagree on their row count {sorted(n)}"
       )
     n = n.pop()
-    chunk = int(self.cfg.forward_chunk_rows)
+    chunk = int(self.cfg.forward_chunk_rows if chunk is None else chunk)
     if n <= chunk:
       return fn(*trees)
     num, c = actor_critic.chunk_plan(n, chunk)
@@ -1664,31 +2069,61 @@ class PGLearner:
     seat = jnp.asarray(bs.seat).astype(jnp.int32)
     return jnp.take_along_axis(value, seat[:, None], axis=-1)[:, 0].astype(F32)
 
-  def _value_row_values(self, params, batch) -> jax.Array:
-    """f32[B, T]: the network's own seat value at every ply.
+  def _value_row_values(
+      self, params, batch, vr=None, cap: Optional[int] = None
+  ) -> jax.Array:
+    """f32[B, T]: the network's own seat value at the value_rows plies.
 
-    f32[B, T]: the network's own seat value at every ply (a flat forward,
-    chunked like every learner forward). Read at value_rows plies only; a NaN
-    elsewhere is never selected.
+    cap None: a flat forward over every ply (chunked like every learner
+    forward). cap C: only the plies of `vr` (value_rows_cap: C holds them
+    all), gathered time-major into C rows padded with copies of them, are
+    evaluated and scattered back; every other ply is 0. Read at value_rows
+    plies only; a NaN elsewhere is never selected.
 
     Args:
       params: the network params.
       batch: the TrajectoryBatch.
+      vr: bool[B, T], the value-only plies (cap given).
+      cap: the static forward size (value_rows_cap), or None.
 
     Returns:
       The seat values, f32[B, T].
     """
     b, t = batch.valid.shape
-    flat = tree_map(lambda x: x.reshape((b * t,) + x.shape[2:]), batch.steps)
-    _, value, _ = self.forward(params, None, flat)
-    return jax.lax.stop_gradient(value.reshape(b, t)).astype(F32)
+    n = b * t
+    flat = tree_map(lambda x: x.reshape((n,) + x.shape[2:]), batch.steps)
+    if cap is None:
+      _, value, _ = self.forward(params, None, flat)
+      return jax.lax.stop_gradient(value.reshape(b, t)).astype(F32)
+    assert vr is not None and 0 < cap < n, (cap, n)
+    tm = self._time_major(vr)  # [T * B]: ply p = (p % B, p // B)
+    order = jnp.argsort(jnp.logical_not(tm), stable=True)[:cap]
+    k = jnp.sum(tm, dtype=jnp.int32)
+    pos = jnp.arange(cap, dtype=jnp.int32)
+    real = pos < k
+    src = jnp.take(order, jnp.where(real, pos, pos % jnp.maximum(k, 1)))
+    rows = (src % b) * t + src // b  # row-major index into flat
+    steps = dp_lib.constrain_rows(
+        tree_map(lambda x: jnp.take(x, rows, axis=0), flat)
+    )
+    _, value, _ = self.forward(params, None, steps)
+    out = (
+        jnp.zeros((n,), F32)
+        .at[jnp.where(real, rows, n)]
+        .set(value.astype(F32), mode="drop")
+    )
+    return jax.lax.stop_gradient(out.reshape(b, t))
 
-  def _prepare(self, s: PGState, batch) -> tuple[Prepared, RowMasks]:
+  def _prepare(
+      self, s: PGState, batch, value_rows_cap: Optional[int] = None
+  ) -> tuple[Prepared, RowMasks]:
     """Step 1: the per-ply targets and the masks of the plies the update trains.
 
     Args:
       s: the learner state.
       batch: the TrajectoryBatch.
+      value_rows_cap: the value_rows forward size (value_rows_cap), or None
+        (every ply).
 
     Returns:
       (Prepared, RowMasks).
@@ -1712,7 +2147,11 @@ class PGLearner:
       v = jnp.where(
           valid,
           v,
-          jnp.where(vr, self._value_row_values(s.params, batch), F32(0.0)),
+          jnp.where(
+              vr,
+              self._value_row_values(s.params, batch, vr, value_rows_cap),
+              F32(0.0),
+          ),
       )
       node = valid | vr
     # A bootstrap value no row reads may be non-finite (ply T outside the
@@ -1946,6 +2385,54 @@ class PGLearner:
     logits, _, _ = self.forward(magnet, None, flat)
     return jax.lax.stop_gradient(logits.reshape((b, t) + logits.shape[1:]))
 
+  def _teacher_probs(self, teacher_params, rows):
+    """f32 legal-masked teacher probabilities of every row, [C, A] or [B, T, A].
+
+    The teacher is fixed, so its forward runs once per update over the rows
+    (module doc "Teacher distillation"): flat plies (stateless), chunked at the
+    Teacher's chunk_rows under no gradient. Illegal actions get 0.
+
+    Args:
+      teacher_params: the teacher's params.
+      rows: the rows, flat [C, ...] or [B, T, ...].
+
+    Returns:
+      The probabilities, f32 [C, A] or [B, T, A].
+    """
+    t = self._teacher
+    assert t is not None, "no teacher"
+    pol = t.policy
+    params = jax.lax.stop_gradient(teacher_params)
+    steps = rows["steps"]
+    lead = rows["valid"].shape
+    n = int(np.prod(lead))
+    flat = tree_map(lambda x: x.reshape((n,) + x.shape[len(lead) :]), steps)
+
+    def _run(st):
+      """The teacher's logits of a chunk of plies.
+
+      Args:
+        st: The plies' SeatSteps.
+
+      Returns:
+        f32 logits.
+      """
+      s_ = jnp.asarray(st.seat)
+      return pol.evaluate(
+          params, pol.init_carry(params, s_.shape[0], s_, None), st, None
+      ).logits
+
+    logits = self._chunked(_run, flat, chunk=t.chunk_rows)
+    assert logits.dtype == F32, logits.dtype
+    legal = flat.legal_mask
+    probs = jnp.exp(
+        loss_lib.masked_log_softmax(
+            logits, legal, stable=self.cfg.pg.stable_softmax
+        )
+    )
+    probs = jnp.where(legal, probs, F32(0.0)).astype(F32)
+    return jax.lax.stop_gradient(probs.reshape(lead + probs.shape[1:]))
+
   def _minibatches(self, key, rows, init_carry):
     """Leaves with a leading [num_minibatches] axis.
 
@@ -2028,12 +2515,15 @@ class PGLearner:
       temperature,
       is_first,
       stats: Optional[loss_lib.PGStats] = None,
+      counts: Optional[dict[str, Any]] = None,
+      step_coefs: Optional[dict[str, Any]] = None,
+      teacher_coef: Optional[jax.Array] = None,
   ):
     """(total, metrics) of a minibatch, or of one chunk of its rows.
 
-    (total, metrics) of a minibatch, or with `stats` (pg_loss only) of
-    one chunk of its rows, every mean over the minibatch's rows
-    (_accumulated_grad).
+    With `stats` (pg_loss) / `counts` (a registered loss with chunk_sums: the
+    minibatch's row counts) of one chunk of its rows, every mean over the
+    minibatch's rows (_accumulated_grad).
 
     Args:
       params: the network params.
@@ -2048,6 +2538,12 @@ class PGLearner:
       is_first: bool, the run's first update.
       stats: the minibatch's losses.PGStats (pg_loss only, one chunk of the
         rows), or None.
+      counts: the minibatch's row counts {policy, value, noop} (a registered
+        loss with chunk_sums, one chunk of the rows), or None.
+      step_coefs: the registered loss's step coefficients (LossSpec
+        step_coefs), or None.
+      teacher_coef: c(t) of the teacher KL (module doc "Teacher
+        distillation"; mb then holds "teacher_probs"), or None (no teacher).
 
     Returns:
       (total, metrics).
@@ -2058,14 +2554,15 @@ class PGLearner:
     valid = mb["valid"]
     action = mb["action"]
     logits, value, value_logits = self.forward(params, carry, steps)
-    logp = loss_lib.action_log_prob(logits, legal, action)
+    stable = cfg.pg.stable_softmax
+    logp = loss_lib.action_log_prob(logits, legal, action, stable=stable)
     log_ratio = logp - mb["behavior_logp"]
     kl_rows = jnp.exp(log_ratio) - 1.0 - log_ratio
-    if stats is None:
-      approx_kl = loss_lib.masked_mean(kl_rows, valid)
+    if stats is not None:
+      approx_kl = loss_lib.masked_mean(kl_rows, valid, stats.mask_count)
     else:
-      approx_kl = jnp.where(valid, kl_rows, F32(0.0)).sum() / jnp.maximum(
-          stats.mask_count, F32(1.0)
+      approx_kl = loss_lib.masked_mean(
+          kl_rows, valid, None if counts is None else counts["policy"]
       )
     magnet_logits = None
     # the magnet's logits, once per update (_magnet_logits, or behaviour)
@@ -2073,10 +2570,25 @@ class PGLearner:
       magnet_logits = jax.lax.stop_gradient(mb["magnet_logits"])
     ext = extension(cfg.loss)
     if stats is not None:
-      assert (
-          ext is None
-      ), f"loss {cfg.loss!r}: a registered loss is not cut into row chunks"
+      assert ext is None, f"loss {cfg.loss!r}: PGStats are pg_loss's"
+    if counts is not None:
+      assert ext is not None and ext.chunk_sums is not None, (
+          f"loss {cfg.loss!r} declares no chunk_sums: it is not cut into row "
+          "chunks"
+      )
     if ext is not None:
+      kw = {}
+      if counts is not None:
+        kw["counts"] = LossCounts(
+            policy=counts["policy"], value=counts["value"]
+        )
+      if step_coefs is not None:
+        assert (
+            ext.step_coefs is not None
+        ), f"loss {cfg.loss!r} declares no step_coefs"
+        kw["step_coefs"] = step_coefs
+      if stable:
+        kw["stable_softmax"] = True
       total, m = ext.loss(
           self._loss_config(ext),
           logits=logits,
@@ -2084,7 +2596,7 @@ class PGLearner:
           legal=legal,
           action=action,
           behavior_log_probs=loss_lib.masked_log_softmax(
-              mb["behavior_logits"], legal
+              mb["behavior_logits"], legal, stable=stable
           ),
           advantages=mb["advantages"],
           returns=targets,
@@ -2092,14 +2604,18 @@ class PGLearner:
           value_mask=mb["value_mask"],
           temperature=temperature,
           magnet_logits=magnet_logits,
+          **kw,
       )
       m = dict(m, loss_total=total)
       # the value loss on decision / value-only plies
       if self._value_rows_fn is not None:
         sq = jax.lax.stop_gradient(loss_lib.value_squared_error(value, targets))
-        m["value_loss_decision"] = loss_lib.masked_mean(sq, valid)
+        noop = mb["value_mask"] & ~valid
+        m["value_loss_decision"] = loss_lib.masked_mean(
+            sq, valid, None if counts is None else counts["policy"]
+        )
         m["value_loss_noop"] = loss_lib.masked_mean(
-            sq, mb["value_mask"] & ~valid
+            sq, noop, None if counts is None else counts["noop"]
         )
     else:
       total, m = loss_lib.pg_loss(
@@ -2124,13 +2640,34 @@ class PGLearner:
       m = dict(m)
       if cfg.loss == "ppo":
         del m["kl_penalty"], m["kl_coef_effective"]  # no magnet: not computed
+    if teacher_coef is not None:  # teacher distillation (module doc)
+      assert ext is None, f"loss {cfg.loss!r}: the teacher KL is pg_loss's"
+      tp = jax.lax.stop_gradient(mb["teacher_probs"])
+      count = None if stats is None else stats.mask_count
+      t_kl = loss_lib.masked_mean(
+          loss_lib.kl_from_target(tp, logits, legal, stable=stable),
+          valid,
+          count,
+      )
+      total = total + teacher_coef * t_kl
+      mine = jnp.argmax(
+          jnp.where(legal, jax.lax.stop_gradient(logits), -jnp.inf), axis=-1
+      )
+      agree = (mine == loss_lib.target_argmax(tp, legal)).astype(F32)
+      m["loss_total"] = total
+      m["teacher_kl"] = loss_lib.f32(jax.lax.stop_gradient(t_kl))
+      m["teacher_top1"] = loss_lib.f32(
+          loss_lib.masked_mean(agree, valid, count)
+      )
+      m["teacher_coef"] = loss_lib.f32(teacher_coef)
     m["approx_kl"] = loss_lib.f32(jax.lax.stop_gradient(approx_kl))
     return total, m
 
   def accumulates(self, rows: int) -> bool:
     """Whether a minibatch's gradient is accumulated over row chunks.
 
-    Module doc "Forward chunking": ppo / mmd above forward_chunk_rows.
+    Module doc "Forward chunking": ppo / mmd, or a registered loss that
+    declares chunk_sums, above forward_chunk_rows.
 
     Args:
       rows: the minibatch's row count.
@@ -2138,9 +2675,30 @@ class PGLearner:
     Returns:
       True to accumulate.
     """
-    return extension(self.cfg.loss) is None and int(rows) > int(
+    ext = extension(self.cfg.loss)
+    return (ext is None or ext.chunk_sums is not None) and int(rows) > int(
         self.cfg.forward_chunk_rows
     )
+
+  def _chunk_metrics(self) -> frozenset[Any]:
+    """The metrics of _loss that add up over a minibatch's row chunks.
+
+    The others are the minibatch's in every chunk.
+
+    Returns:
+      The metric names.
+    """
+    ext = extension(self.cfg.loss)
+    if ext is None:
+      out = loss_lib.PG_CHUNK_SUMS | {"approx_kl"}
+      if self._teacher is not None:
+        out |= {"teacher_kl", "teacher_top1"}
+      return out
+    assert ext.chunk_sums is not None, self.cfg.loss
+    out = ext.chunk_sums | {"loss_total", "approx_kl"}
+    if self._value_rows_fn is not None:
+      out |= {"value_loss_decision", "value_loss_noop"}
+    return out
 
   def loss_and_grad(
       self,
@@ -2155,6 +2713,8 @@ class PGLearner:
       temperature,
       is_first,
       accumulate: Optional[bool] = None,
+      step_coefs: Optional[dict[str, Any]] = None,
+      teacher_coef: Optional[jax.Array] = None,
   ):
     """(metrics, grads) of one minibatch's loss.
 
@@ -2172,6 +2732,10 @@ class PGLearner:
       accumulate: None: as accumulates() says; False: one value_and_grad over
         the minibatch (its forward the rematerialized chunk scan); True:
         _accumulated_grad.
+      step_coefs: a registered loss's LossSpec.step_coefs of this update
+        (step_coefs_at), or None.
+      teacher_coef: c(t) of the teacher KL (mb holds "teacher_probs"), or
+        None.
 
     Returns:
       (metrics, grads).
@@ -2191,10 +2755,14 @@ class PGLearner:
         temperature,
         is_first,
     )
+    kw = {} if teacher_coef is None else {"teacher_coef": teacher_coef}
     if not accumulate:
-      (_, m), grads = jax.value_and_grad(self._loss, has_aux=True)(*args)
+      (_, m), grads = jax.value_and_grad(
+          functools.partial(self._loss, step_coefs=step_coefs, **kw),
+          has_aux=True,
+      )(*args)
       return m, grads
-    return self._accumulated_grad(*args)
+    return self._accumulated_grad(*args, step_coefs=step_coefs, **kw)
 
   def _accumulated_grad(
       self,
@@ -2208,14 +2776,17 @@ class PGLearner:
       ent_coef,
       temperature,
       is_first,
+      step_coefs: Optional[dict[str, Any]] = None,
+      teacher_coef: Optional[jax.Array] = None,
   ):
     """(metrics, grads) of a minibatch, summed over row chunks.
 
     (metrics, grads) of a minibatch as the sum over chunks of at most
     forward_chunk_rows rows (strided as _chunked cuts them; pad rows repeat
     row 0 with every mask off) of each chunk's loss under the minibatch's
-    pg_stats. Metrics in losses.PG_CHUNK_SUMS (and approx_kl) are summed over
-    the chunks; the others are the minibatch's in every chunk.
+    pg_stats (pg_loss) or row counts (a registered loss: LossCounts).
+    Metrics in _chunk_metrics are summed over the chunks; the others are the
+    minibatch's in every chunk.
 
     Args:
       params: the network params.
@@ -2228,15 +2799,37 @@ class PGLearner:
       ent_coef: the entropy coefficient.
       temperature: a registered loss's magnet temperature.
       is_first: bool, the run's first update.
+      step_coefs: the registered loss's step coefficients (LossSpec
+        step_coefs), or None.
+      teacher_coef: c(t) of the teacher KL (mb holds "teacher_probs"), or
+        None.
 
     Returns:
       (metrics, grads).
     """
     cfg = self.cfg
-    assert extension(cfg.loss) is None, cfg.loss
+    ext = extension(cfg.loss)
+    assert ext is None or ext.chunk_sums is not None, cfg.loss
     valid = mb["valid"]
     n = int(valid.shape[0])
-    stats = loss_lib.pg_stats(cfg.pg, valid, mb["advantages"])
+    stats = counts = None
+    if ext is None:
+      stats = loss_lib.pg_stats(cfg.pg, valid, mb["advantages"])
+    else:  # the whole minibatch's denominators (every mask as _loss reads it)
+      vm = mb["value_mask"]
+
+      def cnt(m):
+        """The rows of mask `m`.
+
+        Args:
+          m: A bool mask.
+
+        Returns:
+          f32, its count.
+        """
+        return jnp.sum(m, dtype=F32)
+
+      counts = dict(policy=cnt(valid), value=cnt(vm), noop=cnt(vm & ~valid))
     num, c = actor_critic.chunk_plan(n, int(cfg.forward_chunk_rows))
     assert c <= cfg.forward_chunk_rows and num * c >= n, (
         n,
@@ -2261,13 +2854,9 @@ class PGLearner:
         x = jnp.concatenate([x, jnp.broadcast_to(x[:1], (pad,) + x.shape[1:])])
       return jnp.swapaxes(x.reshape((c, num) + x.shape[1:]), 0, 1)
 
-    rows = dict(
-        mb=mb,
-        targets=targets,
-        value_old=value_old,
-        adv=stats.adv,
-        actor_rows=stats.actor_rows,
-    )
+    rows = dict(mb=mb, targets=targets, value_old=value_old)
+    if stats is not None:
+      rows.update(adv=stats.adv, actor_rows=stats.actor_rows)
     if not flat:
       rows["carry"] = carry
     chunks = tree_map(_split, rows)
@@ -2288,9 +2877,16 @@ class PGLearner:
       """
       real = ch["real"].reshape(ch["real"].shape + (1,) * (valid.ndim - 1))
       mb_c = dict(ch["mb"], valid=ch["mb"]["valid"] & real)
-      st = stats._replace(adv=ch["adv"], actor_rows=ch["actor_rows"] & real)
+      if "value_mask" in mb_c:
+        mb_c["value_mask"] = mb_c["value_mask"] & real
+      st = None
+      if stats is not None:
+        st = stats._replace(adv=ch["adv"], actor_rows=ch["actor_rows"] & real)
       carry_c = ch["carry"] if not flat else carry
-      (_, m), g = jax.value_and_grad(self._loss, has_aux=True)(
+      kw = {} if teacher_coef is None else {"teacher_coef": teacher_coef}
+      (_, m), g = jax.value_and_grad(
+          functools.partial(self._loss, **kw), has_aux=True
+      )(
           params,
           magnet,
           mb_c,
@@ -2302,12 +2898,14 @@ class PGLearner:
           temperature,
           is_first,
           st,
+          counts,
+          step_coefs,
       )
       return tree_map(jnp.add, acc, g), m
 
     zeros = tree_map(jnp.zeros_like, params)
     grads, per = jax.lax.scan(_body, zeros, chunks)
-    summed = loss_lib.PG_CHUNK_SUMS | {"approx_kl"}
+    summed = self._chunk_metrics()
     m = {k: jnp.sum(v, axis=0) if k in summed else v[0] for k, v in per.items()}
     return m, grads
 
@@ -2319,6 +2917,7 @@ class PGLearner:
       key,
       capacity=None,
       masks: Optional[RowMasks] = None,
+      teacher_params=None,
   ):
     """Steps 2-3 on given targets: the epochs of minibatch steps.
 
@@ -2329,11 +2928,18 @@ class PGLearner:
       key: the PRNG key of the shuffle.
       capacity: the rows to compact to (train_rows), or None.
       masks: the RowMasks; None trains every valid ply.
+      teacher_params: the teacher's params (set_teacher), else None.
 
     Returns:
       (the new PGState, per-minibatch metrics f32[E, M]).
     """
     cfg = self.cfg
+    if (self._teacher is None) != (teacher_params is None):
+      raise ValueError(
+          "teacher_params go with set_teacher: teacher "
+          f"{'unset' if self._teacher is None else self._teacher.name}, "
+          f"params {'missing' if teacher_params is None else 'given'}"
+      )
     u = s.update_step
     assert u.dtype == I64, u.dtype
     # The f64 schedule value rounded to the f32 params' dtype once:
@@ -2349,6 +2955,8 @@ class PGLearner:
     temperature = (
         F32(0.0) if ext is None else self._temperature(ext, us)
     )  # pg_loss: none
+    step_coefs = None if ext is None else self._step_coefs(ext, us)
+    teacher_coef = None if teacher_params is None else cfg.teacher_coef.f32(us)
     is_first = u == 0
     rows = self._rows(batch, prep, masks)
     fixed = bool(cfg.minibatch_size)
@@ -2366,18 +2974,26 @@ class PGLearner:
       rows["magnet_logits"] = self._magnet_logits(
           magnet, rows, batch.init_carry
       )
+    if teacher_params is not None and not fixed:  # once per update
+      rows["teacher_probs"] = self._teacher_probs(teacher_params, rows)
+
+    # SGD step gate (module doc): the carry gains a bool `stopped`; no gate
+    # (None), the carry and every step are exactly as without the hook.
+    gate = self._step_gate()
+    gated = gate is not None
 
     def _sgd_step(c, xs):
       """One optimizer step on a minibatch.
 
       Args:
-        c: (params, opt_state, ema, rng).
+        c: (params, opt_state, ema, rng), plus the gate's stop flag when
+          gated.
         xs: (minibatch, carry).
 
       Returns:
         (the new carry tuple, the step's metrics).
       """
-      params, opt_state, ema, rng = c
+      params, opt_state, ema, rng = c[:4]
       mb, carry = xs
       targets, value_old = mb["targets"], mb["value_old"]
       if cfg.value_ema:
@@ -2402,6 +3018,8 @@ class PGLearner:
           ent,
           temperature,
           is_first,
+          step_coefs=step_coefs,
+          teacher_coef=teacher_coef,
       )
       m["grad_norm"] = optax.tree.norm(grads).astype(F32)
       # Telemetry (reads grads / params / the step, changes none of them):
@@ -2413,17 +3031,66 @@ class PGLearner:
       for mod, sub in telemetry.module_groups(grads).items():
         m[f"grad_norm/{mod}"] = telemetry.tree_norm(sub)
       param_norm = telemetry.tree_norm(params)
+      param_mods = telemetry.module_groups(params)
       upd, opt_state = self._tx.update(grads, opt_state, params)
       upd = tree_map(lambda g: _check_f32_leaf(g) * neg_lr, upd)
       m["update_norm"] = telemetry.tree_norm(upd)
       m["update_ratio"] = m["update_norm"] / jnp.maximum(param_norm, F32(1e-12))
+      # Per module: the step's norm and its ratio to the module's params
+      # before it (a dead module, or a head outpacing the torso).
+      for mod, sub in telemetry.module_groups(upd).items():
+        un = telemetry.tree_norm(sub)
+        m[f"update_norm/{mod}"] = un
+        m[f"update_ratio/{mod}"] = un / jnp.maximum(
+            telemetry.tree_norm(param_mods[mod]), F32(1e-12)
+        )
       params = optax.apply_updates(params, upd)
       if fixed:
         m["sgd_step"] = F32(1.0)
         m["minibatch_rows"] = jnp.sum(
             self._trained(mb), dtype=jnp.int32
         ).astype(F32)
-      return (params, opt_state, ema, rng), m
+      if not gated:
+        return (params, opt_state, ema, rng), m
+      # The gate reads the step's metrics, measured at the params it starts
+      # from (before the telemetry of the update itself): False, this step's
+      # update is not applied (params, optimizer state and value EMA as the
+      # carry held them) and the flag skips every later step of the update
+      # (mb_step). Its loss metrics are kept (a measurement at those
+      # params); its update norms are the applied 0.
+      ok = jnp.asarray(
+          gate({
+              k: v
+              for k, v in m.items()
+              if k
+              not in (
+                  "update_norm",
+                  "update_ratio",
+                  "sgd_step",
+                  "minibatch_rows",
+              )
+              and not k.startswith(_UPDATE_MODULE_PREFIXES)
+          })
+      )
+      assert (
+          not ok.shape and ok.dtype == jnp.bool_
+      ), f"step_gate must return a bool scalar, got {ok.dtype}{list(ok.shape)}"
+      over = jnp.logical_not(ok)
+      params, opt_state, ema = tree_map(
+          lambda new, old: jnp.where(over, old, new),
+          (params, opt_state, ema),
+          tuple(c[:3]),
+      )
+      for k in list(m):
+        if k in ("update_norm", "update_ratio") or k.startswith(
+            _UPDATE_MODULE_PREFIXES
+        ):
+          m[k] = jnp.where(over, F32(0.0), m[k])
+      m["sgd_step"] = F32(
+          1.0
+      )  # a loss was computed (summary means run over these)
+      m["gate_stop"] = over.astype(F32)
+      return (params, opt_state, ema, rng, over), m
 
     def _fixed_step(c, plan):
       """One step on a fixed plan's minibatch.
@@ -2439,6 +3106,8 @@ class PGLearner:
       mb = self._gather_rows(rows, idx, real)
       if magnet is not None and not from_behavior:  # fixed within the update
         mb["magnet_logits"] = self._magnet_logits(magnet, mb, None)
+      if teacher_params is not None:  # fixed within the update
+        mb["teacher_probs"] = self._teacher_probs(teacher_params, mb)
       return _sgd_step(c, (mb, jnp.zeros((), F32)))
 
     def _mb_step(c, xs):
@@ -2452,7 +3121,15 @@ class PGLearner:
         (carry, metrics).
       """
       if not fixed:
-        return _sgd_step(c, xs)
+        if not gated:
+          return _sgd_step(c, xs)
+        # stopped: the step is skipped whole (no forward, no update)
+        skip_m = tree_map(
+            lambda a: jnp.zeros(a.shape, a.dtype),
+            jax.eval_shape(_sgd_step, c, xs)[1],
+        )
+        c, m = jax.lax.cond(c[4], lambda c, _: (c, skip_m), _sgd_step, c, xs)
+        return c, dict(m, sgd_planned=F32(1.0))
       # A minibatch with no trained ply (padding only) takes no optimizer
       # step: Adam's moments would otherwise still move the params. Every
       # slot points at a trained ply, so `real` alone says it.
@@ -2460,43 +3137,48 @@ class PGLearner:
           lambda a: jnp.zeros(a.shape, a.dtype),
           jax.eval_shape(_fixed_step, c, xs)[1],
       )
-      return jax.lax.cond(
-          jnp.any(xs[1]), _fixed_step, lambda c, _: (c, skip_m), c, xs
+      if not gated:
+        return jax.lax.cond(
+            jnp.any(xs[1]), _fixed_step, lambda c, _: (c, skip_m), c, xs
+        )
+      real = jnp.any(xs[1])
+      c, m = jax.lax.cond(
+          real & jnp.logical_not(c[4]),
+          _fixed_step,
+          lambda c, _: (c, skip_m),
+          c,
+          xs,
       )
+      return c, dict(m, sgd_planned=real.astype(F32))
 
     def _epoch(c, xs):
       """One epoch of minibatch steps.
 
       Args:
-        c: (params, opt_state, ema, rng).
+        c: (params, opt_state, ema, rng), plus the gate's stop flag when
+          gated.
         xs: The scan's xs, None (unused).
 
       Returns:
         (carry, per-step metrics).
       """
       del xs
-      params, opt_state, ema, rng = c
+      params, opt_state, ema, rng = c[:4]
       rng, k = jax.random.split(rng)
+      c = (params, opt_state, ema, rng) + tuple(c[4:])  # + the gate's stop flag
       if fixed:
-        return jax.lax.scan(
-            _mb_step,
-            (params, opt_state, ema, rng),
-            self._fixed_plan(k, rows, capacity),
-        )
+        return jax.lax.scan(_mb_step, c, self._fixed_plan(k, rows, capacity))
       mbs, carries = self._minibatches(k, rows, batch.init_carry)
       if carries is None:  # flat rows evaluate without a carry
         carries = jnp.zeros((jax.tree_util.tree_leaves(mbs)[0].shape[0],), F32)
-      c, m = jax.lax.scan(
-          _mb_step, (params, opt_state, ema, rng), (mbs, carries)
-      )
+      c, m = jax.lax.scan(_mb_step, c, (mbs, carries))
       return c, m
 
-    (params, opt_state, ema, _), per_mb = jax.lax.scan(
-        _epoch,
-        (s.params, s.opt_state, s.value_ema, key),
-        None,
-        length=cfg.update_epochs,
-    )
+    init = (s.params, s.opt_state, s.value_ema, key)
+    if gated:
+      init += (jnp.asarray(False),)
+    out_c, per_mb = jax.lax.scan(_epoch, init, None, length=cfg.update_epochs)
+    params, opt_state, ema = out_c[:3]
     step_after = u + jnp.int64(1)
     sched_after = self._sched_step(
         step_after
@@ -2521,7 +3203,15 @@ class PGLearner:
     )
     return s2, per_mb
 
-  def _update(self, s: PGState, batch, key, capacity=None):
+  def _update(
+      self,
+      s: PGState,
+      batch,
+      key,
+      capacity=None,
+      teacher_params=None,
+      value_rows_cap=None,
+  ):
     """The full update: prepare, then update_prepared, plus the update's info.
 
     Args:
@@ -2529,12 +3219,19 @@ class PGLearner:
       batch: the TrajectoryBatch.
       key: the PRNG key of the shuffle.
       capacity: the rows to compact to (train_rows), or None.
+      teacher_params: the teacher's params (set_teacher), else None.
+      value_rows_cap: the value_rows forward size (value_rows_cap), or None.
 
     Returns:
       (the new PGState, per-minibatch metrics, the update's info dict).
     """
-    prep, masks = self._prepare(s, batch)
-    s2, per_mb = self._update_prepared(s, batch, prep, key, capacity, masks)
+    prep, masks = self._prepare(s, batch, value_rows_cap)
+    if teacher_params is None:  # the program without the option, unchanged
+      s2, per_mb = self._update_prepared(s, batch, prep, key, capacity, masks)
+    else:
+      s2, per_mb = self._update_prepared(
+          s, batch, prep, key, capacity, masks, teacher_params=teacher_params
+      )
     valid = batch.valid
     info = dict(
         lr=self._lr.f32(
@@ -2574,6 +3271,16 @@ class PGLearner:
         batch.steps.seat,
         self._policy.spec.num_players,
     )
+    game_metrics = telemetry.batch_metrics(self._policy.spec.game)
+    if game_metrics is not None:
+      extra = dict(game_metrics(batch))
+      clash = sorted(set(extra) & set(info))
+      if clash:
+        raise ValueError(
+            f"{self._policy.spec.game} batch metrics {clash} clash with the "
+            "learner's own"
+        )
+      info.update(extra)
     info[_EV] = telemetry.variance_parts(prep.value_old, prep.targets, valid)
     return s2, per_mb, info
 
@@ -2594,9 +3301,16 @@ class PGLearner:
     """
     out: dict[str, float] = {}
     per_mb = dict(per_mb)
-    if "sgd_step" in per_mb:  # fixed minibatch size: means over the steps taken
+    gate_stop = per_mb.pop(
+        "gate_stop", None
+    )  # an SGD step gate only (with sgd_planned)
+    planned = per_mb.pop("sgd_planned", None)
+    took = None
+    # fixed minibatch size, or a step gate: means over the steps that computed a
+    # loss
+    if "sgd_step" in per_mb:
       took = np.asarray(per_mb.pop("sgd_step"), np.float64).reshape(-1) > 0.5
-      rows = np.asarray(per_mb.pop("minibatch_rows"), np.float64).reshape(-1)
+      rows = per_mb.pop("minibatch_rows", None)
       assert (
           took.any()
       ), "no SGD step taken (update refuses a batch with no trained row)"
@@ -2605,17 +3319,48 @@ class PGLearner:
       out["grad_norm_max"] = float(
           np.max(np.asarray(per_mb["grad_norm"], np.float64).reshape(-1)[took])
       )
+      if "approx_kl" in per_mb:
+        out["approx_kl_max"] = float(
+            np.max(
+                np.asarray(per_mb["approx_kl"], np.float64).reshape(-1)[took]
+            )
+        )
       out["sgd_steps"] = float(took.sum())
-      out["minibatch_rows"] = float(rows.sum())
-      out["minibatch_rows_max"] = float(rows[took].max())
-      out["minibatch_rows_min"] = float(rows[took].min())
+      if rows is not None:
+        rows = np.asarray(rows, np.float64).reshape(-1)
+        out["minibatch_rows"] = float(rows.sum())
+        out["minibatch_rows_max"] = float(rows[took].max())
+        out["minibatch_rows_min"] = float(rows[took].min())
       per_mb = {}
+    if (
+        gate_stop is not None
+    ):  # SGD step gate (module doc): at most one step stops an update
+      assert (
+          took is not None and planned is not None
+      ), "step gate metrics are incomplete"
+      stops = np.asarray(gate_stop, np.float64).reshape(-1) > 0.5
+      n_stop = int(stops.sum())
+      assert n_stop <= 1 and not (stops & ~took).any(), (n_stop, "gate stops")
+      taken = int(took.sum()) - n_stop
+      n_planned = int(np.sum(np.asarray(planned, np.float64) > 0.5))
+      assert n_stop or taken == n_planned, (taken, n_planned)
+      name = extension(self.cfg.loss).step_gate_name
+      out[f"{name}_early_stopped"] = float(n_stop)
+      out[f"{name}_stop_step"] = float(
+          taken
+      )  # steps applied before the stop; all when none
+      out["sgd_steps_taken"] = float(taken)
+      out["sgd_steps_planned"] = float(n_planned)
     for k, v in per_mb.items():
       out[k] = float(np.mean(np.asarray(v, np.float64)))
     if per_mb:  # the fixed path took grad_norm_max over its steps taken above
       out["grad_norm_max"] = float(
           np.max(np.asarray(per_mb["grad_norm"], np.float64))
       )
+      if "approx_kl" in per_mb:  # the interval's largest minibatch KL
+        out["approx_kl_max"] = float(
+            np.max(np.asarray(per_mb["approx_kl"], np.float64))
+        )
     info = dict(info)
     out.update(telemetry.episode_summary(info.pop(_EPISODES)))
     out.update(telemetry.explained_variance(info.pop(_EV)))

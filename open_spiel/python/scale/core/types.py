@@ -96,6 +96,10 @@ AUX_TARGET_VALUE = "target_value"
 # sources.targets builder (Monte Carlo returns, search values). The check is
 # on pytree structure: no device sync, and it works under jit.
 TARGET_VALUE_VALID = "target_value_valid"
+# Label key: the batch's reward is the perspective seat's side's mean reward,
+# not its own (core.arena "Credit", Arena credit="side"); bool, True at every
+# ply. learners.pg checks it against PGConfig.credit.
+SIDE_CREDIT = "side_credit"
 
 
 class Capability(enum.Enum):

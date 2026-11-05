@@ -23,6 +23,16 @@ package(
 licenses(["notice"])
 
 py_library(
+    name = "designs",
+    srcs = ["designs.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sides",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
     name = "eval",
     srcs = ["__init__.py"],
     strict_deps = True,
@@ -57,11 +67,16 @@ py_library(
     srcs = ["match.py"],
     strict_deps = True,
     deps = [
+        ":designs",
         ":payoff",
+        ":stats",
+        ":tables",
         "//open_spiel/python/scale/core:arena_engine",
         "//open_spiel/python/scale/core:deadline",
+        "//open_spiel/python/scale/core:hooks",
         "//open_spiel/python/scale/core:rng",
         "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
         "//open_spiel/python/scale/core:slots",
         "@py_deps//numpy",
     ],
@@ -102,6 +117,21 @@ py_library(
     srcs = ["stats.py"],
     strict_deps = True,
     deps = ["@py_deps//numpy"],
+)
+
+py_library(
+    name = "tables",
+    srcs = ["tables.py"],
+    strict_deps = True,
+    deps = [
+        ":designs",
+        ":payoff",
+        ":stats",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
 )
 
 py_library(
@@ -233,6 +263,38 @@ pytest_test(
 )
 
 pytest_test(
+    name = "nplayer_eval_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/nplayer_eval_test.py"],
+    deps = [
+        ":designs",
+        ":match",
+        ":payoff",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:bridge",
+        "//open_spiel/python/scale/envs:nplayer_matrix",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/policies:registry",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
     name = "payoff_test",
     data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/payoff_test.py"],
@@ -280,6 +342,25 @@ pytest_test(
         ":stats",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "tables_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/tables_test.py"],
+    deps = [
+        ":designs",
+        ":match",
+        ":payoff",
+        ":stats",
+        ":tables",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:rng",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
         "@py_deps//numpy",
     ],
 )

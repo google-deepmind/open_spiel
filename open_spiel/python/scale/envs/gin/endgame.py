@@ -43,6 +43,13 @@ Rules, per phase:
   optimal meld, else PASS.
 * WALL: the rule bot's move (knock iff legal, else pass).
 
+Routes. ROUTE (`in_domain`) hands every KNOCK / LAYOFF / WALL decision to
+this policy. AGENT_KNOCK_ROUTE (`in_domain_agent_knock`) leaves the
+knocker's 11-card discard to the base policy (the agent chooses its own knock
+discard, over the engine's legal knock discards) and scripts the rest; a run
+opts in with kinds.PG(scripted_route=AGENT_KNOCK_ROUTE). ROUTES lists both
+(policies.routed.is_scripted_phase).
+
 The policy reads only the mover's own information and public facts:
 `knock_cache` recomputes the engine's KNOCK-phase discard cache from the
 InfoState's hand, and a gin knock is `GinInfo.knocker_gin`.
@@ -422,6 +429,45 @@ def in_domain(info) -> jax.Array:
 ROUTE = f"{__name__}:in_domain"
 
 
+def is_knock_discard(info) -> jax.Array:
+  """Whether the row's seat is to move at the knocker's 11-card discard.
+
+  bool[B]: a live KNOCK node, the row's seat to move, 11 cards held (the
+  discard right after the knock; with <= 10 cards the knocker lays melds).
+
+  Args:
+    info: A batched GinInfo.
+
+  Returns:
+    bool[B], per row.
+  """
+  n_held = jnp.sum((info.hand > 0).astype(jnp.int32), axis=-1)
+  return in_domain(info) & (info.phase == cm.PHASE_KNOCK) & (n_held >= 11)
+
+
+def in_domain_agent_knock(info) -> jax.Array:
+  """`in_domain` without the knocker's 11-card discard.
+
+  bool[B]: the rows the scripted endgame plays when the agent chooses its own
+  knock discard (AGENT_KNOCK_ROUTE): KNOCK meld laying, LAYOFF and WALL.
+
+  Args:
+    info: A batched GinInfo.
+
+  Returns:
+    bool[B], per row.
+  """
+  return in_domain(info) & ~is_knock_discard(info)
+
+
+#: The route on which the agent plays its own knock discard (opt-in:
+#: kinds.PG(scripted_route=AGENT_KNOCK_ROUTE)); the script plays the rest of
+#: the endgame.
+AGENT_KNOCK_ROUTE = f"{__name__}:in_domain_agent_knock"
+#: Every route the scripted endgame may be played on (routed.is_scripted_phase).
+ROUTES = (ROUTE, AGENT_KNOCK_ROUTE)
+
+
 def actions(
     info, knock_discard: KnockDiscard = min_deadwood_knock_discard
 ) -> jax.Array:
@@ -569,6 +615,7 @@ class GinScriptedEndgamePolicy(types.Policy):
   ARCH = ARCH
   decider = "scripted"
   ROUTE = ROUTE
+  ROUTES = ROUTES
   knock_discard = staticmethod(min_deadwood_knock_discard)
 
   def __init__(self):

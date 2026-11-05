@@ -21,9 +21,9 @@ leduc games against it: every move is legal and is the in-process bot's
 move, /info names the artifact's game and the full_state mode, a seat_view
 seat is refused, and a rules-difference notice reaches the GUI's controller
 and, under the GUI's analysis state policy, the seat's view. The GUI's own
-full_state request is the body remote_bot takes (contracts 8 and 9: FULL_STATE_KEYS,
-the version in the Spiel-Protocol header, notices of at most 200
-characters).
+full_state request is the body remote_bot takes (contracts 8 and 9:
+FULL_STATE_KEYS, the version in the Spiel-Protocol header, notices of at
+most 200 characters).
 With GIN_ARTIFACT_ENV naming a trained gin checkpoint, 20 gin games are
 played against a uniform random seat, every move legal.
 SKIPPED, the reason named, where the installed OpenSpiel has no
@@ -56,13 +56,13 @@ GIN_ARTIFACT_ENV = remote_bot.CHECKPOINT_ENV + "_TEST_GIN"
 
 @pytest.fixture(name="leduc_dir", scope="module")
 def _leduc_dir(tmp_path_factory):
-  """A leduc artifact on disk, written once per module.
+  """A leduc_poker checkpoint folder, shared by the module's tests.
 
   Args:
-    tmp_path_factory: pytest's temporary directory factory.
+    tmp_path_factory: pytest's temporary folder factory.
 
   Returns:
-    The artifact's directory.
+    The folder.
   """
   return rbh.write_leduc(tmp_path_factory.mktemp("leduc"))
 
@@ -97,6 +97,19 @@ def _gui_protocol():
   )
 
 
+def _server_env():
+  """This environment, with the package's import root first on PYTHONPATH.
+
+  The import root comes from subprocess_env (the package's own location), not
+  from a folder above remote_bot.py: in an exported tree that folder can hold
+  a `jax/` package that hides the real jax from the child.
+
+  Returns:
+    The environment of a child interpreter.
+  """
+  return subprocess_env.child_env()
+
+
 def start_server(factory, checkpoint):
   """Starts the reference bot server on 127.0.0.1 (a free port).
 
@@ -107,9 +120,8 @@ def start_server(factory, checkpoint):
   Returns:
     (process, its URL).
   """
-  # The child finds this package first on its PYTHONPATH, from a working
-  # directory that shadows no installed package (subprocess_env).
-  env = subprocess_env.child_env({remote_bot.CHECKPOINT_ENV: checkpoint})
+  env = _server_env()
+  env[remote_bot.CHECKPOINT_ENV] = checkpoint
   argv = [
       *subprocess_env.python_command(),
       "-m",
@@ -141,13 +153,13 @@ def start_server(factory, checkpoint):
 
 
 def get_json(url):
-  """GETs `url` and parses its JSON body.
+  """GETs a JSON document.
 
   Args:
-    url: the URL.
+    url: the local server's URL.
 
   Returns:
-    The parsed body.
+    The parsed reply.
   """
   with urllib.request.urlopen(url, timeout=30) as r:  # noqa: S310
     return json.loads(r.read())
@@ -155,19 +167,15 @@ def get_json(url):
 
 @pytest.fixture(name="bot_server")
 def _bot_server():
-  """start(factory, checkpoint) -> URL; every server stops after the test.
-
-  Yields:
-    start: starts a server and returns its URL.
-  """
+  """start(factory, checkpoint) -> URL; every server stops after the test."""
   procs = []
 
   def start(factory, checkpoint):
-    """Starts a reference bot server (start_server) stopped after the test.
+    """Starts a server; it is stopped after the test.
 
     Args:
-      factory: the `--bot` MODULE:FACTORY.
-      checkpoint: the CHECKPOINT_ENV value.
+      factory: the bot factory (module:function).
+      checkpoint: the checkpoint it serves.
 
     Returns:
       The server's URL.
@@ -223,14 +231,15 @@ def test_the_gui_contract_is_what_remote_bot_takes(leduc_dir, bot_server):
   GUI's Spiel-Protocol header; the notice limit is the contract's.
 
   Args:
-    leduc_dir: the leduc artifact the server plays.
-    bot_server: starts a reference bot server (the fixture).
+    leduc_dir: a leduc checkpoint folder (the fixture).
+    bot_server: starts a reference server (the fixture).
   """
   controllers, _, _ = _gui()
   contract, remote_bot_http = _gui_protocol()
-  # Contracts 9 to 11 add the optional bot output to a reply, let a policy
-  # entry's action be null, and queue simultaneous moves; none changes the
-  # remote-bot request, so remote_bot speaks all of them.
+  # Contract 9 adds the optional bot output to a reply and changes no
+  # request; contract 10 changes only what a frame shows other viewers of
+  # that output; contract 11 adds simultaneous-move play and changes no
+  # turn-based request.
   assert contract.CONTRACT_VERSION in (8, 9, 10, 11), contract.CONTRACT_VERSION
   assert contract.NOTICE_MAX_LENGTH == remote_bot.NOTICE_MAX_LENGTH
   assert remote_bot_http.PROTOCOL_HEADER == remote_bot.PROTOCOL_HEADER
@@ -257,7 +266,8 @@ def test_round_trip_through_the_reference_server(leduc_dir, bot_server):
   _, _, move_budget = _gui()
   move_budget.set_seconds(60.0)
   url = bot_server(_FACTORY, leduc_dir)
-  assert get_json(url + "/health")["ok"]
+  ok = get_json(url + "/health")["ok"]
+  assert isinstance(ok, bool) and ok
   info = get_json(url + "/info")
   assert info["state_modes"] == ["full_state"], info
   assert info["games"] == [rbh.GAME], info
@@ -316,7 +326,7 @@ def test_gin_checkpoint_twenty_games(bot_server):
   checkpoint.
 
   Args:
-    bot_server: starts a reference bot server (the fixture).
+    bot_server: starts a reference server (the fixture).
   """
   path = os.environ.get(GIN_ARTIFACT_ENV, "")
   if not path:

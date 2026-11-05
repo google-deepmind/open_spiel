@@ -39,6 +39,7 @@ py_library(
         ":decide",
         ":plies",
         ":sequence",
+        ":sides",
         ":slots",
         ":x64",
         "@py_deps//jax",
@@ -99,6 +100,7 @@ py_library(
         "//open_spiel/python/scale/parallel:probe_arena",
         "//open_spiel/python/scale/policies:registry",
         "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:cpu_class",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],
@@ -166,6 +168,18 @@ py_library(
 )
 
 py_library(
+    name = "hash_compat",
+    srcs = ["hash_compat.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "hooks",
+    srcs = ["hooks.py"],
+    strict_deps = True,
+)
+
+py_library(
     name = "host_arena",
     srcs = ["host_arena.py"],
     strict_deps = True,
@@ -226,7 +240,10 @@ py_library(
     name = "schedules",
     srcs = ["schedules.py"],
     strict_deps = True,
-    deps = ["@py_deps//jax"],
+    deps = [
+        ":hash_compat",
+        "@py_deps//jax",
+    ],
 )
 
 py_library(
@@ -252,6 +269,17 @@ py_library(
         "//open_spiel/python/scale/testing:fixtures",
         "@py_deps//absl:app",
         "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "sides",
+    srcs = ["sides.py"],
+    strict_deps = True,
+    deps = [
+        ":hooks",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],
@@ -293,17 +321,14 @@ pytest_test(
         ":arena_golden",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/testing:cpu_class",
         "@py_deps//jax",
     ],
 )
 
 pytest_test(
     name = "arena_regressions_test",
-    timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
-    ],
     tests = ["tests/arena_regressions_test.py"],
     deps = [
         ":arena",
@@ -410,6 +435,40 @@ pytest_test(
 )
 
 pytest_test(
+    name = "hash_compat_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/hash_compat_test.py"],
+    deps = [
+        ":hash_compat",
+        ":sides",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:controller",
+        "//open_spiel/python/scale/league:sampler",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/testing:registries",
+    ],
+)
+
+pytest_test(
+    name = "hook_protocol_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/hook_protocol_test.py"],
+    deps = [
+        ":hooks",
+        ":sides",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/eval:match",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:controller",
+        "//open_spiel/python/scale/league:sampler",
+        "//open_spiel/python/scale/sources:deals",
+    ],
+)
+
+pytest_test(
     name = "host_arena_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
@@ -475,6 +534,21 @@ pytest_test(
         ":rng",
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "sides_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/sides_test.py"],
+    deps = [
+        ":sides",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/league:config_common",
+        "@py_deps//jax",
         "@py_deps//numpy",
     ],
 )

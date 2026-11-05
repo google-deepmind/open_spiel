@@ -24,6 +24,10 @@ controller, which OpenSpiel's game GUI imports by module name, is checked the
 same way.
 """
 
+import sys
+
+import pytest
+
 from open_spiel.python.jax.games import registry as jax_games
 from open_spiel.python.scale.belief import registry as belief
 from open_spiel.python.scale.encoders import registry as encoders
@@ -73,3 +77,11 @@ def test_the_gui_controller_resolves_by_name():
   package = envs.__name__.rpartition(".envs.")[0]
   register_into = envs.resolve(f"{package}.serve.controller:register_into")
   assert callable(register_into)
+
+
+if __name__ == "__main__":
+  sys.exit(
+      pytest.main(
+          [__file__, "--import-mode=importlib", "-p", "no:cacheprovider"]
+      )
+  )

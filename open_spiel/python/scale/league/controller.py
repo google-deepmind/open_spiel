@@ -59,6 +59,34 @@ Controllers:
   FixedMix             one learner with one constant mix (a plain run).
   Composite            several controllers, actions concatenated in order.
 
+Sides. A view says which payoff view it carries (league.payoff_views):
+kind "pair" (two interchangeable sides: a two-player zero-sum matrix) or
+"field" (more than two sides, or two uneven ones: cell (i, j) is i against a
+field of j, relative to that field), with num_sides and constant_sum, and at
+a field view optionally the symmetric meta-game over the members
+(meta_solvers.SymmetricGame, vs_field payoffs). A controller that declares
+supports_sides(sides) is asked by the League before the run and either
+returns True or raises a ValueError that says why:
+
+  PSRO                 any sides. Two interchangeable constant-sum sides:
+                       unchanged. Otherwise the meta-strategy is one
+                       symmetric sigma over the population from the
+                       SymmetricGame (replicator, fictitious_play,
+                       alpha_rank, uniform), every other side of a BR's table
+                       drawn iid from sigma, so the BR trains on
+                       vs_field(learner, sigma); the LP solvers are refused
+                       at more than two sides and for general-sum games
+                       (meta_solvers.check_capability), except two uneven
+                       constant-sum sides, whose role-averaged matrix is a
+                       zero-sum game.
+  GatedPool, ContinualExploiter, BROracle
+                       gate and admit by pairwise lower confidence bounds
+                       (_lcb, a member against one opponent); refused
+                       except at a pair view.
+  ScheduledPromotion   any sides: the League's gate cell is the substitution
+                       test at more than two sides (GateRequest.field: the
+                       field the subject and incumbent face).
+
 This module imports no array framework: payoffs are `eval.payoff`
 PayoffMatrix values and keys are `core.rng` keys.
 """
@@ -74,15 +102,81 @@ import zlib
 from absl import logging
 import numpy as np
 
+from open_spiel.python.scale.core import hash_compat
+from open_spiel.python.scale.core import hooks
 from open_spiel.python.scale.core import rng
 from open_spiel.python.scale.eval import payoff
 from open_spiel.python.scale.eval import stats
 from open_spiel.python.scale.league import meta_solvers
 from open_spiel.python.scale.league import sampler
 
+VIEW_KINDS = ("pair", "field")
 LIFECYCLES = ("candidate", "active", "inactive", "archived", "evicted", "fixed")
 GATED = ("candidate", "active", "inactive", "archived")
 _ID_RE = re.compile(r"^([A-Za-z0-9_.\-]+)@(\d+)$")
+
+
+# -- hooks ---------------------------------------------------------------------
+#: The optional hooks of a league controller (core.hooks). The League reads
+#: them through this Protocol only, on every leaf of a Composite (and the
+#: Composite forwards them). At a field view (more than two sides, or two
+#: uneven ones) a leaf must declare `supports_sides` or `pairwise`
+#: (League._check_sides): a controller that declares neither is refused there
+#: rather than guessed.
+CONTROLLER_HOOKS = hooks.Protocol(
+    "league controller",
+    [
+        hooks.method(
+            "supports_sides",
+            "supports_sides(sides) -> True, or raises ValueError naming why "
+            "it cannot run at these sides; asked by the League before the run",
+        ),
+        hooks.value(
+            "pairwise",
+            "a bool: True reads the payoff matrix as a two-player game "
+            "(refused at a field view unless supports_sides answers); False "
+            "reads no pairwise cell",
+            check=hooks.is_bool,
+        ),
+        hooks.method(
+            "reserved_pool_positions",
+            "reserved_pool_positions() -> int >= 0: pool positions beyond "
+            "LeagueConfig.pool_capacity (controller.reserved_pool_positions)",
+        ),
+        hooks.method(
+            "training_row_filter",
+            "training_row_filter(env) -> None or a filter of the rows an "
+            "update may train on (kinds.az.AZDriver)",
+        ),
+        hooks.method(
+            "draw_guards",
+            "draw_guards() -> guards run on every drawn opponent table "
+            "(League draw_guards)",
+        ),
+        hooks.method(
+            "gate_request",
+            "gate_request(view) -> None or the GateRequest this iteration "
+            "needs (League.view)",
+        ),
+    ],
+)
+
+#: The optional hooks of a PromotionGate (core.hooks), which
+#: ScheduledPromotion forwards as its own.
+GATE_HOOKS = hooks.Protocol(
+    "promotion gate",
+    [
+        hooks.method(
+            "training_row_filter",
+            "training_row_filter(env) -> None or a filter of the rows the "
+            "main may train on",
+        ),
+        hooks.method(
+            "draw_guards",
+            "draw_guards() -> guards run on every drawn opponent table",
+        ),
+    ],
+)
 
 
 # -- views ---------------------------------------------------------------------
@@ -190,6 +284,10 @@ class GateRequest:
     generation: the round index.
     seed: the deal seed.
     deals: the number of duplicate deal pairs.
+    field: the opponents' mixture of an N-player gate (a sampler.Mix over
+      members, self_play 0, that the subject and the incumbent both face: the
+      League's substitution test, at any sides); None: the head-to-head gate
+      at two sides, the substitution test against the incumbent at more.
   """
 
   subject: str
@@ -197,6 +295,22 @@ class GateRequest:
   generation: int
   seed: int
   deals: int
+  field: Optional[sampler.Mix] = None
+
+  def __post_init__(self):
+    if self.field is not None:
+      if not isinstance(self.field, sampler.Mix):
+        raise TypeError(
+            "GateRequest.field is a sampler.Mix, got "
+            f"{type(self.field).__name__}"
+        )
+      if self.field.self_play > 0.0 or not any(
+          w > 0.0 for w in self.field.weights.values()
+      ):
+        raise ValueError(
+            f"GateRequest.field {self.field}: a field of members only "
+            "(self_play 0, some member weight > 0)"
+        )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -244,6 +358,13 @@ class LeagueView:
     learners: LearnerInfo per live learner, in spawn order.
     payoff: the payoff matrix, or None (see above).
     gate: the requested gate cell, or None.
+    kind: the payoff view, "pair" or "field" (module doc, "Sides").
+    num_sides: the number of sides the view's payoffs are over.
+    constant_sum: whether the game is constant-sum. The defaults of kind,
+      num_sides and constant_sum are a two-player zero-sum league.
+    symmetric: at a field view, the meta_solvers.SymmetricGame over the
+      non-evicted members when a controller asked for it
+      (needs_symmetric_game), else None.
   """
 
   iteration: int
@@ -251,8 +372,23 @@ class LeagueView:
   learners: tuple[LearnerInfo, ...]  # LearnerInfo, spawn order
   payoff: Optional[payoff.PayoffMatrix]
   gate: Optional[GateCell] = None
+  kind: str = "pair"
+  num_sides: int = 2
+  constant_sum: bool = True
+  symmetric: Optional[meta_solvers.SymmetricGame] = None
 
   def __post_init__(self):
+    if self.kind not in VIEW_KINDS:
+      raise ValueError(f"LeagueView kind {self.kind!r} not in {VIEW_KINDS}")
+    if self.kind == "pair" and self.num_sides != 2:
+      raise ValueError(f"a pair view has two sides, got {self.num_sides}")
+    if self.symmetric is not None and not isinstance(
+        self.symmetric, meta_solvers.SymmetricGame
+    ):
+      raise TypeError(
+          "LeagueView.symmetric is a SymmetricGame, got "
+          f"{type(self.symmetric).__name__}"
+      )
     if self.payoff is None:
       object.__setattr__(self, "_index", None)
       return
@@ -328,6 +464,22 @@ class LeagueView:
       True when there is one.
     """
     return any(l.name == name for l in self.learners)
+
+  def need_pair(self, who: str) -> None:
+    """Raises unless this is a pair view (a two-player zero-sum matrix).
+
+    `who` reads cells as pairwise payoffs.
+
+    Args:
+      who: names the reader in the refusal.
+
+    Raises:
+      ValueError: not a pair view.
+    """
+    if self.kind != "pair":
+      raise ValueError(
+          _pairwise_refusal(who, self.num_sides, self.constant_sum)
+      )
 
   def cell(self, a: str, b: str) -> tuple[float, float]:
     """The payoff of entrant a against b.
@@ -505,18 +657,84 @@ def _plateau(scores: Sequence[float], patience: int, threshold: float) -> bool:
   return max(recent) - scores[-(patience + 1)] < threshold
 
 
-def _lcb(view: LeagueView, a: str, b: str, z: float) -> float:
-  """The lower confidence bound of a against b.
+def _pairwise_refusal(who: str, num_sides: int, constant_sum: bool) -> str:
+  """The refusal of a pairwise controller in a league of `num_sides` sides.
 
   Args:
-    view: The league view.
-    a: The row entrant.
-    b: The column entrant.
-    z: The z multiplier.
+    who: The controller.
+    num_sides: The league's sides.
+    constant_sum: Whether the game is constant-sum.
 
   Returns:
-    mean - z * se.
+    The message.
   """
+  return (
+      f"{who} reads the payoff matrix as a two-player game (pairwise lower "
+      "confidence bounds of a member against one opponent); this league has "
+      f"{num_sides} sides ({'constant' if constant_sum else 'general'}-sum, "
+      "not two interchangeable sides), where a cell is a field score relative "
+      "to its field (league.payoff_views), not a pairwise payoff: not "
+      "supported. Use PSRO with a symmetric meta-solver, or ScheduledPromotion "
+      "(the substitution gate)"
+  )
+
+
+def _is_pair(sides: Any) -> bool:
+  """Whether `sides` (a core.sides.Sides) get a pair view.
+
+  Two interchangeable sides.
+
+  Args:
+    sides: the core.sides.Sides.
+
+  Returns:
+    Whether the view is a pair view.
+  """
+  return int(sides.num_sides) == 2 and bool(sides.fully_rotatable)
+
+
+class _PairwiseOnly:
+  """supports_sides of the controllers that read pairwise cells (module doc)."""
+
+  #: Reads pairwise cells (CONTROLLER_HOOKS); supports_sides answers first.
+  pairwise = True
+
+  def supports_sides(self, sides: Any) -> bool:
+    """True for two interchangeable sides; raises otherwise.
+
+    Args:
+      sides: the league's core.sides.Sides.
+
+    Returns:
+      True.
+
+    Raises:
+      ValueError: not two interchangeable sides.
+    """
+    if not _is_pair(sides):
+      raise ValueError(
+          _pairwise_refusal(
+              type(self).__name__, sides.num_sides, sides.constant_sum
+          )
+      )
+    return True
+
+
+def _lcb(view: LeagueView, a: str, b: str, z: float) -> float:
+  """A's lower confidence bound against b.
+
+  A pairwise payoff, pair views only.
+
+  Args:
+    view: the LeagueView.
+    a: the member scored.
+    b: its opponent.
+    z: the bound's z.
+
+  Returns:
+    mean - z * se of a against b.
+  """
+  view.need_pair("_lcb")
   mean, se = view.cell(a, b)
   return mean - z * se
 
@@ -527,6 +745,10 @@ def _lcb(view: LeagueView, a: str, b: str, z: float) -> float:
 #: function of one pairwise payoff difference, so the ranking is defined for
 #: any matrix the league evaluates; alpha = 5 is the selection intensity.
 DEFAULT_SOLVER_KWARGS = {"alpha_rank": {"population_size": 2, "alpha": 5.0}}
+#: The same for the symmetric meta-game (field views): alpha-rank draws its
+#: T - 1 co-players without replacement, so its population is the table's T
+#: sides.
+DEFAULT_SYMMETRIC_KWARGS = {"alpha_rank": {"alpha": 5.0}}
 
 
 class PSRO:
@@ -542,6 +764,20 @@ class PSRO:
 
   A ready BR is promoted once it is the lowest level, at most one promotion
   per iteration.
+
+  Sides (module doc). At a pair view of a constant-sum game: the matrix
+  solvers, unchanged (a symmetric-only solver, "replicator", solves the
+  matrix as a symmetric two-player game). At a pair view of a general-sum
+  two-player game the matrix solvers are refused; a symmetric solver reads
+  the matrix as the symmetric game it is. At a field view the meta-strategy
+  is a symmetric sigma over the population from view.symmetric
+  (meta_solvers.solve_symmetric; alpha_rank's population_size defaults to
+  the number of sides), and the BR's mix draws every other side iid from
+  sigma (the League's per-side draw), so the BR trains on vs_field(BR,
+  sigma); two uneven constant-sum sides also take the matrix solvers on the
+  centred role-averaged matrix (U - U^T) / 2, a zero-sum game. Every sigma
+  at more than two sides is relative to its field, not an equilibrium claim
+  of the underlying game.
 
   Attributes:
     meta_solver: the `meta_solvers.SOLVERS` name.
@@ -560,6 +796,8 @@ class PSRO:
     time_averaged: train against the running average of the meta-strategies.
     population_roles: member roles the meta-strategy covers.
     last_meta: None, or the last (names, float64 strategy) meta-strategy.
+    last_regret: the meta-game regret of the last sigma (symmetric solvers;
+      None otherwise).
   """
 
   BR_ROLE = "psro-br"
@@ -584,7 +822,7 @@ class PSRO:
     """Initializes the controller.
 
     Args:
-      meta_solver: a `meta_solvers.SOLVERS` name.
+      meta_solver: a `meta_solvers.SOLVERS` or `meta_solvers.SYMMETRIC` name.
       iterations: BRs to admit before stopping.
       br_updates: a BR's update budget, counted from its own spawn.
       solver_kwargs: the solver's keyword arguments (default
@@ -606,7 +844,10 @@ class PSRO:
       KeyError: meta_solver is not a known meta-solver.
       ValueError: only one of min_br_updates and plateau_patience is set.
     """
-    if meta_solver not in meta_solvers.SOLVERS:
+    if (
+        meta_solver not in meta_solvers.SOLVERS
+        and meta_solver not in meta_solvers.SYMMETRIC
+    ):
       raise KeyError(f"unknown meta-solver {meta_solver!r}")
     assert iterations >= 1 and br_updates >= 1 and pipeline_depth >= 1
     if (min_br_updates is None) != (plateau_patience is None):
@@ -614,9 +855,11 @@ class PSRO:
           "min_br_updates and plateau_patience go together (plateau promotion)"
       )
     self.meta_solver = meta_solver
+    self._kwargs_given = solver_kwargs is not None
     if solver_kwargs is None:
       solver_kwargs = dict(DEFAULT_SOLVER_KWARGS.get(meta_solver, {}))
     self.solver_kwargs = dict(solver_kwargs)
+    self.last_regret: Optional[float] = None
     self.iterations, self.br_updates = int(iterations), int(br_updates)
     self.min_br_updates, self.plateau_patience = (
         min_br_updates,
@@ -646,6 +889,120 @@ class PSRO:
       {learner name: level}.
     """
     return dict(self._levels)
+
+  @property
+  def pairwise(self) -> bool:
+    """Whether the payoff matrix is solved as a two-player game.
+
+    Every meta-solver but uniform does that (uniform is fictitious play over
+    the population, which reads no payoff; CONTROLLER_HOOKS).
+    """
+    return self.meta_solver != "uniform"
+
+  @property
+  def needs_symmetric_game(self) -> bool:
+    """A field view must carry view.symmetric (every solver but uniform)."""
+    return self.meta_solver != "uniform"
+
+  def supports_sides(self, sides: Any) -> bool:
+    """True, or raises naming why this meta-solver has no meaning here.
+
+    meta_solvers.CapabilityError (a ValueError) at these sides (class doc).
+
+    Args:
+      sides: the league's core.sides.Sides.
+
+    Returns:
+      True.
+
+    Raises:
+      meta_solvers.CapabilityError: the meta-solver has no meaning at these
+        sides.
+    """
+    name, t, cs = (
+        self.meta_solver,
+        int(sides.num_sides),
+        bool(sides.constant_sum),
+    )
+    if name in meta_solvers.SYMMETRIC_SOLVERS:
+      return True
+    if t == 2 and (_is_pair(sides) or cs):
+      # general-sum two sides: refused
+      meta_solvers.check_capability(name, t, cs)
+      return True
+    meta_solvers.check_capability(name, t, cs)  # raises: more than two sides
+    raise meta_solvers.CapabilityError(
+        f"meta-solver {name!r}: no meta-game at sides {sides.side_of_seat}"
+    )
+
+  def _symmetric_kwargs(self, num_sides: int) -> dict[str, Any]:
+    """The symmetric meta-solver's kwargs: the configured ones, else defaults.
+
+    Args:
+      num_sides: The league's sides.
+
+    Returns:
+      The kwargs.
+    """
+    if self._kwargs_given:
+      return dict(self.solver_kwargs)
+    kw = dict(DEFAULT_SYMMETRIC_KWARGS.get(self.meta_solver, {}))
+    if self.meta_solver == "alpha_rank":
+      kw["population_size"] = max(2, int(num_sides))
+    return kw
+
+  def _solve(self, view: LeagueView, pop: list[str]) -> np.ndarray:
+    """The meta-strategy over pop at this view (class doc, "Sides").
+
+    Args:
+      view: The league view.
+      pop: The population.
+
+    Returns:
+      The meta-strategy, f64[len(pop)].
+
+    Raises:
+      ValueError: A field view without its symmetric meta-game.
+    """
+    name = self.meta_solver
+    self.last_regret = None
+    if view.kind == "pair":
+      matrix = name in meta_solvers.SOLVERS and (
+          view.constant_sum or name not in meta_solvers.SYMMETRIC
+      )
+      if matrix:
+        sol = meta_solvers.solve(
+            name,
+            view.submatrix(pop),
+            num_sides=2,
+            constant_sum=view.constant_sum,
+            **self.solver_kwargs,
+        )
+        return sol.col  # a learner's opponents play the column player's mixture
+      game = meta_solvers.SymmetricGame(2, pop, view.submatrix(pop))
+      sol = meta_solvers.solve_symmetric(
+          name, game, **self._symmetric_kwargs(2)
+      )
+      self.last_regret = sol.regret
+      return sol.sigma
+    if name == "uniform":
+      return np.full(len(pop), 1.0 / len(pop))
+    if view.symmetric is None:
+      raise ValueError(
+          f"PSRO({name}) at a field view ({view.num_sides} sides) needs the "
+          "symmetric meta-game (view.symmetric); the League builds it for a "
+          "controller with needs_symmetric_game"
+      )
+    game = view.symmetric.restrict(pop)
+    if name in meta_solvers.SYMMETRIC:
+      sol = meta_solvers.solve_symmetric(
+          name, game, **self._symmetric_kwargs(view.num_sides)
+      )
+      self.last_regret = sol.regret
+      return sol.sigma
+    meta_solvers.check_capability(name, view.num_sides, view.constant_sum)
+    u = game.matrix()  # two uneven constant-sum sides: role-averaged, centred
+    return meta_solvers.solve(name, 0.5 * (u - u.T), **self.solver_kwargs).col
 
   def _spawn(self, level: int, init_from: Optional[str]) -> SpawnLearner:
     """Spawns the next best-response learner.
@@ -690,10 +1047,7 @@ class PSRO:
       The column player's mixture, averaged over populations when
       `time_averaged`.
     """
-    sol = meta_solvers.solve(
-        self.meta_solver, view.submatrix(pop), **self.solver_kwargs
-    )
-    sigma = sol.col  # a learner's opponents play the column player's mixture
+    sigma = self._solve(view, pop)
     if self.time_averaged:
       if tuple(pop) != self._avg_pop:
         if self._avg is None:
@@ -922,7 +1276,7 @@ def gate_lifecycle(prev: str, lcb: float, ucb: float, cfg: GateConfig) -> str:
   return prev
 
 
-class GatedPool:
+class GatedPool(_PairwiseOnly):
   """One main learner against a gated pool of members (GateConfig).
 
   Every iteration each gated member is scored by its payoff against the main
@@ -978,6 +1332,7 @@ class GatedPool:
           SpawnLearner(self.main, "main"),
           SetMix(self.main, sampler.Mix(1.0, {})),
       ]
+    view.need_pair("GatedPool")
     cfg = self.gate
     fresh_tick = view.iteration != self._last_it
     self._last_it = view.iteration
@@ -1086,7 +1441,7 @@ class GatedPool:
 
 
 # -- continual exploiter, best-response oracle ---------------------------------
-class ContinualExploiter:
+class ContinualExploiter(_PairwiseOnly):
   """An always-on best-response learner against snapshots of `target`.
 
   Every refresh_every iterations a new snapshot of the target is admitted and
@@ -1190,7 +1545,7 @@ class ContinualExploiter:
     return acts
 
 
-class BROracle:
+class BROracle(_PairwiseOnly):
   """Periodic best responses against the main learner.
 
   Every `every` iterations a snapshot of the target is admitted and num_brs
@@ -1329,6 +1684,10 @@ class PBT:
     bank_exploit: admit an exploit's source as a member first.
   """
 
+  #: Ranks learners by pairwise payoff cells: refused at a field view
+  #: (CONTROLLER_HOOKS; League._check_sides).
+  pairwise = True
+
   def __init__(
       self,
       learners: Sequence[str],
@@ -1410,6 +1769,9 @@ class LaggedAudit:
     self_play: the self-play share.
     lagged_mass: the lagged snapshot's share.
   """
+
+  #: Reads no pairwise cell (CONTROLLER_HOOKS).
+  pairwise = False
 
   def __init__(
       self,
@@ -1580,6 +1942,38 @@ class SnapshotSchedule:
     return tuple(sorted(pool[int(i)] for i in idx))
 
 
+#: What ScheduledPromotion's max_pool counts with a gate (class doc,
+#: "Pool counts"). "attempts": the newest max_pool harvest steps, passed or
+#: not, filtered to the passed ones (the behaviour of every config written
+#: before "passed" existed). "passed": the newest max_pool snapshots that
+#: passed their gate.
+POOL_COUNTS_ATTEMPTS = "attempts"
+POOL_COUNTS_PASSED = "passed"
+POOL_COUNTS = (POOL_COUNTS_ATTEMPTS, POOL_COUNTS_PASSED)
+
+
+def pool_counts_kwargs(pool_counts: str) -> dict[str, str]:
+  """ScheduledPromotion's controller kwargs for `pool_counts` (POOL_COUNTS).
+
+  {} at "attempts" (core.hash_compat.added_kwarg), so a config that does not
+  set the mode keeps its config hash.
+
+  Args:
+    pool_counts: the mode.
+
+  Returns:
+    The kwargs to merge into controller_kwargs.
+
+  Raises:
+    ValueError: an unknown mode.
+  """
+  if pool_counts not in POOL_COUNTS:
+    raise ValueError(f"pool_counts {pool_counts!r} not in {POOL_COUNTS}")
+  return hash_compat.added_kwarg(
+      "pool_counts", str(pool_counts), POOL_COUNTS_ATTEMPTS
+  )
+
+
 #: Promotion predicates: pure functions of a GateCell. "ci_above_zero": the
 #: whole 95% interval is above 0; "mean_above_zero": the mean is.
 PROMOTION_PREDICATES = {
@@ -1681,8 +2075,9 @@ class ScheduledPromotion:
       included: the snapshot of round 0 is the initial params) the main is
       admitted as member "<main>@<u>", the round's lagged snapshot.
     * Admitted steps that are multiples of harvest_every (u > 0) are the pool,
-      the newest max_pool of them; a superseded snapshot outside the pool and
-      a pool member past max_pool are evicted.
+      the newest max_pool of them (with a gate: see "Pool counts"); a
+      superseded snapshot outside the pool and a pool member past max_pool
+      are evicted, each with an absl log line (member, reason, update).
     * Each round seats min(pool_slots, len(pool)) pool members uniformly
       without replacement (key fold_in64(key(seed), round)); the main's mix is
       `sampler.snapshot_pool(snapshot, seated, self_weight)`.
@@ -1698,8 +2093,29 @@ class ScheduledPromotion:
   u > 0 requests a gate cell of gate_deals deal pairs (`gate_request`) and
   the new snapshot is harvested into the pool only if the gate passes. The
   lagged-snapshot admission never waits on the gate. Each generation gets
-  exactly one attempt, recorded in `gate_attempts`. Two-player games only
-  (the Evaluator's).
+  exactly one attempt, recorded in `gate_attempts`. Any two interchangeable
+  sides (two-player games, bridge's partnerships; the League's gate_cell
+  says what the cell measures).
+
+  Pool counts (`pool_counts`, POOL_COUNTS). With a gate,
+  "passed" makes the pool the newest max_pool snapshots that passed their
+  gate: a failed gate never pushes a passed snapshot out. "attempts" (the
+  default, kept so every config and run before the fix keeps its behaviour
+  and its config hash) takes the newest max_pool harvest STEPS, passed or
+  not (SnapshotSchedule.pool_steps), and keeps the passed ones among them,
+  so a passed snapshot leaves the pool max_pool * harvest_every updates
+  after it was taken whatever came after it (bridge's population league:
+  400 updates). Without a gate every harvest passes and the two agree. A
+  config sets the mode through `pool_counts_kwargs` (the key is absent at
+  "attempts": core.hash_compat.added_kwarg); a controller restored from a
+  checkpoint saved before the field existed reads "attempts" (the class
+  attribute).
+
+  Fixed members. `fixed` ({fixed opponent name: row share}, shares > 0
+  summing below 1) puts those shares of every round's rows on the League's
+  fixed opponents (outside the pool, the gate and every eviction) and scales
+  the snapshot-pool mix by 1 - their sum. None (the default) is the mix
+  above exactly.
 
   Attributes:
     gate: None, or the PromotionGate a snapshot must pass.
@@ -1709,9 +2125,19 @@ class ScheduledPromotion:
     main: the main learner's name.
     seed: the seed of the seating draws.
     role: the role of admitted snapshots.
+    fixed: None, or {fixed opponent name: row share} (see above).
     gate_attempts: update -> the gate's record for that snapshot.
     last_info: the round's snapshot step, pool size and seated count.
+    pool_counts: what max_pool counts with a gate (POOL_COUNTS).
   """
+
+  #: Any sides: its gate is the substitution test at a field view
+  #: (CONTROLLER_HOOKS).
+  pairwise = False
+
+  #: An instance pickled before the field existed restores without it in its
+  #: __dict__ and reads this (class doc, "Pool counts").
+  pool_counts: str = POOL_COUNTS_ATTEMPTS
 
   def __init__(
       self,
@@ -1727,7 +2153,13 @@ class ScheduledPromotion:
       promotion: Optional[str] = None,
       gate: Optional[PromotionGate] = None,
       gate_deals: int = 1024,
+      fixed: Optional[Mapping[str, float]] = None,
+      pool_counts: str = POOL_COUNTS_ATTEMPTS,
   ):
+    if pool_counts not in POOL_COUNTS:
+      raise ValueError(f"pool_counts {pool_counts!r} not in {POOL_COUNTS}")
+    self.pool_counts = str(pool_counts)
+    self.fixed = None if fixed is None else _fixed_shares(fixed)
     if promotion is not None and promotion not in PROMOTION_PREDICATES:
       raise ValueError(
           f"promotion {promotion!r} not in {sorted(PROMOTION_PREDICATES)}"
@@ -1763,7 +2195,23 @@ class ScheduledPromotion:
     Returns:
       The guards.
     """
-    return tuple(getattr(self.gate, "draw_guards", lambda: ())())
+    fn = GATE_HOOKS.get(self.gate, "draw_guards")
+    return () if fn is None else tuple(fn())
+
+  def training_row_filter(self, env: Any) -> Any:
+    """The filter of the rows the main may train on.
+
+    kinds.az.AZDriver reads it: the gate's own, if it defines
+    training_row_filter(env); otherwise None.
+
+    Args:
+      env: the league's env.
+
+    Returns:
+      The filter, or None.
+    """
+    fn = GATE_HOOKS.get(self.gate, "training_row_filter")
+    return None if fn is None else fn(env)
 
   def _name(self, step: int) -> str:
     """The member name of the main learner at `step`.
@@ -1852,6 +2300,51 @@ class ScheduledPromotion:
     )
     return passed
 
+  def _gated_pool_steps(
+      self, u: int, attempt_steps: Sequence[int]
+  ) -> tuple[int, ...]:
+    """The pool's steps at update `u` with a gate, oldest first (class doc).
+
+    Args:
+      u: the round's snapshot step.
+      attempt_steps: SnapshotSchedule.pool_steps(u).
+
+    Returns:
+      "attempts": the passed steps among attempt_steps; "passed": the newest
+      max_pool passed harvest steps in (0, u].
+    """
+    if self.pool_counts == POOL_COUNTS_ATTEMPTS:
+      return tuple(st for st in attempt_steps if st in self._passed)
+    assert self.pool_counts == POOL_COUNTS_PASSED, self.pool_counts
+    h = int(self.schedule.harvest_every)
+    passed = sorted(
+        int(st) for st in self._passed if 0 < st <= int(u) and st % h == 0
+    )
+    return tuple(passed[-int(self.schedule.max_pool) :])
+
+  def _eviction_reason(self, name: str) -> str:
+    """Why `name` leaves at this round start (the log line's reason).
+
+    Args:
+      name: a member leaving the previous round's snapshot or pool.
+
+    Returns:
+      The reason.
+    """
+    if name in self._pool:
+      if self.gate is None or self.pool_counts == POOL_COUNTS_PASSED:
+        return f"past max_pool {self.schedule.max_pool}"
+      return (
+          f"outside the newest max_pool {self.schedule.max_pool} harvest "
+          "steps (pool_counts attempts: failed gates count)"
+      )
+    step = int(name.rsplit("@", 1)[1])
+    if step % int(self.schedule.harvest_every) or step == 0:
+      return "superseded snapshot (not a harvest step)"
+    if self.gate is not None and step not in self._passed:
+      return "superseded snapshot (its gate failed)"
+    return "superseded snapshot (outside the pool)"
+
   def step(self, view: LeagueView) -> list[Any]:
     """The controller's actions for this view.
 
@@ -1893,7 +2386,7 @@ class ScheduledPromotion:
       if self.gate is not None:
         if u > 0:
           self._gate(view, r, u)
-        steps = tuple(st for st in steps if st in self._passed)
+        steps = self._gated_pool_steps(u, steps)
       pool = tuple(self._name(s) for s in steps)
       keep = set(pool) | {snap}
       gone = [
@@ -1902,6 +2395,16 @@ class ScheduledPromotion:
           if n is not None and n not in keep
       ]
       for n in sorted(set(gone)):
+        why = self._eviction_reason(n)
+        logging.info(
+            "ScheduledPromotion: evict %s at update %d (round %d, pool_counts "
+            "%s): %s",
+            n,
+            u,
+            r,
+            self.pool_counts,
+            why,
+        )
         acts.append(
             SetLifecycle(n, "evicted", "superseded snapshot / past max_pool")
         )
@@ -1931,15 +2434,44 @@ class ScheduledPromotion:
           len(pool),
           self._seated,
       )
-    acts.append(
-        SetMix(
-            self.main,
-            sampler.snapshot_pool(
-                self._snapshot, self._seated, sch.self_weight
-            ),
-        )
-    )
+    mix = sampler.snapshot_pool(self._snapshot, self._seated, sch.self_weight)
+    if self.fixed is not None:
+      rest = 1.0 - sum(self.fixed.values())
+      w = {n: rest * x for n, x in mix.weights.items()}
+      for n, x in self.fixed.items():
+        if n in w:
+          raise ValueError(
+              f"ScheduledPromotion: fixed member {n!r} is also a snapshot"
+          )
+        w[n] = x
+      mix = sampler.Mix(0.0, w)
+    acts.append(SetMix(self.main, mix))
     return acts
+
+
+def _fixed_shares(fixed: Mapping[str, float]) -> dict[str, Any]:
+  """ScheduledPromotion's fixed row shares, checked (class doc).
+
+  Args:
+    fixed: member -> its row share.
+
+  Returns:
+    {member: share}.
+
+  Raises:
+    ValueError: A share not finite and > 0, or shares summing to 1 or more.
+  """
+  out = {str(n): float(x) for n, x in dict(fixed).items()}
+  if not out or not all(math.isfinite(x) and x > 0.0 for x in out.values()):
+    raise ValueError(
+        f"fixed: row shares > 0 per fixed member, got {dict(fixed)!r}"
+    )
+  if sum(out.values()) >= 1.0:
+    raise ValueError(
+        f"fixed: shares sum to {sum(out.values())}; the snapshot pool needs "
+        "the rest (sum < 1)"
+    )
+  return out
 
 
 # -- fixed mix, composite ------------------------------------------------------
@@ -1951,6 +2483,9 @@ class FixedMix:
     mix: its constant Mix.
     role: its role.
   """
+
+  #: Reads no payoff (CONTROLLER_HOOKS).
+  pairwise = False
 
   def __init__(self, learner: str, mix: sampler.Mix, role: str = "main"):
     self.learner, self.mix, self.role = learner, mix, role
@@ -1970,13 +2505,40 @@ class FixedMix:
     return acts + [SetMix(self.learner, self.mix)]
 
 
+def reserved_pool_positions(controller: Any) -> int:
+  """The pool positions `controller` reserves beyond pool_capacity.
+
+  A controller whose own entrants need population positions that the run's
+  LeagueConfig.pool_capacity does not count (a Composite child added to a
+  controller the capacity was sized for) declares them with a
+  reserved_pool_positions() method; the League adds them to its pool. The
+  config hash does not see them, so a run that gains a reservation resumes
+  from its earlier checkpoints (League.restore pads the saved positions).
+
+  Args:
+    controller: a league controller.
+
+  Returns:
+    The positions (0 when it declares none).
+
+  Raises:
+    ValueError: a negative reservation.
+  """
+  fn = CONTROLLER_HOOKS.get(controller, "reserved_pool_positions")
+  n = 0 if fn is None else int(fn())
+  if n < 0:
+    raise ValueError(f"{type(controller).__name__} reserves {n} pool positions")
+  return n
+
+
 class Composite:
   """Several controllers; their actions concatenated in order.
 
   What the League reads from its controller besides step() is forwarded from
   the children: the gate request of the one gated child, every child's draw
-  guards, the last_meta of the one child that records a meta-strategy, and
-  the children's last_info merged in order.
+  guards, the sum of their reserved pool positions, the last_meta of the one
+  child that records a meta-strategy, and the children's last_info merged in
+  order.
 
   Raises:
     ValueError: no children, more than one gated child, more than one child
@@ -1993,7 +2555,8 @@ class Composite:
     gated = [
         c
         for c in self.controllers
-        if hasattr(c, "gate_request") and getattr(c, "gate", None) is not None
+        if CONTROLLER_HOOKS.get(c, "gate_request") is not None
+        and getattr(c, "gate", None) is not None
     ]
     if len(gated) > 1:
       raise ValueError(
@@ -2035,9 +2598,12 @@ class Composite:
     reqs = [
         r
         for r in (
-            c.gate_request(view)
-            for c in self.controllers
-            if hasattr(c, "gate_request")
+            fn(view)
+            for fn in (
+                CONTROLLER_HOOKS.get(c, "gate_request")
+                for c in self.controllers
+            )
+            if fn is not None
         )
         if r is not None
     ]
@@ -2055,8 +2621,20 @@ class Composite:
     """
     guards = []
     for c in self.controllers:
-      guards.extend(getattr(c, "draw_guards", lambda: ())())
+      fn = CONTROLLER_HOOKS.get(c, "draw_guards")
+      guards.extend(() if fn is None else fn())
     return tuple(guards)
+
+  def reserved_pool_positions(self) -> int:
+    """The pool positions the children reserve beyond pool_capacity.
+
+    The sum of every child's reserved_pool_positions() (League sizes its pool
+    as LeagueConfig.pool_capacity plus this; loop.reserved_pool_positions).
+
+    Returns:
+      The positions.
+    """
+    return sum(reserved_pool_positions(c) for c in self.controllers)
 
   @property
   def last_meta(self) -> Optional[tuple[Any, ...]]:

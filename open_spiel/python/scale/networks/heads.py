@@ -89,7 +89,10 @@ class ValueHead(nn.Module):
     sigma_ratio: the HL-Gauss sigma over the bin width.
     dtype: the compute dtype name.
     out_dtype: the output layer's compute dtype name; None for `dtype`.
-    init_scheme: the initialiser scheme (layers.INIT_SCHEMES).
+    init_scheme: the initialiser scheme (layers.INIT_SCHEMES), or
+      layers.TORCH_UNIFORM (opt-in, value head only): every Dense's kernel
+      and bias U(+-1/sqrt(fan_in)), the uniform fan-in init of a PyTorch
+      nn.Linear.
     source: the feature key read ("policy" or "value").
   """
 
@@ -140,20 +143,29 @@ class ValueHead(nn.Module):
     dt = layers.dtype_of(self.dtype)
     out_dt = layers.dtype_of(self.out_dtype or self.dtype)
     x = feats[self.source]
+
+    def init(role, fan_in):
+      """The dense layer's initialisers.
+
+      Args:
+        role: the layer's role (layers.init_kwargs).
+        fan_in: its input width.
+
+      Returns:
+        nn.Dense keyword arguments.
+      """
+      if self.init_scheme == layers.TORCH_UNIFORM:
+        return layers.torch_uniform_kwargs(fan_in)
+      return layers.init_kwargs(self.init_scheme, role)
+
     if self.hidden > 0:
-      x = layers.dense(
-          self.hidden,
-          dt,
-          "hidden",
-          **layers.init_kwargs(self.init_scheme, "trunk"),
-      )(x.astype(dt))
+      x = layers.dense(self.hidden, dt, "hidden", **init("trunk", x.shape[-1]))(
+          x.astype(dt)
+      )
       x = layers.activation(self.hidden_activation, x)
     out_dim = self.num_bins if self.kind == "hl_gauss" else 1
     raw = layers.dense(
-        out_dim,
-        out_dt,
-        "out",
-        **layers.init_kwargs(self.init_scheme, "critic_head"),
+        out_dim, out_dt, "out", **init("critic_head", x.shape[-1])
     )(x)
     if self.kind == "hl_gauss":
       return hl_gauss.logits_to_scalar(raw, self.support()), raw

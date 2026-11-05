@@ -143,6 +143,43 @@ def init_kwargs(scheme: str, role: str) -> dict[str, Any]:
   )
 
 
+#: The value head's opt-in torch init (heads.ValueHead init_scheme): not one of
+#: INIT_SCHEMES, so no torso or other head can select it.
+TORCH_UNIFORM = "torch_uniform"
+
+
+def torch_uniform_kwargs(fan_in: int) -> dict[str, Any]:
+  """The torch nn.Linear default init: kernel and bias U(+-1/sqrt(fan_in)).
+
+  Args:
+    fan_in: the layer's input width.
+
+  Returns:
+    nn.Dense keyword arguments.
+
+  Raises:
+    ValueError: fan_in < 1.
+  """
+  if int(fan_in) < 1:
+    raise ValueError(f"torch_uniform_kwargs needs fan_in >= 1, got {fan_in}")
+  bound = 1.0 / float(np.sqrt(int(fan_in)))
+
+  def _u(rng, shape, dtype=PARAM_DTYPE):
+    """U(-bound, bound) of the shape and dtype.
+
+    Args:
+      rng: the key.
+      shape: the shape.
+      dtype: the dtype.
+
+    Returns:
+      The sample.
+    """
+    return jax.random.uniform(rng, shape, dtype, -bound, bound)
+
+  return dict(kernel_init=_u, bias_init=_u)
+
+
 def dense(features: int, dtype: Any, name: str, **kw) -> nn.Dense:
   """nn.Dense with an explicit compute dtype and float32 params.
 

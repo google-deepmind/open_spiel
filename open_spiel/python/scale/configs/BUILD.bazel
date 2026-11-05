@@ -53,15 +53,122 @@ py_library(
 )
 
 py_library(
+    name = "euchre_mmd_from_scratch",
+    srcs = ["euchre_mmd_from_scratch.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/encoders:euchre",
+        "//open_spiel/python/scale/envs:euchre",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "euchre_move_transformer_self_play",
+    srcs = ["euchre_move_transformer_self_play.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/encoders:euchre_card_planes",
+        "//open_spiel/python/scale/envs:euchre",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:card_move_transformer",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "euchre_smoke",
+    srcs = ["euchre_smoke.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/encoders:euchre",
+        "//open_spiel/python/scale/envs:euchre",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
     name = "gin_mmd_from_scratch",
     srcs = ["gin_mmd_from_scratch.py"],
     strict_deps = True,
     deps = [
-        "//open_spiel/python/jax/games/gin_rummy:dense_cache_game",
         "//open_spiel/python/scale/core:schedules",
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/envs:registry",
         "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "hearts_league_smoke",
+    srcs = ["hearts_league_smoke.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/encoders:hearts",
+        "//open_spiel/python/scale/envs:hearts",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "hearts_mmd_from_scratch",
+    srcs = ["hearts_mmd_from_scratch.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/encoders:hearts",
+        "//open_spiel/python/scale/envs:hearts",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:losses",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "hearts_move_transformer_self_play",
+    srcs = ["hearts_move_transformer_self_play.py"],
+    strict_deps = True,
+    deps = [
+        ":recipes",
+        "//open_spiel/python/scale/encoders:hearts_card_planes",
+        "//open_spiel/python/scale/envs:hearts",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:card_move_transformer",
+        "//open_spiel/python/scale/networks:catalog",
+    ],
+)
+
+py_library(
+    name = "kuhn3_league_smoke",
+    srcs = ["kuhn3_league_smoke.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/encoders:kuhn_nplayer",
+        "//open_spiel/python/scale/envs:kuhn_nplayer",
         "//open_spiel/python/scale/league:config_common",
         "//open_spiel/python/scale/learners:losses",
         "//open_spiel/python/scale/learners:pg",
@@ -146,6 +253,7 @@ py_library(
         "//open_spiel/python/scale/learners:bc",
         "//open_spiel/python/scale/learners:losses",
         "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/learners:ppo_magnet",
         "//open_spiel/python/scale/networks:catalog",
     ],
 )
@@ -166,6 +274,142 @@ pytest_test(
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/league:config_common",
         "//open_spiel/python/scale/policies:registry",
+    ],
+)
+
+pytest_test(
+    name = "euchre_mmd_from_scratch_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/euchre_mmd_from_scratch_test.py"],
+    deps = [
+        ":euchre_mmd_from_scratch",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/envs:euchre",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:refs",
+    ],
+)
+
+pytest_test(
+    name = "euchre_move_transformer_self_play_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/euchre_move_transformer_self_play_test.py"],
+    deps = [
+        ":euchre_move_transformer_self_play",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/encoders:euchre_card_planes",
+        "//open_spiel/python/scale/envs:euchre",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/networks:card_move_transformer",
+        "//open_spiel/python/scale/networks:catalog",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "euchre_smoke_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/euchre_smoke_test.py"],
+    deps = [
+        ":euchre_smoke",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:payoff_views",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "hearts_league_smoke_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/hearts_league_smoke_test.py"],
+    deps = [
+        ":hearts_league_smoke",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:payoff_views",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "hearts_mmd_from_scratch_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/hearts_mmd_from_scratch_test.py"],
+    deps = [
+        ":hearts_mmd_from_scratch",
+        "//open_spiel/python/jax/games:hearts",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/envs:hearts",
+        "//open_spiel/python/scale/envs/hearts_telemetry:moon",
+        "//open_spiel/python/scale/league:config_common",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "hearts_move_transformer_self_play_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/hearts_move_transformer_self_play_test.py"],
+    deps = [
+        ":hearts_move_transformer_self_play",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale:train_lib",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/envs:hearts",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/learners:pg",
+        "//open_spiel/python/scale/learners:ppo_magnet",
+        "//open_spiel/python/scale/networks:card_move_transformer",
+        "//open_spiel/python/scale/networks:catalog",
+        "@py_deps//jax",
+        "@py_deps//numpy",
     ],
 )
 

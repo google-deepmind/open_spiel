@@ -35,6 +35,20 @@ py_library(
 )
 
 py_library(
+    name = "card_move_transformer",
+    srcs = ["card_move_transformer.py"],
+    strict_deps = True,
+    deps = [
+        ":actor_critic",
+        ":catalog",
+        ":gin_tfv2",
+        ":layers",
+        "@py_deps//flax:core",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
     name = "catalog",
     srcs = ["catalog.py"],
     strict_deps = True,
@@ -48,8 +62,8 @@ py_library(
     deps = [
         ":actor_critic",
         ":layers",
-        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
         "//open_spiel/python/scale/encoders:card_tokens_layout",
+        "//open_spiel/python/scale/encoders:gin_card_tokens",
         "@py_deps//flax:core",
         "@py_deps//jax",
         "@py_deps//numpy",
@@ -136,6 +150,26 @@ py_library(
         ":layers",
         "@py_deps//flax:core",
         "@py_deps//jax",
+    ],
+)
+
+pytest_test(
+    name = "card_move_transformer_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/card_move_transformer_test.py"],
+    deps = [
+        ":actor_critic",
+        ":card_move_transformer",
+        ":catalog",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/league:config_common",
+        "@py_deps//jax",
+        "@py_deps//numpy",
     ],
 )
 

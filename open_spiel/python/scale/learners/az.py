@@ -156,6 +156,99 @@ def search_value_targets(
   )
 
 
+# -- search health -------------------------------------------------------------
+#: The search-health metrics of a self-play batch (search_health), each a mean
+#: over the batch's decisions.
+SEARCH_HEALTH = (
+    "target_entropy",  # entropy of the search target over legal actions
+    "prior_entropy",  # entropy of the network's prior (legal-masked softmax)
+    "kl_target_prior",  # forward KL(search target || prior)
+    "prior_argmax_agree",  # the target's top legal action is the prior's
+)
+#: With the operator's root value (aux AUX_SEARCH_VALUE): root value against
+#: the decision's Monte Carlo outcome (outcome_targets, value units).
+SEARCH_VALUE_HEALTH = (
+    "root_value_outcome_mse",
+    "root_value_outcome_bias",  # mean(root value - outcome)
+)
+
+
+def search_health(
+    policy: types.Policy,
+    params: Any,
+    batch: types.TrajectoryBatch,
+    value_scale: Optional[float] = None,
+) -> dict[str, jax.Array]:
+  """Whether search still teaches the network: health of a self-play batch.
+
+  Collapsed search targets plateau an AZ run while every loss looks fine, so
+  each update reports, over the batch's decisions (batch.valid):
+  SEARCH_HEALTH from batch.target_policy (the search target) and the prior
+  of `policy` at `params` (the network the search expanded, before the
+  update trains on the batch); and, when the batch carries the operator's
+  root value (aux AUX_SEARCH_VALUE), SEARCH_VALUE_HEALTH against the hand's
+  Monte Carlo outcome (outcome_targets(first_hand_only, value_scale): the
+  value units the root value is in) over the decisions whose hand finished.
+  Jittable; draws no key; never changes the batch the update trains on.
+
+  Args:
+    policy: the network the search expands (a NATIVE_JAX policy).
+    params: its params.
+    batch: the self-play TrajectoryBatch [B, T] with its search targets.
+    value_scale: the outcome's divisor (the run's value_scale), or None.
+
+  Returns:
+    {name: f32 scalar}.
+  """
+  steps = batch.steps
+  legal = jnp.asarray(steps.legal_mask)
+  valid = jnp.asarray(batch.valid)
+  carry = batch.init_carry
+  if policy.spec.stateful and not jax.tree.leaves(carry):
+    seat0 = jnp.asarray(steps.seat[:, 0]).astype(jnp.int32)
+    carry = policy.init_carry(params, seat0.shape[0], seat0, jax.random.key(0))
+  _, out = policy.evaluate_seq(params, carry, steps, None)
+  t = jnp.asarray(batch.target_policy, F32)
+  keep = legal & (t > 0)
+  log_t = jnp.log(jnp.where(keep, t, F32(1.0)))
+  ent_t = -jnp.sum(jnp.where(keep, t * log_t, F32(0.0)), axis=-1)
+  logits = jnp.asarray(out.logits, F32)
+  neg = F32(-jnp.inf)
+  agree = jnp.argmax(jnp.where(legal, t, neg), axis=-1) == jnp.argmax(
+      jnp.where(legal, logits, neg), axis=-1
+  )
+  m = {
+      "target_entropy": losses.masked_mean(ent_t, valid),
+      "prior_entropy": losses.masked_mean(losses.entropy(logits, legal), valid),
+      "kl_target_prior": losses.masked_mean(
+          losses.kl_from_target(t, logits, legal), valid
+      ),
+      "prior_argmax_agree": losses.masked_mean(agree.astype(F32), valid),
+  }
+  if search.AUX_SEARCH_VALUE in batch.aux:
+    labels = {
+        k: v
+        for k, v in batch.labels.items()
+        if k != targets_lib.TARGET_VALUE_VALID
+    }
+    ob = outcome_targets(
+        batch._replace(labels=labels),
+        first_hand_only=True,
+        value_scale=value_scale,
+    )
+    seat = jnp.asarray(steps.seat).astype(jnp.int32)
+    z = jnp.take_along_axis(
+        jnp.asarray(ob.target_value, F32), seat[..., None], axis=-1
+    )[..., 0]
+    done = jnp.asarray(ob.valid) & jnp.asarray(
+        ob.labels[targets_lib.TARGET_VALUE_VALID]
+    )
+    err = jnp.asarray(batch.aux[search.AUX_SEARCH_VALUE], F32) - z
+    m["root_value_outcome_mse"] = losses.masked_mean(err * err, done)
+    m["root_value_outcome_bias"] = losses.masked_mean(err, done)
+  return m
+
+
 # -- replay --------------------------------------------------------------------
 def _flat_plies(batch: types.TrajectoryBatch) -> types.TrajectoryBatch:
   """[R, T, ...] -> [R*T, 1, ...].

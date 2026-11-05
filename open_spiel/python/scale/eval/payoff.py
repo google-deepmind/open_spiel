@@ -19,10 +19,12 @@ not depend on how matches are played. This module holds the result types and
 the accounting, and does not import JAX (numpy only).
 
 Accounting: a row's payoff is its summed rewards over its first `hands`
-hands (`payoffs`); a seat-swapped duplicate match of n deal pairs is a
-MatchResult (`match_result`; the deal pair is the unit, eval.match's module
-doc); a payoff matrix is assembled from the pair results, cell (j, i) from
-the same games as (i, j) (`matrix_from_results`).
+hands (`payoffs`, for any number of seats); a seat-swapped two-player
+duplicate match of n deal pairs is a MatchResult (`match_result`; the deal pair
+is the unit, eval.match's module doc); a payoff matrix is assembled from the
+pair results, cell (j, i) from the same games as (i, j) (`matrix_from_results`).
+Tables of more seats or sides are eval.tables.TableResult records (their
+two-side view is a MatchResult, TableResult.as_head_to_head).
 
 MatchEngine: how the Evaluator plays. eval.match.Evaluator groups entrants
 into slots, builds the duplicate slot tables, chunks rows and does the
@@ -35,6 +37,12 @@ plays rows:
                                     rows (i, r) of each job's n deal pairs
                                     (eval.match's module doc: duplicate
                                     deals share a deal key)
+  table_keys(keys, n, plan, P) -> (deal_key [J*n*R], policy_key [J*n*R, P])
+                                    rows (i, r) of each job's n deals of a
+                                    design, shared as its
+                                    eval.designs.KeyPlan says (N-player
+                                    tables only; an engine without it
+                                    plays two-player head-to-head only)
   play(slots, params, table, deal_key, policy_key, num_steps, *,
        perspective, cache_key) -> (rewards f64[B, T, P], done bool[B, T])
                                     T <= num_steps plies of every row
@@ -68,15 +76,18 @@ class MatchResult(NamedTuple):
     b: entrant b's name.
     a_rule: a's decision rule.
     b_rule: b's decision rule.
-    n_deals: deal pairs; 2 * n_deals matches were played.
+    n_deals: deal groups (with R seats per deal, R * n_deals matches were
+      played; R = 2, deal pairs, for a two-player game).
     hands_per_match: hands per match.
-    duplicate: whether the two rows of a pair shared the deal.
-    a_payoff: f64[n, 2]: a's payoff per match, column r = a in seat r.
-    b_payoff: f64[n, 2]: b's payoff in the same matches.
-    mean: a's payoff per match (pair means).
-    seat: (Estimate a in seat 0, Estimate a in seat 1).
-    diff: a - b per match (pair means).
-    se_unpaired: SE of the mean if the 2n matches were independent.
+    duplicate: whether the R rows of a deal shared the deal.
+    a_payoff: f64[n, R]: a's payoff per match, column r = a in seat r.
+    b_payoff: f64[n, R]: b's payoff in the same matches (with more than one
+      b seat, the mean of b's seats).
+    mean: a's payoff per match (deal means).
+    seat: (Estimate a in seat 0, ..., Estimate a in seat R - 1).
+    diff: a - b_payoff per match (deal means; with more than one b seat, a
+      against b's mean seat, not b's total).
+    se_unpaired: SE of the mean if the R * n matches were independent.
     variance_reduction: (se_unpaired / mean.se) ** 2; when mean.se == 0: inf
       if se_unpaired > 0, NaN if both are 0.
   """
@@ -87,17 +98,19 @@ class MatchResult(NamedTuple):
   b: str
   a_rule: types.DecisionRule
   b_rule: types.DecisionRule
-  n_deals: int  # deal pairs; 2 * n_deals matches were played
+  n_deals: int  # deal groups of R rows (pairs at R = 2); R * n_deals played
   hands_per_match: int
   duplicate: bool
-  # f64[n, 2]: a's payoff per match, column r = a in seat r
+  # f64[n, R]: a's payoff per match, column r = a in seat r
   a_payoff: np.ndarray
-  b_payoff: np.ndarray  # f64[n, 2]: b's payoff in the same matches
-  mean: stats.Estimate  # a's payoff per match (pair means)
-  # (Estimate a in seat 0, Estimate a in seat 1)
-  seat: tuple[stats.Estimate, stats.Estimate]
-  diff: stats.Estimate  # a - b per match (pair means)
-  se_unpaired: float  # SE of the mean if the 2n matches were independent
+  # f64[n, R]: b's payoff in the same matches; with more than one b seat the
+  # mean of b's seats (one seat's payoff, not b's total)
+  b_payoff: np.ndarray
+  mean: stats.Estimate  # a's payoff per match (deal means)
+  # (Estimate a in seat 0, ..., Estimate a in seat R - 1)
+  seat: tuple[stats.Estimate, ...]
+  diff: stats.Estimate  # a - b_payoff per match (deal means): per seat at R > 2
+  se_unpaired: float  # SE of the mean if the R * n matches were independent
   # (se_unpaired / mean.se) ** 2; when mean.se == 0: inf if se_unpaired > 0, NaN
   # if both are 0.
   variance_reduction: float
@@ -188,6 +201,21 @@ class MatchEngine(Protocol):
     """
     ...
 
+  def table_keys(
+      self, keys: Sequence[Any], n: int, plan: Any, num_players: int
+  ) -> tuple[Any, ...]:
+    """The (deal keys, policy keys) of the rows of every table job.
+
+    Per an eval.designs.KeyPlan (core.arena_engine.table_keys), concatenated.
+
+    Args:
+      keys: one key per job.
+      n: deals per job.
+      plan: the design's KeyPlan.
+      num_players: P.
+    """
+    ...
+
   # A protocol stub: Returns documents what implementations return.
   # pylint: disable-next=redundant-returns-doc
   def play(
@@ -263,10 +291,11 @@ def match_result(
     a_pay: np.ndarray,
     b_pay: np.ndarray,
 ) -> MatchResult:
-  """The MatchResult of two sides' payoffs over n deal pairs.
+  """The MatchResult of two sides' payoffs over n deal pairs (or groups).
 
-  The MatchResult of a's payoffs a_pay f64[n, 2] and b's b_pay (column r:
-  a in seat r) over n deal pairs.
+  The MatchResult of a's payoffs a_pay f64[n, R] and b's b_pay (column r:
+  a in seat r) over n deals, each played R times with a in each seat (R = 2,
+  the seat-swapped pair, for a two-player game; b holds every other seat).
 
   Args:
     game: the game name.
@@ -277,15 +306,20 @@ def match_result(
     b: b's name.
     a_rule: a's decision rule.
     b_rule: b's decision rule.
-    a_pay: a's payoffs f64[n, 2].
-    b_pay: b's payoffs f64[n, 2].
+    a_pay: a's payoffs f64[n, R].
+    b_pay: b's payoffs f64[n, R].
 
   Returns:
     the MatchResult.
   """
   n = a_pay.shape[0]
+  if a_pay.ndim != 2 or b_pay.shape != a_pay.shape:
+    raise ValueError(
+        f"a_pay and b_pay must be f64[n, R] of one shape, got {a_pay.shape} "
+        f"and {b_pay.shape}"
+    )
   mean = stats.estimate(a_pay.mean(1))
-  se_un = float(a_pay.reshape(-1).std(ddof=1) / np.sqrt(2 * n))
+  se_un = float(a_pay.reshape(-1).std(ddof=1) / np.sqrt(a_pay.size))
   if mean.se > 0:
     vr = (se_un / mean.se) ** 2
   else:
@@ -303,7 +337,7 @@ def match_result(
       a_payoff=a_pay,
       b_payoff=b_pay,
       mean=mean,
-      seat=(stats.estimate(a_pay[:, 0]), stats.estimate(a_pay[:, 1])),
+      seat=tuple(stats.estimate(a_pay[:, r]) for r in range(a_pay.shape[1])),
       diff=stats.estimate((a_pay - b_pay).mean(1)),
       se_unpaired=se_un,
       variance_reduction=float(vr),

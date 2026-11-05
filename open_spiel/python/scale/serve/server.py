@@ -217,6 +217,8 @@ class PolicyServer:
       loader: Callable[[str, int], types.Artifact] = artifact_lib.load_artifact,
       allow_cross_variant: bool = False,
       cache_size: int = 8,
+      pad_rows: Any = host_agent.PAD_ROWS,
+      compiler_options: Any = None,
   ):
     """Builds the server with an empty cache.
 
@@ -225,6 +227,15 @@ class PolicyServer:
       allow_cross_variant: serve game parameters an artifact's training env
         does not cover (for intentional cross-variant evaluation).
       cache_size: artifacts kept loaded (least recently used evicted first).
+      pad_rows: the rows a HostAgent evaluates a request in
+        (host_agent.PAD_ROWS, which reproduces the Arena's batched logits),
+        an int or a function of the artifact. A server that must reproduce
+        another engine's batch-1 forward (e.g. an older gin engine whose
+        bf16 networks round differently in a batch of 8) passes 1 for those
+        artifacts.
+      compiler_options: the XLA options a HostAgent's policy path is
+        compiled with (HostAgent compiler_options): None, a mapping, or a
+        function of the artifact returning either.
 
     Raises:
       ValueError: cache_size is below 1.
@@ -235,6 +246,8 @@ class PolicyServer:
       raise ValueError(f"cache_size must be >= 1, got {cache_size}")
     self.allow_cross_variant = bool(allow_cross_variant)
     self.cache_size = int(cache_size)
+    self._pad_rows = pad_rows
+    self._compiler_options = compiler_options
     self._loader = loader
     self._lock = threading.Lock()
     self.stats = {"legal_mismatch": 0, "diverged": 0}
@@ -316,10 +329,10 @@ class PolicyServer:
     with self._lock:
       agent = self._agents.get(key)
       if agent is None:
-        if art.manifest.game != game:
+        if games.pyspiel_name(art.manifest.game) != game:
           raise ValueError(
-              f"the checkpoint plays {art.manifest.game!r}; the request's game "
-              f"is {game!r}"
+              f"the checkpoint plays {games.describe(art.manifest.game)}; the "
+              f"request's game is {game!r}"
           )
         # Another seat's agent of the same artifact, game parameters and rule:
         # the new one serves its env and reuses its jitted calls (no second
@@ -339,9 +352,43 @@ class PolicyServer:
             rule=rule,
             allow_cross_variant=self.allow_cross_variant,
             share=sibling,
+            pad_rows=self.pad_rows_for(art),
+            compiler_options=self.compiler_options_for(art),
         )
         self._agents[key] = agent
       return agent
+
+  def pad_rows_for(self, art: types.Artifact) -> int:
+    """The rows `art`'s HostAgents evaluate a request in (__init__ pad_rows).
+
+    Args:
+      art: a loaded artifact.
+
+    Returns:
+      A positive row count.
+    """
+    rows = self._pad_rows(art) if callable(self._pad_rows) else self._pad_rows
+    if isinstance(rows, bool) or not isinstance(rows, int) or rows < 1:
+      raise ValueError(f"pad_rows must be a positive int, got {rows!r}")
+    return rows
+
+  def compiler_options_for(self, art: types.Artifact) -> dict[str, Any]:
+    """The XLA options `art`'s HostAgents compile with (__init__).
+
+    Args:
+      art: a loaded artifact.
+
+    Returns:
+      The options ({}: the process defaults).
+    """
+    opts = self._compiler_options
+    if callable(opts):
+      opts = opts(art)
+    if opts is not None and not isinstance(opts, Mapping):
+      raise ValueError(
+          f"compiler_options must be a mapping or None, got {opts!r}"
+      )
+    return dict(opts or {})
 
   def decide(
       self,

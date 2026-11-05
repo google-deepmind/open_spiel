@@ -47,6 +47,8 @@ from open_spiel.python.scale.core import types
 from open_spiel.python.scale.testing.errors import ContractError
 from open_spiel.python.scale.testing.errors import require
 
+__all__ = ["ContractError", "check_env"]
+
 tree_map = jax.tree_util.tree_map
 
 

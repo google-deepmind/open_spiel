@@ -177,5 +177,3 @@ def mismatch_bot():
     A MismatchBot of the artifact CHECKPOINT_ENV names.
   """
   return MismatchBot(os.environ[remote_bot.CHECKPOINT_ENV])
-
-

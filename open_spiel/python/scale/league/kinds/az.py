@@ -305,6 +305,21 @@ class AZDriver(base.Driver):
     # (snapshot member name, stacked slot params)
     self._gen: Optional[tuple[Any, ...]] = None
     self._league = None
+    self._row_filter: Any = (
+        None  # a controller's training-row filter (_training_row_filter)
+    )
+    self._row_filter_ready = False
+    # Search health (learners.az.search_health) of every AZ update's batch,
+    # written as search/<name>; an ExIt spec (other operators, other
+    # targets, networks too big for one more forward over the batch) has none.
+    self._search_health = None
+    if isinstance(spec, AZ):
+      vs = opts.value_scale
+      self._search_health = jax.jit(
+          lambda params, batch: az_lib.search_health(
+              base_net, params, batch, vs
+          )
+      )
 
   # -- params ------------------------------------------------------------------
   @property
@@ -674,6 +689,30 @@ class AZDriver(base.Driver):
       )
     return batch, excluded
 
+  def _training_row_filter(self):
+    """The filter of the rows an update may train on.
+
+    The first one a controller of the league returns from its optional
+    training_row_filter(env) (for example a promotion gate's,
+    controller.ScheduledPromotion.training_row_filter), built once on the first
+    update; None when no controller names one. The filter maps a TrajectoryBatch
+    to (the batch, its valid mask narrowed; {metric name: count} written with
+    the update's metrics).
+
+    Returns:
+      The filter, or None.
+    """
+    if not self._row_filter_ready:
+      self._row_filter = None
+      for ctl in base.controllers_of(self._league.controller):
+        fn = controller.CONTROLLER_HOOKS.get(ctl, "training_row_filter")
+        got = None if fn is None else fn(self._league.env)
+        if got is not None:
+          self._row_filter = got
+          break
+      self._row_filter_ready = True
+    return self._row_filter
+
   def train_step(self, ls, table, opponent_params, key, fresh):
     """One update of learner slot `ls`.
 
@@ -692,6 +731,7 @@ class AZDriver(base.Driver):
     """
     del fresh  # every update plays one fresh game per row
     self._single(ls)
+    self.check_table(table)
     t0 = time.time()
     k_play, k_epoch, k_train = jax.random.split(key, 3)
     params = [self._slot0(ls), *opponent_params]
@@ -709,6 +749,10 @@ class AZDriver(base.Driver):
     else:  # a labelling slot's {"base", "operator"}
       base_carry = batch.init_carry["base"]
     batch, excluded = self._targets(batch._replace(init_carry=base_carry))
+    row_filter = self._training_row_filter()
+    filtered: dict[str, Any] = {}
+    if row_filter is not None:
+      batch, filtered = row_filter(batch)
     complete = np.asarray(batch.labels[targets_lib.TARGET_VALUE_VALID])
     if not np.all(complete | ~np.asarray(batch.valid)):
       raise AssertionError(
@@ -724,6 +768,11 @@ class AZDriver(base.Driver):
         self.replay.clear()
       self._replay_generation = gen
     self.replay.add(batch)
+    health = (
+        None
+        if self._search_health is None
+        else self._search_health(self.learner.params(ls.state), batch)
+    )
     t_selfplay = time.time()  # the completeness check above synced the batch
     dp = self.dp
     # The epoch's BC steps run data parallel over each minibatch's rows.
@@ -742,8 +791,12 @@ class AZDriver(base.Driver):
     m["train_seconds"] = m["seconds"] - m["selfplay_seconds"]
     if excluded is not None:
       m["routed_excluded"] = float(excluded)
+    for k, v in filtered.items():
+      m[k] = float(v)
     if gen is not None:
       m["generation"] = float(gen)
+    for k, v in (health or {}).items():
+      m[f"search/{k}"] = float(v)
     return state, m, src.frames - f0, src.decisions - d0
 
   def sources_state(self) -> dict[str, Any]:

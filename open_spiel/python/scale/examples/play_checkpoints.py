@@ -14,6 +14,10 @@
 
 r"""Play two checkpoints against each other and save every game.
 
+Any number of players: side a holds one seat and side b every other seat
+(a four-player game seats a against three copies of b), and every deal is
+played once with a in each seat.
+
   python -m open_spiel.python.scale.examples.play_checkpoints \
       --a=/tmp/ttt@20 --b=uniform --games=1024 --out=/tmp/ttt_vs_uniform
   python -m open_spiel.python.scale.examples.play_checkpoints \
@@ -29,13 +33,16 @@ What it does:
     artifact; the game and its rules come from the artifacts' manifests
     (their env spec). Two artifacts must record the same env spec and rules
     hash, or the script refuses;
-  * plays --games games in seat-swapped pairs on duplicate deals: deal i is
-    played twice with the seats swapped (a in seat 0, then in seat 1) and the
-    same chance outcomes, through the Arena (`core.arena`), in batches, on
-    every local device (CPU or GPU). The keys are the Evaluator's, so the
-    payoffs equal `eval.match.head_to_head(env, a, b, games // 2, key)`;
+  * plays --games games on duplicate deals, P games per deal for a game of
+    P players: deal i is played P times with the same chance outcomes, a in
+    seat r of its r-th game and b in every other seat (two players: the
+    seat-swapped pair, a in seat 0, then in seat 1), through the Arena
+    (`core.arena`), in batches, on every local device (CPU or GPU). At two
+    players the keys are the Evaluator's, so the payoffs equal
+    `eval.match.head_to_head(env, a, b, games // 2, key)`;
   * prints a's mean payoff with its standard error, overall and per seat
-    (the unit is the deal pair, so luck of the deal cancels within a pair);
+    (the unit is the deal, so luck of the deal cancels within its P games),
+    and b's mean payoff per seat it held;
   * writes every game to --out (the format below), and, when pyspiel is
     installed, replays every saved game in pyspiel and checks each move is
     legal and the returns are the same. Without pyspiel (the pure-JAX
@@ -62,27 +69,32 @@ The output format ("game_trajectories", version 1). --out holds two files:
                        there is none),
                        "entrants": {"a": {...}, "b": {...}} (spec, name,
                        rule, and for an artifact its path, step, run_id,
-                       params_sha256), "games", "seed", "result": {mean,
-                       se, lo, hi of a's payoff overall and per seat},
+                       params_sha256), "games", "seed", "num_players",
+                       "result": {"a": mean, se, lo, hi, n of a's payoff,
+                       "a_seat<r>": the same for a in seat r, one per seat,
+                       "b_mean": b's mean payoff per seat held, so at
+                       more than two players one b seat's payoff, not b's
+                       total over its P - 1 seats},
                        "num_records"}
   trajectories.jsonl  one JSON object per line, one line per game:
     "index":       the game's index (0 .. games - 1)
-    "deal":        its deal pair (games 2i and 2i + 1 share deal i)
+    "deal":        its deal (games P*i .. P*i + P - 1 share deal i; P
+                   players)
     "game_string": a pyspiel game string, pyspiel.load_game(game_string)
                    loads the game this record was played in; null when the
                    game has no pyspiel counterpart here or its env's
                    histories have no map to pyspiel's, and then "history"
                    is in the env's ids and its seats
-    "seats":       ["a" or "b" for player 0, the same for player 1]: the
-                   players of "history" (pyspiel's when "game_string" is
-                   set; for gin, pyspiel's player 0 is the seat that moved
-                   first)
+    "seats":       ["a" or "b" for player 0, the same for each other
+                   player]: the players of "history" (pyspiel's when
+                   "game_string" is set; for gin, pyspiel's player 0 is the
+                   seat that moved first)
     "history":     the game's pyspiel action history: chance outcomes and
                    player actions interleaved, OpenSpiel action ids, so
                    state.apply_action(a) for each a from
                    game.new_initial_state() replays it exactly
     "actors":      per history entry, the player that acted (-1 for chance)
-    "returns":     [player 0's return, player 1's return]
+    "returns":     [player 0's return, ..., player P - 1's]
     "env_history": the env's own raw history of the game, in the env's ids
                    and seats (equal to "history" when the env's histories
                    are pyspiel's)
@@ -121,6 +133,7 @@ from open_spiel.python.scale.core import host_arena
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.core import x64
 from open_spiel.python.scale.envs import registry as env_registry
+from open_spiel.python.scale.eval import designs
 from open_spiel.python.scale.eval import match
 from open_spiel.python.scale.eval import payoff
 from open_spiel.python.scale.policies import registry as policy_registry
@@ -155,7 +168,10 @@ def _define_flags() -> dict[str, flags.FlagHolder]:
       ),
       b=flags.DEFINE_string("b", None, "side b, as --a"),
       games=flags.DEFINE_integer(
-          "games", 1024, "games to play, an even number (seat-swapped pairs)"
+          "games",
+          1024,
+          "games to play, a multiple of the game's players P"
+          " (each deal is played P times, a in each seat), at least 2P",
       ),
       seed=flags.DEFINE_integer(
           "seed", 0, "seed of the deals and of sampled play"
@@ -422,8 +438,12 @@ def pyspiel_params_for(
   """
   if env_registry.game(env.name).pyspiel_history_to_raw is not None:
     return None
+  if not params:
+    # A game whose served parameters are not all finitely valued maps the
+    # env's options to pyspiel's (ServingSpec.pyspiel_params_of).
+    params = served.pyspiel_params_of(env_spec) or {}
   try:
-    spec = served.env_spec_for(env.name, params)
+    spec = served.env_spec_for(served.pyspiel_name(env.name), params)
   except KeyError:
     return None
   if spec != env_spec:
@@ -696,25 +716,66 @@ def _chunk_rows(
   return min(chunk, -(-rows // unit) * unit)
 
 
-def play(env, a, b, n_deals: int, key, probs: bool, max_rows: int) -> Played:
-  """Plays a against b on n_deals seat-swapped duplicate deals (module doc).
+def lineup_slots(num_players: int) -> list[int]:
+  """The slot of each line-up position: a (slot 0) at 0, b (slot 1) after.
+
+  Row (i, r) of the match rotates the line-up by r (core.arena.rotated_table),
+  so a sits in seat r and b in every other seat.
 
   Args:
-    env: The env.
-    a: Side a's entrant.
-    b: Side b's entrant.
-    n_deals: The number of deals; each is played twice, seats swapped.
+    num_players: P, at least 2.
+
+  Returns:
+    [0, 1, ..., 1], P entries.
+  """
+  assert num_players >= 2, num_players
+  return [0] + [1] * (num_players - 1)
+
+
+def match_keys(key, n_deals: int, num_players: int):
+  """(deal_key [n*P], policy_key [n*P, P]) of the match's rows (i, r).
+
+  The P rows of deal i share its deal key (duplicate deals) and each draws
+  its own policy keys: core.arena_engine.table_keys under that plan. At two
+  players these are core.arena_engine.deal_keys(key, n_deals, True), the
+  Evaluator's keys.
+
+  Args:
+    key: The match key.
+    n_deals: The deals.
+    num_players: P.
+
+  Returns:
+    (deal_key [n*P], policy_key [n*P, P]).
+  """
+  plan = designs.KeyPlan(
+      deal_index=(0,) * num_players, policy_index=tuple(range(num_players))
+  )
+  return arena_engine.table_keys(key, n_deals, plan, num_players)
+
+
+def play(env, a, b, n_deals: int, key, probs: bool, max_rows: int) -> Played:
+  """Plays a against b on n_deals duplicate deals, a in each seat (module doc).
+
+  Args:
+    env: The env, of P players.
+    a: Side a's entrant (one seat).
+    b: Side b's entrant (every other seat).
+    n_deals: The number of deals; each is played P times, a in seat r of its
+      r-th game.
     key: The match key.
     probs: Whether to record the acting side's action distribution.
     max_rows: The Arena batch rows, or 0 to fit the log memory budget.
 
   Returns:
-    Every game's log.
+    Every game's log, rows (i, r) in order.
 
   Raises:
-    RuntimeError: with `probs`, the two perspective passes played different
+    RuntimeError: with `probs`, the perspective passes played different
       games.
   """
+  num_players = env.num_players
+  line = lineup_slots(num_players)
   slots = [arena_lib.Slot(e.policy, 1, e.rule) for e in (a, b)]
   params = [
       arena_engine.stack_members([e.params]) if sl.in_graph else [e.params]
@@ -725,18 +786,28 @@ def play(env, a, b, n_deals: int, key, probs: bool, max_rows: int) -> Played:
       if all(sl.in_graph for sl in slots)
       else host_arena.HostArena
   )
-  passes = (0, 1) if probs else (0,)
+  # One pass per line-up position whose decisions are recorded: position 0
+  # (a) always; with probs, every position, each pass emitting the decisions
+  # of the seat that position holds.
+  passes = tuple(range(num_players)) if probs else (0,)
   arenas = {
-      p: cls(env, slots, perspective_slot=p, hands_per_match=1) for p in passes
-  }
-  tables = {
-      p: arena_lib.rotated_table(n_deals, [0, 1], [0, 0], perspective=p)
+      p: cls(env, slots, perspective_slot=line[p], hands_per_match=1)
       for p in passes
   }
-  deal_key, policy_key = arena_engine.deal_keys(key, n_deals, True)
-  rows, num_steps = 2 * n_deals, env.max_len + 1
+  tables = {
+      p: arena_lib.rotated_table(
+          n_deals, line, [0] * num_players, perspective=p
+      )
+      for p in passes
+  }
+  deal_key, policy_key = match_keys(key, n_deals, num_players)
+  rows, num_steps = num_players * n_deals, env.max_len + 1
   chunk = _chunk_rows(
-      rows, num_steps, env.num_actions, 2 * len(jax.devices()), max_rows
+      rows,
+      num_steps,
+      env.num_actions,
+      num_players * len(jax.devices()),
+      max_rows,
   )
   out = dict(actor=[], action=[], rewards=[], done=[], probs=[])
   for start in range(0, rows, chunk):
@@ -754,7 +825,7 @@ def play(env, a, b, n_deals: int, key, probs: bool, max_rows: int) -> Played:
       logs[p] = log
       if probs:
         valid = np.asarray(batch.valid)
-        rule = (a, b)[p].rule
+        rule = (a, b)[line[p]].rule
         _, pr = decide.decide(
             jnp.asarray(batch.behavior_logits)[valid],
             jnp.asarray(batch.steps.legal_mask)[valid],
@@ -762,13 +833,14 @@ def play(env, a, b, n_deals: int, key, probs: bool, max_rows: int) -> Played:
             jax.random.key(0),
         )
         prob[valid] = np.asarray(pr)
-    if probs and not np.array_equal(
-        np.asarray(logs[0].action), np.asarray(logs[1].action)
-    ):
-      raise RuntimeError(
-          "the two perspective passes played different games (the policies' "
-          "outputs differ with the batch layout); run without --probs"
-      )
+    for p in passes[1:]:
+      if not np.array_equal(
+          np.asarray(logs[0].action), np.asarray(logs[p].action)
+      ):
+        raise RuntimeError(
+            "the perspective passes played different games (the policies' "
+            "outputs differ with the batch layout); run without --probs"
+        )
     log = logs[0]
     n = idx.size
     out["actor"].append(np.asarray(log.actor)[:n])
@@ -785,6 +857,43 @@ def play(env, a, b, n_deals: int, key, probs: bool, max_rows: int) -> Played:
       cat["done"],
       deal_key,
       cat["probs"],
+  )
+
+
+def seat_payoffs(pay: np.ndarray, num_players: int):
+  """(a's seat per row, a's payoffs [n, P], b's payoffs [n, P]) of a match.
+
+  Row (i, r) has a in seat r (lineup_slots); b's payoff in a row is the mean
+  over the P - 1 seats b held there (at two players, its one seat's).
+
+  Args:
+    pay: f64[n * P, P], each row's payoff per seat.
+    num_players: P.
+
+  Returns:
+    (a_seat i32[n * P], a_pay f64[n, P], b_pay f64[n, P]); column r of a_pay
+    and b_pay is the game of the deal with a in seat r.
+
+  Raises:
+    ValueError: `pay` is not [n * P, P].
+  """
+  rows = pay.shape[0]
+  if pay.ndim != 2 or pay.shape[1] != num_players or rows % num_players:
+    raise ValueError(
+        f"payoffs of shape {pay.shape}; a match of {num_players} players has "
+        f"[n * {num_players}, {num_players}]"
+    )
+  n_deals = rows // num_players
+  a_seat = np.tile(np.arange(num_players), n_deals)
+  r = np.arange(rows)
+  a_row = pay[r, a_seat]
+  b_row = (pay.sum(axis=1) - a_row) / (num_players - 1)
+  if num_players == 2:  # exactly the other seat's, no rounding
+    b_row = pay[r, 1 - a_seat]
+  return (
+      a_seat,
+      a_row.reshape(n_deals, num_players),
+      b_row.reshape(n_deals, num_players),
   )
 
 
@@ -1001,7 +1110,8 @@ def run(
   Args:
     a_spec: Side a: an artifact or a built-in side (module doc).
     b_spec: Side b.
-    games: The number of games, even and at least 4.
+    games: The number of games, a multiple of the game's players P, at
+      least 2P.
     seed: The match seed.
     out_dir: The directory written.
     rule_flag: "default", "argmax" or "sample".
@@ -1020,16 +1130,11 @@ def run(
     RuntimeError: the replay of a saved game failed.
     ModuleNotFoundError: a module other than pyspiel failed to import.
   """
-  if games < 4 or games % 2:
-    raise app.UsageError(
-        f"--games={games}: an even number, at least 4 (two seat-swapped "
-        "pairs, for a standard error)"
-    )
   rule = None if rule_flag == "default" else types.DecisionRule(rule_flag, 1.0)
   t0 = time.monotonic()
 
   def builtin(s):
-    """Whether a spec is built in (uniform or an arch).
+    """Whether a spec is built in (uniform or a registered architecture).
 
     Args:
       s: The spec.
@@ -1056,9 +1161,17 @@ def run(
   if scripted_endgame:
     for k in loaded:
       with_endgame(sides[k], env)
-  if env.num_players != 2:
+  num_players = env.num_players
+  if num_players < 2:
     raise app.UsageError(
-        f"{env.name} has {env.num_players} players; this script plays two"
+        f"{env.name} has {num_players} player; a match needs two or more"
+    )
+  if games < 2 * num_players or games % num_players:
+    raise app.UsageError(
+        f"--games={games}: {env.name} has {num_players} players, so a "
+        f"multiple of {num_players} (each deal is played {num_players} times, "
+        f"a in each seat), at least {2 * num_players} (two deals, for a "
+        "standard error)"
     )
   for k, s in sides.items():
     ps = s.entrant.policy.spec
@@ -1069,20 +1182,19 @@ def run(
           f"{env.num_players}"
       )
   a, b = sides["a"].entrant, sides["b"].entrant
+  n_deals = games // num_players
   print(
       f"{env.name}: a = {a.name} ({a.rule.kind}), b = {b.name} "
-      f"({b.rule.kind}); {games} games on {games // 2} seat-swapped deals",
+      f"({b.rule.kind}) in the other {num_players - 1} seat"
+      f"{'s' if num_players > 2 else ''}; {games} games on {n_deals} "
+      f"duplicate deals, a in each of the {num_players} seats",
       flush=True,
   )
 
-  n_deals = games // 2
   played = play(env, a, b, n_deals, jax.random.key(seed), probs, max_rows)
   t_play = time.monotonic() - t0
   pay = payoff.payoffs(played.rewards, played.done, 1)  # f64[rows, P], per seat
-  a_seat = np.tile(np.array([0, 1]), n_deals)
-  rows = np.arange(2 * n_deals)
-  a_pay = pay[rows, a_seat].reshape(n_deals, 2)
-  b_pay = pay[rows, 1 - a_seat].reshape(n_deals, 2)
+  a_seat, a_pay, b_pay = seat_payoffs(pay, num_players)
   res = payoff.match_result(
       env.name,
       "play_checkpoints",
@@ -1095,15 +1207,19 @@ def run(
       a_pay,
       b_pay,
   )
-  m, s0, s1 = res.mean, res.seat[0], res.seat[1]
+  m = res.mean
   print(
       f"a's mean payoff per game: {m.mean:+.4f} +/- {m.se:.4f} (95% CI "
-      f"{m.lo:+.4f} .. {m.hi:+.4f}); b's: {float(b_pay.mean()):+.4f}",
+      f"{m.lo:+.4f} .. {m.hi:+.4f}); b's per seat held: "
+      f"{float(b_pay.mean()):+.4f}",
       flush=True,
   )
   print(
-      f"  a in seat 0: {s0.mean:+.4f} +/- {s0.se:.4f}; a in seat 1: "
-      f"{s1.mean:+.4f} +/- {s1.se:.4f}",
+      "  "
+      + "; ".join(
+          f"a in seat {r}: {e.mean:+.4f} +/- {e.se:.4f}"
+          for r, e in enumerate(res.seat)
+      ),
       flush=True,
   )
 
@@ -1129,10 +1245,11 @@ def run(
   path = os.path.join(out_dir, TRAJECTORIES)
   seen_params, replayable = set(), True
   with open(path, "w", encoding="utf-8") as f:
-    for r in range(2 * n_deals):
+    for r in range(num_players * n_deals):
       raw = [int(x) for x in hists[r]]
       order = list(range(len(raw)))
-      seat_of = (0, 1)  # the env seat of each player of the record
+      # the env seat of each player of the record
+      seat_of = tuple(range(num_players))
       params = base_params
       if to_pyspiel is not None:
         conv = to_pyspiel(raw, env_spec.kwargs)
@@ -1142,12 +1259,14 @@ def run(
         replayable = False
       else:
         seen_params.add(json.dumps(params, sort_keys=True))
-      seats = ["a", "b"] if a_seat[r] == 0 else ["b", "a"]
+      seats = ["a" if q == a_seat[r] else "b" for q in range(num_players)]
       rec = dict(
           index=r,
-          deal=r // 2,
+          deal=r // num_players,
           game_string=(
-              None if params is None else game_string(env.name, params)
+              None
+              if params is None
+              else game_string(served.pyspiel_name(env.name), params)
           ),
           seats=[seats[q] for q in seat_of],
           history=[raw[i] for i in order],
@@ -1196,18 +1315,19 @@ def run(
       entrants={k: s.info for k, s in sides.items()},
       games=games,
       seed=seed,
-      num_records=2 * n_deals,
+      num_players=num_players,
+      num_records=num_players * n_deals,
       result=dict(
           a=_estimate(m),
-          a_seat0=_estimate(s0),
-          a_seat1=_estimate(s1),
           b_mean=float(b_pay.mean()),
+          **{f"a_seat{r}": _estimate(e) for r, e in enumerate(res.seat)},
       ),
   )
   with open(os.path.join(out_dir, SUMMARY), "w", encoding="utf-8") as f:
     json.dump(summary, f, indent=2, sort_keys=True)
   print(
-      f"wrote {2 * n_deals} games to {path} ({FORMAT} format {FORMAT_VERSION}) "
+      f"wrote {num_players * n_deals} games to {path} "
+      f"({FORMAT} format {FORMAT_VERSION}) "
       f"in {time.monotonic() - t0:.0f} s (play {t_play:.0f} s)",
       flush=True,
   )
@@ -1223,7 +1343,8 @@ def run(
       if e.name != "pyspiel":
         raise
       print(
-          f"pyspiel is not installed, so the {2 * n_deals} saved games were "
+          f"pyspiel is not installed, so the {num_players * n_deals} saved "
+          "games were "
           "not replayed in"
           " OpenSpiel: the replay check needs pyspiel (OpenSpiel's full "
           "install); the games, the result above and the summary are complete",

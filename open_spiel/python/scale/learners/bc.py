@@ -73,7 +73,7 @@ optimiser steps of the update.
 from __future__ import annotations
 
 import dataclasses
-from typing import Any, Mapping, NamedTuple, Optional
+from typing import Any, Callable, Mapping, NamedTuple, Optional
 
 import jax
 import jax.numpy as jnp
@@ -240,6 +240,42 @@ def _seat_column(x, seat):
   ]
 
 
+#: obs_format name -> fn(steps SeatStep [B, T], valid bool[B, T]) -> steps
+#: (register_step_padding).
+_STEP_PADDING: dict[
+    str, Callable[[types.SeatStep, jax.Array], types.SeatStep]
+] = {}
+
+
+def register_step_padding(
+    obs_format: str, fn: Callable[[types.SeatStep, jax.Array], types.SeatStep]
+) -> None:
+  """Registers the step padding of a stateless student over `obs_format`.
+
+  BCLearner hands the steps of a STATELESS student over encoder `obs_format`
+  through fn(steps, valid) -> steps before its forward, for an encoder whose
+  output is undefined on some plies (fn replaces the untrained plies' inputs,
+  which every loss term masks out but whose forward still runs). fn must
+  leave the trained plies (valid True) unchanged. Idempotent for the same fn.
+
+  Args:
+    obs_format: the encoder name.
+    fn: the padding.
+
+  Raises:
+    ValueError: an empty name, or another fn registered for it.
+    TypeError: fn is not callable.
+  """
+  if not isinstance(obs_format, str) or not obs_format:
+    raise ValueError(f"want an obs_format name, got {obs_format!r}")
+  if not callable(fn):
+    raise TypeError(f"{fn!r} is not callable")
+  old = _STEP_PADDING.get(obs_format)
+  if old is not None and old is not fn:
+    raise ValueError(f"obs_format {obs_format!r} already has a step padding")
+  _STEP_PADDING[obs_format] = fn
+
+
 class BCLearner:
   """Learner over one Policy (the student).
 
@@ -260,6 +296,14 @@ class BCLearner:
     )
     self.value_support = losses.check_value_support(cfg.loss.value, policy)
     self._policy = policy
+    # A stateless student's registered step padding (register_step_padding).
+    # Only for such encoders: the extra ops change the compiled update, and so
+    # the update's float rounding, for every other student.
+    self._step_padding = (
+        None
+        if policy.spec.stateful
+        else _STEP_PADDING.get(policy.spec.obs_format)
+    )
     self.cfg = cfg
     self._tx = cfg.optimizer()
     self._lr = cfg.schedule()
@@ -362,7 +406,10 @@ class BCLearner:
     """
     assert set(blob) == {"params", "opt_state", "step"}, sorted(blob)
     step = jnp.asarray(blob["step"])
-    assert step.dtype == jnp.int64 and not step.shape, (step.dtype, step.shape)
+    assert step.dtype == jnp.int64 and not step.shape, (
+        step.dtype,
+        step.shape,
+    )
     ref = self._tx.init(blob["params"])
     ref_leaves, treedef = jax.tree.flatten(ref)
     got = list(blob["opt_state"])
@@ -397,6 +444,8 @@ class BCLearner:
     """
     cfg = self.cfg.loss
     steps = batch.steps
+    if self._step_padding is not None:
+      steps = self._step_padding(steps, batch.valid)
     carry = batch.init_carry
     if self._policy.spec.stateful and not jax.tree.leaves(carry):
       # A reset-aligned offline batch: the student starts from its own carry.
@@ -505,9 +554,8 @@ class BCLearner:
       mean over every minibatch step).
     """
     e, m = self.cfg.num_epochs, self.cfg.num_minibatches
-    batch = dp_lib.constrain_rows(
-        batch
-    )  # data parallel: rows stay on their device
+    # data parallel: rows stay on their device
+    batch = dp_lib.constrain_rows(batch)
     if e == 1 and m == 1:
       return self._step(s, batch)
     b = batch.valid.shape[0]

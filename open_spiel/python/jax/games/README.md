@@ -107,9 +107,11 @@ OpenSpiel's default game or an error, never another game.
 | `connect_four` | `connect_four` | `rows`, `columns` |
 | `dark_hex` | `dark_hex(board_size=3)` | 3x3 only |
 | `dark_hex_ir` | `dark_hex_ir` | 3x3 only; `gameversion` `cdh` (default) or `adh` |
-| `gin_rummy` | `gin_rummy` | `oklahoma` and optional rule variants; one scoring rule differs from released OpenSpiel: equal deadwood after layoffs is an undercut (the defender scores the undercut bonus), where OpenSpiel scores the tie 0 for both, so it is not move-checked against stock OpenSpiel |
+| `euchre` | `euchre` | `allow_lone_defender`, `stick_the_dealer`; four players in two partnerships, zero-sum; OpenSpiel's corrected euchre (959-entry information-state tensor, go-alone decided before the dealer takes up the up-card), which released OpenSpiel wheels (2.0.2 and earlier) do not have, so it is checked against recorded goldens when running against an older wheel; information-state tensor only |
+| `gin_rummy` | `gin_rummy` | `oklahoma` and optional rule variants; one scoring rule differs from released OpenSpiel wheels (2.0.2 and earlier): equal deadwood after layoffs is an undercut (the defender scores the undercut bonus), where released OpenSpiel wheels score the tie 0 for both |
 | `go` | `go` | `board_size`, `komi`, `max_game_length`; simple ko, and a repeated position ends the game as a draw (OpenSpiel's superko); no handicap |
 | `gomoku` | `gomoku` | `board_size`, `connect` |
+| `hearts` | `hearts` | all eight OpenSpiel parameters; four players, general-sum; information-state tensor only (OpenSpiel has no observation tensor) |
 | `hex` | `hex` | `board_size`, `swap` (default off: `board_size**2` actions, one more with the swap rule) |
 | `kuhn_poker` | `kuhn_poker` | two players |
 | `leduc_poker` | `leduc_poker` | two players |

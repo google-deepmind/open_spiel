@@ -64,7 +64,10 @@ NOTICE_MAX_LENGTH is cut to it (the whole notice is logged); a blank one
 is sent as None.
 
 The bot output (contract 9, REMOTE_BOTS.md "The bot output"), which the
-GUI keeps with the move's ply and shows to every viewer: `policy` is the decision's distribution over the seat's legal actions
+GUI keeps with the move's ply and shows to the viewers who see the move in
+full (the seat's own and omniscient viewers; in a game that hides
+information, no other seat or spectator): `policy` is the
+decision's distribution over the seat's legal actions
 (checkpoint_bot's last_probs), most probable first, each `{"action",
 "label", "prob"}` with the game's label for the seat; `value` is the
 policy's value estimate for the seat, or None (a forced move runs no
@@ -101,6 +104,7 @@ from open_spiel.python.scale.ckpt import artifact as artifact_lib
 from open_spiel.python.scale.ckpt import public as public_lib
 from open_spiel.python.scale.serve import checkpoint_bot as checkpoint_bot_lib
 from open_spiel.python.scale.serve import controller as controller_lib
+from open_spiel.python.scale.serve import games as games_lib
 
 FULL_STATE = "full_state"
 #: A full_state request's body keys (contract 8 and 9, POST /spiel/step).
@@ -207,8 +211,9 @@ class RemoteCheckpointBot:
 
   Attributes:
     state_modes: ("full_state",), the requests it takes.
-    games: the short name of the default artifact's game, or None (any game,
-      an artifact named per request).
+    games: the pyspiel short name of the default artifact's game
+      (games.pyspiel_name), or None (any game, an artifact named per
+      request).
     default: the default artifact's settings ({"checkpoint": ...}), or None.
   """
 
@@ -241,7 +246,7 @@ class RemoteCheckpointBot:
     if default_checkpoint is not None and default_checkpoint.strip():
       self.default = {"checkpoint": default_checkpoint.strip()}
       bot = self.bot(self.default)
-      self.games = (bot.manifest.game,)
+      self.games = (games_lib.pyspiel_name(bot.manifest.game),)
 
   def bot(self, config: Mapping[str, Any]) -> checkpoint_bot_lib.CheckpointBot:
     """The CheckpointBot `config` names, loaded once (module doc).
@@ -401,7 +406,7 @@ class RemoteCheckpointBot:
 def make_bot(
     environ: Optional[Mapping[str, str]] = None,
 ) -> RemoteCheckpointBot:
-  """The bot remote_bot_server's `--bot` names this factory for (module doc).
+  """The bot this module's `make_bot` entry point serves (module doc).
 
   Args:
     environ: the environment (default os.environ); CHECKPOINT_ENV names the

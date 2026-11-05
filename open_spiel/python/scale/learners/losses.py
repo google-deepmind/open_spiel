@@ -58,6 +58,12 @@ Conventions:
   * NEG = -1e9 is finite because a -inf fill gives NaN gradients through
     0 * -inf on rows with no legal action. `decide` (sampling) is separate and
     uses -inf.
+  * stable_softmax (PGLossConfig, DistillLossConfig; off by default): every
+    log-softmax, cross-entropy and KL here takes `stable`, which swaps
+    jax.nn's for learners.stable_softmax (Barron, Gnanapragasam and
+    Tschannen, arXiv:2610.31642): no softmax collapse at large logit margins,
+    and the KL terms between two sets of logits have a gradient exactly 0 at
+    equality. Off, every loss is the standard one, bit for bit.
 """
 
 from __future__ import annotations
@@ -68,7 +74,9 @@ from typing import Any, Mapping, NamedTuple, Optional, Sequence
 import jax
 import jax.numpy as jnp
 
+from open_spiel.python.scale.core import hash_compat
 from open_spiel.python.scale.core import schedules
+from open_spiel.python.scale.learners import stable_softmax
 from open_spiel.python.scale.networks import hl_gauss
 
 NEG = -1e9
@@ -158,12 +166,17 @@ def _coef(x: Any) -> Any:
 # ---------------------------------------------------------------------------
 
 
-def masked_mean(x: jax.Array, mask: jax.Array) -> jax.Array:
+def masked_mean(
+    x: jax.Array, mask: jax.Array, count: Optional[jax.Array] = None
+) -> jax.Array:
   """Mean of x over mask-True entries; 0 (zero gradient) for an empty mask.
 
   Args:
     x: f32 values.
     mask: bool, the entries to average (x's shape).
+    count: the denominator instead of the mask's own count (a chunk of a
+      minibatch divides by the minibatch's count, so the chunks' means add up
+      to the minibatch's mean; still at least 1).
 
   Returns:
     The f32 mean over the mask, 0 when the mask is empty.
@@ -171,7 +184,9 @@ def masked_mean(x: jax.Array, mask: jax.Array) -> jax.Array:
   mask = _b("mask", mask)
   assert x.shape == mask.shape, (x.shape, mask.shape)
   m = mask.astype(x.dtype)
-  return jnp.where(mask, x, jnp.zeros_like(x)).sum() / jnp.maximum(m.sum(), 1.0)
+  den = m.sum() if count is None else jnp.asarray(count, x.dtype)
+  assert not den.shape, den.shape
+  return jnp.where(mask, x, jnp.zeros_like(x)).sum() / jnp.maximum(den, 1.0)
 
 
 def target_argmax(target, legal) -> jax.Array:
@@ -225,21 +240,31 @@ def masked_logits(logits: jax.Array, legal: jax.Array) -> jax.Array:
   return jnp.where(legal, logits, _F32(NEG))
 
 
-def masked_log_softmax(logits: jax.Array, legal: jax.Array) -> jax.Array:
+def masked_log_softmax(
+    logits: jax.Array, legal: jax.Array, *, stable: bool = False
+) -> jax.Array:
   """Legal-masked log-softmax (illegal entries ~ NEG, never read).
 
   Args:
     logits: f32[..., A] policy logits.
     legal: bool[..., A] legal actions.
+    stable: stable_softmax.log_softmax instead of jax.nn's.
 
   Returns:
     f32[..., A] log-probabilities.
   """
-  return jax.nn.log_softmax(masked_logits(logits, legal), axis=-1)
+  z = masked_logits(logits, legal)
+  if stable:
+    return stable_softmax.log_softmax(z)
+  return jax.nn.log_softmax(z, axis=-1)
 
 
 def action_log_prob(
-    logits: jax.Array, legal: jax.Array, action: jax.Array
+    logits: jax.Array,
+    legal: jax.Array,
+    action: jax.Array,
+    *,
+    stable: bool = False,
 ) -> jax.Array:
   """Log pi(action) under the legal-masked softmax, [...].
 
@@ -247,28 +272,36 @@ def action_log_prob(
     logits: f32[..., A] policy logits.
     legal: bool[..., A] legal actions.
     action: int[...] the action taken.
+    stable: -stable_softmax.cross_entropy instead of jax.nn's log-softmax.
 
   Returns:
     f32[...] log pi(action).
   """
   action = _i("action", action)
+  if stable:
+    return -stable_softmax.cross_entropy(
+        masked_logits(logits, legal), action.astype(jnp.int32)
+    )
   lp = masked_log_softmax(logits, legal)
   return jnp.take_along_axis(lp, action[..., None].astype(jnp.int32), axis=-1)[
       ..., 0
   ]
 
 
-def entropy(logits: jax.Array, legal: jax.Array) -> jax.Array:
+def entropy(
+    logits: jax.Array, legal: jax.Array, *, stable: bool = False
+) -> jax.Array:
   """Per-row entropy of the legal-masked softmax.
 
   Args:
     logits: f32[..., A] policy logits.
     legal: bool[..., A] legal actions.
+    stable: stable_softmax.log_softmax instead of jax.nn's.
 
   Returns:
     f32[...] entropy per row.
   """
-  lp = masked_log_softmax(logits, legal)
+  lp = masked_log_softmax(logits, legal, stable=stable)
   p = jnp.exp(lp)
   return -jnp.sum(jnp.where(legal, p * lp, _F32(0.0)), axis=-1)
 
@@ -331,7 +364,11 @@ def clip_fraction(ratio: jax.Array, *, clip_eps: float) -> jax.Array:
 
 
 def kl_to_reference(
-    logits: jax.Array, reference_logits: jax.Array, legal: jax.Array
+    logits: jax.Array,
+    reference_logits: jax.Array,
+    legal: jax.Array,
+    *,
+    stable: bool = False,
 ) -> jax.Array:
   """Per-row reverse KL(pi || ref) over legal actions.
 
@@ -341,6 +378,7 @@ def kl_to_reference(
     logits: f32[..., A] policy logits.
     reference_logits: f32[..., A] the reference policy's logits.
     legal: bool[..., A] legal actions.
+    stable: stable_softmax.reverse_kl (gradient exactly 0 at pi == ref).
 
   Returns:
     f32[...] KL per row.
@@ -348,22 +386,34 @@ def kl_to_reference(
   ref = jax.lax.stop_gradient(
       masked_logits(_f("reference_logits", reference_logits), legal)
   )
+  if stable:
+    return stable_softmax.reverse_kl(masked_logits(logits, legal), ref)
   lp = masked_log_softmax(logits, legal)
   lr = jax.nn.log_softmax(ref, axis=-1)
   p = jnp.exp(lp)
   return jnp.sum(jnp.where(legal, p * (lp - lr), _F32(0.0)), axis=-1)
 
 
-def kl_to_uniform(logits: jax.Array, legal: jax.Array) -> jax.Array:
+def kl_to_uniform(
+    logits: jax.Array, legal: jax.Array, *, stable: bool = False
+) -> jax.Array:
   """Per-row KL(pi || uniform over legal) = log(#legal) - H(pi).
 
   Args:
     logits: f32[..., A] policy logits.
     legal: bool[..., A] legal actions.
+    stable: kl_to_reference(stable=True) to the constant logits max(legal
+      logits) (stop-gradient): the uniform policy over legal actions, equal
+      bit for bit to a uniform policy's own logits, so its gradient is
+      exactly 0 there.
 
   Returns:
     f32[...] KL per row.
   """
+  if stable:
+    top = jnp.max(masked_logits(logits, legal), axis=-1, keepdims=True)
+    ref = jnp.broadcast_to(jax.lax.stop_gradient(top), logits.shape)
+    return kl_to_reference(logits, ref, legal, stable=True)
   n = jnp.maximum(legal.sum(-1), 1).astype(_F32)
   return jnp.log(n) - entropy(logits, legal)
 
@@ -476,7 +526,11 @@ def hl_gauss_target_probs(
 
 
 def hl_gauss_cross_entropy(
-    logits: jax.Array, target: jax.Array, support: HLGaussSupport
+    logits: jax.Array,
+    target: jax.Array,
+    support: HLGaussSupport,
+    *,
+    stable: bool = False,
 ) -> jax.Array:
   """Per-row CE between softmax(logits) and the HL-Gauss target.
 
@@ -484,12 +538,19 @@ def hl_gauss_cross_entropy(
     logits: f32[..., num_bins] value logits.
     target: f32[...] scalar targets.
     support: the HLGaussSupport.
+    stable: stable_softmax.log_softmax instead of jax.nn's (the target is a
+      distribution with exact zeros, not logits, so the collapse fix only).
 
   Returns:
     f32[...] CE per row.
   """
   logits = _f("value_logits", logits)
   assert logits.shape[-1] == support.num_bins, (logits.shape, support.num_bins)
+  if stable:
+    t = hl_gauss.target_to_probs(
+        jax.lax.stop_gradient(_f("target", target)), support
+    )
+    return -jnp.sum(t * stable_softmax.log_softmax(logits), axis=-1)
   return hl_gauss.cross_entropy(
       logits, jax.lax.stop_gradient(_f("target", target)), support
   )
@@ -509,7 +570,11 @@ def z_loss(logits: jax.Array, legal: jax.Array) -> jax.Array:
 
 
 def cross_entropy_to_target(
-    logits: jax.Array, target_policy: jax.Array, legal: jax.Array
+    logits: jax.Array,
+    target_policy: jax.Array,
+    legal: jax.Array,
+    *,
+    stable: bool = False,
 ) -> jax.Array:
   """Per-row soft-target CE -sum_a t(a) log pi(a) over legal actions.
 
@@ -517,17 +582,23 @@ def cross_entropy_to_target(
     logits: f32[..., A] policy logits.
     target_policy: f32[..., A] the target distribution.
     legal: bool[..., A] legal actions.
+    stable: stable_softmax.log_softmax instead of jax.nn's (the target is a
+      distribution with exact zeros, not logits, so the collapse fix only).
 
   Returns:
     f32[...] CE per row.
   """
   t = jax.lax.stop_gradient(_f("target_policy", target_policy))
-  lp = masked_log_softmax(logits, legal)
+  lp = masked_log_softmax(logits, legal, stable=stable)
   return -jnp.sum(jnp.where(legal, t * lp, _F32(0.0)), axis=-1)
 
 
 def cross_entropy_to_action(
-    logits: jax.Array, legal: jax.Array, action: jax.Array
+    logits: jax.Array,
+    legal: jax.Array,
+    action: jax.Array,
+    *,
+    stable: bool = False,
 ) -> jax.Array:
   """Per-row -log pi(action) (one-hot BC).
 
@@ -535,15 +606,20 @@ def cross_entropy_to_action(
     logits: f32[..., A] policy logits.
     legal: bool[..., A] legal actions.
     action: int[...] the target action.
+    stable: stable_softmax.cross_entropy instead of jax.nn's log-softmax.
 
   Returns:
     f32[...] CE per row.
   """
-  return -action_log_prob(logits, legal, action)
+  return -action_log_prob(logits, legal, action, stable=stable)
 
 
 def kl_from_target(
-    target_policy: jax.Array, logits: jax.Array, legal: jax.Array
+    target_policy: jax.Array,
+    logits: jax.Array,
+    legal: jax.Array,
+    *,
+    stable: bool = False,
 ) -> jax.Array:
   """Per-row forward KL(target || pi) over legal actions (distillation).
 
@@ -551,12 +627,14 @@ def kl_from_target(
     target_policy: f32[..., A] the target distribution.
     logits: f32[..., A] policy logits.
     legal: bool[..., A] legal actions.
+    stable: stable_softmax.log_softmax instead of jax.nn's (the target is a
+      distribution with exact zeros, not logits, so the collapse fix only).
 
   Returns:
     f32[...] KL per row.
   """
   t = jax.lax.stop_gradient(_f("target_policy", target_policy))
-  lp = masked_log_softmax(logits, legal)
+  lp = masked_log_softmax(logits, legal, stable=stable)
   keep = legal & (t > 0)
   log_t = jnp.log(jnp.where(keep, t, _F32(1.0)))
   return jnp.sum(jnp.where(keep, t * (log_t - lp), _F32(0.0)), axis=-1)
@@ -583,7 +661,9 @@ def sigmoid_cross_entropy(logits: jax.Array, labels: jax.Array) -> jax.Array:
 AUX_KINDS = ("sigmoid_ce", "softmax_ce", "mse")
 
 
-def aux_loss(kind: str, pred: jax.Array, label: jax.Array) -> jax.Array:
+def aux_loss(
+    kind: str, pred: jax.Array, label: jax.Array, *, stable: bool = False
+) -> jax.Array:
   """Per-row aux-head loss on a privileged label (TrajectoryBatch.labels).
 
   sigmoid_ce: pred logits [..., K], label {0,1} [..., K], mean over K.
@@ -594,6 +674,7 @@ def aux_loss(kind: str, pred: jax.Array, label: jax.Array) -> jax.Array:
     kind: one of AUX_KINDS (above).
     pred: the aux head's output.
     label: the privileged label.
+    stable: softmax_ce through stable_softmax.cross_entropy.
 
   Returns:
     f32[...] the loss per row.
@@ -605,6 +686,10 @@ def aux_loss(kind: str, pred: jax.Array, label: jax.Array) -> jax.Array:
     return sigmoid_cross_entropy(pred, jnp.asarray(label).astype(_F32))
   if kind == "softmax_ce":
     label = _i("label", label)
+    if stable:
+      return stable_softmax.cross_entropy(
+          _f("aux_logits", pred), label.astype(jnp.int32)
+      )
     lp = jax.nn.log_softmax(_f("aux_logits", pred), axis=-1)
     return -jnp.take_along_axis(
         lp, label[..., None].astype(jnp.int32), axis=-1
@@ -669,9 +754,6 @@ def advantage_filter_mask(
 # ---------------------------------------------------------------------------
 
 
-_step = schedules.counter  # pylint: disable=invalid-name
-
-
 def magnet_due(step_after: Any, every: int) -> jax.Array:
   """bool: the magnet is re-taken after this update.
 
@@ -685,7 +767,7 @@ def magnet_due(step_after: Any, every: int) -> jax.Array:
     A bool scalar.
   """
   assert every >= 1, every
-  return (_step(step_after) % jnp.int64(every)) == 0
+  return (schedules.counter(step_after) % jnp.int64(every)) == 0
 
 
 def refresh_magnet(
@@ -844,6 +926,9 @@ class PGLossConfig:
       is kept).
     advantage_filter_quantile: the filter's quantile q of |A|.
     advantage_filter_floor: the filter's minimum |A|.
+    stable_softmax: the policy log-probs, entropy, magnet KL and HL-Gauss
+      value CE through learners.stable_softmax (module doc). Left out of the
+      config hash at its default (core.hash_compat.added).
   """
 
   clip_eps: float = 0.2
@@ -855,6 +940,7 @@ class PGLossConfig:
   use_advantage_filter: bool = False
   advantage_filter_quantile: float = 0.75
   advantage_filter_floor: float = 0.01
+  stable_softmax: bool = hash_compat.added(False)
 
   def __post_init__(self):
     assert self.value_head in ("scalar", "hl_gauss"), self.value_head
@@ -896,6 +982,7 @@ def _value_term(
     count,
     clip_value: bool,
     clip_eps: float,
+    stable: bool = False,
 ):
   """The value loss and the fraction of clipped values.
 
@@ -910,6 +997,7 @@ def _value_term(
     count: the divisor (floored at 1).
     clip_value: whether to clip the scalar value error.
     clip_eps: the clip range.
+    stable: the HL-Gauss CE through stable_softmax.
 
   Returns:
     (the value loss, the clipped fraction).
@@ -921,7 +1009,11 @@ def _value_term(
     ), "value_head=hl_gauss needs value_support (the head's support)"
     return (
         _sum_over(
-            hl_gauss_cross_entropy(value_logits, targets, support), mask, count
+            hl_gauss_cross_entropy(
+                value_logits, targets, support, stable=stable
+            ),
+            mask,
+            count,
         ),
         _F32(0.0),
     )
@@ -1102,7 +1194,8 @@ def pg_loss(
   )
   n_mask, n_actor = stats.mask_count, stats.actor_count
 
-  logp = action_log_prob(logits, legal, action)
+  stable = cfg.stable_softmax
+  logp = action_log_prob(logits, legal, action, stable=stable)
   ratio = jnp.exp(logp - behavior_logp)
   value_loss, clip_frac_value = _value_term(
       cfg.value_head,
@@ -1115,8 +1208,9 @@ def pg_loss(
       count=n_mask,
       clip_value=cfg.clip_value,
       clip_eps=cfg.clip_eps,
+      stable=stable,
   )
-  ent = _sum_over(entropy(logits, legal), mask, n_mask)
+  ent = _sum_over(entropy(logits, legal, stable=stable), mask, n_mask)
 
   loss_policy = _sum_over(
       ppo_clip_objective(ratio, adv, clip_eps=cfg.clip_eps), actor_rows, n_actor
@@ -1132,7 +1226,9 @@ def pg_loss(
     ref = _f("reference_logits", reference_logits)
     if cfg.kl_init_to_uniform:
       ref = jnp.where(jnp.asarray(is_first_update), jnp.zeros_like(ref), ref)
-    kl = _sum_over(kl_to_reference(logits, ref, legal), actor_rows, n_actor)
+    kl = _sum_over(
+        kl_to_reference(logits, ref, legal, stable=stable), actor_rows, n_actor
+    )
     kl_term = kl_coef * kl
 
   total = loss_policy + cfg.vf_coef * value_loss - ent_coef * ent + kl_term
@@ -1187,6 +1283,9 @@ class DistillLossConfig:
     value_coef: the value loss's weight.
     z_loss_coef: the weight of the logits' z-loss (0: off).
     aux_terms: the AuxTerms on privileged labels.
+    stable_softmax: every policy, value and aux softmax loss through
+      learners.stable_softmax (module doc). Left out of the config hash at
+      its default (core.hash_compat.added).
   """
 
   policy: str = "ce_target"
@@ -1194,6 +1293,7 @@ class DistillLossConfig:
   value_coef: float = 1.0
   z_loss_coef: float = 0.0
   aux_terms: Sequence[AuxTerm] = ()
+  stable_softmax: bool = hash_compat.added(False)
 
   def __post_init__(self):
     assert self.policy in ("ce_action", "ce_target", "kl_target"), self.policy
@@ -1256,15 +1356,16 @@ def distill_loss(
     mask = _b("policy_mask", policy_mask)
     assert mask.shape == aux_mask.shape, (mask.shape, aux_mask.shape)
 
+  stable = cfg.stable_softmax
   if cfg.policy == "ce_action":
     assert action is not None, "policy=ce_action needs action"
-    per = cross_entropy_to_action(logits, legal, action)
+    per = cross_entropy_to_action(logits, legal, action, stable=stable)
   elif cfg.policy == "ce_target":
     assert target_policy is not None, "policy=ce_target needs target_policy"
-    per = cross_entropy_to_target(logits, target_policy, legal)
+    per = cross_entropy_to_target(logits, target_policy, legal, stable=stable)
   else:
     assert target_policy is not None, "policy=kl_target needs target_policy"
-    per = kl_from_target(target_policy, logits, legal)
+    per = kl_from_target(target_policy, logits, legal, stable=stable)
   loss_policy = masked_mean(per, mask)
   total = loss_policy
   metrics = {"loss_policy": loss_policy}
@@ -1278,7 +1379,9 @@ def distill_loss(
         value_support is not None
     ), "value=hl_gauss needs value_support (the head's support)"
     lv = masked_mean(
-        hl_gauss_cross_entropy(value_logits, target_value, value_support),
+        hl_gauss_cross_entropy(
+            value_logits, target_value, value_support, stable=stable
+        ),
         value_mask,
     )
   else:
@@ -1299,7 +1402,8 @@ def distill_loss(
     ), f"aux term {t.name!r}: missing aux_preds[{t.name!r}]"
     assert t.name in labels, f"aux term {t.name!r}: missing labels[{t.name!r}]"
     la = masked_mean(
-        aux_loss(t.kind, aux_preds[t.name], labels[t.name]), aux_mask
+        aux_loss(t.kind, aux_preds[t.name], labels[t.name], stable=stable),
+        aux_mask,
     )
     total = total + t.coef * la
     metrics[f"aux/{t.name}"] = la

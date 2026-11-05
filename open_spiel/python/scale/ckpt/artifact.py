@@ -52,7 +52,8 @@ Invariants:
   * x64 is asserted on write and load whenever jax is loaded; leaf dtypes
     round-trip exactly.
   * The JAX params digest is `tree_sha256(params)`, computed in memory on
-    write and checked against the restored tree on load.
+    write and checked against the restored tree on load, under the format's
+    own tree tag (`NativeFormat.tree_sha_tag`), never the process's.
   * A warm start records both `parents` (artifact ids "<run>@<step>") and a
     `lineage` record ({source, step, ...}); a fresh init records neither.
   * `extensions` holds records keyed by names registered with
@@ -437,10 +438,16 @@ class NativeFormat:
   Attributes:
     name: the format's id in `ckpt.formats`.
     tag: the "format" value its manifests carry and its reader requires.
+    tree_sha_tag: the tree tag its params digests are written and verified
+      under (codecs.format_tree_sha_tag), part of the format: the native
+      format's is codecs.DEFAULT_TREE_SHA_TAG in every process, whatever
+      codecs.set_tree_sha_tag a plugin set, so an artifact the open library
+      wrote verifies everywhere and a tampered one fails everywhere.
   """
 
   name = FORMAT
   tag = FORMAT_TAG
+  tree_sha_tag = codecs.DEFAULT_TREE_SHA_TAG
 
   def _step_dir(self, ckpt_dir: str, step: int) -> epath.Path:
     """The folder of `step`.
@@ -636,9 +643,10 @@ class NativeFormat:
       )
     if verify:
       codec = codecs.params_codec_by_name(m["params_codec"])
-      codec.check(
-          self._params_path(ckpt_dir, step, codec), manifest.params_sha256
-      )
+      with codecs.format_tree_sha_tag(self.tree_sha_tag):
+        codec.check(
+            self._params_path(ckpt_dir, step, codec), manifest.params_sha256
+        )
     return manifest
 
   def load_artifact(
@@ -672,11 +680,12 @@ class NativeFormat:
           f"{ckpt_dir}@{step}: params codec {m['params_codec']!r} is not the "
           f"codec of framework {policy.spec.framework}"
       )
-    params = codec.read(
-        self._params_path(ckpt_dir, step, codec),
-        policy,
-        manifest.params_sha256 if verify else None,
-    )
+    with codecs.format_tree_sha_tag(self.tree_sha_tag):
+      params = codec.read(
+          self._params_path(ckpt_dir, step, codec),
+          policy,
+          manifest.params_sha256 if verify else None,
+      )
     return types.Artifact(
         manifest=manifest,
         params=params,
@@ -720,7 +729,8 @@ class NativeFormat:
           f"{ppath} exists without a manifest (a write that died); "
           "clear_partial moves it aside"
       )
-    digest = codec.write(ppath, policy, params)
+    with codecs.format_tree_sha_tag(self.tree_sha_tag):
+      digest = codec.write(ppath, policy, params)
     manifest = manifest._replace(params_sha256=digest)
     rule = manifest.default_rule
     m = dict(

@@ -55,9 +55,20 @@ is the floor for new writes (a rewound step raises). A resumed run passes
 resume_step (its checkpoint's step): rows after it, written by the preempted
 run past its last checkpoint, are dropped (logged) so the resumed run does
 not duplicate them. A gs:// logdir is supported: lines are kept in memory and
-the whole file is rewritten every `flush_every` writes and on close (GCS has
-no append), so the bytes written grow with the square of the run's rows; a
-long run on gs:// should use a larger flush_every.
+the whole file is uploaded again (GCS has no append) in one pipe_file call
+(gcsfs; never a streamed file write, whose chunks gcsfs < 2026.6 sends
+unaligned, which GCS can refuse), at most every GCS_MIN_FLUSH_S seconds once
+`flush_every` rows are buffered, and at once on flush() and close(). An explicit
+flush() is not rate-limited: the league runner calls it before each checkpoint
+commit and each resume save (train.py --resume_every_min, default 3), so a run
+uploads at most once a minute plus once per checkpoint. Readers see one
+complete metrics.jsonl, at most a minute stale between checkpoints. The bytes
+uploaded still grow with the square of the run's rows: a run of duration D
+whose record ends at S bytes, uploading every T seconds, sends about
+S * D / (2 T) in total; each upload is one request of the current size (a
+21 MiB record took 0.4-0.6 s from a run VM), so a record in the hundreds of
+MiB, or checkpoints far more often than once a minute, is where this costs
+training time.
 
 Run settings are not metrics. MetricsWriter.params({name: value}) records
 constants of the run (identity, hardware, a flat schedule's value, a static
@@ -70,7 +81,14 @@ logged), so a schedule that moves is still a curve and a setting that never
 moves is one params entry.
 
 Failures. The logdir's record (metrics.jsonl, params.json) is the writer's
-own: a failure to write it raises. Every other sink is telemetry, and
+own: a failure to write it raises, with one exception: on gs:// an upload is
+retried GCS_WRITE_ATTEMPTS times with doubling backoff, and an upload that
+still fails while the run is going is logged with its traceback and counted,
+not raised (training goes on; the rows stay in memory and the next upload
+carries them). From then on every row carries the count under
+WRITE_FAILURES_KEY ("alarm/metrics_record_write_failures"), in every sink, so
+the loss is visible in the record and the tracking service; close() raises
+if the record still cannot be uploaded. Every other sink is telemetry, and
 telemetry never stops a run: a sink whose write, params, flush or close
 raises is logged with its traceback, not raised, and the writer goes on
 with the other sinks and the record.
@@ -86,6 +104,12 @@ validated record of a script that is not a training run, such as a benchmark:
 logged and handed to every registered series emitter
 (register_series_emitter), for example one that forwards records to a
 tracking service.
+
+Stages: stage(name) marks where a training process is between its start and
+its first training update (STAGES: boot, build, evals, first-update,
+training). With a stage-record maker registered (register_stage_record),
+the record it makes of each stage is handed to every series emitter, so a
+run page can show setup progress; with none, a stage is a no-op.
 """
 
 from __future__ import annotations
@@ -263,6 +287,51 @@ def register_series_emitter(fn: Callable[[Mapping[str, Any]], None]) -> None:
     _SERIES_EMITTERS.append(fn)
 
 
+#: The stages a training process marks, in order (stage): boot (the trainer
+#: has its flags and plugins), build (env, sources, network, learner), evals
+#: (the in-loop evaluators), first-update (compile, the first rollout and
+#: update), training (the first update's metrics are written).
+STAGES = ("boot", "build", "evals", "first-update", "training")
+_STAGE_RECORDS: list[Callable[[str], Optional[Mapping[str, Any]]]] = []
+
+
+def register_stage_record(
+    fn: Callable[[str], Optional[Mapping[str, Any]]],
+) -> None:
+  """Registers a stage record maker (module doc).
+
+  fn(stage name) -> a series record or None, for every stage.
+
+  Args:
+    fn: the maker.
+  """
+  assert callable(fn), fn
+  if fn not in _STAGE_RECORDS:
+    _STAGE_RECORDS.append(fn)
+
+
+def stage(name: str) -> None:
+  """Marks stage `name` (STAGES).
+
+  Each registered maker's record goes to every series emitter.
+
+  Args:
+    name: the stage.
+
+  Raises:
+    ValueError: not a stage name.
+  """
+  if name not in STAGES:
+    raise ValueError(f"stage {name!r} is not one of {STAGES}")
+  plugins.load_env()
+  for make in list(_STAGE_RECORDS):
+    rec = make(name)
+    if rec is None:
+      continue
+    for fn in list(_SERIES_EMITTERS):
+      fn(rec)
+
+
 def sink_names() -> tuple[str, ...]:
   """The registered sink names, plugins loaded first.
 
@@ -274,12 +343,40 @@ def sink_names() -> tuple[str, ...]:
 
 
 # -- the built-in sinks --------------------------------------------------------
+#: A gs:// record object (metrics.jsonl, params.json) is uploaded in this
+#: many attempts, the first retry after GCS_RETRY_BASE_S seconds, doubling.
+GCS_WRITE_ATTEMPTS = 5
+GCS_RETRY_BASE_S = 2.0
+#: The least seconds between two automatic gs:// uploads of metrics.jsonl
+#: (an explicit flush() or close() uploads at once).
+GCS_MIN_FLUSH_S = 60.0
+#: The row key that carries a JsonlSink's failed gs:// uploads (module doc).
+WRITE_FAILURES_KEY = "alarm/metrics_record_write_failures"
+
+
+def _record_fs(url: str) -> Any:
+  """The filesystem of a gs:// record URL: gcsfs, default credentials.
+
+  Args:
+    url: The gs:// URL.
+
+  Returns:
+    The filesystem; it is used through exists, cat_file and pipe_file.
+  """
+  assert url.startswith("gs://"), url
+  # Lazy: gcsfs is an optional extra (gs:// paths, requirements-gcp.txt).
+  import gcsfs  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+
+  return gcsfs.GCSFileSystem()
+
+
 class JsonlSink(MetricSink):
   """<logdir>/metrics.jsonl and <logdir>/params.json (module doc).
 
   Attributes:
     logdir: the log directory.
     last_step: the last step in the record, or None.
+    write_failures: gs:// uploads that failed every attempt (0 locally).
   """
 
   def __init__(
@@ -288,21 +385,132 @@ class JsonlSink(MetricSink):
       *,
       flush_every: int = 50,
       resume_step: Optional[int] = None,
+      min_flush_s: float = GCS_MIN_FLUSH_S,
+      fs: Any = None,
   ):
+    """Opens the record.
+
+    Args:
+      logdir: The log directory (local or gs://).
+      flush_every: gs://: rows buffered before an automatic upload.
+      resume_step: The resumed run's checkpoint step (module doc).
+      min_flush_s: gs://: the least seconds between automatic uploads.
+      fs: gs://: the filesystem (exists, cat_file, pipe_file); None: gcsfs.
+    """
     assert flush_every >= 1, flush_every
     assert resume_step is None or int(resume_step) >= 0, resume_step
+    assert min_flush_s >= 0, min_flush_s
     self.logdir = str(logdir).rstrip("/")
     self._gcs = self.logdir.startswith("gs://")
     self._flush_every = flush_every
+    self._min_flush_s = float(min_flush_s)
     self._pending = 0
     self._lines: list[str] = []
+    self._last_upload = -math.inf  # time.monotonic() of the last attempt
+    self._params_doc: Optional[dict[str, Any]] = None  # gs://: the record
+    self._params_dirty = False  # gs://: params.json's last upload failed
+    # gs://: nothing written since the last flush() attempt (close() then
+    # does not run a second retry ladder for the same state).
+    self._unchanged_since_flush = False
+    self.write_failures = 0
     self.last_step: Optional[int] = None
-    root = epath.Path(self.logdir)
-    root.mkdir(parents=True, exist_ok=True)
-    self._path = root / JSONL_NAME
-    self._params_path = root / PARAMS_NAME
-    if self._path.exists():
-      self._reopen(resume_step)
+    if self._gcs:
+      self._fs = fs if fs is not None else _record_fs(self.logdir)
+      self._path = f"{self.logdir}/{JSONL_NAME}"
+      self._params_path = f"{self.logdir}/{PARAMS_NAME}"
+      if self._retried(lambda: self._fs.exists(self._path), "stat"):
+        self._reopen(resume_step)
+      # Read once, at startup, where a persistent read failure is raised;
+      # later params() calls (a held key that moves mid-run) never read GCS.
+      self._params_doc = self._read_params()
+    else:
+      assert fs is None, "fs is for a gs:// logdir"
+      root = epath.Path(self.logdir)
+      root.mkdir(parents=True, exist_ok=True)
+      self._path = root / JSONL_NAME
+      self._params_path = root / PARAMS_NAME
+      if self._path.exists():
+        self._reopen(resume_step)
+
+  def _retried(self, fn: Callable[[], Any], what: str) -> Any:
+    """fn(), retried GCS_WRITE_ATTEMPTS times with doubling backoff.
+
+    Args:
+      fn: The GCS call.
+      what: What it does, for the log.
+
+    Returns:
+      fn's value.
+
+    Raises:
+      Exception: fn's error on the last attempt.
+    """
+    for attempt in range(1, GCS_WRITE_ATTEMPTS + 1):
+      try:
+        return fn()
+      except Exception:  # pylint: disable=broad-except
+        if attempt == GCS_WRITE_ATTEMPTS:
+          raise
+        wait = GCS_RETRY_BASE_S * 2 ** (attempt - 1)
+        logging.warning(
+            "metrics: %s under %s failed (attempt %d of %d); retrying in %.0fs",
+            what,
+            self.logdir,
+            attempt,
+            GCS_WRITE_ATTEMPTS,
+            wait,
+            exc_info=True,
+        )
+        time.sleep(wait)
+
+  def _read(self, path) -> str:
+    """Reads a record file whole (retried on GCS).
+
+    Args:
+      path: the file (a gs:// URL or a local path).
+
+    Returns:
+      Its text.
+    """
+    if self._gcs:
+      return self._retried(
+          lambda: self._fs.cat_file(path), f"reading {path}"
+      ).decode("utf-8")
+    return path.read_text()
+
+  def _upload(self, path: str, text: str) -> bool:
+    """Uploads `path` whole, in one pipe_file call, retried.
+
+    A pipe_file of under 50 MiB is one simple upload; a larger one goes in
+    50 MiB chunks, multiples of GCS's 256 KiB chunk unit (a file object's
+    write of > 5 MiB in gcsfs < 2026.6 sent an unaligned chunk, which GCS
+    can refuse with a 400, killing a run).
+
+    Args:
+      path: The gs:// URL.
+      text: The object's content.
+
+    Returns:
+      Whether it was uploaded; False after every attempt failed (logged with
+      its traceback and counted in write_failures, never raised).
+    """
+    data = text.encode("utf-8")
+    try:
+      self._retried(lambda: self._fs.pipe_file(path, data), f"uploading {path}")
+      return True
+    # A metrics upload never stops training (module doc, Failures).
+    except Exception:  # pylint: disable=broad-except
+      self.write_failures += 1
+      logging.exception(
+          "metrics: uploading %s failed %d times; training goes on, the "
+          "record stays in memory for the next upload (%d failed uploads "
+          "so far, row key %s)",
+          path,
+          GCS_WRITE_ATTEMPTS,
+          self.write_failures,
+          WRITE_FAILURES_KEY,
+      )
+      return False
 
   def _reopen(self, resume_step: Optional[int]) -> None:
     """Picks up an existing record, dropping its rows after `resume_step`.
@@ -310,8 +518,12 @@ class JsonlSink(MetricSink):
     Args:
       resume_step: the step a resumed run continues from, or None to keep every
         row.
+
+    Raises:
+      OSError: a gs:// record could not be rewritten (the run has not
+        started: a failure here is raised).
     """
-    lines = [ln for ln in self._path.read_text().splitlines() if ln.strip()]
+    lines = [ln for ln in self._read(self._path).splitlines() if ln.strip()]
     steps = [int(json.loads(ln)["step"]) for ln in lines]
     if resume_step is not None:
       keep = [i for i, st in enumerate(steps) if st <= int(resume_step)]
@@ -323,7 +535,10 @@ class JsonlSink(MetricSink):
             self._path,
         )
         lines, steps = [lines[i] for i in keep], [steps[i] for i in keep]
-        self._write_atomic(self._path, "".join(ln + "\n" for ln in lines))
+        if not self._write_atomic(
+            self._path, "".join(ln + "\n" for ln in lines)
+        ):
+          raise OSError(f"metrics: could not rewrite {self._path} on resume")
     self.last_step = max(steps) if steps else None
     if self._gcs:
       self._lines = lines
@@ -332,16 +547,35 @@ class JsonlSink(MetricSink):
     """params.json's record ({} when absent).
 
     A params.json that is not valid JSON or not a JSON object is logged and the
-    record starts empty: telemetry never stops a run.
+    record starts empty: telemetry never stops a run. On gs:// the record is
+    read once, when the sink opens (a read failure raises there, before
+    training), and then kept in memory (this sink is its only writer).
 
     Returns:
       The record.
     """
+    if self._gcs:
+      assert self._params_doc is not None  # read in __init__
+      return dict(self._params_doc)
+    return self._read_params()
+
+  def _read_params(self) -> dict[str, Any]:
+    """The params record on file.
+
+    Returns:
+      Its JSON object; {} when there is none or it is not a JSON object
+      (logged).
+    """
     path = self._params_path
-    if not path.exists():
+    exists = (
+        self._retried(lambda: self._fs.exists(path), "stat")
+        if self._gcs
+        else path.exists()
+    )
+    if not exists:
       return {}
     try:
-      doc = json.loads(path.read_text())
+      doc = json.loads(self._read(path))
     except ValueError:
       logging.exception(
           "metrics: %s is not valid JSON; starting an empty params record", path
@@ -367,7 +601,11 @@ class JsonlSink(MetricSink):
     if self._gcs:
       self._lines.append(line)
       self._pending += 1
-      if self._pending >= self._flush_every:
+      self._unchanged_since_flush = False
+      if (
+          self._pending >= self._flush_every
+          and time.monotonic() - self._last_upload >= self._min_flush_s
+      ):
         self.flush()
     else:
       with open(str(self._path), "a", encoding="utf-8") as f:
@@ -381,27 +619,78 @@ class JsonlSink(MetricSink):
     """
     doc = self.read_params()
     doc.update(values)
-    text = json.dumps(doc, indent=1, sort_keys=True) + "\n"
-    self._write_atomic(self._params_path, text)
-
-  def _write_atomic(self, path, text: str) -> None:
-    """Writes `path` whole: a preemption never leaves a half-written file."""
     if self._gcs:
-      path.write_text(text)  # a GCS object write is atomic
-    else:  # write then rename
-      tmp = path.parent / (path.name + ".tmp")
-      tmp.write_text(text)
-      os.replace(str(tmp), str(path))
+      self._params_doc = dict(doc)
+      self._unchanged_since_flush = False
+    self._params_dirty = not self._write_params(doc)
+
+  def _write_params(self, doc: Mapping[str, Any]) -> bool:
+    """Writes the params record whole.
+
+    Args:
+      doc: the record.
+
+    Returns:
+      Whether it was written (_write_atomic).
+    """
+    text = json.dumps(doc, indent=1, sort_keys=True) + "\n"
+    return self._write_atomic(self._params_path, text)
+
+  def _write_atomic(self, path, text: str) -> bool:
+    """Writes `path` whole: a preemption never leaves a half-written file.
+
+    Args:
+      path: The file.
+      text: Its content.
+
+    Returns:
+      Whether it was written (gs://: False after every upload attempt failed,
+      logged; a local write failure raises).
+    """
+    if self._gcs:
+      return self._upload(path, text)  # a GCS object write is atomic
+    tmp = path.parent / (path.name + ".tmp")  # write then rename
+    tmp.write_text(text)
+    os.replace(str(tmp), str(path))
+    return True
 
   def flush(self):
-    """Flushes buffered rows (MetricSink.flush)."""
-    if self._gcs and self._pending:
-      self._path.write_text("\n".join(self._lines) + "\n")
-      self._pending = 0
+    """Uploads buffered rows now (MetricSink.flush).
+
+    On gs:// the whole metrics.jsonl goes up in one upload, retried; when
+    every attempt fails the failure is logged and counted, the rows stay
+    buffered and the next upload carries them (training goes on). An
+    explicit flush is not rate-limited by min_flush_s (module doc).
+    """
+    if not self._gcs:
+      return
+    if self._params_dirty:
+      self._params_dirty = not self._write_params(self._params_doc or {})
+    if self._pending:
+      self._last_upload = time.monotonic()
+      if self._upload(self._path, "\n".join(self._lines) + "\n"):
+        self._pending = 0
+    self._unchanged_since_flush = True
 
   def close(self):
-    """Flushes and releases the sink (MetricSink.close)."""
-    self.flush()
+    """Flushes and releases the sink (MetricSink.close).
+
+    When nothing was written since the last flush() (MetricsWriter.close
+    flushes first), that flush's outcome stands: a persistent failure costs
+    one retry ladder, not two.
+
+    Raises:
+      OSError: a gs:// record still could not be uploaded (training is
+        over; the record's tail would be lost, so this is raised).
+    """
+    if not self._unchanged_since_flush:
+      self.flush()
+    if self._gcs and (self._pending or self._params_dirty):
+      raise OSError(
+          f"metrics: the record under {self.logdir} could not be uploaded at "
+          f"close ({self._pending} rows, params pending: {self._params_dirty};"
+          f" {self.write_failures} failed uploads, see the log)"
+      )
 
 
 #: Modules providing a tensorboardX-compatible SummaryWriter, tried in order.
@@ -807,6 +1096,8 @@ class MetricsWriter:
         self._last_step = step_v
         return
     self._last_step = step_v
+    if self._jsonl is not None and self._jsonl.write_failures:
+      vals[WRITE_FAILURES_KEY] = self._jsonl.write_failures
     shown = " ".join(
         f"{k.split('/', 1)[1]}={v:.6g}"
         if isinstance(v, float)

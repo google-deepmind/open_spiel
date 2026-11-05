@@ -33,7 +33,10 @@ build without that game.
 
 The test architectures of testing/ (fixtures, the host operator) are
 registered for the whole session, and jax_enable_x64 is turned on (the
-package's enable_x64) before any test module loads.
+package's enable_x64) before any test module loads. Each test module runs
+with the package's own game rows, rules_sha scheme and a plugin-free child
+environment (testing/registries.open_view), also in a session that loaded
+another package's plugin.
 """
 
 import importlib.util
@@ -102,6 +105,32 @@ def _test_architectures():
   from open_spiel.python.scale.testing import host_operator_fixtures  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
 
   with fixtures.registered(), host_operator_fixtures.registered():
+    yield
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _open_view():
+  """Runs each test module with the package's own process-global state.
+
+  A session that also collects another package's tests may have loaded that
+  package's plugin (its conftest does): the plugin's game rows, rules_sha
+  scheme and plugins.ENV would then leak into these tests, which pass alone
+  and in CI. registries.open_view() holds the
+  package's own for the module's tests, its module fixtures included (an
+  autouse fixture is set up before the others of its scope), and puts the
+  plugin's back after. What a test module reads at collection (module-level
+  code, parametrize arguments) is read before this fixture and still sees a
+  plugin loaded earlier. A session that blocks jax has no plugin to undo.
+
+  Yields:
+    None, inside the open view.
+  """
+  if "jax" in sys.modules and sys.modules["jax"] is None:
+    yield
+    return
+  from open_spiel.python.scale.testing import registries  # pylint: disable=g-import-not-at-top,import-outside-toplevel  # noqa: PLC0415
+
+  with registries.open_view():
     yield
 
 

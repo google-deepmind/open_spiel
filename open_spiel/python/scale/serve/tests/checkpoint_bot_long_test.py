@@ -236,10 +236,12 @@ def test_gin_privacy(tmp_path):
   assert pairs >= 4, pairs
 
 
-def test_gin_oklahoma_artifact_serves(tmp_path):
+def test_gin_oklahoma_artifact_serves_on_stock_pyspiel(tmp_path):
   """An Oklahoma gin artifact (the env draws the first player at chance).
 
-  The installed pyspiel loads its game string and the bot serves it.
+  Its game string omits starting_player at its implicit value 0 when the
+  installed pyspiel lacks that parameter, so pyspiel loads it and the bot
+  serves it.
 
   Args:
     tmp_path: pytest's tmp_path.
@@ -252,7 +254,9 @@ def test_gin_oklahoma_artifact_serves(tmp_path):
       params={"oklahoma": True},
   )
   bot = checkpoint_bot_lib.checkpoint_bot(path, seed=1)
-  assert bot.game_string == "gin_rummy(oklahoma=true)"
+  assert (
+      bot.game_string == "gin_rummy(oklahoma=true)" and bot.upstream_gap is None
+  )
   game = pyspiel.load_game(bot.game_string)
   bot.check_serves(game)
   state = game.new_initial_state()

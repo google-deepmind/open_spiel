@@ -94,6 +94,8 @@ raises core.deadline.EvalOverBudgetError and the process fails.
 
 from __future__ import annotations
 
+import contextlib
+import importlib
 import re
 from typing import Any, Optional
 
@@ -115,6 +117,13 @@ from open_spiel.python.scale.parallel import collectives_check
 from open_spiel.python.scale.parallel import data_parallel
 
 RunResult = runner.LeagueRunResult
+#: env name -> a training-only module whose observing(cfg) context manager
+#: adds that game's rollout telemetry to a run of it (imported by name, only
+#: by run(): nothing that serves, plays or evaluates a game loads it).
+TRAINING_TELEMETRY = {
+    "hearts": "envs.hearts_telemetry.moon",  # moon-shot rates per update
+}
+_PKG = plugins.__name__.rpartition(".")[0]
 FLAGS = flags.FLAGS
 
 _CONFIG = flags.DEFINE_string(
@@ -220,6 +229,9 @@ def run(
 ) -> RunResult:
   """Trains run config cfg to its length, resuming from checkpoint_dir.
 
+  A game in TRAINING_TELEMETRY logs its rollout telemetry too (observed
+  only: the run trains exactly as without it).
+
   Args:
     cfg: a league.runner.LeagueRunConfig.
     checkpoint_dir: where checkpoints go (local or gs://); a directory that
@@ -246,9 +258,20 @@ def run(
         "the trainer runs league.runner.LeagueRunConfig, got "
         f"{type(cfg).__name__}"
     )
-  return runner.run(
-      cfg, checkpoint_dir, run_id=run_id, attempt_id=attempt_id, **runner_kwargs
+  module = TRAINING_TELEMETRY.get(cfg.env)
+  observe = (
+      importlib.import_module(f"{_PKG}.{module}").observing(cfg)
+      if module is not None
+      else contextlib.nullcontext()
   )
+  with observe:
+    return runner.run(
+        cfg,
+        checkpoint_dir,
+        run_id=run_id,
+        attempt_id=attempt_id,
+        **runner_kwargs,
+    )
 
 
 def duration_s(s: str) -> float:
@@ -305,6 +328,7 @@ def main(argv):
   x64.enable_x64()
   plugins.load_env()
   plugins.load(_PLUGINS.value)
+  metrics_lib.stage("boot")
   cfg = config_from_flags()
   ckpt = _CHECKPOINT_DIR.value
   cache_dir = compile_cache.cache_dir_for(_COMPILATION_CACHE_DIR.value, ckpt)

@@ -82,6 +82,15 @@ its sha hashes
 RULES with the dealer and vulnerability stated. compact_history is storage,
 not rules: it does not change the sha.
 
+SIDES AND DUPLICATE SCORE. The two partnerships are the env's sides
+(``BridgeEnv.sides``: North-South {0, 2}, East-West {1, 3}, zero-sum), so a
+league seats one entrant per partnership, and a side's return is either
+seat's duplicate points. A duplicate pair of tables plays one deal with an
+entrant holding each partnership once; its per-deal score is the IMPs of the
+entrant's point total over the two tables (``imps_pair_score``,
+``BridgeEnv.pair_scorer``), the WBF scale ``bridge.imps`` computes. Neither
+is part of the rules identity.
+
 Bridge is not served (its GameSpec has no ServingSpec). ``covers`` is the
 GameSpec.covers of the game.
 """
@@ -95,6 +104,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from open_spiel.python.jax.games import bridge
+from open_spiel.python.scale.core import sides as sides_lib
 from open_spiel.python.scale.envs import jax_game_env
 
 NUM_CARDS = bridge.NUM_CARDS
@@ -130,6 +140,43 @@ def _sha(rules: Mapping[str, Any]) -> str:
 
 
 RULES_SHA = _sha(RULES)
+
+#: The partnerships: North-South (seats 0, 2) and East-West (1, 3), zero-sum.
+SIDES = sides_lib.Sides.partnerships(4, 2, constant_sum=True)
+
+
+def imps_pair_score(r0, r1) -> np.ndarray:
+  """f64 IMPs of an entrant over a duplicate pair of tables on one deal.
+
+  r0, r1: the entrant's side returns (duplicate points, integers) at the two
+  tables, where it holds one partnership at each. The score is
+  IMPs(r0 + r1): with the entrant North-South at table 1 and East-West at
+  table 2, r0 + r1 = NS_1 - NS_2, the point difference duplicate bridge
+  converts to IMPs. Equals bridge.imps (numpy, the same IMP_BAND_FLOORS).
+
+  Args:
+    r0: the entrant's side returns at table 1, per deal.
+    r1: the entrant's side returns at table 2, per deal.
+
+  Returns:
+    f64 IMPs per deal.
+
+  Raises:
+    ValueError: shapes differ, or a return is not a whole number of points.
+  """
+  r0, r1 = np.asarray(r0, np.float64), np.asarray(r1, np.float64)
+  if r0.shape != r1.shape:
+    raise ValueError(
+        f"imps_pair_score: row shapes differ {r0.shape} vs {r1.shape}"
+    )
+  diff = r0 + r1
+  if not np.all(np.isfinite(diff)) or np.any(diff != np.round(diff)):
+    raise ValueError(
+        "imps_pair_score: bridge returns are whole duplicate points"
+    )
+  floors = np.asarray(bridge.IMP_BAND_FLOORS, np.float64)
+  n = (np.abs(diff)[..., None] >= floors).sum(-1)
+  return (np.sign(diff) * n).astype(np.float64)
 
 
 def info_template() -> dict[str, np.ndarray]:
@@ -252,6 +299,8 @@ class BridgeEnv(jax_game_env.JaxGameEnv):
   name = "bridge"
   max_len = MAX_LEN
   zero_sum = True
+  sides = SIDES  # core.sides: the two partnerships (module doc)
+  pair_scorer = staticmethod(imps_pair_score)
 
   def __init__(
       self,

@@ -27,4 +27,9 @@ with `league.config_common.register_config_package` add more names.
   az_connect_four      AlphaZero
   bc_connect_four      behaviour cloning of a scripted player
   psro_connect_four    PSRO with PPO best responses
+  kuhn3_league_smoke   three-player Kuhn PSRO league smoke
+  hearts_league_smoke  four-player hearts league smoke (learner + 3 pool seats)
+  hearts_mmd_from_scratch  hearts MMD from scratch against its own snapshots
+  euchre_smoke         euchre partnership league smoke (learner pair v pool)
+  euchre_mmd_from_scratch  euchre MMD from scratch against its own snapshots
 """

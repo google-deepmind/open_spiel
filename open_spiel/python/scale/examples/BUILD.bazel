@@ -15,6 +15,7 @@
 load("//bazel/python:py_binary.bzl", "py_binary")
 load("//bazel/python:py_library.bzl", "py_library")
 load("//bazel/python:py_test.bzl", "py_test")
+load("//bazel/python:pytest.bzl", "pytest_test")
 
 package(
     default_applicable_licenses = ["//open_spiel:license"],
@@ -97,6 +98,7 @@ py_library(
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/core:x64",
         "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/eval:designs",
         "//open_spiel/python/scale/eval:match",
         "//open_spiel/python/scale/eval:payoff",
         "//open_spiel/python/scale/policies:registry",
@@ -149,6 +151,43 @@ py_library(
     ],
 )
 
+pytest_test(
+    name = "card_move_transformer_play_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["card_move_transformer_play_test.py"],
+    deps = [
+        ":play_checkpoints_lib",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/networks:card_move_transformer",
+        "//open_spiel/python/scale/serve:fresh_artifact",
+    ],
+)
+
+pytest_test(
+    name = "card_move_transformer_train_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["card_move_transformer_train_test.py"],
+    deps = [
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/launch:subprocess_env",
+    ],
+)
+
 py_test(
     name = "examples_test",
     timeout = "long",
@@ -164,6 +203,46 @@ py_test(
         "//open_spiel/python/scale:tests_conftest",
         "//open_spiel/python/scale/launch:subprocess_env",
         "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytest_test(
+    name = "play_checkpoints_hearts_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["play_checkpoints_hearts_test.py"],
+    deps = [
+        ":play_checkpoints_lib",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/serve:fresh_artifact",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "play_checkpoints_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["play_checkpoints_test.py"],
+    deps = [
+        ":play_checkpoints_lib",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:arena_engine",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/eval:payoff",
+        "@py_deps//jax",
+        "@py_deps//numpy",
     ],
 )
 

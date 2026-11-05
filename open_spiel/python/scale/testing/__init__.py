@@ -28,4 +28,6 @@ multidevice               probes under N forced host devices, tree comparisons
 optional_pyspiel_games    skips for pyspiel games a build may leave out
 steps                     SeatStep builders for contract tests
 errors                    ContractError, raised by every checker
+cpu_class                 the host's CPU class, which XLA:CPU float bits follow
+registries                scoped registrations (metrics registries, PG losses)
 """

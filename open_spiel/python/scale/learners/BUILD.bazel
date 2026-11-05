@@ -85,6 +85,8 @@ py_library(
     srcs = ["losses.py"],
     strict_deps = True,
     deps = [
+        ":stable_softmax",
+        "//open_spiel/python/scale/core:hash_compat",
         "//open_spiel/python/scale/core:schedules",
         "//open_spiel/python/scale/networks:hl_gauss",
         "@py_deps//jax",
@@ -99,6 +101,7 @@ py_library(
         ":losses",
         ":telemetry",
         "//open_spiel/python/scale/core:advantages",
+        "//open_spiel/python/scale/core:hash_compat",
         "//open_spiel/python/scale/core:schedules",
         "//open_spiel/python/scale/core:sequence",
         "//open_spiel/python/scale/core:x64",
@@ -124,6 +127,21 @@ py_library(
         "//open_spiel/python/scale/envs/leduc",
         "//open_spiel/python/scale/networks:policy",
         "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "ppo_magnet",
+    srcs = ["ppo_magnet.py"],
+    strict_deps = True,
+    deps = [
+        ":losses",
+        ":pg",
+        ":stable_softmax",
+        "//open_spiel/python/scale/core:advantages",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
     ],
 )
 
@@ -138,6 +156,13 @@ py_library(
         "@py_deps//flax:core",
         "@py_deps//jax",
     ],
+)
+
+py_library(
+    name = "stable_softmax",
+    srcs = ["stable_softmax.py"],
+    strict_deps = True,
+    deps = ["@py_deps//jax"],
 )
 
 py_library(
@@ -304,11 +329,7 @@ pytest_test(
 
 pytest_test(
     name = "pg_forward_chunk_test",
-    timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
-    tags = [
-        "manual",
-    ],
     tests = ["tests/pg_forward_chunk_test.py"],
     deps = [
         ":pg",
@@ -380,6 +401,77 @@ pytest_test(
 )
 
 pytest_test(
+    name = "pg_side_credit_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_side_credit_test.py"],
+    deps = [
+        ":pg",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/core:game_tree",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/core:sides",
+        "//open_spiel/python/scale/encoders:registry",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs:nplayer_matrix",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/league:kinds_pg",
+        "//open_spiel/python/scale/networks:catalog",
+        "//open_spiel/python/scale/policies:registry",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_step_gate_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_step_gate_test.py"],
+    deps = [
+        ":pg",
+        ":pg_fixtures",
+        ":toy_loss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "pg_teacher_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_teacher_test.py"],
+    deps = [
+        ":pg",
+        ":pg_fixtures",
+        ":toy_loss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:x64",
+        "//open_spiel/python/scale/league:config_common",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
     name = "pg_train_rows_test",
     timeout = "long",
     data = ["//open_spiel/python/scale:all_files"],
@@ -422,13 +514,75 @@ pytest_test(
 )
 
 pytest_test(
+    name = "pg_value_rows_cap_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/pg_value_rows_cap_test.py"],
+    deps = [
+        ":pg",
+        "//open_spiel/python/scale:deps",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/configs:hearts_move_transformer_self_play",
+        "//open_spiel/python/scale/core:arena",
+        "//open_spiel/python/scale/league:config_common",
+        "//open_spiel/python/scale/networks:card_move_transformer",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "ppo_magnet_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/ppo_magnet_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":ppo_magnet",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/configs:recipes",
+        "//open_spiel/python/scale/core:schedules",
+        "//open_spiel/python/scale/core:x64",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
     name = "schedules_test",
     data = ["//open_spiel/python/scale:all_files"],
     tests = ["tests/schedules_test.py"],
     deps = [
         "//open_spiel/python/scale:registered",
         "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:hash_compat",
         "//open_spiel/python/scale/core:schedules",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "stable_softmax_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/stable_softmax_test.py"],
+    deps = [
+        ":losses",
+        ":pg",
+        ":stable_softmax",
+        ":toy_loss",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/league:config_common",
         "@py_deps//jax",
         "@py_deps//numpy",
     ],

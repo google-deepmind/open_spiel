@@ -28,6 +28,10 @@ reads their results, so they cannot change training.
   variance_parts(pred, target, mask) / explained_variance(parts)
                                  1 - Var(target - pred) / Var(target) over
                                  masked rows
+  register_batch_metrics(game, fn) / batch_metrics(game)
+                                 a game's own metrics of a TrajectoryBatch
+                                 (e.g. how its hands ended), reported by the
+                                 PG learner for policies of that game
 
 Everything returned on device is f32 (counts int64), so a learner update stays
 free of f64. The host summaries leave a statistic out when
@@ -37,7 +41,7 @@ writing a NaN, which the metrics writer refuses.
 
 from __future__ import annotations
 
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping, Optional
 
 import jax
 import jax.numpy as jnp
@@ -46,6 +50,48 @@ import optax
 
 F32 = jnp.float32
 I64 = jnp.int64
+
+#: game name -> f(TrajectoryBatch) -> {name: scalar} (register_batch_metrics).
+_BATCH_METRICS: dict[str, Callable[[Any], Mapping[str, jax.Array]]] = {}
+
+
+def register_batch_metrics(
+    game: str, fn: Callable[[Any], Mapping[str, jax.Array]]
+) -> None:
+  """Registers a game's batch metrics.
+
+  fn(TrajectoryBatch [B, T]) -> {name: scalar}, jittable, f32 values or int64
+  counts, every value finite. The PG learner computes them inside its update
+  for a policy whose spec.game is `game` and reports them beside its own
+  metrics (a name equal to one of the learner's raises). Idempotent for the
+  same function.
+
+  Args:
+    game: the game name.
+    fn: the metrics function.
+
+  Raises:
+    ValueError: another function is registered for the game.
+  """
+  assert isinstance(game, str) and game, game
+  old = _BATCH_METRICS.get(game)
+  if old is not None and old is not fn:
+    raise ValueError(f"batch metrics of {game!r} are already registered")
+  _BATCH_METRICS[game] = fn
+
+
+def batch_metrics(
+    game: str,
+) -> Optional[Callable[[Any], Mapping[str, jax.Array]]]:
+  """The game's registered batch metrics function, or None.
+
+  Args:
+    game: the game name.
+
+  Returns:
+    The function, or None.
+  """
+  return _BATCH_METRICS.get(game)
 
 
 def module_groups(tree: Any) -> dict[str, Any]:

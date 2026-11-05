@@ -37,6 +37,14 @@ id as a flag and names the environment variable holding the attempt id with
 `set_attempt_id_env`, optionally with an `id_parser` that both ids go
 through. Both are recorded and never compared: a restarted process is a new
 attempt of the same run.
+
+The values a plugin declares (the attempt id's variable and parser, the code
+repository) are read through `attempt_id_env`, `resolve_run_ids` and
+`code_repo`, which first load the plugins named in $OPEN_SPIEL_SCALE_PLUGINS
+(plugins.load_env): a process that reads its run ids before anything else
+asked for its extensions would otherwise see none of them and record no
+attempt id. A plugin must not call them while it is being imported (its
+module would be loaded re-entrantly from inside its own import).
 """
 
 from __future__ import annotations
@@ -170,6 +178,7 @@ def attempt_id_env() -> Optional[str]:
   Returns:
     The variable name, or None.
   """
+  plugins.load_env()
   return _STATE["attempt_id_env"]
 
 
@@ -191,6 +200,7 @@ def code_repo() -> Optional[str]:
   Returns:
     The repository, or None.
   """
+  plugins.load_env()
   return os.environ.get(CODE_REPO_ENV, "").strip() or _STATE["code_repo"]
 
 
@@ -224,7 +234,8 @@ def resolve_run_ids(flag_run_id: Any) -> RunIds:
   Raises:
     ValueError: when either id is malformed for the registered parser.
   """
-  parse, name = _STATE["parse"], attempt_id_env()
+  name = attempt_id_env()  # loads the plugins first: one may set the parser
+  parse = _STATE["parse"]
   raw = os.environ.get(name, "").strip() if name else ""
   try:
     attempt = parse(raw) if raw else None

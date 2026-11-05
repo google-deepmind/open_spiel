@@ -79,6 +79,7 @@ JAX_FREE_TESTS = tuple(
         "league/tests/controller_test.py",
         "league/tests/meta_solvers_test.py",
         "league/tests/artifact_store_index_test.py",
+        "league/tests/payoff_views_test.py",
         "eval/tests/stats_test.py",
         "eval/tests/payoff_test.py",
     )
@@ -97,6 +98,7 @@ JAX_FREE_MODULES = (_PKG,) + tuple(
         "league.meta_solvers",
         "league.artifact_store",
         "league.pool_params",
+        "league.payoff_views",
         "eval.stats",
         "eval.payoff",
         "eval.match",
@@ -400,7 +402,6 @@ def test_source_snapshot_round_trips_jax_keys_and_registered_leaves(
   )
   host = commit.host_tree(tree)
   # A round trip of bytes this test just pickled.
-  # pylint: disable-next=g-unsafe-pickle-load
   back = commit.device_tree(pickle.loads(pickle.dumps(host)))  # noqa: S301
   np.testing.assert_array_equal(
       np.asarray(jax.random.key_data(back["k"])),

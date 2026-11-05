@@ -26,6 +26,11 @@ population run share one trainer, one checkpoint format and one resume path.
   ppo_vs_uniform      PPO (Schulman et al. 2017) against a uniform-random seat
   behaviour_cloning   a student imitating a teacher that plays itself
   alphazero           AlphaZero (Silver et al. 2018) search self-play
+  ppo_magnet_config   the PGConfig of the "ppo_magnet" loss (PPO-clip, a
+                      behaviour KL and an annealed magnet KL) with fixed-size
+                      SGD minibatches
+  ppo_magnet_self_play  one shared network on every seat of an N-player game,
+                      trained with a ppo_magnet_config learner
 """
 
 from __future__ import annotations
@@ -43,6 +48,7 @@ from open_spiel.python.scale.learners import az
 from open_spiel.python.scale.learners import bc
 from open_spiel.python.scale.learners import losses
 from open_spiel.python.scale.learners import pg
+from open_spiel.python.scale.learners import ppo_magnet
 from open_spiel.python.scale.networks import catalog
 
 
@@ -377,4 +383,246 @@ def alphazero(
       self_play=True,
       keep_every=keep_every,
       seed=cfg.seed,
+  )
+
+
+#: ppo_magnet_config's defaults: one SGD minibatch holds at most this many
+#: plies; a forward call runs on at most FORWARD_CHUNK rows (execution only).
+PPO_MAGNET_MINIBATCH = 4096
+PPO_MAGNET_FORWARD_CHUNK = 1024
+
+
+def ppo_magnet_config(
+    *,
+    num_updates: int,
+    sgd_steps: int,
+    value_scale: float,
+    minibatch_size: int = PPO_MAGNET_MINIBATCH,
+    forward_chunk_rows: int = PPO_MAGNET_FORWARD_CHUNK,
+    rescale_step: int = 0,
+    rescale_time_scale: float = 1.0,
+    schedule_step_offset: int = 0,
+    value_rows: str = "",
+    field_players: int = 0,
+    max_decision_share: Optional[float] = None,
+    loss_config: Optional[ppo_magnet.PPOMagnetConfig] = None,
+) -> pg.PGConfig:
+  """The PGConfig of the ppo_magnet loss (learners.ppo_magnet).
+
+  loss       PPO-clip 0.2 on raw advantages + 0.1 KL(pi || behaviour) +
+             temperature x KL(pi || uniform over legal) + 1.0 value MSE, no
+             entropy bonus (PPOMagnetConfig defaults; loss_config replaces
+             them); GAE(0.5) advantages and TD(0.8) returns at gamma 1,
+             rewards over value_scale.
+  optimizer  one epoch, clip_by_global_norm 0.267, Adam (b 0.9 / 0.999,
+             eps 1e-8), step size clip(0.5 / (n + 1)**1.1, 5e-6, 1e-4).
+  SGD        the update's trained plies are shuffled and dealt over
+             max(sgd_steps, ceil(plies / minibatch_size)) steps of at most
+             minibatch_size plies.
+  schedules  n is the update counter (plus schedule_step_offset); with
+             rescale_step S > 0 both the step size and the temperature read
+             n = t * rescale_time_scale from update S on (a run continued
+             at S under a stretched clock, in one run). The step size there
+             must already be at its floor (it is, for S = 3000 and a time
+             scale of 14): it is the Schedule's step-size anneal from S - 1
+             to S down to the floor, held after.
+  credit     field_players P > 0: advantages and value targets from each
+             seat's reward relative to the field (learners.ppo_magnet; the
+             batch must hold every seat of each table, ppo_magnet_self_play).
+
+  Args:
+    num_updates: the run length in updates.
+    sgd_steps: the fewest SGD steps per update.
+    value_scale: the reward divisor of the value targets.
+    minibatch_size: the most plies per SGD step.
+    forward_chunk_rows: the most rows per learner forward (execution only).
+    rescale_step: 0, or the update the clock stretch starts at.
+    rescale_time_scale: the stretch.
+    schedule_step_offset: added to the update counter of every schedule.
+    value_rows: "" or the "module:attr" of the value-only plies.
+    field_players: 0, or the seats of the field credit (PPOMagnetConfig).
+    max_decision_share: PGConfig.max_decision_share.
+    loss_config: the PPOMagnetConfig; None is its defaults with the rescale
+      and field fields set from the arguments.
+
+  Raises:
+    ValueError: a loss config whose rescale or field credit disagrees, or a
+      rescale whose step size is not at its floor from rescale_step on.
+
+  Returns:
+    The pg.PGConfig.
+  """
+  if loss_config is None:
+    loss_config = ppo_magnet.PPOMagnetConfig(
+        rescale_step=int(rescale_step),
+        rescale_time_scale=float(rescale_time_scale),
+        field_players=int(field_players),
+    )
+  if not isinstance(loss_config, ppo_magnet.PPOMagnetConfig):
+    raise TypeError(
+        f"loss_config must be a PPOMagnetConfig, got {type(loss_config)}"
+    )
+  got = (
+      loss_config.rescale_step,
+      float(loss_config.rescale_time_scale),
+      loss_config.field_players,
+  )
+  want = (int(rescale_step), float(rescale_time_scale), int(field_players))
+  if got != want:
+    raise ValueError(
+        "the loss config's (rescale_step, rescale_time_scale, "
+        f"field_players) {got} != the recipe's {want}"
+    )
+  lr = _ppo_magnet_lr(int(rescale_step), float(rescale_time_scale))
+  return pg.PGConfig(
+      loss=ppo_magnet.LOSS,
+      lr=1e-4,
+      lr_end=1e-4,
+      anneal_lr=False,
+      lr_sched=lr,
+      num_updates=int(num_updates),
+      max_grad_norm=0.267,
+      adam_eps=1e-8,
+      use_adamw=False,
+      weight_decay=0.0,
+      update_epochs=1,
+      num_minibatches=1,
+      shuffle="flat",
+      gamma=1.0,
+      gae_lambda=0.5,
+      ent_coef=schedules.constant(0.0),
+      kl_coef=schedules.constant(0.0),
+      loss_config=loss_config,
+      schedule_step_offset=int(schedule_step_offset),
+      value_scale=float(value_scale),
+      value_rows=value_rows,
+      minibatch_size=int(minibatch_size),
+      sgd_steps=int(sgd_steps),
+      forward_chunk_rows=int(forward_chunk_rows),
+      max_decision_share=max_decision_share,
+  )
+
+
+def _ppo_magnet_lr(
+    rescale_step: int, rescale_time_scale: float
+) -> schedules.Schedule:
+  """The step size clip(0.5 / (n + 1)**1.1, 5e-6, 1e-4), n stretched from S.
+
+  Args:
+    rescale_step: 0, or S (ppo_magnet_config).
+    rescale_time_scale: the stretch.
+
+  Returns:
+    The Schedule.
+
+  Raises:
+    ValueError: the stretched step size is above its floor at S.
+  """
+  start, power, floor, ceil = 0.5, 1.1, 5e-6, 1e-4
+  if not rescale_step:
+    return schedules.Schedule(
+        "inverse_power", start, power=power, floor=floor, ceil=ceil
+    )
+  if start / (rescale_step * rescale_time_scale + 1.0) ** power > floor:
+    raise ValueError(
+        f"the step size at update {rescale_step} under time scale"
+        f" {rescale_time_scale} is above its floor: only a stretch that lands"
+        " on the floor is supported"
+    )
+  before = min(
+      ceil, max(floor, start / float(rescale_step) ** power)
+  )  # n = S - 1
+  return schedules.Schedule(
+      "inverse_power",
+      start,
+      power=power,
+      floor=floor,
+      ceil=ceil,
+      anneal_start=rescale_step - 1,
+      anneal_end=rescale_step,
+      anneal_final_frac=floor / before,
+  )
+
+
+def ppo_magnet_self_play(
+    name: str,
+    env: str,
+    learner: pg.PGConfig,
+    policy_kwargs: Mapping[str, Any],
+    *,
+    num_envs: int,
+    num_steps: int,
+    num_updates: int,
+    seed: int,
+    keep_every: int,
+    env_kwargs: Optional[Mapping[str, Any]] = None,
+    init: Optional[refs.PolicyRef] = None,
+    parents: tuple[str, ...] = (),
+    eval: Any = None,  # pylint: disable=redefined-builtin
+    metadata: Optional[Mapping[str, str]] = None,
+    notes: str = "",
+) -> runner.LeagueRunConfig:
+  """One shared network on every seat, trained by a ppo_magnet learner.
+
+  Pure self-play: every seat of every row is the current learner, acting
+  from its own InfoState and sampled at temperature 1, and every seat is a
+  perspective seat (num_players x num_envs batch rows); no pool, snapshot
+  or fixed opponent. Warm-started from `init` when given.
+
+  Args:
+    name: the run name.
+    env: a registered env name.
+    learner: a PGConfig of loss "ppo_magnet" (ppo_magnet_config).
+    policy_kwargs: the network policy's arch_kwargs
+      (config_common.network_policy_kwargs).
+    num_envs: Arena rows per update.
+    num_steps: plies per update.
+    num_updates: the run length in updates.
+    seed: the run seed.
+    keep_every: updates between kept artifacts.
+    env_kwargs: the env's options.
+    init: the warm start, or None.
+    parents: the warm start's lineage.
+    eval: the in-run evals.
+    metadata: extra metadata.
+    notes: the run notes.
+
+  Returns:
+    The runner.LeagueRunConfig.
+
+  Raises:
+    ValueError: the learner's loss is not ppo_magnet, or its field credit
+      names another seat count than the env's.
+  """
+  if learner.loss != ppo_magnet.LOSS:
+    raise ValueError(
+        f"{name}: ppo_magnet_self_play takes a {ppo_magnet.LOSS!r} "
+        f"learner, got loss {learner.loss!r}"
+    )
+  field = (
+      learner.loss_config.field_players
+      if learner.loss_config is not None
+      else 0
+  )
+  if field and field != int(policy_kwargs["num_players"]):
+    raise ValueError(
+        f"{name}: field credit over {field} seats, the game has "
+        f"{policy_kwargs['num_players']}"
+    )
+  return runner.one_slot(
+      name,
+      env,
+      kinds.PG(learner, init=init, parents=tuple(parents)),
+      num_envs=int(num_envs),
+      num_steps=int(num_steps),
+      num_updates=int(num_updates),
+      policy_kwargs=dict(policy_kwargs),
+      learner_rule=types.SAMPLE,
+      self_play=True,
+      keep_every=int(keep_every),
+      seed=int(seed),
+      env_kwargs=env_kwargs,
+      eval=eval,
+      metadata=metadata,
+      notes=notes,
   )

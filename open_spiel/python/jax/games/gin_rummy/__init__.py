@@ -26,6 +26,8 @@ Modules:
   `chance_outcomes`, `get_returns`) and `GinRummy`.
 - `dense_cache_game`, `dense_cache`: the dense-cache backend,
   `GinRummy(backend="dense_cache")`.
+- `backends`: the step and deal with the meld functions supplied, the parts
+  a backend is built from.
 - `simple_bot`: OpenSpiel's simple gin rummy bot as a JAX policy.
 
 This package re-exports the commonly used names of those modules.

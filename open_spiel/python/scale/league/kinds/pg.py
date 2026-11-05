@@ -28,6 +28,7 @@ draws. The PG kind is the only kind that trains several learners at once
 from __future__ import annotations
 
 import dataclasses
+import time
 from typing import Any, Mapping, Optional
 
 from absl import logging
@@ -36,6 +37,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from open_spiel.python.scale.core import arena as arena_lib
+from open_spiel.python.scale.core import hash_compat
 from open_spiel.python.scale.core import types
 from open_spiel.python.scale.envs import registry as env_registry
 from open_spiel.python.scale.league import refs
@@ -58,6 +60,18 @@ def endgames() -> dict[str, Any]:
   return env_registry.by_field("endgame")
 
 
+def scripted_routes(endgame: str) -> tuple[str, ...]:
+  """The routes the scripted final phase `endgame` may be played on.
+
+  Args:
+    endgame: a scripted final-phase architecture name.
+
+  Returns:
+    Its declared "module:attr" routes (policies.routed).
+  """
+  return routed.phase_routes(registry.build(endgame, {}))
+
+
 @dataclasses.dataclass(frozen=True)
 class PG:
   """The policy-gradient learner (loss "ppo", "mmd" or a registered variant).
@@ -68,11 +82,22 @@ class PG:
       (`GameSpec.endgame`). Every slot (learner, pool, fixed opponents) plays
       RoutedPolicy(policy, endgame), the published artifact is that routed
       policy, and the learner trains on its own network's decisions only.
+    scripted_route: the "module:attr" route the scripted endgame is played on;
+      "" (the default) is the endgame's own route. Any other value must be a
+      route the endgame declares (its class's ROUTES), e.g. gin's
+      AGENT_KNOCK_ROUTE, which leaves the knocker's discard to the network
+      (and so to the learner). Left out of the config hash at "".
     init: None (fresh params from the run's key) or a PolicyRef whose params
       warm-start the learner with a fresh optimizer. Its policy (the base of a
       routed artifact) must have the learner policy's spec.
     parents: the artifact ids the run's artifacts name as parents.
     kind: the kind's registered name.
+    teacher: None (the default; left out of the config hash) or a PolicyRef
+      of a frozen distillation teacher (learners.pg module doc "Teacher
+      distillation"; its policy, the base of a routed artifact, plays the
+      learner's game with its action and player counts, its spec its own).
+      It needs learner.teacher_coef. It is never the warm start, a pool
+      member, an opponent or the magnet.
   """
 
   learner: pg.PGConfig
@@ -80,6 +105,8 @@ class PG:
   init: Optional[refs.PolicyRef] = None
   parents: tuple[Any, ...] = ()
   kind: str = "pg"
+  scripted_route: str = hash_compat.added("")
+  teacher: Optional[refs.PolicyRef] = hash_compat.added(None)
 
   def __post_init__(self):
     assert self.kind == "pg", self.kind
@@ -92,12 +119,37 @@ class PG:
     ), self.parents
     if self.parents and self.init is None:
       raise ValueError("parents name the warm start: set init")
+    if self.teacher is not None:
+      if not isinstance(self.teacher, refs.PolicyRef):
+        raise ValueError(f"teacher is a PolicyRef, got {type(self.teacher)}")
+      if not self.learner.teacher_on():
+        raise ValueError(
+            "a teacher needs learner.teacher_coef (not constant 0)"
+        )
+      if self.init is not None and self.init.id == self.teacher.id:
+        raise ValueError(
+            f"teacher {self.teacher.id} is also the warm start (init): a "
+            "kickstarted run starts from fresh params"
+        )
+    elif self.learner.teacher_on():
+      raise ValueError(
+          "learner.teacher_coef distils from a teacher: set teacher"
+      )
     if self.scripted_endgame:
       table = endgames()
       assert self.scripted_endgame in table, (
           self.scripted_endgame,
           sorted(table),
       )
+    if self.scripted_route:
+      if not self.scripted_endgame:
+        raise ValueError("scripted_route needs a scripted_endgame")
+      declared = scripted_routes(self.scripted_endgame)
+      if self.scripted_route not in declared:
+        raise ValueError(
+            f"scripted_route {self.scripted_route!r} is not a route of "
+            f"{self.scripted_endgame!r}: {list(declared)}"
+        )
 
   def constant_lr(self) -> bool:
     """Whether the step size is independent of num_updates.
@@ -228,6 +280,8 @@ class PGKind(base.KindBase):
         init=cfg.init,
         parents=cfg.parents,
         env=env,
+        scripted_route=cfg.scripted_route,
+        teacher=cfg.teacher,
     )
 
 
@@ -255,10 +309,20 @@ class PGDriver(base.Driver):
       init: Optional[refs.PolicyRef] = None,
       parents: tuple[Any, ...] = (),
       env: Optional[types.Env] = None,
+      scripted_route: str = "",
+      teacher: Optional[refs.PolicyRef] = None,
   ):
+    if scripted_route and not scripted_endgame:
+      raise ValueError("scripted_route needs a scripted_endgame")
     self.policy, self.learner = policy, learner
+    # The distillation teacher: built on first use (_ensure_teacher), so a
+    # driver that never trains never reads its artifact.
+    self._teacher_ref = teacher
+    self._teacher_built = False
+    self._route = scripted_route or None
     self._init, self._parents = init, tuple(parents)
     self._routed = None
+    self._default_routed = None
     self._game = None
     if scripted_endgame:
       self._game = env_registry.game(
@@ -269,7 +333,15 @@ class PGDriver(base.Driver):
             f"scripted_endgame {scripted_endgame!r} is not "
             f"{self._game.name}'s ({self._game.endgame!r})"
         )
-      self._routed = routed.with_scripted_phase(policy, self._game.endgame)
+      self._routed = routed.with_scripted_phase(
+          policy, self._game.endgame, self._route
+      )
+      if self._route is not None:
+        # The endgame on its own route: the rows it would script that this
+        # run's route leaves to the learner are counted per update.
+        self._default_routed = routed.with_scripted_phase(
+            policy, self._game.endgame
+        )
       assert not jax.tree_util.tree_leaves(
           self._routed.override.init_params()
       ), "the scripted endgame has params"
@@ -315,6 +387,7 @@ class PGDriver(base.Driver):
     Raises:
       ValueError: the init's policy is not the learner's.
     """
+    self._ensure_teacher(check_only=True)
     if self._init is None:
       return self.learner.init(key, env)
     pol, params = routed.unwrap_routed(*self._init.build())
@@ -347,6 +420,86 @@ class PGDriver(base.Driver):
       return dict(extra, **base.lineage_extra(self._init.id, self._parents))
     return dict(extra, **self._init.lineage())
 
+  def host_state(self) -> dict[str, Any]:
+    """The teacher's id when the run distils from one (else nothing).
+
+    The checkpoint records it (the league's driver state); member artifacts do
+    not (the run config's metadata names it), so their format is unchanged.
+
+    Returns:
+      {"teacher": id} or {}.
+    """
+    if self._teacher_ref is None:
+      return {}
+    return {"teacher": self._teacher_ref.id}
+
+  def load_host_state(self, d: Mapping[str, Any]) -> None:
+    """Checks a resumed run's teacher is this config's.
+
+    Args:
+      d: the saved host state.
+
+    Raises:
+      ValueError: the checkpoint's teacher is not the config's.
+    """
+    want = self.host_state()
+    if dict(d) != want:
+      raise ValueError(
+          f"resume: the checkpoint's driver state {dict(d)} is not this "
+          f"config's {want} (a run's teacher cannot change)"
+      )
+
+  def _ensure_teacher(self, check_only: bool = False) -> None:
+    """Builds the teacher once and hands it to the learner (set_teacher).
+
+    The teacher is the base of a routed artifact (its own scripted endgame
+    dropped: the learner trains its network decisions only), frozen, outside
+    the pool and the magnet. Its params are replicated on the mesh.
+
+    Args:
+      check_only: build and check it, but do not set it (before attach).
+
+    Raises:
+      ValueError: the teacher does not fit the learner, or attach has not run.
+    """
+    if self._teacher_ref is None or self._teacher_built:
+      return
+    pol, params = routed.unwrap_routed(*self._teacher_ref.build())
+    self._check_teacher(pol)
+    if check_only:
+      return
+    if getattr(self, "dp", None) is None:
+      raise ValueError("the teacher is placed on the mesh: attach first")
+    self.learner.set_teacher(
+        pol, self.dp.replicate(params), name=self._teacher_ref.id
+    )
+    self._teacher_built = True
+    logging.info(
+        "PGDriver: teacher %s (frozen; not in the pool, not the magnet)",
+        self._teacher_ref.id,
+    )
+
+  def _check_teacher(self, pol) -> None:
+    """The teacher's game, action and player counts are the learner's.
+
+    Args:
+      pol: the teacher policy.
+
+    Raises:
+      ValueError: they differ.
+    """
+    ts, ls = pol.spec, self.policy.spec
+    if (ts.game, ts.num_actions, ts.num_players) != (
+        ls.game,
+        ls.num_actions,
+        ls.num_players,
+    ):
+      raise ValueError(
+          f"teacher {self._teacher_ref.id}: {ts.game} / {ts.num_actions} "
+          f"actions / {ts.num_players} players, the learner {ls.game} / "
+          f"{ls.num_actions} / {ls.num_players}"
+      )
+
   def wrap_opponent(self, policy, params):
     """How a fixed opponent plays (routed with the scripted endgame).
 
@@ -359,10 +512,15 @@ class PGDriver(base.Driver):
     """
     if self._routed is None:
       return policy, params
-    return routed.routed_pair(policy, params, self._game.endgame)
+    if routed.is_scripted_phase(policy, self._game.endgame):
+      return policy, params  # already routed: plays the route it has
+    return routed.routed_pair(policy, params, self._game.endgame, self._route)
 
   def attach(self, league, mesh) -> None:
     """Builds the Arena over league.opponent_slots().
+
+    The Arena emits the reward credit of the learner's PGConfig.credit
+    (core.arena "Credit"; seat credit for a learner without one).
 
     Args:
       league: the League.
@@ -382,6 +540,7 @@ class PGDriver(base.Driver):
         league,
         mesh,
         arena_lib.Slot(self.slot_policy, 1, league.config.learner_rule),
+        credit=getattr(getattr(self.learner, "cfg", None), "credit", "seat"),
     )
     self.mesh = self.arena.mesh
     self.dp = data_parallel.DataParallel(self.mesh)
@@ -419,6 +578,8 @@ class PGDriver(base.Driver):
     Returns:
       (state, metrics, frames, decisions).
     """
+    self.check_table(table)
+    self._ensure_teacher()
     k_roll, k_upd = jax.random.split(key)
     params = [
         base.stack1(self.wrap(self.learner.params(ls.state))),
@@ -426,6 +587,10 @@ class PGDriver(base.Driver):
     ]
     src = self._source(ls, params, table, fresh)
     f0, d0 = src.frames, src.decisions
+    # Phase timers (wall clock, metrics stream only: runner.is_timing_key):
+    # rollout_seconds is the batch's play and preparation, learn_seconds the
+    # update; each phase is synced before its clock stops.
+    t0 = time.perf_counter()
     batch = src.next(k_roll)
     extra: dict[str, Any] = {}
     if self._routed is not None:
@@ -434,7 +599,22 @@ class PGDriver(base.Driver):
       # The source counts the decisions the learner trains on.
       src.decisions = np.int64(src.decisions - n_routed)
       extra = dict(routed_excluded=int(n_routed), batch_decisions=n_before)
+      if self._default_routed is not None:
+        # Learner decisions the endgame's own route would have scripted
+        # (gin's AGENT_KNOCK_ROUTE: the knocker's discards).
+        own = np.asarray(
+            routed.override_rows(self._default_routed, batch.steps.info)
+        )
+        extra["agent_endgame_decisions"] = int(
+            (np.asarray(batch.valid) & own).sum(dtype=np.int64)
+        )
+    jax.block_until_ready(batch)
+    t1 = time.perf_counter()
     state, m = self.dp.update(self.learner, ls.state, batch, k_upd)
+    jax.block_until_ready(m)
+    extra.update(
+        rollout_seconds=t1 - t0, learn_seconds=time.perf_counter() - t1
+    )
     return state, dict(m, **extra), src.frames - f0, src.decisions - d0
 
 

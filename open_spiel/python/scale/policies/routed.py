@@ -48,7 +48,11 @@ zeros and never used.
 Scripted phases. `with_scripted_phase(policy, endgame)` routes a game's
 scripted final phase (an architecture with a `phase_route`) around any
 policy; `routed_pair` does the same for (policy, params); `unwrap_routed`
-returns the base of such a composition. `override_rows` gives, for any
+returns the base of such a composition. A scripted phase may declare more
+than one route (its class's ROUTES, `phase_routes`; e.g. gin's endgame with
+and without the knocker's discard); `is_scripted_phase` recognises a
+composition on any of them, so a caller that routes the phase keeps an
+artifact on the route it was trained with. `override_rows` gives, for any
 leading batch shape, the rows a RoutedPolicy hands to its override.
 """
 
@@ -354,9 +358,7 @@ class RoutedPolicy(types.Policy):
       ValueError: route() returns the wrong shape, or the parts disagree on an
         aux key's shape or dtype.
     """
-    kb = ko = key
-    if key is not None:
-      kb, ko = jax.random.fold_in(key, 0), jax.random.fold_in(key, 1)
+    kb, ko = _part_keys(key)
     use = jnp.asarray(self.route(step.info), jnp.bool_)
     if use.shape != step.legal_mask.shape[:1]:
       raise ValueError(
@@ -400,6 +402,48 @@ class RoutedPolicy(types.Policy):
         ),
         aux=aux,
     )
+
+  def override_evaluate_rows(self, params, carry, step, key, rows):
+    """The override's PolicyOutput on the rows where `rows`.
+
+    rows: bool[B], the rows the route sends to the override; equal there to
+    evaluate_rows(params, carry, step, key, rows) (the same part key); the base
+    is not evaluated. Other rows' outputs are unused. For a caller that knows
+    its rows are routed and needs no base output (SearchPolicy's routed fold).
+
+    Args:
+      params: the params.
+      carry: the carry.
+      step: the SeatStep, leaves [B, ...].
+      key: a PRNG key.
+      rows: bool[B], the rows to evaluate.
+
+    Returns:
+      The PolicyOutput.
+    """
+    _, ko = _part_keys(key)
+    return _part_evaluate(
+        self.override,
+        params["override"],
+        carry["override"],
+        step,
+        ko,
+        jnp.asarray(rows, jnp.bool_),
+    )
+
+
+def _part_keys(key):
+  """(base key, override key) of a RoutedPolicy evaluation with `key`.
+
+  Args:
+    key: The evaluation's PRNG key, or None.
+
+  Returns:
+    (base key, override key), (None, None) for no key.
+  """
+  if key is None:
+    return None, None
+  return jax.random.fold_in(key, 0), jax.random.fold_in(key, 1)
 
 
 def _part_evaluate(
@@ -683,21 +727,43 @@ def _phase_route(override: types.Policy) -> Optional[str]:
   )
 
 
+def phase_routes(override: types.Policy) -> tuple[str, ...]:
+  """Every "module:attr" route an endgame policy may be played on.
+
+  Its class's ROUTES when it declares them (a scripted phase with an opt-in
+  variant, e.g. envs.gin.endgame's AGENT_KNOCK_ROUTE), else its one declared
+  route (_phase_route), else ().
+
+  Args:
+    override: an endgame (scripted phase) policy.
+
+  Returns:
+    Its declared routes, in declaration order.
+  """
+  routes = getattr(type(override), "ROUTES", None)
+  if routes:
+    return tuple(routes)
+  one = _phase_route(override)
+  return () if one is None else (one,)
+
+
 def is_scripted_phase(
     policy: types.Policy,
     endgame: Optional[str] = None,
     route: Optional[str] = None,
 ) -> bool:
-  """Whether `policy` routes a scripted phase on its own route.
+  """Whether `policy` routes a scripted phase on a route it declares.
 
-  That is a RoutedPolicy whose override is a scripted phase played on its
-  own route.
+  That is a RoutedPolicy whose override is a scripted phase played on one of
+  its declared routes (phase_routes), so a caller that routes the phase
+  keeps such a policy as it is, on the route it was built (or trained) with.
 
   Args:
     policy: any policy.
     endgame: the scripted phase's architecture name (a game's
       GameSpec.endgame); None accepts any scripted phase.
-    route: the route to require; default the override's declared route.
+    route: the route to require exactly; default any route the override
+      declares.
 
   Returns:
     bool.
@@ -706,8 +772,8 @@ def is_scripted_phase(
     return False
   if endgame is not None and policy.override.spec.arch_name != endgame:
     return False
-  want = route or _phase_route(policy.override)
-  return want is not None and registry.resolve_callable(want) is policy.route
+  wants = (route,) if route else phase_routes(policy.override)
+  return any(registry.resolve_callable(w) is policy.route for w in wants)
 
 
 def with_scripted_phase(
@@ -720,18 +786,28 @@ def with_scripted_phase(
     endgame: the scripted phase's architecture name (a game's
       GameSpec.endgame); None (a game without one) returns `policy`.
     route: the phase's "module:attr" route; default the endgame policy's
-      declared route (`phase_route`, or its class's ROUTE).
+      declared route (`phase_route`, or its class's ROUTE). A given route
+      must be one the endgame policy declares (phase_routes) when it
+      declares any.
 
   Returns:
     RoutedPolicy(policy, endgame policy, route); `policy` itself when it
-    already routes that phase.
+    already routes that phase (on `route` when one is given, else on any
+    declared route).
 
   Raises:
-    ValueError: no route given and the endgame policy declares none.
+    ValueError: no route given and the endgame policy declares none, or a
+      route the endgame policy does not declare.
   """
   if endgame is None or is_scripted_phase(policy, endgame, route):
     return policy
   override = registry.build(endgame, {})
+  declared = phase_routes(override)
+  if route and declared and route not in declared:
+    raise ValueError(
+        f"scripted phase {endgame!r} is not played on route {route!r}; "
+        f"its routes are {list(declared)}"
+    )
   route = route or _phase_route(override)
   if route is None:
     raise ValueError(

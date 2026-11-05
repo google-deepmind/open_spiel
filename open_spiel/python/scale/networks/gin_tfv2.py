@@ -721,15 +721,16 @@ def _cards_and_melds():
   """The JAX gin game's card and meld tables (imported on first use).
 
   Lazy: the networks package imports without the games package; only a
-  pointer head needs it.
+  pointer head needs it. Read through the gin card-token encoder, the game
+  adapter whose vector this torso reads.
 
   Returns:
-    The open_spiel.python.jax.games.gin_rummy.cards_and_melds module.
+    The games package's gin_rummy cards_and_melds module.
   """
   # pylint: disable-next=g-import-not-at-top,import-outside-toplevel
-  from open_spiel.python.jax.games.gin_rummy import cards_and_melds  # noqa: PLC0415
+  from open_spiel.python.scale.encoders import gin_card_tokens  # noqa: PLC0415
 
-  return cards_and_melds
+  return gin_card_tokens.cm
 
 
 def meld_incidence() -> np.ndarray:

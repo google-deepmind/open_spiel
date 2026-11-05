@@ -34,14 +34,22 @@ Every environment variable the library reads starts with ENV_PREFIX.
 Extension points, by package (tests/extension_points_test checks that the list
 is complete):
 
-  (root)           registry.register_path_resolver; plugins.register_flags
+  (root)           registry.register_path_resolver,
+                   registry.register_package_alias,
+                   registry.register_object_alias; plugins.register_flags
   metrics          register_sink, register_auto_sink, register_params_publisher,
-                   register_series_emitter, register_tensorboard_writer
+                   register_series_emitter, register_tensorboard_writer,
+                   register_stage_record
   league.config_common  register_config_package, register_config_resolver,
+                   register_config_overlay, register_hidden_config,
                    register_hash_transform
   core             frameworks.register_framework, auxiliary.register_aux_key,
-                   decide.set_scope
+                   decide.set_scope, arena.override_source_next,
+                   hash_compat.register_added_fields,
+                   hash_compat.register_class_transform,
+                   hash_compat.register_string_transform
   envs             registry.register (a game), registry.set_rules_sha_tag,
+                   registry.register_rules_source_alias,
                    gin.set_default_engine
   encoders         registry.register, register_module, register_family
   networks         catalog.register, actor_critic.register_torso,
@@ -49,16 +57,21 @@ is complete):
   policies         registry.register, registry.register_lazy,
                    registry.register_kwargs_translator
   belief           registry.register, registry.register_lazy
-  learners         pg.register_loss
-  sources          deals.register_canon
+  learners         pg.register_loss, bc.register_step_padding,
+                   telemetry.register_batch_metrics
+  sources          deals.register_canon, deals.set_hash_tag,
+                   deals.set_index_format, shards.set_manifest_format
   league           kinds.register_kind, runner.register_controller,
                    runner.register_on_commit, runner.register_reference_eval,
+                   runner.register_run_hook, runner.register_league_evaluator,
+                   runner.set_eval_series,
                    refs.register_policy_format, population.register_reader,
                    pool_params.register, commit.register_layout_reader,
                    loop.register_state_translation,
                    slot_factories.register, slot_factories.register_lazy
   ckpt             formats.register_format, formats.set_default_writer,
                    codecs.register_params_codec, codecs.register_state_codec,
+                   codecs.set_tree_sha_tag,
                    artifact.register_meta_extension,
                    records.register_field_name,
                    run_state.register_record_migration,
