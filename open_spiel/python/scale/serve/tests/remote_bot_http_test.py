@@ -21,7 +21,7 @@ leduc games against it: every move is legal and is the in-process bot's
 move, /info names the artifact's game and the full_state mode, a seat_view
 seat is refused, and a rules-difference notice reaches the GUI's controller
 and, under the GUI's analysis state policy, the seat's view. The GUI's own
-full_state request is the body remote_bot takes (contract 8: FULL_STATE_KEYS,
+full_state request is the body remote_bot takes (contracts 8 and 9: FULL_STATE_KEYS,
 the version in the Spiel-Protocol header, notices of at most 200
 characters).
 With GIN_ARTIFACT_ENV naming a trained gin checkpoint, 20 gin games are
@@ -215,7 +215,7 @@ def gui_seat(url, game, config=None):
   return lambda s, seat: controllers.choose_with_notice(bot, s, seat)
 
 
-def test_contract_8_is_what_remote_bot_takes(leduc_dir, bot_server):
+def test_the_gui_contract_is_what_remote_bot_takes(leduc_dir, bot_server):
   """The GUI's full_state request, header and notice limit are remote_bot's.
 
   The GUI's own Remote bot builds the request remote_bot_helpers.request_of
@@ -228,7 +228,10 @@ def test_contract_8_is_what_remote_bot_takes(leduc_dir, bot_server):
   """
   controllers, _, _ = _gui()
   contract, remote_bot_http = _gui_protocol()
-  assert contract.CONTRACT_VERSION == 8
+  # Contracts 9 to 11 add the optional bot output to a reply, let a policy
+  # entry's action be null, and queue simultaneous moves; none changes the
+  # remote-bot request, so remote_bot speaks all of them.
+  assert contract.CONTRACT_VERSION in (8, 9, 10, 11), contract.CONTRACT_VERSION
   assert contract.NOTICE_MAX_LENGTH == remote_bot.NOTICE_MAX_LENGTH
   assert remote_bot_http.PROTOCOL_HEADER == remote_bot.PROTOCOL_HEADER
   assert remote_bot_http.PROTOCOL == remote_bot.PROTOCOL

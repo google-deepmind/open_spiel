@@ -61,6 +61,13 @@ class Controller(Protocol):
   note about its latest choice, or None. `controllers.choose` reads it right
   after `choose_action` returns, and the seat shows it (`SeatView.notice`) to
   its own viewer and to omniscient viewers only. It has no effect on play.
+
+  It may also have a `last_output` attribute: a `contract.BotOutput` about
+  its latest choice (its policy, value and what decided it), or None, read
+  in the same way. The choice's history entry keeps it
+  (`HistoryEntry.bot_output`), which goes only to the viewers who see the
+  move in full: omniscient viewers and the seat's own. It has no effect on
+  play.
   """
 
   def choose_action(self, state: pyspiel.State, seat: int) -> int:
@@ -164,6 +171,33 @@ def full_state_notice(
   policy = state_policy()
   assert policy == StatePolicy.ANALYSIS, policy
   return notice
+
+
+def full_state_output(
+    game: pyspiel.Game,
+    reads_full_state: bool,
+    output: contract.BotOutput | None,
+) -> contract.BotOutput | None:
+  """Returns the bot output a seat's viewer is shown, from its controller's.
+
+  A bot output (`HistoryEntry.bot_output`) reaches omniscient viewers and
+  the seat's own, and can carry hidden information to the seat as a notice
+  does (`full_state_notice`): a policy computed from the full state favours
+  the moves that hidden cards make good. Under `StatePolicy.ANALYSIS` every
+  output is passed on; this is where a stricter policy would drop the
+  outputs of seats that read the full state, in a game that hides
+  information.
+
+  Args:
+    game: The game the seat plays.
+    reads_full_state: Whether the seat's controller, with its settings,
+      reads the full state.
+    output: The controller's output about its latest choice, or None.
+  """
+  del game, reads_full_state
+  policy = state_policy()
+  assert policy == StatePolicy.ANALYSIS, policy
+  return output
 
 
 @dataclasses.dataclass(frozen=True)

@@ -34,6 +34,10 @@
 // `--state full_state`, as the gin recipe does (the gin checkpoint bot takes
 // only the full state), and the launcher prints its one-line note that the
 // bot sees what its seat may not.
+//
+// Hearts and euchre, four seats, are launched with one `--bot random` and
+// nothing else: the bot fills seats 1-3, Setup › Players reads Remote bot on
+// each, and seat 0 plays the hand to the end with every bot seat answering.
 
 /// <reference types="node" />
 
@@ -78,28 +82,38 @@ interface Launcher {
   readonly output: string[];
 }
 
-/** Starts the launcher; resolves with the address it prints. */
-async function launch(
+/** Starts the gin launcher; resolves with the address it prints. */
+function launch(
   bot: string,
   checkpoint: string,
   state: 'seat_view' | 'full_state' | null,
 ): Promise<Launcher> {
+  return launchWith([
+    '--game',
+    `${GAME}(oklahoma=true)`,
+    '--bot',
+    bot,
+    '--checkpoint',
+    checkpoint,
+    ...(state === null ? [] : ['--state', state]),
+  ]);
+}
+
+/**
+ * Starts the launcher with `flags` (on a free port, serving the built
+ * client); resolves with the address it prints.
+ */
+async function launchWith(flags: readonly string[]): Promise<Launcher> {
   const child = spawn(
     process.env['E2E_PYTHON'] ?? 'python3',
     [
       '-m',
       'open_spiel.python.gui.play',
-      '--game',
-      `${GAME}(oklahoma=true)`,
-      '--bot',
-      bot,
-      '--checkpoint',
-      checkpoint,
+      ...flags,
       '--port',
       '0',
       '--client-dir',
       path.join(CLIENT_ROOT, 'dist'),
-      ...(state === null ? [] : ['--state', state]),
     ],
     {
       cwd: REPOSITORY_ROOT,
@@ -281,3 +295,68 @@ test('play launcher: gin rummy against a checkpoint in one step, to the end', as
     await stopAndExpectBothGone(launcher, page);
   }
 });
+
+// One human against three bots: a hand of each four-seat game, to the end.
+// Most moves of seat 0: hearts passes three cards and plays thirteen;
+// euchre bids at most twice, may discard, and plays five.
+const FOUR_SEATS = [
+  {game: 'hearts', maxMoves: 40, minBotSeatsMoving: 3},
+  {game: 'euchre', maxMoves: 20, minBotSeatsMoving: 2},
+] as const;
+
+for (const {game, maxMoves, minBotSeatsMoving} of FOUR_SEATS) {
+  test(`play launcher: ${game} with one bot on all three other seats, to the end`, async ({
+    app,
+    page,
+  }) => {
+    test.setTimeout(300_000);
+    const launcher = await launchWith(['--game', game, '--bot', 'random']);
+    try {
+      const url = new URL(launcher.playUrl);
+      expect(url.pathname).toBe(`/game/${game}`);
+      expect(url.searchParams.get('viewer')).toBe('0');
+      const session = url.searchParams.get('session') ?? '';
+      const api = new URL(`/api/sessions/${session}`, url);
+
+      const before = app.frames.count;
+      await page.goto(launcher.playUrl);
+      await expect(app.dockTab('Gameplay')).toBeVisible();
+      const opened: Frame = await app.frames.waitFor(
+        frame => frame.session.id === session,
+        before,
+        `the first frame of the launched ${game} session`,
+      );
+      expect(opened.seats.map(seat => seat.controller)).toEqual([
+        'human',
+        'remote',
+        'remote',
+        'remote',
+      ]);
+      for (const seat of [1, 2, 3]) {
+        await expect(await app.seat(seat)).toContainText('Remote bot');
+      }
+
+      const end = await app.playToEnd(game, maxMoves);
+      expect(end.status).toBe('terminal');
+      const oracle = (await (
+        await page.request.get(`${api.toString()}?viewer=oracle`)
+      ).json()) as Frame;
+      expect(oracle.status).toBe('terminal');
+      for (const seat of [1, 2, 3]) {
+        expect(oracle.seats[seat]?.failure ?? null).toBeNull();
+      }
+      // Every hearts seat plays; in euchre the maker's partner sits out a
+      // lone hand, so two bot seats may be all that move.
+      const movers = new Set(
+        oracle.history
+          .map(entry => entry.seat)
+          .filter(seat => seat !== null && seat !== 0),
+      );
+      expect(movers.size, 'bot seats that moved').toBeGreaterThanOrEqual(
+        minBotSeatsMoving,
+      );
+    } finally {
+      await stopAndExpectBothGone(launcher, page);
+    }
+  });
+}

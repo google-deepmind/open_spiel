@@ -29,6 +29,7 @@ const WITHHELD: HistoryEntry = {
   label: null,
   rewards: null,
   public_label: null,
+  bot_output: null,
 };
 
 let container: HTMLElement;

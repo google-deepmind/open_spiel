@@ -58,7 +58,7 @@ seat) checks the seat is to move and returns a legal action; last_probs
 holds that decision's distribution. On a move where the agent's rules and
 OpenSpiel's differ it still returns a legal action (checkpoint_bot, "Rules
 differences"): it logs a WARNING, counts it in `stats` and describes it in
-`last_notice`. The GUI's controller contract (version 8) reads
+`last_notice`. The GUI's controller contract (version 9) reads
 `last_notice` with the action and shows it to that seat's viewer and to
 omniscient viewers; the notice changes nothing of play, and a blank one or
 one over 200 characters fails the seat. CheckpointBot's `last_notice` is

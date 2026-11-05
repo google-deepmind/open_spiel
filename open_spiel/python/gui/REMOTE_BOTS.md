@@ -206,11 +206,31 @@ What `play` does, step by step, is the rest of this page: it runs
 the checkpoint in the environment variables `OPEN_SPIEL_REMOTE_BOT_CHECKPOINT`
 and `OPEN_SPIEL_SCALE_REMOTE_BOT_CHECKPOINT`, the names a bot's factory may read
 (`--checkpoint-env VAR` sets `VAR` alone instead), waits for its `/health`,
-starts the GUI server, and opens a session whose seat `--bot-seat` (1) is a
+starts the GUI server, and opens a session whose bot seats are each a
 Remote bot at that URL, with state `--state` (unless given, the one state the
 bot server takes, or `seat_view` if it takes both), the
 checkpoint in its **Checkpoint** setting and autoplay on, every other seat
-human. Any game and
+human.
+
+The bot seats are every seat but yours, `--human-seat` (0), so one `--bot`
+fills all three other seats of a four-player game:
+
+```sh
+python -m open_spiel.python.gui.play --game hearts --bot random
+```
+
+seats you at seat 0 and the random bot at seats 1, 2 and 3, as Setup ›
+Players shows. `--human-seat 2` seats you at seat 2 instead. `--bot-seat`,
+which may be repeated, names the bot seats itself, every other seat human
+(`--bot-seat 1` alone, in a two-player game, is the default).
+`--seat-bot SEAT=MODULE:FACTORY` gives one seat a bot of its own and
+`--seat-checkpoint SEAT=<location>@<step>` a checkpoint of its own; each
+different bot and checkpoint is served by a bot server of its own, and the
+seats that share one share its server. A bot server may so be asked for the
+moves of several seats of one game, in turn: each request names its `seat`,
+and a bot that keeps state between requests (a search tree, a belief over
+the hidden cards) must key it on that seat. `--server-per-seat` gives every
+bot seat a server of its own instead, for a bot that cannot. Any game and
 any bot work the same way (`--game`, `--bot random`). The bot runs in its own
 process, so the GUI imports nothing of it. Flags after `--` go to the GUI
 server; `--move-budget-seconds` (60, so that a checkpoint switched in the seat
@@ -384,7 +404,11 @@ carries `observation_string` (null where the game provides none),
 `history`: the history as the seat's own frame shows it, `{"seat",
 "action", "label", "public_label"}` per ply, the seat's own actions in full
 and every other ply (chance included) only as its public label, in a game
-that hides information. With `tensors` on, it also carries
+that hides information. A joint step of a simultaneous game is listed as one
+entry per seat, in seat order, as OpenSpiel's history holds it, the seat's
+own part in full and every other seat's withheld. At a simultaneous node
+each bot seat is asked on the state before any seat's choice is applied, so
+no request carries another seat's pending choice. With `tensors` on, it also carries
 `observation_tensor` and `information_state_tensor`, each null where the
 game provides none. A strict bot refuses either addition. `seed` changes
 from ply to ply and is the same at the same position, so a bot that draws
@@ -395,7 +419,8 @@ first is played and the bot is asked again at the next position. It may add
 `"notice"`: plain text of at most 200 characters about the move, such as a
 fallback the bot took. The seat's own viewer and omniscient viewers see it
 after the controller's name in Setup › Players (`SeatView.notice`); it has no
-effect on play. Other fields are ignored.
+effect on play. Other fields, apart from the bot output below, are
+ignored.
 
 A reply with HTTP 400, 409 or 422, or a 2xx reply with `"error"` set, is a
 refusal (`{"error": ..., "reason": ...}`), and the seat fails with
@@ -404,3 +429,37 @@ the timeout fails it with `RemoteBotUnreachableError`; a reply that is not
 the protocol's, or whose action is not legal, with `RemoteBotReplyError`.
 Nothing is retried. As for every controller, what went wrong reaches only
 omniscient viewers (`failure.message`).
+
+### The bot output
+
+A reply may also say why the bot chose its move, for the GUI's Bot output
+panel. Three optional fields carry it; each may be left out or null:
+
+```json
+{
+  "action": 12,
+  "policy": [
+    {"action": 12, "label": "Discard 7h", "prob": 0.71},
+    {"action": 3, "label": "Discard Kd", "prob": 0.29}
+  ],
+  "value": 0.18,
+  "decided_by": "network"
+}
+```
+
+| Field | Type | Meaning |
+| ----- | ---- | ------- |
+| `policy` | list of `{"action", "label", "prob"}` | The bot's probabilities over the seat's legal actions, in any order. Each `action` is a legal action, named at most once; each `prob` is a number in [0, 1], and together they sum to at most 1, so a bot may send only its likeliest actions. `label` is optional; the GUI shows the game's own text for each action. |
+| `value` | number | The bot's estimate of the position's value for its seat. |
+| `decided_by` | text, at most 40 characters | What part of the bot chose the move, such as `network`, `search`, `scripted` (a scripted endgame) or `forced` (the only legal action). |
+
+The server keeps them with the move's ply (`HistoryEntry.bot_output`, GUI
+contract 10), and the Bot output panel shows them for the ply the History
+slider is on: the policy most probable first, with the move played marked.
+A seat's bot output goes only to the viewers who see its move in full: the
+seat's own viewer and omniscient viewers (every viewer, in a game that hides
+nothing). In a game that hides information no other seat or spectator
+receives it, since a bot's policy, value and `decided_by` follow from its
+hand: a trick-taking bot's policy names the cards it holds. A reply whose
+`policy`, `value` or `decided_by` is not as above fails the seat with
+`RemoteBotReplyError`.

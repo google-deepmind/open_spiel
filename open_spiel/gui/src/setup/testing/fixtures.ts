@@ -136,7 +136,7 @@ export function boardFrame({
 }: FrameOptions = {}): Frame {
   const omniscient = viewer.kind === 'oracle' || !hidesInformation;
   return {
-    contract_version: 8,
+    contract_version: 10,
     session: {
       id,
       game: 'board',
@@ -184,6 +184,7 @@ export function boardFrame({
     history: history.map((action, ply) => ({
       seat: ply % 2,
       public_label: null,
+      bot_output: null,
       ...(omniscient
         ? {action, label: String(action), rewards: [0, 0]}
         : {action: null, label: null, rewards: null}),

@@ -14,9 +14,10 @@
 
 
 """The one-step launcher's life: it starts both servers, opens the session
-with its Remote bot seat, and stops both again, on a failure and on a
-signal. The bot is the stand-in checkpoint bot, so nothing beyond OpenSpiel
-is needed."""
+with its Remote bot seats, and stops both again, on a failure and on a
+signal. Four-player games seat a bot on every seat but the human's, and play
+to the end. The bot is the stand-in checkpoint bot or the reference server's
+random bot, so nothing beyond OpenSpiel is needed."""
 
 import http.client
 import io
@@ -88,6 +89,40 @@ def _post(url: str, body: dict[str, Any]) -> Any:
   return json.loads(raw)
 
 
+def _play_to_end(running: play.Running, human: int) -> dict[str, Any]:
+  """Plays `human`'s first legal action at each of its turns until the end.
+
+  The bots answer every other turn. Returns the terminal frame, as the
+  oracle sees it.
+  """
+  api = f"{running.gui_url}/api/sessions/{running.session}"
+  deadline = time.monotonic() + 240
+  while time.monotonic() < deadline:
+    frame = _get(f"{api}?viewer={human}")
+    assert frame["status"] != "paused", frame["seats"]
+    if frame["status"] == "terminal":
+      end: dict[str, Any] = _get(f"{api}?viewer=oracle")
+      return end
+    to_move = frame["to_move"]
+    if (
+        to_move["kind"] == "seat"
+        and to_move["seat"] == human
+        and frame["legal_actions"]
+    ):
+      status, raw = _call(
+          f"{api}/actions?viewer={human}",
+          {
+              "action": frame["legal_actions"][0]["id"],
+              "ply": frame["ply"],
+          },
+      )
+      # A bot may have moved since the frame was read (the ply is stale).
+      assert status in (200, 409), (status, raw)
+    else:
+      time.sleep(0.05)
+  raise AssertionError(f"{running.play_url} did not end within 240 s.")
+
+
 def _refuses(url: str) -> bool:
   """Whether nothing listens at `url` any more."""
   try:
@@ -125,7 +160,66 @@ class ParseTest(absltest.TestCase):
     # Unless --state is given, the bot server's /info decides (LaunchTest).
     self.assertIsNone(options.state)
     self.assertIsNone(play.Options(game="kuhn_poker", bot="random").state)
-    self.assertEqual(options.bot_seat, 1)
+    # No seat named: every seat but seat 0 is a bot seat (seating, below).
+    self.assertIsNone(options.bot_seat)
+    self.assertEqual(options.bot_seats, ())
+    self.assertIsNone(options.human_seat)
+    self.assertEqual(options.seat_bots, {})
+    self.assertFalse(options.server_per_seat)
+
+  def test_seats_and_their_own_bots_are_given_by_seat(self) -> None:
+    options = play.parse_args([
+        "--game",
+        "hearts",
+        "--bot",
+        "random",
+        "--checkpoint",
+        "/c@1",
+        "--bot-seat",
+        "1",
+        "--bot-seat",
+        "3",
+        "--human-seat",
+        "2",
+        "--seat-bot",
+        "3=mcts",
+        "--seat-checkpoint",
+        "1=/d@2",
+        "--server-per-seat",
+    ])
+    self.assertTrue(options.server_per_seat)
+    self.assertEqual(options.bot_seats, (1, 3))
+    self.assertEqual(options.human_seat, 2)
+    self.assertEqual(
+        options.seat_bots,
+        {1: play.SeatBot("random", "/d@2"), 3: play.SeatBot("mcts", "")},
+    )
+
+  def test_a_seat_value_that_is_not_seat_equals_value_is_refused(
+      self,
+  ) -> None:
+    for flag, value in (
+        ("--seat-bot", "random"),
+        ("--seat-bot", "x=random"),
+        ("--seat-checkpoint", "1="),
+    ):
+      with mock.patch.object(sys, "stderr", io.StringIO()) as printed:
+        with self.assertRaises(SystemExit):
+          play.parse_args(["--game", "hearts", "--bot", "random", flag, value])
+      self.assertIn("is not SEAT=VALUE", printed.getvalue())
+    with mock.patch.object(sys, "stderr", io.StringIO()) as printed:
+      with self.assertRaises(SystemExit):
+        play.parse_args([
+            "--game",
+            "hearts",
+            "--bot",
+            "random",
+            "--seat-bot",
+            "1=random",
+            "--seat-bot",
+            "1=mcts",
+        ])
+    self.assertIn("names seat 1 twice", printed.getvalue())
 
   def test_the_full_state_is_given_by_name(self) -> None:
     options = play.parse_args(
@@ -216,6 +310,126 @@ class ParseTest(absltest.TestCase):
       play.seat_config(
           play.Options(game="kuhn_poker", bot="random"), "http://127.0.0.1:9"
       )
+
+
+class SeatingTest(absltest.TestCase):
+  """Which seats the bots play, and which the human."""
+
+  def seating(self, game: str, **changes: Any) -> play.Seating:
+    """The seating of `game` for the random bot on /c@1, with `changes`."""
+    options = play.Options(
+        game=game, bot="random", checkpoint="/c@1", **changes
+    )
+    return play.seating(options, pyspiel.load_game(game).num_players())
+
+  def test_two_seats_seat_the_bot_on_seat_1_as_before(self) -> None:
+    default = play.SeatBot("random", "/c@1")
+    for changes in (
+        {},
+        {"bot_seat": 1},
+        {"bot_seats": (1,)},
+        {"human_seat": 0},
+    ):
+      who = self.seating("kuhn_poker", **changes)
+      self.assertEqual(who.bots, {1: default}, changes)
+      self.assertEqual(who.human, 0, changes)
+    who = self.seating("kuhn_poker", bot_seat=0)
+    self.assertEqual((list(who.bots), who.human), ([0], 1))
+
+  def test_one_bot_fills_every_seat_but_the_human_of_four(self) -> None:
+    default = play.SeatBot("random", "/c@1")
+    for game in ("hearts", "euchre"):
+      who = self.seating(game)
+      self.assertEqual(who.bots, {1: default, 2: default, 3: default})
+      self.assertEqual(who.human, 0)
+      self.assertEqual(who.servers(), [(None, default)])
+      who = self.seating(game, human_seat=2)
+      self.assertEqual(list(who.bots), [0, 1, 3])
+      self.assertEqual(who.human, 2)
+
+  def test_every_bot_seat_may_have_a_server_of_its_own(self) -> None:
+    default = play.SeatBot("random", "/c@1")
+    who = self.seating("hearts", server_per_seat=True)
+    self.assertEqual(who.servers(), [(1, default), (2, default), (3, default)])
+    self.assertEqual(who.server_of(2), (2, default))
+
+  def test_named_bot_seats_leave_every_other_seat_human(self) -> None:
+    who = self.seating("hearts", bot_seats=(1, 3))
+    self.assertEqual((list(who.bots), who.human), ([1, 3], 0))
+    who = self.seating("hearts", bot_seat=0, bot_seats=(1,))
+    self.assertEqual((list(who.bots), who.human), ([0, 1], 2))
+
+  def test_a_seat_may_play_a_bot_of_its_own(self) -> None:
+    own = play.SeatBot("mcts")
+    who = self.seating("hearts", seat_bots={2: own})
+    default = play.SeatBot("random", "/c@1")
+    self.assertEqual(who.bots, {1: default, 2: own, 3: default})
+    self.assertEqual(who.servers(), [(None, default), (None, own)])
+    # A seat with its own bot is a bot seat even when not named.
+    who = self.seating("hearts", bot_seats=(1,), seat_bots={3: own})
+    self.assertEqual(who.bots, {1: default, 3: own})
+
+  def test_seats_that_cannot_be_played_are_refused(self) -> None:
+    for changes, message in (
+        ({"bot_seats": (4,)}, "--bot-seat 4 is not a seat of hearts"),
+        ({"bot_seat": -1}, "--bot-seat -1 is not a seat"),
+        ({"human_seat": 4}, "--human-seat 4 is not a seat"),
+        ({"seat_bots": {5: play.SeatBot("mcts")}}, "--seat-bot 5 is not"),
+        ({"bot_seats": (0, 1), "human_seat": 1}, "--human-seat 1 is a bot"),
+        (
+            {"seat_bots": {0: play.SeatBot("mcts")}},
+            r"--seat-bot 0 is the human seat \(0\); pass --human-seat",
+        ),
+        (
+            {"seat_bots": {2: play.SeatBot("mcts")}, "human_seat": 2},
+            "--human-seat 2 is a bot seat",
+        ),
+        ({"bot_seats": (0, 1, 2, 3)}, "Every seat of hearts is a bot seat"),
+    ):
+      with self.assertRaisesRegex(play.LaunchError, message, msg=changes):
+        self.seating("hearts", **changes)
+
+  def test_the_session_seats_a_bot_on_every_bot_seat(self) -> None:
+    options = play.Options(
+        game="hearts",
+        bot="random",
+        seat_bots={2: play.SeatBot("mcts", "/m@4")},
+    )
+    body = play.session_body(
+        options,
+        {
+            1: "http://127.0.0.1:9",
+            2: "http://127.0.0.1:8",
+            3: "http://127.0.0.1:9",
+        },
+        4,
+        {1: "seat_view", 2: "full_state", 3: "seat_view"},
+    )
+    self.assertEqual(body["seats"][0]["controller"], "human")
+    self.assertEqual(
+        [seat["config"] for seat in body["seats"][1:]],
+        [
+            {
+                "url": "http://127.0.0.1:9",
+                "state": "seat_view",
+                "checkpoint": "",
+                "timeout_seconds": 0.0,
+            },
+            {
+                "url": "http://127.0.0.1:8",
+                "state": "full_state",
+                "checkpoint": "/m@4",
+                "timeout_seconds": 0.0,
+            },
+            {
+                "url": "http://127.0.0.1:9",
+                "state": "seat_view",
+                "checkpoint": "",
+                "timeout_seconds": 0.0,
+            },
+        ],
+    )
+    self.assertTrue(all(seat["autoplay"] for seat in body["seats"][1:]))
 
 
 class ChildServerTest(absltest.TestCase):
@@ -498,6 +712,97 @@ class LaunchTest(absltest.TestCase):
     with self.assertRaisesRegex(play.LaunchError, "not a seat"):
       play.launch(self.options(bot_seat=2), self.out)
     self.assertEqual(self.out.getvalue(), "")
+
+  def test_four_player_games_play_to_the_end_with_three_bots(self) -> None:
+    # One bot, given once, fills seats 1-3; the human at seat 0 plays to
+    # the end and every bot seat moves.
+    for game in ("hearts", "euchre"):
+      with self.subTest(game=game):
+        running = play.launch(
+            self.options(game=game, bot="random", checkpoint=""), self.out
+        )
+        self.addCleanup(running.stop)
+        self.assertTrue(running.play_url.endswith("&viewer=0"))
+        self.assertEqual(list(running.bot_urls), [1, 2, 3])
+        self.assertEqual(len(set(running.bot_urls.values())), 1)
+        end = _play_to_end(running, 0)
+        self.assertEqual(end["status"], "terminal")
+        self.assertEqual(end["seats"][0]["controller"], "human")
+        for seat in (1, 2, 3):
+          self.assertEqual(end["seats"][seat]["controller"], "remote")
+          self.assertIsNone(end["seats"][seat].get("failure"))
+        movers = {entry["seat"] for entry in end["history"]} & {1, 2, 3}
+        # Every hearts seat plays; in euchre the maker's partner sits out a
+        # lone hand, so two bot seats may be all that move.
+        self.assertGreaterEqual(len(movers), 3 if game == "hearts" else 2)
+        running.stop()
+        self.assertTrue(_refuses(running.bot_url + "/health"))
+
+  def test_every_bot_seat_may_get_a_server_of_its_own(self) -> None:
+    running = play.launch(
+        self.options(
+            game="hearts", bot="random", checkpoint="", server_per_seat=True
+        ),
+        self.out,
+    )
+    self.addCleanup(running.stop)
+    self.assertEqual(list(running.bot_urls), [1, 2, 3])
+    self.assertEqual(len(set(running.bot_urls.values())), 3)
+    self.assertEqual(_play_to_end(running, 0)["status"], "terminal")
+    running.stop()
+    for url in running.bot_urls.values():
+      self.assertTrue(_refuses(url + "/health"))
+
+  def test_the_full_state_note_is_printed_once_for_two_servers(self) -> None:
+    # The mcts bot takes only the full state; seat 3's own checkpoint puts
+    # it in a second server, and the note is still one line.
+    running = play.launch(
+        self.options(
+            game="hearts",
+            bot="mcts",
+            checkpoint="",
+            seat_bots={3: play.SeatBot("mcts", "/m@1")},
+        ),
+        self.out,
+    )
+    self.addCleanup(running.stop)
+    self.assertNotEqual(running.bot_urls[1], running.bot_urls[3])
+    notes = [
+        line
+        for line in self.out.getvalue().splitlines()
+        if line.startswith("Note: --state full_state")
+    ]
+    self.assertEqual(len(notes), 1, notes)
+
+  def test_a_seat_with_its_own_bot_gets_its_own_bot_server(self) -> None:
+    # Hearts, the human at seat 2; seat 3 plays the stand-in checkpoint in
+    # a second bot server; stopping stops every server.
+    checkpoint = stand_in_checkpoint_bot.write(
+        os.path.join(self.directory, "hearts"), 6, "hearts"
+    )
+    running = play.launch(
+        self.options(
+            game="hearts",
+            bot="random",
+            checkpoint="",
+            human_seat=2,
+            seat_bots={3: play.SeatBot(STAND_IN, checkpoint)},
+        ),
+        self.out,
+    )
+    self.addCleanup(running.stop)
+    self.assertTrue(running.play_url.endswith("&viewer=2"))
+    self.assertEqual(list(running.bot_urls), [0, 1, 3])
+    self.assertEqual(running.bot_urls[0], running.bot_urls[1])
+    self.assertNotEqual(running.bot_urls[0], running.bot_urls[3])
+    self.assertIn("[bot 2 server] Serving", self.out.getvalue())
+    end = _play_to_end(running, 2)
+    self.assertEqual(end["seats"][3]["config"]["checkpoint"], checkpoint)
+    self.assertEqual(end["seats"][3]["notice"], "stand-in hearts@6")
+    running.stop()
+    for url in set(running.bot_urls.values()):
+      self.assertTrue(_refuses(url + "/health"))
+    self.assertTrue(_refuses(running.gui_url + "/api/health"))
 
 
 class MainTest(absltest.TestCase):

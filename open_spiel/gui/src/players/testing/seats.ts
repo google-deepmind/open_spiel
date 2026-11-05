@@ -148,7 +148,7 @@ export function frameWith(
   overrides: Partial<Frame> = {},
 ): Frame {
   return {
-    contract_version: 8,
+    contract_version: 10,
     session: {
       id: 'session-1',
       game: 'kuhn_poker',

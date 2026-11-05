@@ -27,9 +27,10 @@ served without the GUI knowing of it. A bot is an object with:
     "full_state").
   games: the short names of the games it plays, or None for any.
   step(mode, request): the action to play, as an int, or a dict
-    {"action": int, "notice": str | None}. `mode` is "seat_view" or
-    "full_state", and `request` is the request's JSON body. A ValueError
-    is answered as a refusal (HTTP 422), with its message.
+    {"action": int, "notice": str | None}, which may add the bot output
+    `policy`, `value` and `decided_by` (REMOTE_BOTS.md). `mode` is
+    "seat_view" or "full_state", and `request` is the request's JSON body.
+    A ValueError is answered as a refusal (HTTP 422), with its message.
 
 A factory that plays a checkpoint reads it, by convention, from the
 environment variable CHECKPOINT_ENV, and a request's `config.checkpoint`

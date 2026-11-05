@@ -535,6 +535,8 @@ class Session:
     if action is None:
       return False
     self._apply(action)
+    ply = self._plies[-1]
+    self._plies[-1] = dataclasses.replace(ply, bot_output=seat.output)
     return True
 
   def _last_action(self, viewer: contract.Viewer) -> int | None:

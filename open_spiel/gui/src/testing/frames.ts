@@ -37,6 +37,7 @@ export function entries(labels: readonly string[]): HistoryEntry[] {
     label,
     rewards: [0, 0],
     public_label: null,
+    bot_output: null,
   }));
 }
 
@@ -47,7 +48,7 @@ export function entries(labels: readonly string[]): HistoryEntry[] {
 export function frame(fields: Partial<Frame> = {}): Frame {
   const history = fields.history ?? [];
   return {
-    contract_version: 8,
+    contract_version: 10,
     session: {
       id: 'session-1',
       game: 'game',

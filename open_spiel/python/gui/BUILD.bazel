@@ -570,6 +570,42 @@ pytype_strict_contrib_test(
 )
 
 pytype_strict_contrib_test(
+    name = "bot_output_test",
+    srcs = ["bot_output_test.py"],
+    deps = [
+        ":api",
+        ":builds",
+        ":catalogue",
+        ":contract",
+        ":controllers",
+        ":errors",
+        ":health",
+        ":remote_bot",
+        ":remote_bot_http",
+        ":remote_bot_server",
+        ":session",
+        ":store",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
+    name = "bot_output_privacy_test",
+    srcs = ["bot_output_privacy_test.py"],
+    deps = [
+        ":builds",
+        ":contract",
+        ":controllers",
+        ":remote_bot",
+        ":remote_bot_server",
+        ":session",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+pytype_strict_contrib_test(
     name = "builds_test",
     srcs = ["builds_test.py"],
     deps = [

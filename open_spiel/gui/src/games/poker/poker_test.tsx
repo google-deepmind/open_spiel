@@ -45,11 +45,19 @@ function deal(): HistoryEntry {
     label: null,
     rewards: null,
     public_label: null,
+    bot_output: null,
   };
 }
 
 function move(seat: number, label: string): HistoryEntry {
-  return {seat, action: 0, label, rewards: null, public_label: null};
+  return {
+    seat,
+    action: 0,
+    label,
+    rewards: null,
+    public_label: null,
+    bot_output: null,
+  };
 }
 
 interface Table {

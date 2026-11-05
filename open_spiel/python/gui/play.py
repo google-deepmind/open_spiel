@@ -23,13 +23,24 @@ free port of this machine, with the checkpoint in the environment
 variables CHECKPOINT_ENVS (both names a bot's factory may read), or in
 `--checkpoint-env` alone; waits until its `/health` answers, and stops,
 naming the `--state` to rerun with, if its `/info` does not take `--state`;
-starts the GUI server; opens a session of the game whose seat `--bot-seat`
-is a Remote bot seat at that URL (its `checkpoint` setting the checkpoint,
-autoplay on) and every other seat human; and prints the address to play it
-at. The seat's state is `--state` if given; otherwise the one state mode the
-bot server's `/info` names, if it names one, and seat_view if it takes both.
-When the bot is sent the full state of a game that hides information, the
-launcher prints one line saying the bot sees the whole state.
+starts the GUI server; opens a session of the game whose bot seats are
+Remote bot seats at that URL (each one's `checkpoint` setting the
+checkpoint, autoplay on) and every other seat human; and prints the address
+to play it at, as the human seat. The seat's state is `--state` if given;
+otherwise the one state mode the bot server's `/info` names, if it names
+one, and seat_view if it takes both. When the bot is sent the full state of
+a game that hides information, the launcher prints one line saying the bot
+sees the whole state.
+
+The bot seats are every seat but `--human-seat` (seat 0 by default), so
+`--bot` fills all three other seats of a four-player game such as hearts or
+euchre; `--bot-seat`, which may be repeated, names them instead, every other
+seat human. `--seat-bot SEAT=MODULE:FACTORY` and
+`--seat-checkpoint SEAT=CHECKPOINT` give one seat a bot or checkpoint of its
+own; each different bot and checkpoint runs in a bot server of its own, and
+seats with the same bot and checkpoint share one, which is then asked for
+each of their moves (a bot that keeps state between requests keys it on the
+request's `seat`, or is given `--server-per-seat`).
 Ctrl-C, SIGTERM or SIGHUP (closing the terminal) stops both servers, as does
 any error, at any point of the launch or after it.
 
@@ -92,6 +103,19 @@ LaunchError = child_servers.LaunchError
 
 
 @dataclasses.dataclass(frozen=True)
+class SeatBot:
+  """The bot a seat plays.
+
+  Attributes:
+    bot: The bot server's `--bot`: random, mcts or MODULE:FACTORY.
+    checkpoint: The checkpoint the bot plays, or empty for none.
+  """
+
+  bot: str
+  checkpoint: str = ""
+
+
+@dataclasses.dataclass(frozen=True)
 class Options:
   """What to launch.
 
@@ -102,7 +126,18 @@ class Options:
     checkpoint: The checkpoint the bot plays, or empty for none.
     checkpoint_envs: The environment variables the bot server is given the
       checkpoint in.
-    bot_seat: The seat the bot plays.
+    bot_seat: One seat the bot plays, as `bot_seats=(bot_seat,)` does; kept
+      for callers that seat one bot.
+    bot_seats: The seats the bots play, every other seat human. Empty (the
+      default, with no `bot_seat`) is every seat but the human seat.
+    human_seat: The seat the printed address opens as; None (the default) is
+      seat 0, or the first seat that is not a bot seat.
+    seat_bots: The seats that play a bot or checkpoint other than `bot` and
+      `checkpoint`, each a bot seat.
+    server_per_seat: Whether every bot seat gets a bot server of its own,
+      for a bot that keeps state between requests and cannot key it on the
+      request's seat; otherwise the seats with the same bot and checkpoint
+      share one.
     state: What the bot is sent: seat_view, what its seat may see; or
       full_state, the whole state, for a bot that needs it. None (the
       default) is the bot server's one state mode if it declares one, and
@@ -122,7 +157,11 @@ class Options:
   bot: str
   checkpoint: str = ""
   checkpoint_envs: tuple[str, ...] = CHECKPOINT_ENVS
-  bot_seat: int = 1
+  bot_seat: int | None = None
+  bot_seats: tuple[int, ...] = ()
+  human_seat: int | None = None
+  seat_bots: Mapping[int, SeatBot] = dataclasses.field(default_factory=dict)
+  server_per_seat: bool = False
   state: str | None = None
   host: str = "127.0.0.1"
   port: int = 8080
@@ -148,6 +187,81 @@ def parse_game(text: str) -> tuple[str, dict[str, Any]]:
   if name not in pyspiel.registered_names():
     raise LaunchError(f"--game {text!r} names no registered game.")
   return name, parameters
+
+
+@dataclasses.dataclass(frozen=True)
+class Seating:
+  """Who plays each seat.
+
+  Attributes:
+    bots: Every bot seat, in seat order, and the bot it plays.
+    human: The seat the printed address opens as, a human seat.
+    server_per_seat: Whether every bot seat has a bot server of its own,
+      rather than one shared by the seats with the same bot.
+  """
+
+  bots: Mapping[int, SeatBot]
+  human: int
+  server_per_seat: bool = False
+
+  def server_of(self, seat: int) -> tuple[int | None, SeatBot]:
+    """Returns the key of the bot server the bot seat `seat` plays on.
+
+    That is its bot, with the seat too when every seat has its own server.
+    """
+    return (seat if self.server_per_seat else None, self.bots[seat])
+
+  def servers(self) -> list[tuple[int | None, SeatBot]]:
+    """Returns the keys of the bot servers to start, in seat order."""
+    return list(dict.fromkeys(self.server_of(seat) for seat in self.bots))
+
+
+def seating(options: Options, num_players: int) -> Seating:
+  """Returns who plays each seat of the game `options.game`.
+
+  Raises:
+    LaunchError: If a seat named is not a seat of the game, the human seat
+      is a bot seat, or every seat is a bot seat.
+  """
+  name, _ = parse_game(options.game)
+  named = list(options.bot_seats)
+  if options.bot_seat is not None:
+    named.append(options.bot_seat)
+  checks = [("--bot-seat", seat) for seat in named]
+  checks += [("--seat-bot", seat) for seat in options.seat_bots]
+  if options.human_seat is not None:
+    checks.append(("--human-seat", options.human_seat))
+  for flag, seat in checks:
+    if not 0 <= seat < num_players:
+      raise LaunchError(
+          f"{flag} {seat} is not a seat of {name}, which has {num_players}."
+      )
+  if named:
+    seats = set(named)
+  else:
+    human = 0 if options.human_seat is None else options.human_seat
+    if options.human_seat is None and human in options.seat_bots:
+      raise LaunchError(
+          f"--seat-bot {human} is the human seat ({human}); pass "
+          "--human-seat to sit at another."
+      )
+    seats = set(range(num_players)) - {human}
+  seats |= set(options.seat_bots)
+  if options.human_seat in seats:
+    raise LaunchError(f"--human-seat {options.human_seat} is a bot seat.")
+  humans = [seat for seat in range(num_players) if seat not in seats]
+  if not humans:
+    raise LaunchError(
+        f"Every seat of {name} is a bot seat, so no one plays against the bots."
+    )
+  default = SeatBot(options.bot, options.checkpoint)
+  return Seating(
+      bots={
+          seat: options.seat_bots.get(seat, default) for seat in sorted(seats)
+      },
+      human=humans[0] if options.human_seat is None else options.human_seat,
+      server_per_seat=options.server_per_seat,
+  )
 
 
 def full_state_note(
@@ -285,19 +399,38 @@ def seat_config(options: Options, bot_url: str) -> dict[str, Any]:
 
 
 def session_body(
-    options: Options, bot_url: str, num_players: int
+    options: Options,
+    bot_url: str | Mapping[int, str],
+    num_players: int,
+    states: Mapping[int, str] | None = None,
 ) -> dict[str, Any]:
-  """Returns the body that opens the session, its bot seat a Remote bot."""
+  """Returns the body that opens the session, its bot seats Remote bots.
+
+  Args:
+    options: What is launched.
+    bot_url: The bot server's URL, or each bot seat's.
+    num_players: The game's number of seats.
+    states: Each bot seat's state, if not `options.state`.
+  """
   name, parameters = parse_game(options.game)
+  who = seating(options, num_players)
   seats = [
       {"controller": "human", "config": {}, "autoplay": False}
       for _ in range(num_players)
   ]
-  seats[options.bot_seat] = {
-      "controller": remote_bot.NAME,
-      "config": seat_config(options, bot_url),
-      "autoplay": True,
-  }
+  for seat, bot in who.bots.items():
+    url = bot_url if isinstance(bot_url, str) else bot_url[seat]
+    state = options.state if states is None else states[seat]
+    seats[seat] = {
+        "controller": remote_bot.NAME,
+        "config": seat_config(
+            dataclasses.replace(
+                options, checkpoint=bot.checkpoint, state=state
+            ),
+            url,
+        ),
+        "autoplay": True,
+    }
   return {
       "game": name,
       "parameters": parameters,
@@ -309,32 +442,110 @@ def session_body(
 
 @dataclasses.dataclass
 class Running:
-  """A launched bot server, GUI server and session.
+  """Launched bot servers, a GUI server and a session.
 
   Attributes:
-    bot_url: The bot server's URL.
+    bot_url: The first bot seat's bot server's URL.
     gui_url: The GUI server's URL, without a trailing slash.
     session: The session's id.
-    play_url: The address to play the session at, as the first human seat.
+    play_url: The address to play the session at, as the human seat.
+    bot_urls: Each bot seat's bot server's URL, in seat order.
   """
 
   bot_url: str
   gui_url: str
   session: str
   play_url: str
-  _bot: child_servers.ChildServer
+  _bots: tuple[child_servers.ChildServer, ...]
   _gui: child_servers.ChildServer | None
+  bot_urls: Mapping[int, str] = dataclasses.field(default_factory=dict)
 
   def exited(self) -> str | None:
     """Returns the label of a server that has exited, or None."""
-    for child in (self._bot, self._gui):
+    for child in (*self._bots, self._gui):
       if child is not None and child.process.poll() is not None:
         return child.label
     return None
 
   def stop(self) -> None:
-    """Stops the GUI server, then the bot server."""
-    child_servers.stop_all((self._gui, self._bot))
+    """Stops the GUI server, then the bot servers."""
+    child_servers.stop_all((self._gui, *self._bots))
+
+
+def _start_bot(
+    options: Options,
+    bot: SeatBot,
+    label: str,
+    out: TextIO,
+    started: list[child_servers.ChildServer],
+) -> str:
+  """Starts a bot server serving `bot`; returns its URL once it is healthy.
+
+  The server is appended to `started` as soon as it runs, so the caller
+  stops it whatever happens next.
+  """
+  env = dict(os.environ)
+  if bot.checkpoint:
+    for variable in options.checkpoint_envs:
+      env[variable] = bot.checkpoint
+  child = child_servers.ChildServer(
+      label,
+      [
+          options.python,
+          "-m",
+          "open_spiel.python.gui.remote_bot_server",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "0",
+          "--bot",
+          bot.bot,
+      ],
+      env,
+      _BOT_READY,
+      out,
+  )
+  started.append(child)
+  url = child.wait_ready(options.bot_start_seconds)
+  reason = bot_unready(url)
+  if reason is not None:
+    raise LaunchError(reason)
+  return url
+
+
+def _start_bots(
+    options: Options,
+    who: Seating,
+    game: pyspiel.Game,
+    out: TextIO,
+    started: list[child_servers.ChildServer],
+) -> tuple[dict[int, str], dict[int, str]]:
+  """Starts the bot servers `who` needs; returns each bot seat's URL and state.
+
+  Each server is appended to `started` as soon as it runs. The full-state
+  note is printed once, however many servers it applies to.
+  """
+  urls: dict[tuple[int | None, SeatBot], str] = {}
+  server_states: dict[tuple[int | None, SeatBot], str] = {}
+  printed: set[str] = set()
+  for i, served in enumerate(who.servers()):
+    label = "bot" if i == 0 else f"bot {i + 1}"
+    url = _start_bot(options, served[1], label, out, started)
+    state = resolve_state(url, options.state)
+    note = full_state_note(
+        dataclasses.replace(options, state=state),
+        game,
+        chosen=options.state is None,
+    )
+    if note is not None and note not in printed:
+      printed.add(note)
+      print(note, file=out, flush=True)
+    urls[served] = url
+    server_states[served] = state
+  keys = {seat: who.server_of(seat) for seat in who.bots}
+  bot_urls = {seat: urls[key] for seat, key in keys.items()}
+  states = {seat: server_states[key] for seat, key in keys.items()}
+  return bot_urls, states
 
 
 def launch(
@@ -342,14 +553,15 @@ def launch(
     out: TextIO = sys.stderr,
     started: Callable[[Running], object] | None = None,
 ) -> Running:
-  """Starts the bot server and the GUI server, and opens the session.
+  """Starts the bot servers and the GUI server, and opens the session.
 
-  Every server started is stopped again if a later step fails or is
-  interrupted.
+  Every bot seat's bot (`seating`) runs in a bot server; seats with the same
+  bot and checkpoint share one. Every server started is stopped again if a
+  later step fails or is interrupted.
 
   Args:
     options: What to launch.
-    out: Where both servers' output is copied.
+    out: Where every server's output is copied.
     started: Called with the `Running` before it is returned. A caller that
       stops the servers on a signal hands its handler the `Running` here: if
       `started` raises, or a signal interrupts it, the servers are stopped,
@@ -357,19 +569,15 @@ def launch(
 
   Raises:
     LaunchError: If the options are invalid, the GUI's port is taken (found
-      before the bot server starts), a server does not start, or the
+      before a bot server starts), a server does not start, or the
       session cannot be opened.
   """
   name, _ = parse_game(options.game)
   game = pyspiel.load_game(options.game)
   num_players = game.num_players()
-  if not 0 <= options.bot_seat < num_players:
-    raise LaunchError(
-        f"--bot-seat {options.bot_seat} is not a seat of {name}, which has "
-        f"{num_players}."
-    )
   if num_players < 2:
     raise LaunchError(f"{name} has one seat, so no one plays against the bot.")
+  who = seating(options, num_players)
   if options.state is not None and options.state not in remote_bot.STATE_MODES:
     raise LaunchError(
         f"--state {options.state!r} is not seat_view or full_state."
@@ -377,41 +585,10 @@ def launch(
   reason = child_servers.port_unavailable(options.host, options.port)
   if reason is not None:
     raise LaunchError(reason)
-  env = dict(os.environ)
-  if options.checkpoint:
-    for variable in options.checkpoint_envs:
-      env[variable] = options.checkpoint
-  bot: child_servers.ChildServer | None = None
+  bots: list[child_servers.ChildServer] = []
   gui: child_servers.ChildServer | None = None
   try:
-    bot = child_servers.ChildServer(
-        "bot",
-        [
-            options.python,
-            "-m",
-            "open_spiel.python.gui.remote_bot_server",
-            "--host",
-            "127.0.0.1",
-            "--port",
-            "0",
-            "--bot",
-            options.bot,
-        ],
-        env,
-        _BOT_READY,
-        out,
-    )
-    bot_url = bot.wait_ready(options.bot_start_seconds)
-    reason = bot_unready(bot_url)
-    if reason is not None:
-      raise LaunchError(reason)
-    chosen = options.state is None
-    options = dataclasses.replace(
-        options, state=resolve_state(bot_url, options.state)
-    )
-    note = full_state_note(options, game, chosen=chosen)
-    if note is not None:
-      print(note, file=out, flush=True)
+    bot_urls, states = _start_bots(options, who, game, out, bots)
     gui = child_servers.ChildServer(
         "gui",
         [
@@ -439,30 +616,54 @@ def launch(
     frame = _request(
         "POST",
         f"{local_api}/sessions?viewer=oracle",
-        session_body(options, bot_url, num_players),
+        session_body(options, bot_urls, num_players, states),
     )
     session = str(frame["session"]["id"])
-    seat = frame["seats"][options.bot_seat]
-    if seat.get("controller") != remote_bot.NAME:
-      raise LaunchError(f"The bot seat is {seat!r}, not a Remote bot.")
-    if seat.get("failure"):
-      raise LaunchError(f"The bot seat failed: {seat['failure']}.")
-    human = next(i for i in range(num_players) if i != options.bot_seat)
-    query = urllib.parse.urlencode({"session": session, "viewer": human})
+    for seat_number in who.bots:
+      seat = frame["seats"][seat_number]
+      if seat.get("controller") != remote_bot.NAME:
+        raise LaunchError(
+            f"The bot seat {seat_number} is {seat!r}, not a Remote bot."
+        )
+      if seat.get("failure"):
+        raise LaunchError(
+            f"The bot seat {seat_number} failed: {seat['failure']}."
+        )
+    query = urllib.parse.urlencode({"session": session, "viewer": who.human})
     running = Running(
-        bot_url=bot_url,
+        bot_url=next(iter(bot_urls.values())),
         gui_url=gui_url,
         session=session,
         play_url=f"{gui_url}/game/{urllib.parse.quote(name)}?{query}",
-        _bot=bot,
+        _bots=tuple(bots),
         _gui=gui,
+        bot_urls=bot_urls,
     )
     if started is not None:
       started(running)
     return running
   except BaseException:
-    child_servers.stop_all((gui, bot))
+    child_servers.stop_all((gui, *bots))
     raise
+
+
+def _seat_values(
+    parser: argparse.ArgumentParser, flag: str, values: Sequence[str]
+) -> dict[int, str]:
+  """Returns `flag`'s SEAT=VALUE arguments as a map from seat to value.
+
+  Exits through `parser.error` if one is not SEAT=VALUE with SEAT a number
+  and VALUE not empty, or a seat is named twice.
+  """
+  result: dict[int, str] = {}
+  for value in values:
+    seat, _, text = value.partition("=")
+    if not seat.strip().isdigit() or not text.strip():
+      parser.error(f"{flag} {value!r} is not SEAT=VALUE.")
+    if int(seat) in result:
+      parser.error(f"{flag} names seat {int(seat)} twice.")
+    result[int(seat)] = text.strip()
+  return result
 
 
 def parse_args(argv: Sequence[str] | None = None) -> Options:
@@ -511,7 +712,45 @@ def parse_args(argv: Sequence[str] | None = None) -> Options:
       ),
   )
   parser.add_argument(
-      "--bot-seat", type=int, default=1, help="The bot's seat. Default: 1."
+      "--bot-seat",
+      type=int,
+      action="append",
+      default=None,
+      metavar="SEAT",
+      help=(
+          "A seat the bot plays; repeat it for several, every other seat "
+          "human. Default: every seat but --human-seat."
+      ),
+  )
+  parser.add_argument(
+      "--human-seat",
+      type=int,
+      default=None,
+      metavar="SEAT",
+      help=(
+          "The seat you play, which the printed address opens as. Default: "
+          "seat 0, or the first seat that is not a --bot-seat."
+      ),
+  )
+  parser.add_argument(
+      "--seat-bot",
+      action="append",
+      default=[],
+      metavar="SEAT=BOT",
+      help=(
+          "A bot seat's own bot server --bot, instead of --bot, with no "
+          "checkpoint unless --seat-checkpoint gives one; may be repeated."
+      ),
+  )
+  parser.add_argument(
+      "--seat-checkpoint",
+      action="append",
+      default=[],
+      metavar="SEAT=CHECKPOINT",
+      help=(
+          "A bot seat's own checkpoint, instead of --checkpoint; may be "
+          "repeated."
+      ),
   )
   parser.add_argument(
       "--state",
@@ -554,7 +793,27 @@ def parse_args(argv: Sequence[str] | None = None) -> Options:
       action="store_true",
       help="Open the address in a browser too.",
   )
+  parser.add_argument(
+      "--server-per-seat",
+      action="store_true",
+      help=(
+          "Give every bot seat a bot server of its own, for a bot that keeps "
+          "state between requests and cannot key it on the request's seat. "
+          "Default: seats with the same bot and checkpoint share one."
+      ),
+  )
   args = parser.parse_args(argv)
+  bots = _seat_values(parser, "--seat-bot", args.seat_bot)
+  checkpoints = _seat_values(parser, "--seat-checkpoint", args.seat_checkpoint)
+  seat_bots = {
+      seat: SeatBot(
+          bots.get(seat, args.bot),
+          checkpoints.get(
+              seat, "" if seat in bots else args.checkpoint.strip()
+          ),
+      )
+      for seat in sorted(set(bots) | set(checkpoints))
+  }
   options = Options(
       game=args.game,
       bot=args.bot,
@@ -564,7 +823,10 @@ def parse_args(argv: Sequence[str] | None = None) -> Options:
           if args.checkpoint_env is None
           else (args.checkpoint_env,)
       ),
-      bot_seat=args.bot_seat,
+      bot_seats=tuple(args.bot_seat or ()),
+      human_seat=args.human_seat,
+      seat_bots=seat_bots,
+      server_per_seat=args.server_per_seat,
       state=args.state,
       host=args.host,
       port=args.port,

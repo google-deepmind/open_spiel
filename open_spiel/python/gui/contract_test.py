@@ -140,6 +140,7 @@ class ToJsonTest(absltest.TestCase):
             "label": "Bet",
             "rewards": [-1.0, 1.0],
             "public_label": None,
+            "bot_output": None,
         },
     )
 

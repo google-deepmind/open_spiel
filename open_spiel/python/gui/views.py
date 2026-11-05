@@ -156,10 +156,21 @@ def _history_entry(
   """Shows one ply: in full to its own seat and to an omniscient viewer.
 
   Any other viewer reads only the ply's public label, if its game gives one.
+  The ply's bot output goes with the full ply, to the same viewers, and to no
+  other: a bot's policy, value and what decided its move all follow from its
+  information state, so in a game that hides information they tell of its
+  hand. Its policy names the cards it may play, and its probabilities and
+  value change with its cards even when its legal actions do not. In a game
+  that hides nothing every viewer is omniscient and receives it.
   """
-  if omniscient or (ply.seat is not None and ply.seat == viewer.seat):
+  own = ply.seat is not None and ply.seat == viewer.seat
+  if omniscient or own:
     return contract.HistoryEntry(
-        seat=ply.seat, action=ply.action, label=ply.label, rewards=ply.rewards
+        seat=ply.seat,
+        action=ply.action,
+        label=ply.label,
+        rewards=ply.rewards,
+        bot_output=ply.bot_output,
     )
   return contract.HistoryEntry(
       seat=ply.seat,

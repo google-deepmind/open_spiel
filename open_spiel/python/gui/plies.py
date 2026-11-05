@@ -69,6 +69,10 @@ class Ply:
     public_label: What a viewer who may not see the action may read of it,
       from the game's adapter; None when the action is hidden from such a
       viewer.
+    bot_output: What the seat's controller said about the action, or None.
+      It is a record of play, not of the game, so rebuilding a position
+      neither reproduces nor compares it, and carries it over from the
+      record.
   """
 
   seat: int | None
@@ -76,6 +80,9 @@ class Ply:
   label: str
   rewards: tuple[float, ...]
   public_label: str | None = None
+  bot_output: contract.BotOutput | None = dataclasses.field(
+      default=None, compare=False
+  )
 
 
 def to_move(state: pyspiel.State) -> contract.ToMove:
@@ -187,5 +194,7 @@ def rebuild(
           f"{expected[index]}.",
           ply=index,
       )
+    if expected:
+      ply = dataclasses.replace(ply, bot_output=expected[index].bot_output)
     plies.append(ply)
   return state, tuple(plies)

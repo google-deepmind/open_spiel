@@ -23,6 +23,7 @@ const CHANCE: HistoryEntry = {
   label: 'deal',
   rewards: [0, 0],
   public_label: null,
+  bot_output: null,
 };
 
 function seat(index: number): HistoryEntry {
@@ -32,6 +33,7 @@ function seat(index: number): HistoryEntry {
     label: null,
     rewards: null,
     public_label: null,
+    bot_output: null,
   };
 }
 

@@ -310,6 +310,22 @@ def seat_notice(
   return controller_registry.full_state_notice(game, reads_full_state, notice)
 
 
+def seat_output(
+    spec: Spec, game: pyspiel.Game, output: contract.BotOutput | None
+) -> contract.BotOutput | None:
+  """Returns the bot output a seat played as `spec` keeps, from its own.
+
+  As `seat_notice`, through `controller_registry.full_state_output`.
+  """
+  if output is None:
+    return None
+  kind = kinds().get(spec.kind)
+  reads_full_state = kind is None or kind.seat_reads_full_state(
+      kind.parse(spec.config)
+  )
+  return controller_registry.full_state_output(game, reads_full_state, output)
+
+
 def label(name: str) -> str:
   """Returns the label of the controller registered as `name`, or `name`."""
   kind = kinds().get(name)
@@ -347,6 +363,17 @@ def choose_with_notice(
 ) -> tuple[int, str | None]:
   """Asks `controller` for `seat`'s action at `state`, within the budget.
 
+  As `choose_with_output`, without the bot output.
+  """
+  action, notice, _ = choose_with_output(controller, state, seat)
+  return action, notice
+
+
+def choose_with_output(
+    controller: Controller, state: pyspiel.State, seat: int
+) -> tuple[int, str | None, contract.BotOutput | None]:
+  """Asks `controller` for `seat`'s action at `state`, within the budget.
+
   Args:
     controller: The controller playing `seat`.
     state: The position, where `seat` is to move. The controller is given a
@@ -354,17 +381,19 @@ def choose_with_notice(
     seat: The seat to move.
 
   Returns:
-    One of `seat`'s legal actions, and the controller's notice about the
-    choice: its `last_notice` attribute, read on the controller's thread right
-    after it chose, or None if it has none.
+    One of `seat`'s legal actions, the controller's notice about the choice
+    and its bot output: its `last_notice` and `last_output` attributes, read
+    on the controller's thread right after it chose, each None if it has
+    none.
 
   Raises:
     ValueError: If `seat` is not to move at `state`, or `controller` is a
       human's, whose moves come from the client and never from here.
     ControllerError: If the controller raises, returns anything but one of
       `seat`'s legal actions, gives a notice that is not text of at most
-      `contract.NOTICE_MAX_LENGTH` characters, or does not return within the
-      move budget.
+      `contract.NOTICE_MAX_LENGTH` characters, gives a bot output that is
+      not a `contract.BotOutput` whose policy names only legal actions, or
+      does not return within the move budget.
   """
   if isinstance(controller, Human):
     raise ValueError(
@@ -378,12 +407,18 @@ def choose_with_notice(
   # A copy: the controller may play on it, and the position stays as it is.
   copy = state.clone()
 
-  def ask() -> tuple[object, object]:
+  def ask() -> tuple[object, object, object]:
     action = controller.choose_action(copy, seat)
-    return action, getattr(controller, "last_notice", None)
+    return (
+        action,
+        getattr(controller, "last_notice", None),
+        getattr(controller, "last_output", None),
+    )
 
   try:
-    action, notice = move_budget_lib.run(ask, name=f"controller-seat-{seat}")
+    action, notice, output = move_budget_lib.run(
+        ask, name=f"controller-seat-{seat}"
+    )
   except move_budget_lib.OverBudgetError as e:
     raise ControllerError(
         seat,
@@ -417,4 +452,14 @@ def choose_with_notice(
         f"{controller_settings.shown(notice)}, which is not non-blank text "
         f"of at most {contract.NOTICE_MAX_LENGTH} characters.",
     )
-  return action, notice
+  if output is not None and (
+      not isinstance(output, contract.BotOutput)
+      or any(entry.action not in legal for entry in output.policy)
+  ):
+    raise ControllerError(
+        seat,
+        "InvalidBotOutput",
+        f"Seat {seat}'s controller gave a bot output that is not a policy, "
+        "value and decided_by over its legal actions.",
+    )
+  return action, notice, output
