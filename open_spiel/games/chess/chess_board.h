@@ -56,6 +56,9 @@ enum class CastlingDirection { kLeft, kRight, kNone };
 
 int ToInt(CastlingDirection dir);
 
+// Controls the encoding of castling rights in FEN.
+enum class FenFormat { kStandard, kXFen, kShredder };
+
 enum class PieceType : int8_t {
   kEmpty = 0,
   kKing = 1,
@@ -262,6 +265,8 @@ class ChessBoard {
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+  // Accepts standard, X-FEN and Shredder-FEN castling rights, including mixed
+  // notation. Invalid or conflicting castling rights return std::nullopt.
   static absl::optional<ChessBoard> BoardFromFEN(
       const std::string& fen, int board_size = 8,
       bool king_in_check_allowed = false, bool allow_pass_move = false,
@@ -294,6 +299,8 @@ class ChessBoard {
   void SetCastlingRight(Color side, CastlingDirection direction,
                         absl::optional<Square> maybe_rook_square);
 
+  // Returns the outermost rook on the given side of a king on its back rank,
+  // or kInvalidSquare if no such king/rook exists.
   Square FindRookForCastling(Color color, CastlingDirection dir) const;
 
   // Find the location of any one piece of the given type, or kInvalidSquare.
@@ -442,7 +449,12 @@ class ChessBoard {
 
   // Constructs a string describing the chess board position in Forsyth-Edwards
   // Notation. https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+  // The legacy default uses KQkq, which can lose the identity of an inner
+  // castling rook. Use X-FEN or Shredder-FEN to preserve such rights.
   std::string ToFEN(bool shredder = false) const;
+  // X-FEN uses KQkq for outermost rooks and file letters for inner rooks.
+  // Shredder-FEN always uses file letters.
+  std::string ToFEN(FenFormat format) const;
 
   /* Constructs a string describing the dark chess board position in a notation
    * similar to Forsyth-Edwards Notation.
