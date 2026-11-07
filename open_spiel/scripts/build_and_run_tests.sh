@@ -122,12 +122,12 @@ if [[ $ARG_virtualenv == "true" ]]; then
     fi
     echo "Installing..."
     echo -e "\e[33mInstalling a virtualenv to $VENV_DIR. The setup is long the first time, please wait.\e[0m"
-    virtualenv -p $PYBIN $VENV_DIR $extra_args
+    virtualenv -p $PYBIN $VENV_DIR $extra_args || exit $?
   else
     echo -e "\e[33mReusing virtualenv from $VENV_DIR.\e[0m"
   fi
   PYBIN=python
-  source $VENV_DIR/bin/activate
+  source $VENV_DIR/bin/activate || exit $?
   # When you're in a virtual environment, the python binary should be just python.
   # Otherwise, it uses the environment's python.
   PYBIN="python"
@@ -144,14 +144,14 @@ trap cleanup EXIT
 
 if [[ $ARG_install == "true" ]]; then
   echo -e "\e[33mInstalling the requirements (use --noinstall to skip).\e[0m"
-  $PYBIN -m pip install --upgrade -r ./requirements.txt
+  $PYBIN -m pip install --upgrade -r ./requirements.txt || exit $?
 else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
 
 PYVERSION=$($PYBIN -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
 BUILD_DIR="$ARG_build_dir"
-mkdir -p $BUILD_DIR
+mkdir -p "$BUILD_DIR" || exit $?
 
 # Configure Julia compilation if required.
 if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
@@ -185,16 +185,18 @@ function print_skipping_tests {
 }
 
 # Build / install everything and run tests (C++, Python, optionally Julia).
+# Local runs do not enable errexit, so propagate each failed build explicitly.
+# Otherwise CTest can report success for an empty or stale build directory.
 if [[ $ARG_build_with_pip == "true" ]]; then
-  ${PYBIN} -m pip install .
-  if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
+  ${PYBIN} -m pip install . || exit $?
+  if ctest -j$TEST_NUM_PROCS --output-on-failure --no-tests=error ../open_spiel; then
     print_tests_passed
   else
     print_tests_failed
     exit 1
   fi
 else
-  cd $BUILD_DIR
+  cd "$BUILD_DIR" || exit $?
   echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
   pwd=`pwd`
@@ -208,7 +210,7 @@ else
         -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR}  \
         -DBUILD_TYPE=Testing                         \
         -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
-        ../open_spiel
+        ../open_spiel || exit $?
 
   if [ "$ARG_test_only" != "all" ]
   then
@@ -217,22 +219,22 @@ else
     echo "Build and testing only $ARG_test_only"
     if [[ $ARG_test_only == python_* ]]; then
       echo "Building pyspiel"
-      make -j$MAKE_NUM_PROCS pyspiel
+      make -j$MAKE_NUM_PROCS pyspiel || exit $?
     elif [[ $ARG_test_only == julia_test ]]; then
       echo "Building Julia API"
-      make -j$MAKE_NUM_PROCS spieljl
+      make -j$MAKE_NUM_PROCS spieljl || exit $?
     elif [[ $ARG_test_only == gospiel_test ]]; then
       echo "Building Go API"
-      make -j$MAKE_NUM_PROCS gospiel
+      make -j$MAKE_NUM_PROCS gospiel || exit $?
     else
       echo "Building everything"
-      make -j$MAKE_NUM_PROCS
+      make -j$MAKE_NUM_PROCS || exit $?
     fi
 
     if [[ $ARG_build_only == "true" ]]; then
       echo -e "\033[32m*** Skipping runing tests as build_only is ${ARG_build_only} \e[0m"
     else
-      if ctest -j$TEST_NUM_PROCS --output-on-failure -R "$ARG_test_only" ../open_spiel; then
+      if ctest -j$TEST_NUM_PROCS --output-on-failure --no-tests=error -R "$ARG_test_only" ../open_spiel; then
         print_tests_passed
       else
         print_tests_failed
@@ -241,7 +243,7 @@ else
   else
     # Make everything
     echo "Building project"
-    make -j$MAKE_NUM_PROCS
+    make -j$MAKE_NUM_PROCS || exit $?
 
     if [[ $ARG_build_only == "true" ]]; then
       echo -e "\033[32m*** Skipping runing tests as build_only is ${ARG_build_only} \e[0m"
@@ -249,7 +251,7 @@ else
       # Test everything
       echo "Running all tests"
 
-      if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
+      if ctest -j$TEST_NUM_PROCS --output-on-failure --no-tests=error ../open_spiel; then
         print_tests_passed
       else
         print_tests_failed
