@@ -60,6 +60,16 @@ pytype_strict_library(
     srcs = ["stats.py"],
 )
 
+py_test(
+    name = "stats_test",
+    srcs = ["stats_test.py"],
+    deps = [
+        ":stats",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
 pytype_strict_library(
     name = "file_utils",
     srcs = ["file_utils.py"],
