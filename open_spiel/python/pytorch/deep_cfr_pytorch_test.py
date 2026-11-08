@@ -164,6 +164,30 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
     logging.info('Deep CFR in Matching Pennies 3p. NashConv: %.2f', conv)
 
 
+  def test_action_probabilities_sum_to_one_on_legal_actions(self):
+    game = pyspiel.load_game('leduc_poker')
+    deep_cfr_solver = deep_cfr.DeepCFRSolver(
+        game,
+        policy_network_layers=(8, 4),
+        advantage_network_layers=(4, 2),
+        num_iterations=1,
+        num_traversals=1,
+        memory_capacity=1000,
+        seed=SEED,
+    )
+    tabular_policy = policy.tabular_policy_from_callable(
+        game, deep_cfr_solver.action_probabilities
+    )
+    row_sums = np.sum(tabular_policy.action_probability_array, axis=1)
+    np.testing.assert_allclose(row_sums, 1.0, rtol=1e-5, atol=1e-5)
+    state = game.new_initial_state()
+    while state.is_chance_node():
+      state.apply_action(state.legal_actions()[0])
+    cur_player = state.current_player()
+    probs = deep_cfr_solver.action_probabilities(state, player_id=cur_player)
+    self.assertEqual(set(probs.keys()), set(state.legal_actions(cur_player)))
+    self.assertAlmostEqual(sum(probs.values()), 1.0, places=5)
+
 def main(_):
   torch.manual_seed(SEED)
   absltest.main()
