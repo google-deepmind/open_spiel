@@ -125,11 +125,14 @@ VPNetModel::VPNetModel(const Game& game, const std::string& path,
 
   // Put this model on the specified device.
   model_->to(torch_device_);
+  // Evaluation mode outside Learn (see mutex_).
+  model_->eval();
 }
 
 std::string VPNetModel::SaveCheckpoint(int step) {
   std::string full_path = absl::StrCat(path_, "/checkpoint-", step);
 
+  absl::ReaderMutexLock lock(mutex_.get());
   torch::save(model_, absl::StrCat(full_path, ".pt"));
   torch::save(model_optimizer_, absl::StrCat(full_path, "-optimizer.pt"));
 
@@ -142,9 +145,11 @@ void VPNetModel::LoadCheckpoint(int step) {
 }
 
 void VPNetModel::LoadCheckpoint(const std::string& path) {
+  absl::WriterMutexLock lock(mutex_.get());
   torch::load(model_, absl::StrCat(path, ".pt"), torch_device_);
   torch::load(model_optimizer_, absl::StrCat(path, "-optimizer.pt"),
               torch_device_);
+  model_->eval();
 }
 
 std::vector<VPNetModel::InferenceOutputs> VPNetModel::Inference(
@@ -187,8 +192,9 @@ std::vector<VPNetModel::InferenceOutputs> VPNetModel::Inference(
   // Run the inference with gradient tracking disabled.
   // NoGradGuard prevents LibTorch from building the autograd computation
   // graph, saving memory and compute since we never backprop through
-  // inference.
-  model_->eval();
+  // inference. The model is in evaluation mode outside Learn (see mutex_);
+  // concurrent Inference calls run side by side.
+  absl::ReaderMutexLock lock(mutex_.get());
   torch::NoGradGuard no_grad;
   std::vector<torch::Tensor> torch_outputs =
       model_(torch_inf_inputs, torch_inf_legal_mask);
@@ -266,7 +272,9 @@ VPNetModel::LossInfo VPNetModel::Learn(const std::vector<TrainInputs>& inputs) {
           .clone()
           .to(torch_device_);
 
-  // Run a training step and get the losses.
+  // Run a training step and get the losses, with Inference excluded: it would
+  // switch the model to evaluation mode and read parameters being written.
+  absl::WriterMutexLock lock(mutex_.get());
   model_->train();
   model_->zero_grad();
 
@@ -280,6 +288,7 @@ VPNetModel::LossInfo VPNetModel::Learn(const std::vector<TrainInputs>& inputs) {
   total_loss.backward();
 
   model_optimizer_.step();
+  model_->eval();
 
   return LossInfo(torch_outputs[0].item<float>(),
                   torch_outputs[1].item<float>(),
