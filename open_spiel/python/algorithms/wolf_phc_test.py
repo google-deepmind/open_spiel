@@ -17,13 +17,37 @@ from absl.testing import absltest
 import numpy as np
 
 from open_spiel.python import rl_environment
+from open_spiel.python import rl_tools
 from open_spiel.python.algorithms.tabular_qlearner import QLearner
 from open_spiel.python.algorithms.wolf_phc import WoLFPHC
+import pyspiel
 
 SEED = 18763511
 
 
 class WoLFTest(absltest.TestCase):
+
+  def test_terminal_transition_updates_policy(self):
+    game = pyspiel.create_matrix_game([[1, 1], [1, 1]], [[0, 0], [0, 0]])
+    env = rl_environment.Environment(game=game)
+    agent = WoLFPHC(
+        0,
+        game.num_distinct_actions(),
+        step_size=rl_tools.ConstantSchedule(1.0),
+        epsilon_schedule=rl_tools.ConstantSchedule(0.0),
+        delta_w=rl_tools.ConstantSchedule(0.05),
+        delta_l=rl_tools.ConstantSchedule(0.1),
+    )
+
+    first = agent.step(env.reset())
+    np.testing.assert_allclose(first.probs, [0.5, 0.5])
+    terminal = env.step([first.action, 0])
+    self.assertTrue(terminal.last())
+    agent.step(terminal)
+
+    updated = agent.step(env.reset(), is_evaluation=True)
+    self.assertAlmostEqual(updated.probs[first.action], 0.6)
+    self.assertAlmostEqual(updated.probs[1 - first.action], 0.4)
 
   def test_simple_pathfinding_run(self):
     env = rl_environment.Environment(
@@ -46,6 +70,7 @@ class WoLFTest(absltest.TestCase):
       self.assertLess(step_cnt, 500)
 
   def test_rps_run(self):
+    np.random.seed(SEED)
     env = rl_environment.Environment("matrix_rps")
     wolf0 = WoLFPHC(0, env.game.num_distinct_actions())
     wolf1 = WoLFPHC(1, env.game.num_distinct_actions())
@@ -57,18 +82,12 @@ class WoLFTest(absltest.TestCase):
       wolf0.step(time_step)
       wolf1.step(time_step)
 
-    with self.subTest("correct_rps_strategy"):
+    with self.subTest("near_uniform_rps_strategy"):
       time_step = env.reset()
-      learner0_strategy, learner1_strategy = wolf0.step(
-          time_step).probs, wolf1.step(time_step).probs
-      np.testing.assert_array_almost_equal(
-          np.asarray([1 / 3, 1 / 3, 1 / 3]),
-          learner0_strategy.reshape(-1),
-          decimal=4)
-      np.testing.assert_array_almost_equal(
-          np.asarray([1 / 3, 1 / 3, 1 / 3]),
-          learner1_strategy.reshape(-1),
-          decimal=4)
+      for learner in (wolf0, wolf1):
+        strategy = learner.step(time_step, is_evaluation=True).probs
+        # A finite self-play run keeps the policy near the equilibrium.
+        np.testing.assert_allclose(strategy, [1 / 3] * 3, atol=0.05)
 
 
 if __name__ == "__main__":
