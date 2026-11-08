@@ -26,12 +26,12 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/match.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -1716,7 +1716,7 @@ std::string ChessBoard::ToUnicodeString() const {
     for (int8_t file = 0; file < board_size_; ++file) {
       out += at(Square{file, rank}).ToUnicode();
     }
-    out += "\n";
+    out += '\n';
   }
   out += ' ';
   for (int8_t file = 0; file < board_size_; ++file) {

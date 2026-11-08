@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_real_distribution.h"
+#include "absl/random/uniform_real_distribution.h"
 
 // A suite of utilities that wrap random number generators.
 //

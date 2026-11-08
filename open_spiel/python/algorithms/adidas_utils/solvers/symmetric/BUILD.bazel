@@ -1,0 +1,39 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "symmetric",
+    srcs = glob(
+        ["*.py"],
+        exclude = ["*test.py"],
+    ),
+    deps = [
+        "//open_spiel/python/algorithms/adidas_utils/helpers",
+        "//open_spiel/python/algorithms/adidas_utils/helpers/symmetric",
+        "@py_deps//absl/logging",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//scipy",
+    ],
+)
+
+py_test(
+    name = "solvers_test",
+    srcs = ["solvers_test.py"],
+    deps = [
+        ":symmetric",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)

@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
+#include "absl/synchronization/mutex.h"
 #include "open_spiel/algorithms/alpha_zero_torch/vpnet.h"
 
 namespace open_spiel {

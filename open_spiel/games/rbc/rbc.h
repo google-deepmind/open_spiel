@@ -23,10 +23,10 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/memory/memory.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/games/chess/chess_board.h"

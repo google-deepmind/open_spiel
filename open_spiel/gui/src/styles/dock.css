@@ -1,0 +1,63 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  The dock's theme: dockview's variables mapped onto the design tokens, so the
+  dock follows the light and dark themes with everything else. A dock opts in
+  with the class dockview-theme-open-spiel. Every tab, the active one or not,
+  keeps full-contrast text.
+*/
+
+.dockview-theme-open-spiel {
+  --dv-tabs-and-actions-container-height: 35px;
+  --dv-tabs-and-actions-container-font-size: 13px;
+  --dv-tab-font-size: 13px;
+  --dv-tab-margin: 0;
+  --dv-border-radius: var(--radius);
+  /* Below the settings menu's dialog, z-index 1000 in controls.css. */
+  --dv-overlay-z-index: 999;
+  --dv-transition-duration: 0s;
+  --dv-active-sash-transition-duration: 0s;
+  --dv-active-sash-transition-delay: 0s;
+
+  --dv-group-view-background-color: var(--color-surface);
+  --dv-tabs-and-actions-container-background-color: var(--color-surface-sunken);
+  --dv-activegroup-visiblepanel-tab-background-color: var(--color-surface);
+  --dv-activegroup-hiddenpanel-tab-background-color: var(
+    --color-surface-sunken
+  );
+  --dv-inactivegroup-visiblepanel-tab-background-color: var(--color-surface);
+  --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+    --color-surface-sunken
+  );
+  --dv-activegroup-visiblepanel-tab-color: var(--color-text);
+  --dv-activegroup-hiddenpanel-tab-color: var(--color-text-secondary);
+  --dv-inactivegroup-visiblepanel-tab-color: var(--color-text);
+  --dv-inactivegroup-hiddenpanel-tab-color: var(--color-text-secondary);
+  --dv-tab-divider-color: var(--color-border);
+
+  --dv-separator-border: var(--color-border);
+  --dv-paneview-header-border-color: var(--color-border);
+  --dv-paneview-active-outline-color: var(--color-focus);
+  --dv-sash-color: var(--color-none);
+  --dv-active-sash-color: var(--color-accent);
+  --dv-drag-over-background-color: var(--color-drop-target);
+  --dv-drag-over-border-color: var(--color-accent);
+  --dv-icon-hover-background-color: var(--color-surface-sunken);
+  --dv-tabs-container-scrollbar-color: var(--color-border-strong);
+  --dv-scrollbar-background-color: var(--color-border-strong);
+  --dv-floating-box-shadow: 0 0 0 1px var(--color-border-strong);
+}

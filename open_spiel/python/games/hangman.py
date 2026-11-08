@@ -229,7 +229,7 @@ class HangmanState(pyspiel.State):
       self._letters_guessed.append(letter)
       # 2. Iterate over the letters in the word to see if any are revealed.
       num_letters_revealed = 0
-      for i, c in enumerate(self._word):  # pyrefly: ignore[bad-argument-type]
+      for i, c in enumerate(self._word):  # pyrefly: ignore[bad-argument-type, not-iterable]
         if self._letters_revealed[i] == _UNREVEALED_CHARACTER and c == letter:  # pyrefly: ignore[unsupported-operation]
           self._letters_revealed[i] = letter  # pyrefly: ignore[unsupported-operation]
           num_letters_revealed += 1

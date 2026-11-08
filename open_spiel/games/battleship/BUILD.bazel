@@ -1,0 +1,49 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "battleship",
+    srcs = [
+        "battleship.cc",
+        "battleship_types.cc",
+    ],
+    hdrs = [
+        "battleship.h",
+        "battleship_types.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/types:variant",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "battleship_test",
+    srcs = ["battleship_test.cc"],
+    deps = [
+        ":battleship",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:expected_returns",
+        "//open_spiel/algorithms:get_all_states",
+        "//open_spiel/algorithms:tabular_exploitability",
+    ],
+)

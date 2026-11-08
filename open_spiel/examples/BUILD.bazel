@@ -1,0 +1,454 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_binary(
+    name = "count_all_states",
+    srcs = ["count_all_states.cc"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "//open_spiel",
+        "//open_spiel:all_games",  # build_cleaner: keep
+        "//open_spiel/algorithms:get_all_histories",
+    ],
+)
+
+cc_binary(
+    name = "benchmark_game",
+    srcs = [
+        "benchmark_game.cc",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings:str_format",
+        "//open_spiel",
+        "//open_spiel:all_games",
+    ],
+)
+
+cc_binary(
+    name = "example",
+    srcs = [
+        "example.cc",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+    ],
+)
+
+cc_test(
+    name = "example_test",
+    timeout = "short",
+    srcs = [
+        "example.cc",
+    ],
+    args = ["--game=kuhn_poker"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+    ],
+)
+
+cc_binary(
+    name = "example_allgames",
+    srcs = [
+        "example.cc",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:all_games",
+    ],
+)
+
+cc_binary(
+    name = "fsicfr_liars_dice",
+    srcs = ["fsicfr_liars_dice.cc"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel/algorithms:fsicfr",
+        "//open_spiel/algorithms:tabular_best_response_mdp",
+        "//open_spiel/games/liars_dice",
+    ],
+)
+
+cc_test(
+    name = "example_allgames_test",
+    timeout = "short",
+    srcs = [
+        "example.cc",
+    ],
+    args = ["--game=matrix_rps"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:all_games",
+    ],
+)
+
+cc_binary(
+    name = "matrix_example",
+    srcs = [
+        "matrix_example.cc",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+    ],
+)
+
+cc_test(
+    name = "matrix_example_test",
+    timeout = "short",
+    srcs = [
+        "matrix_example.cc",
+    ],
+    deps = [
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+    ],
+)
+
+cc_binary(
+    name = "minimax_example",
+    srcs = [
+        "minimax_example.cc",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:minimax",
+        "//open_spiel/games/breakthrough",
+        "//open_spiel/games/pig",
+    ],
+)
+
+cc_test(
+    name = "minimax_example_test",
+    timeout = "short",
+    srcs = [
+        "minimax_example.cc",
+    ],
+    deps = [
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:minimax",
+        "//open_spiel/games/breakthrough",
+        "//open_spiel/games/pig",
+    ],
+)
+
+cc_binary(
+    name = "mcts_example",
+    srcs = [
+        "mcts_example.cc",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:mcts",
+    ],
+)
+
+cc_test(
+    name = "mcts_example_test",
+    timeout = "short",
+    srcs = [
+        "mcts_example.cc",
+    ],
+    deps = [
+        "@abseil-cpp//absl/container:btree",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:mcts",
+    ],
+)
+
+cc_binary(
+    name = "tabular_sarsa_example",
+    srcs = [
+        "tabular_sarsa_example.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:tabular_sarsa",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_test(
+    name = "tabular_sarsa_example_test",
+    timeout = "short",
+    srcs = [
+        "tabular_sarsa_example.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:tabular_sarsa",
+        "//open_spiel/games/catch",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_binary(
+    name = "tabular_q_learning_example",
+    srcs = [
+        "tabular_q_learning_example.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:tabular_q_learning",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_test(
+    name = "tabular_q_learning_example_test",
+    timeout = "long",
+    srcs = [
+        "tabular_q_learning_example.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:tabular_q_learning",
+        "//open_spiel/games/catch",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_binary(
+    name = "policy_iteration_example",
+    srcs = [
+        "policy_iteration_example.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:policy_iteration",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_test(
+    name = "policy_iteration_example_test",
+    timeout = "short",
+    srcs = [
+        "policy_iteration_example.cc",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:policy_iteration",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_binary(
+    name = "value_iteration_example",
+    srcs = [
+        "value_iteration_example.cc",
+    ],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings:str_format",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:value_iteration",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_test(
+    name = "value_iteration_example_test",
+    timeout = "short",
+    srcs = [
+        "value_iteration_example.cc",
+    ],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings:str_format",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:value_iteration",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)
+
+cc_binary(
+    name = "cfr_example",
+    srcs = ["cfr_example.cc"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:cfr",
+        "//open_spiel/algorithms:tabular_exploitability",
+    ],
+)
+
+cc_test(
+    name = "cfr_example_test",
+    timeout = "short",
+    srcs = [
+        "cfr_example.cc",
+    ],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:cfr",
+        "//open_spiel/algorithms:tabular_exploitability",
+    ],
+)
+
+cc_binary(
+    name = "universal_poker_mccfr_acpc_gamedef_example",
+    srcs = ["universal_poker_mccfr_acpc_gamedef_example.cc"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:external_sampling_mccfr",
+        "//open_spiel/algorithms:tabular_exploitability",
+        "//open_spiel/games/universal_poker",
+    ],
+)
+
+cc_test(
+    name = "universal_poker_mccfr_acpc_gamedef_example_test",
+    timeout = "long",
+    srcs = [
+        "universal_poker_mccfr_acpc_gamedef_example.cc",
+    ],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:external_sampling_mccfr",
+        "//open_spiel/algorithms:tabular_exploitability",
+        "//open_spiel/games/universal_poker",
+    ],
+)
+
+cc_binary(
+    name = "imperfect_recall_mccfr",
+    srcs = ["imperfect_recall_mccfr.cc"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:external_sampling_mccfr",
+        "//open_spiel/algorithms:outcome_sampling_mccfr",
+        "//open_spiel/algorithms:tabular_best_response_mdp",
+        "//open_spiel/games/phantom_ttt",
+    ],
+)
+
+cc_binary(
+    name = "cfr_multi_equilibria_example",
+    srcs = ["cfr_multi_equilibria_example.cc"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:cfr",
+        "//open_spiel/algorithms:outcome_sampling_mccfr",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:init",
+    ],
+)
+
+cc_binary(
+    name = "gtp",
+    srcs = ["gtp.cc"],
+    features = ["-use_header_modules"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+        "//open_spiel:standard_games",
+        "//open_spiel/algorithms:mcts",
+        "//open_spiel/games/tic_tac_toe",
+    ],
+)

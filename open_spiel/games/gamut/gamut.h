@@ -20,7 +20,7 @@
 #include <random>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
+#include "absl/synchronization/mutex.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tensor_game.h"

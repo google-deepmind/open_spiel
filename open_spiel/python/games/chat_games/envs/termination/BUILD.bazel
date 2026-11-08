@@ -1,0 +1,22 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "termination",
+    srcs = glob(["**/*.py"]),
+    deps = [
+        "//open_spiel/python/games/chat_games/envs/observations",
+    ],
+)
+
+pytype_strict_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    deps = ["//open_spiel/python/games/chat_games/envs/observations"],
+)

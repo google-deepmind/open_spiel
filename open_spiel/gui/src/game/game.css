@@ -1,0 +1,186 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  The game page: its panels' frames, the Gameplay panel's status line and
+  notices, and the Session panel.
+*/
+
+.game-page {
+  height: 100%;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.panel__error {
+  margin: 0;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-danger);
+}
+
+.panel__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* The positioned box the notices are drawn over. */
+.gameplay {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 14px 16px;
+}
+
+/* One rounded line: the turn, who is to move, and who the viewer is. */
+.gameplay__status {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.gameplay__board {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/*
+  The notices are absolutely placed over the top of the board, so they take
+  no room: showing or hiding one never moves the board. The layer passes
+  clicks through to the board; only a notice's controls take the pointer.
+*/
+.gameplay__notices {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: min(560px, calc(100% - 24px));
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.gameplay__notices:empty {
+  display: none;
+}
+
+.gameplay__notice {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 6px 12px;
+  /* A plain, squared plaque, lifted just off the board it covers. Its tone
+     is told by its text, never by a coloured edge. */
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+  box-shadow: 0 1px 3px var(--color-shadow);
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/*
+  An error is never cut short: it may say what to do. It scrolls past a
+  third of the panel instead of covering it.
+*/
+.gameplay__notice[data-tone='error'] {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.gameplay__notice-text {
+  min-width: 0;
+  max-height: 33vh;
+  overflow-y: auto;
+}
+
+.gameplay__notice button {
+  pointer-events: auto;
+}
+
+.gameplay__notice-dismiss {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-none);
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.gameplay__notice-dismiss:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.gameplay__notice-dismiss:hover:not([aria-disabled='true']) {
+  background: var(--color-surface-sunken);
+}
+
+.session-panel__details {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.session-panel__details div {
+  display: grid;
+  grid-template-columns: 7em 1fr;
+  gap: 8px;
+}
+
+.session-panel__details dt {
+  color: var(--color-text-secondary);
+}
+
+.session-panel__details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.session-panel__seats {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.session-panel__failure {
+  color: var(--color-danger);
+}

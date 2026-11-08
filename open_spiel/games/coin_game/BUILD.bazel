@@ -1,0 +1,32 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "coin_game",
+    srcs = ["coin_game.cc"],
+    hdrs = ["coin_game.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "coin_game_test",
+    srcs = ["coin_game_test.cc"],
+    deps = [
+        ":coin_game",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/algorithms:get_all_states",
+    ],
+)

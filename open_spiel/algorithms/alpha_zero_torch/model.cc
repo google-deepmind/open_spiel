@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "absl/strings/match.h"
 
 namespace open_spiel {
 namespace algorithms {

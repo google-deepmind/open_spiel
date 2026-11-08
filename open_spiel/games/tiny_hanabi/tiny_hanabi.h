@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "absl/algorithm/container.h"
 #include "open_spiel/spiel.h"
 
 // This is the cooperative two-turn game defined in [1]

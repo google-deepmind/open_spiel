@@ -15,10 +15,10 @@
 #include <limits>
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/container/flat_hash_set.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/get_all_states.h"

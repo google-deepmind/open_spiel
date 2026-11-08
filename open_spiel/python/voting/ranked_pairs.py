@@ -133,7 +133,7 @@ class RankedPairsVoting(base.AbstractVotingMethod):
       for j in outgoing_edges:
         score += margin_matrix[i, j]
         if j not in open_list and j not in closed_list:
-          open_list[j] = True
+          open_list[j] = True  # pyrefly: ignore[unsupported-operation]
       closed_list[i] = True
     return score
 

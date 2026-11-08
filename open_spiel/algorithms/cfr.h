@@ -21,9 +21,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/random/distributions.h"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 

@@ -1,0 +1,66 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "nonsymmetric",
+    srcs = glob(["*.py"]),
+    deps = [
+        "//open_spiel/python/algorithms/adidas_utils/helpers",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytype_strict_library(
+    name = "exploitability",
+    srcs = ["exploitability.py"],
+    deps = [
+        "//open_spiel/python/algorithms/adidas_utils/helpers:misc",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+py_test(
+    name = "exploitability_test",
+    srcs = ["exploitability_test.py"],
+    deps = [
+        ":exploitability",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "game_runner",
+    srcs = ["game_runner.py"],
+    deps = [
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "updates",
+    srcs = ["updates.py"],
+    deps = [
+        ":exploitability",
+        "//open_spiel/python/algorithms/adidas_utils/helpers:simplex",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)

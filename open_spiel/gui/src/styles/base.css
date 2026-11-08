@@ -1,0 +1,59 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* The page itself, and the rules every control shares. */
+
+html {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: 1.4;
+}
+
+body {
+  margin: 0;
+}
+
+pre,
+code {
+  font-family: var(--font-family-monospace);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/*
+  A disabled control keeps full contrast. The not-allowed cursor and a dashed
+  edge say it is disabled; fading it would make it hard to read.
+*/
+:disabled,
+[aria-disabled='true'] {
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+/* Hidden on screen, still read by screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

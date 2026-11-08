@@ -17,9 +17,9 @@
 #include <cstring>
 #include <iostream>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {

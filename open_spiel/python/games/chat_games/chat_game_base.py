@@ -1303,9 +1303,9 @@ class BaseChatGame(pyspiel.Game):
     #    scenarios
     # we are currently going with a mix of options 2) and 3)
     logging.info('Generating initial scenario...')
-    logging.info('Scenario prompt:\n%s', self._meta_query + header)
+    logging.info('Scenario prompt:\n%s', self._meta_query + header)  # pyrefly: ignore[unsupported-operation]
     response = self.generate_response(
-        prompt=self._meta_query + header,
+        prompt=self._meta_query + header,  # pyrefly: ignore[unsupported-operation]
         seed=self._seed,
         num_output_tokens=LLM_LENGTH_MESSAGE_TOKENS
         )

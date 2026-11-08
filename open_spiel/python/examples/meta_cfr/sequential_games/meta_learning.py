@@ -173,7 +173,7 @@ def compute_next_policy(infostates: typing.InfostateMapping,
 
     batched_input_jnp = jnp.array(
         np.expand_dims(np.array(batched_input), axis=1))
-    batched_net_output = utils.get_network_output_batched(  # pytype: disable=wrong-arg-types  # jnp-type
+    batched_net_output = utils.get_network_output_batched(
         net_apply, net_params,
         batched_input_jnp,  # pyrefly: ignore[bad-argument-type]
         relevant_illegal_action, key)
@@ -253,7 +253,7 @@ def cfr_br_meta_data(
         player_2_last_best_response_values[-1],
     )
 
-  return (  # pytype: disable=bad-return-type  # jax-ndarray
+  return (  # pyrefly: ignore[bad-return]
       counterfactual_values_player1,
       counterfactual_values_player2,
       player_2_last_best_response_values,
@@ -350,13 +350,13 @@ class MetaCFRRegretAgent:
     first_history_node, infostate_nodes = game_tree_utils.build_tree_dfs(
         world_state, all_infostates_map)
 
-    _, _, player_2_best_response_values = cfr_br_meta_data(  # pytype: disable=wrong-arg-types
+    _, _, player_2_best_response_values = cfr_br_meta_data(
         history_tree_node=first_history_node,
         infostate_nodes=infostate_nodes,
         all_infostates_map=all_infostates_map,
         epochs=self._meta_learner_training_epochs,
-        net_apply=self.optimizer.net_apply,  # pytype: disable=attribute-error
-        net_params=self.optimizer.net_params,  # pytype: disable=attribute-error
+        net_apply=self.optimizer.net_apply,
+        net_params=self.optimizer.net_params,
         all_actions=self._all_actions,
         infostate_map=self._infostate_map,
         key=self._rng)
@@ -374,17 +374,17 @@ class MetaCFRRegretAgent:
       rng: Next random seed.
     """
     grads = jax.grad(
-        utils.meta_loss, has_aux=False)(self.optimizer.net_params, cfvalues,  # pytype: disable=attribute-error
-                                        self.optimizer.net_apply,  # pytype: disable=attribute-error
+        utils.meta_loss, has_aux=False)(self.optimizer.net_params, cfvalues,
+                                        self.optimizer.net_apply,
                                         self._meta_learner_training_epochs,
                                         len(self._all_actions), infoset,
                                         infostate_map, FLAGS.batch_size,
                                         next(rng),
                                         FLAGS.use_infostate_representation)
-    updates, self.optimizer.opt_state = self.optimizer.opt_update(  # pytype: disable=attribute-error
-        grads, self.optimizer.opt_state)  # pytype: disable=attribute-error
+    updates, self.optimizer.opt_state = self.optimizer.opt_update(  # pyrefly: ignore[not-callable]
+        grads, self.optimizer.opt_state)
 
-    self.optimizer.net_params = optax.apply_updates(self.optimizer.net_params,  # pytype: disable=attribute-error
+    self.optimizer.net_params = optax.apply_updates(self.optimizer.net_params,  # pyrefly: ignore[bad-argument-type, bad-assignment]
                                                     updates)
 
   def training_optimizer(self):
@@ -415,7 +415,7 @@ class MetaCFRRegretAgent:
         all_infostates_map = [{}, {}, {}]
         first_history_node, infostate_nodes = game_tree_utils.build_tree_dfs(
             self._world_state, all_infostates_map)
-        cfr_values_player1, cfr_values_player2, _ = cfr_br_meta_data(  # pytype: disable=wrong-arg-types
+        cfr_values_player1, cfr_values_player2, _ = cfr_br_meta_data(
             history_tree_node=first_history_node,
             infostate_nodes=infostate_nodes,
             all_infostates_map=all_infostates_map,
@@ -440,7 +440,7 @@ class MetaCFRRegretAgent:
           cfvalues = cfvalues_per_player[player_ix][infoset.infostate_string]
           train_dataset.append((cfvalues, infoset))
 
-        dataset = dataset_generator.Dataset(train_dataset, FLAGS.batch_size)  # pytype: disable=wrong-arg-types  # jax-ndarray
+        dataset = dataset_generator.Dataset(train_dataset, FLAGS.batch_size)
         data_loader = dataset.get_batch()
         for _ in range(FLAGS.num_batches):
           batch = next(data_loader)
@@ -448,7 +448,7 @@ class MetaCFRRegretAgent:
           cfvalues = np.array(list(cfvalues), dtype=object)
           cfvalues = utils.mask(cfvalues, infoset, len(self._all_actions),  # pyrefly: ignore[bad-argument-type]
                                 FLAGS.batch_size)
-          self.optimize_infoset(cfvalues, infoset, self._infostate_map,  # pytype: disable=wrong-arg-types
+          self.optimize_infoset(cfvalues, infoset, self._infostate_map,  # pyrefly: ignore[bad-argument-type]
                                 self._rng)
       logging.info("Game: %d", self._step)
       self._step += 1

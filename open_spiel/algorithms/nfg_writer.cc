@@ -16,10 +16,10 @@
 
 #include <fstream>
 
-#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/str_join.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/spiel.h"
 

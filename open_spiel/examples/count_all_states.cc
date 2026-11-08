@@ -17,9 +17,9 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/container/flat_hash_set.h"
 #include "open_spiel/algorithms/get_all_histories.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"

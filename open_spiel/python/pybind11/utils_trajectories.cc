@@ -18,11 +18,11 @@
 
 // Python bindings for policies and algorithms handling them.
 
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "open_spiel/spiel.h"
 #include "open_spiel/utils/trajectories.h"
-#include "pybind11/include/pybind11/detail/common.h"
-#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
+#include "pybind11/detail/common.h"
+#include "pybind11_json/pybind11_json.hpp"
 
 namespace open_spiel {
 namespace {

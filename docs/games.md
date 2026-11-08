@@ -110,3 +110,10 @@ Status                                                                 | Game   
 🔶                                                                      | [Xiangqi](https://en.wikipedia.org/wiki/Xiangqi)                                               | 2       | ✅              | ✅            | A traditional Chinese strategy board game similar to Western chess but with different pieces, a river dividing the board, and a palace for the general.
 🟢                                                                      | [Y](https://en.wikipedia.org/wiki/Y_(game))                                                    | 2       | ✅              | ✅            | Players place tokens to try and connect sides of a triangular board.
 🔶                                                                      | [Yacht](https://en.wikipedia.org/wiki/Yacht_(dice_game))                                       | 1–10    | ❌              | ✅            | Dice game where players score points in different categories. Rules follow Knizia, which is slightly different from the Wikipedia rules. Reference: Knizia 1999 *Dice Games Properly Explained*.
+
+## JAX implementations
+
+`open_spiel.python.jax.games` holds JAX implementations of OpenSpiel games that run
+inside `jit` and `vmap`. They are JAX environments, not registered
+`pyspiel` games, and the games above are unchanged. See
+[scale](scale.md).

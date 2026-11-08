@@ -1,0 +1,60 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "games",
+    srcs = glob(
+        ["*.py"],
+        exclude = ["*test.py"],
+    ),
+    data = [
+    ],
+    deps = [
+        "//open_spiel/python/algorithms/adidas_utils/helpers:misc",
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "small",
+    srcs = ["small.py"],
+    deps = [
+        "//open_spiel/python/algorithms/adidas_utils/helpers:misc",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "pyspiel_tensor_game",
+    srcs = ["pyspiel_tensor_game.py"],
+    deps = [
+        "//open_spiel/python/egt:utils",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "small_test",
+    srcs = ["small_test.py"],
+    deps = [
+        ":small",
+        "//open_spiel/python/algorithms/adidas_utils/helpers",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)

@@ -17,7 +17,7 @@
 #include <memory>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/types/span.h"
 #include "open_spiel/games/twixt/twixtboard.h"
 #include "open_spiel/games/twixt/twixtcell.h"
 #include "open_spiel/game_parameters.h"

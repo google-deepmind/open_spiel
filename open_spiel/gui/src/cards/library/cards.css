@@ -1,0 +1,240 @@
+/*
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+.pcard {
+  position: relative;
+  /* Its own stacking context: the tint/band layer (::before, z-index 1)
+       stays inside this card and never paints over the cards stacked on top
+       of it (a covered card's tint bleeding onto the card covering it). */
+  isolation: isolate;
+  display: inline-block;
+  /* A card is not text: top-aligned, it sits on no baseline, so the line
+       it is in adds no descender under it (a card's box would be ~7 px
+       taller than the card, and a turned hand would reach past its slot
+       and the table by that much). */
+  vertical-align: top;
+  flex: none;
+  /* CardStyle: radius, shadow, selection ring and lift arrive as
+       variables from cardStyleVars(); the fallbacks are the defaults. The
+       radius clips the face, so a rounder style rounds the art too. */
+  border-radius: var(--pcard-radius, 5%/3.6%);
+  overflow: hidden;
+  /* State tags: a game tag writes
+       --pcard-<field> inline on the card; a library tag (focus, drop-over, …)
+       writes --pcard-l-<field> on the card's wrapper, read first so it wins.
+       Unset, the ring and glow are var(--color-none). */
+  box-shadow:
+    0 0 0 3px var(--pcard-l-ring, var(--pcard-ring, var(--color-none))),
+    0 0 14px 2px var(--pcard-l-glow, var(--pcard-glow, var(--color-none))),
+    var(--pcard-shadow-list, 0 0 0 0 var(--color-none));
+  filter: var(--pcard-l-filter, var(--pcard-filter, none));
+  cursor: var(--pcard-l-cursor, var(--pcard-cursor, inherit));
+  transition:
+    transform var(--pcard-motion-ms, calc(120ms * var(--anim-scale, 1)))
+      var(--pcard-motion-ease, ease),
+    box-shadow var(--pcard-motion-ms, calc(120ms * var(--anim-scale, 1)))
+      var(--pcard-motion-ease, ease),
+    filter var(--pcard-motion-ms, calc(120ms * var(--anim-scale, 1)))
+      var(--pcard-motion-ease, ease);
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcard {
+    transition: none;
+  }
+}
+
+/* Tint (an overlay ABOVE an opaque face: the face never goes var(--color-none))
+   and band (an edge band, e.g. a meld colour). */
+.pcard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: var(--pcard-l-tint, var(--pcard-tint, var(--color-none)));
+  box-shadow: inset 0 0 0 calc(var(--pcard-edge-width, 1px) + 3px)
+    var(--pcard-l-band, var(--pcard-band, var(--color-none)));
+  pointer-events: none;
+}
+
+/* The wrapper <Table> positions a card in; it carries the a11y node and the
+   library tags. The focus ring is the 'focus' tag, not the UA outline. */
+[data-card-id]:focus,
+[data-slot-id]:focus {
+  outline: none;
+}
+
+/* motion.free(): the card has left the layout for the free layer, which
+   draws it; its slot keeps the space. */
+[data-table-surface] [data-card-id].pcard--t-held {
+  visibility: hidden;
+}
+
+/* The 'focus' library tag, set by the focus model only while focus is
+   visible (keyboard, or a programmatic move after one): a 2px outline 2px
+   off the card, in CardStyle.tags.focus.ring. An outline, so it neither
+   replaces a selection or drop ring nor vanishes in forced-colors mode. */
+[data-card-id].pcard--t-focus,
+[data-slot-id].pcard--t-focus {
+  outline: 2px solid var(--pcard-l-focus, var(--card-ring-selected));
+  outline-offset: 2px;
+  border-radius: var(--pcard-radius, 5%/3.6%);
+}
+
+[data-card-id][data-interactive='true']:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+/* A library tag's lift (CardStyle.tags.hover.lift: a hover peek) is a
+   `translate` rule in the scoped tag sheet (libraryTagSheet), on the tagged
+   wrapper only; this eases it in and out. Paint only: nothing reflows, and
+   the resting layout the legibility check measures is unchanged. */
+[data-card-id],
+[data-pile-empty] {
+  transition: translate
+    var(--pcard-motion-ms, calc(120ms * var(--anim-scale, 1)))
+    var(--pcard-motion-ease, ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-card-id],
+  [data-pile-empty] {
+    transition: none;
+  }
+}
+
+/* The card's edge (CardStyle.outline): an inset ring on a layer over
+   the art, with the container's own border-radius, so it follows exactly the
+   rounded rect that clips the face and the clip can never cut it. Decks whose
+   art carries its own border (Deck.drawsOwnOutline) get none. */
+.pcard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--pcard-edge-width, 1px)
+    var(--pcard-edge-color, var(--card-edge));
+  pointer-events: none;
+}
+
+.pcard--own-outline::after {
+  content: none;
+}
+
+/* Selection is the 'selected' tag's ring alone (lift 0 by default): a lift
+   would cover the index of the card above it in a fan, unless the
+   CardStyle asks for one (selection.lift > 0); the legibility check
+   measures the lifted card, so a covering lift shows FAIL. */
+.pcard--lifted {
+  transform: translateY(calc(-1 * var(--pcard-lift, 0px)));
+}
+
+.pcard-empty {
+  display: inline-flex;
+  vertical-align: top;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: none;
+  /* The outline is faint; its label is not: fading the whole element would
+     put the label below 4.5:1 on a dark felt. The label takes the full
+     inherited colour; the dashes are 45% of it. */
+  color: currentColor;
+  border: 2px dashed var(--card-empty-dash);
+  border-radius: var(--pcard-radius, 5%/3.6%);
+  font-size: min(0.8em, var(--pcard-empty-font, 0.8em));
+  text-align: center;
+  /* The label stays inside the dashed box: its font is fitted to the width
+       (--pcard-empty-font, from emptyLabelMaxFont), and a word the estimate misjudges wraps rather
+       than crossing the border. */
+  padding: 0 2px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+/* A symbol-only card (TagStyle.symbol): no body at all. The box stays (it is
+   still the card's hit and focus target) but draws nothing of a card: no
+   face, edge, shadow, game ring, glow, tint, band or filter. Only the rank
+   and suit, centred, flat in the ONE colour the tag gives, whatever the suit.
+   A library ring (drop-legal, drop-over) still draws: it is interaction
+   feedback, not the card's look; focus is the wrapper's outline.
+   It stands for a card its place does not hold, so the place keeps its empty
+   outline around the symbol: the same dash, in the same (inherited) colour,
+   as .pcard-empty. A slot whose look hides its empty outline
+   (TagStyle.empty 'hidden', e.g. 'hide-empty') draws none here either. */
+.pcard.pcard--symbol {
+  box-sizing: border-box;
+  background: var(--color-none);
+  box-shadow: 0 0 0 3px var(--pcard-l-ring, var(--color-none));
+  filter: none;
+  overflow: visible;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--card-empty-dash);
+}
+
+[data-empty-outline='hidden'] .pcard.pcard--symbol {
+  border-color: var(--color-none);
+}
+
+.pcard.pcard--symbol::before,
+.pcard.pcard--symbol::after {
+  content: none;
+}
+
+.pcard-symbol {
+  color: var(--pcard-symbol-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.04em;
+  font-size: var(--pcard-symbol-font, 1em);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+}
+
+.pcard-symbol__suit {
+  width: 0.82em;
+  height: 0.82em;
+  flex: none;
+  overflow: visible;
+}
+
+/* A symbol-only card in a slot tagged 'symbol-corner' (SYMBOL_CORNER_TAG): a
+   slot whose card another may cover past its index. The symbol sits at the
+   index corner, rank over suit, where an overlap always leaves it in view.
+   Its box is filled with the surface (--pcard-symbol-backing, the game sets
+   it to its felt): it covers the card it overlaps exactly as a real card
+   would, so the symbol reads on the surface, never on a neighbour's face. */
+[data-slot-tags~='symbol-corner'] .pcard.pcard--symbol {
+  align-items: flex-start;
+  justify-content: flex-start;
+  background: var(--pcard-symbol-backing, var(--color-none));
+}
+
+[data-slot-tags~='symbol-corner'] .pcard--symbol .pcard-symbol {
+  flex-direction: column;
+  gap: 0.05em;
+  padding: 0.18em 0 0 0.16em;
+  font-size: calc(var(--pcard-symbol-font, 1em) * 0.62);
+}

@@ -31,7 +31,7 @@
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/python/pybind11/python_policy.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/detail/common.h"
+#include "pybind11/detail/common.h"
 
 namespace open_spiel {
 namespace {

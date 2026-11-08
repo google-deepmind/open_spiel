@@ -21,14 +21,13 @@ import warnings
 
 import chex
 import flax
-from flax import training
 from flax import traverse_util
 import flax.linen as nn
+from flax.training import train_state
 import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
-import orbax
 import orbax.checkpoint
 
 from open_spiel.python.algorithms.alpha_zero import utils
@@ -239,7 +238,7 @@ class AlphaZeroModel(nn.Module):
     return policy_logits, value_out.squeeze(-1)
 
 
-class TrainState(training.train_state.TrainState):
+class TrainState(train_state.TrainState):
   batch_stats: Any
 
 

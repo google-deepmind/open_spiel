@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_GAMES_DOU_DIZHU_DOU_DIZHU_UTILS_H_
 #define OPEN_SPIEL_GAMES_DOU_DIZHU_DOU_DIZHU_UTILS_H_
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {

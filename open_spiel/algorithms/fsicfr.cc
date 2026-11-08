@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "absl/random/distributions.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {

@@ -20,9 +20,9 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go.h"
 #include "open_spiel/games/go/go_board.h"

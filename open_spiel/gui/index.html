@@ -1,0 +1,50 @@
+<!--
+  Copyright 2026 DeepMind Technologies Limited
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenSpiel</title>
+    <!-- No icon: the page ships no images, and asks for none. -->
+    <link rel="icon" href="data:," />
+    <script>
+      // Shows the stored theme before the first paint, so the page never
+      // flashes the other one. Resolves the theme exactly as
+      // src/theme/theme.ts does; ThemeProvider takes over once mounted and
+      // reports an unknown stored value.
+      (() => {
+        let preference = null;
+        try {
+          preference = localStorage.getItem('open_spiel.theme');
+        } catch {
+          // Unreadable storage: follow the system, as ThemeProvider will.
+        }
+        const dark =
+          preference === 'dark' ||
+          (preference !== 'light' &&
+            matchMedia('(prefers-color-scheme: dark)').matches);
+        const theme = dark ? 'dark' : 'light';
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "card_set",
+    srcs = [
+        "card_set.cc",
+    ],
+    hdrs = [
+        "card_set.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_acpc_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "@acpc",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "card_set_test",
+    srcs = ["card_set_test.cc"],
+    deps = [
+        ":card_set",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "gamedef",
+    srcs = [
+        "gamedef.cc",
+    ],
+    hdrs = [
+        "gamedef.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "gamedef_test",
+    srcs = ["gamedef_test.cc"],
+    deps = [
+        ":gamedef",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:string_view",
+        "//open_spiel",
+    ],
+)
+
+cc_library(
+    name = "action_translation",
+    srcs = [
+        "action_translation.cc",
+    ],
+    hdrs = [
+        "action_translation.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/strings",
+        "//open_spiel",
+    ],
+)
+
+cc_test(
+    name = "action_translation_test",
+    srcs = ["action_translation_test.cc"],
+    deps = [
+        ":action_translation",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:string_view",
+        "//open_spiel",
+    ],
+)

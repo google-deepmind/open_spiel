@@ -1,0 +1,105 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "uniform_random",
+    srcs = ["uniform_random.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_test(
+    name = "uniform_random_test",
+    srcs = ["uniform_random_test.py"],
+    deps = [
+        ":uniform_random",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "policy",
+    srcs = ["policy.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_test(
+    name = "is_mcts_test",
+    srcs = ["is_mcts_test.py"],
+    deps = [
+        ":uniform_random",
+        "//open_spiel/python/algorithms:evaluate_bots",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "bluechip_bridge",
+    srcs = ["bluechip_bridge.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_test(
+    name = "bluechip_bridge_test",
+    srcs = ["bluechip_bridge_test.py"],
+    deps = [
+        ":bluechip_bridge",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//mock",  # buildcleaner: keep
+    ],
+)
+
+py_library(
+    name = "bluechip_bridge_uncontested_bidding",
+    srcs = ["bluechip_bridge_uncontested_bidding.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+py_test(
+    name = "bluechip_bridge_uncontested_bidding_test",
+    srcs = ["bluechip_bridge_uncontested_bidding_test.py"],
+    deps = [
+        ":bluechip_bridge_uncontested_bidding",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//mock",  # buildcleaner: keep
+    ],
+)
+
+py_library(
+    name = "gtp",
+    srcs = ["gtp.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+
+py_library(
+    name = "human",
+    srcs = ["human.py"],
+    strict_deps = True,
+    deps = ["//open_spiel/python/pybind11:pyspiel"],
+)
+
+pytype_strict_library(
+    name = "scenarios",
+    srcs = ["scenarios.py"],
+    deps = [
+        "@py_deps//absl/logging",
+    ],
+)

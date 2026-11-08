@@ -1,0 +1,46 @@
+# Python support for the Bazel build of OpenSpiel: rule shims used by the BUILD
+# files, the @py_deps label tree and the pinned pip requirements.
+
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "py_test_main.py",
+    "pytest_main.py",
+    "requirements.in",
+    "requirements_lock.txt",
+])
+
+# Optional dependency groups (OPTIONAL_DEP_GROUPS in py_deps_table.bzl),
+# mirroring CMake's OPEN_SPIEL_ENABLE_* switches. All are off by default.
+
+bool_flag(
+    name = "enable_jax",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "jax_enabled",
+    flag_values = {":enable_jax": "true"},
+)
+
+bool_flag(
+    name = "enable_pytorch",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "pytorch_enabled",
+    flag_values = {":enable_pytorch": "true"},
+)
+
+bool_flag(
+    name = "enable_python_misc",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "python_misc_enabled",
+    flag_values = {":enable_python_misc": "true"},
+)

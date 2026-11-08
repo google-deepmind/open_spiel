@@ -24,11 +24,11 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/algorithm/container.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
 #include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
@@ -771,13 +771,15 @@ std::vector<double> GinRummyState::Returns() const {
     return std::vector<double>(kNumPlayers, 0.0);
   }
   std::vector<double> returns(kNumPlayers, 0.0);
+  // The knocker is undercut unless their deadwood is strictly lower than the
+  // opponent's, so equal deadwood is an undercut. A gin hand cannot be
+  // undercut; the explicit check keeps this true when gin_bonus is 0.
   // player 0 knocked
   if (knocked_[0]) {
     returns[0] = deadwood_[1] - deadwood_[0];
     if (deadwood_[0] == 0) {
       returns[0] += gin_bonus_;
-    }
-    if (returns[0] < 0) {
+    } else if (returns[0] <= 0) {
       returns[0] -= undercut_bonus_;
     }
     returns[1] = -returns[0];
@@ -786,8 +788,7 @@ std::vector<double> GinRummyState::Returns() const {
     returns[1] = deadwood_[0] - deadwood_[1];
     if (deadwood_[1] == 0) {
       returns[1] += gin_bonus_;
-    }
-    if (returns[1] < 0) {
+    } else if (returns[1] <= 0) {
       returns[1] -= undercut_bonus_;
     }
     returns[0] = -returns[1];

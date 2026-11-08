@@ -20,8 +20,8 @@
 #include <string>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "absl/algorithm/container.h"
+#include "absl/memory/memory.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/simultaneous_move_game.h"

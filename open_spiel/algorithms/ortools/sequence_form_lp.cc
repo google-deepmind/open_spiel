@@ -18,10 +18,10 @@
 #include <memory>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
+#include "absl/container/btree_map.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
-#include "ortools/linear_solver/linear_solver.h"
+#include "third_party/ortools/ortools/linear_solver/linear_solver.h"
 
 namespace open_spiel {
 namespace algorithms {

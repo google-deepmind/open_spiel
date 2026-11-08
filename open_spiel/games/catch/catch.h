@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/types/span.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

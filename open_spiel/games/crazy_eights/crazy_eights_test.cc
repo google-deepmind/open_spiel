@@ -17,7 +17,7 @@
 
 #include "open_spiel/games/crazy_eights/crazy_eights.h"
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "absl/strings/str_format.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
