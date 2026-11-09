@@ -22,7 +22,33 @@ from open_spiel.python.algorithms import best_response
 from open_spiel.python.algorithms import policy_utils
 from open_spiel.python.algorithms.psro_v2 import optimization_oracle
 from open_spiel.python.algorithms.psro_v2 import utils
+import numpy as np
 import pyspiel
+
+
+def _opponent_strategies_are_correlated(joint_probabilities, policy_counts,
+                                        responder):
+  """Whether the responders' opponents have a non-product distribution."""
+  if len(policy_counts) <= 2:
+    return False
+  weights = np.asarray(joint_probabilities, dtype=float).reshape(policy_counts)
+  if not np.all(np.isfinite(weights)) or np.any(weights < 0):
+    raise ValueError("Joint strategy weights must be finite and nonnegative.")
+  opponents = weights.sum(axis=responder)
+  total = opponents.sum()
+  if total <= 0:
+    raise ValueError("Joint strategy weights must have positive total weight.")
+  opponents = opponents / total
+  product = np.ones_like(opponents)
+  for axis, count in enumerate(opponents.shape):
+    other_axes = tuple(i for i in range(opponents.ndim) if i != axis)
+    marginal = opponents.sum(axis=other_axes)
+    shape = [1] * opponents.ndim
+    shape[axis] = count
+    product *= marginal.reshape(shape)
+  # A small correlation can still change a best response near a tie. Falling
+  # back to the exact calculation on rounding differences is safe.
+  return not np.array_equal(opponents, product)
 
 
 class BestResponseOracle(optimization_oracle.AbstractOracle):
@@ -132,9 +158,17 @@ class BestResponseOracle(optimization_oracle.AbstractOracle):
         probabilities_of_playing_policies = params[
             'probabilities_of_playing_policies']
         if using_joint_strategies:
+          joint_policies = utils.marginal_to_joint(total_policies)
+          joint_weights = probabilities_of_playing_policies.reshape(-1)
+          if _opponent_strategies_are_correlated(
+              joint_weights, tuple(map(len, total_policies)), current_player):
+            # A per-player Policy cannot represent correlated opponents. Use
+            # the exact Python computation, including for the C++ backend.
+            player_policies.append(best_response.JointMixtureBestResponsePolicy(
+                game, current_player, joint_policies, joint_weights))
+            continue
           aggr_policy = utils.aggregate_joint_policies(
-              game, utils.marginal_to_joint(total_policies),
-              probabilities_of_playing_policies.reshape(-1))
+              game, joint_policies, joint_weights)
         else:
           aggr_policy = utils.aggregate_policies(
               game, total_policies, probabilities_of_playing_policies)

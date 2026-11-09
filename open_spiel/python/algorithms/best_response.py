@@ -232,6 +232,151 @@ class BestResponsePolicy(openspiel_policy.Policy):
     }
 
 
+class JointMixtureBestResponsePolicy(openspiel_policy.Policy):
+  """Best response to a mixture of joint policies in a multi-player game.
+
+  A joint profile is drawn once per game, but the responder does not observe
+  which profile was drawn. Keeping the profile index in the tree traversal
+  preserves correlations between opponents. The selected action is shared by
+  all profiles at the same responder information state.
+  """
+
+  def __init__(self, game, player_id, joint_policies, weights,
+               root_state=None):
+    """Initializes the best response to a weighted set of joint profiles.
+
+    Args:
+      game: The game to analyze.
+      player_id: The player whose best response is computed.
+      joint_policies: One list of player policies for each joint profile.
+      weights: Probability weight of each joint profile.
+      root_state: Optional starting state; defaults to the game's initial state.
+    """
+    self._player_id = player_id
+    self._num_players = game.num_players()
+    weights = np.array(weights, dtype=float, copy=True).reshape(-1)
+    total_weight = np.sum(weights)
+    if (len(joint_policies) != len(weights) or not len(weights) or
+        not np.all(np.isfinite(weights)) or np.any(weights < 0) or
+        not np.isfinite(total_weight) or total_weight <= 0):
+      raise ValueError("Expected one nonnegative weight per joint policy.")
+    if any(len(profile) != self._num_players for profile in joint_policies):
+      raise ValueError("Each joint policy must contain one policy per player.")
+
+    weights /= total_weight
+    self._profiles = [(profile, weight) for profile, weight in
+                      zip(joint_policies, weights) if weight > 0]
+    self._root_state = (game.new_initial_state()
+                        if root_state is None else root_state)
+    self.infosets = collections.defaultdict(list)
+    for profile_index, (_, weight) in enumerate(self._profiles):
+      for state, reach in self._decision_nodes(self._root_state,
+                                                profile_index, weight):
+        key = state.information_state_string(player_id)
+        self.infosets[key].append((state, reach, profile_index))
+    self.infosets = dict(self.infosets)
+    self._value_cache = {}
+    self._action_cache = {}
+
+  def _transitions(self, state, profile_index):
+    """Counterfactual transitions under one sampled joint policy."""
+    if state.current_player() == self._player_id:
+      return [(action, 1.0) for action in state.legal_actions()]
+    if state.is_chance_node():
+      return state.chance_outcomes()
+
+    profile = self._profiles[profile_index][0]
+    if state.is_simultaneous_node():
+      actions_per_player = [state.legal_actions(player)
+                            for player in range(self._num_players)]
+      probabilities_per_player = []
+      for player, actions in enumerate(actions_per_player):
+        if player == self._player_id:
+          probabilities_per_player.append([1.0] * len(actions))
+        else:
+          probabilities = profile[player].action_probabilities(state, player)
+          probabilities_per_player.append(
+              [probabilities.get(action, 0.0) for action in actions])
+      return [(list(actions), np.prod(probabilities))
+              for actions, probabilities in zip(
+                  itertools.product(*actions_per_player),
+                  itertools.product(*probabilities_per_player))]
+
+    player = state.current_player()
+    probabilities = profile[player].action_probabilities(state, player)
+    return [(action, probabilities.get(action, 0.0))
+            for action in state.legal_actions()]
+
+  def _decision_nodes(self, state, profile_index, reach):
+    """Yields responder states with their counterfactual reach weights."""
+    if state.is_terminal():
+      return
+    if (state.current_player() == self._player_id or
+        state.is_simultaneous_node()):
+      yield state, reach
+    for action, probability in self._transitions(state, profile_index):
+      child = openspiel_policy.child(state, action)
+      yield from self._decision_nodes(child, profile_index,
+                                      reach * probability)
+
+  def _value(self, state, profile_index):
+    """Returns the responder's value given one hidden joint profile."""
+    key = (state.history_str(), profile_index)
+    if key not in self._value_cache:
+      if state.is_terminal():
+        value = state.player_return(self._player_id)
+      elif (state.current_player() == self._player_id or
+            state.is_simultaneous_node()):
+        action = self.best_response_action(
+            state.information_state_string(self._player_id))
+        value = self._q_value(state, action, profile_index)
+      else:
+        value = sum(probability * self._value(
+            openspiel_policy.child(state, action), profile_index)
+                    for action, probability in self._transitions(
+                        state, profile_index) if probability > 0)
+      self._value_cache[key] = value
+    return self._value_cache[key]
+
+  def _q_value(self, state, action, profile_index):
+    """Returns the value of choosing an action under one joint profile."""
+    if not state.is_simultaneous_node():
+      return self._value(state.child(action), profile_index)
+    value = 0.0
+    for joint_action, probability in self._transitions(state, profile_index):
+      if joint_action[self._player_id] == action and probability > 0:
+        value += probability * self._value(
+            openspiel_policy.child(state, joint_action), profile_index)
+    return value
+
+  def best_response_action(self, infostate):
+    """Returns the same optimal action for all profiles at an information set."""
+    if infostate not in self._action_cache:
+      infoset = self.infosets[infostate]
+      self._action_cache[infostate] = max(
+          infoset[0][0].legal_actions(self._player_id),
+          key=lambda action: sum(
+              reach * self._q_value(state, action, profile_index)
+              for state, reach, profile_index in infoset))
+    return self._action_cache[infostate]
+
+  def value(self, state=None):
+    """Return the expected best-response value under the joint mixture."""
+    if state is None:
+      state = self._root_state
+    return sum(weight * self._value(state, profile_index)
+               for profile_index, (_, weight) in enumerate(self._profiles))
+
+  def action_probabilities(self, state, player_id=None):
+    """Returns the best responder's deterministic action distribution."""
+    if player_id is None:
+      player_id = self._player_id
+    if player_id != self._player_id:
+      raise ValueError("This policy is only defined for the best responder.")
+    return {self.best_response_action(
+        state.information_state_string(player_id)): 1.0}
+
+
 class CPPBestResponsePolicy(openspiel_policy.Policy):
   """Computes best response action_probabilities using open_spiel's C++ backend.
 

@@ -119,7 +119,10 @@ class JointPolicyAggregator(object):
       return str(state)
 
   def aggregate(self, pids, joint_policies, weights):
-    r"""Computes the weighted-mixture of the joint policies.
+    r"""Computes each player's behavioral policy in a joint-policy mixture.
+
+    The returned policy gives per-player action probabilities. It does not
+    preserve correlations between different players' policy choices.
 
     Let P of shape [num_players] be the joint policy, and W some weights.
     Let N be the number of policies (i.e. len(policies)).
