@@ -91,6 +91,7 @@ target_link_libraries(open_spiel_games_all_games INTERFACE
   open_spiel::games::rbc::rbc
   open_spiel::games::sheriff::sheriff
   open_spiel::games::shogi::shogi
+  open_spiel::games::siguo_junqi::siguo_junqi
   open_spiel::games::skat::skat
   open_spiel::games::snake::snake
   open_spiel::games::social_deduction::social_deduction
@@ -204,6 +205,7 @@ add_subdirectory(rbc)
 add_subdirectory(repeated_pokerkit)
 add_subdirectory(sheriff)
 add_subdirectory(shogi)
+add_subdirectory(siguo_junqi)
 add_subdirectory(skat)
 add_subdirectory(snake)
 add_subdirectory(social_deduction)
