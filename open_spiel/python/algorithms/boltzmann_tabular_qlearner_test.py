@@ -98,6 +98,38 @@ class BoltzmannQlearnerTest(absltest.TestCase):
     self.assertAlmostEqual(np.sum(agent_output.probs), 1.0)
     self.assertIn(agent_output.action, legal_actions)
 
+  def test_softmax_at_small_positive_temperature_preserves_ties(self):
+    env = rl_environment.Environment("matrix_rps")
+    agent = boltzmann_tabular_qlearner.BoltzmannQLearner(
+        0,
+        env.game.num_distinct_actions(),
+        temperature_schedule=rl_tools.ConstantSchedule(1e-310),
+    )
+    time_step = env.reset()
+    info_state = str(time_step.observations["info_state"][0])
+    agent._q_values[info_state].update({0: 1.0, 1: 0.0, 2: 1.0})
+
+    output = agent.step(time_step)
+    np.testing.assert_array_equal(output.probs, [0.5, 0.0, 0.5])
+    self.assertIn(output.action, (0, 2))
+
+  def test_softmax_is_stable_when_q_value_difference_overflows(self):
+    env = rl_environment.Environment("matrix_mp")
+    temperature = np.array(1e308)
+    agent = boltzmann_tabular_qlearner.BoltzmannQLearner(
+        0,
+        env.game.num_distinct_actions(),
+        temperature_schedule=rl_tools.ConstantSchedule(temperature),
+    )
+    time_step = env.reset()
+    info_state = str(time_step.observations["info_state"][0])
+    agent._q_values[info_state].update({0: -1e308, 1: 1e308})
+
+    output = agent.step(time_step)
+    expected = np.exp([-2.0, 0.0])
+    np.testing.assert_allclose(output.probs, expected / expected.sum())
+    self.assertEqual(temperature, 1e308)
+
 
 if __name__ == "__main__":
   np.random.seed(SEED)
