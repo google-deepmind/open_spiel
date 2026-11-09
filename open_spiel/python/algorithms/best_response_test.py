@@ -29,6 +29,37 @@ import pyspiel
 
 class BestResponseTest(parameterized.TestCase, absltest.TestCase):
 
+  def test_joint_mixture_matches_single_profile_with_chance(self):
+    game = pyspiel.load_game("kuhn_poker(players=3)")
+    uniform = policy.UniformRandomPolicy(game)
+    ordinary = best_response.BestResponsePolicy(game, 0, uniform)
+    joint = best_response.JointMixtureBestResponsePolicy(
+        game, 0, [[uniform] * 3], [1.0])
+
+    self.assertAlmostEqual(ordinary.value(game.new_initial_state()),
+                           joint.value())
+    self.assertEqual(ordinary.infosets.keys(), joint.infosets.keys())
+    for infostate in ordinary.infosets:
+      self.assertEqual(ordinary.best_response_action(infostate),
+                       joint.best_response_action(infostate))
+
+  def test_joint_mixture_defines_actions_at_unreachable_states(self):
+    game = pyspiel.load_game("kuhn_poker(players=3)")
+
+    class AlwaysZero(policy.Policy):
+
+      def action_probabilities(self, state, player_id=None):
+        return {0: 1.0}
+
+    zero = AlwaysZero(game, range(3))
+    response = best_response.JointMixtureBestResponsePolicy(
+        game, 0, [[zero] * 3], [1.0])
+    states = get_all_states.get_all_states(game)
+    for state in states.values():
+      if state.current_player() == 0:
+        self.assertEqual(sum(response.action_probabilities(state, 0).values()),
+                         1.0)
+
   def test_best_response_is_a_policy(self):
     game = pyspiel.load_game("kuhn_poker")
     test_policy = policy.UniformRandomPolicy(game)

@@ -17,13 +17,88 @@
 from absl.testing import absltest
 from absl.testing import parameterized
 
+import numpy as np
+
 from open_spiel.python import policy
 from open_spiel.python.algorithms import best_response
+from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms.psro_v2 import best_response_oracle
 import pyspiel
 
 
+class _ConstantPolicy(policy.Policy):
+
+  def __init__(self, game, action):
+    super().__init__(game, range(game.num_players()))
+    self.action = action
+
+  def action_probabilities(self, state, player_id=None):
+    return {self.action: 1.0}
+
+
 class BestResponseOracleTest(parameterized.TestCase, absltest.TestCase):
+
+  @parameterized.named_parameters(
+      ("python_sequential", "py", True),
+      ("cpp_sequential", "cpp", True),
+      ("python_simultaneous", "py", False))
+  def test_joint_best_response_preserves_opponent_correlation(
+      self, backend, turn_based):
+    # Player 0 prefers action 0 when the opponents coordinate, but action 1
+    # when they independently choose between their two policies.
+    payoff = np.array([[[1., 0.], [0., 1.]],
+                       [[0.75, 0.75], [0.75, 0.75]]])
+    game = pyspiel.create_tensor_game([payoff, np.zeros_like(payoff),
+                                       np.zeros_like(payoff)])
+    if turn_based:
+      game = pyspiel.convert_to_turn_based(game)
+
+    zero, one = _ConstantPolicy(game, 0), _ConstantPolicy(game, 1)
+    populations = [[zero], [zero, one], [zero, one]]
+    oracle = best_response_oracle.BestResponseOracle(
+        game=game, best_response_backend=backend)
+
+    for weights, expected_action in (
+        (np.array([[[0.5, 0.0], [0.0, 0.5]]]), 0),
+        (np.full((1, 2, 2), 0.25), 1)):
+      params = [[{
+          "total_policies": populations,
+          "current_player": 0,
+          "probabilities_of_playing_policies": weights,
+      }], [], []]
+      response = oracle(game, params, using_joint_strategies=True)[0][0]
+      action_probabilities = response.action_probabilities(
+          game.new_initial_state(), 0)
+      self.assertEqual(action_probabilities.get(expected_action), 1.0)
+      self.assertEqual(action_probabilities.get(1 - expected_action, 0.0), 0.0)
+      if expected_action == 0:
+        self.assertIsInstance(response,
+                              best_response.JointMixtureBestResponsePolicy)
+        self.assertAlmostEqual(response.value(), 1.0)
+      elif backend == "cpp":
+        self.assertIsInstance(response, best_response.CPPBestResponsePolicy)
+
+  @parameterized.parameters("py", "cpp")
+  def test_joint_best_response_on_three_player_kuhn_poker(self, backend):
+    game = pyspiel.load_game("kuhn_poker(players=3)")
+
+    zero, one = _ConstantPolicy(game, 0), _ConstantPolicy(game, 1)
+    profiles = [[zero, zero, zero], [zero, one, one]]
+    params = [[{
+        "total_policies": [[zero], [zero, one], [zero, one]],
+        "current_player": 0,
+        "probabilities_of_playing_policies": np.array(
+            [[[0.5, 0.0], [0.0, 0.5]]]),
+    }], [], []]
+    oracle = best_response_oracle.BestResponseOracle(
+        game=game, best_response_backend=backend)
+    response = oracle(game, params, using_joint_strategies=True)[0][0]
+
+    profile_values = [expected_game_score.policy_value(
+        game.new_initial_state(), [response, profile[1], profile[2]])[0]
+                      for profile in profiles]
+    self.assertAlmostEqual(np.mean(profile_values), 1.0)
+    self.assertAlmostEqual(response.value(), 1.0)
 
   @parameterized.parameters(("kuhn_poker", 2), ("kuhn_poker", 3),
                             ("leduc_poker", 2))
