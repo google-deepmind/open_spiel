@@ -30,10 +30,11 @@ class WoLFTest(absltest.TestCase):
   def test_terminal_transition_updates_policy(self):
     game = pyspiel.create_matrix_game([[1, 1], [1, 1]], [[0, 0], [0, 0]])
     env = rl_environment.Environment(game=game)
+    step_size = rl_tools.LinearSchedule(1.0, 0.0, 2)
     agent = WoLFPHC(
         0,
         game.num_distinct_actions(),
-        step_size=rl_tools.ConstantSchedule(1.0),
+        step_size=step_size,
         epsilon_schedule=rl_tools.ConstantSchedule(0.0),
         delta_w=rl_tools.ConstantSchedule(0.05),
         delta_l=rl_tools.ConstantSchedule(0.1),
@@ -41,9 +42,11 @@ class WoLFTest(absltest.TestCase):
 
     first = agent.step(env.reset())
     np.testing.assert_allclose(first.probs, [0.5, 0.5])
+    self.assertEqual(step_size.value, 1.0)
     terminal = env.step([first.action, 0])
     self.assertTrue(terminal.last())
     agent.step(terminal)
+    self.assertEqual(step_size.value, 0.5)
 
     updated = agent.step(env.reset(), is_evaluation=True)
     self.assertAlmostEqual(updated.probs[first.action], 0.6)
@@ -86,7 +89,9 @@ class WoLFTest(absltest.TestCase):
       time_step = env.reset()
       for learner in (wolf0, wolf1):
         strategy = learner.step(time_step, is_evaluation=True).probs
-        # A finite self-play run keeps the policy near the equilibrium.
+        # RPS ends after one move. Skipping terminal updates left the policy
+        # exactly uniform. With learning enabled, finite self-play stays near
+        # the uniform equilibrium.
         np.testing.assert_allclose(strategy, [1 / 3] * 3, atol=0.05)
 
 
