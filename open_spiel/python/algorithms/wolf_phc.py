@@ -81,6 +81,7 @@ class WoLFPHC(rl_agent.AbstractAgent):
     self._q_values = collections.defaultdict(valuedict)
     self._state_counters = valuedict()
     self._prev_info_state = None
+    self._prev_legal_actions = ()
     self._last_loss_value = None
     self._cur_delta_value = self._delta_l.value
 
@@ -176,54 +177,54 @@ class WoLFPHC(rl_agent.AbstractAgent):
 
     # Learn step: don't learn during evaluation or at first agent steps.
     if self._prev_info_state and not is_evaluation:
+      prev_info_state = self._prev_info_state
+      prev_legal_actions = self._prev_legal_actions
       target = time_step.rewards[self._player_id]
       if not time_step.last():  # Q values are zero for terminal.
         target += self._discount_factor * max(
             [self._q_values[info_state][a] for a in legal_actions])
 
-      prev_q_value = self._q_values[self._prev_info_state][self._prev_action]
+      prev_q_value = self._q_values[prev_info_state][self._prev_action]
       self._last_loss_value = target - prev_q_value
-      self._q_values[self._prev_info_state][self._prev_action] += (
+      self._q_values[prev_info_state][self._prev_action] += (
           self._step_size.value * self._last_loss_value)
 
-      self._state_counters[info_state] += 1
-      for action_ in legal_actions:
-        self._avg_policy[info_state][action_] = (
-            self._avg_policy[info_state][action_] +
-            1 / self._state_counters[info_state] * (
-                self._cur_policy[info_state][action_] -
-                self._avg_policy[info_state][action_]))
+      cur_policy = self._cur_policy[prev_info_state]
+      avg_policy = self._avg_policy[prev_info_state]
+      q_values = self._q_values[prev_info_state]
+      self._state_counters[prev_info_state] += 1
+      visits = self._state_counters[prev_info_state]
+      for a in prev_legal_actions:
+        avg_policy[a] += (cur_policy[a] - avg_policy[a]) / visits
 
       assert self._delta_l.value > self._delta_w.value
-      cur_policy_value = sum([
-          self._cur_policy[info_state][action] *
-          self._q_values[info_state][action] for action in legal_actions
-      ])
-      avg_policy_value = sum([
-          self._avg_policy[info_state][action] *
-          self._q_values[info_state][action] for action in legal_actions
-      ])
+      cur_policy_value = sum(
+          cur_policy[a] * q_values[a] for a in prev_legal_actions
+      )
+      avg_policy_value = sum(
+          avg_policy[a] * q_values[a] for a in prev_legal_actions
+      )
       if cur_policy_value > avg_policy_value:
         self._cur_delta_value = self._delta_w.value
       else:
         self._cur_delta_value = self._delta_l.value
 
-      if not time_step.last():
-        self._hill_climbing(info_state, legal_actions)
+      self._hill_climbing(prev_info_state, prev_legal_actions)
 
-        # Decay epsilon, if necessary.
-        self._epsilon = self._epsilon_schedule.step()
-        self._delta_l.step()
-        self._delta_w.step()
-        self._step_size.step()
-      else:  # prepare for the next episode.
+      # Decay schedules once per update, including terminal transitions.
+      self._epsilon = self._epsilon_schedule.step()
+      self._delta_l.step()
+      self._delta_w.step()
+      self._step_size.step()
+      if time_step.last():  # Prepare for the next episode.
         self._prev_info_state = None
         return
 
     # Don't mess up with the state during evaluation.
-    if not is_evaluation:
+    if not is_evaluation and not time_step.last():
       self._prev_info_state = info_state
       self._prev_action = action
+      self._prev_legal_actions = tuple(legal_actions)
     return rl_agent.StepOutput(action=action, probs=probs)
 
   @property
