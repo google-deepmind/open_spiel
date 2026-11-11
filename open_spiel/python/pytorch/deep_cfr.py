@@ -125,10 +125,12 @@ class ReservoirBuffer:
   """
 
   def __init__(
-      self, capacity: np.ndarray, experience: AdvantageMemory | StrategyMemory
+      self, capacity: np.ndarray, storage: AdvantageMemory | StrategyMemory
   ) -> None:
     self.capacity = capacity
-    self.experience = experience
+    # Full-capacity backing arrays. Rows at and past len(self) have never been
+    # written and hold arbitrary values, so read them only via `experience`.
+    self._storage = storage
     self.add_calls = np.array(0)
 
   def __len__(self) -> int:
@@ -137,15 +139,20 @@ class ReservoirBuffer:
   def __getitem__(self, idx):
     return np_tree.map_structure(lambda data: data[idx], self.experience)
 
+  @property
+  def experience(self) -> AdvantageMemory | StrategyMemory:
+    """The filled rows of the buffer, as views into the backing arrays."""
+    return np_tree.map_structure(lambda x: x[: len(self)], self._storage)
+
   @classmethod
   def init(
       cls, capacity: int, experience: AdvantageMemory | StrategyMemory
   ) -> "ReservoirBuffer":
     # Initialize buffer by replicating the structure of the experience
-    experience_ = np_tree.map_structure(
+    storage = np_tree.map_structure(
         lambda x: np.empty((capacity, *x.shape), dtype=x.dtype), experience
     )
-    return cls(np.array(capacity), experience_)
+    return cls(np.array(capacity), storage)
 
   def append(
       self,
@@ -176,7 +183,7 @@ class ReservoirBuffer:
     if should_update:
       np_tree.map_structure(
           lambda buf_leaf, exp_leaf: _inplace(buf_leaf, write_idx, exp_leaf),
-          self.experience,
+          self._storage,
           experience,
       )
     self.add_calls += 1
@@ -203,10 +210,13 @@ class ReservoirBuffer:
     return np_tree.map_structure(lambda data: data[indices], self.experience)
 
   def shuffle(self) -> None:
-    """Shuffling the reservoir buffer along the batch axis."""
-    np_tree.map_structure(
-        lambda x: np.random.shuffle(x[: len(self)]), self.experience
-    )
+    """Shuffles the filled rows in place, keeping each row's fields together."""
+    permutation = np.random.permutation(len(self))
+
+    def _permute(x):
+      x[:] = x[permutation]
+
+    np_tree.map_structure(_permute, self.experience)
 
   def clear(self) -> None:
     """Clears the reservoir buffer."""

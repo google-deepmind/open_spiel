@@ -47,10 +47,10 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/span.h"
+#include "nlohmann/json.hpp"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
 #include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"

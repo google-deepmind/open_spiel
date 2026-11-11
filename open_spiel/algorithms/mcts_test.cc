@@ -17,10 +17,10 @@
 #include <memory>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/string_view.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"

@@ -1,0 +1,62 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel/third_party:torch_extension.bzl", "TORCH_COPTS", "TORCH_FEATURES")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "dqn",
+    srcs = ["dqn.cc"],
+    hdrs = ["dqn.h"],
+    copts = TORCH_COPTS,
+    features = TORCH_FEATURES,
+    target_compatible_with = select({
+        "//open_spiel:build_with_libtorch_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":simple_nets",
+        "@abseil-cpp//absl/random",
+        "@abseil-cpp//absl/random:distributions",
+        "//open_spiel",
+        "//open_spiel/utils:circular_buffer",
+        "@libtorch//:libtorch",
+    ],
+)
+
+cc_library(
+    name = "simple_nets",
+    srcs = ["simple_nets.cc"],
+    hdrs = ["simple_nets.h"],
+    copts = TORCH_COPTS,
+    features = TORCH_FEATURES,
+    target_compatible_with = select({
+        "//open_spiel:build_with_libtorch_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel",
+        "@libtorch//:libtorch",
+    ],
+)
+
+cc_test(
+    name = "dqn_torch_test",
+    srcs = ["dqn_torch_test.cc"],
+    copts = TORCH_COPTS,
+    features = TORCH_FEATURES,
+    deps = [
+        ":dqn",
+        "//open_spiel",
+        "//open_spiel/games/efg_game",
+        "//open_spiel/games/efg_game:efg_game_data",
+        "//open_spiel/games/tic_tac_toe",
+        "//open_spiel/games/tiny_hanabi",
+        "@libtorch//:libtorch",
+    ],
+)

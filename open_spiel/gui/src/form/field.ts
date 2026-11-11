@@ -21,25 +21,31 @@ export type FieldValue = boolean | number | string;
 /** What a field holds while it is edited: a box's state, or typed text. */
 export type FieldDraft = boolean | string;
 
+/** What a required field that is left empty says. */
+export const REQUIRED_ERROR = 'This setting is required.';
+
 interface FieldBase {
   /** The setting's name, as the server takes it. */
   readonly name: string;
   /** What the form calls the setting. */
   readonly label: string;
   readonly description: string | null;
-  readonly default: FieldValue;
+  /** Whether the setting must be sent: the server has no default for it. */
+  readonly required: boolean;
+  /** The setting's default; null only for a required setting. */
+  readonly default: FieldValue | null;
 }
 
-/** A setting that is on or off. */
+/** A setting that is on or off. A box is always sent, so never missing. */
 export interface BooleanField extends FieldBase {
   readonly kind: 'boolean';
-  readonly default: boolean;
+  readonly default: boolean | null;
 }
 
 /** A setting that takes a number, optionally a whole one, within bounds. */
 export interface NumberField extends FieldBase {
   readonly kind: 'integer' | 'number';
-  readonly default: number;
+  readonly default: number | null;
   /** Values offered as one-click choices beside the box; none if absent. */
   readonly presets?: readonly number[];
   /** The least value admitted, inclusive, or null for no bound. */
@@ -48,12 +54,21 @@ export interface NumberField extends FieldBase {
   readonly maximum: number | null;
 }
 
-/** A setting that takes any text. */
+/** A setting that takes text, optionally bounded in length and patterned. */
 export interface StringField extends FieldBase {
   readonly kind: 'string';
-  readonly default: string;
+  readonly default: string | null;
   /** Values offered as one-click choices beside the box; none if absent. */
   readonly presets?: readonly string[];
+  /** The fewest characters admitted, or null for no bound. */
+  readonly minLength: number | null;
+  /** The most characters admitted, or null for no bound. */
+  readonly maxLength: number | null;
+  /**
+   * A regular expression the text must contain a match of, as JSON Schema's
+   * `pattern` does, or null for none.
+   */
+  readonly pattern: string | null;
 }
 
 /** A setting that takes one of a list of values. */
@@ -73,7 +88,8 @@ export type FieldReading =
 /**
  * Returns the draft that shows `value`, or the field's default when `value`
  * is undefined. A choice's draft is the index of its value in `choices`, and
- * the empty string when `value` is not one of them.
+ * the empty string when `value` is not one of them. A required field with
+ * neither starts empty: unticked, unchosen, or with no text.
  */
 export function draftOf(field: Field, value?: FieldValue): FieldDraft {
   const shown = value ?? field.default;
@@ -81,13 +97,13 @@ export function draftOf(field: Field, value?: FieldValue): FieldDraft {
     case 'boolean':
       return shown === true;
     case 'choice': {
-      const index = field.choices.indexOf(shown);
+      const index = shown === null ? -1 : field.choices.indexOf(shown);
       return index < 0 ? '' : String(index);
     }
     case 'integer':
     case 'number':
     case 'string':
-      return String(shown);
+      return shown === null ? '' : String(shown);
     default: {
       const unreachable: never = field;
       throw new Error(`Unhandled field kind: ${String(unreachable)}`);
@@ -96,7 +112,8 @@ export function draftOf(field: Field, value?: FieldValue): FieldDraft {
 }
 
 /**
- * Reads `draft` as a value of `field`.
+ * Reads `draft` as a value of `field`. A required field left empty is
+ * refused with `REQUIRED_ERROR`.
  *
  * @throws Error when the draft is not of the field's kind: a box's state for
  *     a boolean field, and text for any other.
@@ -111,9 +128,13 @@ export function readDraft(field: Field, draft: FieldDraft): FieldReading {
   if (typeof draft !== 'string') {
     throw new Error(`The field ${field.name} has a box's draft.`);
   }
+  const empty = (field.kind === 'string' ? draft : draft.trim()) === '';
+  if (field.required && empty) {
+    return {ok: false, error: REQUIRED_ERROR};
+  }
   switch (field.kind) {
     case 'string':
-      return {ok: true, value: draft};
+      return readString(field, draft);
     case 'choice': {
       const value = draft === '' ? undefined : field.choices[Number(draft)];
       return value === undefined
@@ -140,6 +161,61 @@ export function admittedNumbers(field: NumberField): string {
   if (minimum !== null) return `${what}, at least ${String(minimum)}.`;
   if (maximum !== null) return `${what}, at most ${String(maximum)}.`;
   return `${what}.`;
+}
+
+/** Says, as a sentence, which text `field` admits; null for any text. */
+export function admittedText(field: StringField): string | null {
+  const {minLength, maxLength, pattern} = field;
+  const characters = (count: number): string =>
+    count === 1 ? '1 character' : `${String(count)} characters`;
+  let length: string | null = null;
+  if (minLength !== null && maxLength !== null) {
+    length =
+      minLength === maxLength
+        ? `exactly ${characters(minLength)}`
+        : `${String(minLength)} to ${characters(maxLength)}`;
+  } else if (minLength !== null) {
+    length = `at least ${characters(minLength)}`;
+  } else if (maxLength !== null) {
+    length = `at most ${characters(maxLength)}`;
+  }
+  const parts = [
+    ...(length === null ? [] : [`of ${length}`]),
+    ...(pattern === null ? [] : [`matching ${pattern}`]),
+  ];
+  return parts.length === 0 ? null : `Text ${parts.join(', ')}.`;
+}
+
+/** A text field's length bounds and pattern. */
+export type TextConstraints = Pick<
+  StringField,
+  'minLength' | 'maxLength' | 'pattern'
+>;
+
+/**
+ * Whether `text` is admitted by length bounds and a pattern. Lengths count
+ * characters (code points), as JSON Schema does, not UTF-16 units.
+ */
+export function admitsText(
+  constraints: TextConstraints,
+  text: string,
+): boolean {
+  const {minLength, maxLength, pattern} = constraints;
+  const length = Array.from(text).length;
+  return (
+    (minLength === null || length >= minLength) &&
+    (maxLength === null || length <= maxLength) &&
+    (pattern === null || new RegExp(pattern, 'u').test(text))
+  );
+}
+
+function readString(field: StringField, text: string): FieldReading {
+  if (admitsText(field, text)) return {ok: true, value: text};
+  const admitted = admittedText(field);
+  if (admitted === null) {
+    throw new Error(`The field ${field.name} refused text it admits.`);
+  }
+  return {ok: false, error: admitted};
 }
 
 // A number in decimal notation, optionally with an exponent, as a person

@@ -22,12 +22,12 @@
 #include <random>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/algorithm/container.h"
+#include "absl/random/distributions.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"

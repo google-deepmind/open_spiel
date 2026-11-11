@@ -27,6 +27,8 @@ const WITHHELD: HistoryEntry = {
   action: null,
   label: null,
   rewards: null,
+  public_label: null,
+  bot_output: null,
 };
 
 let rendered: Rendered | undefined;

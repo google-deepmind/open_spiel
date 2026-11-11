@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "absl/algorithm/container.h"
 #include "open_spiel/utils/json.h"
 
 namespace open_spiel {

@@ -1,0 +1,25 @@
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_test(
+    name = "mfg_test",
+    srcs = ["mfg_test.py"],
+    deps = [
+        "//open_spiel/games/mfg:crowd_modelling",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:get_all_states",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)

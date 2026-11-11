@@ -16,18 +16,20 @@ import {type JSX, useState} from 'react';
 
 import {GameplayBoard} from '../board/board.tsx';
 import type {Frame} from '../contract/contract.ts';
-import {type Game, useGame} from './game_context.ts';
-import {seatToHandOver, statusLine} from './gameplay_state.ts';
+import {preparingMover, preparingText} from '../players/preparing.ts';
+import {RENDERERS} from '../renderers/registry.ts';
+import {useGame} from './game_context.ts';
+import {statusLine} from './gameplay_state.ts';
 
 import './game.css';
 
 /**
- * The Gameplay panel: one status line, then the board, and nothing else.
+ * The Gameplay panel: one status line, unless the board draws its own, then
+ * the board, and nothing else.
  * Moving is done in Actions; stepping through the positions, in Actions ›
- * History. The session's error, and the offer to hand the device over when
- * another person's seat is to move in a game that hides information, are
- * notices over the top of the board, which take no room: showing one never
- * moves the board.
+ * History. The session's error is a notice over the top of the board, which
+ * takes no room: showing one never moves the board. So is the seat to move
+ * preparing, on a board that draws its own status line.
  */
 export function GameplayPanel(): JSX.Element {
   const game = useGame();
@@ -36,9 +38,11 @@ export function GameplayPanel(): JSX.Element {
     <div className="gameplay">
       <div className="gameplay__notices">
         {error !== null && <ErrorNotice message={error.message} />}
-        {frame !== null && <HandOverNotice game={game} frame={frame} />}
+        {frame !== null && drawsStatus(frame) && (
+          <PreparingNotice frame={frame} />
+        )}
       </div>
-      {frame !== null && (
+      {frame !== null && !drawsStatus(frame) && (
         <p className="gameplay__status" role="status">
           {statusLine(frame)}
         </p>
@@ -48,6 +52,14 @@ export function GameplayPanel(): JSX.Element {
       </div>
     </div>
   );
+}
+
+// Whether the board draws its own turn and status, so the panel shows none.
+function drawsStatus(frame: Frame): boolean {
+  const {presentation} = frame;
+  if (presentation === null) return false;
+  if (RENDERERS.get(presentation.renderer) === null) return false;
+  return RENDERERS.options(presentation.renderer).drawsStatus === true;
 }
 
 /**
@@ -80,34 +92,19 @@ function ErrorNotice({message}: {message: string}): JSX.Element | null {
   );
 }
 
-function HandOverNotice({
-  game,
-  frame,
-}: {
-  readonly game: Game;
-  readonly frame: Frame;
-}): JSX.Element | null {
-  const seat = seatToHandOver(frame);
+// The seat to move, still being built, over a board that draws its status.
+function PreparingNotice({frame}: {readonly frame: Frame}): JSX.Element | null {
+  const seat = preparingMover(frame);
   if (seat === null) return null;
-  const name = `Player ${String(seat)}`;
-  const text = `${name} is to move, and plays from their own view.`;
+  const text = preparingText(frame.session.controllers, seat);
   return (
     <div
       className="gameplay__notice"
       data-tone="turn"
       role="status"
-      title={text}
+      title={seat.message ?? text}
     >
       <span className="gameplay__notice-text">{text}</span>
-      <button
-        type="button"
-        className="gameplay__notice-action"
-        onClick={() => {
-          game.handOver(seat);
-        }}
-      >
-        {`Hand over to ${name}`}
-      </button>
     </div>
   );
 }

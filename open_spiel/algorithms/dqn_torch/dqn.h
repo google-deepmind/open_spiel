@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "open_spiel/algorithms/dqn_torch/simple_nets.h"
-#include "open_spiel/abseil-cpp/absl/random/random.h"
+#include "absl/random/random.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

@@ -28,11 +28,22 @@ breaks them cannot be built.
 from collections.abc import Mapping, Sequence
 import dataclasses
 import enum
+import math
 from typing import Annotated, Literal
 
 # The contract's version, incremented on every change that breaks clients.
-ContractVersion = Literal[2]
-CONTRACT_VERSION: ContractVersion = 2
+ContractVersion = Literal[10]
+CONTRACT_VERSION: ContractVersion = 10
+
+# The most characters a seat's `SeatView.notice` holds.
+NOTICE_MAX_LENGTH = 200
+
+# The most characters a `BotOutput.decided_by` holds.
+DECIDED_BY_MAX_LENGTH = 40
+
+# How far above 1 the probabilities of a `BotOutput.policy` may sum, for
+# rounding.
+POLICY_SUM_TOLERANCE = 1e-3
 
 # The value of a game parameter or a controller setting.
 ParameterValue = bool | int | float | str
@@ -97,13 +108,34 @@ class SessionStatus(enum.StrEnum):
   Attributes:
     PLAYING: The game is in progress.
     PAUSED: A seat's controller failed; play resumes only after an undo, a
-      reset or a change of that seat's controller.
+      reset or a change of that seat's controller. A seat whose controller
+      could not be built (`SeatStatus.UNAVAILABLE`) resumes only after a
+      change of its controller.
     TERMINAL: The game is over.
   """
 
   PLAYING = "playing"
   PAUSED = "paused"
   TERMINAL = "terminal"
+
+
+class SeatStatus(enum.StrEnum):
+  """Whether a seat's controller is ready to play.
+
+  Attributes:
+    READY: The controller is built and plays the seat; a human seat is always
+      ready.
+    PREPARING: The server is building the controller, which can take a while
+      (a trained model loads and warms up). The seat does not move until it
+      is ready; then autoplay goes on.
+    UNAVAILABLE: The controller could not be built, or was not built within
+      the build budget. The seat has a `failure`, so the session is paused
+      until the seat is given a controller again.
+  """
+
+  READY = "ready"
+  PREPARING = "preparing"
+  UNAVAILABLE = "unavailable"
 
 
 class ChancePolicy(enum.StrEnum):
@@ -117,6 +149,26 @@ class ChancePolicy(enum.StrEnum):
 
   AUTO = "auto"
   EXPOSE = "expose"
+
+
+class MctsLimits(enum.StrEnum):
+  """How the served pyspiel's C++ MCTS (`pyspiel.MCTSBot`) bounds a search.
+
+  The server finds out once, at startup, and picks MCTS's limits by it.
+
+  Attributes:
+    SIMULATIONS_OR_CLOCK: A search stops at its simulation count or its
+      wall-clock time, whichever comes first. MCTS runs up to 10000
+      simulations, 1000 by default, with a wall-clock backstop a little
+      inside the move budget.
+    SIMULATIONS_ONLY: A wall-clock time replaces the simulation count rather
+      than bounding it. MCTS sets no wall-clock time, and its simulations are
+      capped at 250, which fits the move budget on the slowest catalogued
+      game.
+  """
+
+  SIMULATIONS_OR_CLOCK = "simulations_or_clock"
+  SIMULATIONS_ONLY = "simulations_only"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -165,7 +217,10 @@ class Controller:
     name: The stable identifier used in requests and in `SeatView.controller`.
     label: The human-readable name.
     config_schema: A JSON Schema object that a seat's `config` for this
-      controller must satisfy; `{}` when it takes no settings.
+      controller must satisfy; `{}` when it takes no settings. Each of its
+      `properties` gives a setting's `type`, `default` and constraints; a
+      setting listed in its `required` has no `default`, and a seat must be
+      given it.
     unavailable_reason: Why the controller cannot play the session's game;
       null when it can. A seat is never played by a controller with a
       reason.
@@ -204,6 +259,15 @@ class SeatView:
     autoplay: Whether the server plays the seat's moves as soon as it is to
       move, rather than on an advance request. Never true for a human seat.
     failure: Why the controller failed, or null while it plays.
+    status: Whether the controller is ready, being built, or could not be
+      built.
+    message: Why the seat is not ready, for every viewer: what the server is
+      doing while it is `preparing`, or why it is `unavailable`; null when it
+      is `ready`, and optional while it is `preparing`.
+    notice: The controller's short note about its latest choice, such as a
+      remote bot reporting something it recovered from; null when it gave
+      none. Only the seat's own viewer and omniscient viewers receive it. It
+      has no effect on play.
   """
 
   seat: int
@@ -211,11 +275,41 @@ class SeatView:
   config: dict[str, ParameterValue]
   autoplay: bool
   failure: ControllerFailure | None
+  status: SeatStatus = SeatStatus.READY
+  message: str | None = None
+  notice: str | None = None
 
   def __post_init__(self) -> None:
     require(
         not (self.autoplay and self.controller == HUMAN),
         f"Seat {self.seat} is human, so it cannot autoplay.",
+    )
+    require(
+        self.status == SeatStatus.READY or self.controller != HUMAN,
+        f"Seat {self.seat} is human, so it is always ready.",
+    )
+    require(
+        self.status != SeatStatus.READY or self.message is None,
+        f"Seat {self.seat} is ready, so it has no message.",
+    )
+    require(
+        self.status != SeatStatus.PREPARING or self.failure is None,
+        f"Seat {self.seat} is preparing, so it has not failed.",
+    )
+    require(
+        self.status != SeatStatus.UNAVAILABLE
+        or (self.failure is not None and self.message is not None),
+        f"Seat {self.seat} is unavailable, so it has a failure and a message.",
+    )
+    require(
+        self.notice is None
+        or (
+            self.controller != HUMAN
+            and bool(self.notice.strip())
+            and len(self.notice) <= NOTICE_MAX_LENGTH
+        ),
+        f"Seat {self.seat}'s notice is not a controller's non-blank text of "
+        f"at most {NOTICE_MAX_LENGTH} characters.",
     )
 
 
@@ -230,6 +324,38 @@ class Action:
 
   id: int
   label: str
+
+
+@dataclasses.dataclass(frozen=True)
+class ActionHint:
+  """What a game's adapter says about one legal action, for its renderer.
+
+  Attributes:
+    id: The legal action's OpenSpiel id.
+    hint: The adapter's description of the action, such as the card it plays
+      or the cells it joins.
+  """
+
+  id: int
+  hint: Json
+
+
+@dataclasses.dataclass(frozen=True)
+class Presentation:
+  """A position as the game's adapter presents it to one viewer.
+
+  Attributes:
+    renderer: The name of the client renderer that draws the view.
+    view: The adapter's view of the position, holding only what the viewer
+      may see.
+    actions: The adapter's hints for the legal actions, each naming an action
+      of the frame's `legal_actions` at most once; null exactly when the
+      frame's `legal_actions` is null.
+  """
+
+  renderer: str
+  view: Json
+  actions: tuple[ActionHint, ...] | None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -254,6 +380,90 @@ class ChanceOutcome:
 
 
 @dataclasses.dataclass(frozen=True)
+class PolicyEntry:
+  """One action of a bot's policy, with the probability it gave it.
+
+  Attributes:
+    action: The OpenSpiel action id, a legal action where the bot chose.
+      The schema's type admits null, but a history entry carries a bot
+      output only when its own action is given, and then every policy
+      entry's action is given too, so no frame holds a null one.
+    label: The game's text for the action.
+    prob: The probability the bot gave the action, in [0, 1].
+  """
+
+  action: int | None
+  label: str
+  prob: float
+
+  def __post_init__(self) -> None:
+    require(
+        0.0 <= self.prob <= 1.0,
+        f"Action {self.action} cannot have probability {self.prob}.",
+    )
+
+
+@dataclasses.dataclass(frozen=True)
+class BotOutput:
+  """What a bot said about one of its choices, beyond the action.
+
+  Attributes:
+    policy: The bot's probabilities over the legal actions where it chose,
+      most probable first, each action at most once; empty when it gave
+      none. Their sum is at most 1, as a bot may give only its likeliest
+      actions. Either every entry has its action or none does.
+    value: The bot's estimate of the position's value for its seat, or null
+      when it gave none.
+    decided_by: What part of the bot made the choice, such as `network`,
+      `search`, `scripted` or `forced`; null when it did not say.
+  """
+
+  policy: tuple[PolicyEntry, ...]
+  value: float | None
+  decided_by: str | None
+
+  def __post_init__(self) -> None:
+    actions = [entry.action for entry in self.policy]
+    probs = [entry.prob for entry in self.policy]
+    shown = [action for action in actions if action is not None]
+    require(
+        not shown or len(shown) == len(actions),
+        "A bot's policy shows every action's id or none.",
+    )
+    require(
+        len(set(shown)) == len(shown),
+        "A bot's policy names each action at most once.",
+    )
+    require(
+        probs == sorted(probs, reverse=True),
+        "A bot's policy lists its most probable action first.",
+    )
+    require(
+        sum(probs) <= 1.0 + POLICY_SUM_TOLERANCE,
+        f"A bot's policy cannot sum to {sum(probs)}.",
+    )
+    require(
+        self.value is None or math.isfinite(self.value),
+        f"A bot's value cannot be {self.value}.",
+    )
+    require(
+        self.decided_by is None
+        or (
+            bool(self.decided_by.strip())
+            and len(self.decided_by) <= DECIDED_BY_MAX_LENGTH
+        ),
+        "A bot's decided_by is non-blank text of at most "
+        f"{DECIDED_BY_MAX_LENGTH} characters.",
+    )
+    require(
+        bool(self.policy)
+        or self.value is not None
+        or self.decided_by is not None,
+        "A bot output says something.",
+    )
+
+
+@dataclasses.dataclass(frozen=True)
 class HistoryEntry:
   """One action of the live game, as the viewer may see it.
 
@@ -263,17 +473,49 @@ class HistoryEntry:
     label: The game's text for the action, or null when withheld.
     rewards: Each seat's reward for the action, in seat order, or null when
       withheld.
+    public_label: What every viewer may read of a withheld action, as the
+      game's adapter says, such as a card discarded face up; null when the
+      action is shown in full or wholly hidden.
+    bot_output: What the seat's controller said about the action: its
+      policy, value and what decided it. It goes with the action in full: to
+      an omniscient viewer and to the seat's own, and null for any other
+      viewer, since in a game that hides information a bot's policy, value
+      and what decided its move all follow from its hand. Null also when the
+      controller said nothing.
   """
 
   seat: int | None
   action: int | None
   label: str | None
   rewards: tuple[float, ...] | None
+  public_label: str | None = None
+  bot_output: BotOutput | None = None
 
   def __post_init__(self) -> None:
     require(
         (self.action is None) == (self.label is None) == (self.rewards is None),
         "A history entry withholds its action, label and rewards together.",
+    )
+    require(
+        self.public_label is None or self.action is None,
+        "Only a withheld history entry has a public label.",
+    )
+    require(
+        self.bot_output is None or self.seat is not None,
+        "Only a seat's history entry has a bot output.",
+    )
+    require(
+        self.bot_output is None
+        or all(
+            (entry.action is None) == (self.action is None)
+            for entry in self.bot_output.policy
+        ),
+        "A history entry withholds its bot's policy ids with its action.",
+    )
+    require(
+        self.bot_output is None or self.action is not None,
+        "A history entry withheld from the viewer carries no bot output: a"
+        " bot's output tells of its hand.",
     )
 
   @property
@@ -322,6 +564,24 @@ class SessionInfo:
         ),
         "A session offers the human controller.",
     )
+
+
+@dataclasses.dataclass(frozen=True)
+class SessionClosed:
+  """The answer to closing a session: the server has forgotten it.
+
+  Attributes:
+    contract_version: The contract version the answer was built against.
+    id: The id of the session closed.
+  """
+
+  contract_version: ContractVersion = dataclasses.field(
+      default=CONTRACT_VERSION, kw_only=True
+  )
+  id: str
+
+  def __post_init__(self) -> None:
+    require(bool(self.id), "A closed session has an id.")
 
 
 def to_json(value: object) -> JsonValue:

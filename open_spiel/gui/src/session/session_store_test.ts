@@ -361,12 +361,12 @@ describe('SessionStore hidden information', () => {
   });
 });
 
-describe('SessionStore hand-over', () => {
+describe('SessionStore, the viewer changed mid-request', () => {
   beforeEach(() => {
     serve(true);
   });
 
-  it('sends an action as the seat that took it, after a hand-over', async () => {
+  it('sends an action as the seat that took it, after a viewer change', async () => {
     serve(true, SEAT_0);
     store.create(COUNT);
     await settle(store);
@@ -387,7 +387,7 @@ describe('SessionStore hand-over', () => {
     expect(actions(shown(store))).toEqual([null]);
   });
 
-  it("sends the oracle's reset as the oracle, after a hand-over", async () => {
+  it("sends the oracle's reset as the oracle, after a viewer change", async () => {
     await play(1, 0, 1);
     server.hold();
     store.reset([1]);
@@ -432,6 +432,42 @@ describe('SessionStore failures', () => {
     server.release();
     await settle(store);
     expect(shown(store).ply).toBe(1);
+  });
+});
+
+describe('SessionStore action sequences', () => {
+  it('answers a sequence with the frame after its last action', async () => {
+    await play();
+    const frame = await store.actSequence([1, 0]);
+    await settle(store);
+    expect(frame.ply).toBe(2);
+    expect(shown(store)).toBe(frame);
+    expect(server.history('session-1')).toEqual([1, 0]);
+  });
+
+  it('shows the position the server is at after a refusal partway through', async () => {
+    await play(1);
+    const refused = store.actSequence([0, 7, 1]);
+    store.act(1);
+    await expect(refused).rejects.toMatchObject({code: 'illegal_action'});
+    await settle(store);
+    // The action before the refusal was played: the store shows it, says
+    // nothing itself (the board that sent the sequence does), and drops
+    // the command queued behind.
+    expect(server.history('session-1')).toEqual([1, 0]);
+    expect(shown(store)).toMatchObject({ply: 2, num_plies: 2});
+    expect(store.getSnapshot().error).toBeNull();
+  });
+
+  it('keeps the frame when the first action is refused', async () => {
+    await play(1);
+    await expect(store.actSequence([7, 0])).rejects.toBeInstanceOf(
+      ContractError,
+    );
+    await settle(store);
+    expect(server.history('session-1')).toEqual([1]);
+    expect(shown(store)).toMatchObject({ply: 1, num_plies: 1});
+    expect(store.getSnapshot().error).toBeNull();
   });
 });
 

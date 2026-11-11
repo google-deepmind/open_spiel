@@ -90,8 +90,6 @@ function Panel({
           entry,
           session,
           viewer,
-          setViewer,
-          handOver: () => undefined,
         }}
       >
         <SetupPanel />

@@ -258,6 +258,14 @@ class Api:
     session = self._sessions.get(req.session_id)
     return _ok(session.reset(viewer, history=body.history or ()))
 
+  def _close(self, req: _Request) -> Response:
+    """Forgets a session; any viewer but a spectator closes it."""
+    viewer = req.viewer()
+    session = self._sessions.get(req.session_id)
+    session.check_closer(viewer)
+    self._sessions.delete(req.session_id)
+    return _ok(contract.SessionClosed(id=req.session_id))
+
   def _seat(self, req: _Request) -> Response:
     """Changes a seat's controller."""
     viewer, seat = req.viewer(), req.index("seat")
@@ -274,6 +282,7 @@ class Api:
       _route("GET", "games", _catalogue),
       _route("POST", "sessions", _create),
       _route("GET", "sessions/{id}", _frame),
+      _route("DELETE", "sessions/{id}", _close),
       _route("GET", "sessions/{id}/plies/{ply}", _replay),
       _route("POST", "sessions/{id}/actions", _action),
       _route("POST", "sessions/{id}/chance", _chance),

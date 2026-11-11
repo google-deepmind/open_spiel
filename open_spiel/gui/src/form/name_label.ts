@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Words a label writes in capitals, as people write them.
+const ACRONYMS: ReadonlyMap<string, string> = new Map([['url', 'URL']]);
+
 /**
  * A setting's name for people: its words capitalised, so `board_size` and
- * `boardSize` read "Board Size".
+ * `boardSize` read "Board Size", and `url` reads "URL".
  */
 export function nameLabel(name: string): string {
   return name
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
     .split(/[_\s]+/)
     .filter(word => word !== '')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(
+      word =>
+        ACRONYMS.get(word.toLowerCase()) ??
+        word.charAt(0).toUpperCase() + word.slice(1),
+    )
     .join(' ');
 }

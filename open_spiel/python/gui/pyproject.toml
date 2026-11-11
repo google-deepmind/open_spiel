@@ -55,8 +55,29 @@ enable_error_code = [
 
 # pyspiel has no stubs, and the rest of OpenSpiel is not annotated.
 [[tool.mypy.overrides]]
-module = ["pyspiel", "open_spiel.python.games", "open_spiel.python.games.*"]
+module = [
+    "pyspiel",
+    "open_spiel.python.algorithms",
+    "open_spiel.python.algorithms.*",
+    "open_spiel.python.games",
+    "open_spiel.python.games.*",
+]
 ignore_missing_imports = true
+
+# absltest's assertLen and assertEmpty carry no annotations. mypy names a
+# method call by the caller's class (CliTest.assertLen), so
+# untyped_calls_exclude cannot reach them; the tests that call them are listed.
+[[tool.mypy.overrides]]
+module = [
+    "open_spiel.python.gui.api_test",
+    "open_spiel.python.gui.cli_test",
+    "open_spiel.python.gui.controllers_test",
+    "open_spiel.python.gui.server_test",
+    "open_spiel.python.gui.session_history_test",
+    "open_spiel.python.gui.session_test",
+    "open_spiel.python.gui.store_test",
+]
+disallow_untyped_calls = false
 
 # Google Python Style Guide settings, with OpenSpiel's two-space indentation.
 # The too-many-* design checks stay off, as in Google's own pylintrc; the
@@ -89,7 +110,8 @@ enable = ["useless-suppression"]
 indent-string = "  "
 indent-after-paren = 4
 max-line-length = 80
-max-module-lines = 500
+# 600, not the TypeScript 500: pylint counts docstrings and comments.
+max-module-lines = 600
 ignore-long-lines = '^\s*(# )?<?https?://\S+>?$'
 
 [tool.pylint.design]

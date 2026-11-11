@@ -21,11 +21,11 @@
 #include <random>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/random/poisson_distribution.h"
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "absl/random/poisson_distribution.h"
+#include "absl/random/uniform_int_distribution.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

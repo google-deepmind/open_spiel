@@ -17,9 +17,9 @@
 #include <iostream>
 #include <limits>
 
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/random/distributions.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 #include "open_spiel/bots/xinxin/hearts/Hearts.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/spiel.h"

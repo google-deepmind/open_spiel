@@ -36,6 +36,8 @@ export function entries(labels: readonly string[]): HistoryEntry[] {
     action: index,
     label,
     rewards: [0, 0],
+    public_label: null,
+    bot_output: null,
   }));
 }
 
@@ -46,7 +48,7 @@ export function entries(labels: readonly string[]): HistoryEntry[] {
 export function frame(fields: Partial<Frame> = {}): Frame {
   const history = fields.history ?? [];
   return {
-    contract_version: 2,
+    contract_version: 10,
     session: {
       id: 'session-1',
       game: 'game',
@@ -80,6 +82,9 @@ export function frame(fields: Partial<Frame> = {}): Frame {
       config: {},
       autoplay: false,
       failure: null,
+      status: 'ready',
+      message: null,
+      notice: null,
     })),
     ply: history.length,
     num_plies: history.length,
@@ -93,6 +98,8 @@ export function frame(fields: Partial<Frame> = {}): Frame {
     observation_text: null,
     information_state_text: null,
     struct: null,
+    observation_struct: null,
+    presentation: null,
     ...fields,
   };
 }
@@ -103,9 +110,11 @@ export function session(shown: Frame | null, busy = false): Session {
     create: vi.fn(),
     open: vi.fn(),
     refresh: vi.fn(),
+    poll: vi.fn(),
     goTo: vi.fn(),
     step: vi.fn(),
     act: vi.fn(),
+    actSequence: vi.fn(),
     chooseChance: vi.fn(),
     advance: vi.fn(),
     undo: vi.fn(),

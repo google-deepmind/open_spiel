@@ -1,0 +1,133 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_binary", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+pytype_strict_library(
+    name = "openspiel_api",
+    srcs = ["openspiel_api.py"],
+    deps = [
+        ":world_representation",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "world_representation",
+    srcs = ["world_representation.py"],
+)
+
+pytype_strict_library(
+    name = "cfr_cluster",
+    srcs = [
+        "cfr.py",
+        "game_tree_utils.py",
+        "typing.py",
+    ],
+    deps = [
+        ":openspiel_api",
+        "@py_deps//jax",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    deps = [
+        ":cfr_cluster",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "models",
+    srcs = ["models.py"],
+    deps = [
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_library(
+    name = "dataset_generator",
+    srcs = ["dataset_generator.py"],
+    deps = [
+        ":cfr_cluster",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "meta_learning",
+    srcs = ["meta_learning.py"],
+    deps = [
+        ":cfr_cluster",
+        ":dataset_generator",
+        ":models",
+        ":openspiel_api",
+        ":utils",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/logging",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_library(
+    name = "evaluation",
+    srcs = ["evaluation.py"],
+    deps = ["@py_deps//absl/flags"],
+)
+
+py_test(
+    name = "cfr_test",
+    srcs = ["cfr_test.py"],
+    deps = [
+        ":cfr_cluster",
+        ":openspiel_api",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "meta_learning_test",
+    srcs = ["meta_learning_test.py"],
+    deps = [
+        ":meta_learning",
+        ":models",
+        ":openspiel_api",
+        "@py_deps//absl/flags",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//mock",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+pytype_strict_binary(
+    name = "main",
+    srcs = ["main.py"],
+    deps = [
+        ":cfr_cluster",
+        ":evaluation",
+        ":meta_learning",
+        ":openspiel_api",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+        "@py_deps//numpy",
+    ],
+)

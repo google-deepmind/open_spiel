@@ -1,0 +1,264 @@
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "rcfr",
+    srcs = ["rcfr.py"],
+    strict_deps = True,
+    deps = [
+        ":deep_cfr",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_library(
+    name = "dqn",
+    srcs = ["dqn.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "boltzmann_dqn",
+    srcs = ["boltzmann_dqn.py"],
+    strict_deps = True,
+    deps = [
+        ":dqn",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "boltzmann_dqn_pytorch_test",
+    size = "small",
+    srcs = ["boltzmann_dqn_pytorch_test.py"],
+    deps = [
+        ":boltzmann_dqn",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_library(
+    name = "deep_cfr",
+    srcs = ["deep_cfr.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "escher",
+    srcs = ["escher.py"],
+    strict_deps = True,
+    deps = [
+        ":deep_cfr",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "rl_losses",
+    srcs = ["losses/rl_losses.py"],
+    strict_deps = True,
+    deps = ["@py_deps//torch:pytorch"],
+)
+
+py_library(
+    name = "policy_gradient",
+    srcs = ["policy_gradient.py"],
+    strict_deps = True,
+    deps = [
+        ":rl_losses",
+        "//open_spiel/python:rl_agent",
+        "@py_deps//absl/logging",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "policy_gradient_pytorch_test",
+    size = "small",
+    srcs = ["policy_gradient_pytorch_test.py"],
+    deps = [
+        ":policy_gradient",
+        ":rl_losses",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/algorithms:exploitability",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_library(
+    name = "neurd",
+    srcs = ["neurd.py"],
+    strict_deps = True,
+    deps = [
+        ":rcfr",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_library(
+    name = "nfsp",
+    srcs = ["nfsp.py"],
+    strict_deps = True,
+    deps = [
+        ":dqn",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+        "@py_deps//tree",
+    ],
+)
+
+py_library(
+    name = "ppo",
+    srcs = ["ppo.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python:rl_agent",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "deep_cfr_pytorch_test",
+    srcs = ["deep_cfr_pytorch_test.py"],
+    deps = [
+        ":deep_cfr",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/logging",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "dqn_pytorch_test",
+    srcs = ["dqn_pytorch_test.py"],
+    deps = [
+        ":dqn",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "escher_test",
+    srcs = ["escher_test.py"],
+    deps = [
+        ":escher",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "rl_losses_pytorch_test",
+    srcs = ["losses/rl_losses_pytorch_test.py"],
+    deps = [
+        ":rl_losses",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "neurd_pytorch_test",
+    srcs = ["neurd_pytorch_test.py"],
+    deps = [
+        ":neurd",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "nfsp_pytorch_test",
+    srcs = ["nfsp_pytorch_test.py"],
+    deps = [
+        ":nfsp",
+        "//open_spiel/python:rl_environment",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+py_test(
+    name = "ppo_pytorch_test",
+    srcs = ["ppo_pytorch_test.py"],
+    deps = [
+        ":ppo",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python:vector_env",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+        "@py_deps//torch:pytorch",
+    ],
+)
+
+# RCFR PyTorch test causing problems. Disabled for now.
+# py_test(
+#    name = "rcfr_pytorch_test",
+#    srcs = ["rcfr_pytorch_test.py"],
+#    deps = [
+#        ":rcfr",
+#        "//open_spiel/python/pybind11:pyspiel",
+#        "@py_deps//absl/testing:absltest",
+#        "@py_deps//absl/testing:parameterized",
+#        "@py_deps//numpy",
+#        "@py_deps//torch:pytorch",
+#    ],
+#)

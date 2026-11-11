@@ -23,9 +23,9 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
-#include "open_spiel/json/include/nlohmann/json_fwd.hpp"
+#include "absl/strings/str_cat.h"
+#include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/utils/nlohmann_json.h"  // IWYU pragma: keep

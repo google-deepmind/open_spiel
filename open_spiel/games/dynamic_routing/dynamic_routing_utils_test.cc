@@ -19,8 +19,8 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/memory/memory.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

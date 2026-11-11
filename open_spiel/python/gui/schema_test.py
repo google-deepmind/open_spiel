@@ -99,7 +99,7 @@ class SchemaTest(absltest.TestCase):
     self.assertEqual(set(_properties("Frame")["struct"]), {"description"})
 
   def test_the_contract_version_is_a_constant(self) -> None:
-    for name in ("Frame", "Catalogue", "Health", "Error"):
+    for name in ("Frame", "Catalogue", "Health", "SessionClosed", "Error"):
       with self.subTest(name):
         self.assertEqual(
             _properties(name)["contract_version"]["const"],

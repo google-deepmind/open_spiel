@@ -17,7 +17,7 @@
 #include <memory>
 #include <numeric>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "absl/strings/str_join.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/spiel_utils.h"

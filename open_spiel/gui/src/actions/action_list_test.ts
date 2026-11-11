@@ -14,20 +14,14 @@
 
 import {describe, expect, it} from 'vitest';
 
-import type {Action} from '../contract/contract.ts';
 import {
   OVERSCAN_ROWS,
   ROW_STRIDE_PX,
   clampScrollTop,
-  duplicateLabelIds,
   scrollTopShowing,
   sortById,
   windowRange,
 } from './action_list.ts';
-
-function labelled(...labels: string[]): Action[] {
-  return labels.map((label, id) => ({id, label}));
-}
 
 describe('sortById', () => {
   it('orders by id and leaves its input alone', () => {
@@ -38,17 +32,6 @@ describe('sortById', () => {
     ];
     expect(sortById(given).map(action => action.id)).toEqual([1, 2, 3]);
     expect(given.map(action => action.id)).toEqual([3, 1, 2]);
-  });
-});
-
-describe('duplicateLabelIds', () => {
-  it('names every action whose label is shared', () => {
-    const all = labelled('Draw', 'Play', 'Draw', 'Pass', 'Draw', 'Play2');
-    expect([...duplicateLabelIds(all)].sort()).toEqual([0, 2, 4]);
-  });
-
-  it('is empty when every label differs', () => {
-    expect(duplicateLabelIds(labelled('a', 'b')).size).toBe(0);
   });
 });
 

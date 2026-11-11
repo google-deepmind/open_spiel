@@ -1,0 +1,40 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "base_envs",
+    srcs = [
+        "debate_with_style_info.py",
+        "email_plain.py",
+        "email_with_tone.py",
+        "email_with_tone_info.py",
+        "schedule_meeting_with_dow_info.py",
+        "schedule_meeting_with_info.py",
+        "schedule_meeting_with_tone_info.py",
+        "trade_fruit_with_info.py",
+        "trade_fruit_with_tone_info.py",
+    ],
+    deps = [
+        "//open_spiel/python/games/chat_games/envs/comm_substrates",
+        "//open_spiel/python/games/chat_games/envs/scenarios/domains",
+        "//open_spiel/python/games/chat_games/envs/utils",
+    ],
+)
+
+py_test(
+    name = "base_envs_test",
+    srcs = ["base_envs_test.py"],
+    deps = [
+        ":base_envs",
+        "//open_spiel/python/games/chat_games/envs/utils",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)

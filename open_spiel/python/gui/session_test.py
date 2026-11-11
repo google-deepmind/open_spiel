@@ -18,7 +18,7 @@
 Undo, reset and replay are tested in session_history_test.py.
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 import contextlib
 import dataclasses
 from unittest import mock
@@ -96,16 +96,16 @@ def _non_humans_played_by(
     controller: object,
 ) -> contextlib.AbstractContextManager[object]:
   """Builds every seat that is not a human's as `controller`."""
-  create = controllers.create
+  builder = controllers.builder
 
-  def fake_create(
-      spec: controllers.Spec, game: pyspiel.Game, *, seed: int
-  ) -> object:
+  def fake_builder(
+      spec: controllers.Spec, game: pyspiel.Game
+  ) -> Callable[[int], object]:
     if spec.kind == controllers.HUMAN:
-      return create(spec, game, seed=seed)
-    return controller
+      return builder(spec, game)
+    return lambda _: controller
 
-  return mock.patch.object(controllers, "create", side_effect=fake_create)
+  return mock.patch.object(controllers, "builder", side_effect=fake_builder)
 
 
 class CreateTest(absltest.TestCase):

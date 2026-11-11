@@ -16,8 +16,8 @@
 
 #include <random>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_replace.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
 #include "open_spiel/games/bridge/bridge_uncontested_bidding.h"
 #include "open_spiel/spiel.h"

@@ -17,11 +17,26 @@
 
 A client sends a controller's settings as JSON. `schema` describes them, and
 `parse` checks what a client sent against them and fills in the defaults.
+
+A setting is a boolean, an integer, a number or a string. One with a default
+may be left out; one declared with `default=REQUIRED` must be sent. A number
+may be bounded; a string may be bounded in length and held to a pattern; a
+string or a number may be held to a closed set of `choices`. For example, a
+controller that plays a checkpoint takes:
+
+  Setting("checkpoint", str, REQUIRED, "The checkpoint to play.",
+          min_length=1)
+  Setting("deterministic", bool, True, "Whether it plays its best move.")
+  Setting("temperature", float, 1.0, "The sampling temperature.",
+          minimum=0.0)
 """
 
 from collections.abc import Mapping, Sequence
 import dataclasses
+import enum
 import math
+import re
+from typing import Final
 
 from open_spiel.python.gui import contract
 
@@ -29,7 +44,7 @@ from open_spiel.python.gui import contract
 Config = Mapping[str, contract.ParameterValue]
 
 # The Python type a setting takes.
-SettingType = type[bool] | type[int] | type[float]
+SettingType = type[bool] | type[int] | type[float] | type[str]
 
 # The longest client-sent text an error message repeats.
 _MAX_SHOWN = 40
@@ -39,18 +54,34 @@ _JSON_TYPES: Mapping[SettingType, str] = {
     bool: "boolean",
     int: "integer",
     float: "number",
+    str: "string",
 }
 _ACCEPTED: Mapping[SettingType, tuple[type[object], ...]] = {
     bool: (bool,),
     int: (int,),
     float: (int, float),
+    str: (str,),
 }
+
+
+class _Required(enum.Enum):
+  """The marker of a setting that has no default: `REQUIRED`."""
+
+  REQUIRED = "REQUIRED"
+
+  def __repr__(self) -> str:
+    return "REQUIRED"
+
+
+# The default of a setting a client must send.
+REQUIRED: Final = _Required.REQUIRED
 
 
 class InvalidSettingError(ValueError):
   """A client sent a setting the controller does not take, or a bad value.
 
-  The message is safe to show to anyone.
+  Also the error of a client that leaves out a required setting. The message
+  is safe to show to anyone.
   """
 
 
@@ -62,37 +93,131 @@ def shown(value: object) -> str:
   return f"{text[:_MAX_SHOWN]}..."
 
 
+def _characters(count: int) -> str:
+  """Returns "1 character" or "`count` characters"."""
+  return "1 character" if count == 1 else f"{count} characters"
+
+
 @dataclasses.dataclass(frozen=True)
 class Setting:
-  """One setting of a controller, and the bounds that it must lie within.
+  """One setting of a controller, and the values that it admits.
+
+  The constructor checks the declaration, so a controller cannot declare a
+  setting whose default its own constraints refuse.
 
   Attributes:
     name: The setting's name, as a client sends it.
-    kind: The setting's type.
-    default: The value a client that leaves the setting out gets.
+    kind: The setting's type: bool, int, float or str.
+    default: The value a client that leaves the setting out gets, or
+      `REQUIRED` for a setting a client must send.
     description: What the setting does, for a client to show.
-    minimum: The least value the setting takes, or None for no bound.
-    maximum: The greatest value the setting takes, or None for no bound.
+    minimum: The least value a number setting takes, or None for no bound.
+    maximum: The greatest value a number setting takes, or None for no bound.
+    min_length: The fewest characters a string setting takes, or None.
+    max_length: The most characters a string setting takes, or None.
+    pattern: A regular expression a string setting must contain a match of,
+      as JSON Schema's `pattern` does; anchor it with ^ and $ to match the
+      whole string. Keep to the syntax Python and JavaScript share, since a
+      client checks it too. None for no pattern.
+    choices: The only values the setting takes, for a string or number
+      setting, in the order a client offers them; None for no closed set.
   """
 
   name: str
   kind: SettingType
-  default: contract.ParameterValue
+  default: contract.ParameterValue | _Required
   description: str
   minimum: float | None = None
   maximum: float | None = None
+  min_length: int | None = None
+  max_length: int | None = None
+  pattern: str | None = None
+  choices: tuple[contract.ParameterValue, ...] | None = None
+
+  def __post_init__(self) -> None:
+    if self.kind not in _JSON_TYPES:
+      raise ValueError(
+          f"Setting {self.name!r} has kind {self.kind!r}, not bool, int, "
+          "float or str."
+      )
+    is_number = self.kind in (int, float)
+    if not is_number and (self.minimum is not None or self.maximum is not None):
+      raise ValueError(f"Setting {self.name!r} is not a number to bound.")
+    is_string = self.kind is str
+    has_text_constraint = (
+        self.min_length is not None
+        or self.max_length is not None
+        or self.pattern is not None
+    )
+    if not is_string and has_text_constraint:
+      raise ValueError(
+          f"Setting {self.name!r} is not a string to bound in length or "
+          "hold to a pattern."
+      )
+    for length in (self.min_length, self.max_length):
+      if length is not None and length < 0:
+        raise ValueError(
+            f"Setting {self.name!r} has length bound {length!r}, not a "
+            "whole number of characters."
+        )
+    if (
+        self.min_length is not None
+        and self.max_length is not None
+        and self.min_length > self.max_length
+    ):
+      raise ValueError(f"Setting {self.name!r} admits no length.")
+    if self.pattern is not None:
+      try:
+        re.compile(self.pattern)
+      except re.error as e:
+        raise ValueError(
+            f"Setting {self.name!r} has an invalid pattern: {e}."
+        ) from e
+    if self.choices is not None:
+      if self.kind is bool:
+        raise ValueError(
+            f"Setting {self.name!r} is a boolean, which has its own choices."
+        )
+      if not self.choices or len(set(self.choices)) != len(self.choices):
+        raise ValueError(
+            f"Setting {self.name!r} has no choices, or repeats one."
+        )
+      for choice in self.choices:
+        self._check_declared(choice, "choice")
+    if self.default is not REQUIRED:
+      self._check_declared(self.default, "default")
+
+  def _check_declared(self, value: contract.ParameterValue, what: str) -> None:
+    """Raises ValueError if the setting refuses its own `value`."""
+    try:
+      self.parse(value)
+    except InvalidSettingError as e:
+      raise ValueError(f"The {what} is refused: {e}") from e
+
+  @property
+  def required(self) -> bool:
+    """Whether a client must send the setting, having no default."""
+    return self.default is REQUIRED
 
   def schema(self) -> dict[str, contract.Json]:
     """Returns the setting's JSON Schema."""
-    result: dict[str, contract.Json] = {
-        "type": _JSON_TYPES[self.kind],
-        "default": self.default,
-        "description": self.description,
+    result: dict[str, contract.Json] = {"type": _JSON_TYPES[self.kind]}
+    if self.default is not REQUIRED:
+      result["default"] = self.default
+    result["description"] = self.description
+    optional: dict[str, contract.Json | None] = {
+        "minimum": self.minimum,
+        "maximum": self.maximum,
+        "minLength": self.min_length,
+        "maxLength": self.max_length,
+        "pattern": self.pattern,
+        "enum": None if self.choices is None else list(self.choices),
     }
-    if self.minimum is not None:
-      result["minimum"] = self.minimum
-    if self.maximum is not None:
-      result["maximum"] = self.maximum
+    result.update(
+        (keyword, value)
+        for keyword, value in optional.items()
+        if value is not None
+    )
     return result
 
   def _bounds(self) -> str:
@@ -105,6 +230,15 @@ class Setting:
       return f"is at most {self.maximum}"
     return "is a finite number"
 
+  def _lengths(self) -> str:
+    """Describes the lengths the setting's length bounds admit."""
+    if self.min_length is not None and self.max_length is not None:
+      return f"{self.min_length} to {self.max_length} characters long"
+    if self.min_length is not None:
+      return f"at least {_characters(self.min_length)} long"
+    assert self.max_length is not None, self.name
+    return f"at most {_characters(self.max_length)} long"
+
   def parse(self, value: contract.ParameterValue) -> contract.ParameterValue:
     """Returns `value` as the setting's type.
 
@@ -112,8 +246,10 @@ class Setting:
       value: The value a client sent.
 
     Raises:
-      InvalidSettingError: If `value` has the wrong type, is not finite or
-        lies out of bounds. A boolean is never taken for a number.
+      InvalidSettingError: If `value` has the wrong type, is not finite, lies
+        out of bounds, has a length out of bounds, does not match the
+        pattern or is not one of the choices. A boolean is never taken for a
+        number.
     """
     # bool subclasses int, so a boolean must be refused for a number, and a
     # number for a boolean, before the type itself is checked.
@@ -124,8 +260,39 @@ class Setting:
           f"Setting {self.name!r} takes {_JSON_TYPES[self.kind]} values, not "
           f"{shown(value)}."
       )
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
+    parsed: contract.ParameterValue
+    if isinstance(value, str):
+      parsed = self._parse_string(value)
+    elif isinstance(value, bool):
       return value  # A boolean, for a boolean setting.
+    else:
+      parsed = self._parse_number(value)
+    if self.choices is not None and parsed not in self.choices:
+      raise InvalidSettingError(
+          f"Setting {self.name!r} is one of "
+          f"{', '.join(map(shown, self.choices))}, so it cannot be "
+          f"{shown(value)}."
+      )
+    return parsed
+
+  def _parse_string(self, value: str) -> str:
+    """Returns `value`, a string, if its length and pattern are admitted."""
+    if (self.min_length is not None and len(value) < self.min_length) or (
+        self.max_length is not None and len(value) > self.max_length
+    ):
+      raise InvalidSettingError(
+          f"Setting {self.name!r} is {self._lengths()}, so it cannot be "
+          f"{shown(value)}."
+      )
+    if self.pattern is not None and re.search(self.pattern, value) is None:
+      raise InvalidSettingError(
+          f"Setting {self.name!r} matches {shown(self.pattern)}, so it cannot "
+          f"be {shown(value)}."
+      )
+    return value
+
+  def _parse_number(self, value: int | float) -> int | float:
+    """Returns `value`, a number, as the setting's type, if within bounds."""
     try:
       number = float(value)
     except OverflowError:  # An integer too large for a float.
@@ -139,18 +306,26 @@ class Setting:
           f"Setting {self.name!r} {self._bounds()}, so it cannot be "
           f"{shown(value)}."
       )
-    return self.kind(value)
+    return int(value) if self.kind is int else float(value)
 
 
 def schema(settings: Sequence[Setting]) -> dict[str, contract.Json]:
-  """Returns the JSON Schema of a controller that takes `settings`."""
+  """Returns the JSON Schema of a controller that takes `settings`.
+
+  The schema lists the settings a client must send in `required`, which it
+  leaves out when there are none.
+  """
   if not settings:
     return {}
-  return {
+  result: dict[str, contract.Json] = {
       "type": "object",
       "properties": {setting.name: setting.schema() for setting in settings},
       "additionalProperties": False,
   }
+  required = [setting.name for setting in settings if setting.required]
+  if required:
+    result["required"] = required
+  return result
 
 
 def parse(
@@ -164,8 +339,8 @@ def parse(
     label: The controller's human-readable name, for the error message.
 
   Raises:
-    InvalidSettingError: If `config` names an unknown setting or holds an
-      invalid value.
+    InvalidSettingError: If `config` names an unknown setting, leaves out a
+      required one or holds an invalid value.
   """
   known = {setting.name: setting for setting in settings}
   unknown = sorted(set(config) - set(known))
@@ -173,7 +348,18 @@ def parse(
     raise InvalidSettingError(
         f"{label} takes no setting {', '.join(map(shown, unknown))}."
     )
-  return {
-      name: setting.parse(config.get(name, setting.default))
+  missing = [
+      name
       for name, setting in known.items()
-  }
+      if setting.required and name not in config
+  ]
+  if missing:
+    raise InvalidSettingError(
+        f"{label} needs the setting {', '.join(map(shown, missing))}."
+    )
+  parsed: dict[str, contract.ParameterValue] = {}
+  for name, setting in known.items():
+    value = config.get(name, setting.default)
+    assert not isinstance(value, _Required), name  # Refused as missing above.
+    parsed[name] = setting.parse(value)
+  return parsed

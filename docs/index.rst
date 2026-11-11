@@ -15,6 +15,7 @@ Welcome to OpenSpiel's documentation!
    concepts
    api_reference
    algorithms
+   scale
    games
    Playing games in a browser<gui>
 

@@ -19,8 +19,8 @@
 #include "open_spiel/algorithms/corr_dev_builder.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/cast.h"
+#include "pybind11/pybind11.h"
 
 namespace open_spiel {
 namespace py = ::pybind11;

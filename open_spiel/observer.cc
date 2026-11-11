@@ -16,10 +16,10 @@
 
 #include <memory>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "absl/algorithm/container.h"
+#include "absl/memory/memory.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/string_view.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

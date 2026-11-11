@@ -19,11 +19,11 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "open_spiel/games/crossword/crossword.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "absl/random/distributions.h"
+#include "absl/strings/str_cat.h"
 #include "open_spiel/games/crossword/crossword_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"

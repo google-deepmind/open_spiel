@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/types/optional.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/universal_poker.h"
 #include "open_spiel/spiel.h"

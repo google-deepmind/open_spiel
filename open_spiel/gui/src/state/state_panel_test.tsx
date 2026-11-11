@@ -64,13 +64,26 @@ describe('StatePanel', () => {
     expect(only(text, 'pre').tabIndex).toBe(0);
   });
 
-  it('shows returns and rewards as compact text with no copy icon', async () => {
+  it('shows returns and rewards as compact text with a copy icon', async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    stubProperty(navigator, 'clipboard', {writeText});
     const container = await show('kuhn_poker/oracle/live');
     const returns = openTab(container, 'Returns');
-    expect(returns.querySelector('button')).toBeNull();
     const text = only(returns, 'pre');
     expect(text.classList).toContain('copyable__text--compact');
     expect(text.textContent).toBe('Player 0: -2\nPlayer 1: 2');
+    const copy = only(returns, '.copy-button');
+    expect(copy.getAttribute('aria-label')).toBe('Copy to clipboard');
+    await act(async () => {
+      copy.click();
+      await Promise.resolve();
+    });
+    expect(writeText).toHaveBeenCalledExactlyOnceWith(
+      'Player 0: -2\nPlayer 1: 2',
+    );
+    expect(copy.getAttribute('aria-label')).toBe('Copied');
+    const rewards = openTab(container, 'Rewards');
+    expect(only(rewards, '.copy-button')).toBeTruthy();
   });
 
   it('copies the text with the icon in its card', async () => {
@@ -78,7 +91,10 @@ describe('StatePanel', () => {
     stubProperty(navigator, 'clipboard', {writeText});
     const container = await show('kuhn_poker/0/3');
     expect(tabs(container)).toEqual(['Observation', 'Rewards']);
-    const copy = only(container, '.copy-button');
+    const copy = only(
+      container,
+      '[role="tabpanel"]:not([hidden]) .copy-button',
+    );
     expect(copy.getAttribute('aria-label')).toBe('Copy to clipboard');
     await act(async () => {
       copy.click();

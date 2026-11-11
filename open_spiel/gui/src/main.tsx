@@ -15,12 +15,16 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 
+import {loadAddOns} from './addons.ts';
 import {App} from './app.tsx';
 import {ThemeProvider} from './theme/theme_provider.tsx';
 
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/dock.css';
+
+// The user's own add-ons, should addons/ hold any (src/addons.ts).
+loadAddOns(import.meta.glob('../addons/*.{ts,tsx}', {eager: true}));
 
 const container = document.getElementById('root');
 if (container === null) {

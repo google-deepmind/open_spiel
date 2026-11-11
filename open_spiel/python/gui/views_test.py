@@ -16,6 +16,7 @@
 """Tests for building frames for each kind of viewer."""
 
 import dataclasses
+import json
 
 from absl.testing import absltest
 
@@ -111,6 +112,100 @@ class BuildTest(absltest.TestCase):
       views.build(
           _position(loaded), contract.Viewer(contract.ViewerKind.SEAT, 0)
       )
+
+
+def _dealt(loaded: loader.LoadedGame) -> views.Position:
+  """Returns a position of `loaded` after its opening chance outcomes."""
+  state = loaded.game.new_initial_state()
+  while state.is_chance_node():
+    state.apply_action(state.chance_outcomes()[0][0])
+  return dataclasses.replace(_position(loaded), state=state)
+
+
+class ObservationStructTest(absltest.TestCase):
+
+  def test_a_seat_gets_its_own_observation_struct(self) -> None:
+    position = _dealt(loader.load("gin_rummy", {}))
+    for seat in (0, 1):
+      built = views.build(
+          position, contract.Viewer(contract.ViewerKind.SEAT, seat)
+      )
+      self.assertIsNone(built.struct)
+      observed = built.observation_struct
+      assert isinstance(observed, dict)
+      self.assertEqual(observed["observing_player"], seat)
+      hands = observed["hands"]
+      self.assertNotIn("XX", hands[seat])
+      self.assertEqual(set(hands[1 - seat]), {"XX"})
+
+  def test_the_oracle_and_a_spectator_get_none(self) -> None:
+    position = _dealt(loader.load("gin_rummy", {}))
+    oracle = views.build(position, _ORACLE)
+    self.assertIsNone(oracle.observation_struct)
+    self.assertIsNotNone(oracle.struct)
+    self.assertIsNone(views.build(position, _SPECTATOR).observation_struct)
+
+  def test_a_seat_of_a_game_without_observation_structs_gets_none(
+      self,
+  ) -> None:
+    position = _dealt(loader.load("kuhn_poker", {}))
+    built = views.build(position, contract.Viewer(contract.ViewerKind.SEAT, 0))
+    self.assertIsNone(built.observation_struct)
+
+  def test_a_seat_of_a_game_that_hides_nothing_gets_both_structs(
+      self,
+  ) -> None:
+    position = _position(loader.load("tic_tac_toe", {}))
+    built = views.build(position, contract.Viewer(contract.ViewerKind.SEAT, 1))
+    self.assertEqual(built.observation_struct, built.struct)
+
+
+def _hearts(num_passes: int) -> views.Position:
+  """Returns a hearts position passing left, `num_passes` cards passed."""
+  loaded = loader.load("hearts", {})
+  state = loaded.game.new_initial_state()
+  state.apply_action(1)  # The pass direction: left.
+  while state.is_chance_node():
+    state.apply_action(state.chance_outcomes()[0][0])
+  for _ in range(num_passes):
+    state.apply_action(state.legal_actions()[0])
+  seats = tuple(
+      contract.SeatView(seat, contract.HUMAN, {}, False, None)
+      for seat in range(loaded.num_seats)
+  )
+  return dataclasses.replace(_position(loaded), seats=seats, state=state)
+
+
+class HeartsPassingTest(absltest.TestCase):
+  """The hearts observation struct is withheld from seats while passing."""
+
+  def test_a_seat_gets_none_while_the_hand_is_passing(self) -> None:
+    for num_passes in (0, 3, 11):
+      position = _hearts(num_passes)
+      for seat in range(4):
+        built = views.build(
+            position, contract.Viewer(contract.ViewerKind.SEAT, seat)
+        )
+        self.assertIsNone(built.observation_struct)
+        self.assertIsNotNone(built.presentation)
+
+  def test_a_seat_gets_its_struct_once_every_seat_has_passed(self) -> None:
+    position = _hearts(12)
+    for seat in range(4):
+      built = views.build(
+          position, contract.Viewer(contract.ViewerKind.SEAT, seat)
+      )
+      observed = built.observation_struct
+      assert isinstance(observed, dict)
+      self.assertEqual(observed["phase"], "Play")
+      self.assertEqual(observed["observing_player"], seat)
+
+  def test_the_oracle_is_unaffected(self) -> None:
+    for num_passes in (0, 11, 12):
+      position = _hearts(num_passes)
+      oracle = views.build(position, _ORACLE)
+      self.assertEqual(oracle.struct, json.loads(position.state.to_json()))
+      self.assertIsNone(oracle.observation_struct)
 
 
 if __name__ == "__main__":

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import {act} from 'react';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, describe, expect, it} from 'vitest';
 
-import type {CatalogueEntry, Frame} from '../contract/contract.ts';
+import type {CatalogueEntry} from '../contract/contract.ts';
 import {TransportError} from '../session/errors.ts';
 import type {Session} from '../session/use_session.ts';
 import {entries, frame, session} from '../testing/frames.ts';
@@ -38,6 +38,7 @@ const ENTRY: CatalogueEntry = {
   loadable: true,
   unavailable_reason: null,
   controllers: ['human'],
+  renderer: null,
 };
 
 let rendered: Rendered | undefined;
@@ -53,8 +54,6 @@ function game(shown: Session): Game {
     entry: ENTRY,
     session: shown,
     viewer: shown.frame?.viewer ?? {kind: 'oracle', seat: null},
-    setViewer: vi.fn(),
-    handOver: vi.fn(),
   };
 }
 
@@ -66,19 +65,6 @@ function showGameplay(value: Game): HTMLElement {
     </GameContext>,
   );
   return rendered.container;
-}
-
-// Seat 0 views a game that hides information, with seat 1, a person, to move.
-function handOverFrame(): Frame {
-  const shown = frame({
-    viewer: {kind: 'seat', seat: 0},
-    omniscient: false,
-    to_move: {kind: 'seat', seat: 1},
-    legal_actions: null,
-    state_text: null,
-    observation_text: 'Card: K',
-  });
-  return {...shown, session: {...shown.session, hides_information: true}};
 }
 
 describe('GameplayPanel', () => {
@@ -93,8 +79,10 @@ describe('GameplayPanel', () => {
     expect(container.querySelector('[aria-label="Replay"]')).toBeNull();
     expect(container.querySelector('.legal__row')).toBeNull();
     expect(container.querySelector('input')).toBeNull();
-    // The text is copied from State, so the board has no copy button.
-    expect(container.querySelectorAll('button')).toHaveLength(0);
+    // The board's text has its own copy button, and that is the one button.
+    expect(
+      Array.from(container.querySelectorAll('button'), b => b.className),
+    ).toEqual(['button button--icon copy-button']);
   });
 
   it('shows the session error over the board, until dismissed', () => {
@@ -113,17 +101,30 @@ describe('GameplayPanel', () => {
     expect(container.querySelector('[role="alert"]')).toBeNull();
   });
 
-  it('offers to hand the device over, in a notice over the board', () => {
-    const value = game(session(handOverFrame()));
-    const container = showGameplay(value);
-    const notices = only(container, '.gameplay__notices');
-    expect(notices.textContent).toContain(
-      'Player 1 is to move, and plays from their own view.',
-    );
-    act(() => {
-      button('Hand over to Player 1', notices).click();
+  it('offers no hand-over when another person is to move in a game', () => {
+    const shown = frame({
+      viewer: {kind: 'seat', seat: 0},
+      omniscient: false,
+      to_move: {kind: 'seat', seat: 1},
+      legal_actions: null,
+      state_text: null,
+      observation_text: 'Card: K',
     });
-    expect(value.handOver).toHaveBeenCalledExactlyOnceWith(1);
+    const container = showGameplay(
+      game(
+        session({
+          ...shown,
+          session: {...shown.session, hides_information: true},
+        }),
+      ),
+    );
+    expect(container.textContent).not.toContain('Hand over');
+    // The observation's copy button is the one button.
+    expect(
+      Array.from(container.querySelectorAll('button'), b =>
+        b.getAttribute('aria-label'),
+      ),
+    ).toEqual(['Copy to clipboard']);
   });
 });
 

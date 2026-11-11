@@ -57,6 +57,7 @@ def _catalogue() -> catalogue_lib.Catalogue:
               loadable=True,
               unavailable_reason=None,
               controllers=(contract.HUMAN,),
+              renderer="tic_tac_toe",
           ),
       )
   )
@@ -70,7 +71,7 @@ def _health() -> health_lib.Health:
       capabilities=health_lib.Capabilities(
           controllers=controllers.registered(),
           chance_policies=tuple(contract.ChancePolicy),
-          python_game_search=False,
+          cpp_mcts_limits=controllers.mcts_limits(),
       ),
   )
 
@@ -486,6 +487,49 @@ class ApiTest(absltest.TestCase):
         http.HTTPStatus.METHOD_NOT_ALLOWED,
     )
     self.assertIn("accepts GET", error["message"])
+
+  def test_close_forgets_the_session(self) -> None:
+    session = self.create()
+    status, closed = self.call("DELETE", f"/api/sessions/{session}?viewer=0")
+    self.assertEqual(status, http.HTTPStatus.OK)
+    self.assertEqual(
+        closed, {"contract_version": contract.CONTRACT_VERSION, "id": session}
+    )
+    self.assert_refused(
+        "GET",
+        f"/api/sessions/{session}?viewer=oracle",
+        None,
+        "not_found",
+        http.HTTPStatus.NOT_FOUND,
+    )
+    self.assert_refused(
+        "DELETE",
+        f"/api/sessions/{session}?viewer=oracle",
+        None,
+        "not_found",
+        http.HTTPStatus.NOT_FOUND,
+    )
+
+  def test_a_spectator_never_closes_a_session(self) -> None:
+    session = self.create()
+    self.assert_refused(
+        "DELETE",
+        f"/api/sessions/{session}?viewer=spectator",
+        None,
+        "not_your_turn",
+        http.HTTPStatus.CONFLICT,
+    )
+    self.assertLen(self.store, 1)
+
+  def test_close_requires_a_viewer(self) -> None:
+    session = self.create()
+    self.assert_refused(
+        "DELETE",
+        f"/api/sessions/{session}",
+        None,
+        "bad_request",
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
   def test_a_session_fault_propagates(self) -> None:
     session = self.create()

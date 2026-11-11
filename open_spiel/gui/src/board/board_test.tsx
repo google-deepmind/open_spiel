@@ -77,11 +77,14 @@ describe('GameplayBoard text', () => {
     expect(container.querySelector('h3')).toBeNull();
   });
 
-  it('draws the board alone: no copy button and no moves', () => {
+  it('draws the board alone, with its copy button and no moves', () => {
     act(() => {
       root.render(<GameplayBoard session={session(frame())} />);
     });
-    expect(container.querySelectorAll('button')).toHaveLength(0);
+    const buttons = container.querySelectorAll('button');
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0]?.classList).toContain('copy-button');
+    expect(buttons[0]?.getAttribute('aria-label')).toBe('Copy to clipboard');
   });
 
   it('shows a seat its own observation', () => {

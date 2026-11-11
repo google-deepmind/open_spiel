@@ -1,0 +1,262 @@
+# Copyright 2026 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("//bazel/python:py_library.bzl", "py_library")
+load("//bazel/python:pytest.bzl", "pytest_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "belief",
+    srcs = ["__init__.py"],
+    strict_deps = True,
+)
+
+py_library(
+    name = "enumeration",
+    srcs = ["enumeration.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/core:game_tree",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "gin_positions",
+    testonly = True,
+    srcs = ["tests/gin_positions.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "//open_spiel/python/scale/envs/gin",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "leduc_fixtures",
+    testonly = True,
+    srcs = ["tests/leduc_fixtures.py"],
+    strict_deps = True,
+    deps = [
+        ":named_fns",
+        "//open_spiel/python/scale/policies:tabular",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+py_library(
+    name = "named_fns",
+    testonly = True,
+    srcs = ["tests/named_fns.py"],
+    strict_deps = True,
+    deps = ["@py_deps//jax"],
+)
+
+py_library(
+    name = "perfect_information",
+    srcs = ["perfect_information.py"],
+    strict_deps = True,
+    deps = [
+        ":registry",
+        "//open_spiel/python/scale/core:sequence",
+        "@py_deps//jax",
+    ],
+)
+
+py_library(
+    name = "registry",
+    srcs = ["registry.py"],
+    strict_deps = True,
+    deps = [
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:registry",
+    ],
+)
+
+py_library(
+    name = "tests_init",
+    testonly = True,
+    srcs = ["tests/__init__.py"],
+    strict_deps = True,
+)
+
+pytest_test(
+    name = "enumeration_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/enumeration_test.py"],
+    deps = [
+        ":enumeration",
+        ":leduc_fixtures",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs:kuhn",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/envs/leduc:belief",
+        "//open_spiel/python/scale/eval:exploitability",
+        "//open_spiel/python/scale/policies:uniform",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "gin_calibration_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/gin_calibration_test.py"],
+    deps = [
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:gin_games",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:belief",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "gin_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/gin_test.py"],
+    deps = [
+        ":gin_positions",
+        ":registry",
+        "//open_spiel/python/jax/games/gin_rummy:cards_and_melds",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:gin_games",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs/gin",
+        "//open_spiel/python/scale/envs/gin:belief",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "leduc_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/leduc_test.py"],
+    deps = [
+        ":leduc_fixtures",
+        ":named_fns",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/envs/leduc:belief",
+        "//open_spiel/python/scale/policies:search",
+        "//open_spiel/python/scale/policies:tabular",
+        "//open_spiel/python/scale/policies:uniform",
+        "//open_spiel/python/scale/testing:fixtures",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "particle_test",
+    timeout = "long",
+    data = ["//open_spiel/python/scale:all_files"],
+    tags = [
+        "manual",
+    ],
+    tests = ["tests/particle_test.py"],
+    deps = [
+        ":leduc_fixtures",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/core:plies",
+        "//open_spiel/python/scale/core:sequence",
+        "//open_spiel/python/scale/envs/leduc",
+        "//open_spiel/python/scale/envs/leduc:belief",
+        "//open_spiel/python/scale/policies:particle_belief",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "perfect_information_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/perfect_information_test.py"],
+    deps = [
+        ":perfect_information",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:tic_tac_toe",
+        "//open_spiel/python/scale/envs/connect_four",
+        "//open_spiel/python/scale/envs/leduc",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+    ],
+)
+
+pytest_test(
+    name = "registry_test",
+    data = ["//open_spiel/python/scale:all_files"],
+    tests = ["tests/registry_test.py"],
+    deps = [
+        ":enumeration",
+        ":perfect_information",
+        ":registry",
+        "//open_spiel/python/scale:registered",
+        "//open_spiel/python/scale:tests_conftest",
+        "//open_spiel/python/scale/envs:registry",
+        "//open_spiel/python/scale/envs/leduc:belief",
+        "//open_spiel/python/scale/policies:particle_belief",
+        "//open_spiel/python/scale/policies:uniform",
+    ],
+)
+
+# Every file of the package below this folder (the tests' data).
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+    visibility = ["//open_spiel/python/scale:__subpackages__"],
+)

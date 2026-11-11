@@ -1,0 +1,47 @@
+# Python packages for the Bazel build of OpenSpiel (all optional ones included).
+# Pins follow requirements.txt and scripts/python_extra_deps.sh (Python 3.12).
+# Regenerate requirements_lock.txt with update_requirements_lock.sh.
+# Core (opensource/requirements.txt).
+absl-py>=0.10.0
+attrs>=19.3.0
+ml-collections>=0.1.1
+numpy>=1.21.5
+scipy==1.16.3
+# OPEN_SPIEL_PYTHON_JAX_DEPS (scripts/python_extra_deps.sh, Python 3.12).
+jax==0.12.0.1
+jaxlib==0.12.0.1
+flax==0.12.10
+dm-haiku==0.0.17
+optax==0.2.8
+chex==0.1.92
+rlax==0.1.9
+distrax==0.1.9
+mctx==0.0.71
+# OPEN_SPIEL_PYTHON_PYTORCH_DEPS.
+torch==2.9.1
+dm-tree==0.1.10
+# OPEN_SPIEL_PYTHON_MISC_DEPS.
+IPython==8.23.0
+networkx==3.3
+matplotlib==3.10.7
+mock==5.1.0
+nashpy==0.0.43
+testresources==2.0.1
+cvxpy==1.7.5
+ecos==2.0.14
+osqp==1.0.4
+scs==3.2.11
+pokerkit==0.6.3
+fastmcp==3.3.1
+# OPEN_SPIEL_PYTHON_TEST_DEPS (all Python versions).
+pytest==9.1.1
+# Used by BUILD targets but not pinned by python_extra_deps.sh.
+cma
+etils[epath]
+orbax-checkpoint==0.12.8
+pandas
+pyarrow
+pygraphviz
+# No optional group: ml-collections (a core requirement) depends on it, so
+# every OpenSpiel install has it.
+pyyaml

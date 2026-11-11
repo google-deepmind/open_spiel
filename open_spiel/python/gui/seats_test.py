@@ -22,6 +22,13 @@ from open_spiel.python.gui import controllers
 from open_spiel.python.gui import seats
 import pyspiel
 
+_GAME = pyspiel.load_game("tic_tac_toe")
+
+
+def _never_built(index: int, build: object) -> None:
+  """Fails the test: no seat of these tests is given a controller to build."""
+  raise AssertionError(f"Seat {index} built {build!r}.")
+
 
 class _Fixed:
   """A controller that always chooses the same action."""
@@ -144,7 +151,7 @@ class ChooseActionTest(absltest.TestCase):
 class SeatsTest(absltest.TestCase):
 
   def test_starts_human_and_reports_the_first_failure(self) -> None:
-    every = seats.Seats(3)
+    every = seats.Seats(3, _GAME, seed=0, on_built=_never_built)
     self.assertIsNone(every.failed)
     every[2].failure = contract.ControllerFailure("RuntimeError", "boom")
     every[1].failure = contract.ControllerFailure("RuntimeError", "boom")
@@ -153,7 +160,7 @@ class SeatsTest(absltest.TestCase):
     self.assertIsNone(every.failed)
 
   def test_views_list_every_seat_in_order(self) -> None:
-    views = seats.Seats(2).views()
+    views = seats.Seats(2, _GAME, seed=0, on_built=_never_built).views()
     self.assertEqual([view.seat for view in views], [0, 1])
     self.assertEqual({view.controller for view in views}, {contract.HUMAN})
 

@@ -17,8 +17,8 @@
 
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/types/optional.h"
 #include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/game_transforms/game_wrapper.h"
 #include "open_spiel/policy.h"

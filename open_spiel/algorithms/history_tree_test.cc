@@ -19,7 +19,7 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "open_spiel/abseil-cpp/absl/container/node_hash_set.h"
+#include "absl/container/node_hash_set.h"
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/goofspiel/goofspiel.h"

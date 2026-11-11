@@ -22,7 +22,7 @@
 #include <ostream>
 #include <sstream>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "absl/algorithm/container.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/spiel_utils.h"
 

@@ -18,7 +18,7 @@
 #include <string>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "absl/types/span.h"
 #include "open_spiel/games/spades/spades.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"

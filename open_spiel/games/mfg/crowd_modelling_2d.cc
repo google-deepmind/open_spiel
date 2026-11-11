@@ -23,12 +23,12 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/strings/strip.h"
-#include "open_spiel/abseil-cpp/absl/strings/substitute.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/string_view.h"
+#include "absl/strings/strip.h"
+#include "absl/strings/substitute.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

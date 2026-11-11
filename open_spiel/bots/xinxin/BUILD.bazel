@@ -1,0 +1,92 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel/python:py_test.bzl", "py_test")
+load("//bazel/python:pybind.bzl", "pybind_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "xinxin_bot",
+    srcs = ["xinxin_bot.cc"],
+    hdrs = ["xinxin_bot.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_xinxin_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "@xinxin//:xinxin",
+        "//open_spiel",
+        "//open_spiel/games/hearts",
+    ],
+)
+
+cc_test(
+    name = "xinxin_bot_test",
+    size = "large",
+    srcs = ["xinxin_bot_test.cc"],
+    deps = [
+        ":xinxin_bot",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/time",
+        "@xinxin//:xinxin",
+        "//open_spiel",
+        "//open_spiel/algorithms:evaluate_bots",
+    ],
+)
+
+cc_binary(
+    name = "xinxin_game_generator",
+    srcs = ["xinxin_game_generator.cc"],
+    features = ["-use_header_modules"],
+    target_compatible_with = select({
+        "//open_spiel:build_with_xinxin_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":xinxin_bot",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/time",
+        "@xinxin//:xinxin",
+        "//open_spiel",
+        "//open_spiel/algorithms:evaluate_bots",
+    ],
+)
+
+py_test(
+    name = "py_xinxin_bot_test",
+    srcs = ["xinxin_bot_test.py"],
+    main = "xinxin_bot_test.py",
+    target_compatible_with = select({
+        "//open_spiel:build_with_xinxin_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//open_spiel/python/algorithms:evaluate_bots",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//numpy",
+    ],
+)
+
+pybind_library(
+    name = "xinxin_pybind11",
+    srcs = ["xinxin_pybind11.cc"],
+    hdrs = ["xinxin_pybind11.h"],
+    deps = [
+        ":xinxin_bot",
+        "//open_spiel",
+        "//open_spiel/python/pybind11",
+    ],
+)

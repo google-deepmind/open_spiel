@@ -77,6 +77,7 @@ export function App(props: AppProps): JSX.Element {
         client={client}
         session={route.session}
         viewer={route.viewer}
+        viewSeat={route.viewSeat}
       />
     </Page>
   );

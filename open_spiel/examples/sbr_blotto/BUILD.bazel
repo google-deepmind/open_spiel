@@ -1,0 +1,44 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//open_spiel:__subpackages__"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "fictitious_play",
+    srcs = ["fictitious_play.cc"],
+    hdrs = ["fictitious_play.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/random:distributions",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+        "//open_spiel:all_games",
+        "//open_spiel/algorithms:best_response",
+        "//open_spiel/algorithms:corr_dist",
+        "//open_spiel/algorithms:tabular_exploitability",
+    ],
+)
+
+cc_binary(
+    name = "sbr_blotto_main",
+    srcs = ["sbr_blotto_main.cc"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":fictitious_play",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+        "//open_spiel/utils:init",
+    ],
+)

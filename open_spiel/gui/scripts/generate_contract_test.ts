@@ -63,6 +63,15 @@ describe('schemaToTypeScript translations', () => {
       {type: 'array', items: {type: ['string', 'null']}},
       'Array<string | null>',
     ],
+    [{type: 'array', items: {$ref: '#/$defs/Other'}}, 'Other[]'],
+    [
+      {type: 'array', items: {type: 'array', items: {type: 'integer'}}},
+      'Array<number[]>',
+    ],
+    [
+      {type: 'array', items: {type: 'object', additionalProperties: true}},
+      'Array<Record<string, unknown>>',
+    ],
     [
       {anyOf: [{type: 'array', items: {type: 'integer'}}, {type: 'null'}]},
       'number[] | null',

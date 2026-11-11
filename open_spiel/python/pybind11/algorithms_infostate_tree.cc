@@ -27,7 +27,7 @@
 #include "open_spiel/python/pybind11/algorithms_infostate_tree_templates.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
-#include "pybind11/include/pybind11/stl_bind.h"
+#include "pybind11/stl_bind.h"
 
 namespace py = ::pybind11;
 

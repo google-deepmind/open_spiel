@@ -12,15 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import process from 'node:process';
+
 import react from '@vitejs/plugin-react';
 import {defineConfig} from 'vitest/config';
 
+import {fetchedSetNotices} from './scripts/fetch_piece_set.ts';
 import {thirdPartyNotices} from './scripts/third_party_notices.ts';
 
+// The server `npm run dev` sends the client's API requests to:
+// `python -m open_spiel.python.gui`, on its default port unless
+// OPENSPIEL_GUI_SERVER names another. The request keeps its own Host and
+// Origin, the dev server's, so the server's same-origin check passes.
+const API_SERVER =
+  process.env['OPENSPIEL_GUI_SERVER'] ?? 'http://127.0.0.1:8080';
+
 export default defineConfig({
-  plugins: [react(), thirdPartyNotices()],
+  plugins: [react(), thirdPartyNotices(), fetchedSetNotices()],
+  server: {proxy: {'/api': {target: API_SERVER, changeOrigin: false}}},
   test: {
     environment: 'jsdom',
     include: ['{scripts,src}/**/*_test.{ts,tsx}'],
+    // Twice app_test's 5 s `until`, so a slow wait reports its failing
+    // check rather than the test timeout, and two waits fit in one test.
+    testTimeout: 10000,
   },
 });

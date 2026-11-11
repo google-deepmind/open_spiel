@@ -20,6 +20,7 @@ import {resolve} from 'node:path';
 import {describe, expect, it} from 'vitest';
 
 import {readDeclarations} from '../../scripts/css.ts';
+import {pixels} from '../styles/pixels.ts';
 
 // jsdom neither matches :hover nor cascades by specificity, so the rules are
 // read as written.
@@ -92,10 +93,9 @@ describe('controls.css', () => {
       }
       return only.value;
     };
-    const px = (text: string): number => Number(text.replace(/px$/, ''));
-    const gutter = px(value('.copyable', 'padding-right'));
-    const inset = px(value('.copy-button', 'right'));
-    const width = px(value('.button--icon', 'width'));
+    const gutter = pixels(value('.copyable', 'padding-right'));
+    const inset = pixels(value('.copy-button', 'right'));
+    const width = pixels(value('.button--icon', 'width'));
     expect(gutter).toBeGreaterThanOrEqual(inset + width + 8);
     expect(value('.copyable__text', 'overflow')).toBe('auto');
     expect(value('.copyable__text', 'padding').split(' ')[1]).toBe('0');

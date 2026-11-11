@@ -4,7 +4,7 @@
 # standard MacOS X, and Windows using MSVC. Each binary wheel is built for
 # x86_64 (and arm64 where supported). Basic API tests are run within the build
 # environment. Full tests (tests that use extra dependencies such as PyTorch,
-# JAX, Tensorflow) are tested in the Github Actions CI environment.
+# JAX) are tested in the Github Actions CI environment.
 name: wheels
 
 on:
@@ -52,9 +52,11 @@ jobs:
           CIBW_ENABLE: all
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp311-manylinux_aarch64 cp312-manylinux_aarch64 cp313-manylinux_aarch64 cp314-manylinux_aarch64
-        - os: macos-14
+        - os: macos-15
+          NAME: "MacOS15_Python_3.12"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.12
+          OPEN_SPIEL_ABSL_VERSION: "20250814.1"
           OS_PYTHON_VERSION: 3.12
           CIBW_VERSION: 3.2.1
           CIBW_ENABLE: all
@@ -116,7 +118,9 @@ jobs:
           python -m pip install --upgrade setuptools
           python -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh python
-          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TEST_DEPS
+          # Empty when no JAX release supports this Python version.
+          [[ -n "$OPEN_SPIEL_PYTHON_JAX_DEPS" ]] && python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine

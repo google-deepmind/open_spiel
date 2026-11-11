@@ -22,10 +22,10 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/memory/memory.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/policy.h"

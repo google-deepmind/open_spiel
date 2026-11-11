@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"

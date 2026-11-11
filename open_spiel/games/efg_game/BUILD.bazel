@@ -1,0 +1,74 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+filegroup(
+    name = "efg_files",
+    srcs = [
+        "games/extended_bos.efg",
+        "games/extended_mp.efg",
+        "games/extended_shapleys.efg",
+        "games/greenwald_sarfati_example1.efg",
+        "games/greenwald_sarfati_example2.efg",
+        "games/guess_the_ace.efg",
+        "games/kuhn_poker.efg",
+        "games/kuhn_poker_with_raise.efg",
+        "games/leduc_poker.efg",
+        "games/sample.efg",
+        "games/signaling_vonstengel_forges_2008.efg",
+    ],
+)
+
+cc_library(
+    name = "efg_game",
+    srcs = ["efg_game.cc"],
+    hdrs = ["efg_game.h"],
+    copts = ["-fexceptions"],
+    data = [":efg_files"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/utils:file",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "efg_game_data",
+    srcs = ["efg_game_data.cc"],
+    hdrs = ["efg_game_data.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":efg_game",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "efg_game_test",
+    srcs = ["efg_game_test.cc"],
+    data = [":efg_files"],
+    deps = [
+        ":efg_game",
+        ":efg_game_data",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+        "//open_spiel/utils:init",
+    ],
+)

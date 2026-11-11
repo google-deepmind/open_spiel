@@ -20,11 +20,11 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "open_spiel/abseil-cpp/absl/flags/parse.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/strings/str_join.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 #include "open_spiel/algorithms/alpha_zero_torch/device_manager.h"
 #include "open_spiel/algorithms/alpha_zero_torch/vpevaluator.h"
 #include "open_spiel/algorithms/alpha_zero_torch/vpnet.h"

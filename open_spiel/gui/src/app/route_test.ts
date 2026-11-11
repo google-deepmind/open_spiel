@@ -31,8 +31,27 @@ describe('routeOf', () => {
       game: 'kuhn_poker',
       session: 's1',
       viewer: {kind: 'seat', seat: 1},
+      viewSeat: null,
     });
   });
+
+  it('reads the seat analysis is drawn from', () => {
+    expect(
+      routeOf(at('/game/euchre?session=s1&viewer=oracle&viewSeat=2')),
+    ).toMatchObject({viewer: {kind: 'oracle', seat: null}, viewSeat: 2});
+    expect(routeOf(at('/game/euchre?viewSeat=north'))).toMatchObject({
+      viewSeat: null,
+    });
+  });
+
+  it.each(['', 'seat', '-1', '01', '99999'])(
+    'shows the spectator, never the oracle, for viewer=%s',
+    parameter => {
+      expect(
+        routeOf(at(`/game/euchre?viewer=${encodeURIComponent(parameter)}`)),
+      ).toMatchObject({viewer: {kind: 'spectator', seat: null}});
+    },
+  );
 
   it('starts a new session for the default viewer when none is named', () => {
     expect(routeOf(at('/game/go/'))).toEqual({
@@ -40,6 +59,7 @@ describe('routeOf', () => {
       game: 'go',
       session: null,
       viewer: null,
+      viewSeat: null,
     });
   });
 
@@ -87,6 +107,14 @@ describe('sessionPath', () => {
       game: 'tic_tac_toe',
       session: 'abc',
       viewer: {kind: 'seat', seat: 1},
+      viewSeat: null,
     });
+  });
+
+  it('names the seat analysis is drawn from, and reads back', () => {
+    const oracle = {kind: 'oracle', seat: null} as const;
+    const path = sessionPath('euchre', 'abc', oracle, 3);
+    expect(path).toBe('/game/euchre?session=abc&viewer=oracle&viewSeat=3');
+    expect(routeOf(at(path))).toMatchObject({viewer: oracle, viewSeat: 3});
   });
 });

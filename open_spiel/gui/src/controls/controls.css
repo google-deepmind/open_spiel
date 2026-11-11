@@ -428,16 +428,25 @@
 }
 
 /*
-  Rewards and returns: a card of its own with no copy button, sized to its
-  few lines, never half the panel.
+  Compact copyable text (rewards, returns, a seat's message): a card sized
+  to its few lines, never half the panel, its copy button inset less so
+  that one line of text holds it without growing.
 */
-.copyable__text--compact {
+.copyable--compact {
   flex: 0 0 auto;
   max-height: 30%;
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  background: var(--color-surface-raised);
+  min-height: 36px;
+  /* The button's 28 pixels, its 4 pixel inset and 8 pixels of air. */
+  padding-right: 40px;
+}
+
+.copyable--compact > .copy-button {
+  top: 4px;
+  right: 4px;
+}
+
+.copyable__text--compact {
+  padding: 8px 0 8px 12px;
 }
 
 /* An inset card that holds a panel's content. */

@@ -1,0 +1,46 @@
+# Description:
+#   Oware implementation details.
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "oware",
+    srcs = ["oware.cc"],
+    hdrs = ["oware.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":oware_board",
+        "//open_spiel",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "oware_test",
+    srcs = ["oware_test.cc"],
+    deps = [
+        ":oware",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
+    name = "oware_board",
+    srcs = ["oware_board.cc"],
+    hdrs = ["oware_board.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = ["//open_spiel"],
+)

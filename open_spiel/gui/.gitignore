@@ -1,0 +1,9 @@
+dist/
+node_modules/
+e2e-server.log
+playwright-report/
+test-results/
+# Fetched by the user (npm run fetch-pieces), never committed.
+/piece_sets/
+# The user's own client add-ons (src/INTERFACES.md, "Client add-ons").
+/addons/

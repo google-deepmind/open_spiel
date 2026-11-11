@@ -27,5 +27,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["src", "scripts", "e2e", "*.config.mjs", "*.config.ts"]
+  "include": ["src", "scripts", "e2e", "addons", "*.config.mjs", "*.config.ts"]
 }

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 import type {CatalogueEntry} from '../contract/contract.ts';
+import {RENDERERS} from '../renderers/registry.ts';
+import type {Renderers} from '../renderers/renderer.ts';
 
 const INFORMATION: Record<CatalogueEntry['information'], string> = {
   perfect_information: 'perfect information',
@@ -21,18 +23,47 @@ const INFORMATION: Record<CatalogueEntry['information'], string> = {
 };
 
 /**
+ * How a game is drawn: `board` when the client has the renderer the
+ * server's adapter names for it, `text` when it is played from its text,
+ * and `unavailable` when the server cannot serve it at all. Every game is
+ * exactly one, so the three filters' counts add up to the catalogue.
+ */
+export type GameView = 'board' | 'text' | 'unavailable';
+
+/** Which games the catalogue lists: every one, or those drawn one way. */
+export type ViewFilter = 'all' | GameView;
+
+/**
+ * How `entry` is drawn, read from the server's catalogue and the client's
+ * own renderer registry, the two that decide it on the game page;
+ * `unavailable` when the game cannot be played here.
+ */
+export function gameView(
+  entry: CatalogueEntry,
+  renderers: Renderers = RENDERERS,
+): GameView {
+  if (!entry.loadable) return 'unavailable';
+  return entry.renderer !== null && renderers.get(entry.renderer) !== null
+    ? 'board'
+    : 'text';
+}
+
+/**
  * The games whose short or display name contains `query`, ignoring case and
- * the spaces around it, in catalogue order.
+ * the spaces around it, and that `view` admits, in catalogue order.
  */
 export function filterGames(
   games: readonly CatalogueEntry[],
   query: string,
+  view: ViewFilter = 'all',
+  renderers: Renderers = RENDERERS,
 ): CatalogueEntry[] {
   const wanted = query.trim().toLowerCase();
   return games.filter(
-    ({name, long_name: longName}) =>
-      name.toLowerCase().includes(wanted) ||
-      longName.toLowerCase().includes(wanted),
+    entry =>
+      (entry.name.toLowerCase().includes(wanted) ||
+        entry.long_name.toLowerCase().includes(wanted)) &&
+      (view === 'all' || gameView(entry, renderers) === view),
   );
 }
 

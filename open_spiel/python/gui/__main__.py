@@ -17,6 +17,7 @@
 
 Usage:
   python -m open_spiel.python.gui [--host HOST] [--port PORT]
+      [--controllers MODULE[,MODULE...]] [--move-budget-seconds SECONDS]
 """
 
 from open_spiel.python.gui import cli

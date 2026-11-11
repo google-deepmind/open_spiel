@@ -59,7 +59,7 @@ def _health() -> health_lib.Health:
       capabilities=health_lib.Capabilities(
           controllers=controllers.registered(),
           chance_policies=tuple(contract.ChancePolicy),
-          python_game_search=False,
+          cpp_mcts_limits=controllers.mcts_limits(),
       ),
   )
 
@@ -134,11 +134,42 @@ class ServerTest(absltest.TestCase):
     self.assertEqual(frame["status"], "terminal")
     self.assertEqual(frame["returns"], [1.0, -1.0])
 
+  def test_serves_each_viewer_its_observation_struct(self) -> None:
+    _, frame = self.request_json("POST", "/api/sessions?viewer=1", _CREATE)
+    session = frame["session"]["id"]
+    self.request_json(
+        "POST",
+        f"/api/sessions/{session}/actions?viewer=0",
+        {"action": 4, "ply": None},
+    )
+    _, seat = self.request_json("GET", f"/api/sessions/{session}?viewer=1")
+    self.assertEqual(seat["contract_version"], contract.CONTRACT_VERSION)
+    self.assertEqual(seat["observation_struct"]["board"][4], "x")
+    _, oracle = self.request_json(
+        "GET", f"/api/sessions/{session}?viewer=oracle"
+    )
+    self.assertIsNone(oracle["observation_struct"])
+    self.assertEqual(oracle["struct"]["board"][4], "x")
+
+  def test_serves_the_adapter_presentation(self) -> None:
+    _, frame = self.request_json("POST", "/api/sessions?viewer=1", _CREATE)
+    session = frame["session"]["id"]
+    self.request_json(
+        "POST",
+        f"/api/sessions/{session}/actions?viewer=0",
+        {"action": 4, "ply": None},
+    )
+    _, seat = self.request_json("GET", f"/api/sessions/{session}?viewer=1")
+    presentation = seat["presentation"]
+    self.assertEqual(presentation["renderer"], "tic_tac_toe")
+    self.assertEqual(presentation["view"]["history"], [4])
+    self.assertEqual(presentation["actions"], [])
+
   def test_refusals_carry_the_contract_error_and_status(self) -> None:
     status, error = self.request_json("GET", "/api/sessions/none?viewer=0")
     self.assertEqual(status, http.HTTPStatus.NOT_FOUND)
     self.assertEqual(error["code"], "not_found")
-    self.assertEqual(error["contract_version"], 2)
+    self.assertEqual(error["contract_version"], contract.CONTRACT_VERSION)
 
   def test_refuses_a_host_it_does_not_answer_to(self) -> None:
     status, _, content = self.request(
@@ -174,6 +205,26 @@ class ServerTest(absltest.TestCase):
         _JSON | {"Origin": "http://attacker.example"},
     )
     self.assertEqual(status, http.HTTPStatus.BAD_REQUEST)
+    self.assertEmpty(self.store)
+
+  def test_closing_a_session_from_another_origin_is_refused(self) -> None:
+    _, frame = self.request_json("POST", "/api/sessions?viewer=0", _CREATE)
+    session = frame["session"]["id"]
+    status, _, _ = self.request(
+        "DELETE",
+        f"/api/sessions/{session}?viewer=oracle",
+        headers={"Origin": "http://attacker.example"},
+    )
+    self.assertEqual(status, http.HTTPStatus.BAD_REQUEST)
+    self.assertLen(self.store, 1)
+    status, _, content = self.request(
+        "DELETE", f"/api/sessions/{session}?viewer=oracle"
+    )
+    self.assertEqual(status, http.HTTPStatus.OK)
+    self.assertEqual(
+        json.loads(content),
+        {"contract_version": contract.CONTRACT_VERSION, "id": session},
+    )
     self.assertEmpty(self.store)
 
   def test_a_change_from_its_own_origin_is_accepted(self) -> None:
@@ -301,6 +352,26 @@ class ServerTest(absltest.TestCase):
     status, _, content = self.request("GET", "/")
     self.assertEqual(status, http.HTTPStatus.NOT_FOUND)
     self.assertIn(b"npm run build", content)
+
+
+class BacklogTest(absltest.TestCase):
+
+  def test_holds_a_burst_of_connections_it_has_not_accepted(self) -> None:
+    self.assertGreaterEqual(server_lib.Server.request_queue_size, 128)
+    server = server_lib.Server(
+        ("127.0.0.1", 0),
+        api.Api(store_lib.SessionStore(), catalogue=_catalogue, health=_health),
+        static.ClientFiles(pathlib.Path(self.create_tempdir().full_path)),
+        server_lib.LOOPBACK_HOSTS,
+    )
+    self.addCleanup(server.server_close)
+    host, port = server.server_address[:2]
+    # Not serving, so nothing accepts: every connection waits in the backlog.
+    # Past a full backlog the system drops the handshake, and the connection
+    # times out (or is reset).
+    for _ in range(100):
+      connection = socket.create_connection((str(host), port), timeout=2)
+      self.addCleanup(connection.close)
 
 
 class HostNameTest(absltest.TestCase):

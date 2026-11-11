@@ -16,7 +16,7 @@
 #include <memory>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/algorithms/expected_returns.h"

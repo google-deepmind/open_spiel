@@ -15,6 +15,7 @@
 
 """Tests for a session's history: undo, reset, replay and playing on."""
 
+from collections.abc import Callable
 import contextlib
 from unittest import mock
 
@@ -64,16 +65,16 @@ class _Raising:
 
 def _raising_non_humans() -> contextlib.AbstractContextManager[object]:
   """Builds every seat that is not a human's as a controller that fails."""
-  create = controllers.create
+  builder = controllers.builder
 
-  def fake_create(
-      spec: controllers.Spec, game: pyspiel.Game, *, seed: int
-  ) -> object:
+  def fake_builder(
+      spec: controllers.Spec, game: pyspiel.Game
+  ) -> Callable[[int], object]:
     if spec.kind == controllers.HUMAN:
-      return create(spec, game, seed=seed)
-    return _Raising()
+      return builder(spec, game)
+    return lambda _: _Raising()
 
-  return mock.patch.object(controllers, "create", side_effect=fake_create)
+  return mock.patch.object(controllers, "builder", side_effect=fake_builder)
 
 
 class UndoTest(absltest.TestCase):

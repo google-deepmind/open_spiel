@@ -17,7 +17,7 @@
 
 import type {Controller, SeatConfig, SeatView} from '../contract/contract.ts';
 import type {Field, FieldDraft, FieldValue} from '../form/field.ts';
-import {draftOf, readDraft} from '../form/field.ts';
+import {REQUIRED_ERROR, draftOf, readDraft} from '../form/field.ts';
 import {fieldsOf} from '../form/json_schema.ts';
 
 /** The controller that a person plays. */
@@ -71,7 +71,8 @@ export function controllerNamed(
 /**
  * Returns what the server holds for `seat`, each setting the seat was given
  * without in its default, which is what the controller plays with. Settings
- * a form shows come in the form's order.
+ * a form shows come in the form's order. A required setting has no default,
+ * and the server holds every seat with its required settings.
  */
 export function savedConfig(
   seat: SeatView,
@@ -81,7 +82,9 @@ export function savedConfig(
     controllerNamed(controllers, seat.controller).config_schema,
   );
   const defaults = Object.fromEntries(
-    (fields ?? []).map(field => [field.name, field.default]),
+    (fields ?? []).flatMap(field =>
+      field.default === null ? [] : [[field.name, field.default]],
+    ),
   );
   return {
     controller: seat.controller,
@@ -156,6 +159,36 @@ export function readSeatDraft(draft: SeatDraft): DraftReading {
       autoplay: draft.controller !== HUMAN && draft.autoplay,
     },
   };
+}
+
+/**
+ * Says why a save was refused: which settings are required and missing, and
+ * which hold a value they do not admit.
+ */
+export function refusalOf(draft: SeatDraft, errors: SettingsErrors): string {
+  if (errors.kind === 'json' || draft.settings.kind === 'json') {
+    return 'Not saved: the settings are not valid.';
+  }
+  const missing: string[] = [];
+  const invalid: string[] = [];
+  for (const field of draft.settings.fields) {
+    const error = errors.errors[field.name];
+    if (error === REQUIRED_ERROR) missing.push(field.label);
+    else if (error !== undefined) invalid.push(field.label);
+  }
+  const parts = [
+    ...(missing.length === 0
+      ? []
+      : [
+          `${missing.join(', ')} ${missing.length === 1 ? 'is' : 'are'} required`,
+        ]),
+    ...(invalid.length === 0
+      ? []
+      : [
+          `${invalid.join(', ')} ${invalid.length === 1 ? 'is' : 'are'} not valid`,
+        ]),
+  ];
+  return `Not saved: ${parts.join('; ')}.`;
 }
 
 /**

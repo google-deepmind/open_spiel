@@ -87,6 +87,8 @@ DOWNLOAD_CACHE_DIR=${DOWNLOAD_CACHE_DIR:-$DEFAULT_DOWNLOAD_CACHE_DIR}
 
 # Note that this needs Git intalled, so we check for that.
 if [[ ! -x `which git` ]]; then
+  [[ "${OPEN_SPIEL_INSTALL_SYSTEM_DEPS:-1}" != "0" ]] || \
+      die "git is needed to fetch the dependencies: install it and rerun."
   echo "Did not find git, attempting to install it."
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get install git
@@ -219,6 +221,13 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; th
   tar -xzf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
 fi
 
+# OPEN_SPIEL_INSTALL_SYSTEM_DEPS=0 stops here, after fetching the source
+# dependencies: no apt-get, brew or other system package command runs.
+if [[ "${OPEN_SPIEL_INSTALL_SYSTEM_DEPS:-1}" == "0" ]]; then
+  echo -e "\033[33mOPEN_SPIEL_INSTALL_SYSTEM_DEPS=0: fetched the source dependencies and skipped the system packages; see docs/install.md for what to install.\033[0m"
+  return 0 2>/dev/null || exit 0
+fi
+
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.
@@ -226,13 +235,13 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
   if [[ ! -x `which julia` ]] || [ "$(julia -e 'println(VERSION >= v"1.6.1")')" == "false" ]
   then
-    echo -e "\e[33mWarning: julia not in your PATH or its too old. Trying \$HOME/.local/bin\e[0m"
+    echo -e "\033[33mWarning: julia not in your PATH or its too old. Trying \$HOME/.local/bin\033[0m"
     PATH=${HOME}/.local/bin:${PATH}
   fi
 
   if which julia >/dev/null && [ "$(julia -e 'println(VERSION >= v"1.6.1")')" == "true" ] ; then
     JULIA_VERSION_INFO=`julia --version`
-    echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
+    echo -e "\033[33m$JULIA_VERSION_INFO is already installed.\033[0m"
   else
     # Julia installed needs wget, make sure it's accessible.
     if [[ "$OSTYPE" == "linux-gnu" ]]
@@ -302,7 +311,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   /usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' $EXT_DEPS || already_installed=$?
   if [ $already_installed -eq 0 ]
   then
-    echo -e "\e[33mSystem wide packages already installed, skipping their installation.\e[0m"
+    echo -e "\033[33mSystem wide packages already installed, skipping their installation.\033[0m"
   else
     echo "System wide packages missing. Installing them..."
     sudo apt-get -y update
@@ -349,4 +358,14 @@ else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."
   exit 1
+fi
+
+# The CMake build needs CMake >= 3.21 (see open_spiel/CMakeLists.txt). Older
+# distributions ship an older version: `python3 -m pip install cmake` gets a
+# recent one.
+OPEN_SPIEL_MIN_CMAKE_VERSION="3.21"
+CMAKE_VERSION=$(cmake --version 2>/dev/null | head -n1 | sed -E 's/[^0-9]*([0-9.]+).*/\1/')
+if [[ -z "$CMAKE_VERSION" ]] || \
+   [[ "$(printf '%s\n' "$OPEN_SPIEL_MIN_CMAKE_VERSION" "$CMAKE_VERSION" | sort -V | head -n1)" != "$OPEN_SPIEL_MIN_CMAKE_VERSION" ]]; then
+  echo -e "\033[33m** Warning: CMake >= ${OPEN_SPIEL_MIN_CMAKE_VERSION} is required, found '${CMAKE_VERSION}'. Install a recent one, e.g. with 'python3 -m pip install cmake'.\033[0m"
 fi

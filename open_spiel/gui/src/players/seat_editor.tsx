@@ -18,7 +18,13 @@ import {useId} from 'react';
 import type {Controller} from '../contract/contract.ts';
 import {FieldForm} from '../form/field_form.tsx';
 import type {SeatDraft, SettingsErrors} from './seat_draft.ts';
-import {HUMAN, controllerNamed, editField, editJson} from './seat_draft.ts';
+import {
+  HUMAN,
+  controllerNamed,
+  editField,
+  editJson,
+  refusalOf,
+} from './seat_draft.ts';
 import type {SeatDraftState} from './use_seat_draft.ts';
 
 /** The properties of a SeatEditor. */
@@ -35,7 +41,9 @@ export interface SeatEditorProps {
  * The controls that choose who plays a seat and with what settings, between
  * two Save and Reset bars: one above the controller, saying whether there
  * are unsaved changes, and one after the last setting. One of the two sticks
- * to the scrolling seat list, so a tall form never scrolls them away.
+ * to the scrolling seat list, so a tall form never scrolls them away. A save
+ * the draft cannot make, such as one missing a required setting, is refused
+ * in both bars, naming the settings to fix, as well as under each setting.
  */
 export function SeatEditor({
   name,
@@ -174,9 +182,12 @@ interface SaveBarProps {
 }
 
 // Saves or discards the draft. Both buttons wait only for a request in
-// flight; a dot on Save marks unsaved changes.
+// flight; a dot on Save marks unsaved changes. A refused save is said in
+// the top bar's place for the draft's state, and after the bottom bar's
+// buttons.
 function SaveBar({placement, name, state, busy}: SaveBarProps): JSX.Element {
-  const {changed} = state;
+  const {changed, errors} = state;
+  const refusal = errors === null ? null : refusalOf(state.draft, errors);
   const top = placement === 'top';
   const dot = changed && (
     <span className="seat-editor__unsaved-dot" aria-hidden="true" />
@@ -189,9 +200,10 @@ function SaveBar({placement, name, state, busy}: SaveBarProps): JSX.Element {
         <span
           className="seat-editor__state"
           data-changed={changed}
+          data-refused={refusal !== null}
           role="status"
         >
-          {changed ? 'Unsaved changes' : 'No changes'}
+          {refusal ?? (changed ? 'Unsaved changes' : 'No changes')}
         </span>
       )}
       <button
@@ -216,6 +228,9 @@ function SaveBar({placement, name, state, busy}: SaveBarProps): JSX.Element {
       >
         {top ? 'Reset' : 'Reset changes'}
       </button>
+      {!top && refusal !== null && (
+        <span className="seat-editor__refusal">{refusal}</span>
+      )}
     </div>
   );
 }

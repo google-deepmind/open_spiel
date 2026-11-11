@@ -52,3 +52,9 @@
   color: var(--color-text);
   font: inherit;
 }
+
+.view-note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}

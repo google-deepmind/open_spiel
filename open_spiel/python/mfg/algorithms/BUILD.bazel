@@ -1,0 +1,462 @@
+load("//bazel/python:pytype.bzl", "pytype_strict_binary", "pytype_strict_library")
+load("//bazel/python:py_test.bzl", "py_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+pytype_strict_library(
+    name = "distribution",
+    srcs = ["distribution.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:tabular_distribution",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "best_response_value",
+    srcs = ["best_response_value.py"],
+    deps = [
+        "//open_spiel/python/mfg:distribution",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "policy_value",
+    srcs = ["policy_value.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:distribution",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "greedy_policy",
+    srcs = ["greedy_policy.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "fictitious_play",
+    srcs = ["fictitious_play.py"],
+    deps = [
+        ":best_response_value",
+        ":distribution",
+        ":greedy_policy",
+        ":policy_value",
+        ":softmax_policy",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:distribution",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "fixed_point",
+    srcs = ["fixed_point.py"],
+    deps = [
+        ":best_response_value",
+        ":distribution",
+        ":greedy_policy",
+        ":softmax_policy",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "nash_conv",
+    srcs = ["nash_conv.py"],
+    deps = [
+        ":best_response_value",
+        ":distribution",
+        ":policy_value",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+    ],
+)
+
+pytype_strict_library(
+    name = "mirror_descent",
+    srcs = ["mirror_descent.py"],
+    deps = [
+        ":distribution",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "munchausen_mirror_descent",
+    srcs = ["munchausen_mirror_descent.py"],
+    deps = [
+        ":mirror_descent",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "munchausen_deep_mirror_descent",
+    srcs = ["munchausen_deep_mirror_descent.py"],
+    deps = [
+        ":distribution",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:replay_buffer",
+        "@py_deps//absl/logging",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+        "@py_deps//rlax",
+    ],
+)
+
+pytype_strict_library(
+    name = "boltzmann_policy_iteration",
+    srcs = ["boltzmann_policy_iteration.py"],
+    deps = [
+        ":mirror_descent",
+        "//open_spiel/python:policy",
+    ],
+)
+
+pytype_strict_library(
+    name = "softmax_policy",
+    srcs = ["softmax_policy.py"],
+    deps = [
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "@py_deps//numpy",
+    ],
+)
+
+py_test(
+    name = "best_response_value_test",
+    srcs = ["best_response_value_test.py"],
+    deps = [
+        ":best_response_value",
+        ":distribution",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "distribution_test",
+    srcs = ["distribution_test.py"],
+    deps = [
+        ":distribution",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "policy_value_test",
+    srcs = ["policy_value_test.py"],
+    deps = [
+        ":distribution",
+        ":policy_value",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "greedy_policy_test",
+    srcs = ["greedy_policy_test.py"],
+    deps = [
+        ":best_response_value",
+        ":distribution",
+        ":greedy_policy",
+        ":policy_value",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "fictitious_play_test",
+    srcs = ["fictitious_play_test.py"],
+    deps = [
+        ":best_response_value",
+        ":distribution",
+        ":fictitious_play",
+        ":greedy_policy",
+        ":nash_conv",
+        ":policy_value",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//jax",
+    ],
+)
+
+py_test(
+    name = "fixed_point_test",
+    srcs = ["fixed_point_test.py"],
+    deps = [
+        ":fixed_point",
+        ":nash_conv",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "nash_conv_test",
+    srcs = ["nash_conv_test.py"],
+    deps = [
+        ":nash_conv",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+    ],
+)
+
+py_test(
+    name = "mirror_descent_test",
+    srcs = ["mirror_descent_test.py"],
+    deps = [
+        ":mirror_descent",
+        ":nash_conv",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "munchausen_mirror_descent_test",
+    srcs = ["munchausen_mirror_descent_test.py"],
+    deps = [
+        ":munchausen_mirror_descent",
+        ":nash_conv",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "boltzmann_policy_iteration_test",
+    srcs = ["boltzmann_policy_iteration_test.py"],
+    deps = [
+        ":boltzmann_policy_iteration",
+        ":nash_conv",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "softmax_policy_test",
+    srcs = ["softmax_policy_test.py"],
+    deps = [
+        ":best_response_value",
+        ":distribution",
+        ":policy_value",
+        ":softmax_policy",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+    ],
+)
+
+pytype_strict_binary(
+    name = "benchmark",
+    srcs = ["benchmark.py"],
+    deps = [
+        ":fictitious_play",
+        "//open_spiel/python/mfg/games",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl:app",
+        "@py_deps//absl/flags",
+    ],
+)
+
+py_test(
+    name = "munchausen_deep_mirror_descent_test",
+    srcs = ["munchausen_deep_mirror_descent_test.py"],
+    deps = [
+        ":munchausen_deep_mirror_descent",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/mfg/algorithms:distribution",
+        "//open_spiel/python/mfg/algorithms:nash_conv",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "average_network_fictitious_play",
+    srcs = ["average_network_fictitious_play.py"],
+    deps = [
+        ":distribution",
+        "//open_spiel/python:rl_agent",
+        "//open_spiel/python:rl_agent_policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:reservoir_buffer",
+        "//open_spiel/python/utils:training",
+        "@py_deps//haiku",
+        "@py_deps//jax",
+        "@py_deps//numpy",
+        "@py_deps//optax",
+    ],
+)
+
+py_test(
+    name = "average_network_fictitious_play_test",
+    srcs = ["average_network_fictitious_play_test.py"],
+    deps = [
+        ":average_network_fictitious_play",
+        ":distribution",
+        ":nash_conv",
+        "//open_spiel/python:policy",
+        "//open_spiel/python:rl_environment",
+        "//open_spiel/python/jax:dqn",
+        "//open_spiel/python/mfg/games:crowd_modelling",
+        "//open_spiel/python/pybind11:pyspiel",
+        "//open_spiel/python/utils:training",
+        "@py_deps//absl/testing:absltest",
+        "@py_deps//absl/testing:parameterized",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "algorithms",
+    srcs = ["__init__.py"],
+    deps = [
+        ":average_network_fictitious_play",
+        ":best_response_value",
+        ":boltzmann_policy_iteration",
+        ":distribution",
+        ":fictitious_play",
+        ":fixed_point",
+        ":greedy_policy",
+        ":mirror_descent",
+        ":munchausen_deep_mirror_descent",
+        ":munchausen_mirror_descent",
+        ":nash_conv",
+        ":policy_value",
+        ":softmax_policy",
+    ],
+)
+
+pytype_strict_library(
+    name = "correlated_equilibrium",
+    srcs = ["correlated_equilibrium.py"],
+    deps = [
+        ":greedy_policy",
+        ":joint_best_response_value",
+        ":utils",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "bandit_regret",
+    srcs = ["bandit_regret.py"],
+    deps = [
+        ":distribution",
+        ":utils",
+        "@py_deps//numpy",
+        "@py_deps//scipy",
+    ],
+)
+
+pytype_strict_library(
+    name = "joint_best_response_value",
+    srcs = ["joint_best_response_value.py"],
+    deps = [
+        "//open_spiel/python/mfg:distribution",
+        "//open_spiel/python/mfg:value",
+        "//open_spiel/python/pybind11:pyspiel",
+    ],
+)
+
+pytype_strict_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    deps = [
+        ":distribution",
+        ":policy_value",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/mfg:distribution",
+        "//open_spiel/python/pybind11:pyspiel",
+        "@py_deps//numpy",
+    ],
+)
+
+pytype_strict_library(
+    name = "mf_psro",
+    srcs = ["mf_psro.py"],
+    deps = [
+        ":correlated_equilibrium",
+        ":distribution",
+        ":greedy_policy",
+        "//open_spiel/python:policy",
+        "//open_spiel/python/algorithms:get_all_states",
+    ],
+)

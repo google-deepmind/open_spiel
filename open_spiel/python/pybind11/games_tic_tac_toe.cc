@@ -18,11 +18,11 @@
 #include <string>
 #include <utility>
 
-#include "open_spiel/json/include/nlohmann/json.hpp"  // IWYU pragma: keep
+#include "nlohmann/json.hpp"  // IWYU pragma: keep
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
+#include "pybind11_json/pybind11_json.hpp"
 
 namespace py = ::pybind11;
 using open_spiel::Game;

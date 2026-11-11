@@ -1,0 +1,49 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "hive",
+    srcs = [
+        "hive.cc",
+        "hive_board.cc",
+    ],
+    hdrs = [
+        "hive.h",
+        "hive_board.h",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/base:core_headers",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@abseil-cpp//absl/types:optional",
+        "@abseil-cpp//absl/types:span",
+        "//open_spiel",
+        "//open_spiel/utils:tensor_view",
+    ],
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "hive_test",
+    srcs = ["hive_test.cc"],
+    deps = [
+        ":hive",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)

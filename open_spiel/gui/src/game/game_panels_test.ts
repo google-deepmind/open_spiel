@@ -30,6 +30,7 @@ describe('GAME_PANELS', () => {
       'Gameplay',
       'Actions',
       'State',
+      'Bot output',
       'Session',
       'Setup',
       'View',
@@ -41,9 +42,22 @@ describe('GAME_PANELS', () => {
       'gameplay',
       'actions',
       'state',
+      'bot_output',
       'setup',
       'view',
     ]);
+  });
+
+  it('opens Bot output in its own group below Actions', () => {
+    const arrangement = arrange(GAME_PANELS, INITIAL, {
+      width: 1800,
+      height: 900,
+    });
+    const output = arrangement.panels.find(({id}) => id === 'bot_output');
+    expect(output?.position).toEqual({
+      referencePanel: 'actions',
+      direction: 'below',
+    });
   });
 
   it('opens Session as a tab of Actions', () => {
@@ -57,14 +71,14 @@ describe('GAME_PANELS', () => {
   });
 
   it.each([1800, 1200])(
-    'puts one column of two groups beside Gameplay at %i px',
+    'puts one column of three groups beside Gameplay at %i px',
     width => {
       const arrangement = arrange(GAME_PANELS, INITIAL, {width, height: 900});
       expect(arrangement.columns.map(({panel}) => panel)).toEqual([
         'gameplay',
         'actions',
       ]);
-      expect(arrangement.stacks).toEqual([['actions', 'setup']]);
+      expect(arrangement.stacks).toEqual([['actions', 'bot_output', 'setup']]);
     },
   );
 

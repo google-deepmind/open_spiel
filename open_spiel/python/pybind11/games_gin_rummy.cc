@@ -18,7 +18,7 @@
 #include <string>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/games/gin_rummy/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -26,7 +26,7 @@
 
 // Several function return absl::optional or lists of absl::optional, so must
 // use pybind11_abseil here.
-#include "pybind11/include/pybind11/detail/common.h"
+#include "pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 
 namespace open_spiel {

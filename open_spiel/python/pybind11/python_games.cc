@@ -22,23 +22,23 @@
 
 // Interface code for using Python Games and States from C++.
 
-#include "open_spiel/abseil-cpp/absl/container/inlined_vector.h"
-#include "open_spiel/abseil-cpp/absl/strings/escaping.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "absl/container/inlined_vector.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
+#include "nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
+#include "pybind11_json/pybind11_json.hpp"
 
 namespace open_spiel {
 

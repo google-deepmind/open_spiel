@@ -22,8 +22,8 @@
 #include "open_spiel/games/crossword/crossword_board.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/cast.h"
+#include "pybind11/pybind11.h"
 
 namespace py = ::pybind11;
 using open_spiel::ActionStruct;

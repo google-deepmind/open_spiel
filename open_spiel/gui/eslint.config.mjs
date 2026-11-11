@@ -20,6 +20,7 @@
 import eslint from '@eslint/js';
 import {defineConfig} from 'eslint/config';
 import prettier from 'eslint-config-prettier';
+import jsdoc from 'eslint-plugin-jsdoc';
 import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
@@ -48,7 +49,7 @@ function staysInClient(depth) {
             },
             {regex: '^/', message: 'No absolute imports.'},
             {
-              regex: '^\\.\\.?(/.*)?(?<!\\.(ts|tsx|css|json))$',
+              regex: '^\\.\\.?(/.*)?(?<!\\.(ts|tsx|css|json|svg\\?raw))$',
               message: 'A relative import names the file with its extension.',
             },
           ],
@@ -58,12 +59,127 @@ function staysInClient(depth) {
   };
 }
 
+const NUMBER_PARSING =
+  'Use Number() to parse numbers; parseInt only with a radix other than 10.';
+const ARRAY_CONSTRUCTOR = 'Use an array literal or Array.from({length}).';
+const NUMBER_PARSING_PROPERTIES = [
+  {object: 'Number', property: 'parseFloat', message: NUMBER_PARSING},
+  {object: 'Number', property: 'parseInt', message: NUMBER_PARSING},
+];
+
+// Every restriction but the one on default exports, which Playwright's
+// configuration files need.
+const RESTRICTED_SYNTAX = [
+  {
+    selector:
+      "CallExpression[callee.name='parseInt'][arguments.length<2], CallExpression[callee.name='parseInt'][arguments.1.value=10]",
+    message: NUMBER_PARSING,
+  },
+  {
+    selector:
+      'Program > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression, Program > ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression',
+    message: 'Use a function declaration for top-level functions.',
+  },
+  {selector: "CallExpression[callee.name='Array']", message: ARRAY_CONSTRUCTOR},
+  {selector: "NewExpression[callee.name='Array']", message: ARRAY_CONSTRUCTOR},
+];
+
+// The Google TypeScript Style Guide rules that neither the gts rule set nor
+// typescript-eslint's presets enforce. They come after Prettier's config,
+// which turns `curly` off.
+/** @type {import('eslint').Linter.Config[]} */
+const googleStyle = [
+  {
+    files: ['**/*.{ts,tsx}'],
+    plugins: {jsdoc},
+    rules: {
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          // The fixer only inserts empty comments; exports need real ones.
+          enableFixer: false,
+          publicOnly: true,
+          require: {
+            FunctionDeclaration: true,
+            ClassDeclaration: true,
+            ArrowFunctionExpression: true,
+          },
+          contexts: [
+            'ExportNamedDeclaration > VariableDeclaration',
+            'ExportNamedDeclaration > TSTypeAliasDeclaration',
+            'ExportNamedDeclaration > TSInterfaceDeclaration',
+          ],
+        },
+      ],
+      'default-case': 'error',
+      'no-restricted-globals': [
+        'error',
+        {name: 'parseFloat', message: NUMBER_PARSING},
+      ],
+      'no-restricted-properties': ['error', ...NUMBER_PARSING_PROPERTIES],
+      'no-restricted-syntax': [
+        'error',
+        ...RESTRICTED_SYNTAX,
+        {selector: 'ExportDefaultDeclaration', message: 'Use named exports.'},
+      ],
+      // A body without braces sits on the line of its condition; one-line
+      // `if (x) return;` stays allowed.
+      curly: ['error', 'multi-line'],
+      'nonblock-statement-body-position': ['error', 'beside'],
+    },
+  },
+  {
+    // DOM code reads textContent. Playwright's locator.innerText() in e2e/ is
+    // a different API: the rendered text the privacy tests read.
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        ...NUMBER_PARSING_PROPERTIES,
+        {property: 'innerText', message: 'Use textContent.'},
+      ],
+    },
+  },
+  {
+    // Production code types an object literal by its declaration,
+    // `const x: T = {...}`. Tests and their fakes may cast partial objects
+    // (events jsdom does not implement, for one).
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/**/testing/**', 'src/**/*_test.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        {
+          assertionStyle: 'as',
+          objectLiteralTypeAssertions: 'allow-as-parameter',
+        },
+      ],
+    },
+  },
+  {
+    // Playwright requires a default export from these files.
+    files: ['playwright.config.ts', 'e2e/global_setup.ts'],
+    rules: {'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX]},
+  },
+];
+
 const boundaries = Array.from({length: MAX_DEPTH + 1}, (_, depth) =>
   staysInClient(depth),
 );
 
 export default defineConfig(
-  {ignores: ['dist/', 'node_modules/']},
+  // addons/ and piece_sets/ hold the user's own add-ons and fetched files;
+  // npm run typecheck still checks the add-ons.
+  {
+    ignores: [
+      'dist/',
+      'node_modules/',
+      'playwright-report/',
+      'test-results/',
+      'addons/',
+      'piece_sets/',
+    ],
+  },
   eslint.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
@@ -101,4 +217,5 @@ export default defineConfig(
   },
   ...boundaries,
   prettier,
+  ...googleStyle,
 );

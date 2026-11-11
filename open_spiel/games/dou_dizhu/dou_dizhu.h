@@ -64,7 +64,7 @@
 // (2) dizhu does not play any cards after its first hand, then it's called
 // spring. And the stake is also doubled.
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "absl/types/optional.h"
 #include "open_spiel/games/dou_dizhu/dou_dizhu_utils.h"
 #include "open_spiel/spiel.h"
 

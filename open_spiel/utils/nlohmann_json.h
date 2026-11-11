@@ -16,7 +16,7 @@
 #define OPEN_SPIEL_UTILS_NLOHMANN_JSON_H_
 
 #include <optional>
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 namespace nlohmann {
 

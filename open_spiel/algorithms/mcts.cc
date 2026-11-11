@@ -21,12 +21,12 @@
 #include <random>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "absl/algorithm/container.h"
+#include "absl/random/distributions.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"

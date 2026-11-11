@@ -43,7 +43,15 @@ async function playAgainst(
   await expect(
     legal.getByText('Game finished. No legal actions.'),
   ).toBeVisible();
-  await expect(app.returnsSentence(await app.gameplay())).toBeVisible();
+  // The tic-tac-toe board says the result itself, over the board, to seat 0.
+  const [first = 0, second = 0] = end.returns ?? [];
+  await expect((await app.gameplay()).getByTestId('game-result')).toHaveText(
+    first > second
+      ? 'X wins · You win'
+      : second > first
+        ? 'O wins · You lose'
+        : 'Draw',
+  );
 }
 
 test('tic_tac_toe: seat 0 plays Random, then MCTS, to the end', async ({

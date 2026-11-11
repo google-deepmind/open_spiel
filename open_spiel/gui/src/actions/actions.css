@@ -172,11 +172,6 @@ button.legal__row:hover:not([aria-disabled='true']) {
   font-variant-numeric: tabular-nums;
 }
 
-.legal__row[data-duplicate='true'] .legal__id {
-  color: var(--color-warning);
-  font-weight: 600;
-}
-
 .legal__label {
   flex: 1;
   min-width: 0;

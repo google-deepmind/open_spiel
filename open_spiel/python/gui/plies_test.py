@@ -17,11 +17,13 @@
 
 import dataclasses
 import random
+from unittest import mock
 
 from absl.testing import absltest
 
 from open_spiel.python.gui import contract
 from open_spiel.python.gui import plies
+from open_spiel.python.gui import presenters
 import pyspiel
 
 
@@ -54,6 +56,24 @@ class ApplyTest(absltest.TestCase):
     ply = plies.apply(state, 4, ply=0)
     self.assertEqual(ply, plies.Ply(0, 4, "x(1,1)", (0.0, 0.0)))
     self.assertEqual(state.history(), [4])
+
+  def test_records_the_adapters_public_label_from_the_state_before(
+      self,
+  ) -> None:
+    game = pyspiel.load_game("tic_tac_toe")
+    state = game.new_initial_state()
+    grid = presenters.adapter_for("tic_tac_toe")
+    seen = []
+
+    def public(before: pyspiel.State, action: int) -> str | None:
+      seen.append((str(before), action))
+      return f"seat {before.current_player()} took {action}"
+
+    with mock.patch.object(grid, "public_action_label", public):
+      ply = plies.apply(state, 4, ply=0)
+    self.assertEqual(ply.public_label, "seat 0 took 4")
+    self.assertEqual(seen, [(str(game.new_initial_state()), 4)])
+    self.assertIsNone(plies.apply(state, 0, ply=1).public_label)
 
   def test_records_a_chance_outcome_without_a_seat(self) -> None:
     state = pyspiel.load_game("kuhn_poker").new_initial_state()

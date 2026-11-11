@@ -24,9 +24,9 @@ NumPlayers() = 4
 MinUtility() = -4.0
 MaxUtility() = 4.0
 UtilitySum() = 0.0
-InformationStateTensorShape() = [935]
+InformationStateTensorShape() = [959]
 InformationStateTensorLayout() = TensorLayout.CHW
-InformationStateTensorSize() = 935
+InformationStateTensorSize() = 959
 MaxGameLength() = 29
 ToString() = "euchre()"
 
@@ -55,10 +55,10 @@ InformationStateString(0) = "Dealer: \nHand:\nS none\nH none\nD none\nC none\n"
 InformationStateString(1) = "Dealer: \nHand:\nS none\nH none\nD none\nC none\n"
 InformationStateString(2) = "Dealer: \nHand:\nS none\nH none\nD none\nC none\n"
 InformationStateString(3) = "Dealer: \nHand:\nS none\nH none\nD none\nC none\n"
-InformationStateTensor(0): zeros(935)
-InformationStateTensor(1): zeros(935)
-InformationStateTensor(2): zeros(935)
-InformationStateTensor(3): zeros(935)
+InformationStateTensor(0): zeros(959)
+InformationStateTensor(1): zeros(959)
+InformationStateTensor(2): zeros(959)
+InformationStateTensor(3): zeros(959)
 ObservationString(0) = "Dealer: \nHand:\nS none\nH none\nD none\nC none\n"
 ObservationString(1) = "Dealer: \nHand:\nS none\nH none\nD none\nC none\n"
 ObservationString(2) = "Dealer: \nHand:\nS none\nH none\nD none\nC none\n"
@@ -95,10 +95,10 @@ InformationStateString(0) = "Dealer: E\nHand:\nS none\nH none\nD none\nC none\n"
 InformationStateString(1) = "Dealer: E\nHand:\nS none\nH none\nD none\nC none\n"
 InformationStateString(2) = "Dealer: E\nHand:\nS none\nH none\nD none\nC none\n"
 InformationStateString(3) = "Dealer: E\nHand:\nS none\nH none\nD none\nC none\n"
-InformationStateTensor(0): zeros(935)
-InformationStateTensor(1): zeros(935)
-InformationStateTensor(2): zeros(935)
-InformationStateTensor(3): zeros(935)
+InformationStateTensor(0): zeros(959)
+InformationStateTensor(1): zeros(959)
+InformationStateTensor(2): zeros(959)
+InformationStateTensor(3): zeros(959)
 ObservationString(0) = "Dealer: E\nHand:\nS none\nH none\nD none\nC none\n"
 ObservationString(1) = "Dealer: E\nHand:\nS none\nH none\nD none\nC none\n"
 ObservationString(2) = "Dealer: E\nHand:\nS none\nH none\nD none\nC none\n"
@@ -217,10 +217,10 @@ InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n
 InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n"
 InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n"
 InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n"
-InformationStateTensor(0): binvec(935, 0x202000000000000003000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000000000000003128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000000000000003800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000000000000003291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(0): binvec(959, 0x202000000000000000000000000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000000000000000000000128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000000000000000000000800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000000000000000000000291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
 ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n"
 ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n"
 ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n"
@@ -263,10 +263,10 @@ InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n
 InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     \n"
 InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     \n"
 InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     \n"
-InformationStateTensor(0): binvec(935, 0x202000002000000003000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002000000003128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002000000003800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002000000003291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(0): binvec(959, 0x202000004000000000000000000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004000000000000000128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004000000000000000800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004000000000000000291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
 ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     \n"
 ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     \n"
 ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     \n"
@@ -310,10 +310,10 @@ InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n
 InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \n\n"
 InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \n\n"
 InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \n\n"
-InformationStateTensor(0): binvec(935, 0x202000002100000003000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002100000003128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002100000003800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002100000003291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(0): binvec(959, 0x202000004200000000000000000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004200000000000000128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004200000000000000800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004200000000000000291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
 ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \n\n"
 ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \n\n"
 ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \n\n"
@@ -357,10 +357,10 @@ InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n
 InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     \n"
 InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     \n"
 InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     \n"
-InformationStateTensor(0): binvec(935, 0x202000002108000003000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002108000003128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002108000003800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002108000003291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(0): binvec(959, 0x202000004210000000000000000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004210000000000000128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004210000000000000800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004210000000000000291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
 ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     \n"
 ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     \n"
 ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     \n"
@@ -404,10 +404,10 @@ InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n
 InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     \n"
 InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     \n"
 InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     \n"
-InformationStateTensor(0): binvec(935, 0x202000002108400003000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002108400003128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002108400003800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002108400003291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(0): binvec(959, 0x202000004210800000000000000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004210800000000000128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004210800000000000800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004210800000000000291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
 ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     \n"
 ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     \n"
 ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     \n"
@@ -440,25 +440,25 @@ action: 27
 # Bidding:
 # North    East     South    West
 #                   Pass     Pass
-# Pass     Pass     Pick up!
+# Pass     Pass     Hearts
 IsTerminal() = False
 History() = [1, 6, 0, 11, 21, 8, 19, 7, 14, 3, 22, 4, 15, 23, 13, 2, 20, 17, 16, 18, 12, 5, 24, 24, 24, 24, 27]
 HistoryString() = "1, 6, 0, 11, 21, 8, 19, 7, 14, 3, 22, 4, 15, 23, 13, 2, 20, 17, 16, 18, 12, 5, 24, 24, 24, 24, 27"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
-InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
-InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
-InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
-InformationStateTensor(0): binvec(935, 0x202000002108500000000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002108500000128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002108500000800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002108500000291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
-ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
-ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
-ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n"
+InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
+InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
+InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
+InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
+InformationStateTensor(0): binvec(959, 0x202000004210900000000000000b0c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004210900000000000128041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004210900000000000800492000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004210900000000000291020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
+ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
+ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC K9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
+ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n"
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [29, 30]
@@ -491,7 +491,7 @@ action: 16
 # Bidding:
 # North    East     South    West
 #                   Pass     Pass
-# Pass     Pass     Pick up!
+# Pass     Pass     Hearts
 #
 # Declarer go alone: true
 #
@@ -510,18 +510,18 @@ HistoryString() = "1, 6, 0, 11, 21, 8, 19, 7, 14, 3, 22, 4, 15, 23, 13, 2, 20, 1
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateTensor(0): binvec(935, 0x202000002108500004000b0c000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002108500004128041000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002108500004800412000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002108500004291020000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateTensor(0): binvec(959, 0x202000004210900004000000000b0c000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004210900004000000128041000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004210900004000000800412000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004210900004000000291020000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC T\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [4]
@@ -550,7 +550,7 @@ action: 4
 # Bidding:
 # North    East     South    West
 #                   Pass     Pass
-# Pass     Pass     Pick up!
+# Pass     Pass     Hearts
 #
 # Declarer go alone: true
 #
@@ -569,18 +569,18 @@ HistoryString() = "1, 6, 0, 11, 21, 8, 19, 7, 14, 3, 22, 4, 15, 23, 13, 2, 20, 1
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateTensor(0): binvec(935, 0x202000002108500004000b0c000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002108500004128041000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002108500004800412000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002108500004211020000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateTensor(0): binvec(959, 0x202000004210900004000000000b0c000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004210900004000000128041000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004210900004000000800412000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004210900004000000211020000000000000000080080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC J\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC 9\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [8]
@@ -613,7 +613,7 @@ action: 0
 # Bidding:
 # North    East     South    West
 #                   Pass     Pass
-# Pass     Pass     Pick up!
+# Pass     Pass     Hearts
 #
 # Declarer go alone: true
 #
@@ -633,18 +633,18 @@ HistoryString() = "1, 6, 0, 11, 21, 8, 19, 7, 14, 3, 22, 4, 15, 23, 13, 2, 20, 1
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateTensor(0): binvec(935, 0x202000002108500004000b0c000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002108500004120041000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002108500004000412000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002108500004211020000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateTensor(0): binvec(959, 0x202000004210900004000000000b0c000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004210900004000000120041000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004210900004000000000412000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004210900004000000211020000000000000000080080000000000008000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K9\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [2, 7, 11, 18]
@@ -673,7 +673,7 @@ action: 2
 # Bidding:
 # North    East     South    West
 #                   Pass     Pass
-# Pass     Pass     Pick up!
+# Pass     Pass     Hearts
 #
 # Declarer go alone: true
 #
@@ -693,18 +693,18 @@ HistoryString() = "1, 6, 0, 11, 21, 8, 19, 7, 14, 3, 22, 4, 15, 23, 13, 2, 20, 1
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-InformationStateTensor(0): binvec(935, 0x202000002108500004000b0c000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(1): binvec(935, 0x202000002108500004120041000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(2): binvec(935, 0x202000002108500004000412000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-InformationStateTensor(3): binvec(935, 0x202000002108500004011020000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
-ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
-ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+InformationStateTensor(0): binvec(959, 0x202000004210900004000000000b0c000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(959, 0x202000004210900004000000120041000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(959, 0x202000004210900004000000000412000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(3): binvec(959, 0x202000004210900004000000011020000000000000000080080000000000008000000000000000000000800000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Dealer: E\nUpcard: DT\nHand:\nS Q\nH Q\nD A\nC AQ\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(1) = "Dealer: E\nUpcard: DT\nHand:\nS A9\nH T\nD K\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(2) = "Dealer: E\nUpcard: DT\nHand:\nS K\nH A\nD Q\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
+ObservationString(3) = "Dealer: E\nUpcard: DT\nHand:\nS JT\nH K\nD none\nC none\n\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    \n\nPoints:\nN: 0\nE: 0\nS: 0\nW: 0"
 Rewards() = [0, 0, 0, 0]
 Returns() = [0, 0, 0, 0]
 LegalActions() = [3, 6, 17, 23]
@@ -769,7 +769,7 @@ action: 17
 # Bidding:
 # North    East     South    West
 #                   Pass     Pass
-# Pass     Pass     Pick up!
+# Pass     Pass     Hearts
 #
 # Declarer go alone: true
 #
@@ -792,17 +792,17 @@ HistoryString() = "1, 6, 0, 11, 21, 8, 19, 7, 14, 3, 22, 4, 15, 23, 13, 2, 20, 1
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
-InformationStateString(1) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
-InformationStateString(2) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
-InformationStateString(3) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
-InformationStateTensor(0): binvec(935, 0x202000002108500004000b0c000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
-InformationStateTensor(1): binvec(935, 0x202000002108500004000000000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
-InformationStateTensor(2): binvec(935, 0x202000002108500004000000000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
-InformationStateTensor(3): binvec(935, 0x202000002108500004000000000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
-ObservationString(0) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
-ObservationString(1) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
-ObservationString(2) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
-ObservationString(3) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Pick up! \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+InformationStateString(0) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+InformationStateString(1) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+InformationStateString(2) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+InformationStateString(3) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+InformationStateTensor(0): binvec(959, 0x202000004210900004000000000b0c000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
+InformationStateTensor(1): binvec(959, 0x202000004210900004000000000000000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
+InformationStateTensor(2): binvec(959, 0x202000004210900004000000000000000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
+InformationStateTensor(3): binvec(959, 0x202000004210900004000000000000000000000000000080080000000000008000000000000000000000800000200000000000100000000000000000000000000000001000000000000001000010000000020000000002000020000000000000000000000000000000000400010000000000000040000000)
+ObservationString(0) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+ObservationString(1) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+ObservationString(2) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
+ObservationString(3) = "Dealer: E\n\n        S Q\n        H Q\n        D A\n        C AQ\nS JT            S A9\nH K9            H T\nD               D K\nC T             C J\n        S K\n        H A\n        D Q\n        C K9\n\nUpcard: DT\nBidding:\nNorth    East     South    West\n                  Pass     Pass     \nPass     Pass     Hearts   \n\nDeclarer go alone: true\n\nTricks:\nN  E  S  W  N  E  S\n      CK CT    CJ \n      C9 H9    S9 \n         SJ    SA SK \n   HT HA HK    \n      DQ ST    DK \n\nPoints:\nN: -2\nE: 2\nS: -2\nW: 2"
 Rewards() = [-2, 2, -2, 2]
 Returns() = [-2, 2, -2, 2]

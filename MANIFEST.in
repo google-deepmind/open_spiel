@@ -8,6 +8,10 @@ include pybind11/CMakeLists.txt
 
 # open_spiel files, including source files for abseil and dds
 recursive-include open_spiel CMakeLists.txt *.cc *.cpp *.h *.hpp *.py evalHandTables
+# open_spiel CMake files that are not called CMakeLists.txt
+include open_spiel/targets.cmake
+include open_spiel/python/python_tests.cmake
+recursive-include open_spiel/cmake *.cmake
 
 # data files of the GUI server
 recursive-include open_spiel/python/gui *.json

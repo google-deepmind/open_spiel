@@ -16,8 +16,10 @@ import {definePanels} from '../dock/panels.ts';
 
 /**
  * The game page's panels. Gameplay is on the left; beside it, one column of
- * Actions | State over Setup | View. Session is closed at first, and opens
- * from Panel options as a tab of Actions.
+ * Actions | State, then Bot output, then Setup | View, so the Bot output
+ * panel stays in view beside the History slider as it steps through plies.
+ * Session is closed at first, and opens from Panel options as a tab of
+ * Actions.
  */
 export const GAME_PANELS = definePanels([
   {
@@ -43,6 +45,13 @@ export const GAME_PANELS = definePanels([
     minimumHeight: 200,
   },
   {
+    id: 'bot_output',
+    title: 'Bot output',
+    position: {referencePanel: 'actions', direction: 'below'},
+    minimumWidth: 260,
+    minimumHeight: 200,
+  },
+  {
     id: 'session',
     title: 'Session',
     position: {referencePanel: 'actions', direction: 'within'},
@@ -53,7 +62,7 @@ export const GAME_PANELS = definePanels([
   {
     id: 'setup',
     title: 'Setup',
-    position: {referencePanel: 'actions', direction: 'below'},
+    position: {referencePanel: 'bot_output', direction: 'below'},
     minimumWidth: 260,
     minimumHeight: 200,
   },

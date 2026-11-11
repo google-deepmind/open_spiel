@@ -31,10 +31,18 @@ function hiddenLabel(seat: number | null): string {
     : `Hidden action of seat ${String(seat)}`;
 }
 
+/** What the viewer may read of `entry`: its label, or the public label of a
+ *  withheld action the game makes public (a card discarded face up); null
+ *  when the action is hidden. */
+export function readableLabel(entry: HistoryEntry): string | null {
+  return entry.label ?? entry.public_label;
+}
+
 /**
  * The rows for `history`, after a row for the initial position. A run of
- * withheld actions by the same seat, or of withheld chance outcomes, is one
- * row: a deal of 52 hidden cards is one row, not 52.
+ * hidden actions by the same seat, or of hidden chance outcomes, is one
+ * row: a deal of 52 hidden cards is one row, not 52. A withheld action the
+ * game makes public has its own row, under its public label.
  */
 export function historyRows(
   history: readonly HistoryEntry[],
@@ -42,15 +50,17 @@ export function historyRows(
   const rows: HistoryRow[] = [{first: 0, last: 0, label: 'Initial'}];
   history.forEach((entry, index) => {
     const ply = index + 1;
-    if (entry.label !== null) {
-      rows.push({first: ply, last: ply, label: entry.label});
+    const label = readableLabel(entry);
+    if (label !== null) {
+      rows.push({first: ply, last: ply, label});
       return;
     }
     const previous = history[index - 1];
     const run = rows.at(-1);
     if (
       run !== undefined &&
-      previous?.label === null &&
+      previous !== undefined &&
+      readableLabel(previous) === null &&
       previous.seat === entry.seat
     ) {
       rows[rows.length - 1] = {...run, last: ply};

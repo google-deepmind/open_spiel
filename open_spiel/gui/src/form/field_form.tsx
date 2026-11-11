@@ -39,8 +39,9 @@ export interface FieldFormProps {
 /**
  * One row per field: its label on the left, with its description behind an
  * "i" toggle, and its control on the right: a checkbox, a number or text
- * box, or a list of choices. A box with presets offers them as chips under
- * it. A field's error is shown under its row.
+ * box, or a list of choices. A required field's label carries an asterisk
+ * and its control is marked required. A box with presets offers them as
+ * chips under it. A field's error is shown under its row.
  *
  * @throws Error when a field has no draft.
  */
@@ -95,11 +96,21 @@ function FieldRow({
     id,
     'aria-describedby': error === null ? undefined : errorId,
     'aria-invalid': error !== null,
+    'aria-required': field.required,
   };
   return (
-    <div className="field-form__field" data-kind={field.kind}>
+    <div
+      className="field-form__field"
+      data-kind={field.kind}
+      data-required={field.required}
+    >
       <span className="field-form__label">
         <label htmlFor={id}>{field.label}</label>
+        {field.required && (
+          <span className="field-form__required" aria-hidden="true">
+            *
+          </span>
+        )}
         {field.description !== null && (
           <FieldInfo description={field.description} />
         )}
@@ -136,6 +147,7 @@ interface ControlAttributes {
   readonly id: string;
   readonly 'aria-describedby': string | undefined;
   readonly 'aria-invalid': boolean;
+  readonly 'aria-required': boolean;
 }
 
 interface InputProps {
@@ -172,6 +184,7 @@ function Input({field, control, draft, onChange}: InputProps): JSX.Element {
       {...control}
       className="control"
       type={numeric ? 'number' : 'text'}
+      placeholder={field.required ? 'Required' : undefined}
       min={numeric ? (field.minimum ?? undefined) : undefined}
       max={numeric ? (field.maximum ?? undefined) : undefined}
       step={numeric ? (field.kind === 'integer' ? 1 : 'any') : undefined}

@@ -1,0 +1,56 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(
+    default_applicable_licenses = ["//open_spiel:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+licenses(["notice"])
+
+exports_files(["CMakeLists.txt"])
+
+cc_library(
+    name = "simple_gin_rummy_bot",
+    srcs = ["simple_gin_rummy_bot.cc"],
+    hdrs = ["simple_gin_rummy_bot.h"],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    deps = [
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/types:optional",
+        "//open_spiel",
+        "//open_spiel/games/gin_rummy",
+    ],
+)
+
+cc_test(
+    name = "simple_gin_rummy_bot_test",
+    srcs = ["simple_gin_rummy_bot_test.cc"],
+    deps = [
+        ":simple_gin_rummy_bot",
+        "@abseil-cpp//absl/algorithm:container",
+        "//open_spiel",
+        "//open_spiel/game_transforms:repeated_game",
+        "//open_spiel/games:all_games",  # build-cleaner: keep
+        "//open_spiel/games/gin_rummy",
+    ],
+)
+
+cc_binary(
+    name = "simple_gin_rummy_bot_example",
+    srcs = ["simple_gin_rummy_bot_example.cc"],
+    features = ["-use_header_modules"],
+    deps = [
+        ":simple_gin_rummy_bot",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/time",
+        "//open_spiel",
+        "//open_spiel/game_transforms:repeated_game",
+        "//open_spiel/games:all_games",  # build-cleaner: keep
+        "//open_spiel/games/gin_rummy",
+    ],
+)

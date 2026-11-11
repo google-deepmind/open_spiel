@@ -19,8 +19,7 @@ import {
   defaultSession,
   defaultViewer,
   initialViewer,
-  viewerLabel,
-  viewerOptions,
+  modeLabel,
 } from './game_defaults.ts';
 
 function entry(fields: Partial<CatalogueEntry> = {}): CatalogueEntry {
@@ -37,6 +36,7 @@ function entry(fields: Partial<CatalogueEntry> = {}): CatalogueEntry {
     loadable: true,
     unavailable_reason: null,
     controllers: ['human'],
+    renderer: null,
     ...fields,
   };
 }
@@ -62,31 +62,28 @@ describe('defaultSession', () => {
     ).toEqual({board_size: 9});
   });
 
+  it('opens gin rummy on Oklahoma rules', () => {
+    expect(
+      defaultSession(entry({name: 'gin_rummy', num_players: 2})).parameters,
+    ).toEqual({oklahoma: true});
+  });
+
   it('refuses a game the server cannot load', () => {
     const unloadable = entry({
       num_players: null,
       loadable: false,
       unavailable_reason: 'No.',
       controllers: [],
+      renderer: null,
     });
     expect(() => defaultSession(unloadable)).toThrow('not loadable');
   });
 });
 
 describe('defaultViewer', () => {
-  it('shows a game of perfect information to the oracle', () => {
-    expect(defaultViewer(entry())).toEqual({kind: 'oracle', seat: null});
+  it('opens every game in analysis, as the oracle', () => {
+    expect(defaultViewer()).toEqual({kind: 'oracle', seat: null});
   });
-
-  it.each(['imperfect_information', 'one_shot'] as const)(
-    'shows a game of %s to the first seat',
-    information => {
-      expect(defaultViewer(entry({information}))).toEqual({
-        kind: 'seat',
-        seat: 0,
-      });
-    },
-  );
 });
 
 describe('initialViewer', () => {
@@ -103,25 +100,25 @@ describe('initialViewer', () => {
     });
   });
 
-  it.each([null, {kind: 'seat', seat: 3} as const])(
-    'opens for the default viewer when the address names %j',
-    asked => {
-      expect(initialViewer(entry(), asked)).toEqual(oracle);
+  it('opens for the default viewer when the address names no one', () => {
+    expect(initialViewer(entry(), null)).toEqual(oracle);
+  });
+
+  it.each([3, 4, 9999])(
+    'opens the spectator, never the oracle, for seat %i the game lacks',
+    seat => {
+      expect(initialViewer(entry(), {kind: 'seat', seat})).toEqual({
+        kind: 'spectator',
+        seat: null,
+      });
     },
   );
 });
 
-describe('viewerOptions', () => {
-  it('offers every seat, then the oracle and a spectator', () => {
-    expect(viewerOptions(2).map(({value, label}) => [value, label])).toEqual([
-      ['0', 'Seat 0'],
-      ['1', 'Seat 1'],
-      ['oracle', 'Oracle (sees everything)'],
-      ['spectator', 'Spectator'],
-    ]);
-  });
-
-  it('labels a seat as a seat', () => {
-    expect(viewerLabel({kind: 'seat', seat: 4})).toBe('Seat 4');
+describe('modeLabel', () => {
+  it('names analysis, a seat in a game and a spectator', () => {
+    expect(modeLabel({kind: 'oracle', seat: null})).toBe('Analysis');
+    expect(modeLabel({kind: 'seat', seat: 4})).toBe('Game, seat 4');
+    expect(modeLabel({kind: 'spectator', seat: null})).toBe('Game, spectating');
   });
 });

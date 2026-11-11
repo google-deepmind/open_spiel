@@ -43,6 +43,12 @@ export interface SessionCommands {
   /** Fetches the shown position again. */
   readonly refresh: () => void;
   /**
+   * Fetches the shown position again, quietly: the session is not marked
+   * busy, and nothing is sent while another command is pending. For waiting
+   * on the server, as while a seat's controller is preparing.
+   */
+  readonly poll: () => void;
+  /**
    * Shows the position after `ply` actions, or the live position when `ply`
    * is past it.
    */
@@ -54,6 +60,16 @@ export interface SessionCommands {
    * from it, taking back every later ply, as only an omniscient viewer may.
    */
   readonly act: (action: number) => void;
+  /**
+   * Plays `actions` in order from the position shown, as one command: the
+   * frame after the last, or a rejection with the first refusal, after which
+   * none of the rest is sent. A board that composes several actions into one
+   * move (a gin lay-down) waits on it, and says why it failed: a refusal is
+   * the board's to show, not the snapshot's error. The actions before the
+   * refusal stay played, so after one the store fetches the position the
+   * server is at and shows it, and drops the commands queued behind.
+   */
+  readonly actSequence: (actions: readonly number[]) => Promise<Frame>;
   /** Chooses a chance outcome at the position shown, as `act` does. */
   readonly chooseChance: (outcome: number) => void;
   /** Lets controllers play; `maxPlies` null leaves the bound to the server. */
@@ -168,10 +184,12 @@ export class SessionStore implements SessionCommands {
   };
 
   readonly refresh = (): void => {
-    this.enqueue((position, viewer) => {
-      const current = requireSession(position);
-      return this.load(current, viewer, current.ply);
-    });
+    this.enqueue(this.reload);
+  };
+
+  readonly poll = (): void => {
+    if (this.pending > 0 || this.position === null) return;
+    this.enqueue(this.reload, {quiet: true});
   };
 
   readonly goTo = (ply: number): void => {
@@ -198,6 +216,52 @@ export class SessionStore implements SessionCommands {
     this.enqueue((position, viewer) => {
       const current = requireSession(position);
       return this.client.act(current.id, viewer, action, earlierPly(current));
+    });
+  };
+
+  readonly actSequence = (actions: readonly number[]): Promise<Frame> => {
+    if (actions.length === 0) {
+      return Promise.reject(new RangeError('An action sequence is empty.'));
+    }
+    return new Promise<Frame>((resolve, reject) => {
+      const command: Command = async (position, viewer) => {
+        let current = requireSession(position);
+        let frame: Frame | null = null;
+        try {
+          for (const action of actions) {
+            frame = await this.client.act(
+              current.id,
+              viewer,
+              action,
+              earlierPly(current),
+            );
+            current = {
+              id: frame.session.id,
+              ply: frame.ply,
+              numPlies: frame.num_plies,
+            };
+          }
+        } catch (e) {
+          reject(e instanceof Error ? e : new Error(String(e)));
+          if (!(e instanceof ContractError || e instanceof TransportError)) {
+            throw e;
+          }
+          // The commands queued behind were issued on the expectation that
+          // the sequence would succeed.
+          this.generation += 1;
+          // The actions before the refusal were played: the frame shown must
+          // be the server's, or every later move is built on a stale one.
+          return this.load(current, viewer, current.ply);
+        }
+        if (frame === null) throw new Error('An action sequence is empty.');
+        resolve(frame);
+        return frame;
+      };
+      this.enqueue(command, {
+        onDrop: () => {
+          reject(new Error('An earlier command failed; nothing was sent.'));
+        },
+      });
     });
   };
 
@@ -248,6 +312,12 @@ export class SessionStore implements SessionCommands {
     });
   }
 
+  // Fetches the position the previous command left.
+  private readonly reload: Command = (position, viewer) => {
+    const current = requireSession(position);
+    return this.load(current, viewer, current.ply);
+  };
+
   // The live position comes by the live route, so that refreshing a live
   // frame picks up the plies played since.
   private load(current: Position, viewer: Viewer, ply: number): Promise<Frame> {
@@ -256,22 +326,40 @@ export class SessionStore implements SessionCommands {
       : this.client.replay(current.id, viewer, ply);
   }
 
-  // Queues `command`, which a failure before it drops unless `keep`.
-  private enqueue(command: Command, {keep = false} = {}): void {
+  // Queues `command`, which a failure before it drops unless `keep`;
+  // `onDrop` hears of the drop. A `quiet` command neither marks the session
+  // busy nor clears its error, and counts for nothing in `pending`.
+  private enqueue(
+    command: Command,
+    {
+      keep = false,
+      quiet = false,
+      onDrop,
+    }: {keep?: boolean; quiet?: boolean; onDrop?: () => void} = {},
+  ): void {
     const viewer = this.viewer;
     const generation = keep ? null : this.generation;
-    this.pending += 1;
-    this.update({busy: true, error: null});
-    this.queue = this.queue.then(() => this.run(command, viewer, generation));
+    if (!quiet) {
+      this.pending += 1;
+      this.update({busy: true, error: null});
+    }
+    this.queue = this.queue.then(() =>
+      this.run(command, viewer, generation, onDrop, quiet),
+    );
   }
 
   private async run(
     command: Command,
     viewer: Viewer,
     generation: number | null,
+    onDrop: (() => void) | undefined,
+    quiet: boolean,
   ): Promise<void> {
     try {
-      if (generation !== null && generation !== this.generation) return;
+      if (generation !== null && generation !== this.generation) {
+        onDrop?.();
+        return;
+      }
       const request = command(this.position, viewer);
       if (request === null) return;
       const frame = await request;
@@ -282,7 +370,8 @@ export class SessionStore implements SessionCommands {
       };
       if (sameViewer(frame.viewer, this.viewer)) this.update({frame});
     } catch (e) {
-      this.generation += 1;
+      // A quiet command was issued by no one, so nothing queued rests on it.
+      if (!quiet) this.generation += 1;
       if (e instanceof ContractError || e instanceof TransportError) {
         this.update({error: e});
       } else {
@@ -291,8 +380,10 @@ export class SessionStore implements SessionCommands {
         });
       }
     } finally {
-      this.pending -= 1;
-      if (this.pending === 0) this.update({busy: false});
+      if (!quiet) {
+        this.pending -= 1;
+        if (this.pending === 0) this.update({busy: false});
+      }
     }
   }
 

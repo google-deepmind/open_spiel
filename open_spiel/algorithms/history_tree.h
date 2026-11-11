@@ -21,9 +21,9 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "absl/container/btree_map.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

@@ -18,8 +18,8 @@
 #include <random>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/time/time.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "absl/time/time.h"
+#include "absl/random/distributions.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 

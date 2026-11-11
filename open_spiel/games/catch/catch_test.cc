@@ -14,7 +14,7 @@
 
 #include "open_spiel/games/catch/catch.h"
 
-#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "open_spiel/algorithms/get_all_states.h"
 #include "open_spiel/spiel.h"
