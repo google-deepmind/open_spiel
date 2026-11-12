@@ -104,13 +104,13 @@ std::pair<std::vector<int>, Action> PIMCBot::Search(const State& root_state) {
         root_state.NumPlayers() == 2) {
       // Special case for two-player zero-sum deterministic games: use
       // alpha-beta.
-      std::pair<double, Action> search_result = algorithms::AlphaBetaSearch(
+      std::pair<double, algorithms::BestActions> search_result = algorithms::AlphaBetaSearch(
           *state->GetGame(), state.get(),
           [this, player](const State& state) {
             return this->value_function_(state, player);
           },
           depth_limit_, player, /*use_undo*/ false);
-      action_counts[search_result.second] += 1;
+      action_counts[search_result.second.Single()] += 1;
     } else {
       std::pair<std::vector<double>, Action> search_result =
           algorithms::MaxNSearch(*state->GetGame(), state.get(),

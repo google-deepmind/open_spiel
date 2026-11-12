@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
 #include <memory>
+#include <utility>
 
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/games/breakthrough/breakthrough.h"
@@ -20,7 +22,8 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-inline constexpr int kSearchDepth = 2;
+inline constexpr int kSearchDepthTicTacToe = 9;
+inline constexpr int kSearchDepthBreakthrough = 2;
 inline constexpr int kSearchDepthPig = 10;
 inline constexpr int kWinscorePig = 30;
 inline constexpr int kDiceoutcomesPig = 2;
@@ -35,29 +38,62 @@ int BlackPieceAdvantage(const State& state) {
          bstate.pieces(breakthrough::kWhitePlayerId);
 }
 
-void PlayBreakthrough() {
+void PlayTicTacToe(std::mt19937& rng, bool sample_actions = true) {
   std::shared_ptr<const Game> game =
-      LoadGame("breakthrough", {{"rows", GameParameter(6)},
-                                {"columns", GameParameter(6)}});
+      LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
     std::cout << std::endl << state->ToString() << std::endl;
 
     Player player = state->CurrentPlayer();
-    std::pair<double, Action> value_action = algorithms::AlphaBetaSearch(
-        *game, state.get(), [player](const State& state) {
-            return (player == breakthrough::kBlackPlayerId ?
-                    BlackPieceAdvantage(state) :
-                    -BlackPieceAdvantage(state));
-            },
-        kSearchDepth, player);
+    std::pair<double, algorithms::BestActions> value_action =
+        algorithms::AlphaBetaSearch(
+            *game, state.get(),
+            nullptr,
+            kSearchDepthTicTacToe, player);
 
-    std::cout << std::endl << "Player " << player << " choosing action "
-              << state->ActionToString(player, value_action.second)
-              << " with heuristic value (to black) " << value_action.first
+    const double value = value_action.first;
+    const double action = sample_actions ? value_action.second.SampleUniformly(rng) : value_action.second.Single();
+
+    std::cout << std::endl
+              << "Player " << player << " choosing action "
+              << state->ActionToString(player, action)
+              << " with heuristic value (to black) " << value
               << std::endl;
 
-    state->ApplyAction(value_action.second);
+    state->ApplyAction(action);
+  }
+}
+
+void PlayBreakthrough(std::mt19937& rng, bool sample_actions = true) {
+  std::shared_ptr<const Game> game =
+      LoadGame("breakthrough",
+               {{"rows", GameParameter(6)}, {"columns", GameParameter(6)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (!state->IsTerminal()) {
+    std::cout << std::endl << state->ToString() << std::endl;
+
+    Player player = state->CurrentPlayer();
+    std::pair<double, algorithms::BestActions> value_action =
+        algorithms::AlphaBetaSearch(
+            *game, state.get(),
+            [player](const State& state) {
+              return (player == breakthrough::kBlackPlayerId
+                          ? BlackPieceAdvantage(state)
+                          : -BlackPieceAdvantage(state));
+            },
+            kSearchDepthBreakthrough, player);
+
+    const double value = value_action.first;
+    const double action = sample_actions ? value_action.second.SampleUniformly(rng) : value_action.second.Single();
+
+    std::cout << std::endl
+              << "Player " << player << " choosing action "
+              << state->ActionToString(player, action)
+              << " with heuristic value (to black) " << value
+              << std::endl;
+
+    state->ApplyAction(action);
   }
 
   std::cout << "Terminal state: " << std::endl;
@@ -69,7 +105,7 @@ int FirstPlayerAdvantage(const State& state) {
   return pstate.score(0) - pstate.score(1);
 }
 
-void PlayPig(std::mt19937& rng) {
+void PlayPig(std::mt19937& rng, bool sample_actions = true) {
   std::shared_ptr<const Game> game =
       LoadGame("pig", {{"winscore", GameParameter(kWinscorePig)},
                        {"diceoutcomes", GameParameter(kDiceoutcomesPig)}});
@@ -86,20 +122,25 @@ void PlayPig(std::mt19937& rng) {
                 << std::endl;
       state->ApplyAction(action);
     } else {
-      std::pair<double, Action> value_action = algorithms::ExpectiminimaxSearch(
-          *game, state.get(),
-          [player](const State& state) {
-            return (player == Player{0} ? FirstPlayerAdvantage(state)
-                                        : -FirstPlayerAdvantage(state));
-          },
-          kSearchDepthPig, player);
+      std::pair<double, algorithms::BestActions> value_actions =
+          algorithms::ExpectiminimaxSearch(
+              *game, state.get(),
+              [player](const State& state) {
+                return (player == kDefaultPlayerId
+                            ? FirstPlayerAdvantage(state)
+                            : -FirstPlayerAdvantage(state));
+              },
+              kSearchDepthPig, player);
+
+      const double value = value_actions.first;
+      const Action action = sample_actions ? value_actions.second.SampleUniformly(rng) : value_actions.second.Single();
 
       std::cout << std::endl
                 << "Player " << player << " choosing action "
-                << state->ActionToString(player, value_action.second)
-                << " with heuristic value " << value_action.first << std::endl;
+                << state->ActionToString(player, action)
+                << " with heuristic value " << value << std::endl;
 
-      state->ApplyAction(value_action.second);
+      state->ApplyAction(action);
     }
   }
 
@@ -110,8 +151,9 @@ void PlayPig(std::mt19937& rng) {
 }  // namespace
 }  // namespace open_spiel
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   std::mt19937 rng(kSeed);  // Random number generator.
-  open_spiel::PlayBreakthrough();
-  open_spiel::PlayPig(rng);
+  open_spiel::PlayTicTacToe(rng, true);
+  open_spiel::PlayBreakthrough(rng, true);
+  open_spiel::PlayPig(rng, true);
 }
