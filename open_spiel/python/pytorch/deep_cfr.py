@@ -532,10 +532,11 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       (dict) action probabilities for a single batch.
     """
-    del player_id
-    cur_player = state.current_player()
+    cur_player = state.current_player() if player_id is None else player_id
     legal_actions = state.legal_actions(cur_player)
-    info_state_vector = np.array(state.information_state_tensor())
+    if not legal_actions:
+      return {}
+    info_state_vector = np.array(state.information_state_tensor(cur_player))
     if len(info_state_vector.shape) == 1:
       info_state_vector = np.expand_dims(info_state_vector, axis=0)
     probs = (
@@ -543,9 +544,15 @@ class DeepCFRSolver(policy.Policy):
             torch.FloatTensor(info_state_vector, device=self._device)
         )
         .cpu()
-        .numpy()
+        .numpy()[0]
     )
-    return {action: probs[0][action] for action in legal_actions}
+    legal_probs = np.array([probs[action] for action in legal_actions])
+    probs_sum = legal_probs.sum()
+    if probs_sum > 0:
+      legal_probs /= probs_sum
+    else:
+      legal_probs = np.full(len(legal_actions), 1.0 / len(legal_actions))
+    return {action: prob for action, prob in zip(legal_actions, legal_probs)}
 
   def _learn_advantage_network(self, player):
     """Compute the loss on sampled transitions and perform a Q-network update.
