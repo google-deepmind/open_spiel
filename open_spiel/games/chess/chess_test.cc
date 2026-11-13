@@ -83,11 +83,16 @@ void BasicChessTests() {
   testing::NoChanceOutcomesTest(*LoadGame("chess"));
   testing::RandomSimTest(*LoadGame("chess"), 10);
   testing::RandomSimTestWithUndo(*LoadGame("chess"), 10);
+  testing::LoadGameTest("chess(egocentric_obs_tensor=true)");
+  testing::RandomSimTest(*LoadGame("chess(egocentric_obs_tensor=true)"), 2);
 }
 
 void BasicChess960Tests() {
   testing::LoadGameTest("chess(chess960=true)");
   testing::RandomSimTest(*LoadGame("chess(chess960=true)"), 10);
+  testing::LoadGameTest("chess(chess960=true,egocentric_obs_tensor=true)");
+  testing::RandomSimTest(
+      *LoadGame("chess(chess960=true,egocentric_obs_tensor=true)"), 2);
   // Undo only works after the chance node in chess960.
   // testing::RandomSimTestWithUndo(*LoadGame(chess960_game_string), 10);
 }
@@ -334,6 +339,114 @@ void ObservationTensorTests() {
   SPIEL_CHECK_EQ(ValueAt(v, shape, 19, 3, 3), 1.0);
 }
 
+// Check every square, not just occupied squares: egocentric observations only
+// reorder color-dependent planes, without reflecting the board coordinates.
+void CheckEgocentricObservation(const State& absolute,
+                                const State& egocentric) {
+  SPIEL_CHECK_EQ(absolute.ToString(), egocentric.ToString());
+  SPIEL_CHECK_EQ(absolute.CurrentPlayer(), egocentric.CurrentPlayer());
+  SPIEL_CHECK_TRUE(absolute.LegalActions() == egocentric.LegalActions());
+  SPIEL_CHECK_TRUE(absolute.Returns() == egocentric.Returns());
+  SPIEL_CHECK_TRUE(absolute.History() == egocentric.History());
+  const auto shape = absolute.GetGame()->ObservationTensorShape();
+  SPIEL_CHECK_TRUE(shape == egocentric.GetGame()->ObservationTensorShape());
+  SPIEL_CHECK_EQ(egocentric.GetGame()->ObservationTensorSize(), 1280);
+  const auto expected = absolute.ObservationTensor(0);
+  SPIEL_CHECK_TRUE(expected == absolute.ObservationTensor(1));
+  for (Player player : {0, 1}) {
+    const auto actual = egocentric.ObservationTensor(player);
+    SPIEL_CHECK_EQ(actual.size(), expected.size());
+    for (int plane = 0; plane < shape[0]; ++plane) {
+      int source_plane = plane;
+      if (player == ColorToPlayer(Color::kBlack)) {
+        if (plane < 12) {
+          source_plane = plane ^ 1;
+        } else if (plane >= 16) {
+          source_plane = 16 + (plane - 16 + 2) % 4;
+        }
+      }
+      for (int row = 0; row < shape[1]; ++row) {
+        for (int col = 0; col < shape[2]; ++col) {
+          SPIEL_CHECK_EQ(ValueAt(actual, shape, plane, col, row),
+                         ValueAt(expected, shape, source_plane, col, row));
+        }
+      }
+    }
+  }
+  if (!egocentric.IsTerminal() && !egocentric.IsChanceNode()) {
+    SPIEL_CHECK_TRUE(egocentric.ObservationTensor() ==
+                     egocentric.ObservationTensor(egocentric.CurrentPlayer()));
+  }
+}
+
+void EgocentricObservationTensorTests() {
+  for (bool chess960 : {false, true}) {
+    const GameParameters params = {{"chess960", GameParameter(chess960)}};
+    auto game = LoadGame("chess", params);
+    auto absolute_params = params;
+    absolute_params["egocentric_obs_tensor"] = GameParameter(false);
+    auto absolute_game = LoadGame("chess", absolute_params);
+    auto egocentric_params = params;
+    egocentric_params["egocentric_obs_tensor"] = GameParameter(true);
+    auto egocentric_game = LoadGame("chess", egocentric_params);
+
+    // All piece types, asymmetric squares and castling rights, both sides to
+    // move, and a terminal position (observed using explicit real players).
+    for (const std::string& fen :
+         {"rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b Kq - 7 3",
+          "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w Qk - 7 3",
+          "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1"}) {
+      auto state = game->NewInitialState(fen);
+      auto absolute = absolute_game->NewInitialState(fen);
+      auto egocentric = egocentric_game->NewInitialState(fen);
+      for (Player player : {0, 1}) {
+        SPIEL_CHECK_TRUE(state->ObservationTensor(player) ==
+                         absolute->ObservationTensor(player));
+      }
+      CheckEgocentricObservation(*absolute, *egocentric);
+    }
+
+    auto absolute = absolute_game->NewInitialState();
+    auto egocentric = egocentric_game->NewInitialState();
+    if (chess960) {
+      SPIEL_CHECK_TRUE(egocentric->IsChanceNode());
+      auto restored = DeserializeGameAndState(
+          SerializeGameAndState(*egocentric_game, *egocentric));
+      SPIEL_CHECK_TRUE(restored.second->IsChanceNode());
+      absolute->ApplyAction(347);
+      egocentric->ApplyAction(347);
+      restored.second->ApplyAction(347);
+      CheckEgocentricObservation(*absolute, *restored.second);
+    }
+    CheckEgocentricObservation(*absolute, *egocentric);
+    for (int i = 0; i < 4; ++i) {
+      Action action = absolute->LegalActions().front();
+      absolute->ApplyAction(action);
+      egocentric->ApplyAction(action);
+      CheckEgocentricObservation(*absolute, *egocentric);
+    }
+    auto clone = egocentric->Clone();
+    CheckEgocentricObservation(*absolute, *clone);
+    auto restored = DeserializeGameAndState(
+        SerializeGameAndState(*egocentric_game, *egocentric));
+    CheckEgocentricObservation(*absolute, *restored.second);
+
+    // Exercise a nonzero repetition plane and changes to castling rights.
+    const std::string start_fen =
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    ChessState absolute_state(absolute_game, start_fen);
+    ChessState egocentric_state(egocentric_game, start_fen);
+    for (const char* move : {"Nf3", "Nf6", "Ng1", "Ng8", "e4", "e5", "Ke2"}) {
+      ApplySANMove(move, &absolute_state);
+      ApplySANMove(move, &egocentric_state);
+      CheckEgocentricObservation(absolute_state, egocentric_state);
+    }
+    auto restored_fen = DeserializeGameAndState(
+        SerializeGameAndState(*egocentric_game, egocentric_state));
+    CheckEgocentricObservation(absolute_state, *restored_fen.second);
+  }
+}
+
 void MoveConversionTests() {
   auto game = LoadGame("chess");
   std::mt19937 rng(23);
@@ -422,6 +535,7 @@ int main(int argc, char** argv) {
   open_spiel::chess::UndoTests();
   open_spiel::chess::TerminalReturnTests();
   open_spiel::chess::ObservationTensorTests();
+  open_spiel::chess::EgocentricObservationTensorTests();
   open_spiel::chess::MoveConversionTests();
   open_spiel::chess::SerializaitionTests();
   open_spiel::chess::BasicChess960Tests();

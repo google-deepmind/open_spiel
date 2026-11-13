@@ -59,7 +59,9 @@ const GameType kGameType{/*short_name=*/"chess",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"chess960", GameParameter(kDefaultChess960)}}};
+                         {{"chess960", GameParameter(kDefaultChess960)},
+                          {"egocentric_obs_tensor",
+                           GameParameter(kDefaultEgocentricObsTensor)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new ChessGame(params));
@@ -410,10 +412,17 @@ void ChessState::ObservationTensor(Player player,
 
   auto value_it = values.begin();
 
-  // Piece configuration.
+  // Only color-dependent planes are reordered; squares and side to play remain
+  // absolute. Use the requested observer, not necessarily the current player.
+  const Color first_color =
+      ParentGame()->IsEgocentric() ? PlayerToColor(player) : Color::kWhite;
+  const Color second_color = OppColor(first_color);
+
+  // Piece configuration: observer/opponent when egocentric, white/black
+  // otherwise.
   for (const auto& piece_type : kPieceTypes) {
-    AddPieceTypePlane(Color::kWhite, piece_type, Board(), value_it);
-    AddPieceTypePlane(Color::kBlack, piece_type, Board(), value_it);
+    AddPieceTypePlane(first_color, piece_type, Board(), value_it);
+    AddPieceTypePlane(second_color, piece_type, Board(), value_it);
   }
 
   AddPieceTypePlane(Color::kEmpty, PieceType::kEmpty, Board(), value_it);
@@ -432,19 +441,12 @@ void ChessState::ObservationTensor(Player player,
   AddScalarPlane(Board().IrreversibleMoveCounter(), 0, 101, value_it);
 
   // Castling rights.
-  AddBinaryPlane(Board().CastlingRight(Color::kWhite, CastlingDirection::kLeft),
-                 value_it);
-
-  AddBinaryPlane(
-      Board().CastlingRight(Color::kWhite, CastlingDirection::kRight),
-      value_it);
-
-  AddBinaryPlane(Board().CastlingRight(Color::kBlack, CastlingDirection::kLeft),
-                 value_it);
-
-  AddBinaryPlane(
-      Board().CastlingRight(Color::kBlack, CastlingDirection::kRight),
-      value_it);
+  for (Color color : {first_color, second_color}) {
+    AddBinaryPlane(Board().CastlingRight(color, CastlingDirection::kLeft),
+                   value_it);
+    AddBinaryPlane(Board().CastlingRight(color, CastlingDirection::kRight),
+                   value_it);
+  }
 
   SPIEL_CHECK_EQ(value_it, values.end());
 }
@@ -550,7 +552,9 @@ std::string ChessState::StartFEN() const {
 
 
 ChessGame::ChessGame(const GameParameters& params)
-    : Game(kGameType, params), chess960_(ParameterValue<bool>("chess960")) {
+    : Game(kGameType, params),
+      chess960_(ParameterValue<bool>("chess960")),
+      egocentric_obs_tensor_(ParameterValue<bool>("egocentric_obs_tensor")) {
   if (chess960_) {
     initial_fens_ = Chess960StartingPositions();
     SPIEL_CHECK_EQ(initial_fens_.size(), 960);
