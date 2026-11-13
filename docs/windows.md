@@ -5,9 +5,9 @@
 
 # OpenSpiel Installation on Windows
 
-OpenSpiel now has official support for Windows with pre-built binary wheels
-available on PyPI. Windows wheels are built and tested automatically via GitHub
-Actions CI for Python 3.11, 3.12, and 3.13.
+OpenSpiel now has official support for Windows (both `x64` and `ARM64`) with
+pre-built binary wheels available on PyPI. Windows wheels are built and tested
+automatically via GitHub Actions CI for Python 3.11, 3.12, 3.13, and 3.14.
 
 This section assumes that you are into the isolated virtual environment. To
 create one: `PowerShell python -m venv .venv; .venv\Scripts\activate` If you
@@ -39,6 +39,12 @@ pip install open-spiel
 
 For additional features like visualization and machine learning: `Bash pip
 install open-spiel[full]`
+
+> **Note for Windows ARM64:** Core `pip install open-spiel` dependencies have
+> native `win_arm64` wheels on PyPI, whereas some optional packages in
+> `open-spiel[full]` (such as `torch`, `pygame`, and `pygraphviz`) may not yet
+> publish pre-built `win_arm64` wheels. On Windows on ARM, prefer installing
+> only the optional packages you need individually.
 
 ### Verification
 
@@ -77,7 +83,9 @@ If you need to build from source or contribute to the project:
 -   **Git** (get from [git-scm.com](https://git-scm.com))
 -   **CMake 3.21+** (get from [cmake.org](https://cmake.org))
 -   **Visual Studio 2019 or later** with C++ development tools from
-    [Microsoft](https://visualstudio.microsoft.com/vs/features/cplusplus/)
+    [Microsoft](https://visualstudio.microsoft.com/vs/features/cplusplus/) (on
+    Windows on ARM, ensure the **MSVC ARM64/ARM64EC build tools** component is
+    selected in Visual Studio Installer)
 
 > [!NOTE] Don't foget to add installed programmes to PATH checking the option
 > when committing the installation.
@@ -203,9 +211,9 @@ Open Visual Studio and continue without code. Then, click on File | Open ->
 CMake, and choose `C:\Users\MyUser\open_spiel\open_spiel\CMakeLists.txt`. CMake
 will then run; once you see `CMake generation finished`, choose Build -> Build
 All. The files will be available in
-`C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug`, when the build
-completes with "Build All succeeded." Extra compilation options may be necessary
-if errors occur. \
+`C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug` (or `arm64-Debug` on
+Windows ARM64), when the build completes with "Build All succeeded." Extra
+compilation options may be necessary if errors occur. \
 MSVC options to deal with required C++ standard, file encoding (for chess
 characters) and large object files include `/std:c++20`, `/utf-8`, `/bigobj`. To
 use them together with default MSVC arguments, you can use the following CMake

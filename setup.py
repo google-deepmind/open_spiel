@@ -18,11 +18,22 @@ See https://setuptools.readthedocs.io/en/latest/setuptools.html
 """
 
 import os
+import shlex
 import subprocess
 import sys
+import sysconfig
 
 import setuptools
 from setuptools.command.build_ext import build_ext
+
+# Maps distutils/setuptools Windows platform names to CMake -A generator
+# platform names.
+_PLAT_TO_CMAKE = {
+    "win32": "Win32",
+    "win-amd64": "x64",
+    "win-arm32": "ARM",
+    "win-arm64": "ARM64",
+}
 
 
 class CMakeExtension(setuptools.Extension):
@@ -76,45 +87,76 @@ class BuildExt(build_ext):
 
   def build_extension(self, ext):
     extension_dir = os.path.abspath(
-        os.path.dirname(self.get_ext_fullpath(ext.name)))
+        os.path.dirname(self.get_ext_fullpath(ext.name))
+    )
 
     env = os.environ.copy()
+    building_wheel = env.get("OPEN_SPIEL_BUILDING_WHEEL", "ON")
+    is_win = sys.platform.startswith("win")
+    host_plat = sysconfig.get_platform()
+    plat_name = self.plat_name or host_plat
+    is_cross_compile = is_win and plat_name != host_plat
+
     cmake_args = [
-        f"-DPython3_EXECUTABLE={sys.executable}",
         f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extension_dir}",
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DOPEN_SPIEL_BUILDING_WHEEL=ON",
+        f"-DOPEN_SPIEL_BUILDING_WHEEL={building_wheel}",
     ]
+    if is_cross_compile:
+      py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+      cmake_args += [
+          "-DCMAKE_SYSTEM_NAME=Windows",
+          f"-DOPEN_SPIEL_PYTHON_VERSION={py_version}",
+      ]
+    else:
+      cmake_args.append(f"-DPython3_EXECUTABLE={sys.executable}")
 
     # Platform-specific configuration
-    if sys.platform.startswith("win"):
-      # Windows-specific CMake arguments
-      cmake_args += [
-          (
-              "-DCMAKE_CXX_FLAGS=/std:c++20 /utf-8 /bigobj /DWIN32 /D_WINDOWS"
-              " /GR /EHsc"
-          ),
-          f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={extension_dir}",
-          "-A",
-          "x64",
-      ]
-    # Parallel build arguments
-    if sys.platform.startswith("win"):
+    is_msvc_generator = False
+    if is_win:
+      cmake_generator = env.get("CMAKE_GENERATOR", "")
+      is_msvc_generator = not cmake_generator or cmake_generator.startswith(
+          "Visual Studio"
+      )
+      is_multi_config = is_msvc_generator or "Multi-Config" in cmake_generator
+      contains_arch = any(arch in cmake_generator for arch in ("ARM", "Win64"))
+      cmake_args.append(
+          "-DCMAKE_CXX_FLAGS=/std:c++20 /utf-8 /bigobj /DWIN32 /D_WINDOWS"
+          " /GR /EHsc"
+      )
+      if is_multi_config:
+        cmake_args.append(
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={extension_dir}"
+        )
+      if (
+          is_msvc_generator
+          and "CMAKE_GENERATOR_PLATFORM" not in env
+          and not contains_arch
+      ):
+        if plat_name not in _PLAT_TO_CMAKE:
+          raise ValueError(f"Unsupported Windows platform: {plat_name!r}")
+        cmake_args += ["-A", _PLAT_TO_CMAKE[plat_name]]
+    else:
+      cxx = env.get("CXX", "clang++")
+      cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
+
+    if is_msvc_generator:
       build_args = ["--", "/m"]
     else:
-      cxx = os.environ.get("CXX", "clang++")
-      cmake_args.append(f"-DCMAKE_CXX_COMPILER={cxx}")
       detected_jobs = os.cpu_count()
       jobs = max(detected_jobs or 1, 1)
       build_args = ["--parallel", str(jobs)]
+
+    if env.get("CMAKE_ARGS"):
+      cmake_args += shlex.split(env["CMAKE_ARGS"])
 
     if not os.path.exists(self.build_temp):
       os.makedirs(self.build_temp)
 
     # Configure
     subprocess.check_call(
-        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp,
-        env=env)
+        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env
+    )
 
     # Build using cmake --build for better portability
     subprocess.check_call(

@@ -159,13 +159,23 @@ jobs:
   build_windows_wheels:
     permissions:
       contents: write
-    name: Build wheels on Windows Python ${{ matrix.python-version }}
-    runs-on: windows-latest
+    name: Build wheels on ${{ matrix.os }} (${{ matrix.arch }}) Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-latest, windows-11-arm]
         python-version: ['3.11', '3.12', '3.13', '3.14']
+        include:
+          - os: windows-latest
+            arch: x64
+            plat: win-amd64
+            wheel-tag: win_amd64
+          - os: windows-11-arm
+            arch: arm64
+            plat: win-arm64
+            wheel-tag: win_arm64
 
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
@@ -176,21 +186,31 @@ jobs:
           persist-credentials: false
           submodules: recursive
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }} (${{ matrix.arch }})
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
 
-      - name: Install CMake
+      - name: Ensure CMake is available
         run: |
-          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-          refreshenv
+          if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
+            choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            refreshenv
+          }
+          cmake --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         shell: pwsh
 
       - name: Install build dependencies
         run: |
+          python -c "import sysconfig; plat = sysconfig.get_platform(); print('Python platform:', plat); assert plat == '${{ matrix.plat }}', f'Expected ${{ matrix.plat }}, got {plat}'"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install --upgrade pip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install build wheel setuptools
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         shell: pwsh
 
       - name: Clone dependencies
@@ -209,28 +229,59 @@ jobs:
       - name: Build wheel
         run: |
           python -m build --wheel --outdir dist/
-          if (!(Test-Path dist/*.whl)) { Write-Error "No wheel file generated"; exit 1 }
-          Get-ChildItem dist/*.whl
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $wheels = @(Get-ChildItem dist/*-${{ matrix.wheel-tag }}.whl)
+          if ($wheels.Count -ne 1) {
+            Get-ChildItem dist/ -ErrorAction SilentlyContinue
+            Write-Error "Expected one ${{ matrix.wheel-tag }} wheel in dist/, found $($wheels.Count)"
+            exit 1
+          }
+          $wheels
         shell: pwsh
 
       - name: Test wheel installation
         run: |
-          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
-          python -m pip install $wheel.FullName
-          python -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
+          $wheel = Get-ChildItem dist/*-${{ matrix.wheel-tag }}.whl | Select-Object -First 1
+          python -m venv .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $venvPy = Join-Path (Resolve-Path .venv) "Scripts/python.exe"
+          & $venvPy -m pip install --upgrade pip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $venvPy -m pip install $wheel.FullName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Push-Location $env:TEMP
+          try {
+            & $venvPy -c "import pyspiel; game = pyspiel.load_game('tic_tac_toe'); print('OpenSpiel works! Game:', game.get_type().short_name)"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally {
+            Pop-Location
+          }
         shell: pwsh
 
       # Note: Windows tests are currently less thorough than Linux/macOS tests.
       # TODO: Improve Windows test coverage in future iterations.
       - name: Run basic tests
         run: |
-          python -c "import pyspiel; print('Registered games:', len(pyspiel.registered_names()))"
-          python -c "import pyspiel; g = pyspiel.load_game('kuhn_poker'); print('Kuhn poker loaded successfully')"
-          python -c "import pyspiel; g = pyspiel.load_game('leduc_poker'); print('Leduc poker loaded successfully')"
+          $venvPy = Join-Path (Resolve-Path .venv) "Scripts/python.exe"
+          Push-Location $env:TEMP
+          try {
+            & $venvPy -c "import pyspiel; print('Registered games:', len(pyspiel.registered_names()))"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & $venvPy -c "import pyspiel; g = pyspiel.load_game('kuhn_poker'); print('Kuhn poker loaded successfully')"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & $venvPy -c "import pyspiel; g = pyspiel.load_game('leduc_poker'); print('Leduc poker loaded successfully')"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & $venvPy -c "import pyspiel; g = pyspiel.load_game('bridge'); s = g.new_initial_state(); print('Bridge loaded successfully')"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & $venvPy -c "from open_spiel.python import rl_environment; env = rl_environment.Environment('tic_tac_toe'); env.reset(); print('RL environment works')"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally {
+            Pop-Location
+          }
         shell: pwsh
 
       - name: Upload artifacts
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
         with:
-          name: artifact-windows-py${{ matrix.python-version }}
+          name: artifact-windows-${{ matrix.arch }}-py${{ matrix.python-version }}
           path: dist/*.whl
