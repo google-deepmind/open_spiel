@@ -36,6 +36,7 @@ cc_library(
         # do not sort
         ":games",
         "//open_spiel/game_transforms",
+        "//open_spiel/games/altior",
         "//open_spiel/games/amazons",
         "//open_spiel/games/antichess",
         "//open_spiel/games/banqi",
