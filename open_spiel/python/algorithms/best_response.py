@@ -104,6 +104,7 @@ class BestResponsePolicy(openspiel_policy.Policy):
       cut_threshold: The probability to cut when calculating the value.
         Increasing this value will trade off accuracy for speed.
     """
+    super().__init__(game, [player_id])
     self._num_players = game.num_players()
     self._player_id = player_id
     self._policy = policy
@@ -264,6 +265,7 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
       cut_threshold: The probability to cut when calculating the value.
         Increasing this value will trade off accuracy for speed.
     """
+    super().__init__(game, list(range(game.num_players())))
     (self.all_states, self.state_to_information_state) = (
         compute_states_and_info_states_if_none(game, all_states,
                                                state_to_information_state))

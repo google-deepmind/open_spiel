@@ -29,6 +29,56 @@ import pyspiel
 
 class BestResponseTest(parameterized.TestCase, absltest.TestCase):
 
+  @parameterized.product(
+      policy_class=[
+          best_response.BestResponsePolicy,
+          best_response.CPPBestResponsePolicy,
+      ],
+      player_id=[0, 1],
+  )
+  def test_best_response_supports_policy_sampling(
+      self, policy_class, player_id
+  ):
+    game = pyspiel.load_game("kuhn_poker")
+    br = policy_class(game, player_id, policy.UniformRandomPolicy(game))
+    state = game.new_initial_state()
+    state.apply_action(0)
+    state.apply_action(1)
+    if player_id == 1:
+      state.apply_action(0)
+    expected = br.action_probabilities(state)
+    for _ in range(3):
+      action = br.sample_action(state)
+      self.assertIn(action, state.legal_actions())
+      self.assertEqual(expected[action], 1.0)
+
+  @parameterized.product(
+      policy_class=[
+          best_response.BestResponsePolicy,
+          best_response.CPPBestResponsePolicy,
+      ],
+      player_id=[0, 1],
+  )
+  def test_best_response_supports_tabular_conversion(
+      self, policy_class, player_id
+  ):
+    game = pyspiel.load_game("kuhn_poker")
+    br = policy_class(game, player_id, policy.UniformRandomPolicy(game))
+    tabular = br.to_tabular()
+    self.assertIs(br.game, game)
+    expected_players = (
+        [player_id]
+        if policy_class is best_response.BestResponsePolicy
+        else [0, 1]
+    )
+    self.assertEqual(br.player_ids, expected_players)
+    self.assertEqual(tabular.player_ids, expected_players)
+    for state in tabular.states:
+      expected = br.action_probabilities(state)
+      actual = tabular.action_probabilities(state)
+      for action in state.legal_actions():
+        self.assertEqual(actual[action], expected.get(action, 0.0))
+
   def test_best_response_is_a_policy(self):
     game = pyspiel.load_game("kuhn_poker")
     test_policy = policy.UniformRandomPolicy(game)
