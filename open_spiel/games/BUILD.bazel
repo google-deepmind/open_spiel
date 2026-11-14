@@ -49,6 +49,7 @@ cc_library(
         "//open_spiel/games/bridge:bridge_uncontested_bidding",
         "//open_spiel/games/capture_the_flag",
         "//open_spiel/games/catch",
+        "//open_spiel/games/catch_the_hidden_evader",
         "//open_spiel/games/checkers",
         "//open_spiel/games/chess",
         "//open_spiel/games/chinese_checkers",

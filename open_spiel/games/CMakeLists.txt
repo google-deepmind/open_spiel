@@ -26,6 +26,7 @@ target_link_libraries(open_spiel_games_all_games INTERFACE
   open_spiel::games::bridge::bridge_uncontested_bidding
   open_spiel::games::capture_the_flag::capture_the_flag
   open_spiel::games::catch::catch
+  open_spiel::games::catch_the_hidden_evader::catch_the_hidden_evader
   open_spiel::games::checkers::checkers
   open_spiel::games::chess::chess
   open_spiel::games::chinese_checkers::chinese_checkers
@@ -133,6 +134,7 @@ add_subdirectory(breakthrough)
 add_subdirectory(bridge)
 add_subdirectory(capture_the_flag)
 add_subdirectory(catch)
+add_subdirectory(catch_the_hidden_evader)
 add_subdirectory(checkers)
 add_subdirectory(chess)
 add_subdirectory(chinese_checkers)
