@@ -13,6 +13,7 @@ add_library(open_spiel_games_all_games INTERFACE)
 target_link_libraries(open_spiel_games_all_games INTERFACE
   open_spiel::games::games
   open_spiel::game_transforms::game_transforms
+  open_spiel::games::altior::altior
   open_spiel::games::amazons::amazons
   open_spiel::games::antichess::antichess
   open_spiel::games::banqi::banqi
@@ -121,6 +122,7 @@ endif()
 add_library(open_spiel::games::all_games ALIAS open_spiel_games_all_games)
 set_property(GLOBAL APPEND PROPERTY OPEN_SPIEL_OBJECT_LIBRARIES open_spiel_games_all_games)
 
+add_subdirectory(altior)
 add_subdirectory(amazons)
 add_subdirectory(antichess)
 add_subdirectory(backgammon)

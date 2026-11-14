@@ -35,6 +35,7 @@ _FULLY_OPTIONAL_PYTHON_GAMES = frozenset([
 EXPECTED_MANDATORY_GAMES = frozenset([
     "2048",
     "add_noise",
+    "altior",
     "amazons",
     "antichess",
     "backgammon",
