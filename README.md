@@ -11,6 +11,10 @@
 ![build_and_test](https://github.com/deepmind/open_spiel/workflows/build_and_test/badge.svg)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org)
 
+<p align="center">
+  <b>English</b> · <a href="https://github.com/google-deepmind/open_spiel/blob/master/README.zh.md">简体中文</a>
+</p>
+
 OpenSpiel is a collection of environments and algorithms for research in general
 reinforcement learning and search/planning in games. OpenSpiel supports n-player
 (single- and multi- agent) zero-sum, cooperative and general-sum, one-shot and
