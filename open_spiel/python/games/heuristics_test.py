@@ -67,13 +67,14 @@ class HeuristicsTest(absltest.TestCase):
       if player == 0:
         action = np.random.choice(state.legal_actions(state.current_player()))
       else:
-        _, action = minimax.alpha_beta_search(
+        _, best_actions = minimax.alpha_beta_search(
             game=game,
             state=state,
             value_function=functools.partial(heuristics.evaluate_state,
                                              player=player),
             maximum_depth=2,
             maximizing_player_id=player)
+        action = best_actions.single()
       print(f"State is: \n{state.debug_string()}\n")
       print(f"Taking action: {state.action_to_string(player, action)}\n")
       state.apply_action(action)
