@@ -123,6 +123,24 @@ class AntForagingTest(absltest.TestCase):
       returns = state.returns()
       self.assertLen(returns, game.num_players())
 
+  def test_new_initial_state_keeps_global_rng(self):
+    """Creating a state must not reset numpy's global random state."""
+    game = pyspiel.load_game("python_ant_foraging")
+    np.random.seed(0)
+    expected = np.random.rand(5)
+    np.random.seed(0)
+    game.new_initial_state()
+    np.testing.assert_array_equal(np.random.rand(5), expected)
+
+  def test_food_layout_is_fixed(self):
+    """The food layout does not depend on numpy's global random state."""
+    game = pyspiel.load_game("python_ant_foraging")
+    np.random.seed(1)
+    state1 = game.new_initial_state()
+    np.random.seed(2)
+    state2 = game.new_initial_state()
+    self.assertEqual(str(state1), str(state2))
+
   def test_action_to_string(self):
     """Test action to string conversion."""
     game = pyspiel.load_game("python_ant_foraging")

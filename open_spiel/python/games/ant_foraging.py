@@ -195,11 +195,13 @@ class AntForagingState(pyspiel.State):
 
     # Place food sources randomly (avoiding nest and edges)
     self._food_positions = []
-    np.random.seed(42)  # Deterministic for reproducibility
+    # Deterministic for reproducibility. Use a local generator so that creating
+    # a state does not reset numpy's global random state.
+    rng = np.random.RandomState(42)
     attempts = 0
     while len(self._food_positions) < self._num_food and attempts < 100:
-      row = np.random.randint(1, self._grid_size - 1)
-      col = np.random.randint(1, self._grid_size - 1)
+      row = rng.randint(1, self._grid_size - 1)
+      col = rng.randint(1, self._grid_size - 1)
       if (row, col) != self._nest_pos and (
           row,
           col,
