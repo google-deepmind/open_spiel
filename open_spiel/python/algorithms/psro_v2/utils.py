@@ -391,13 +391,12 @@ def marginal_to_joint(policies):
 
 def aggregate_joint_policies(game, total_policies,
                              probabilities_of_playing_policies):
-  """Aggregate the players' joint policies.
+  """Aggregate the players' marginal behavior in a joint-policy mixture.
 
-  Specifically, returns a single callable policy object that is
-  realization-equivalent to playing total_policies with
-  probabilities_of_playing_policies. I.e., aggr_policy is a joint policy that
-  can be called at any information state [via
-  action_probabilities(state, player_id)].
+  Returns a callable policy for each player's action probabilities at an
+  information state. When the joint profile distribution correlates players,
+  the returned policy does not preserve that correlation; evaluating its
+  players' actions independently can change joint outcomes.
 
   Args:
     game: The open_spiel game.
