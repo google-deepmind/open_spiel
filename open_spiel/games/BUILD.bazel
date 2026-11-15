@@ -114,6 +114,7 @@ cc_library(
         "//open_spiel/games/rbc",
         "//open_spiel/games/sheriff",
         "//open_spiel/games/shogi",
+        "//open_spiel/games/siguo_junqi",
         "//open_spiel/games/skat",
         "//open_spiel/games/snake",
         "//open_spiel/games/social_deduction",
