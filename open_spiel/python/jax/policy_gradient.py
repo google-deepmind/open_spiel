@@ -217,10 +217,10 @@ class PolicyGradient(rl_agent.AbstractAgent):
         to (128,), which produces a NN: [INPUT] -> [128] -> ReLU -> [OUTPUT].
       lambda_: float, lambda in TD(lambda) or SARSA(lambda). Defaults to 1.0.
       critic_learning_rate: float, learning rate used for Critic (Q or V).
-        Defaults to 0.001.
+        Defaults to 0.01.
       pi_learning_rate: float, learning rate used for Pi. Defaults to 0.001.
       entropy_cost: float, entropy cost used to multiply the entropy loss. Can
-        be set to None to skip entropy computation. Defaults to 0.001.
+        be set to None to skip entropy computation. Defaults to 0.01.
       l2_weight_actor: l2 penaly weight for actor network. Defaults to 0.0.
       l2_weight_critic: l2 penalty weight for critic network. Defaults to
         0.0.
