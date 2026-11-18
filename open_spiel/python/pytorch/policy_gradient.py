@@ -149,12 +149,12 @@ class PolicyGradient(rl_agent.AbstractAgent):
         `loss_str`. Defaults to None.
       hidden_layers_sizes: iterable, defines the neural network layers. Defaults
           to (128,), which produces a NN: [INPUT] -> [128] -> ReLU -> [OUTPUT].
-      batch_size: int, batch size to use for Q and Pi learning. Defaults to 128.
+      batch_size: int, batch size to use for Q and Pi learning. Defaults to 16.
       critic_learning_rate: float, learning rate used for Critic (Q or V).
-        Defaults to 0.001.
+        Defaults to 0.01.
       pi_learning_rate: float, learning rate used for Pi. Defaults to 0.001.
       entropy_cost: float, entropy cost used to multiply the entropy loss. Can
-        be set to None to skip entropy computation. Defaults to 0.001.
+        be set to None to skip entropy computation. Defaults to 0.01.
       num_critic_before_pi: int, number of Critic (Q or V) updates before each
         Pi update. Defaults to 8 (every 8th critic learning step, Pi also
         learns).
