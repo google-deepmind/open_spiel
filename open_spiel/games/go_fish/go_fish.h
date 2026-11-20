@@ -75,7 +75,7 @@ struct Event {
     if (target == -1) {  // fishing
       absl::StrAppend(&result, player_id, " drew");
       if (caught) absl::StrAppend(&result, " caught ", rank);
-      if (booked) absl::StrAppend(&result, " booked ", booked);
+      if (booked >= 0) absl::StrAppend(&result, " booked ", booked);
     } else {
       absl::StrAppend(&result, player_id, " asked ", target, " for ", rank);
       if (received > 0) absl::StrAppend(&result, " recieved ", received);
