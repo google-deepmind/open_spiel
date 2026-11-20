@@ -33,6 +33,7 @@ using open_spiel::chess::ChessGame;
 using open_spiel::chess::ChessState;
 using open_spiel::chess::ChessBoard;
 using open_spiel::chess::Color;
+using open_spiel::chess::FenFormat;
 using open_spiel::chess::Square;
 using open_spiel::chess::Piece;
 using open_spiel::chess::PieceType;
@@ -56,6 +57,11 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
     .value("KNIGHT", PieceType::kKnight)
     .value("PAWN", PieceType::kPawn)
     .export_values();
+
+  py::enum_<FenFormat>(chess, "FenFormat")
+      .value("STANDARD", FenFormat::kStandard)
+      .value("XFEN", FenFormat::kXFen)
+      .value("SHREDDER", FenFormat::kShredder);
 
   py::class_<Piece>(chess, "Piece")
       .def(py::init<>())
@@ -85,7 +91,10 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
       .def("has_legal_moves", &ChessBoard::HasLegalMoves)
       .def("debug_string", &ChessBoard::DebugString,
            py::arg("shredder_fen") = false)
-      .def("to_fen", &ChessBoard::ToFEN, py::arg("shredder") = false)
+      .def("to_fen", py::overload_cast<bool>(&ChessBoard::ToFEN, py::const_),
+           py::arg("shredder") = false)
+      .def("to_fen", py::overload_cast<FenFormat>(&ChessBoard::ToFEN, py::const_),
+           py::arg("format"))
       .def("to_unicode_string", &ChessBoard::ToUnicodeString);
 
   py::classh<ChessState, State>(m, "ChessState")

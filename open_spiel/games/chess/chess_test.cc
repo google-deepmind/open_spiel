@@ -92,6 +92,267 @@ void BasicChess960Tests() {
   // testing::RandomSimTestWithUndo(*LoadGame(chess960_game_string), 10);
 }
 
+void CheckCastlingRook(const ChessBoard& board, Color color,
+                      CastlingDirection direction, const std::string& square) {
+  auto rook = board.MaybeCastlingRookSquare(color, direction);
+  SPIEL_CHECK_TRUE(rook.has_value());
+  SPIEL_CHECK_EQ(*rook, *SquareFromString(square));
+}
+
+void CastlingFENParsingTests() {
+  // KQ select the outermost rooks, even when neither is on a corner.
+  const std::string position = "1rr1krr1/8/8/8/8/8/8/1RR1KRR1 w ";
+  for (const std::string& rights : {"KQkq", "GBgb", "KBkq"}) {
+    auto board = ChessBoard::BoardFromFEN(position + rights + " - 0 1");
+    SPIEL_CHECK_TRUE(board.has_value());
+    CheckCastlingRook(*board, Color::kWhite, CastlingDirection::kRight, "g1");
+    CheckCastlingRook(*board, Color::kWhite, CastlingDirection::kLeft, "b1");
+    CheckCastlingRook(*board, Color::kBlack, CastlingDirection::kRight, "g8");
+    CheckCastlingRook(*board, Color::kBlack, CastlingDirection::kLeft, "b8");
+  }
+  auto inner = ChessBoard::BoardFromFEN(position + "FCfc - 0 1");
+  SPIEL_CHECK_TRUE(inner.has_value());
+  CheckCastlingRook(*inner, Color::kWhite, CastlingDirection::kRight, "f1");
+  CheckCastlingRook(*inner, Color::kWhite, CastlingDirection::kLeft, "c1");
+  CheckCastlingRook(*inner, Color::kBlack, CastlingDirection::kRight, "f8");
+  CheckCastlingRook(*inner, Color::kBlack, CastlingDirection::kLeft, "c8");
+  SPIEL_CHECK_EQ(inner->ToFEN(true), position + "FCfc - 0 1");
+  // The legacy default intentionally does not distinguish inner rights.
+  SPIEL_CHECK_EQ(inner->ToFEN(), position + "KQkq - 0 1");
+
+  auto corners = ChessBoard::BoardFromFEN(
+      "rr2k1rr/8/8/8/8/8/8/RR2K1RR w KQkq - 0 1");
+  SPIEL_CHECK_TRUE(corners.has_value());
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    const std::string rank = color == Color::kWhite ? "1" : "8";
+    CheckCastlingRook(*corners, color, CastlingDirection::kRight, "h" + rank);
+    CheckCastlingRook(*corners, color, CastlingDirection::kLeft, "a" + rank);
+  }
+}
+
+void InvalidCastlingFENTests() {
+  const std::string position = "1rr1krr1/8/8/8/8/8/8/1RR1KRR1 w ";
+  for (const std::string& rights : {
+           "", "KK", "QQ", "kk", "qq", "GG", "gg", "KF", "FK", "QB",
+           "BQ", "kf", "fk", "qb", "bq", "FG", "BC", "fg", "bc", "K-",
+           "-K", "--", "KQkq-", "I", "i", "Z", "1", "E", "e", "A",
+           "a", "H", "h", "!", "/"}) {
+    SPIEL_CHECK_FALSE(
+        ChessBoard::BoardFromFEN(position + rights + " - 0 1").has_value());
+  }
+  for (const std::string& fen : {
+           // Missing king or rook, wrong color/type, and pieces off back rank.
+           "4k3/8/8/8/8/8/8/7R w K - 0 1",
+           "7r/8/8/8/8/8/8/4K3 b h - 0 1",
+           "4k3/8/8/8/8/8/8/4K3 w K - 0 1",
+           "4k3/8/8/8/8/8/8/4K3 b q - 0 1",
+           "4k3/8/8/8/8/8/8/4K2r w H - 0 1",
+           "R3k3/8/8/8/8/8/8/4K3 b q - 0 1",
+           "4k3/8/8/8/8/8/8/4K2B w H - 0 1",
+           "4k3/8/8/8/8/8/4K2R/8 w K - 0 1",
+           "8/4k2r/8/8/8/8/8/4K3 b h - 0 1",
+           "4k3/8/8/8/8/8/7R/4K3 w H - 0 1",
+           "4k3/7r/8/8/8/8/8/4K3 b k - 0 1",
+           "4k3/8/8/8/8/8/8/4KR1K w K - 0 1",
+           "k2rk3/8/8/8/8/8/8/4K3 b d - 0 1",
+           "4k3/8/8/8/8/8/8/5R1K w K - 0 1",
+           "k1r5/8/8/8/8/8/8/4K3 b q - 0 1"}) {
+    SPIEL_CHECK_FALSE(ChessBoard::BoardFromFEN(fen).has_value());
+  }
+  SPIEL_CHECK_FALSE(
+      ChessBoard::BoardFromFEN("r1kr/4/4/R1KR w H - 0 1", 4).has_value());
+}
+
+void VariantCastlingFENTests() {
+  for (bool allow_check : {false, true}) {
+    auto small = ChessBoard::BoardFromFEN(kDefaultSmallFEN, 4, allow_check);
+    SPIEL_CHECK_TRUE(small.has_value());
+    SPIEL_CHECK_EQ(small->ToFEN(), kDefaultSmallFEN);
+    // Small boards can store rights, although move generation omits castling.
+    small = ChessBoard::BoardFromFEN("r1kr/4/4/R1KR w KQkq - 0 1", 4,
+                                    allow_check);
+    SPIEL_CHECK_TRUE(small.has_value());
+    SPIEL_CHECK_EQ(small->ToFEN(true), "r1kr/4/4/R1KR w DAda - 0 1");
+    auto board = ChessBoard::BoardFromFEN(kDefaultStandardFEN, 8, allow_check,
+                                         /*allow_pass_move=*/true);
+    SPIEL_CHECK_TRUE(board.has_value());
+    SPIEL_CHECK_EQ(board->ToFEN(), kDefaultStandardFEN);
+  }
+  // Captured kings in dark chess/RBC, and promoted kings in antichess, do
+  // not make FEN invalid when that color claims no castling rights.
+  for (const std::string& fen : {"8/8/8/8/8/8/8/4K3 w - - 0 1",
+                                 "4k3/8/8/8/8/8/4K3/4K3 w - - 0 1"}) {
+    auto board = ChessBoard::BoardFromFEN(fen, 8, true, false, true);
+    SPIEL_CHECK_TRUE(board.has_value());
+    SPIEL_CHECK_EQ(board->ToFEN(), fen);
+  }
+}
+
+void CheckCastlingFENRoundTrip(const ChessBoard& board, FenFormat format) {
+  const std::string fen = board.ToFEN(format);
+  auto parsed = ChessBoard::BoardFromFEN(fen);
+  SPIEL_CHECK_TRUE(parsed.has_value());
+  SPIEL_CHECK_EQ(parsed->ToFEN(format), fen);
+  SPIEL_CHECK_EQ(parsed->ToFEN(true), board.ToFEN(true));
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    for (CastlingDirection direction : {CastlingDirection::kLeft,
+                                        CastlingDirection::kRight}) {
+      SPIEL_CHECK_TRUE(parsed->MaybeCastlingRookSquare(color, direction) ==
+                       board.MaybeCastlingRookSquare(color, direction));
+    }
+  }
+}
+
+void CastlingFENSerializationTests() {
+  auto standard = MakeDefaultBoard();
+  SPIEL_CHECK_EQ(standard.ToFEN(), kDefaultStandardFEN);
+  SPIEL_CHECK_EQ(standard.ToFEN(false), standard.ToFEN(FenFormat::kStandard));
+  SPIEL_CHECK_EQ(standard.ToFEN(true),
+                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w HAha - 0 1");
+  auto starting_positions = Chess960StartingPositions();
+  SPIEL_CHECK_EQ(starting_positions.size(), 960);
+  for (const std::string& fen : starting_positions) {
+    auto board = ChessBoard::BoardFromFEN(fen);
+    SPIEL_CHECK_TRUE(board.has_value());
+    SPIEL_CHECK_EQ(board->ToFEN(), fen);
+    SPIEL_CHECK_EQ(board->ToFEN(FenFormat::kXFen), fen);
+    SPIEL_CHECK_EQ(board->ToFEN(false), board->ToFEN(FenFormat::kStandard));
+    SPIEL_CHECK_EQ(board->ToFEN(true), board->ToFEN(FenFormat::kShredder));
+    for (FenFormat format : {FenFormat::kStandard, FenFormat::kXFen,
+                             FenFormat::kShredder}) {
+      CheckCastlingFENRoundTrip(*board, format);
+    }
+  }
+  const std::string position = "1rr1krr1/8/8/8/8/8/8/1RR1KRR1 w ";
+  for (const std::string& rights : {"KQkq", "FCfc", "FQkc", "-"}) {
+    auto board = ChessBoard::BoardFromFEN(position + rights + " - 0 1");
+    SPIEL_CHECK_TRUE(board.has_value());
+    SPIEL_CHECK_EQ(board->ToFEN(FenFormat::kXFen), position + rights + " - 0 1");
+    CheckCastlingFENRoundTrip(*board, FenFormat::kXFen);
+    CheckCastlingFENRoundTrip(*board, FenFormat::kShredder);
+  }
+}
+
+void CastlingAfterFENRoundTripTests() {
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    const std::string fen = color == Color::kWhite
+        ? "4k3/8/8/8/8/8/8/R2RKR1R w FD - 0 1"
+        : "r2rkr1r/8/8/8/8/8/8/4K3 b fd - 0 1";
+    auto original = ChessBoard::BoardFromFEN(fen);
+    SPIEL_CHECK_TRUE(original.has_value());
+    for (const std::string& encoded :
+         {fen, original->ToFEN(FenFormat::kXFen), original->ToFEN(true)}) {
+      for (const std::string& san : {"O-O", "O-O-O"}) {
+        auto board = ChessBoard::BoardFromFEN(encoded);
+        SPIEL_CHECK_TRUE(board.has_value());
+        auto move = board->ParseSANMove(san);
+        SPIEL_CHECK_TRUE(move.has_value());
+        SPIEL_CHECK_TRUE(move->is_castling());
+        board->ApplyMove(*move);
+        const bool right = san == "O-O";
+        const int8_t rank = color == Color::kWhite ? 0 : 7;
+        SPIEL_CHECK_EQ(board->at(Square{right ? int8_t{6} : int8_t{2}, rank}),
+                       (Piece{color, PieceType::kKing}));
+        SPIEL_CHECK_EQ(board->at(Square{right ? int8_t{5} : int8_t{3}, rank}),
+                       (Piece{color, PieceType::kRook}));
+        // The outer rooks must not be used or removed.
+        SPIEL_CHECK_EQ(board->at(Square{0, rank}),
+                       (Piece{color, PieceType::kRook}));
+        SPIEL_CHECK_EQ(board->at(Square{7, rank}),
+                       (Piece{color, PieceType::kRook}));
+        SPIEL_CHECK_FALSE(board->CastlingRight(color, CastlingDirection::kLeft));
+        SPIEL_CHECK_FALSE(board->CastlingRight(color, CastlingDirection::kRight));
+        CheckCastlingFENRoundTrip(*board, FenFormat::kXFen);
+      }
+    }
+  }
+}
+
+void OutermostCastlingRookTests() {
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    const bool white = color == Color::kWhite;
+    const std::string fen = white
+        ? "4k3/8/8/8/8/8/8/1RR1KRR1 w KQ - 0 1"
+        : "1rr1krr1/8/8/8/8/8/8/4K3 b kq - 0 1";
+    for (bool right : {false, true}) {
+      auto board = ChessBoard::BoardFromFEN(fen);
+      SPIEL_CHECK_TRUE(board.has_value());
+      const std::string san = right ? "O-O" : "O-O-O";
+      // The inner rook initially blocks castling with the outer rook.
+      board->GenerateLegalMoves([](const Move& move) {
+        SPIEL_CHECK_FALSE(move.is_castling());
+        return true;
+      });
+      const std::string file = right ? "f" : "c";
+      auto move = board->ParseLANMove(file + (white ? "1" : "8") + file +
+                                      (white ? "2" : "7"));
+      SPIEL_CHECK_TRUE(move.has_value());
+      board->ApplyMove(*move);
+      board->SetToPlay(color);
+      for (FenFormat format : {FenFormat::kXFen, FenFormat::kShredder}) {
+        auto parsed = ChessBoard::BoardFromFEN(board->ToFEN(format));
+        SPIEL_CHECK_TRUE(parsed.has_value());
+        auto castle = parsed->ParseSANMove(san);
+        SPIEL_CHECK_TRUE(castle.has_value());
+        SPIEL_CHECK_TRUE(castle->is_castling());
+        parsed->ApplyMove(*castle);
+        const int8_t rank = white ? 0 : 7;
+        SPIEL_CHECK_EQ(parsed->at(Square{right ? int8_t{6} : int8_t{2}, rank}),
+                       (Piece{color, PieceType::kKing}));
+        SPIEL_CHECK_EQ(parsed->at(Square{right ? int8_t{5} : int8_t{3}, rank}),
+                       (Piece{color, PieceType::kRook}));
+        SPIEL_CHECK_EQ(parsed->at(*SquareFromString(file + (white ? "2" : "7"))),
+                       (Piece{color, PieceType::kRook}));
+      }
+    }
+  }
+}
+
+void CastlingRookMoveAndCaptureTests() {
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    const bool white = color == Color::kWhite;
+    const std::string rank = white ? "1" : "8";
+    const std::string next_rank = white ? "2" : "7";
+    const std::string opposite_rank = white ? "8" : "1";
+    const std::string fen = white
+        ? "4k3/8/8/8/8/8/8/R2RKR1R w FD - 0 1"
+        : "r2rkr1r/8/8/8/8/8/8/4K3 b fd - 0 1";
+    for (const std::string& file : {"a", "d", "e", "f", "h"}) {
+      auto board = ChessBoard::BoardFromFEN(fen);
+      SPIEL_CHECK_TRUE(board.has_value());
+      auto move = board->ParseLANMove(file + rank + file + next_rank);
+      SPIEL_CHECK_TRUE(move.has_value());
+      board->ApplyMove(*move);
+      SPIEL_CHECK_EQ(board->CastlingRight(color, CastlingDirection::kLeft),
+                     file != "d" && file != "e");
+      SPIEL_CHECK_EQ(board->CastlingRight(color, CastlingDirection::kRight),
+                     file != "f" && file != "e");
+      CheckCastlingFENRoundTrip(*board, FenFormat::kXFen);
+      CheckCastlingFENRoundTrip(*board, FenFormat::kShredder);
+    }
+    // Capturing an inner castling rook removes its right. Capturing an outer
+    // rook without rights must leave the inner rook's right intact.
+    for (const std::string& file : {"a", "d", "f", "h"}) {
+      auto board = ChessBoard::BoardFromFEN(fen);
+      SPIEL_CHECK_TRUE(board.has_value());
+      board->set_square(*SquareFromString(file + opposite_rank),
+                        Piece{OppColor(color), PieceType::kRook});
+      board->SetToPlay(OppColor(color));
+      board = ChessBoard::BoardFromFEN(board->ToFEN(FenFormat::kXFen));
+      SPIEL_CHECK_TRUE(board.has_value());
+      auto move = board->ParseLANMove(file + opposite_rank + file + rank);
+      SPIEL_CHECK_TRUE(move.has_value());
+      board->ApplyMove(*move);
+      SPIEL_CHECK_EQ(board->CastlingRight(color, CastlingDirection::kLeft),
+                     file != "d");
+      SPIEL_CHECK_EQ(board->CastlingRight(color, CastlingDirection::kRight),
+                     file != "f");
+      CheckCastlingFENRoundTrip(*board, FenFormat::kXFen);
+      CheckCastlingFENRoundTrip(*board, FenFormat::kShredder);
+    }
+  }
+}
+
 void Chess960SerializationRootIsChanceNodeTest() {
   std::shared_ptr<const Game> game = LoadGame("chess(chess960=true)");
 
@@ -417,6 +678,13 @@ void ThreeFoldRepetitionTestWithEnPassant() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::chess::CastlingFENParsingTests();
+  open_spiel::chess::InvalidCastlingFENTests();
+  open_spiel::chess::VariantCastlingFENTests();
+  open_spiel::chess::CastlingFENSerializationTests();
+  open_spiel::chess::CastlingAfterFENRoundTripTests();
+  open_spiel::chess::OutermostCastlingRookTests();
+  open_spiel::chess::CastlingRookMoveAndCaptureTests();
   open_spiel::chess::BasicChessTests();
   open_spiel::chess::MoveGenerationTests();
   open_spiel::chess::UndoTests();

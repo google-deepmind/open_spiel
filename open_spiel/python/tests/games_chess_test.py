@@ -72,6 +72,29 @@ class GamesChessTest(parameterized.TestCase):
     print(" ".join([move.to_lan() for move in state.moves_history()]))
     self.assertTrue(state.is_terminal())
 
+  @parameterized.parameters("KQkq", "FCfc", "FQkc", "-")
+  def test_fen_formats_preserve_castling_rooks(self, rights):
+    game = pyspiel.load_game("chess(chess960=true)")
+    position = "1rr1krr1/8/8/8/8/8/8/1RR1KRR1 w "
+    state = game.new_initial_state(position + rights + " - 0 1")
+    board = state.board()
+    self.assertEqual(
+        board.to_fen(format=chess.FenFormat.STANDARD), board.to_fen()
+    )
+    self.assertEqual(board.to_fen(False), board.to_fen(shredder=False))
+    self.assertEqual(
+        board.to_fen(format=chess.FenFormat.SHREDDER), board.to_fen(True)
+    )
+    self.assertEqual(board.to_fen(True), board.to_fen(shredder=True))
+    xfen = position + rights + " - 0 1"
+    self.assertEqual(board.to_fen(chess.FenFormat.XFEN), xfen)
+    self.assertEqual(board.to_fen(format=chess.FenFormat.XFEN), xfen)
+    for encoded in (xfen, board.to_fen(shredder=True)):
+      restored = game.new_initial_state(encoded)
+      self.assertEqual(
+          restored.board().to_fen(shredder=True), board.to_fen(shredder=True)
+      )
+
   def test_state_from_fen(self):
     game = pyspiel.load_game("chess")
     fen_string = "8/k1P5/8/1K6/8/8/8/8 w - - 0 1"

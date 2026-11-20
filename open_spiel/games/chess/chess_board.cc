@@ -21,7 +21,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
-#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -450,61 +449,46 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
     return std::nullopt;
   }
 
-  // Castling rights are done differently in standard FEN versus shredder FEN.
-  // https://www.chessprogramming.org/Forsyth-Edwards_Notation#Shredder-FEN.
-  //
-  // If we have a castling right, we look for a rook in that position. In
-  // chess960 there must be a rook on either side of the king, but all 3 can
-  // otherwise be in any square. When using the standard notations ("KQkq"): if
-  // we find one rook on that side, that is used as the castling square.
-  // Otherwise we use capital letters corresponding to the file of the rook
-  // that can castle. E.g. "Hkq" would mean white can castle (which side depends
-  // on which file the white king is on), and black can castle on both sides.
-  if (castling_rights.find('K') != std::string::npos) {  // NOLINT
-    Square rook_sq =
-        board.FindRookForCastling(Color::kWhite, CastlingDirection::kRight);
-    board.SetCastlingRight(Color::kWhite, CastlingDirection::kRight, rook_sq);
-  }
-
-  if (castling_rights.find('Q') != std::string::npos) {  // NOLINT
-    Square rook_sq =
-        board.FindRookForCastling(Color::kWhite, CastlingDirection::kLeft);
-    board.SetCastlingRight(Color::kWhite, CastlingDirection::kLeft, rook_sq);
-  }
-
-  if (castling_rights.find('k') != std::string::npos) {  // NOLINT
-    Square rook_sq =
-        board.FindRookForCastling(Color::kBlack, CastlingDirection::kRight);
-    board.SetCastlingRight(Color::kBlack, CastlingDirection::kRight, rook_sq);
-  }
-
-  if (castling_rights.find('q') != std::string::npos) {  // NOLINT
-    Square rook_sq =
-        board.FindRookForCastling(Color::kBlack, CastlingDirection::kLeft);
-    board.SetCastlingRight(Color::kBlack, CastlingDirection::kLeft, rook_sq);
-  }
-
-  // Now check each character for the Shredder-based castling rights. These will
-  // be supported for regular chess but is only necessary for Chess960.
-  // Checking these here in addition to the above allows for a combination of
-  // Shredder and standard FEN notation for castling, e.g. "Gkq", which is
-  // sometimes used (see e.g. the following example):
-  // https://chess.stackexchange.com/questions/19331/how-does-x-fen-chess960-fen-differentiate-from-traditional-fen-notation
-  for (char c : castling_rights) {
-    for (Color color : {Color::kWhite, Color::kBlack}) {
-      std::string shredder_castling_files(
-          color == Color::kWhite ? kShredderWhiteCastlingFiles
-                                  : kShredderBlackCastlingFiles);
-      Square king_square = board.find(Piece{color, PieceType::kKing});
-      size_t idx = shredder_castling_files.find(c);
-      if (idx != std::string::npos) {
-        CastlingDirection direction = idx > king_square.x ?
-            CastlingDirection::kRight : CastlingDirection::kLeft;
-        Square rook_sq{static_cast<int8_t>(idx), king_square.y};
-        SPIEL_CHECK_TRUE(board.at(rook_sq).type == PieceType::kRook);
-        SPIEL_CHECK_TRUE(board.at(rook_sq).color == color);
-        board.SetCastlingRight(color, direction, rook_sq);
+  // Accept standard, X-FEN, Shredder-FEN, and mixed castling fields. In
+  // X-FEN, K/Q identify the outermost rook on that side of the king; a file
+  // letter identifies a particular rook, including an inner rook.
+  if (castling_rights.empty()) return std::nullopt;
+  if (castling_rights != "-") {
+    for (char c : castling_rights) {
+      const char lower = absl::ascii_tolower(c);
+      if (lower != 'k' && lower != 'q' && (lower < 'a' || lower > 'h')) {
+        return std::nullopt;
       }
+      const Color color = absl::ascii_isupper(c) ? Color::kWhite : Color::kBlack;
+      const Piece king{color, PieceType::kKing};
+      const Square king_square = board.find(king);
+      const int8_t back_rank = color == Color::kWhite ? 0 : board_size - 1;
+      // Only validate kings for colors claiming rights: some variants allow
+      // captured or promoted kings when there are no castling rights.
+      if (king_square == kInvalidSquare || king_square.y != back_rank ||
+          std::count(board.pieces().begin(), board.pieces().end(), king) != 1) {
+        return std::nullopt;
+      }
+      CastlingDirection direction;
+      Square rook_square;
+      if (lower == 'k' || lower == 'q') {
+        direction = lower == 'k' ? CastlingDirection::kRight
+                                : CastlingDirection::kLeft;
+        rook_square = board.FindRookForCastling(color, direction);
+        if (rook_square == kInvalidSquare) return std::nullopt;
+      } else {
+        const int8_t file = lower - 'a';
+        if (file >= board_size || file == king_square.x) return std::nullopt;
+        rook_square = Square{file, back_rank};
+        if (board.at(rook_square) != Piece{color, PieceType::kRook}) {
+          return std::nullopt;
+        }
+        direction = file > king_square.x ? CastlingDirection::kRight
+                                        : CastlingDirection::kLeft;
+      }
+      // Reject duplicate sides, including aliases and conflicting rook files.
+      if (board.CastlingRight(color, direction)) return std::nullopt;
+      board.SetCastlingRight(color, direction, rook_square);
     }
   }
 
@@ -1727,7 +1711,7 @@ std::string ChessBoard::ToUnicodeString() const {
 }
 
 char ChessBoard::ShredderCastlingRightChar(Color color,
-                                           CastlingDirection dir) const {
+                                          CastlingDirection dir) const {
   std::optional<Square> maybe_rook_sq = MaybeCastlingRookSquare(color, dir);
   if (!maybe_rook_sq.has_value()) {
     return '-';
@@ -1739,6 +1723,10 @@ char ChessBoard::ShredderCastlingRightChar(Color color,
 }
 
 std::string ChessBoard::ToFEN(bool shredder) const {
+  return ToFEN(shredder ? FenFormat::kShredder : FenFormat::kStandard);
+}
+
+std::string ChessBoard::ToFEN(FenFormat format) const {
   // Example FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
   std::string fen;
 
@@ -1773,25 +1761,21 @@ std::string ChessBoard::ToFEN(bool shredder) const {
   //    https://www.chessprogramming.org/Forsyth-Edwards_Notation#Shredder-FEN.
   absl::StrAppend(&fen, " ");
   std::string castling_rights;
-  if (CastlingRight(Color::kWhite, CastlingDirection::kRight)) {
-    castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kWhite,
-                                             CastlingDirection::kRight) : 'K');
-  }
-  if (CastlingRight(Color::kWhite, CastlingDirection::kLeft)) {
-    castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kWhite,
-                                             CastlingDirection::kLeft) : 'Q');
-  }
-  if (CastlingRight(Color::kBlack, CastlingDirection::kRight)) {
-    castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kBlack,
-                                             CastlingDirection::kRight) : 'k');
-  }
-  if (CastlingRight(Color::kBlack, CastlingDirection::kLeft)) {
-    castling_rights.push_back(
-        shredder ? ShredderCastlingRightChar(Color::kBlack,
-                                             CastlingDirection::kLeft) : 'q');
+  for (Color color : {Color::kWhite, Color::kBlack}) {
+    for (CastlingDirection direction : {CastlingDirection::kRight,
+                                       CastlingDirection::kLeft}) {
+      auto rook = MaybeCastlingRookSquare(color, direction);
+      if (!rook.has_value()) continue;
+      if (format == FenFormat::kShredder ||
+          (format == FenFormat::kXFen &&
+           *rook != FindRookForCastling(color, direction))) {
+        castling_rights.push_back(ShredderCastlingRightChar(color, direction));
+      } else {
+        char c = direction == CastlingDirection::kRight ? 'k' : 'q';
+        castling_rights.push_back(color == Color::kWhite ? absl::ascii_toupper(c)
+                                                       : c);
+      }
+    }
   }
   absl::StrAppend(&fen, castling_rights.empty() ? "-" : castling_rights);
 
@@ -1970,36 +1954,20 @@ void ChessBoard::SetCastlingRight(Color side, CastlingDirection direction,
 
 Square ChessBoard::FindRookForCastling(Color color,
                                        CastlingDirection dir) const {
-  Square my_king = find(Piece{color, PieceType::kKing});
-  Piece rook_to_find{color, PieceType::kRook};
-  int canonical_x = dir == CastlingDirection::kLeft ? 0 : (board_size_ - 1);
-  Square canonical_sq = Square{static_cast<int8_t>(canonical_x), my_king.y};
-  if (board_[SquareToIndex_(canonical_sq)] == rook_to_find) {
-    return canonical_sq;
-  } else {
-    // Find all rooks.
-    int x_offset = dir == CastlingDirection::kLeft ? -1 : 1;
-    int x = my_king.x + x_offset;
-    std::set<Square> rooks;
-    while (x < board_size_ && x >= 0) {
-      auto sq = Square{static_cast<int8_t>(x), my_king.y};
-      auto index = SquareToIndex_(sq);
-      if (board_[index] == rook_to_find) {
-        rooks.insert(sq);
-      }
-      x += x_offset;
-    }
-    // Failing here means the FEN is either from chess960 or malformed (the FEN
-    // says we have castling rights, but there is no rook on the canonical
-    // square, and more than one rook in the castling direction). This provides
-    // partial support for chess960, but not for loading a mid-game chess960
-    // position where two rooks ended up on the same side, while there's still
-    // castling right on that side (we can't determine which rook to castle
-    // with then). Solving this will require implementing a chess960-specific
-    // FEN format.
-    SPIEL_CHECK_EQ(rooks.size(), 1);
-    return *rooks.begin();
+  const Square king = find(Piece{color, PieceType::kKing});
+  const int8_t back_rank = color == Color::kWhite ? 0 : board_size_ - 1;
+  if (king == kInvalidSquare || king.y != back_rank ||
+      dir == CastlingDirection::kNone) {
+    return kInvalidSquare;
   }
+  // Search from the edge towards the king for the outermost rook (X-FEN).
+  const int step = dir == CastlingDirection::kLeft ? 1 : -1;
+  for (int x = dir == CastlingDirection::kLeft ? 0 : board_size_ - 1;
+       x != king.x; x += step) {
+    const Square square{static_cast<int8_t>(x), back_rank};
+    if (at(square) == Piece{color, PieceType::kRook}) return square;
+  }
+  return kInvalidSquare;
 }
 
 void ChessBoard::SetToPlay(Color c) {
