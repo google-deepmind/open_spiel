@@ -101,6 +101,28 @@ cc_test(
 )
 
 cc_library(
+    name = "extra_info_game",
+    srcs = ["extra_info_game.cc"],
+    hdrs = ["extra_info_game.h"],
+    alwayslink = 1,
+    deps = [
+        "//open_spiel",
+        "//open_spiel/games:all_games",
+        "//open_spiel/utils:file",
+    ],
+)
+
+cc_test(
+    name = "extra_info_game_test",
+    srcs = ["extra_info_game_test.cc"],
+    deps = [
+        ":extra_info_game",
+        "//open_spiel",
+        "//open_spiel:basic_tests",
+    ],
+)
+
+cc_library(
     name = "turn_based_simultaneous_game",
     srcs = ["turn_based_simultaneous_game.cc"],
     hdrs = ["turn_based_simultaneous_game.h"],
