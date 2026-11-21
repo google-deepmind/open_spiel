@@ -92,6 +92,9 @@ jobs:
         with:
           python-version: ${{ matrix.OS_PYTHON_VERSION }}
 
+      - name: Test build script failure handling
+        run: python3 open_spiel/scripts/build_and_run_tests_test.py
+
       - name: Ad-hoc fix
         if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
         run: |
