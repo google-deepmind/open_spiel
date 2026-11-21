@@ -532,9 +532,9 @@ fastmcp==3.3.1 \
     --hash=sha256:862440c5c4d281363a5995eee59d77f0f7cac1f18869038729cecf03b02fc522 \
     --hash=sha256:979362ea557de42a5f40342563c7e4b236bcc8e7cd192715f50030695d1a71cd
     # via -r requirements.in
-fastmcp-slim==3.3.1 \
-    --hash=sha256:0957835fc59452e143ab2f4b7836d2d2df9b2d9958408edc79ba8b56232b2a88 \
-    --hash=sha256:6cf1c2d77e3adb0d409d6825ed6b0b2a999062973e00b8eea03bd48bf9b4c043
+fastmcp-slim==3.4.10 \
+    --hash=sha256:d80ae606ead8dfefa1f21b009929824210ea87eb4b422653a1be8dca61797ccd \
+    --hash=sha256:f388941db8bdf38999e6c9d2536c4cd59a6571908d851cee2d10ee59f4e53532
     # via fastmcp
 filelock==4.2.0 \
     --hash=sha256:2ff5690882e8cdb00ef31fb3d01a3094c29f30985426c59495afb1733f3b7238 \
