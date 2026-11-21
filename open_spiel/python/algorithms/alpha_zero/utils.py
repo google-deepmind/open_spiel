@@ -14,13 +14,13 @@
 
 """Common utilities for AlphaZero."""
 
+import threading
 from typing import Any, Callable
 
 import chex
-from flax import linen
-from flax import nnx
 import jax
 import jax.numpy as jnp
+from flax import linen, nnx
 
 AVIALABLE_APIS = ["nnx", "linen"]
 
@@ -121,3 +121,23 @@ class Losses:
 
   def __truediv__(self, n) -> "Losses":
     return Losses(policy=self.policy / n, value=self.value / n, l2=self.l2 / n)
+
+class ExceptionBarrier:
+  """A barrier to proparage Exceptions through tread execution."""
+  def __init__(self) -> None:
+    self._event = threading.Event()
+    self._exc = None
+    self._lock = threading.Lock()
+
+  def signal(self, exc) -> None:
+    with self._lock:
+      if self._exc is None:
+        self._exc = exc
+        self._event.set()
+
+  def check(self) -> Exception:
+    if self._event.is_set():
+      raise self._exc
+
+  def is_set(self) -> bool:
+    return self._event.is_set()

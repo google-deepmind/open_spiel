@@ -75,6 +75,8 @@ flags.DEFINE_integer("evaluators", 2, "How many evaluators to run.")
 flags.DEFINE_integer(
     "evaluation_window", 50, "How many games to average results over."
 )
+flags.DEFINE_integer("from_checkpoint", None, "Step to continue training from.")
+
 
 flags.DEFINE_integer(
     "eval_levels",
@@ -104,6 +106,7 @@ def main(unused_argv):
       replay_buffer_reuse=FLAGS.replay_buffer_reuse,
       max_steps=FLAGS.max_steps,
       checkpoint_freq=FLAGS.checkpoint_freq,
+      pretrained_checkpoint_step=FLAGS.from_checkpoint,
       actors=FLAGS.actors,
       evaluators=FLAGS.evaluators,
       uct_c=FLAGS.uct_c,
